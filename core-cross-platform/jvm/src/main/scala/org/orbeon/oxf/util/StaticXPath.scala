@@ -38,6 +38,7 @@ import org.xml.sax.{SAXParseException, XMLReader}
 
 object StaticXPath extends StaticXPathTrait {
 
+  // TODO: Move to `SaxonUtilsTrait`?
   type SaxonConfiguration      = Configuration
   type DocumentNodeInfoType    = om.DocumentInfo
   type VirtualNodeType         = om.VirtualNode

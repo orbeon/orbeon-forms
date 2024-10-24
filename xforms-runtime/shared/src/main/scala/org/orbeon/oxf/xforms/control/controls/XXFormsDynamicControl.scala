@@ -437,7 +437,7 @@ object XXFormsDynamicControl {
   // Find whether a change occurred in a descendant of a top-level XBL binding
   def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {
 
-    if (node.getNodeKind == SaxonUtils.NamespaceType)
+    if (node.getNodeKind == SaxonUtils.NodeType.Namespace)
       None // can't find ancestors of namespace nodes with Orbeon DOM
     else {
 

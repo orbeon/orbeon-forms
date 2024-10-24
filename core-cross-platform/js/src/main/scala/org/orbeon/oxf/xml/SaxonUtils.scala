@@ -16,12 +16,11 @@ package org.orbeon.oxf.xml
 import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.util.StaticXPath.{GlobalConfiguration, SaxonConfiguration, ValueRepresentationType}
+import org.orbeon.oxf.util.StaticXPath.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.expr.parser.ExpressionTool
 import org.orbeon.saxon.expr.sort.{CodepointCollator, GenericAtomicComparer}
-import org.orbeon.saxon.expr.{EarlyEvaluationContext, Expression, FunctionCall, StringLiteral}
+import org.orbeon.saxon.expr.{EarlyEvaluationContext, Expression, StringLiteral}
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.ma.arrays.ImmutableArrayItem
 import org.orbeon.saxon.ma.map.HashTrieMap
@@ -31,7 +30,6 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.tree.iter.{EmptyIterator, ListIterator, SingletonIterator}
-import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits
 import org.w3c.dom.Node.*
@@ -42,29 +40,8 @@ import scala.util.Try
 import scala.util.control.Breaks.{break, breakable}
 
 
-object SaxonUtils {
+object SaxonUtils extends SaxonUtilsTrait {
 
-  // Version of `StringValue` which supports `equals()` (universal equality).
-  // Saxon throws on `equals()` to make a point that a collation should be used for `StringValue` comparison.
-  // Here, we don't really care about equality, but we want to implement `equals()` as e.g. Jetty calls `equals()` on
-  // objects stored into the session. See:
-  // http://forge.ow2.org/tracker/index.php?func=detail&aid=315528&group_id=168&atid=350207
-  class StringValueWithEquals(value: CharSequence) extends StringValue(value) {
-    override def equals(other: Any): Boolean = {
-      // Compare the CharSequence
-      other.isInstanceOf[StringValue] && getStringValueCS == other.asInstanceOf[StringValue].getStringValueCS
-    }
-
-    override def hashCode(): Int = value.hashCode()
-  }
-
-  def fixStringValue[V <: Item](item: V): V =
-    item match {
-      case v: StringValue => new StringValueWithEquals(v.getStringValueCS).asInstanceOf[V] // we know it's ok...
-      case v              => v
-    }
-
-  // Effective boolean value of the iterator
   def effectiveBooleanValue(iterator: SequenceIterator): Boolean =
     ExpressionTool.effectiveBooleanValue(iterator)
 
@@ -79,11 +56,6 @@ object SaxonUtils {
     }
   }
 
-  def iterateFunctions(expr: Expression, fnName: StructuredQName): Iterator[FunctionCall] =
-    iterateExpressionTree(expr) collect {
-      case fn: FunctionCall if fn.getFunctionName == fnName => fn
-    }
-
   def containsFnWithParam(expr: Expression, fnName: StructuredQName, arity: Int, oldName: String, argPos: Int): Boolean =
     iterateFunctions(expr, fnName) exists {
       case fn if fn.getArguments.size == arity =>
@@ -94,7 +66,6 @@ object SaxonUtils {
       case _ => false
     }
 
-  // Parse the given qualified name and return the separated prefix and local name
   def parseQName(lexicalQName: String): (String, String) = {
     val checker = NameChecker
     val parts   = checker.getQNameParts(lexicalQName)
@@ -102,10 +73,6 @@ object SaxonUtils {
     (parts(0), parts(1))
   }
 
-  // Make an NCName out of a non-blank string
-  // Any characters that do not belong in an NCName are converted to `_`.
-  // If `keepFirstIfPossible == true`, prepend `_` if first character is allowed within NCName and keep first character.
-  //@XPathFunction
   def makeNCName(name: String, keepFirstIfPossible: Boolean): String = {
 
     require(name.nonAllBlank, "name must not be blank or empty")
@@ -133,16 +100,7 @@ object SaxonUtils {
     }
   }
 
-  // 2020-12-05:
-  //
-  // - Called only from `XFormsVariableControl`
-  // - With Saxon 10, this will be one of :
-  //   - `SequenceExtent` reduced to `AtomicValue`, `NodeInfo`, or `Function` (unsupported yet below)
-  //   - `SequenceExtent` with more than one item
-  //   - `EmptySequence`
-  // - Also, if a sequence, it's already reduced.
-  //
-  def compareValueRepresentations(valueRepr1: GroundedValue, valueRepr2: GroundedValue): Boolean =
+  def compareValueRepresentations(valueRepr1: ValueRepresentationType, valueRepr2: ValueRepresentationType): Boolean =
     (
       // Ideally we wouldn't support `null` here but `XFormsVariableControl` can pass `null`
       if (valueRepr1 ne null) valueRepr1 else EmptySequence,
@@ -192,77 +150,26 @@ object SaxonUtils {
       case _                                                      => throw new IllegalStateException
     }
 
-  def buildNodePath(node: NodeInfo): List[String] = {
+  protected def findNodePosition(node: NodeInfo): Int = {
 
-    def findNodePosition(node: NodeInfo): Int = {
-
-      val nodeTestForSameNode =
-        node.getNodeKind match {
-          case Type.ELEMENT | Type.ATTRIBUTE | Type.PROCESSING_INSTRUCTION | Type.NAMESPACE =>
-            new NameTest(node.getNodeKind, node.getURI, node.getLocalPart, node.getConfiguration.getNamePool)
-          case _ =>
-            NodeKindTest.makeNodeKindTest(node.getNodeKind)
-        }
-
-      val precedingAxis =
-        node.iterateAxis(AxisInfo.PRECEDING_SIBLING, nodeTestForSameNode)
-
-      var i = 1
-      while (precedingAxis.next() ne null)
-        i += 1
-      i
-    }
-
-    def buildOne(node: NodeInfo): List[String] = {
-
-      def buildNameTest(node: NodeInfo) =
-        if (node.getURI == "")
-          node.getLocalPart
-        else
-          s"*:${node.getLocalPart}[namespace-uri() = '${node.getURI}']"
-
-      if (node ne null) {
-        val parent = node.getParent
-        node.getNodeKind match {
-          case Type.DOCUMENT =>
-            Nil
-          case Type.ELEMENT =>
-            if (parent eq null) {
-              List(buildNameTest(node))
-            } else {
-              val pre = buildOne(parent)
-              if (pre == Nil) {
-                buildNameTest(node) :: pre
-              } else {
-                (buildNameTest(node) + '[' + findNodePosition(node) + ']') :: pre
-              }
-            }
-          case Type.ATTRIBUTE =>
-            ("@" + buildNameTest(node)) :: buildOne(parent)
-          case Type.TEXT =>
-            ("text()[" + findNodePosition(node) + ']') :: buildOne(parent)
-          case Type.COMMENT =>
-            "comment()[" + findNodePosition(node) + ']' :: buildOne(parent)
-          case Type.PROCESSING_INSTRUCTION =>
-            ("processing-instruction()[" + findNodePosition(node) + ']') :: buildOne(parent)
-          case Type.NAMESPACE =>
-            var test = node.getLocalPart
-            if (test.isEmpty) {
-              test = "*[not(local-name()]"
-            }
-            ("namespace::" + test) :: buildOne(parent)
-          case _ =>
-            throw new IllegalArgumentException
-        }
-      } else {
-        throw new IllegalArgumentException
+    val nodeTestForSameNode =
+      node.getNodeKind match {
+        case Type.ELEMENT | Type.ATTRIBUTE | Type.PROCESSING_INSTRUCTION | Type.NAMESPACE =>
+          new NameTest(node.getNodeKind, node.getURI, node.getLocalPart, node.getConfiguration.getNamePool)
+        case _ =>
+          NodeKindTest.makeNodeKindTest(node.getNodeKind)
       }
-    }
 
-    buildOne(node).reverse
+    val precedingAxis =
+      node.iterateAxis(AxisInfo.PRECEDING_SIBLING, nodeTestForSameNode)
+
+    var i = 1
+    while (precedingAxis.next() ne null)
+      i += 1
+    i
   }
 
-  def convertJavaObjectToSaxonObject(o: Any): GroundedValue =
+  def convertJavaObjectToSaxonObject(o: Any): ValueRepresentationType =
     o match {
       case v: GroundedValue       => v
       case v: String              => new StringValue(v)
@@ -274,23 +181,8 @@ object SaxonUtils {
       case _                      => throw new OXFException(s"Invalid variable type: ${o.getClass}")
     }
 
-  // Return `true` iif `potentialAncestor` is an ancestor of `potentialDescendant`
-  def isFirstNodeAncestorOfSecondNode(
-    potentialAncestor   : NodeInfo,
-    potentialDescendant : NodeInfo,
-    includeSelf         : Boolean
-  ): Boolean = {
-    var parent = if (includeSelf) potentialDescendant else potentialDescendant.getParent
-    while (parent ne null) {
-      if (parent.isSameNodeInfo(potentialAncestor))
-        return true
-      parent = parent.getParent
-    }
-    false
-  }
-
   def deepCompare(
-    config                     : Configuration,
+    config                     : SaxonConfiguration,
     it1                        : Iterator[om.Item],
     it2                        : Iterator[om.Item],
     excludeWhitespaceTextNodes : Boolean
@@ -333,7 +225,7 @@ object SaxonUtils {
     m
   }
 
-  def newArrayItem(v: collection.Seq[GroundedValue]): Item =
+  def newArrayItem(v: collection.Seq[ValueRepresentationType]): Item =
     new ImmutableArrayItem(ImmList.fromList(v.asJava))
 
   def hasXPathNumberer(lang: String): Boolean =
@@ -345,10 +237,8 @@ object SaxonUtils {
   def isValidNmtoken(name: String): Boolean =
     NameChecker.isValidNmtoken(name)
 
-  val ChildAxisInfo: Int = AxisInfo.CHILD
-  val AttributeAxisInfo: Int = AxisInfo.ATTRIBUTE
-
-  val NamespaceType: Short = Type.NAMESPACE
+  val ChildAxisInfo: AxisType = AxisInfo.CHILD
+  val AttributeAxisInfo: AxisType = AxisInfo.ATTRIBUTE
 
   def getInternalPathForDisplayPath(namespaces: Map[String, String], path: String): String =
     throw new NotImplementedError("getInternalPathForDisplayPath")
@@ -367,7 +257,7 @@ object SaxonUtils {
         return QName(parts(1)).some
 
       // There is a prefix, resolve it
-      val namespaceNodes = elem.iterateAxis(StaticXPath.NamespaceAxisType)
+      val namespaceNodes = elem.iterateAxis(NamespaceAxisType)
       breakable {
         while (true) {
           val currentNamespaceNode = namespaceNodes.next()
@@ -391,7 +281,6 @@ object SaxonUtils {
     Try(Converter.convert(value, targetType, config.getConversionRules)).toOption
   }
 
-  // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
   def createFingerprintedPath(node: om.NodeInfo): String = {
 
     // Create an immutable list with ancestor-or-self nodes up to but not including the document node

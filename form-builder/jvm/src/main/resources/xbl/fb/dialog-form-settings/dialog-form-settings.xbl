@@ -923,7 +923,7 @@
                                             ref="$description-opt"
                                             class="alert fr-form-description">
 
-                                            <xf:switch caseref="starts-with(., '&lt;div&gt;')">
+                                            <xf:switch caseref="starts-with(., '&lt;div')">
                                                 <xf:case value="true()">
                                                     <xf:output mediatype="text/html" value="."/>
                                                 </xf:case>

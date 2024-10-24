@@ -76,7 +76,7 @@ trait FormRunnerSummary {
   def maybeFilterHtml(htmlString: String): String =
     htmlString
       .trimAllToOpt
-      .filter(_.startsWith("<div>"))
+      .filter(_.startsWith("<div")) // heuristic; don't close `<div>` so that it works if there are attributes
       .map(HtmlParsing.sanitizeHtmlString(_, ElemNamesToFilterOut))
       .getOrElse(htmlString)
 

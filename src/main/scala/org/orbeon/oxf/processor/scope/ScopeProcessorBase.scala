@@ -17,10 +17,10 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{CacheableInputReader, ProcessorImpl, ProcessorInput, ProcessorUtils}
+import org.orbeon.oxf.util.ContentTypes.PlainTextContentType
 
 object ScopeProcessorBase {
 
-  val TextPlain               = "text/plain"
   val ScopeConfigNamespaceUri = "http://orbeon.org/oxf/schemas/scope-config"
 
   case class ContextConfig(
@@ -38,7 +38,7 @@ object ScopeProcessorBase {
 
 abstract class ScopeProcessorBase extends ProcessorImpl {
 
-  import ScopeProcessorBase._
+  import ScopeProcessorBase.*
 
   protected def readConfig(context: PipelineContext): ContextConfig =
     readCacheInputAsObject(
@@ -66,7 +66,7 @@ abstract class ScopeProcessorBase extends ProcessorImpl {
             else
               ExternalContext.SessionScope.Local,
             rootElement.element("key").getStringValue,
-            contentTypeElementOpt map (_.getStringValue) contains TextPlain,
+            contentTypeElementOpt map (_.getStringValue) contains PlainTextContentType,
             ProcessorUtils.selectBooleanValue(rootElement, "/*/test-ignore-stored-key-validity", false)
           )
         }

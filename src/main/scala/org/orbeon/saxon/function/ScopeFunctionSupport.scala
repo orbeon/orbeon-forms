@@ -15,15 +15,18 @@ package org.orbeon.saxon.function
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.scope.ScopeGenerator
+import org.orbeon.oxf.util.ContentTypes.PlainTextContentType
 import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.saxon.`type`.ExternalObjectType
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.*
-import org.orbeon.saxon.value.{AtomicValue, StringValue}
+import org.orbeon.saxon.om
+import org.orbeon.saxon.value.{AtomicValue, ObjectValue, StringValue}
+
 
 object ScopeFunctionSupport {
 
-  def storeAttribute(put: (String, AnyRef) => Any, attributeName: String, item: Item): Unit = {
+  def storeAttribute(put: (String, AnyRef) => Any, attributeName: String, item: om.Item): Unit = {
     if (item eq null) {
       // Clear value
       // TODO: Shouldn't this use `remove()`?
@@ -37,7 +40,7 @@ object ScopeFunctionSupport {
         item match {
           case v: StringValue => new StringValueWithEquals(v.getStringValueCS)
           case v: AtomicValue => v
-          case v: NodeInfo    => TransformerUtils.tinyTreeToSAXStore(v)
+          case v: om.NodeInfo => TransformerUtils.tinyTreeToSAXStore(v)
           case _ => throw new OXFException(s"xxf:set-*-attribute() does not support storing objects of type: ${item.getClass.getName}")
         }
       // Store value
@@ -47,21 +50,30 @@ object ScopeFunctionSupport {
   }
 
   def convertAttributeValue(
-    valueOpt        : Option[Any],
-    contentTypeOpt  : Option[String],
-    keyForLogging   : String)(implicit
-    xpathContext    : XPathContext
-  ): SequenceIterator =
+    valueOpt      : Option[Any],
+    contentTypeOpt: Option[String],
+    keyForLogging : String
+  )(implicit
+    xpathContext  : XPathContext
+  ): om.SequenceIterator =
     valueOpt match {
-      case Some(v: Item) =>
+      case Some(v: om.Item) =>
         // NOTE: This can be a `StringValueWithEquals`
-        SingletonIterator.makeIterator(v)
+        om.SingletonIterator.makeIterator(v)
+      case Some(v: String) if contentTypeOpt.contains(PlainTextContentType) =>
+        StringValue.makeStringValue(v).iterate()
+      case Some(_) if contentTypeOpt.contains(PlainTextContentType) =>
+        om.EmptyIterator.getInstance
       case Some(v) =>
-        val saxStore = ScopeGenerator.getSAXStore(v, contentTypeOpt.orNull, keyForLogging)
-        // Convert to DocumentInfo
-        val documentInfo = TransformerUtils.saxStoreToTinyTree(xpathContext.getConfiguration, saxStore)
-        SingletonIterator.makeIterator(documentInfo)
+        om.SingletonIterator.makeIterator(
+          Option(ScopeGenerator.getSAXStoreOrNull(v)) match {
+            case Some(saxStore) =>
+              TransformerUtils.saxStoreToTinyTree(xpathContext.getConfiguration, saxStore)
+            case None =>
+              new ObjectValue(v, new ExternalObjectType(v.getClass, xpathContext.getConfiguration))
+          }
+        )
       case None =>
-        EmptyIterator.getInstance
+        om.EmptyIterator.getInstance
     }
 }

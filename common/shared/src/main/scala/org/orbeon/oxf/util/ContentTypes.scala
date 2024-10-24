@@ -17,6 +17,7 @@ import org.orbeon.oxf.util.StringUtils.*
 
 object ContentTypes {
 
+  val PlainTextContentType        = "text/plain"
   val XmlContentType              = "application/xml"
   val XmlTextContentType          = "text/xml"
   val JsonContentType             = "application/json"

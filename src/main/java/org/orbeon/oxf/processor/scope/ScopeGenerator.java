@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
+import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 import org.xml.sax.SAXException;
@@ -92,7 +93,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 // Just get SAXStore from ScopeStore
                                 state.saxStore = contextStore.getSaxStore();
                             } else {
-                                state.saxStore = getSAXStore(value, config.isTextPlain() ? ScopeProcessorBase.TextPlain() : null, config.key());
+                                state.saxStore = getSAXStore(value, config.isTextPlain() ? ContentTypes.PlainTextContentType() : null, config.key());
                             }
                         } else {
                             // Store empty document
@@ -120,23 +121,29 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     public static SAXStore getSAXStore(Object value, String contentType, String key) throws SAXException {
-        if (ScopeProcessorBase.TextPlain().equals(contentType)) {
+        if (ContentTypes.PlainTextContentType().equals(contentType)) {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
                 // Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
                 BinaryTextSupport.readText((String) value, result, contentType, System.currentTimeMillis());
             } else {
-                logger.error("Content-type: " + ScopeProcessorBase.TextPlain() + " not applicable for key: " + key);
+                logger.error("Content-type: " + ContentTypes.PlainTextContentType() + " not applicable for key: " + key);
                 SAXUtils.streamNullDocument(result);
             }
             return result;
         } else {
-            return getSAXStore(value);
+            final SAXStore result = getSAXStoreOrNull(value);
+            if (result == null) {
+                throw new OXFException("Unknown value type: " + value.getClass().getName());
+            } else {
+                return result;
+            }
         }
     }
 
-    private static SAXStore getSAXStore(Object value) {
+    public static SAXStore getSAXStoreOrNull(Object value) {
         final SAXStore resultStore;
+
         if (value instanceof ScopeStore) {
             final ScopeStore contextStore = (ScopeStore) value;
             resultStore = contextStore.getSaxStore();
@@ -145,21 +152,23 @@ public class ScopeGenerator extends ScopeProcessorBase {
                 resultStore = (SAXStore) value;
             } else {
                 // Write "foreign" object to new SAX store
-                resultStore = new SAXStore();
                 if (value instanceof Document) {
                     // Orbeon DOM document
+                    resultStore = new SAXStore();
                     final LocationSAXWriter saxWriter = new LocationSAXWriter();
                     saxWriter.setContentHandler(resultStore);
                     saxWriter.setLexicalHandler(resultStore);
                     saxWriter.write((Document) value);
                 } else if (value instanceof org.w3c.dom.Document) {
                     // W3C DOM document
+                    resultStore = new SAXStore();
                     TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) value), resultStore);
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse
+                    resultStore = new SAXStore();
                     XMLParsing.stringToSAX((String) value, "", resultStore, ParserConfiguration.Plain(), true);
                 } else {
-                    throw new OXFException("Unknown value type: " + value.getClass().getName());
+                    resultStore = null;
                 }
             }
         }

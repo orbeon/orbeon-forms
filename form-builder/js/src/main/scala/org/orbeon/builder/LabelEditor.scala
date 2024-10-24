@@ -83,7 +83,7 @@ object LabelEditor {
           $(".fb-main").append(labelInput)
           labelInput.get().foreach(_.addEventListener("blur", (_: dom.Event) => { if (labelInput.is(":visible")) sendNewLabelValue() }))
           labelInput.get().foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
-            if (e.keyCode == 13) {
+            if (e.code == "Enter") {
               // Avoid "enter" from being dispatched to other control that might get the focus
               e.preventDefault()
               sendNewLabelValue()

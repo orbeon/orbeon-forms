@@ -52,6 +52,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames.XFORMS_VAR_QNAME
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
@@ -1099,12 +1100,13 @@ object FormBuilderXPathApi {
     newName     : String
   ): Boolean =
     if (elemOrAtt.stringValue.trimAllToOpt.nonEmpty)
-      Try(
+      Try {
+        implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
         FormRunnerRename.findUnresolvedVariableReferences(
           elemOrAtt      = elemOrAtt,
           avt            = avt,
           validBindNames = (
-            FormBuilder.iterateNamesInUseCtx(FormBuilderDocContext())
+            FormBuilder.iterateNamesInUseCtx
               .filterNot(_ == originalName)
               ++
               Iterator(
@@ -1112,9 +1114,12 @@ object FormBuilderXPathApi {
                 "form-resources", // Issue #5909
                 "fr-mode"         // Issue #6220
               )
+              ++ (                // Issue #6145
+                ctx.modelElem / XFORMS_VAR_QNAME attValue "name"
+              )
           ).toSet
         )
-      ) match {
+      } match {
         case Success(it) if it.nonEmpty => true
         case Success(_)                 => false
         case Failure(_)                 => false // The user expression can be incorrect in the UI. We ignore it

@@ -33,8 +33,7 @@ object Upload {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
 
-  private val ListenerSuffix = ".orbeon.upload"
-  private val ClickEvent     = s"click$ListenerSuffix"
+  private val ClickEvent     = s"click"
 
   logger.debug("init object")
 

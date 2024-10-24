@@ -34,8 +34,7 @@ object LaddaButton {
   }
 
   val ComponentName  = "ladda-button"
-  val ListenerSuffix = s".orbeon-$ComponentName"
-  val ClickEventName = s"click$ListenerSuffix"
+  val ClickEventName = s"click"
 
   XBL.declareCompanion(s"fr|$ComponentName", js.constructorOf[LaddaButtonCompanion])
 

@@ -33,7 +33,6 @@ import scala.scalajs.js.{Promise, UndefOr, |}
 object Time {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Time")
-  private val ListenerSuffix = ".time"
 
   XBL.declareCompanion("fr|time", js.constructorOf[TimeCompanion])
 

@@ -79,28 +79,27 @@ object ControlLabelHintTextEditor {
       document.addEventListener("focusin", clickOrFocus _, useCapture = true)
 
       // Click on label/hint
-      document.addEventListener(DomEventNames.Click, (event: dom.Event) =>
-        if (event.target.asInstanceOf[dom.Element].matches(LabelHintSelector)) {
+      document.addEventListener(DomEventNames.Click, (event: dom.Event) => {
+        val labelHint = event.target.asInstanceOf[dom.Element].closest(LabelHintSelector)
+        if (labelHint != null) {
           // Close current editor, if there is one open
           resourceEditorEndEdit()
-          resourceEditorCurrentLabelHint = $(event.currentTarget)
+          resourceEditorCurrentLabelHint = $(labelHint)
           // Find control for this label
           val th = resourceEditorCurrentLabelHint.parents(".fr-grid-th")
           resourceEditorCurrentControlOpt =
             Some(
-              if (th.is("*")) {
+              if (th.is("*"))
                 // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
                 resourceEditorCurrentLabelHint
-              } else {
-                val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray
-                val controls    = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray
-                val parents     = $(explanation ++ controls)
-                parents.first()
-              }
+              else
+                Option(labelHint.closest(ExplanationSelector))
+                  .getOrElse(labelHint.closest(ControlSelector))
+                  .pipe($(_))
             )
           resourceEditorStartEdit(resourceEditorCurrentLabelHint)
         }
-      )
+      })
 
       // New control added
       controlAdded.add((containerId: String) => {

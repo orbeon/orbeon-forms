@@ -29,18 +29,18 @@ object DialogItemset {
       label.trimAllToOpt map (_.replaceAll("""\s+""", "-").toLowerCase)
 
     // Automatically set a corresponding value when the user changes a label
-    dom.document.addEventListener("change", (event: dom.Event) =>
-      if (event.target.asInstanceOf[dom.Element].matches(LabelInputSelector)) {
-
-        val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input").get(0).get.asInstanceOf[html.Element]
-        val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input").get(0).get.asInstanceOf[html.Element]
-
+    dom.document.addEventListener("change", (event: dom.Event) => {
+      val labelInput =
+        event.target                .asInstanceOf[html.Element]
+        .closest(LabelInputSelector).asInstanceOf[html.Element]
+      if (labelInput != null) {
+        val valueXFormsInput = $(labelInput).closest(".fr-grid-tr").find(".fb-itemset-value-input").get(0).get.asInstanceOf[html.Element]
         if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isAllBlank)) {
-          DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue =>
+          DocumentAPI.getValue(labelInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue =>
             DocumentAPI.setValue(valueXFormsInput, suggestedValue)
           }
         }
       }
-    )
+    })
   }
 }

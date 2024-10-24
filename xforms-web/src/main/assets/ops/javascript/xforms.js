@@ -1822,7 +1822,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "DOMActivate");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
 
-                    if ($(controlTarget).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
+                    if (controlTarget.closest(".xforms-trigger-appearance-modal, .xforms-submit-appearance-modal") != null) {
                         ORBEON.xforms.XFormsUi.displayModalProgressPanel();
                     }
                     handled = true;

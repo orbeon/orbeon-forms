@@ -10,13 +10,22 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 //
-//@import (reference) "form-runner-common";
+@import (reference) "form-runner-common";
 
 html {
     font-size: 13px; // Bootstrap 5 keeps the 16px browser default
 }
 
 .orbeon {
+
+    .fr-mode-landing {
+        .row {
+            justify-content: space-evenly;
+            & > * {
+                max-width: 400px;
+            }
+        }
+    }
 
     .fr-config-check {
         margin-top: 1rem;
@@ -27,9 +36,21 @@ html {
         &:hover {
             text-decoration: underline;
         }
+
+        &:focus {
+            outline: 0;
+
+            &:focus-visible > figure {
+                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                .focusDecorations();
+            }
+        }
     }
 
     .card .list-group-item {
+        &:has(a:focus-visible) {
+            box-shadow: 0 0 0 0.2rem inset @focusHighlightColor;
+        }
         &:hover {
             background-color: @frRowHoverBackground;
             filter: brightness(0.95);
@@ -55,9 +76,25 @@ html {
         border-left: 40px solid transparent;
     }
 
+    .card {
+        figure {
+            margin-bottom: .5rem;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            border-radius: 10px;
+        }
+        figcaption {
+            color: var(--bs-body-color);
+            font-weight: 500;
+            margin: 0 0 .5em;
+        }
+    }
+
     .img-thumbnail {
-        padding: 2rem;
+        padding: 15%;
         border: none;
+        border-top-left-radius: 10px; // avoid stepping over enclosing border
+        border-top-right-radius: 10px;
+        opacity: .8;
 
         &:hover {
             padding: 1rem;

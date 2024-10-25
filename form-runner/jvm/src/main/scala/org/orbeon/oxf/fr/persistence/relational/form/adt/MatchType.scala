@@ -86,8 +86,18 @@ object MatchType {
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
       (formValue, queryValue) match {
         case (formValues: OperationsList, queryValues: OperationsList) =>
-          val lowerCaseFormValues = formValues.ops.map(_.toLowerCase)
-          queryValues.ops.forall(value => lowerCaseFormValues.contains(value.toLowerCase))
+          // e.g. "admin *", "admin create", or "update delete list"
+          val formValueSet = formValues.ops.map(_.toLowerCase).toSet
+
+          // All operations can be matched with a wildcard except "admin"
+          val operationsThatCanMatchWildcard = Set("create", "read", "update", "delete", "list")
+
+          queryValues.ops.map(_.toLowerCase).forall { queryValue =>
+            if (operationsThatCanMatchWildcard.contains(queryValue))
+              formValueSet.contains("*") || formValueSet.contains(queryValue)
+            else
+              formValueSet.contains(queryValue)
+          }
 
         case _ =>
           throwInvalidType(metadata)

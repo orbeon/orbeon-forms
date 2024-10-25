@@ -309,6 +309,7 @@ object Provider extends Enum[Provider] {
         |       WHERE $tableAlias.app          = '${escapeSQL(appForm.app)}'
         |         AND $tableAlias.form         = '${escapeSQL(appForm.form)}'
         |         AND $tableAlias.form_version = $version
+        |         AND $tableAlias.draft        = 'N'
         |""".stripMargin
   }
 

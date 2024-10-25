@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:my-test="java:org.orbeon.oxf.fr.MyTest" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xh:title>`xxf:get-session-attribute()` to support returning a Java object #6564</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1><control-1/></grid-1>
+
+                    </section-1>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="control-1-bind" ref="control-1" name="control-1" calculate="my-test:value(xxf:get-request-attribute('my-attribute'))" readonly="false()"/></xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6564</form-name>
+                    <title xml:lang="en">`xxf:get-session-attribute()` to support returning a Java object #6564</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+
+                        <orbeon>3</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"}],"topLevel":true}]}</migration></metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><control-1><label/><hint/></control-1>
+                        <section-1>
+                            <label/>
+                        </section-1>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6"><xf:output id="control-1-control" bind="control-1-bind">
+                        <xf:label ref="$form-resources/control-1/label"/>
+                        <xf:hint ref="$form-resources/control-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:output>
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

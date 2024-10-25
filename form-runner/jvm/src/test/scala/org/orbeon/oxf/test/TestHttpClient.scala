@@ -15,10 +15,10 @@ package org.orbeon.oxf.test
 
 import org.orbeon.connection.StreamedContent
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.*
-import org.orbeon.oxf.http.Headers.*
+import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.pipeline.InitUtils.*
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 import java.util.Locale
 import java.{util, util as ju}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters.*
 
 
 // HttpClient which simulates a call to Orbeon Forms without using a servlet. This acts as if the caller
@@ -73,7 +74,8 @@ object TestHttpClient {
     method      : HttpMethod,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent],
-    credentials : Option[Credentials] = None
+    credentials : Option[Credentials] = None,
+    attributes  : Map[String, AnyRef] = Map.empty
   ): (ProcessorService, HttpResponse, Option[Session], List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
@@ -110,7 +112,7 @@ object TestHttpClient {
           val baseRequest = new RequestAdapter {
 
             override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
-            override val getAttributesMap                        = ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef]())
+            override val getAttributesMap                        = ju.Collections.synchronizedMap(attributes.asJava)
             override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
 
             override val getContainerType                        = "servlet"

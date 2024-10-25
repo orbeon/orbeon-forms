@@ -23,6 +23,8 @@ import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
+import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.{XS_ANYURI_QNAME, XS_BOOLEAN_QNAME, XS_STRING_QNAME}
@@ -38,6 +40,7 @@ import scala.jdk.CollectionConverters.*
 class FormRunnerFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
+     with FormRunnerSupport
      with AnyFunSpecLike {
 
   private val Logger = LoggerFactory.createLogger(classOf[FormRunnerFunctionsTest])
@@ -716,4 +719,30 @@ class FormRunnerFunctionsTest
       assert(result == expected)
     }
   }
+
+  describe("#6564: `xxf:get-session-attribute()` to support returning a Java object") {
+
+    val (processorService, docOpt, _) =
+      runFormRunner(
+        "issue",
+        "6564",
+        "new",
+        initialize = true,
+        attributes = Map("my-attribute" -> MyTest("my-value")) // see `MyTest` case class below
+      )
+
+    // Before fix for #6544, this throws as the document initialization fails
+    val doc = docOpt.get
+
+    it("must have evaluated the value") {
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, doc) {
+          assert(resolveObject[XFormsValueControl]("control-1-control").get.getValue(EventCollector.Throw) == "my-value")
+        }
+      }
+    }
+  }
 }
+
+// Class for test above
+case class MyTest(value: String)

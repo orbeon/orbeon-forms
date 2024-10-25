@@ -68,7 +68,8 @@ trait FormRunnerSupport extends DocumentTestBase {
     document    : String  = "", // not used yet
     query       : IterableOnce[(String, String)] = Nil,
     initialize  : Boolean = true,
-    content     : Option[StreamedContent] = None
+    content     : Option[StreamedContent] = None,
+    attributes  : Map[String, AnyRef]     = Map.empty
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
     val (processorService, response, _, events) =
@@ -76,7 +77,8 @@ trait FormRunnerSupport extends DocumentTestBase {
         url         = PathUtils.recombineQuery(s"/fr/$app/$form/$mode", query),
         method      = if (content.isDefined) POST else GET,
         headers     = Map.empty,
-        content     = content
+        content     = content,
+        attributes  = attributes
       )
 
     val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)

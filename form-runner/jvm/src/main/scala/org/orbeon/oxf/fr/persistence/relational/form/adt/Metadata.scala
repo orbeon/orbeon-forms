@@ -107,14 +107,14 @@ object Metadata {
       case FormDefinitionVersion.Specific(version) => version.toString
     }
 
-    override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThan, Exact)
+    override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThanOrEqual, LowerThan, Exact)
   }
 
   trait InstantMetadata extends Metadata[Instant] with MultiValueSupport[Instant] {
     override def valueFromString(string: String): Instant = RelationalUtils.instantFromString(string)
     override def valueAsString(value : Instant): String   = value.toString
 
-    override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThan, Exact)
+    override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThanOrEqual, LowerThan, Exact)
 
     override def min(values: List[Instant]): Option[Instant] =
       values match {

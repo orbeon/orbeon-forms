@@ -13,8 +13,8 @@ import org.scalatest.funspec.AnyFunSpecLike
 class FormRunnerButtonsTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with AnyFunSpecLike
-     with FormRunnerSupport {
+     with FormRunnerSupport
+     with AnyFunSpecLike {
 
   describe("Form Runner buttons") {
 

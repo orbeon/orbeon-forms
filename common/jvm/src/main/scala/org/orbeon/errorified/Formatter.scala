@@ -12,7 +12,7 @@ trait Formatter {
     def getThrowableMessage(t: Throwable): Option[String] = Option(t.getMessage)
     def getAllLocationData(t: Throwable): List[SourceLocation] = Nil
 
-    private lazy val OuterHr      = "+" + '-' * (Width - 2) + '+'
+    private lazy val OuterHr      = "+" + "-" * (Width - 2) + "+"
     private lazy val InnerHr      = withBorder("-" * (Width - 2))
     private lazy val InnerHrLight = withBorder("·" * (Width - 2))
     private lazy val ScissorsHr   = withBorder("---8<-----" * ((Width - 2 + 9) / 10), Width)

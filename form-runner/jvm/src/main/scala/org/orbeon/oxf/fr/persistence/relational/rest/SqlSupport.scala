@@ -68,6 +68,7 @@ object SqlSupport {
 
   def insertCols(
     req                    : CrudRequest,
+    reqBodyOpt             : Option[RequestReader.Body],
     delete                 : Boolean,
     versionToSet           : Int,
     currentTimestamp       : Timestamp,
@@ -89,7 +90,7 @@ object SqlSupport {
 
     val (xmlOpt, metadataOpt) =
       if (! delete && ! req.forAttachment) {
-        RequestReader.dataAndMetadataAsString(req.provider, metadata = !req.forData)
+        RequestReader.dataAndMetadataAsString(reqBodyOpt, req.provider, metadata = !req.forData)
       } else {
         (None, None)
       }
@@ -198,7 +199,7 @@ object SqlSupport {
           name          = "file_content",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setBytes, RequestReader.bytes.orNull)
+            paramSetter = param(_.setBytes, RequestReader.bytes(reqBodyOpt).orNull)
           )
         )
     ) ::: (

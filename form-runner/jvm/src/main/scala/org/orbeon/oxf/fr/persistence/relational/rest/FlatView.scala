@@ -60,6 +60,7 @@ private object FlatView {
   // - https://github.com/orbeon/orbeon-forms/issues/1571
   def createFlatViews(
     req                : CrudRequest,
+    reqBodyOpt         : Option[RequestReader.Body],
     version            : Int,
     connection         : Connection,
     fullyQualifiedNames: Boolean,
@@ -67,7 +68,7 @@ private object FlatView {
   )(implicit
     externalContext    : ExternalContext
   ): Unit =
-    RequestReader.xmlDocument.foreach { documentInfo =>
+    RequestReader.xmlDocument(reqBodyOpt).foreach { documentInfo =>
       createFlatViewsForDocument(req, version, connection, documentInfo, fullyQualifiedNames, maxIdentifierLength)
     }
 

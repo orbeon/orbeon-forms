@@ -35,7 +35,7 @@ import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
 
-import java.io.{ByteArrayOutputStream, InputStream, Writer}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array as _, *}
 import java.time.Instant
 import javax.xml.transform.OutputKeys
@@ -49,6 +49,10 @@ object RequestReader {
     private val IdQName = JXQName("id")
     def unapply(atts: Atts): Option[String] = atts.atts collectFirst { case (IdQName, value) => value }
   }
+
+  sealed trait                                       Body
+  case class Cached   (bytes  : Array[Byte]) extends Body
+  case class Streamed (stream : InputStream) extends Body
 
   // See https://github.com/orbeon/orbeon-forms/issues/2385
   private val MetadataElementsToKeep = Set(
@@ -72,18 +76,29 @@ object RequestReader {
       case _  => false
     }
 
-  def requestInputStream(implicit externalContext: ExternalContext): Option[InputStream] =
-    Option(externalContext.getRequest.getInputStream).filter(_ != EmptyInputStream)
-
-  def bytes(implicit externalContext: ExternalContext): Option[Array[Byte]] =
-    requestInputStream.map { is =>
-      val os = new ByteArrayOutputStream
-      IOUtils.copyStreamAndClose(is, os)
-      os.toByteArray
+  private def requestInputStream(bodyOpt: Option[Body]): Option[InputStream] =
+    bodyOpt.map {
+      case Cached(bytes) => new ByteArrayInputStream(bytes)
+      case Streamed(is)  => is
     }
 
-  def dataAndMetadataAsString(provider: Provider, metadata: Boolean)(implicit externalContext: ExternalContext): (Option[String], Option[String]) =
-    requestInputStream.map { is =>
+  def bytes(bodyOpt: Option[Body]): Option[Array[Byte]] =
+    bodyOpt.map {
+      case Cached(bytes) => bytes
+      case Streamed(is)  =>
+        val os = new ByteArrayOutputStream
+        IOUtils.copyStreamAndClose(is, os)
+        os.toByteArray
+    }
+
+  // Used by FlatView
+  def xmlDocument(bodyOpt: Option[Body]): Option[DocumentInfo] =
+    requestInputStream(bodyOpt).map { is =>
+      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, "", false, false)
+    }
+
+  def dataAndMetadataAsString(bodyOpt: Option[Body], provider: Provider, metadata: Boolean): (Option[String], Option[String]) =
+    requestInputStream(bodyOpt).map { is =>
       val (data, metadataOpt) = dataAndMetadataAsString(provider, is, metadata)
       (Some(data), metadataOpt)
     }.getOrElse {
@@ -157,12 +172,6 @@ object RequestReader {
 
     (dataWriter.result, metadataWriterAndReceiver map (_._1.result))
   }
-
-  // Used by FlatView
-  def xmlDocument(implicit externalContext: ExternalContext): Option[DocumentInfo] =
-    requestInputStream.map { is =>
-      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, "", false, false)
-    }
 }
 
 trait CreateUpdateDelete {
@@ -177,6 +186,7 @@ trait CreateUpdateDelete {
   private def store(
     connection     : Connection,
     req            : CrudRequest,
+    reqBodyOpt     : Option[RequestReader.Body],
     delete         : Boolean,
     versionToSet   : Int
   )(implicit
@@ -320,7 +330,7 @@ trait CreateUpdateDelete {
 
       val currentTimestamp = new Timestamp(System.currentTimeMillis())
 
-      val includedCols = insertCols(req, delete, versionToSet, currentTimestamp, currentUserOrganization(connection, req))
+      val includedCols = insertCols(req, reqBodyOpt, delete, versionToSet, currentTimestamp, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols
@@ -368,10 +378,32 @@ trait CreateUpdateDelete {
     if (req.forForm)
       PersistenceMetadataSupport.maybeInvalidateCachesFor(req.appForm, versionToSet)
 
+    val createFlatView: Boolean =
+      req.flatView                                      &&
+      Provider.FlatViewSupportedProviders(req.provider) &&
+      req.forForm                                       &&
+      ! req.forAttachment                               &&
+      ! delete                                          &&
+      req.appForm.form != Names.LibraryFormName
+
+    // Cache the request content if we need it for multiple reads
+    val reqBodyOpt: Option[RequestReader.Body] = {
+      val inputStreamOpt = Some(externalContext.getRequest.getInputStream).filter(_ != EmptyInputStream)
+      inputStreamOpt.map { is =>
+        if (createFlatView) {
+          val os = new ByteArrayOutputStream
+          IOUtils.copyStreamAndClose(is, os)
+          RequestReader.Cached(os.toByteArray)
+        } else {
+          RequestReader.Streamed(is)
+        }
+      }
+    }
+
     RelationalUtils.withConnection { connection =>
 
       // Update database
-      val lastModifiedOpt = store(connection, req, delete, versionToSet)
+      val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
 
       debug("CRUD: database updated, before commit", List("version" -> versionToSet.toString))
 
@@ -399,29 +431,23 @@ trait CreateUpdateDelete {
         }
 
         // Create flat view if needed
-        if (
-          req.flatView                                      &&
-          Provider.FlatViewSupportedProviders(req.provider) &&
-          req.forForm                                       &&
-          ! req.forAttachment                               &&
-          ! delete                                          &&
-          req.appForm.form != Names.LibraryFormName
-        ) withDebug("CRUD: creating flat view") {
+        if (createFlatView)
+          withDebug("CRUD: creating flat view") {
 
-          val fullyQualifiedNames = FormRunner.providerPropertyAsBoolean(
-            req.provider.entryName,
-            "flat-view.fully-qualified-names",
-            default = true
-          )
+            val fullyQualifiedNames = FormRunner.providerPropertyAsBoolean(
+              req.provider.entryName,
+              "flat-view.fully-qualified-names",
+              default = true
+            )
 
-          val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
-            req.provider.entryName,
-            "flat-view.max-identifier-length",
-            default = FlatView.CompatibilityMaxIdentifierLength
-          )
+            val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
+              req.provider.entryName,
+              "flat-view.max-identifier-length",
+              default = FlatView.CompatibilityMaxIdentifierLength
+            )
 
-          FlatView.createFlatViews(req, versionToSet, connection, fullyQualifiedNames, maxIdentifierLength)
-        }
+            FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, fullyQualifiedNames, maxIdentifierLength)
+          }
       }
 
       val httpResponse = externalContext.getResponse

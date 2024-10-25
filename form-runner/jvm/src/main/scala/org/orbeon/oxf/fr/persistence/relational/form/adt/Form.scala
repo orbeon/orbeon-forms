@@ -51,7 +51,7 @@ case class FormMetadata(
     val createdXml           = <created>{created}</created>
     val titleXml             = title.map { case (lang, title) => <title xml:lang={lang}>{title}</title> }
     val availabilityXml      = <available>{available}</available>
-    val permissionsXmlOpt    = permissionsOpt.map(nodeInfoToElem)
+    val permissionsXmlOpt    = permissionsOpt.map(nodeInfoToElem).map(Form.elemWithoutScope)
 
     // 2024-07-23: I thought that it might not be necessary to include in the response the `<permissions>` element,
     // since we compute here the required `operations` attribute. However, the Search API, as well as the persistence
@@ -225,4 +225,13 @@ object Form {
     }
     xml.Elem(None.orNull, name, attributes, xml.TopScope, minimizeEmpty = true, Seq(xml.Text(value)) *)
   }
+
+  def elemWithoutScope(elem: xml.Elem): xml.Elem =
+    elem.copy(
+      scope = xml.TopScope,
+      child = elem.child.map {
+        case e: xml.Elem => elemWithoutScope(e)
+        case node        => node
+      }
+    )
 }

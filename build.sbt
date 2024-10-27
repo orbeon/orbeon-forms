@@ -178,7 +178,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 lazy val scala213 = "2.13.15"
-lazy val scala3   = "3.5.1"
+lazy val scala3   = "3.5.2"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala213)
 

@@ -37,6 +37,10 @@ object Pagination {
     val pageNumberOpt = xml.attValueOpt("page-number").map(_.toInt)
     val pageSizeOpt   = xml.attValueOpt("page-size")  .map(_.toInt)
 
+    if (pageNumberOpt.exists(_ < 1) || pageSizeOpt.exists(_ < 1)) {
+      throw new IllegalArgumentException("Page number/size must be at least 1")
+    }
+
     // Use same defaults as in search API
     Pagination(
       pageNumber = pageNumberOpt.getOrElse(1),

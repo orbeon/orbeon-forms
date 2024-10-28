@@ -937,6 +937,12 @@ class FormMetadataApiTest
           pageSize                   = 1,
           expectedPaginatedFormNames = Seq("test-form-4")
         )
+
+        // Incorrect page number and page size
+        assertPagination(pageNumber =  0, pageSize =  1, expectedStatusCode = StatusCode.BadRequest)
+        assertPagination(pageNumber = -1, pageSize =  1, expectedStatusCode = StatusCode.BadRequest)
+        assertPagination(pageNumber =  1, pageSize =  0, expectedStatusCode = StatusCode.BadRequest)
+        assertPagination(pageNumber =  1, pageSize = -1, expectedStatusCode = StatusCode.BadRequest)
       }
     }
 

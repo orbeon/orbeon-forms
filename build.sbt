@@ -173,9 +173,11 @@ val copyDependenciesToExplodedWar  = taskKey[Unit]("Copy managed library JAR fil
 val fastOptJSToLocalResources      = taskKey[Unit]("Copy fast-optimized JavaScript files to local resources.")
 val fullOptJSToLocalResources      = taskKey[Unit]("Copy full-optimized JavaScript files to local resources.")
 val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
+val fastOrFullOptJS                = taskKey[Attributed[File]]("Performs either fast or full Scala.js optimization.")
 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
+val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-specific optimizations (for development).")
 
 lazy val scala213 = "2.13.15"
 lazy val scala3   = "3.5.1"
@@ -190,6 +192,7 @@ ThisBuild / orbeonVersionFromProperties := sys.props.get("orbeon.version") getOr
 ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
 ThisBuild / traceLevel                  := 0
+ThisBuild / preferFastOptJS             := sys.props.get("orbeon.prefer-fast-opt-js").isDefined
 
 // Restrict the number of concurrent linker processes so we don't run out of memory
 Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 1)
@@ -418,11 +421,17 @@ lazy val commonScalaJsSettings = Seq(
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES2018))),
 
-//  scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withParallel(false) },
+//  scalaJSLinkerConfig in (Compile, fastOrFullOptJS) ~= { _.withParallel(false) },
 //  scalaJSLinkerConfig ~= { _.withOptimizer(false) },
 
   Compile / scalaJSUseMainModuleInitializer := true,
   Test    / scalaJSUseMainModuleInitializer := false,
+  fastOrFullOptJS := {
+    if (preferFastOptJS.value)
+      (Compile / fastOptJS).value
+    else
+      (Compile / fullOptJS).value
+  }
 )
 
 lazy val assetsSettings = Seq(
@@ -716,7 +725,7 @@ lazy val formRunnerJVM = formRunner.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-runner.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fastOrFullOptJS).value.data, FormRunnerResourcesPathInWar),
   )
 
 lazy val formRunnerJS = formRunner.js
@@ -879,7 +888,7 @@ lazy val formBuilderJVM = formBuilder.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development, we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fullOptJS).value.data, FormBuilderResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fastOrFullOptJS).value.data, FormBuilderResourcesPathInWar)
   )
 
 
@@ -948,7 +957,7 @@ lazy val xformsJVM = xforms.jvm
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development, we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fastOrFullOptJS).value.data, XFormsResourcesPathInWar),
   )
 
 lazy val xformsJS = xforms.js

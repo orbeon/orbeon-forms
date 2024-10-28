@@ -297,12 +297,27 @@ class FormMetadataApiTest
     expectedStatusCode        : Int = StatusCode.Ok
   )(implicit
     externalContext           : ExternalContext
+  ): Unit =
+    assertPaginationWithStrings(
+      pageNumber                 = pageNumber.toString,
+      pageSize                   = pageSize.toString,
+      expectedPaginatedFormNames = expectedPaginatedFormNames,
+      expectedStatusCode         = expectedStatusCode
+    )
+
+  private def assertPaginationWithStrings(
+    pageNumber                : String,
+    pageSize                  : String,
+    expectedPaginatedFormNames: Seq[String] = Seq.empty,
+    expectedStatusCode        : Int = StatusCode.Ok
+  )(implicit
+    externalContext           : ExternalContext
   ): Unit = {
 
     val searchRequest =
       <search>
         <sort metadata="form-name" direction="asc"/>
-        <pagination page-number={pageNumber.toString} page-size={pageSize.toString}/>
+        <pagination page-number={pageNumber} page-size={pageSize}/>
       </search>.toDocument
 
     assert(
@@ -943,6 +958,9 @@ class FormMetadataApiTest
         assertPagination(pageNumber = -1, pageSize =  1, expectedStatusCode = StatusCode.BadRequest)
         assertPagination(pageNumber =  1, pageSize =  0, expectedStatusCode = StatusCode.BadRequest)
         assertPagination(pageNumber =  1, pageSize = -1, expectedStatusCode = StatusCode.BadRequest)
+
+        assertPaginationWithStrings(pageNumber = "string", pageSize =  "1"     , expectedStatusCode = StatusCode.BadRequest)
+        assertPaginationWithStrings(pageNumber = "1"     , pageSize =  "string", expectedStatusCode = StatusCode.BadRequest)
       }
     }
 

@@ -34,8 +34,13 @@ case class Pagination(
 object Pagination {
   def apply(xml: NodeInfo): Pagination = {
 
-    val pageNumberOpt = xml.attValueOpt("page-number").map(_.toInt)
-    val pageSizeOpt   = xml.attValueOpt("page-size")  .map(_.toInt)
+    val (pageNumberOpt, pageSizeOpt) = try {
+      (xml.attValueOpt("page-number").map(_.toInt),
+       xml.attValueOpt("page-size")  .map(_.toInt))
+    } catch {
+      case _: NumberFormatException =>
+        throw new IllegalArgumentException("Page number/size must be integers")
+    }
 
     if (pageNumberOpt.exists(_ < 1) || pageSizeOpt.exists(_ < 1)) {
       throw new IllegalArgumentException("Page number/size must be at least 1")

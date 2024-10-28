@@ -4848,7 +4848,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Applicazione</application-name>
                 <form-name>Modulo</form-name>
-                <version todo="true">[Version]</version>
+                <version>Versione</version>
                 <form-title>Titolo</form-title>
             </titles>
             <search>
@@ -6238,7 +6238,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Sovellus</application-name>
                 <form-name>Lomake</form-name>
-                <version todo="true">[Version]</version>
+                <version>Versio</version>
                 <form-title>Otsikko</form-title>
             </titles>
             <search>
@@ -6933,7 +6933,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Område</application-name>
                 <form-name>Formulär</form-name>
-                <version todo="true">[Version]</version>
+                <version>Version</version>
                 <form-title>Titel</form-title>
             </titles>
             <search>
@@ -7628,7 +7628,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Applicatie</application-name>
                 <form-name>Form</form-name>
-                <version todo="true">[Version]</version>
+                <version>Versie</version>
                 <form-title>Titel</form-title>
             </titles>
             <search>
@@ -8323,7 +8323,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Aplicação</application-name>
                 <form-name>Formulário</form-name>
-                <version todo="true">[Version]</version>
+                <version>Versão</version>
                 <form-title>Título</form-title>
             </titles>
             <search>
@@ -9009,7 +9009,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>App</application-name>
                 <form-name>Blanket</form-name>
-                <version todo="true">[Version]</version>
+                <version>Version</version>
                 <form-title>Titel</form-title>
             </titles>
             <search>
@@ -9704,7 +9704,7 @@
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Aplikacja</application-name>
                 <form-name>Formularz</form-name>
-                <version todo="true">[Version]</version>
+                <version>Wersja</version>
                 <form-title>Tytuł</form-title>
             </titles>
             <search>

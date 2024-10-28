@@ -50,9 +50,11 @@ object RequestReader {
     def unapply(atts: Atts): Option[String] = atts.atts collectFirst { case (IdQName, value) => value }
   }
 
-  sealed trait                                       Body
-  case class Cached   (bytes  : Array[Byte]) extends Body
-  case class Streamed (stream : InputStream) extends Body
+  sealed trait                                         Body
+  object Body {
+    case class Cached   (bytes  : Array[Byte]) extends Body
+    case class Streamed (stream : InputStream) extends Body
+  }
 
   // See https://github.com/orbeon/orbeon-forms/issues/2385
   private val MetadataElementsToKeep = Set(
@@ -78,14 +80,14 @@ object RequestReader {
 
   private def requestInputStream(bodyOpt: Option[Body]): Option[InputStream] =
     bodyOpt.map {
-      case Cached(bytes) => new ByteArrayInputStream(bytes)
-      case Streamed(is)  => is
+      case Body.Cached(bytes) => new ByteArrayInputStream(bytes)
+      case Body.Streamed(is)  => is
     }
 
   def bytes(bodyOpt: Option[Body]): Option[Array[Byte]] =
     bodyOpt.map {
-      case Cached(bytes) => bytes
-      case Streamed(is)  =>
+      case Body.Cached(bytes) => bytes
+      case Body.Streamed(is)  =>
         val os = new ByteArrayOutputStream
         IOUtils.copyStreamAndClose(is, os)
         os.toByteArray
@@ -393,9 +395,9 @@ trait CreateUpdateDelete {
         if (createFlatView) {
           val os = new ByteArrayOutputStream
           IOUtils.copyStreamAndClose(is, os)
-          RequestReader.Cached(os.toByteArray)
+          RequestReader.Body.Cached(os.toByteArray)
         } else {
-          RequestReader.Streamed(is)
+          RequestReader.Body.Streamed(is)
         }
       }
     }

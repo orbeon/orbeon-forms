@@ -391,9 +391,6 @@ object InitSupport {
     private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {
 
-        // We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blur`, maybe
-        // for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
-        // we're then unable stopping the propagation of those events
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    Events.change)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   Events.focus)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)

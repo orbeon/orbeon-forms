@@ -1573,23 +1573,24 @@
                     <xf:group ref="instance('fr-search-results-instance')" xxf:update="full">
 
                         <xh:div class="fr-search-results">
-                            <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
-                            <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
-                            <xf:var name="labels-class" value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="documents"        value="document"/>
+                            <xf:var name="have-drafts"      value="exists($documents[@draft = 'true'])"/>
+                            <xf:var name="have-read-only"   value="exists($documents[not(xxf:split(@operations) = ('*', 'update'))])"/>
+                            <xf:var name="labels-class"     value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
                             <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
                             <xf:var
                                 name="metadata-columns"
                                 value="(
-                                    'created'[$show-created],
-                                    'last-modified'[$show-last-modified],
-                                    'created-by'[$show-created-by],
+                                    'created'         [$show-created],
+                                    'last-modified'   [$show-last-modified],
+                                    'created-by'      [$show-created-by],
                                     'last-modified-by'[$show-last-modified-by],
-                                    'workflow-stage'[$show-workflow-stage]
+                                    'workflow-stage'  [$show-workflow-stage]
                                 )"/>
 
-                            <xh:table class="table table-bordered table-condensed">
+                            <xh:table class="table table-bordered table-condensed {'fr-table-no-form-data'[empty($documents)]}">
                                 <!-- scrollable="horizontal" width="940px" -->
                                 <xh:thead>
                                     <xh:tr>
@@ -1629,7 +1630,7 @@
                                         name="datelang"
                                         value="(xxf:lang()[frf:hasXPathNumberer(.)], 'en')[1]"/>
 
-                                    <xf:repeat ref="1 to count(document)" id="documents-repeat"><!-- iterate over positions so that repeat iterations are not recreated  -->
+                                    <xf:repeat ref="1 to count($documents)" id="documents-repeat"><!-- iterate over positions so that repeat iterations are not recreated  -->
                                         <!-- 1-based position in the current page -->
                                         <xf:var name="position" value="position()"/>
                                         <!-- Set context to current document -->
@@ -1890,7 +1891,7 @@
                                             </xh:tr>
                                         </xf:group>
                                     </xf:repeat>
-                                    <xf:group ref=".[not(document)]">
+                                    <xf:group ref=".[empty($documents)]">
                                         <xh:tr>
                                             <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show = 'true'])}">
 

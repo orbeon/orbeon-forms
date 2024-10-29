@@ -20,9 +20,6 @@ import org.scalajs.dom
 import org.scalajs.dom.{DOMParser, HTMLFormElement, URLSearchParams}
 
 import scala.scalajs.js
-
-import scala.scalajs.js.Dynamic.global
-import scala.scalajs.js.UndefOr
 import scala.scalajs.js.JSConverters.*
 
 
@@ -66,33 +63,27 @@ object FormRunnerPrivateAPI extends js.Object {
 
     val location = dom.window.location
 
-    val NewEditViewPathRe(_, _, _, mode, _)  = location.pathname
-
-    if (mode == "new") {
-
-      val newSearch = {
-        val supportsURLSearchParams = global.URLSearchParams.asInstanceOf[UndefOr[URLSearchParams]].isDefined
-        if (supportsURLSearchParams) {
+    location.pathname match {
+      case NewEditViewPathRe(_, _, _, "new", _) =>
+        val newSearch = {
           val urlSearchParams = new URLSearchParams(location.search)
           urlSearchParams.delete("draft")
-          if (isDraft.toBoolean) urlSearchParams.set("draft", "true")
+          if (isDraft.toBoolean)
+            urlSearchParams.set("draft", "true")
           urlSearchParams.toString match {
             case ""                 => ""
             case stringSearchParams => s"?$stringSearchParams"
           }
-        } else {
-          // IE11 is the last browser not to support `URLSearchParams`; in this case, don't bother updating `draft`
-          location.search
         }
-      }
 
-      // `newSearch`: for example `?form-version=42`
-      // `hash`: for now not used by Form Runner, but it is safer to keep it
-      dom.window.history.replaceState(
-        statedata = dom.window.history.state,
-        title     = "",
-        url       = s"edit/$documentId$newSearch${location.hash}"
-      )
+        // `newSearch`: for example `?form-version=42`
+        // `hash`: for now not used by Form Runner, but it is safer to keep it
+        dom.window.history.replaceState(
+          statedata = dom.window.history.state,
+          title     = "",
+          url       = s"edit/$documentId$newSearch${location.hash}"
+        )
+      case _ =>
     }
   }
 
@@ -100,26 +91,25 @@ object FormRunnerPrivateAPI extends js.Object {
 
     val location = dom.window.location
 
-    val NewEditViewPathRe(context, app, form, mode, _)  = location.pathname
-
-    if (mode == "edit") {
-
-      val newSearch = {
-        val urlSearchParams = new URLSearchParams(location.search)
-        urlSearchParams.delete("draft")
-        urlSearchParams.toString match {
-          case ""                 => ""
-          case stringSearchParams => s"?$stringSearchParams"
+    location.pathname match  {
+      case NewEditViewPathRe(context, app, form, "edit", _) =>
+        val newSearch = {
+          val urlSearchParams = new URLSearchParams(location.search)
+          urlSearchParams.delete("draft")
+          urlSearchParams.toString match {
+            case ""                 => ""
+            case stringSearchParams => s"?$stringSearchParams"
+          }
         }
-      }
 
-      // `newSearch`: for example `?form-version=42`
-      // `hash`: for now not used by Form Runner, but it is safer to keep it
-      dom.window.history.replaceState(
-        statedata = dom.window.history.state,
-        title     = "",
-        url       = s"$context$app/$form/new$newSearch${location.hash}"
-      )
+        // `newSearch`: for example `?form-version=42`
+        // `hash`: for now not used by Form Runner, but it is safer to keep it
+        dom.window.history.replaceState(
+          statedata = dom.window.history.state,
+          title     = "",
+          url       = s"$context$app/$form/new$newSearch${location.hash}"
+        )
+      case _ =>
     }
   }
 

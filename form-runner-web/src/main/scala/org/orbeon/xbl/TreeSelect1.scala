@@ -121,8 +121,7 @@ object TreeSelect1 {
 
             val onActivate: js.Function2[js.Any, JQueryEvent, Unit] = (_ :js.Any, event: JQueryEvent) => {
               if (! this.isReadonly) {
-                val data: FancytreeEventData = event.data.asInstanceOf[FancytreeEventData] // TODO: does this work?
-                val newValue = data.node.key ensuring (_ ne null)
+                val newValue = event.asInstanceOf[FancytreeEventData].node.key ensuring (_ ne null)
 
                 if (this.currentValue != newValue) {
                   this.currentValue = newValue

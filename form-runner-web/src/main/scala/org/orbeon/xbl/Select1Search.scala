@@ -89,12 +89,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         optionsOpt.foreach(jSelect.select2)
 
         // Register event listeners
-        if (isDatabound) {
-          // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
-          jSelect.asInstanceOf[js.Dynamic].on("select2:close", ((_: js.Any, _: JQueryEvent) => onChangeDispatchFrChange()): js.Function2[js.Any, JQueryEvent, Unit])
-        }
-        jSelect.asInstanceOf[js.Dynamic].on("select2:open", ((_: js.Any, e: JQueryEvent) => onOpen(e)): js.Function2[js.Any, JQueryEvent, Unit])
-        jSelect.asInstanceOf[js.Dynamic].on("results:focus", ((_: js.Any, e: JQueryEvent) => onResultsFocus(e)): js.Function2[js.Any, JQueryEvent, Unit])
+        // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
+        if (isDatabound)
+          jSelect.asInstanceOf[js.Dynamic].on("select2:close", ((_: js.Any, _: JQueryEvent) => onChangeDispatchFrChange())     : js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("select2:close",   ((_: js.Any, _: JQueryEvent) => dispatchDomChangeEvent(select)) : js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("select2:open",    ((_: js.Any, e: JQueryEvent) => onOpen(e))                      : js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("results:focus",   ((_: js.Any, e: JQueryEvent) => onResultsFocus(e))              : js.Function2[js.Any, JQueryEvent, Unit])
 
         // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
         val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -335,6 +335,15 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       )
     }
   }
+
+  // `InitSupport.scala` listens to DOM, not jQuery-only, events
+  private def dispatchDomChangeEvent(select: html.Select): Unit =
+    select.dispatchEvent(
+      new dom.Event("change", new dom.EventInit {
+        bubbles    = true
+        cancelable = true
+      })
+    )
 
   private def dispatchFrChange(
     label : String,

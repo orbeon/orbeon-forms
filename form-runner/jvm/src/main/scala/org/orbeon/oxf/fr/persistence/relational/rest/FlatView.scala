@@ -33,7 +33,7 @@ private object FlatView {
   val CompatibilityMaxIdentifierLength = 30
 
   case class Column(expression: String, nameOpt: Option[String]) {
-    def sql: String = expression + nameOpt.map(name => " " + xmlToSQLId(name)).getOrElse("")
+    def sql: String = expression + nameOpt.map(name => s" \"${xmlToSQLId(name)}\"").getOrElse("")
   }
 
   private val TablePrefix        = "orbeon_f_"

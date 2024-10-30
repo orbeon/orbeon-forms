@@ -34,8 +34,8 @@ object PersistenceMetadataSupport {
     ! Properties.instance.getPropertySet.getBooleanOpt("oxf.fr.persistence.form-definition-cache.enable").contains(false)
 
   // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
-  private lazy val formDefinitionCache = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-definition")
-  private lazy val formMetadataCache   = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-metadata")
+  private lazy val formDefinitionCache = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-definition", store = false)
+  private lazy val formMetadataCache   = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-metadata",   store = false)
 
   private type CacheKey = (String, String, Int) // app/form/version
 

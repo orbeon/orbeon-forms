@@ -1,38 +1,47 @@
 package org.orbeon.oxf.cache
 
 import cats.data.NonEmptyList
-import cats.syntax.option.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.*
 
 import java.io
 import java.net.URI
-import javax.cache.Caching
 import javax.cache.configuration.MutableConfiguration
+import javax.cache.{CacheManager, Caching}
 import scala.jdk.CollectionConverters.*
 import scala.util.Try
-import scala.util.control.NonFatal
 
 
-object JCacheSupport extends CacheProviderApi {
+class JCacheSupport(store: Boolean) extends CacheProviderApi {
 
-  import CacheSupport.Logger._
+  import CacheSupport.*
+  import CacheSupport.Logger.*
 
   def get(cacheName: String): Option[CacheApi] = {
     val cacheOpt = Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
     val cache = cacheOpt.getOrElse(
       cacheManager.createCache
         [io.Serializable, io.Serializable, MutableConfiguration[io.Serializable, io.Serializable]]
-        (cacheName, new MutableConfiguration[io.Serializable, io.Serializable]())
+        (
+          cacheName,
+          new MutableConfiguration[io.Serializable, io.Serializable]() |!> { config =>
+            // Force storing by reference if we are a plain cache, otherwise leave it to the default
+            if (! store)
+              config.setStoreByValue(false)
+          }
+        )
     )
     // We always return a `Some` since our implementation for JCache always creates a cache if one doesn't
     // already exist, while our implementation for EHCache 2 doesn't.
     Some(new JCacheCacheApi(cache))
   }
 
+  // Calling `close()` on the provider is a shortcut to closing all its cache managers, so we just close the cache
+  // manager as that's what makes sense here. If any other code had obtained cache managers separately, we wouldn't
+  // want to close them as a side effect of this.
   def close(): Unit =
-    provider.close() // xxx TODO: what if provider used by others? should we close it, or just the cache manager?
+    cacheManager.close()
 
   class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
     def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(k, v) }
@@ -44,7 +53,7 @@ object JCacheSupport extends CacheProviderApi {
     def getLocalHeapSize: Option[Long]                            = { trace("getLocalHeapSize");       None }
   }
 
-  private lazy val (provider, cacheManager) =
+  private lazy val cacheManager: CacheManager =
     try {
 
       val properties =
@@ -69,8 +78,8 @@ object JCacheSupport extends CacheProviderApi {
               debug(s"  ${index + 1}: `${provider.getClass.getName}`")
             }
 
-            properties.getNonBlankString(CacheSupport.ClassnameRePropertyName) match {
-              case Some(re) =>
+            nonBlankString(store, classnameRePropertyName)(properties) match {
+              case Some((_, re)) =>
                 providers.find(_.getClass.getName.matches(re)) match {
                   case Some(provider) =>
                     debug(s"Found JCache provider in the classpath with class name matching `$re`")
@@ -81,7 +90,10 @@ object JCacheSupport extends CacheProviderApi {
                     throw new IllegalStateException(msg)
                 }
               case None =>
-                debug(s"No `${CacheSupport.ClassnameRePropertyName}` property set")
+                if (store)
+                  debug(s"No `${classnameRePropertyName(true)}` or `${classnameRePropertyName(false)}` property set")
+                else
+                  debug(s"No `${classnameRePropertyName(false)}` property set")
                 if (providers.size > 1)
                   debug(s"  picking first provider found out of ${providers.size} providers")
                 else
@@ -93,26 +105,21 @@ object JCacheSupport extends CacheProviderApi {
       info(s"Using the JCache provider found in the classpath with class name: `${provider.getClass.getName}`")
 
       def fromResource: Option[URI] =
-        properties
-          .getNonBlankString(CacheSupport.ResourcePropertyName)
-          .flatMap(p => Option(getClass.getResource(p)))
+        nonBlankString(store, CacheSupport.resourcePropertyName)(properties)
+          .flatMap { case (_, p) => Option(getClass.getResource(p)) }
           .map(_.toURI)
 
       def fromUri: Option[URI] =
-        properties
-          .getNonBlankString(CacheSupport.UriPropertyName)
-          .map(URI.create)
+        nonBlankString(store, CacheSupport.uriPropertyName)(properties)
+          .map { case (_, p) => URI.create(p) }
 
       val configUri =
         fromResource.orElse(fromUri).getOrElse(provider.getDefaultURI)
 
-      (
-        provider,
-        provider.getCacheManager(configUri, getClass.getClassLoader) |!>
-          (_ => debug(s"initialized JCache cache manager"))
-      )
+      provider.getCacheManager(configUri, getClass.getClassLoader) |!>
+        (_ => debug(s"initialized JCache cache manager with URI `$configUri`"))
     } catch {
-      case NonFatal(t) =>
+      case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
 
         Try(Properties.instance.getPropertySetOrThrow)
           .foreach(CacheSupport.logProperties(_, CacheSupport.Logger.error))

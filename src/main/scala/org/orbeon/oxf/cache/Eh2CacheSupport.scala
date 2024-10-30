@@ -26,8 +26,8 @@ import scala.util.control.NonFatal
 
 object Eh2CacheSupport extends CacheProviderApi {
 
-  import CacheSupport.Logger._
-  import Private._
+  import CacheSupport.Logger.*
+  import Private.*
 
   def get(cacheName: String): Option[CacheApi] =
     cacheManager.getCache(cacheName) match {

@@ -69,7 +69,17 @@
     <!-- Instance containing all the ISO 639-1 languages -->
     <xf:instance id="fr-languages-instance" src="oxf:/apps/fr/i18n/languages.xml" xxf:readonly="true" xxf:cache="true"/>
 
-    <xf:action event="fr-update-language">
+    <xf:action
+        event="fr-update-language"
+        if="
+            (:
+                On the summary page, when this is called on `xforms-model-construct-done`, the `fr-language-instance`
+                has not yet been set. Skip this step, as we would otherwise reset the language stored in the session.
+                This handler will be called again by the summary page after it sets `instance('fr-form-resources')`
+                by extracting the resources from the form source.
+            :)
+            exists(xxf:instance('fr-form-resources')/*)
+        ">
 
         <!-- Find form language -->
         <xf:setvalue

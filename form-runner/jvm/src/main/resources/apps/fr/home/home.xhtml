@@ -1749,42 +1749,45 @@
 
             <xf:label ref="$fr-resources/home/titles/credentials"/>
 
-            <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
-            <xh:div class="fr-dialog-credentials-fields">
+            <xh:div class="fr-dialog-credentials-icon-and-fields">
+                <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
 
-                <xf:var
-                    name="remote-server"
-                    value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
+                <xh:div class="fr-dialog-credentials-fields">
 
-                <fr:grid>
-                    <xh:tr>
-                        <xh:td>
-                            <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
-                                <xf:select1 ref="instance()/current-remote-server">
-                                    <xf:label ref="$fr-resources/home/labels/remote-server"/>
-                                    <xf:itemset ref="instance()/remote-servers/remote-server">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="position()"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                            </xf:group>
-                        </xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:td>
-                            <xf:input ref="$remote-server/username">
-                                <xf:label ref="$fr-resources/home/labels/username"/>
-                            </xf:input>
-                        </xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:td>
-                            <xf:secret ref="$remote-server/password">
-                                <xf:label ref="$fr-resources/home/labels/password"/>
-                            </xf:secret>
-                        </xh:td>
-                    </xh:tr>
-                </fr:grid>
+                    <xf:var
+                        name="remote-server"
+                        value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
+
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
+                                    <xf:select1 ref="instance()/current-remote-server">
+                                        <xf:label ref="$fr-resources/home/labels/remote-server"/>
+                                        <xf:itemset ref="instance()/remote-servers/remote-server">
+                                            <xf:label ref="label"/>
+                                            <xf:value ref="position()"/>
+                                        </xf:itemset>
+                                    </xf:select1>
+                                </xf:group>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="$remote-server/username">
+                                    <xf:label ref="$fr-resources/home/labels/username"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:secret ref="$remote-server/password">
+                                    <xf:label ref="$fr-resources/home/labels/password"/>
+                                </xf:secret>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </xh:div>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
                 <xf:trigger id="cancel-button" xxf:modal="true">

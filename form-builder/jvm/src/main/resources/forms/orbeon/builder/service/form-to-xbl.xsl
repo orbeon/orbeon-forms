@@ -629,7 +629,7 @@
                         observer="fr-section-template-view"
                         event="xforms-disabled"
                         xxf:phantom="true"
-                        if="event('xxf:binding')/root()/* is instance('fr-form-instance')"
+                        if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())"
 
                         context="event('xxf:binding')"
                         origin="xf:attribute('fr:relevant', 'false')"/>
@@ -638,7 +638,7 @@
                         observer="fr-section-template-view"
                         event="xforms-enabled"
                         xxf:phantom="true"
-                        if="event('xxf:binding')/root() is instance('fr-form-instance')/root()"
+                        if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())"
 
                         ref="event('xxf:binding')/@fr:relevant"/>
 

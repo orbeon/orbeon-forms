@@ -1875,7 +1875,7 @@
                                                             <xh:a href="{$current-document-href-opt}">
                                                                 <!-- Q: Why `$is-fb`? Other forms too could have HTML. -->
                                                                 <xf:switch
-                                                                    caseref="starts-with(normalize-space($detail), '&lt;div&gt;')"
+                                                                    caseref="starts-with(normalize-space($detail), '&lt;div')"
                                                                     xxf:update="full">
                                                                     <xf:case value="true()">
                                                                         <xf:output mediatype="text/html" value="frf:maybeFilterHtml($detail)"/>

@@ -39,3 +39,4 @@ react/dist/
 react-test/dist/
 # FormMetadataApiTest
 src/test/resources/properties-form-metadata-api-test.xml
+.aider*

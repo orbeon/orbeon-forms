@@ -49,23 +49,11 @@ trait Logging {
       logger.log(logLevel, "", message, flattenTuples(parameters)*)
 
   // Debug block with optional parameters
-  def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T = {
-    val debugEnabled = logger.debugEnabled
-    var success = true
-    try {
-      if (debugEnabled)
-        logger.startHandleOperation("", message, flattenTuples(parameters)*)
-
+  def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T =
+    if (logger.debugEnabled)
+      logger.withDebug("", message, flattenTuples(parameters)*)(body)
+    else
       body
-    } catch {
-      case NonFatal(t) =>
-        success = false
-        throw t
-    } finally {
-      if (debugEnabled)
-        logger.endHandleOperation(success)
-    }
-  }
 
   def debugResult[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T = {
     val r = body
@@ -89,7 +77,7 @@ trait Logging {
     if (logger.debugEnabled)
       logger.setDebugResults(flattenTuples(parameters)*)
 
-  private def flattenTuples(tuples: Seq[(String, String)]) =
+  private def flattenTuples(tuples: Seq[(String, String)]): Seq[String] =
     tuples flatMap { case (n, v) => Seq(n, v) }
 }
 

@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.util
 
-import java.lang as jl
-
 import org.log4s
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.IndentedLogger.*
 
+import java.lang as jl
 import scala.annotation.varargs
 
 /**
@@ -122,25 +121,41 @@ class IndentedLogger(
   def infoEnabled: Boolean =
     logger.isInfoEnabled
 
-  def startHandleOperation(`type`: String, message: String, parameters: String*): Unit =
+  // Debug block with optional parameters
+  def withDebug[T](`type`: String, message: String, parameters: String*)(body: => T): T = {
+    var success = true
+    try {
+      if (debugEnabled)
+        startHandleOperation(`type`, message, parameters*)
+
+      body
+    } catch {
+      case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
+        success = false
+        throw t
+    } finally {
+      if (debugEnabled)
+        endHandleOperation(success)
+    }
+  }
+
+  private def startHandleOperation(`type`: String, message: String, parameters: String*): Unit =
     if (debugEnabled) {
       stack ::= new Operation(`type`, message)
       logDebug(`type`, "start " + message, parameters*)
       indentation.indentation += 1
     }
 
-  def endHandleOperation(success: Boolean = true): Unit =
-    if (debugEnabled) {
-      val resultParameters = stack.head.resultParameters
-      indentation.indentation -= 1
-
+  private def endHandleOperation(success: Boolean = true): Unit =
+    if (debugEnabled)
       stack match {
         case operation :: tail =>
 
           stack = tail
+          indentation.indentation -= 1
 
           val newParams =
-            "time (ms)" :: operation.timeElapsed.toString :: resultParameters.toList
+            "time (ms)" :: operation.timeElapsed.toString :: operation.resultParameters.toList
 
           logDebug(
             operation.`type`,
@@ -149,10 +164,10 @@ class IndentedLogger(
           )
         case _ =>
       }
-    }
 
   def setDebugResults(parameters: String*): Unit =
-    stack.head.resultParameters = parameters
+    if (debugEnabled)
+      stack.head.resultParameters = parameters
 
   def log(level: log4s.LogLevel, `type`: String, message: String, parameters: String*): Unit =
     if (!((level eq log4s.Debug) && ! debugEnabled))

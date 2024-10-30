@@ -593,7 +593,8 @@ object PageFlowControllerProcessor {
       pc            : PipelineContext,
       ec            : ExternalContext,
       matchResult   : MatchResult,
-      mustAuthorize : Boolean = true)(implicit
+      mustAuthorize : Boolean = true
+    )(implicit
       logger        : IndentedLogger
     ): Unit
   }
@@ -604,7 +605,8 @@ object PageFlowControllerProcessor {
       pc            : PipelineContext,
       ec            : ExternalContext,
       matchResult   : MatchResult,
-      mustAuthorize : Boolean = true)(implicit
+      mustAuthorize : Boolean = true
+    )(implicit
       logger        : IndentedLogger
     ): Unit = {
       debug("processing route", Seq("route" -> this.toString))

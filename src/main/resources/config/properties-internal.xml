@@ -469,13 +469,15 @@
         then xf:dispatch("store-credentials")
         recover load-metadata-with-credentials
     </property>
-
     <property as="xs:string"  name="oxf.fr.home.process.credentials-ok">
         resume
     </property>
     <property as="xs:string"  name="oxf.fr.home.process.credentials-cancel">
-        abort then load-local
+        abort
+        then xf:dispatch("select-previously-loaded-remote-server")
+        then load-metadata
     </property>
+
     <property as="xs:string"  name="oxf.fr.home.process.publish-local">
         xf:dispatch("confirm-local-publish")    then suspend then xf:dispatch("local-publish")
     </property>

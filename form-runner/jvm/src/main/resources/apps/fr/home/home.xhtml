@@ -155,6 +155,7 @@
                     <remote-newer-select/>
 
                     <current-remote-server>0</current-remote-server>
+                    <loaded-remote-server>0</loaded-remote-server>
                     <remote-servers>
                         <!--
 
@@ -234,6 +235,9 @@
             <xf:bind ref="instance('fr-form-instance')">
                 <xf:bind
                     ref="current-remote-server"
+                    type="xs:integer"/>
+                <xf:bind
+                    ref="loaded-remote-server"
                     type="xs:integer"/>
                 <xf:bind
                     ref="remote-servers/remote-server/username | remote-servers/remote-server/password"
@@ -518,8 +522,21 @@
                     </xf:action>
                 </xf:action>
 
-                <xf:setvalue event="xforms-submit-done" ref="instance()/initializing">false</xf:setvalue>
+                <xf:action event="xforms-submit-done">
+                    <xf:setvalue ref="instance()/initializing">false</xf:setvalue>
+
+                    <xf:action if="instance()/current-remote-server gt 0 and $remote-set">
+                        <xf:setvalue ref="instance()/loaded-remote-server" value="instance()/current-remote-server"/>
+                    </xf:action>
+                </xf:action>
             </xf:submission>
+
+            <xf:action event="select-previously-loaded-remote-server">
+                <!-- Select previously loaded remote server, if any -->
+                <xf:action if="instance()/loaded-remote-server gt 0">
+                    <xf:setvalue ref="instance()/current-remote-server" value="instance()/loaded-remote-server"/>
+                </xf:action>
+            </xf:action>
 
             <xf:submission
                 id="read-all-metadata"
@@ -793,7 +810,7 @@
         <xf:var name="fr-lang"      model="fr-resources-model" value="$fr-lang"/>
 
         <xf:var name="show-permissions" value="$is-admin"/>
-        <xf:var name="show-remote"      value="$remote-set"/>
+        <xf:var name="show-remote"      value="instance()/loaded-remote-server gt 0"/>
 
         <fr:view fluid="true">
             <fr:navbar/>

@@ -132,22 +132,36 @@
 
             .xforms-dnd-item {
 
-                display: table;
+                display: table-row;
                 width: 100%;
                 box-sizing: border-box;
 
                 // 2022-12-02: Font Awesome icons now show
                 .fr-attachment-icon {
+                    display: table-cell;
+                    vertical-align: middle;
+                    padding: 4px;
                 }
 
                 .fr-attachment-filename {
                     display: table-cell;
-                    padding-left: 4px;
+                    padding: 4px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    vertical-align: middle;
+
+                    // 2024-10-30: I haven't found a way to prevent the table from becoming too wide if we want to
+                    // truncate long file names. So we instead wrap the text.
+                    // https://github.com/orbeon/orbeon-forms/issues/6598
+                    white-space: normal;
+                    overflow-wrap: break-word;
+                    word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
                 }
 
                 .fr-attachment-size {
                     display: table-cell;
-                    padding-right: 4px;
+                    padding: 4px;
+                    vertical-align: middle;
                 }
             }
         }

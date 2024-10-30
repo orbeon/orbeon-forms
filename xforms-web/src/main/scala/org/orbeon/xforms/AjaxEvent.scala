@@ -135,7 +135,9 @@ class AjaxEvent(args: js.Any*) extends js.Object {
       case (Some(_), None) =>
         throw new IllegalArgumentException("targetId")
       case (None, Some(targetId)) =>
-        dom.document.getElementByIdOpt(targetId).flatMap(e => Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(e)) match {
+        val targetOpt = dom.document.getElementByIdOpt(targetId)
+        val formOpt   = Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(targetOpt.orUndefined)
+        formOpt match {
           case Some(form) =>
             form -> targetId.some // here we could check that the namespaces match!
           case None =>

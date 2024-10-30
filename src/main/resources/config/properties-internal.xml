@@ -389,11 +389,11 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-explanation.*"                  value="output-string"/>
 
      <!-- Internal processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value='save'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"   value='abort'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*" value='resume'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                   value='save(draft = "true")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.relinquish-lease.*.*"           value='relinquish-lease'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value="save"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"   value="abort"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*" value="resume"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                   value="save(draft = 'true')"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.relinquish-lease.*.*"           value="relinquish-lease"/>
 
     <!-- Reusable processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*">

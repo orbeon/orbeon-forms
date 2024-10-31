@@ -78,7 +78,10 @@
                 This handler will be called again by the summary page after it sets `instance('fr-form-resources')`
                 by extracting the resources from the form source.
             :)
-            exists(xxf:instance('fr-form-resources')/*)
+            not(
+                $use-form-resources and
+                empty(xxf:instance('fr-form-resources')/*)
+            )
         ">
 
         <!-- Find form language -->

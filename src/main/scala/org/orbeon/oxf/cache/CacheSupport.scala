@@ -3,6 +3,8 @@ package org.orbeon.oxf.cache
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.slf4j
 
+import java.io
+
 
 trait CacheProviderApi {
   def get(cacheName: String): Option[CacheApi]
@@ -10,10 +12,10 @@ trait CacheProviderApi {
 }
 
 trait CacheApi {
-  def put(k: Serializable, v: Serializable): Unit
-  def putIfAbsent(k: Serializable, v: Serializable): Unit
-  def get(k: Serializable): Option[Serializable]
-  def remove(k: Serializable): Boolean
+  def put(k: io.Serializable, v: io.Serializable): Unit
+  def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit
+  def get(k: io.Serializable): Option[io.Serializable]
+  def remove(k: io.Serializable): Boolean
 
   def getName: String
 

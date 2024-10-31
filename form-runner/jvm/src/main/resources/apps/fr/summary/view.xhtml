@@ -515,6 +515,9 @@
                     context="instance('fr-bulk-edit-instance')"
                     ref="query"
                     origin="instance('fr-search-instance')/query[@path]"/>
+                <!-- https://github.com/orbeon/orbeon-forms/issues/6604 -->
+                <xf:delete
+                    ref="instance('fr-bulk-edit-instance')/query[exists(@path)]/*"/>
 
                 <!-- Initial values for bulk edit dropdowns -->
                 <xf:action iterate="instance('fr-search-labels-instance')/query[@control = ('select1', 'open-select1')]">

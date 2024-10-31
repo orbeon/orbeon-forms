@@ -493,7 +493,7 @@
                 <xf:insert
                     context="instance('fr-search-instance')"
                     ref="query"
-                    origin="instance('fr-search-labels-instance')/query[@path]"/>
+                    origin="instance('fr-search-labels-instance')/query[exists(@path)]"/>
 
                 <!-- Don't leave nested `<resources>`s -->
                 <xf:delete
@@ -514,7 +514,7 @@
                 <xf:insert
                     context="instance('fr-bulk-edit-instance')"
                     ref="query"
-                    origin="instance('fr-search-instance')/query[@path]"/>
+                    origin="instance('fr-search-instance')/query[exists(@path)]"/>
                 <!-- https://github.com/orbeon/orbeon-forms/issues/6604 -->
                 <xf:delete
                     ref="instance('fr-bulk-edit-instance')/query[exists(@path)]/*"/>

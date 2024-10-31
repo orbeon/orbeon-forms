@@ -132,9 +132,16 @@
 
             .xforms-dnd-item {
 
-                display: table-row;
+                display: block; // using `table-row` causes the border not to show
                 width: 100%;
                 box-sizing: border-box;
+
+                // https://github.com/orbeon/orbeon-forms/issues/6598
+                // @fieldBorderColor uses `var`, so the following doesn't work:
+                // .fieldDecorations();
+                border: 1px solid #ccc;
+                border-radius: @inputBorderRadius;
+                box-shadow: none;
 
                 // 2022-12-02: Font Awesome icons now show
                 .fr-attachment-icon {

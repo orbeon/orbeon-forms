@@ -125,6 +125,15 @@
                     <xf:setvalue ref="instance()/request-parameters-loaded" value="'true'"/>
                 </xf:action>
 
+                <xf:action if="instance()/request-parameters-loaded = 'true'">
+                    <xf:var name="fr-search-app" value="xxf:get-request-parameter('fr-search-app')"/>
+
+                    <xf:action if="$fr-search-app != '' and instance()/search-options/local/application-name != $fr-search-app">
+                        <!-- Clear search option passed as URL parameter (do not manage browser history for now) -->
+                        <xf:action type="javascript">ORBEON.fr.private.API.removeUrlParameter("fr-search-app");</xf:action>
+                    </xf:action>
+                </xf:action>
+
                 <xf:action type="xpath">
                     if (instance()/current-remote-server = 0) then
                         fr:run-process-by-name('oxf.fr.home.process', 'load-metadata')
@@ -1219,11 +1228,6 @@
 
                                         <xf:action if="case('fr-search-options-switch') = 'fr-search-options-shown'">
                                             <xf:setfocus control="fr-search-options-switch"/>
-                                        </xf:action>
-
-                                        <xf:action if="case('fr-search-options-switch') = 'fr-search-options-hidden'">
-                                            <!-- Clear any search option passed as URL parameter (do not manage browser history for now) -->
-                                            <xf:action type="javascript">ORBEON.fr.private.API.removeUrlParameter("fr-search-app");</xf:action>
                                         </xf:action>
                                     </xf:action>
                                 </xf:trigger>

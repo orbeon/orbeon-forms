@@ -1222,12 +1222,8 @@
                                         </xf:action>
 
                                         <xf:action if="case('fr-search-options-switch') = 'fr-search-options-hidden'">
-                                            <!-- Clear any search option passed as URL parameter -->
-                                            <xf:action type="javascript">
-                                                <xf:body>
-                                                    window.history.pushState({}, '', window.location.pathname);
-                                                </xf:body>
-                                            </xf:action>
+                                            <!-- Clear any search option passed as URL parameter (do not manage browser history for now) -->
+                                            <xf:action type="javascript">ORBEON.fr.private.API.removeUrlParameter("fr-search-app");</xf:action>
                                         </xf:action>
                                     </xf:action>
                                 </xf:trigger>

@@ -113,6 +113,18 @@
                 <!-- Don't keep potentially large instances -->
                 <xf:insert ref="instance('fr-form')" origin="xf:element('_')"/>
 
+                <xf:action if="instance()/request-parameters-loaded = 'false'">
+                    <xf:var name="fr-search-app" value="xxf:get-request-parameter('fr-search-app')"/>
+
+                    <!-- If we have a fr-search-app URL parameter, use it as a search option and show search options -->
+                    <xf:action if="$fr-search-app != ''">
+                        <xf:setvalue ref="instance()/search-options/local/application-name" value="$fr-search-app"/>
+                        <xf:toggle case="fr-search-options-shown"/>
+                    </xf:action>
+
+                    <xf:setvalue ref="instance()/request-parameters-loaded" value="'true'"/>
+                </xf:action>
+
                 <xf:action type="xpath">
                     if (instance()/current-remote-server = 0) then
                         fr:run-process-by-name('oxf.fr.home.process', 'load-metadata')
@@ -130,6 +142,7 @@
                     <error/>
 
                     <initializing>true</initializing>
+                    <request-parameters-loaded>false</request-parameters-loaded>
 
                     <local-unpublish-action/>
                     <local-publish-action/>
@@ -1206,6 +1219,15 @@
 
                                         <xf:action if="case('fr-search-options-switch') = 'fr-search-options-shown'">
                                             <xf:setfocus control="fr-search-options-switch"/>
+                                        </xf:action>
+
+                                        <xf:action if="case('fr-search-options-switch') = 'fr-search-options-hidden'">
+                                            <!-- Clear any search option passed as URL parameter -->
+                                            <xf:action type="javascript">
+                                                <xf:body>
+                                                    window.history.pushState({}, '', window.location.pathname);
+                                                </xf:body>
+                                            </xf:action>
                                         </xf:action>
                                     </xf:action>
                                 </xf:trigger>

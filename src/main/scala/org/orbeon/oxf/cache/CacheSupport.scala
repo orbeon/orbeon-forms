@@ -59,8 +59,8 @@ object CacheSupport {
 
   private def loadProvider(store: Boolean): CacheProviderApi =
     nonBlankString(store, providerPropertyName)(Properties.instance.getPropertySetOrThrow) match {
-      case None | Some((_, "ehcache2")) => Eh2CacheSupport
-      case        Some((_, "jcache"))   => new JCacheSupport(store)
+      case None | Some((_, "ehcache2")) => Ehcache2Provider
+      case        Some((_, "jcache"))   => new JCacheProvider(store)
       case        Some((name, other))   => throw new IllegalArgumentException(s"invalid value for `$name`: `$other` (must be one of `ehcache2` or `jcache`)")
     }
 

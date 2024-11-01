@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 
-class JCacheSupport(store: Boolean) extends CacheProviderApi {
+class JCacheProvider(store: Boolean) extends CacheProviderApi {
 
   import CacheSupport.*
   import CacheSupport.Logger.*
@@ -26,7 +26,8 @@ class JCacheSupport(store: Boolean) extends CacheProviderApi {
         (
           cacheName,
           new MutableConfiguration[io.Serializable, io.Serializable]() |!> { config =>
-            // Force storing by reference if we are a plain cache, otherwise leave it to the default
+            // Force storing by reference if we are a plain cache, otherwise leave it to the default. It doesn't seem
+            // that this can be configured in the declarative XML configuration file for Ehcache 3, so we do it here.
             if (! store)
               config.setStoreByValue(false)
           }

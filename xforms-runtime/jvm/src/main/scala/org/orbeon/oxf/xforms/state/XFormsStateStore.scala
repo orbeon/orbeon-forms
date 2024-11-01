@@ -52,16 +52,16 @@ object XFormsStateStore {
       val sequence          = document.sequence
 
       // Mapping (UUID -> static state key : dynamic state key
-      Caches.stateCache.put(documentUUID, (staticStateDigest + ":" + dynamicStateKey, sequence): CacheValueMappingType)
+      XFormsStores.stateStore.put(documentUUID, (staticStateDigest + ":" + dynamicStateKey, sequence): CacheValueMappingType)
 
       // Static and dynamic states
-      Caches.stateCache.putIfAbsent(staticStateDigest, document.staticState.encodedState)
-      Caches.stateCache.put(dynamicStateKey,   DynamicState(document))
+      XFormsStores.stateStore.putIfAbsent(staticStateDigest, document.staticState.encodedState)
+      XFormsStores.stateStore.put(dynamicStateKey,   DynamicState(document))
     }
   }
 
   def findSequence(documentUUID: String): Option[Long] =
-    Caches.stateCache.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]).map(_._2)
+    XFormsStores.stateStore.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]).map(_._2)
 
   def findState(
     documentUUID   : String,
@@ -81,7 +81,7 @@ object XFormsStateStore {
     ) {
       debug(s"store size before finding: ${getCurrentSize.map(_.toString).getOrElse("unknown")} entries.")
 
-      Caches.stateCache.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]) match {
+      XFormsStores.stateStore.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]) match {
         case Some((keyString: String, _: Long)) =>
 
           // Found the keys, split into parts
@@ -94,7 +94,7 @@ object XFormsStateStore {
           val dynamicStateKey = if (isInitialState) createDynamicStateKey(documentUUID, isInitialState = true) else parts(1)
 
           // Gather values from cache for both keys and return state only if both are non-null
-          LazyList(parts(0), dynamicStateKey) flatMap Caches.stateCache.get filter (_ != null) match {
+          LazyList(parts(0), dynamicStateKey) flatMap XFormsStores.stateStore.get filter (_ != null) match {
             case LazyList(staticState: String, dynamicState: DynamicState) =>
               Some(XFormsState(Some(parts(0)), Some(staticState), Some(dynamicState)))
             case _ =>
@@ -109,13 +109,13 @@ object XFormsStateStore {
 
   // NOTE: Don't remove the static state as it might be in use by other form sessions.
   def removeDynamicState(documentUUID: String): Unit = {
-    Caches.stateCache.remove(documentUUID)
-    Caches.stateCache.remove(createDynamicStateKey(documentUUID, isInitialState = true))
-    Caches.stateCache.remove(createDynamicStateKey(documentUUID, isInitialState = false))
+    XFormsStores.stateStore.remove(documentUUID)
+    XFormsStores.stateStore.remove(createDynamicStateKey(documentUUID, isInitialState = true))
+    XFormsStores.stateStore.remove(createDynamicStateKey(documentUUID, isInitialState = false))
   }
 
-  def getMaxSize     : Option[Long] = Caches.stateCache.getMaxEntriesLocalHeap
-  def getCurrentSize : Option[Long] = Caches.stateCache.getLocalHeapSize
+  def getMaxSize     : Option[Long] = XFormsStores.stateStore.getMaxEntriesLocalHeap
+  def getCurrentSize : Option[Long] = XFormsStores.stateStore.getLocalHeapSize
 
   private object Private {
     def createDynamicStateKey(documentUUID: String, isInitialState: Boolean) =

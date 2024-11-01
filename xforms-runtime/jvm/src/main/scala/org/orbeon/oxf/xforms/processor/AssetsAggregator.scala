@@ -258,7 +258,7 @@ object AssetsAggregator extends Logging {
       val resourcesHash = SecureUtils.digestStringToHexShort(itemsToHash mkString "|")
 
       // Cache mapping so that resource can be served by resource server
-      Caches.resourcesCache.put(resourcesHash, assets.toArray) // use `Array` which is compact, serializable and usable from Java
+      XFormsStores.resourcesStore.put(resourcesHash, assets.toArray) // use `Array` which is compact, serializable and usable from Java
 
       // Extension and optional namespace parameter
       def extension = if (isCSS) ".css" else ".js"

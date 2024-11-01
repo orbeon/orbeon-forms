@@ -30,7 +30,7 @@ class ReplicationServletContextListenerImpl extends ServletContextListener {
   override def contextInitialized(servletContextEvent: ServletContextEvent): Unit =
     if (XFormsGlobalProperties.isReplication) {
       Version.instance.requirePEFeature("State replication")
-      withDebug("eagerly bootstrapping caches for replication")(Caches)(cache.CacheSupport.Logger)
+      withDebug("eagerly bootstrapping caches for replication")(XFormsStores)(cache.CacheSupport.Logger)
     }
 
   override def contextDestroyed(servletContextEvent: ServletContextEvent): Unit = ()

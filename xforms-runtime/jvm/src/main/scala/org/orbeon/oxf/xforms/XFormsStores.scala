@@ -15,8 +15,8 @@
 package org.orbeon.oxf.xforms
 
 
-object Caches {
+object XFormsStores {
   // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
-  lazy val stateCache     = org.orbeon.oxf.cache.CacheSupport.getOrElseThrow("xforms.state",     store = true)
-  lazy val resourcesCache = org.orbeon.oxf.cache.CacheSupport.getOrElseThrow("xforms.resources", store = true)
+  lazy val stateStore     = org.orbeon.oxf.cache.CacheSupport.getOrElseThrow("xforms.state",     store = true)
+  lazy val resourcesStore = org.orbeon.oxf.cache.CacheSupport.getOrElseThrow("xforms.resources", store = true)
 }

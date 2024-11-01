@@ -53,7 +53,7 @@
                 xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
 
                 <xf:instance src="input:data" id="fr-batch-data" xxf:readonly="true"/>
-                <xf:instance id="fr-empty-data"><dummy/></xf:instance>
+                <xf:instance id="fr-empty-data"><_/></xf:instance>
                 <xf:instance id="fr-import-stats" xxf:exclude-result-prefixes="#all">
                     <stats>
                         <total>0</total>

@@ -682,7 +682,7 @@
             <lang>en</lang>
         </search>
     </xf:instance>
-    <xf:instance id="fr-search-response" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
+    <xf:instance id="fr-search-response" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
     <xf:instance id="fr-lockinfo-request" xxf:exclude-result-prefixes="#all">
         <d:lockinfo>

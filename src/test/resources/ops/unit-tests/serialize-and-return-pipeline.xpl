@@ -11,7 +11,7 @@
         </p:input>
     </p:processor>
     <p:processor name="oxf:identity">
-        <p:input name="data"><dummy/></p:input>
+        <p:input name="data"><_/></p:input>
         <p:output name="data" ref="sub-output"/>
     </p:processor>
 </p:config>

@@ -45,7 +45,7 @@
 
     <!-- Put app, form, and mode in format understood by read-form.xpl -->
     <p:processor name="oxf:xslt">
-        <p:input name="data"><dummy/></p:input>
+        <p:input name="data"><_/></p:input>
         <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="request"        href="#request"/>
         <p:input name="config">

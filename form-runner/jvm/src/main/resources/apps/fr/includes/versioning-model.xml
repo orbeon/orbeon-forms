@@ -239,7 +239,7 @@
     </xf:submission>
 
     <xf:instance id="fr-versioning-form-metadata">
-        <dummy/>
+        <_/>
     </xf:instance>
 
     <xf:instance id="fr-versioning-instance" xxf:expose-xpath-types="true">

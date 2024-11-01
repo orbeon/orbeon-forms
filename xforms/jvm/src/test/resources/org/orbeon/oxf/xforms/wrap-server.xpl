@@ -29,14 +29,14 @@
 
     <!-- Create XHTML+XForms document based on separate models, instances, and controls -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data"><dummy/></p:input>
+        <p:input name="data"><_/></p:input>
         <p:input name="controls" href="#controls"/>
         <p:input name="models" href="#models"/>
         <p:input name="instances" href="#instances"/>
         <p:input name="config">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-                
+
                 <xsl:variable name="model-ids" select="doc('input:instances')/*/instance/@model-id/string()"/>
                 <xsl:variable name="instance-ids" select="doc('input:instances')/*/instance/@id/string()"/>
 
@@ -53,7 +53,7 @@
                             <xsl:apply-templates select="doc('input:controls')/*/*"/>
                         </xh:body>
                     </xh:html>
-                    
+
                 </xsl:template>
 
                 <!-- Copy instance content for matching instances -->

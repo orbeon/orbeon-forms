@@ -31,8 +31,8 @@
 
     <p:processor name="oxf:html-converter">
         <p:input name="config"><config/></p:input>
-        <!-- Get elements under <dummy-root>, the wrapper when going through TagSoup -->
-        <p:input name="data" href="#clean-html-parsed#xpointer(/dummy-root/*)"/>
+        <!-- Get elements under `<_>`, the wrapper when going through `TagSoup` -->
+        <p:input name="data" href="#clean-html-parsed#xpointer(/_/*)"/>
         <p:output name="data" ref="clean-html"/>
     </p:processor>
 

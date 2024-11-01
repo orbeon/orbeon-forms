@@ -71,7 +71,7 @@
 
     <!-- Main instance -->
     <!-- Index ids on fb-form-instance for performance -->
-    <xf:instance id="fb-form-instance" xxf:index="id"><dummy/></xf:instance>
+    <xf:instance id="fb-form-instance" xxf:index="id"><_/></xf:instance>
     <xf:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
 
     <!-- RPC request from the client -->
@@ -1064,7 +1064,7 @@
     </xf:action>
 
     <xf:instance id="fb-publish-response-instance">
-        <dummy/>
+        <_/>
     </xf:instance>
 
     <!-- These actions track how many dialogs are open at a given time (for keyboard shortcuts) -->

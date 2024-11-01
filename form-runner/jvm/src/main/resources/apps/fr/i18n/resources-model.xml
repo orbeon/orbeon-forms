@@ -51,7 +51,7 @@
     <xf:var name="fr-selector-resources" value="if ($use-form-resources) then xxf:instance('fr-form-resources') else instance('fr-fr-resources')"/>
 
     <!-- Instance containing the Form Runner resources -->
-    <xf:instance id="fr-fr-resources"><dummy/></xf:instance>
+    <xf:instance id="fr-fr-resources"><_/></xf:instance>
     <xf:instance id="no-form-metadata"><_/></xf:instance>
     <!-- Here we pass only the relevant subset of the form metadata to the submission, so that the resources are not repatched everytime any
          value of the form metadata is changed. -->

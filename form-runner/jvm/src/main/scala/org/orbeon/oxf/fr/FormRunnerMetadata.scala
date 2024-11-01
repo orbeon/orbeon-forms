@@ -246,7 +246,7 @@ object FormRunnerMetadata {
           lhhaName = lhha.entryName
           holder   <- enclosingHolder child lhhaName
         } yield
-          <dummy>{holder.stringValue}</dummy>.copy(label = lhhaName)
+          <_>{holder.stringValue}</_>.copy(label = lhhaName)
 
       val items =
         (enclosingHolder child Names.Item nonEmpty) list
@@ -256,7 +256,7 @@ object FormRunnerMetadata {
               <item>{
                 for (el <- item child *)
                 yield
-                  <dummy>{el.stringValue}</dummy>.copy(label = el.localname)
+                  <_>{el.stringValue}</_>.copy(label = el.localname)
               }</item>
 
           }</items>

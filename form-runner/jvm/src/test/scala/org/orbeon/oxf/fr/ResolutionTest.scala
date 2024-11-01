@@ -129,7 +129,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
             </resources>
           </xf:instance>
           <xf:instance xxf:readonly="true" id="dummy-template">
-            <dummy/>
+            <_/>
           </xf:instance>
         </xf:model>
       </xh:head>

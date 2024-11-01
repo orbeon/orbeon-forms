@@ -451,7 +451,7 @@
             </search>
         </xf:instance>
 
-        <xf:instance id="fb-publish-search-result-instance"><dummy/></xf:instance>
+        <xf:instance id="fb-publish-search-result-instance"><_/></xf:instance>
 
         <xf:submission
             id="fb-search-form-data"

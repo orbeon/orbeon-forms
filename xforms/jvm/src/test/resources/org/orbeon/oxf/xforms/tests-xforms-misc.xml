@@ -893,8 +893,8 @@
             <xh:html>
                 <xh:head>
                     <xf:model id="model">
-                        <xf:instance id="instance-readwrite"><dummy/></xf:instance>
-                        <xf:instance id="instance-readonly"><dummy/></xf:instance>
+                        <xf:instance id="instance-readwrite"><_/></xf:instance>
+                        <xf:instance id="instance-readonly"><_/></xf:instance>
 
                         <xf:submission id="readwrite" method="get" resource="oxf:/ops/unit-tests/comments.xml" replace="instance" instance="instance-readwrite"/>
                         <xf:submission id="readonly" method="get" resource="oxf:/ops/unit-tests/comments.xml" replace="instance" instance="instance-readonly" xxf:readonly="true"/>

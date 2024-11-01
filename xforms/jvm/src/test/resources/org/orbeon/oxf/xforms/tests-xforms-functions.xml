@@ -2759,7 +2759,7 @@
                 <xh:head>
                     <xf:model id="model" xxf:function-library="org.orbeon.oxf.xforms.function.TestFooFunctionLibrary">
                         <xf:instance id="instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:message
@@ -2791,7 +2791,7 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:message

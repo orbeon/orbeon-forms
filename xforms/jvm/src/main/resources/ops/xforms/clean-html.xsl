@@ -14,9 +14,9 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="/">
-        <dummy-root>
+        <_>
             <xsl:apply-templates select="node()"/>
-        </dummy-root>
+        </_>
     </xsl:template>
 
     <!-- Add safe elements to this list -->

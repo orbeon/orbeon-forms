@@ -70,7 +70,7 @@
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="result"/>
                 <p:processor name="oxf:xslt">
-                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="data"><_/></p:input>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                             <xsl:template match="/">
@@ -106,7 +106,7 @@
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="result"/>
                 <p:processor name="oxf:xslt">
-                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="data"><_/></p:input>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                             <xsl:template match="/">

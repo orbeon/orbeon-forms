@@ -18,7 +18,7 @@
     <p:param name="data" type="output"/>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data"><dummy/></p:input>
+        <p:input name="data"><_/></p:input>
         <p:input name="config">
             <uuid xsl:version="2.0">
                 <!-- Prevent pipeline engine to cache the output of this processor -->

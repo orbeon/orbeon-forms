@@ -841,12 +841,12 @@
             <xh:html>
                 <xh:head>
                     <xf:model id="model1">
-                        <xf:instance><dummy/></xf:instance>
+                        <xf:instance><_/></xf:instance>
                         <xf:var name="v11" value="42"/>
                         <xf:var name="v12" value="43"/>
                     </xf:model>
                     <xf:model id="model2">
-                        <xf:instance><dummy/></xf:instance>
+                        <xf:instance><_/></xf:instance>
                         <xf:var name="v21" model="model1" value="$v11"/>
                         <xf:var name="v22" model="model1" value="$v12"/>
                     </xf:model>

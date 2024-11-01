@@ -22,7 +22,7 @@
             <xf:submission xmlns:xf="http://www.w3.org/2002/xforms" serialization="none"
                                method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"/>
         </p:input>
-        <p:input name="request"><dummy/></p:input>
+        <p:input name="request"><_/></p:input>
         <p:output name="response" ref="data"/>
     </p:processor>
 

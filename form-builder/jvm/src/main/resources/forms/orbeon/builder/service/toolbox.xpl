@@ -71,10 +71,10 @@
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input  name="config"     href="toolbox.xsl"/>
-        <p:input  name="data"                ><dummy/></p:input>
-        <p:input  name="global-template-xbl" ><dummy/></p:input>
-        <p:input  name="special-template-xbl"><dummy/></p:input>
-        <p:input  name="app-template-xbl"    ><dummy/></p:input>
+        <p:input  name="data"                ><_/></p:input>
+        <p:input  name="global-template-xbl" ><_/></p:input>
+        <p:input  name="special-template-xbl"><_/></p:input>
+        <p:input  name="app-template-xbl"    ><_/></p:input>
         <p:input  name="request"   href="#request"/>
         <p:output name="data"      id="components-but-not-section-templates"/>
     </p:processor>
@@ -183,7 +183,7 @@
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="toolbox.xsl"/>
-        <p:input name="data"><dummy/></p:input>
+        <p:input name="data"><_/></p:input>
         <p:input name="global-template-xbl"  href="#global-template-xbl"/>
         <p:input name="special-template-xbl" href="#special-template-xbl"/>
         <p:input name="app-template-xbl"     href="#app-template-xbl"/>

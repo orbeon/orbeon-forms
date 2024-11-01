@@ -261,7 +261,7 @@
                     <xf:model id="model">
                         <!-- Instance with XInclude -->
                         <xf:instance id="instance-xinclude">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
                         <!-- Load instance upon init -->
                         <xf:send ev:event="xforms-model-construct-done" submission="get-instance-xinclude"/>
@@ -271,7 +271,7 @@
 
                         <!-- Instance without XInclude -->
                         <xf:instance id="instance-no-xinclude">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
                         <!-- Load instance upon init -->
                         <xf:send ev:event="xforms-model-construct-done" submission="get-instance-no-xinclude"/>
@@ -318,7 +318,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -388,7 +388,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -537,11 +537,11 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -611,11 +611,11 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -685,11 +685,11 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -759,7 +759,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
@@ -842,7 +842,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy foo="bar"/>
+                            <_ foo="bar"/>
                         </xf:instance>
 
                         <xf:action ev:event="xforms-model-construct-done">
@@ -1110,9 +1110,9 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy>
+                            <_>
                                 <nested-element/>
-                            </dummy>
+                            </_>
                         </xf:instance>
 
                         <xf:action ev:event="xforms-model-construct-done">
@@ -1166,12 +1166,12 @@
                     <dynamic-state>
                         <instances>
                             <instance id="source-instance" model-id="model">
-                                <dummy>
+                                <_>
                                     <book>
                                         <title lang="en">Pale Blue Dot</title>
                                         <author>Carl Sagan</author>
                                     </book>
-                                </dummy>
+                                </_>
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
@@ -1200,10 +1200,10 @@
                     <xf:model id="model">
 
                         <xf:instance id="instance-1">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
                         <xf:instance id="instance-2">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
 
                         <!-- Load instances upon init -->
@@ -1592,7 +1592,7 @@
             </xf:submission>
         </input>
         <input name="request">
-            <dummy/>
+            <_/>
         </input>
         <output name="response">
             <envelope>
@@ -1617,7 +1617,7 @@
             </xf:submission>
         </input>
         <input name="request">
-            <dummy/>
+            <_/>
         </input>
         <output name="response">
             <failure/>
@@ -1785,7 +1785,7 @@ az4K</document>
                             <json>{"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}}</json>
                         </xf:instance>
                         <xf:instance id="xml-result-instance">
-                            <dummy/>
+                            <_/>
                         </xf:instance>
                         <xf:instance id="json-result-instance">
                             <json/>
@@ -1903,9 +1903,9 @@ az4K</document>
 
                         <xf:bind ref="//section-11 | //control-5 | //grid-19//@foo" relevant="false"/>
 
-                        <xf:instance id="blank-result-instance"><dummy/></xf:instance>
-                        <xf:instance id="annotate-result-instance"><dummy/></xf:instance>
-                        <xf:instance id="blank-annotate-result-instance"><dummy/></xf:instance>
+                        <xf:instance id="blank-result-instance"><_/></xf:instance>
+                        <xf:instance id="annotate-result-instance"><_/></xf:instance>
+                        <xf:instance id="blank-annotate-result-instance"><_/></xf:instance>
 
                         <xf:submission
                             ref="instance('instance')"
@@ -2121,7 +2121,7 @@ az4K</document>
 
                         <xf:bind ref="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
 
-                        <xf:instance id="result-instance"><dummy/></xf:instance>
+                        <xf:instance id="result-instance"><_/></xf:instance>
 
                         <xf:submission
                             id="submission"

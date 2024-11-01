@@ -31,8 +31,9 @@
 
     <xsl:import href="toc.xsl"/>
 
-    <xsl:variable name="metadata"       select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
-    <xsl:variable name="page-layout"    select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, $mode) else ()"/>
+    <xsl:variable name="metadata"      select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
+    <xsl:variable name="page-layout"   select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, $mode) else ()"/>
+    <xsl:variable name="density-class" select="if ($is-detail and not($is-form-builder)) then concat('fr-density-', (frf:optionFromMetadataOrPropertiesXPath($metadata, 'density', $app, $form, $mode), 'compact')[1]) else ()"/>
 
     <xsl:variable name="view"                 select="(/xh:html/xh:body/fr:view)[1]"                   as="element(fr:view)?"/>
     <xsl:variable name="fluid"                select="$view/@fluid = 'true' or $page-layout = 'fluid'" as="xs:boolean"/>
@@ -528,7 +529,7 @@
                                     false()
                         )
                     ]
-                }}"
+                }} {$density-class}"
                 xxf:element="div">
                 <xsl:choose>
                     <xsl:when test="$is-detail and not($is-form-builder)">

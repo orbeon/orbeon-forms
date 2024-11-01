@@ -152,6 +152,10 @@
                     value="(event('html-page-layout')[. = ('fixed', 'fluid')], 'default')[1]"/>
 
                 <xf:setvalue
+                    ref="$i/density"
+                    value="(event('density')[. = ('compact', 'comfortable', 'roomy')], 'default')[1]"/>
+
+                <xf:setvalue
                     ref="$i/analysis-calculate"
                     value="(event('analysis-calculate')[. = ('true', 'false')], 'default')[1]"/>
 
@@ -403,6 +407,7 @@
                         <xf:property name="relevant"                               value="$i/relevant/string()"/>
                         <xf:property name="readonly"                               value="$i/readonly/string()"/>
                         <xf:property name="html-page-layout"                       value="$i/html-page-layout/string()"/>
+                        <xf:property name="density"                                value="$i/density/string()"/>
                         <xf:property name="analysis-calculate"                     value="$i/analysis-calculate/string()"/>
                         <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
 
@@ -496,6 +501,7 @@
 <!--                        <relevant/>-->
                         <readonly/>
                         <html-page-layout/>
+                        <density/>
                         <attachment-max-size-per-file/>
                         <attachment-max-size-aggregate-per-form/>
                         <attachment-mediatypes/>
@@ -504,11 +510,11 @@
                         <hints/>
                         <hints-placeholders/>
                         <automatic-hints/>
+                        <grid-tab-order/>
                         <mode/>
                         <created-with-version/>
                         <updated-with-versions/>
                         <data-migration/>
-                        <grid-tab-order/>
                         <analysis-calculate/>
                         <xbl/>
                     </_>
@@ -936,6 +942,7 @@
                                 </fr:grid>
 
                             </fr:tab>
+
                             <fr:tab visible="$is-app-form or $is-form-settings">
                                 <fr:label ref="$resources/general-settings[$is-form-settings]"/>
 
@@ -1025,6 +1032,44 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
+                                            <xf:select1 ref="data-migration" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/data-migration/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/data-migration/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/data-migration/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                            ref="
+                                                            if (@id = 0) then
+                                                                'default'
+                                                            else if (@id = 1) then
+                                                                'enabled'
+                                                            else if (@id = 2) then
+                                                                'disabled'
+                                                            else
+                                                                'error'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:select1 ref="grid-tab-order" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/grid-tab-order/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/grid-tab-order/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/grid-tab-order/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                            ref="
+                                                        if (@id = 0) then
+                                                            'default'
+                                                        else if (@id = 1) then
+                                                            'rows'
+                                                        else
+                                                            'columns'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
                                             <fr:open-select1
                                                 ref="attachment-max-size-per-file"
                                                 appearance="full xxf:horizontal"
@@ -1072,115 +1117,12 @@
                                                 </xf:itemset>
                                             </fr:open-select1>
                                         </xh:td>
-                                        <xh:td/>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:select1 ref="labels" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-form-settings/labels/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/labels/hint"/>
-                                                <xf:itemset ref="$resources/dialog-form-settings/appearances/item[@id != 2]">
-                                                    <xf:label ref="."/>
-                                                    <xf:value
-                                                        ref="
-                                                            if (@id = 0) then
-                                                                'default'
-                                                            else
-                                                                'full'"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                        </xh:td>
-                                        <xh:td>
-                                            <xf:select1 ref="hints" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-form-settings/hints/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/hints/hint"/>
-                                                <xf:itemset ref="$resources/dialog-form-settings/appearances/item">
-                                                    <xf:label ref="."/>
-                                                    <xf:value
-                                                        ref="
-                                                            if (@id = 0) then
-                                                                'default'
-                                                            else if (@id = 1) then
-                                                                'full'
-                                                            else
-                                                                'tooltip'"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <fr:checkbox-input ref="labels-placeholders" class="fb-labels-placeholders">
-                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
-                                                <xf:setvalue
-                                                    event="xforms-value-changed"
-                                                    if="event('xxf:value') = 'true'"
-                                                    ref="../hints-placeholders"
-                                                    value="false()"
-                                                />
-                                            </fr:checkbox-input>
-                                        </xh:td>
-                                        <xh:td>
-                                            <fr:checkbox-input ref="hints-placeholders" class="fb-hints-placeholders">
-                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
-                                                <xf:setvalue
-                                                    event="xforms-value-changed"
-                                                    if="event('xxf:value') = 'true'"
-                                                    ref="../labels-placeholders"
-                                                    value="false()"
-                                                />
-                                            </fr:checkbox-input>
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td/>
                                         <xh:td>
                                             <xf:select1 ref="automatic-hints" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/automatic-hints/label"/>
                                                 <xf:itemset ref="$resources/property-yes-no/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:select1 ref="data-migration" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-form-settings/data-migration/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/data-migration/hint"/>
-                                                <xf:itemset ref="$resources/dialog-form-settings/data-migration/item">
-                                                    <xf:label ref="."/>
-                                                    <xf:value
-                                                        ref="
-                                                            if (@id = 0) then
-                                                                'default'
-                                                            else if (@id = 1) then
-                                                                'enabled'
-                                                            else if (@id = 2) then
-                                                                'disabled'
-                                                            else
-                                                                'error'"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                        </xh:td>
-
-                                        <xh:td>
-                                            <xf:select1 ref="grid-tab-order" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-form-settings/grid-tab-order/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/grid-tab-order/hint"/>
-                                                <xf:itemset ref="$resources/dialog-form-settings/grid-tab-order/item">
-                                                    <xf:label ref="."/>
-                                                    <xf:value
-                                                        ref="
-                                                        if (@id = 0) then
-                                                            'default'
-                                                        else if (@id = 1) then
-                                                            'rows'
-                                                        else
-                                                            'columns'"/>
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>
@@ -1208,8 +1150,8 @@
 
                             </fr:tab>
 
-                            <fr:tab class="fb-dialog-form-settings-wizard-options" visible="$is-form-settings">
-                                <fr:label value="$resources/dialog-form-settings/wizard-options"/>
+                            <fr:tab class="fb-dialog-form-settings-view-options" visible="$is-form-settings">
+                                <fr:label value="$resources/dialog-form-settings/view-options"/>
 
                                 <fr:grid>
                                     <xh:tr>
@@ -1226,7 +1168,88 @@
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>
+                                        <xh:td>
+                                            <xf:select1 ref="density" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/density/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/density/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/density/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="
+                                                             if (@id = 1) then 'compact'
+                                                        else if (@id = 2) then 'comfortable'
+                                                        else if (@id = 3) then 'roomy'
+                                                        else                   'default'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
                                     </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="labels" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/labels/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/labels/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/appearances/item[@id != 2]">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                            ref="
+                                                            if (@id = 0) then
+                                                                'default'
+                                                            else
+                                                                'full'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:select1 ref="hints" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/hints/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/hints/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/appearances/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                            ref="
+                                                            if (@id = 0) then
+                                                                'default'
+                                                            else if (@id = 1) then
+                                                                'full'
+                                                            else
+                                                                'tooltip'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="labels-placeholders" class="fb-labels-placeholders">
+                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
+                                                <xf:setvalue
+                                                        event="xforms-value-changed"
+                                                        if="event('xxf:value') = 'true'"
+                                                        ref="../hints-placeholders"
+                                                        value="false()"
+                                                />
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="hints-placeholders" class="fb-hints-placeholders">
+                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
+                                                <xf:setvalue
+                                                        event="xforms-value-changed"
+                                                        if="event('xxf:value') = 'true'"
+                                                        ref="../labels-placeholders"
+                                                        value="false()"
+                                                />
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
+                            </fr:tab>
+
+                            <fr:tab class="fb-dialog-form-settings-wizard-options" visible="$is-form-settings">
+                                <fr:label value="$resources/dialog-form-settings/wizard-options"/>
+
+                                <fr:grid>
                                     <xh:tr>
                                         <xh:td>
                                             <xf:select1 ref="wizard" appearance="full xxf:horizontal">

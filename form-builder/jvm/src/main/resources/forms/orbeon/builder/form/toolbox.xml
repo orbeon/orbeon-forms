@@ -82,6 +82,7 @@
                             <xf:property name="relevant"                                  value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
                             <xf:property name="readonly"                                  value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
                             <xf:property name="html-page-layout"                          value="bind('html-page-layout-bind')"/>
+                            <xf:property name="density"                                   value="bind('density-bind')"/>
                             <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>
                             <xf:property name="email"                                     value="bind('email-bind')"/>
                             <xf:property name="xbl"                                       value="bind('xbl-bind')"/>

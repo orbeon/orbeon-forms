@@ -256,7 +256,21 @@
                             'edit'
                         ) = 'fluid'"/>
 
-                <xh:div class="container{'-fluid'[$is-page-layout-fluid]}">
+                <xf:var
+                    name="density"
+                    value="
+                    (
+                        frf:optionFromMetadataOrPropertiesXPath(
+                            bind('metadata-bind'),
+                            'density',
+                            bind('application-name-bind'),
+                            bind('form-name-bind'),
+                            'edit'
+                        ),
+                        'compact'
+                    )[1]"/>
+
+                <xh:div class="container{'-fluid'[$is-page-layout-fluid]} fr-density-{$density}">
 
                     <xh:div class="row{'-fluid'[$is-page-layout-fluid]}">
                         <xh:div class="span12">
@@ -709,15 +723,7 @@
                                             ref="*"
                                             origin="xf:element('data-migration', event('data-migration'))"/>
 
-                                        <xf:delete
-                                            bind="grid-tab-order-bind"/>
-                                        <xf:insert
-                                            if="event('grid-tab-order') = ('rows', 'columns')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('grid-tab-order', event('grid-tab-order'))"/>
-
-                                        <xf:action iterate="'rendered-page-orientation', 'rendered-page-size', 'html-page-layout'">
+                                        <xf:action iterate="'rendered-page-orientation', 'rendered-page-size', 'html-page-layout', 'density', 'grid-tab-order'">
                                             <xf:var name="n" value="."/>
                                             <xf:delete
                                                 ref="bind(concat($n, '-bind'))"/>

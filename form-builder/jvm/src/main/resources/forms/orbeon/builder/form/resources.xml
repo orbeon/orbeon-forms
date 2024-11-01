@@ -366,8 +366,9 @@
             <save-as>Save as…</save-as>
             <open><label>Form settings</label></open>
             <options>Form Options</options>
-            <wizard-options>View Options</wizard-options>
-            <pdf-options>PDF Options</pdf-options>
+            <view-options>Appearance</view-options>
+            <wizard-options>Wizard</wizard-options>
+            <pdf-options>PDF</pdf-options>
             <control-settings>Control Settings</control-settings>
             <about>About this Form</about>
             <stats>Form Statistics</stats>
@@ -434,7 +435,7 @@
                 <label>Appearance of Control Hints</label>
             </hints>
             <automatic-hints>
-                <label>Use automatic hints</label>
+                <label>Use Automatic Hints</label>
             </automatic-hints>
             <appearances>
                 <item id="0">Use property</item>
@@ -488,6 +489,14 @@
                 <item id="1">Fixed width</item>
                 <item id="2">Fluid width</item>
             </html-page-layout>
+            <density>
+                <label>Density</label>
+                <hint>Spacing between elements in the interface</hint>
+                <item id="0">Use property</item>
+                <item id="1">Compact</item>
+                <item id="2">Comfortable</item>
+                <item id="3">Roomy</item>
+            </density>
             <analysis-calculate>
                 <label>Automatic Calculations Dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -1778,7 +1787,8 @@
             <save-as>Sauvegarder sous…</save-as>
             <open><label>Paramètres du formulaire</label></open>
             <options>Options</options>
-            <wizard-options>Vue</wizard-options>
+            <view-options>Apparence</view-options>
+            <wizard-options>Wizard</wizard-options>
             <pdf-options>PDF</pdf-options>
             <control-settings>Contrôles</control-settings>
             <about>À propos</about>
@@ -1900,6 +1910,14 @@
                 <item id="1">Largeur fixe</item>
                 <item id="2">Largeur fluide</item>
             </html-page-layout>
+            <density>
+                <label>Densité</label>
+                <hint>Espacement entre les éléments de l'interface</hint>
+                <item id="0">Utiliser la propriété</item>
+                <item id="1">Compact</item>
+                <item id="2">Confortable</item>
+                <item id="3">Spacieux</item>
+            </density>
             <analysis-calculate>
                 <label>Dépendances automatiques des formules de calculs</label>
                 <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
@@ -3173,8 +3191,9 @@
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form settings]</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats todo="true">[Form Statistics]</stats>
@@ -3241,7 +3260,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -3295,6 +3314,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -4596,8 +4623,9 @@
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form Settings]</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats todo="true">[Form statistics]</stats>
@@ -4664,7 +4692,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -4718,6 +4746,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -6019,8 +6055,9 @@
             <save-as>Salva con nome…</save-as>
             <open><label>Impostazioni modulo</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Statistiche del modulo</stats>
@@ -6087,7 +6124,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -6141,6 +6178,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -7406,8 +7451,9 @@
             <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
             <options>Formular</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings>Steuerelement</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Statistiken</stats>
@@ -7474,7 +7520,7 @@
                 <label>Anzeige der Steuerelement-Hinweise</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item id="0">Standard-Einstellung</item>
@@ -7528,6 +7574,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label>Abhängigkeiten automatisch ermitteln</label>
                 <hint>Definiert die Auswertungsreihenfolge von "Berechneten Werten" und "Initialen Werten" automatisch</hint>
@@ -8796,8 +8850,9 @@
             <save-as>Tallenna nimellä</save-as>
             <open><label>Lomakeasetukset</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Lomatilastot</stats>
@@ -8864,7 +8919,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -8918,6 +8973,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -10211,8 +10274,9 @@
             <save-as>Guardar como…</save-as>
             <open><label>Configuración del Formulario</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Estadísticas del Formulario</stats>
@@ -10279,7 +10343,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -10333,6 +10397,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -11627,8 +11699,9 @@
             <save-as>Bewaar als…</save-as>
             <open><label>Form-instellingen</label></open>
             <options>Form opties</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Form-statistieken</stats>
@@ -11695,7 +11768,7 @@
                 <label>Weergave van control-hints</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item id="0">Gebruik standaard</item>
@@ -11749,6 +11822,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label>Automatische afhankelijkheid calculatie</label>
                 <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>
@@ -13022,8 +13103,9 @@
             <save-as>Guardar como…</save-as>
             <open><label>Configurações do Formulário</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Estatística do Formulário</stats>
@@ -13090,7 +13172,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -13144,6 +13226,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -14444,8 +14534,9 @@
             <save-as>Spara som…</save-as>
             <open><label>Inställningar för formulär</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[View Options]</wizard-options>
-            <pdf-options todo="true">[PDF Options]</pdf-options>
+            <view-options todo="true">[Appearance]</view-options>
+            <wizard-options todo="true">[Wizard]</wizard-options>
+            <pdf-options todo="true">[PDF]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Formulärstatistik</stats>
@@ -14512,7 +14603,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use automatic hints]</label>
+                <label todo="true">[Use Automatic Hints]</label>
             </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
@@ -14566,6 +14657,14 @@
                 <item id="1" todo="true">[Fixed width]</item>
                 <item id="2" todo="true">[Fluid width]</item>
             </html-page-layout>
+            <density>
+                <label todo="true">[Density]</label>
+                <hint todo="true">[Spacing between elements in the interface]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Compact]</item>
+                <item id="2" todo="true">[Comfortable]</item>
+                <item id="3" todo="true">[Roomy]</item>
+            </density>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>

@@ -74,7 +74,7 @@
         }
     }
 
-    .xbl-fr-grid {
+    .xbl-fr-grid(@densityMarginTopBottom, @densityMarginLeftRight) {
 
         .fr-grid-th,
         .fr-grid-td,
@@ -90,7 +90,7 @@
             &> .xforms-control,
             &> .xbl-component,
             &> .xforms-group {
-                margin: @frGridCellPadding @frGridCellPadding;
+                margin: @densityMarginTopBottom @densityMarginLeftRight;
                 display: block;
             }
 
@@ -814,6 +814,11 @@
             }
         }
     }
+
+    .xbl-fr-grid(@frGridDensityMarginCompactTopBottom, @frGridDensityMarginCompactLeftRight); // Default density
+    .fr-density-compact     { .xbl-fr-grid(@frGridDensityMarginCompactTopBottom    , @frGridDensityMarginCompactLeftRight);     }
+    .fr-density-comfortable { .xbl-fr-grid(@frGridDensityMarginComfortableTopBottom, @frGridDensityMarginComfortableLeftRight); }
+    .fr-density-roomy       { .xbl-fr-grid(@frGridDensityMarginRoomyTopBottom      , @frGridDensityMarginRoomyLeftRight);       }
 
     // Changes for view mode only
     .fr-mode-view {

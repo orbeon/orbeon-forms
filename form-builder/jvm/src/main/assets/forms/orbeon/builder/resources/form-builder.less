@@ -694,7 +694,7 @@ body.orbeon {
 
     // Metadata editor dialog
     .fb-dialog-form-settings {
-        width: 1010px; // larger so that tab titles in French, in particular, fit
+        width: 1130px; // larger so that tab titles in French, in particular, fit
         max-width: none;
 
         .fb-settings-mode-edit {
@@ -1626,104 +1626,122 @@ body.orbeon {
 
 
     // Editable grids
-    .fr-view .xbl-fr-grid .fr-grid.fr-editable {
+    .fr-view {
+        .xbl-fr-grid(@densityMarginTopBottom, @densityMarginLeftRight) {
+            .xbl-fr-grid .fr-grid.fr-editable {
+                .fr-grid-td {
+                    &.fb-selected {
+                        box-shadow: 0 0 0 4px @cellHighlight !important;
+                        outline: 0;
+                        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+                        border-radius: @baseBorderRadius;
+                        z-index: 1; // Highlight to show over grey background for hover cell
+                    }
+                }
 
-        .fr-grid-td {
-            &.fb-selected {
-                box-shadow: 0 0 0 4px @cellHighlight !important;
-                outline: 0;
-                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-                border-radius: @baseBorderRadius;
-                z-index: 1;                                                             // Highlight to show over grey background for hover cell
-            }
-        }
+                .fr-grid-td {
+                    &:hover:not(.fb-selected) { // Grey background on hover on non-selected cell, to indicate it can be selected
+                        background-color: #eee;
+                    }
+                }
 
-        .fr-grid-td {
-            &:hover:not(.fb-selected) {                                                 // Grey background on hover on non-selected cell, to indicate it can be selected
-                background-color: #eee;
-            }
-        }
+                &.fr-repeat.fr-repeat-single-row .fr-grid-body .fr-grid-td > * {
+                    & > .xforms-label,
+                    & > .xforms-help,
+                    & > .xforms-hint {
+                        display: none;
+                    }
+                }
 
-        &.fr-repeat.fr-repeat-single-row .fr-grid-body .fr-grid-td > * {
-            &> .xforms-label,
-            &> .xforms-help,
-            &> .xforms-hint {
-                display: none;
-            }
-        }
+                .fr-grid-body {
+                    grid-gap: 0px
+                }
 
-        .fr-grid-body { grid-gap: 0px }
-        &.fr-norepeat {
-            .fr-grid-body { grid-gap: 1px }
-            &.fb-hover .fr-grid-td { box-shadow: 0 0 0 1px @grayLighter }
-        }
+                &.fr-norepeat {
+                    .fr-grid-body {
+                        grid-gap: 1px
+                    }
 
-        // Enough space to hold row icons so hovering doesn't cause the row to expand
-        .fr-grid-td {
-            min-height: @fbGridRowMinHeight;
-        }
+                    &.fb-hover .fr-grid-td {
+                        box-shadow: 0 0 0 1px @grayLighter
+                    }
+                }
 
-        // Generate multiples of min height so that empty cells take space
-        .generateMinHeight(@h) when (@h > 0) {
-            .fr-grid-td[data-fr-h =  '@{h}'] { min-height: @h * @fbGridRowMinHeight; }
-            .generateMinHeight(@h - 1)
-        }
+                // Enough space to hold row icons so hovering doesn't cause the row to expand
+                .fr-grid-td {
+                    min-height: @fbGridRowMinHeight;
+                }
 
-        .generateMinHeight(20);
+                // Generate multiples of min height so that empty cells take space
+                .generateMinHeight(@h) when (@h > 0) {
+                    .fr-grid-td[data-fr-h =  '@{h}'] {
+                        min-height: @h * @fbGridRowMinHeight;
+                    }
+                    .generateMinHeight(@h - 1)
+                }
 
-        .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
-            &:hover {
-                // Indicate the value can be edited
-                background-color: #ddd;
-                cursor: pointer;
-                border-radius: @baseBorderRadius;
-            }
-        }
-        // Make click area with the grey background larger, as it will typically contain a longer text
-        .xforms-text .xforms-output-output {
-            min-height: 50px;
-            display: block;
-            border: 1px solid transparent; // so we can have a visible border when editing without causing resizing
-            border-radius: @baseBorderRadius;
-            padding: 1px; // so that cursor does not touch border
-        }
+                .generateMinHeight(20);
 
-        // Even if the label or hint is empty, we still want space for 1 line to be reserved
-        // In regular grid content
-        .fr-grid-td {
-            & > .xbl-component, & > .xforms-control {
-                // At design-time, the cells have internal padding for the icons, so we don't want a margin. This also
-                // helps with sizing the content to 100% width consistently.
-                margin: 0;
+                .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
+                    &:hover {
+                        // Indicate the value can be edited
+                        background-color: #ddd;
+                        cursor: pointer;
+                        border-radius: @baseBorderRadius;
+                    }
+                }
 
-                & > .xforms-label, & > .xforms-hint {
-                    min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+                // Make click area with the grey background larger, as it will typically contain a longer text
+                .xforms-text .xforms-output-output {
+                    min-height: 50px;
                     display: block;
+                    border: 1px solid transparent; // so we can have a visible border when editing without causing resizing
+                    border-radius: @baseBorderRadius;
+                    padding: 1px; // so that cursor does not touch border
+                }
+
+                // Even if the label or hint is empty, we still want space for 1 line to be reserved
+                // In regular grid content
+                .fr-grid-td {
+                    & > .xbl-component, & > .xforms-control {
+                        // At design-time, the cells also have internal padding for the icons.
+                        margin: @densityMarginTopBottom, @densityMarginLeftRight;
+
+                        & > .xforms-label, & > .xforms-hint {
+                            min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+                            display: block;
+                        }
+                    }
+                }
+
+                // In grid header, for the repeat single line
+                .fr-grid-th {
+                    .xforms-label, .xforms-hint {
+                        min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+                        display: block;
+                    }
+                }
+
+                .fr-grid-td, .fr-grid-th {
+                    // Space for highlights
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                    // Space for the icons to the left and right of the control
+                    padding-left: 24px;
+                    padding-right: 24px;
+
+                    // Inputs for editing the label and hint to take the whole width of the grid content
+                    .xforms-label input, .xforms-hint input {
+                        width: 100%
+                    }
                 }
             }
         }
 
-        // In grid header, for the repeat single line
-        .fr-grid-th {
-            .xforms-label, .xforms-hint {
-                min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
-                display: block;
-            }
-        }
-
-        .fr-grid-td, .fr-grid-th {
-            // Space for highlights
-            padding-top: 4px;
-            padding-bottom: 4px;
-            // Space for the icons to the left and right of the control
-            padding-left: 24px;
-            padding-right: 24px;
-
-            // Inputs for editing the label and hint to take the whole width of the grid content
-            .xforms-label input, .xforms-hint input {
-                width: 100%
-            }
-        }
+        .xbl-fr-grid(@frGridDensityMarginCompactTopBottom, @frGridDensityMarginCompactLeftRight); // Default density
+        .fr-density-compact     { .xbl-fr-grid(@frGridDensityMarginCompactTopBottom    , @frGridDensityMarginCompactLeftRight);     }
+        .fr-density-comfortable { .xbl-fr-grid(@frGridDensityMarginComfortableTopBottom, @frGridDensityMarginComfortableLeftRight); }
+        .fr-density-roomy       { .xbl-fr-grid(@frGridDensityMarginRoomyTopBottom      , @frGridDensityMarginRoomyLeftRight);       }
     }
 
     .fb-use-toolbar-message, .fb-click-message {

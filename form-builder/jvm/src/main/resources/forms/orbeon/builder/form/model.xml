@@ -454,6 +454,7 @@
                 <xf:property name="relevant"                                  value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
                 <xf:property name="readonly"                                  value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
                 <xf:property name="html-page-layout"                          value="bind('html-page-layout-bind')"/>
+                <xf:property name="density"                                   value="bind('density-bind')"/>
                 <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>
                 <xf:property name="email"                                     value="bind('email-bind')"/>
                 <xf:property name="control-settings-elems"                    value="bind('xbl-bind')/*"/>
@@ -499,6 +500,7 @@
                 <xf:property name="relevant"                                  value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
                 <xf:property name="readonly"                                  value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
                 <xf:property name="html-page-layout"                          value="bind('html-page-layout-bind')"/>
+                <xf:property name="density"                                   value="bind('density-bind')"/>
                 <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>
                 <xf:property name="email"                                     value="bind('email-bind')"/>
                 <xf:property name="xbl"                                       value="bind('xbl-bind')"/>
@@ -534,6 +536,7 @@
                     <xf:bind id="rendered-page-orientation-bind"  ref="rendered-page-orientation"/>
                     <xf:bind id="rendered-page-size-bind"         ref="rendered-page-size"/>
                     <xf:bind id="html-page-layout-bind"           ref="html-page-layout"/>
+                    <xf:bind id="density-bind"                    ref="density"/>
                     <xf:bind id="readonly-disable-calculate-bind" ref="readonly-disable-calculate"/>
                     <xf:bind id="xbl-bind"                        ref="xbl"/>
                     <xf:bind id="library-versions-bind"           ref="library-versions">

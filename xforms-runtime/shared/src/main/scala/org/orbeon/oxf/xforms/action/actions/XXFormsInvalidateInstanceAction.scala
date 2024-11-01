@@ -39,13 +39,9 @@ object XXFormsInvalidateInstanceAction {
   )(implicit
     logger           : IndentedLogger
   ): Unit =
-    handleXInclude.map(List(_)).getOrElse(List(true, false)).foreach { handleXInclude =>
-      XFormsServerSharedInstancesCache.remove(
-        instanceSourceURI = resourceURI,
-        requestBodyHash   = None,
-        handleXInclude    = handleXInclude,
-        ignoreQueryString = ignoreQueryString
-      )
-    }
-
+    XFormsServerSharedInstancesCache.remove(
+      instanceSourceURI = resourceURI,
+      handleXInclude    = handleXInclude,
+      ignoreQueryString = ignoreQueryString
+    )
 }

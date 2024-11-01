@@ -29,15 +29,16 @@ trait XFormsServerSharedInstancesCacheTrait {
   type InstanceLoader = (String, Boolean) => DocumentNodeInfoType
 
   protected case class InstanceContent(documentInfo: DocumentNodeInfoType) {
-    require(! documentInfo.isInstanceOf[VirtualNodeType], "`InstanceContent` must return a `TinyTree`")
+    require(! documentInfo.isInstanceOf[VirtualNodeType], "`InstanceContent` must contain an immutable tree")
   }
 
-  import Private._
+  import Private.*
 
   def findContent(
     instanceCaching  : InstanceCaching,
     readonly         : Boolean,
-    exposeXPathTypes : Boolean)(implicit
+    exposeXPathTypes : Boolean
+  )(implicit
     indentedLogger   : IndentedLogger
   ): Option[DocumentNodeInfoType] =
     find(instanceCaching)
@@ -86,8 +87,7 @@ trait XFormsServerSharedInstancesCacheTrait {
 
   def remove(
     instanceSourceURI : String,
-    requestBodyHash   : Option[String],
-    handleXInclude    : Boolean,
+    handleXInclude    : Option[Boolean],
     ignoreQueryString : Boolean
   )(implicit
     indentedLogger    : IndentedLogger

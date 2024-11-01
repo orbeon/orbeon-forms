@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option.*
 import org.orbeon.oxf.cache.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.model.XFormsInstance.*
@@ -29,7 +28,7 @@ import scala.jdk.CollectionConverters.*
  */
 object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCacheTrait {
 
-  import Private._
+  import Private.*
 
   protected def add(
     instanceCaching: InstanceCaching,
@@ -74,32 +73,45 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
   def remove(
     instanceSourceURI : String,
-    requestBodyHash   : Option[String],
-    handleXInclude    : Boolean,
+    handleXInclude    : Option[Boolean],
     ignoreQueryString : Boolean
   )(implicit
     indentedLogger    : IndentedLogger
   ): Unit = {
-    debug("removing instance", List("URI" -> instanceSourceURI, "request hash" -> requestBodyHash.toString))
+    debug(
+      "removing instance",
+      List(
+        "instanceSourceURI" -> instanceSourceURI,
+        "handleXInclude"    -> handleXInclude.toString,
+        "ignoreQueryString" -> ignoreQueryString.toString
+      )
+    )
 
     val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
 
+    val cacheKeysIt =
+      cache
+        .iterateCacheKeys()
+        .asScala
+
+    def matchesXInclude(v: Boolean): Boolean =
+      handleXInclude.isEmpty || handleXInclude.contains(v)
+
     if (ignoreQueryString) {
-
-      // Here we remove all the entries that have a URI that matches but *with the query string removed*
-
-      def extractUriOpt(key: InternalCacheKey) =
-        key.getKey.splitTo[List]("|").headOption
-
       val uriNoQueryString = PathUtils.removeQueryString(instanceSourceURI)
-
-      cache.iterateCacheKeys().asScala collect { case key: InternalCacheKey
-        if extractUriOpt(key).map(PathUtils.removeQueryString).contains(uriNoQueryString) => key
-      } foreach
-        cache.remove
+      cacheKeysIt
+        .collect {
+          case key @ SharedInstanceCacheKey(uri, xinclude, _)
+            if PathUtils.removeQueryString(uri) == uriNoQueryString && matchesXInclude(xinclude) => key
+        }
+        .foreach(cache.remove)
     } else {
-      val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, requestBodyHash)
-      cache.remove(cacheKey)
+      cacheKeysIt
+        .collect {
+          case key @ SharedInstanceCacheKey(`instanceSourceURI`, xinclude, _)
+            if matchesXInclude(xinclude) => key
+        }
+        .foreach(cache.remove)
     }
   }
 
@@ -113,25 +125,25 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
   private object Private {
 
+    case class SharedInstanceCacheKey(
+      sourceURI      : String,
+      handleXInclude : Boolean,
+      requestBodyHash: Option[String]
+    ) extends CacheKey
+
+    case class CacheEntry(instanceContent: InstanceContent, timeToLive: Long, timestamp: Long = System.currentTimeMillis)
+
     val XFormsSharedInstancesCacheName        = "xforms.cache.shared-instances"
+
     val XFormsSharedInstancesCacheDefaultSize = 10
 
     val ConstantValidity                      = 0L
-    val SharedInstanceKeyType                 = XFormsSharedInstancesCacheName
-
-    case class CacheEntry(instanceContent: InstanceContent, timeToLive: Long, timestamp: Long = System.currentTimeMillis)
 
     def getCache: org.orbeon.oxf.cache.Cache =
       ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
 
-    def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: Option[String]): InternalCacheKey =
-      new InternalCacheKey(
-        SharedInstanceKeyType,
-        sourceURI + "|" + handleXInclude.toString + (requestBodyHash map ("|" + _) getOrElse "")
-      )
-
-    // Make key also depend on handleXInclude and on request body hash if present
-    def createCacheKey(instanceCaching: InstanceCaching): InternalCacheKey =
-      createCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
+    // Make key also depend on `handleXInclude` and on request body hash if present
+    def createCacheKey(instanceCaching: InstanceCaching): SharedInstanceCacheKey =
+      SharedInstanceCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
   }
 }

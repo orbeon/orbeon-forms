@@ -196,8 +196,7 @@ class XFormsInstance(
           case Some(instanceCaching) =>
             XFormsServerSharedInstancesCache.remove(
               instanceSourceURI = instanceCaching.pathOrAbsoluteURI,
-              requestBodyHash   = None,
-              handleXInclude    = instanceCaching.handleXInclude,
+              handleXInclude    = Some(instanceCaching.handleXInclude),
               ignoreQueryString = false
             )
           case None =>

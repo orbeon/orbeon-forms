@@ -159,6 +159,17 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         onAttributeChange(elementWithData, DataPlaceholder, updatePlaceholder)
         makeClearAccessible()
         onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible)
+
+        // Workaround for Select2 not closing itself on click below the `<body>`
+        EventSupport.addListener(
+          document,
+          "click",
+          (e: dom.MouseEvent) => {
+            val target = e.target.asInstanceOf[dom.Element]
+            if (target == document.documentElement)
+              jSelect.select2("close")
+          }
+        )
       }
   }
 

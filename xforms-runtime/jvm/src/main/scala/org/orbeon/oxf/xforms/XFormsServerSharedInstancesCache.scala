@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms
 
 import cats.syntax.option.*
 import org.orbeon.oxf.cache.*
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
@@ -87,7 +88,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       )
     )
 
-    val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
+    val cache = getCache
 
     val cacheKeysIt =
       cache
@@ -115,7 +116,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
     }
   }
 
-  def removeAll(implicit indentedLogger: IndentedLogger): Unit = {
+  def removeAll()(implicit indentedLogger: IndentedLogger): Unit = {
 
     val cache = getCache
     val count = cache.removeAll()

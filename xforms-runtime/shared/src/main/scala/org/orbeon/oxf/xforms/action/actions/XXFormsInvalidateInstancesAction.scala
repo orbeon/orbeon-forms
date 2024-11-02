@@ -22,6 +22,6 @@ class XXFormsInvalidateInstancesAction extends XFormsAction {
   ): Unit = {
     // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
     val indentedLogger = actionInterpreter.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
-    XFormsServerSharedInstancesCache.removeAll(indentedLogger)
+    XFormsServerSharedInstancesCache.removeAll()(indentedLogger)
   }
 }

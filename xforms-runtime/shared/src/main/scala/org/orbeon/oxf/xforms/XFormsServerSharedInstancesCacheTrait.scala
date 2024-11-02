@@ -93,7 +93,7 @@ trait XFormsServerSharedInstancesCacheTrait {
     indentedLogger    : IndentedLogger
   ): Unit
 
-  def removeAll(implicit indentedLogger: IndentedLogger): Unit
+  def removeAll()(implicit indentedLogger: IndentedLogger): Unit
 
   private object Private {
 

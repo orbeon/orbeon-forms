@@ -77,7 +77,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
     }
   }
 
-  def removeAll(implicit indentedLogger: IndentedLogger): Unit =
+  def removeAll()(implicit indentedLogger: IndentedLogger): Unit =
     cache = Map.empty
 
   private object Private {

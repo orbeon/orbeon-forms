@@ -66,3 +66,5 @@ trait XMLSupport extends AssertionsForJUnit {
     }
   }
 }
+
+object XMLSupport extends XMLSupport

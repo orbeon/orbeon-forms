@@ -282,10 +282,10 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     val observer = new MutationObserver((_, _) => listener())
     mutationObservers = observer :: mutationObservers
 
-    observer.observe(element, MutationObserverInit(
-      attributes = true,
+    observer.observe(element, new MutationObserverInit {
+      attributes      = true
       attributeFilter = js.Array(attributeName)
-    ))
+    })
   }
 
   private def onElementAdded(container: dom.Element, selector: String, listener: () => Unit): Unit = {
@@ -300,7 +300,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     })
     mutationObservers = observer :: mutationObservers
 
-    val config = MutationObserverInit(childList = true, subtree = true)
+    val config = new MutationObserverInit { childList = true ; subtree = true }
     observer.observe(container, config)
   }
 

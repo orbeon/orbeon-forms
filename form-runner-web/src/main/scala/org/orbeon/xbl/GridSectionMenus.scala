@@ -60,12 +60,16 @@ trait GridSectionMenus {
     document.addEventListener("click",   (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-remove-button"))   removeIterationHandler(e))
 
     // Listeners for all menu actions
-    Operation.values foreach { op =>
-      document.addEventListener("click", (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-dropdown-menu, .fr-${op.entryName}")) actionHandler(op))
-    }
+    document.addEventListener("click", (e: dom.Event) => {
+      val target  = e.target.asInstanceOf[html.Element]
+      Operation.values foreach { op =>
+        val liOpOpt = Option(target.closest(s".fr-$componentName-dropdown-menu .fr-${op.entryName}"))
+        liOpOpt.foreach(_ => actionHandler(op, e))
+      }
+    })
   }
 
-  def removeIterationHandler(e: dom.Event): Unit = {
+  private def removeIterationHandler(e: dom.Event): Unit = {
 
     val jTarget = $(e.target)
 
@@ -78,7 +82,7 @@ trait GridSectionMenus {
     }
   }
 
-  def moveAndShowMenuHandler(e: dom.Event): Unit = {
+  private def moveAndShowMenuHandler(e: dom.Event): Unit = {
 
     moveMenu(e)
 
@@ -97,7 +101,7 @@ trait GridSectionMenus {
 
   // Move the menu just below the button
   // Both callers are in response to  events flowing through `.fr-$componentName-dropdown-button`.
-  def moveMenu(e: dom.Event): Unit = {
+  private def moveMenu(e: dom.Event): Unit = {
 
     val target    = e.target.asInstanceOf[html.Element]
     val button    = target.closest(s".fr-$componentName-dropdown-button").asInstanceOf[html.Element]
@@ -123,7 +127,7 @@ trait GridSectionMenus {
   }
 
   // Handle `keydown` events that arrive at our button and delegate the to the Bootstrap menu button
-  def delegateKeyEventToBootstrapButtonHandler(e: dom.Event): Unit = {
+  private def delegateKeyEventToBootstrapButtonHandler(e: dom.Event): Unit = {
 
     moveMenu(e)
 
@@ -151,7 +155,7 @@ trait GridSectionMenus {
     )
   }
 
-  def actionHandler(op: Operation): JQueryEvent => js.Any = e => asUnit {
+  private def actionHandler(op: Operation, e: dom.Event): Unit = {
     currentComponentOpt foreach {
       case CurrentComponent(currentComponentId, currentIteration) =>
         dispatchActionEvent(op, currentComponentId, currentIteration)
@@ -159,7 +163,7 @@ trait GridSectionMenus {
     e.preventDefault()
   }
 
-  def dispatchActionEvent(op: Operation, currentComponentId: String, currentIteration: Int): Unit =
+  private def dispatchActionEvent(op: Operation, currentComponentId: String, currentIteration: Int): Unit =
     AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = s"fr-${op.entryName}",

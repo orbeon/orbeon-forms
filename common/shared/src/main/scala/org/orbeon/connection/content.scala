@@ -54,6 +54,14 @@ object StreamedContent {
       title         = None
     )
 
+  def apply(content: BufferedContent): StreamedContent =
+    StreamedContent(
+      inputStream   = new ByteArrayInputStream(content.body),
+      contentType   = content.contentType,
+      contentLength = Some(content.body.size.toLong),
+      title         = content.title
+    )
+
   def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None): StreamedContent =
     StreamedContent(
       inputStream   = new ByteArrayInputStream(bytes),

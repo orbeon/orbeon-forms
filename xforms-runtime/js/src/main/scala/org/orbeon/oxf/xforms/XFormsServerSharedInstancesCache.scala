@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
@@ -62,14 +63,14 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       val uriNoQueryString = PathUtils.removeQueryString(instanceSourceURI)
       cacheKeysIt
         .collect {
-          case key @ SharedInstanceCacheKey(uri, xinclude, _)
+          case key @ SharedInstanceCacheKey(uri, _, xinclude, _)
             if PathUtils.removeQueryString(uri) == uriNoQueryString && matchesXInclude(xinclude) => key
         }
         .foreach(cache -= _)
     } else {
       cacheKeysIt
         .collect {
-          case key @ SharedInstanceCacheKey(`instanceSourceURI`, xinclude, _)
+          case key @ SharedInstanceCacheKey(`instanceSourceURI`, _, xinclude, _)
             if matchesXInclude(xinclude) => key
         }
         .foreach(cache -= _)
@@ -83,14 +84,19 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
     case class SharedInstanceCacheKey(
       sourceURI      : String,
+      method         : HttpMethod,
       handleXInclude : Boolean,
       requestBodyHash: Option[String]
     )
 
     var cache = Map[SharedInstanceCacheKey, DocumentNodeInfoType]()
 
-    // Make key also depend on handleXInclude and on request body hash if present
     def createCacheKey(instanceCaching: InstanceCaching): SharedInstanceCacheKey =
-      SharedInstanceCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
+      SharedInstanceCacheKey(
+        instanceCaching.pathOrAbsoluteURI,
+        instanceCaching.method,
+        instanceCaching.handleXInclude,
+        instanceCaching.contentHash
+      )
   }
 }

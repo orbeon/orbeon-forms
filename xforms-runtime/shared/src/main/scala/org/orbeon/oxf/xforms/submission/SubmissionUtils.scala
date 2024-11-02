@@ -15,15 +15,16 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
 import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
-import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent, StreamedContentT}
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
-import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -35,8 +36,6 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 import scala.collection.mutable
-import scala.util.{Failure, Success}
-import org.orbeon.oxf.util.Logging.*
 
 
 object SubmissionUtils {
@@ -135,13 +134,15 @@ object SubmissionUtils {
 
   def readByteArray(
     headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI
+    resolvedAbsoluteUrl : URI,
+    method              : HttpMethod              = HttpMethod.GET,
+    content             : Option[StreamedContent] = None,
   )(implicit
     logger              : IndentedLogger,
     externalContext     : ExternalContext,
     resourceResolver    : Option[ResourceResolver]
   ): Array[Byte] =
-    processGETConnection(headersGetter, resolvedAbsoluteUrl) { case (is, _) =>
+    processConnection(resolvedAbsoluteUrl, headersGetter, method, content) { case (is, _) =>
       inputStreamToByteArray(is)
     }
 
@@ -155,13 +156,15 @@ object SubmissionUtils {
   def readTinyTree(
     headersGetter       : String => Option[List[String]],
     resolvedAbsoluteUrl : URI,
-    handleXInclude      : Boolean
+    handleXInclude      : Boolean,
+    method              : HttpMethod              = HttpMethod.GET,
+    content             : Option[StreamedContent] = None,
   )(implicit
     logger              : IndentedLogger,
     externalContext     : ExternalContext,
     resourceResolver    : Option[ResourceResolver]
   ): (DocumentNodeInfoType, Map[String, List[String]]) =
-    processGETConnection(headersGetter, resolvedAbsoluteUrl) { case (is, headers) =>
+    processConnection(resolvedAbsoluteUrl, headersGetter, method, content) { case (is, headers) =>
       XFormsCrossPlatformSupport.readTinyTree(
         XPath.GlobalConfiguration,
         is,
@@ -171,38 +174,43 @@ object SubmissionUtils {
       ) -> headers
     }
 
-  private def processGETConnection[T](
-    headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI)(
+  private def processConnection[T](
+    url          : URI,
+    headersGetter: String => Option[List[String]],
+    method       : HttpMethod,
+    content      : Option[StreamedContent],
+  )(
     body                : (InputStream, Map[String, List[String]]) => T
   )(implicit
     logger              : IndentedLogger,
     externalContext     : ExternalContext,
     resourceResolver    : Option[ResourceResolver]
   ): T = {
-    val cxr = openGETConnection(headersGetter, resolvedAbsoluteUrl)
+    val cxr = openConnection(method, url, content, headersGetter)
     ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(body(_, cxr.headers))
   }
 
-  private def openGETConnection(
-    headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI
+  private def openConnection(
+    method       : HttpMethod,
+    url          : URI,
+    content      : Option[StreamedContent],
+    headersGetter: String => Option[List[String]],
   )(implicit
     logger              : IndentedLogger,
     externalContext     : ExternalContext,
     resourceResolver    : Option[ResourceResolver]
   ): ConnectionResult = {
 
-    implicit val _coreCrossPlatformSupport = CoreCrossPlatformSupport
+    implicit val _coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
     Connection.connectNow(
-      method          = GET,
-      url             = resolvedAbsoluteUrl,
+      method          = method,
+      url             = url,
       credentials     = None,
-      content         = None,
+      content         = content,
       headers         =
         Connection.buildConnectionHeadersCapitalizedIfNeeded(
-          url              = resolvedAbsoluteUrl,
+          url              = url,
           hasCredentials   = false,
           customHeaders    = Map.empty,
           headersToForward = Connection.headersToForwardFromProperty,
@@ -262,7 +270,7 @@ object SubmissionUtils {
     } else
       Map.empty[String, List[String]]
 
-  def forwardResponseHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit =
+  private def forwardResponseHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit =
     for {
       (headerName, headerValues) <- http.Headers.proxyHeaders(cxr.headers, request = false)
       headerValue                <- headerValues

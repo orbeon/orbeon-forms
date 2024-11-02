@@ -13,7 +13,9 @@
 */
 package org.orbeon.oxf.xforms.state
 
+import org.orbeon.connection.BufferedContent
 import org.orbeon.dom.{Document, Namespace, QName}
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats.*
@@ -22,8 +24,8 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationDocumentSource
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.runtime.{DelayedEvent, SimplePropertyValue}
-import sbinary.Operations.*
 import sbinary.*
+import sbinary.Operations.*
 
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
@@ -142,13 +144,30 @@ object XFormsProtocols {
       )
   }
 
+  implicit object BufferedContentFormat extends Format[BufferedContent] {
+
+    def writes(output: Output, content: BufferedContent): Unit = {
+      write(output, content.body)
+      write(output, content.contentType)
+      write(output, content.title)
+    }
+
+    def reads(in: Input): BufferedContent =
+      BufferedContent(
+        read[Array[Byte]](in),
+        read[Option[String]](in),
+        read[Option[String]](in),
+      )
+  }
+
   implicit object InstanceCachingFormat extends Format[InstanceCaching] {
 
     def writes(output: Output, instance: InstanceCaching): Unit = {
       write(output, instance.timeToLive)
       write(output, instance.handleXInclude)
       write(output, instance.pathOrAbsoluteURI)
-      write(output, instance.requestBodyHash)
+      write(output, instance.method.toString)
+      write(output, instance.requestContent)
     }
 
     def reads(in: Input): InstanceCaching =
@@ -156,7 +175,8 @@ object XFormsProtocols {
         read[Long](in),
         read[Boolean](in),
         read[String](in),
-        read[Option[String]](in)
+        HttpMethod.withName(read[String](in)),
+        read[Option[BufferedContent]](in)
       )
   }
 

@@ -14,21 +14,21 @@
 package org.orbeon.oxf.xforms.model
 
 import cats.syntax.option.*
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.control.Controls
-import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.*
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.state.InstancesControls
@@ -401,7 +401,7 @@ trait XFormsModelInstances {
     }
   }
 
-  private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentNodeInfoType = {
+  private def loadInstance(instanceCaching: InstanceCaching): DocumentNodeInfoType = {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
     implicit val resourceResolver: Option[ResourceResolver] = containingDocument.staticState.resourceResolverOpt
@@ -411,11 +411,13 @@ trait XFormsModelInstances {
       resolvedAbsoluteUrl = URI.create(
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
-          pathOrAbsoluteURI,
+          instanceCaching.pathOrAbsoluteURI,
           UrlRewriteMode.Absolute
         )
       ),
-      handleXInclude = handleXInclude
+      handleXInclude = instanceCaching.handleXInclude,
+      method = instanceCaching.method,
+      content = instanceCaching.requestContent.map(StreamedContent.apply)
     )._1
   }
 

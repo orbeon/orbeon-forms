@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.model.XFormsInstance.*
  */
 trait XFormsServerSharedInstancesCacheTrait {
 
-  type InstanceLoader = (String, Boolean) => DocumentNodeInfoType
+  type InstanceLoader = InstanceCaching => DocumentNodeInfoType
 
   protected case class InstanceContent(documentInfo: DocumentNodeInfoType) {
     require(! documentInfo.isInstanceOf[VirtualNodeType], "`InstanceContent` must contain an immutable tree")
@@ -111,7 +111,7 @@ trait XFormsServerSharedInstancesCacheTrait {
       // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
       debug("loading instance into cache", instanceCaching.debugPairs)
 
-      loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude) |!>
+      loadInstance(instanceCaching) |!>
         (documentInfo => add(instanceCaching, InstanceContent(documentInfo), instanceCaching.timeToLive))
     }
   }

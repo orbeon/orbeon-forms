@@ -60,15 +60,18 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         submissionParameters.urlType
       )
 
-    val requestBodyHash =
-      serializationParameters.messageBody.map(XFormsCrossPlatformSupport.digestBytes(_, ByteEncoding.Hex))
-
     val submissionEffectiveId = submission.effectiveId
 
     // Find and check replacement location
     val instanceToUpdate = checkInstanceToUpdate(detailsLogger, submissionParameters)
     val staticInstance   = instanceToUpdate.instance
-    val instanceCaching  = InstanceCaching.fromValues(submissionParameters.timeToLive, submissionParameters.isHandleXInclude, absoluteResolvedURLString, requestBodyHash)
+    val instanceCaching  = InstanceCaching.fromValues(
+        timeToLive     = submissionParameters.timeToLive,
+        handleXInclude = submissionParameters.isHandleXInclude,
+        sourceURI      = absoluteResolvedURLString,
+        method         = submissionParameters.httpMethod,
+        requestContent = serializationParameters.messageBody.map(_ -> serializationParameters.actualRequestMediatype)
+      )
     val instanceStaticId = staticInstance.staticId
 
     def createReplacerAndConnectionResult(document: DocumentNodeInfoType): ConnectResult = {
@@ -118,11 +121,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         // NOTE: somebody else could put an instance in cache between now and the obtaining of the result below
         debug(
           "did not find instance in cache",
-          List(
-            "id"           -> instanceStaticId,
-            "URI"          -> absoluteResolvedURLString,
-            "request hash" -> requestBodyHash.orNull
-          )
+          ("id" -> instanceStaticId) :: instanceCaching.debugPairs
         )(detailsLogger)
         // Create deferred evaluation for synchronous or asynchronous loading
         maybeWithDebug(
@@ -236,8 +235,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(
-    instanceSourceURI: String,
-    handleXInclude   : Boolean
+    instanceCaching        : InstanceCaching
   )(implicit
     refContext          : RefContext
   ): DocumentNodeInfoType =

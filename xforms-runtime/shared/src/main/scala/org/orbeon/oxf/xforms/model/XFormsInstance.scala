@@ -13,21 +13,23 @@
  */
 package org.orbeon.oxf.xforms.model
 
+import org.orbeon.connection.BufferedContent
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.dom
 import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
-import org.orbeon.oxf.util.*
-import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.*
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.state.InstanceState
@@ -41,12 +43,13 @@ import java.net.URI
 import scala.jdk.CollectionConverters.*
 
 
-// Caching information associated with an instance loaded with xxf:cache="true"
+// Caching information associated with an instance loaded with `xxf:cache="true"`
 case class InstanceCaching(
   timeToLive        : Long,
   handleXInclude    : Boolean,
   pathOrAbsoluteURI : String, // for internal requests must be an internal path so that replication works
-  requestBodyHash   : Option[String]
+  method            : HttpMethod,
+  requestContent    : Option[BufferedContent]
 ) {
 
   require(
@@ -54,11 +57,16 @@ case class InstanceCaching(
     """Only XForms instances externally loaded through the src attribute may have xxf:cache="true"."""
   )
 
+  lazy val contentHash: Option[String] =
+    requestContent.map(c => XFormsCrossPlatformSupport.digestBytes(c.body, ByteEncoding.Hex))
+
   def debugPairs: List[(String, String)] = List(
-    "timeToLive"      -> timeToLive.toString,
-    "handleXInclude"  -> handleXInclude.toString,
-    "sourceURI"       -> pathOrAbsoluteURI,
-    "requestBodyHash" -> requestBodyHash.orNull
+    "timeToLive"     -> timeToLive.toString,
+    "handleXInclude" -> handleXInclude.toString,
+    "sourceURI"      -> pathOrAbsoluteURI,
+    "method"         -> method.toString,
+    "contentHash"    -> contentHash.orNull,
+    "mediatype"      -> requestContent.flatMap(_.contentType).orNull
   )
 
   def writeAttributes(att: (String, String) => Unit): Unit = {
@@ -66,7 +74,8 @@ case class InstanceCaching(
     if (timeToLive >= 0) att("ttl", timeToLive.toString)
     if (handleXInclude)  att("xinclude", "true")
     att("source-uri", pathOrAbsoluteURI)
-    requestBodyHash foreach (att("request-body-hash", _))
+    contentHash.foreach(att("request-content-hash", _))
+    requestContent.flatMap(_.contentType).foreach(att("request-mediatype", _))
   }
 }
 
@@ -74,20 +83,29 @@ object InstanceCaching {
 
   // Not using "apply" as that causes issues for Java callers
   def fromValues(
-    timeToLive      : Long,
-    handleXInclude  : Boolean,
-    sourceURI       : String,
-    requestBodyHash : Option[String]
+    timeToLive    : Long,
+    handleXInclude: Boolean,
+    sourceURI     : String,
+    method        : HttpMethod,
+    requestContent: Option[(Array[Byte], String)]
   ): InstanceCaching =
     InstanceCaching(
       timeToLive        = timeToLive,
       handleXInclude    = handleXInclude,
       pathOrAbsoluteURI = Connection.findInternalUrl(
-        normalizedUrl = URI.create(sourceURI).normalize,
-        filter        = isInternalPath)(
-        request         = XFormsCrossPlatformSupport.externalContext.getRequest
-      ) getOrElse sourceURI, // adjust for internal path so replication works
-      requestBodyHash   = requestBodyHash
+          normalizedUrl = URI.create(sourceURI).normalize,
+          filter        = isInternalPath
+        )(
+          request       = XFormsCrossPlatformSupport.externalContext.getRequest
+        ).getOrElse(sourceURI), // adjust for internal path so replication works
+      method            = method,
+      requestContent    = requestContent.map { case (body, contentType) =>
+        BufferedContent(
+          body         = body,
+          contentType  = Some(contentType),
+          title        = None
+        )
+      }
     )
 }
 
@@ -358,7 +376,7 @@ class XFormsInstance(
 
 trait BasicIdIndex {
 
-  import org.orbeon.scaxon.SimplePath._
+  import org.orbeon.scaxon.SimplePath.*
   import org.w3c.dom.Node.ATTRIBUTE_NODE
 
   import collection.mutable as m
@@ -425,7 +443,7 @@ trait XFormsInstanceIndex extends BasicIdIndex {
 
   self: XFormsInstance =>
 
-  import org.orbeon.scaxon.SimplePath._
+  import org.orbeon.scaxon.SimplePath.*
   import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
   def requireNewIndex(): Unit = {

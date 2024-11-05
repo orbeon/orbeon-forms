@@ -86,8 +86,8 @@ object UploaderServer {
               uuid    = uuid,
               timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)
             { doc =>
-              doc.getUploadConstraintsForControl(controlEffectiveId).map(_ -> doc.getRequestUri)
-            } .flatten
+              doc.getUploadConstraintsForControl(controlEffectiveId) -> doc.getRequestUri
+            }
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
@@ -211,7 +211,10 @@ object UploaderServer {
         // Browsers do set the outer `Content-Length` though. Again we assume that the overhead of the
         // entire request vs. the part is small so it's ok, for progress purposes, to use the outer size.
         untrustedExpectedSizeOpt foreach { untrustedExpectedSize =>
-          checkSizeLimitExceeded(maxSize = maxUploadSizeForControl, currentSize = untrustedExpectedSize)
+          UploadCheckerLogic.checkSizeLimitExceeded(
+            maxSize     = maxUploadSizeForControl,
+            currentSize = untrustedExpectedSize
+          ).foreach(Multipart.throwSizeLimitExceeded(_, untrustedExpectedSize))
         }
 
         // Otherwise update the outer limiter to support enough additional bytes
@@ -324,13 +327,6 @@ object UploaderServer {
 
     def getProgressSessionKey(uuid: String, fieldName: String): String =
       UploadProgressSessionKey + uuid + "." + fieldName
-
-    def checkSizeLimitExceeded(maxSize: MaximumSize, currentSize: Long): Unit = maxSize match {
-      case UnlimitedSize        =>
-      case LimitedSize(maxSize) =>
-        if (currentSize > maxSize)
-          Multipart.throwSizeLimitExceeded(maxSize, currentSize)
-    }
 
     def convertFileItemHeaders(headers: FileItemHeaders): List[(String, List[String])] =
       for (name <- headers.getHeaderNames.asScala.toList)

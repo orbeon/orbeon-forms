@@ -163,6 +163,14 @@ class XXFormsUploadCancelEvent(target: XFormsEventTarget, properties: PropertyGe
 class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(EventNames.XXFormsUploadDone, target, properties, bubbles = true, cancelable = true) {
 
+  def filename      = property[String]("filename").get
+  def contentType   = property[String](Headers.ContentTypeLower).get
+  def contentLength = property[String](Headers.ContentLengthLower).get // comes as String from the client
+}
+
+class XXFormsUploadStoreEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(EventNames.XXFormsUploadStore, target, properties, bubbles = true, cancelable = true) {
+
   // These properties come from the client
   def file          = property[String]("file").get
   def filename      = property[String]("filename").get
@@ -170,9 +178,9 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
   def contentLength = property[String](Headers.ContentLengthLower).get // comes as String from the client
 }
 
-object XXFormsUploadDoneEvent {
+object XXFormsUploadStoreEvent {
   val StandardProperties = Map(
-    EventNames.XXFormsUploadDone -> List("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
+    EventNames.XXFormsUploadStore -> List("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
   )
 }
 

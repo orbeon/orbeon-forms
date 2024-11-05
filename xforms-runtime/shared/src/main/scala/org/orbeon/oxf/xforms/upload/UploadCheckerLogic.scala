@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.upload
 
 import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 
 
@@ -15,6 +16,7 @@ trait UploadCheckerLogic {
   def uploadMaxSizeAggregatePerFormProperty                                                        : MaximumSize
 
   def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
+
     val maximumSizePerFile =
       attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizePerFile)
         .flatMap(MaximumSize.unapply)
@@ -40,4 +42,12 @@ trait UploadCheckerLogic {
     // Do not evaluate aggregate sizes unless needed
     MaximumSize.min(maximumSizePerFile #:: maximumSizeAggregatePerControl #:: maximumSizeAggregatePerForm #:: LazyList.empty)
   }
+}
+
+object UploadCheckerLogic {
+  def checkSizeLimitExceeded(maxSize: MaximumSize, currentSize: Long): Option[Long] =
+    maxSize match {
+      case LimitedSize(maxSize) if currentSize > maxSize => Some(maxSize)
+      case _                                             => None
+    }
 }

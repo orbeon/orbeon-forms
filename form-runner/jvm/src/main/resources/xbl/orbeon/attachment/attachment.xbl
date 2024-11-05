@@ -512,7 +512,6 @@
 
                             targetid="fr-attachment"
                             name="{event('xxf:type')}">
-                            <xf:property name="file"           value="event('file')"/>
                             <xf:property name="filename"       value="event('filename')"/>
                             <xf:property name="content-type"   value="event('content-type')"/>
                             <xf:property name="content-length" value="event('content-length')"/>

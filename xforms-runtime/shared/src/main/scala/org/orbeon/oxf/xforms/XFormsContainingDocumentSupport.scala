@@ -302,7 +302,7 @@ trait ContainingDocumentUpload {
     def uploadMaxSizeAggregatePerFormProperty: MaximumSize    = staticState.uploadMaxSizeAggregatePerForm
   }
 
-  def getUploadConstraintsForControl(controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] = {
+  def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, AllowedMediatypes) = {
 
     val allowedMediatypesMaybeRange = {
 
@@ -319,7 +319,7 @@ trait ContainingDocumentUpload {
         AllowedMediatypes.AllowedAnyMediatype
     }
 
-    Success(UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange)
+    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange
   }
 }
 

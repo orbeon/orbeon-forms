@@ -12,7 +12,7 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.event.XFormsServer
-import org.orbeon.oxf.xforms.event.events.{KeyboardEvent, XXFormsDndEvent, XXFormsLoadEvent, XXFormsUploadDoneEvent}
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.processor.PipelineResponse
 import org.orbeon.oxf.xforms.state.RequestParameters
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
@@ -144,9 +144,9 @@ object XFormsServerRoute extends XmlNativeRoute {
 
     // Only a few events specify custom properties that can be set by the client
     val AllStandardProperties =
-      XXFormsDndEvent.StandardProperties        ++
-      KeyboardEvent.StandardProperties          ++
-      XXFormsUploadDoneEvent.StandardProperties ++
+      XXFormsDndEvent.StandardProperties         ++
+      KeyboardEvent.StandardProperties           ++
+      XXFormsUploadStoreEvent.StandardProperties ++
       XXFormsLoadEvent.StandardProperties
 
     def extractWireEvent(eventElem: Element): WireAjaxEvent = {

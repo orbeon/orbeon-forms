@@ -53,6 +53,7 @@ object XFormsEventFactory {
     XXFormsUploadCancel         -> (new XXFormsUploadCancelEvent(_, _)),
     XXFormsUploadDone           -> (new XXFormsUploadDoneEvent(_, _)),
     XXFormsUploadError          -> (new XXFormsUploadErrorEvent(_, _)),
+    XXFormsUploadStore          -> (new XXFormsUploadStoreEvent(_, _)),
     XFORMS_MODEL_CONSTRUCT_DONE -> (new XFormsModelConstructDoneEvent(_, _)),
     XFORMS_MODEL_CONSTRUCT      -> (new XFormsModelConstructEvent(_, _)),
     XXFORMS_INSTANCES_READY     -> (new XXFormsInstancesReadyEvent(_, _)),

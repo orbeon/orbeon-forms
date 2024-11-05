@@ -154,7 +154,8 @@ private object UploadControl {
       EventNames.XXFormsUploadStart,
       EventNames.XXFormsUploadProgress,
       EventNames.XXFormsUploadCancel,
-      EventNames.XXFormsUploadError
+      EventNames.XXFormsUploadError,
+      EventNames.XXFormsUploadStore
     )
 
   val AllowedExtensionAttributes: Set[QName] =

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.upload.UploadCheckerLogic
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.XMLReceiverAdapter
@@ -86,23 +87,56 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         // Upload canceled by the user
         containingDocument.endUpload(getUploadUniqueId)
         XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
-      case doneEvent: XXFormsUploadDoneEvent =>
-        // Upload done: process upload to this control
-        // Notify that the upload has ended
-        containingDocument.endUpload(getUploadUniqueId)
-        XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
-        handleUploadedFile(
-          doneEvent.file,
-          Option(doneEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
-          Option(doneEvent.contentType),
-          Option(doneEvent.contentLength),
-          collector
-        )
-        visitWithAncestors()
+      case _: XXFormsUploadDoneEvent =>
+        // 2024-11-04: Now just a notification event
+        // https://github.com/orbeon/orbeon-forms/issues/6606
       case _: XXFormsUploadErrorEvent =>
-        // Upload error: sent by the client in case of error
+        // Upload error: can be sent by the client in case of error, or as consequence of `xxforms-upload-store`
         containingDocument.endUpload(getUploadUniqueId)
         XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
+      case storeEvent: XXFormsUploadStoreEvent =>
+        // https://github.com/orbeon/orbeon-forms/issues/6606
+        val size = storeEvent.contentLength.toLong
+        UploadCheckerLogic.checkSizeLimitExceeded(
+          maxSize     = containingDocument.getUploadConstraintsForControl(effectiveId)._1,
+          currentSize = size
+        ) match {
+          case Some(maxSize) =>
+            XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
+            Dispatch.dispatchEvent(
+              new XXFormsUploadErrorEvent(
+                this,
+                Map(
+                  "error-type" -> Some("size-error"),
+                  "permitted"  -> Some(maxSize),
+                  "actual"     -> Some(size)
+                )
+              ),
+              collector
+            )
+          case None =>
+            containingDocument.endUpload(getUploadUniqueId)
+            XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
+            handleUploadedFile(
+              storeEvent.file,
+              Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
+              Option(storeEvent.contentType),
+              Option(storeEvent.contentLength),
+              collector
+            )
+            visitWithAncestors()
+            Dispatch.dispatchEvent(
+              new XXFormsUploadDoneEvent(
+                this,
+                Map(
+                  "filename"       -> Option(storeEvent.filename),
+                  "content-type"   -> Option(storeEvent.contentType),
+                  "content-length" -> Option(storeEvent.contentLength)
+                )
+              ),
+              collector
+            )
+        }
       case _ =>
     }
   }

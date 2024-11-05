@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.scaxon.NodeConversions
+import org.orbeon.xforms.EventNames
 
 
 object XFormsUploadRoute extends XmlNativeRoute {
@@ -119,7 +120,7 @@ object XFormsUploadRoute extends XmlNativeRoute {
               mediatypeOpt = Mediatypes.fromHeadersOrFilename(n => headers.get(n).flatten, filename)
             } yield
               <xxf:event
-                name="xxforms-upload-done"
+                name={EventNames.XXFormsUploadStore}
                 source-control-id={fieldName}
                 file={sessionUrl.toString}
                 filename={filename.getOrElse("")}
@@ -139,7 +140,7 @@ object XFormsUploadRoute extends XmlNativeRoute {
           case FileScanException(fieldName, fileScanResult) =>
             outputResponse(
               <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:event name="xxforms-upload-error" source-control-id={fieldName}>
+                <xxf:event name={EventNames.XXFormsUploadError} source-control-id={fieldName}>
                   <xxf:property name="error-type">file-scan-error</xxf:property>
                   <xxf:property name="message">{fileScanResult.message.getOrElse("")}</xxf:property>
                 </xxf:event>

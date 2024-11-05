@@ -156,7 +156,7 @@ public class MemoryCacheImpl implements Cache {
             notifyRemoved(i.next());
         }
 
-        keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
+        keyToEntryMap = new HashMap<>();
         linkedList = new CacheLinkedList();
         currentSize = 0;
         return previousSize;

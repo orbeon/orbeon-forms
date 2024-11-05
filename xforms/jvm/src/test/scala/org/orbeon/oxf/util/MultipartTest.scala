@@ -134,7 +134,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         it("must set completed `UploadProgress` into session") {
           assert(
             UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed(DummyFileItem)) ===
-              UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName).get
+              UploaderServer.getUploadProgressForTests(session, UUID, FieldName).get
           )
         }
       }
@@ -164,7 +164,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         it("must set `Interrupted` `UploadProgress` into session") {
           assert(
             Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeTooLarge(limit, 8326))))) ===
-              UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName)
+              UploaderServer.getUploadProgressForTests(session, UUID, FieldName)
           )
         }
       }

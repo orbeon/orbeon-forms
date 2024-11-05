@@ -242,8 +242,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   // NOTE: Leave public for unit tests
   def processEvent(doc: XFormsContainingDocument, event: XFormsEvent): Unit = {
 
-    // Check whether an event can be be dispatched to the given object. This only checks:
-    // - the the target is still live
+    // Check whether an event can be dispatched to the given object. This only checks:
+    // - the target is still live
     // - that the target is not a non-relevant or readonly control
     def checkEventTarget(event: XFormsEvent): Boolean = {
       val eventTarget = event.targetObject

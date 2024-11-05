@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.upload
 
-import org.slf4j
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
 import org.orbeon.datatypes.MaximumSize
@@ -26,17 +25,18 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.OptionOps
 import org.orbeon.oxf.util.Multipart.UploadItem
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult as JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
+import org.slf4j
 import shapeless.syntax.typeable.*
 
 import java.net.URI
@@ -48,7 +48,7 @@ import scala.util.{Failure, Success, Try}
 
 object UploaderServer {
 
-  import Private._
+  import Private.*
 
   def processUpload(request: Request): (List[(String, UploadItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
 
@@ -97,18 +97,45 @@ object UploaderServer {
     )
   }
 
-  def getUploadProgressFromSession(session: Option[Session], uuid: String, fieldName: String): Option[UploadProgress[DiskFileItem]] =
-    session flatMap (_.getAttribute(getProgressSessionKey(uuid, fieldName))) collect {
-      case progress: UploadProgress[_] => progress.asInstanceOf[UploadProgress[DiskFileItem]]
-    }
+  def getUploadProgressForTests(
+    session  : Session,
+    uuid     : String,
+    fieldName: String
+  ): Option[UploadProgress[DiskFileItem]] =
+    getUploadProgress(session, getProgressSessionKey(uuid, fieldName))
 
-  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[DiskFileItem]] =
-    getUploadProgressFromSession(request.sessionOpt, uuid, fieldName)
+  private def getUploadProgress(
+    session   : Session,
+    sessionKey: String
+  ): Option[UploadProgress[DiskFileItem]] =
+    session.getAttribute(sessionKey)
+      .flatMap(_.cast[UploadProgress[DiskFileItem]])
 
-  def removeUploadProgress(request: Request, control: XFormsValueControl): Unit =
-    request.sessionOpt foreach {
-      _.removeAttribute(getProgressSessionKey(control.containingDocument.uuid, control.effectiveId))
-    }
+  private def setUploadProgress(
+    session        : Session,
+    uuid           : String,
+    fieldName      : String,
+    expectedSizeOpt: Option[Long],
+    fileName       : Option[String]
+  ): (String, UploadProgress[DiskFileItem]) = {
+    val progress      = UploadProgress[DiskFileItem](fieldName, expectedSizeOpt)
+    val newSessionKey = getProgressSessionKey(uuid, fieldName)
+    session.setAttribute(newSessionKey, progress)
+    newSessionKey -> progress
+  }
+
+  def getUploadProgress(
+    request  : Request,
+    uuid     : String,
+    fieldName: String
+  ): Option[UploadProgress[DiskFileItem]] =
+    request.sessionOpt.flatMap(getUploadProgress(_, getProgressSessionKey(uuid, fieldName)))
+
+  def removeUploadProgress(request: Request, control: XFormsValueControl): Unit = {
+    request
+      .sessionOpt
+      .foreach(_.removeAttribute(getProgressSessionKey(control.containingDocument.uuid, control.effectiveId)))
+  }
 
   // Public for tests
   abstract class UploadProgressMultipartLifecycle(
@@ -118,7 +145,7 @@ object UploaderServer {
     session                  : Session
   ) extends MultipartLifecycle {
 
-    import Private._
+    import Private.*
 
     // Mutable state
     private var uuidOpt     : Option[String]                       = None
@@ -175,12 +202,8 @@ object UploaderServer {
         // So that the XFCD is aware of progress information
         // Do this before checking size so that we can report the interrupted upload
         locally {
-          val progress = UploadProgress[DiskFileItem](fieldName, untrustedExpectedSizeOpt)
-
-          val newSessionKey = getProgressSessionKey(uuid, fieldName)
+          val (newSessionKey, progress) = UploaderServer.setUploadProgress(session, uuid, fieldName, untrustedExpectedSizeOpt, fileItem.getName.trimAllToOpt)
           sessionKeys += newSessionKey
-          session.setAttribute(newSessionKey, progress)
-
           progressOpt = Some(progress)
         }
 
@@ -287,15 +310,10 @@ object UploaderServer {
       // - instead mark all entries added so far as being in state `Interrupted` if not already the case
       for (sessionKey <- sessionKeys)
         runQuietly {
-          getUploadProgress(sessionKey)
+          UploaderServer.getUploadProgress(session, sessionKey)
           .collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) => p }
           .foreach (_.state = UploadState.Interrupted(None))
         }
-
-    private def getUploadProgress(sessionKey: String): Option[UploadProgress[DiskFileItem]] =
-      session.getAttribute(sessionKey) collect {
-        case progress: UploadProgress[_] => progress.asInstanceOf[UploadProgress[DiskFileItem]]
-      }
   }
 
   private object Private {

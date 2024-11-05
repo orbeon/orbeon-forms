@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.model.XFormsInstance.*
 import scala.jdk.CollectionConverters.*
 
 
+// TODO: Use heap memory cache from `CacheSupport` instead of `ObjectCache`.
 /**
  * Cache for shared and immutable XForms instances.
  */

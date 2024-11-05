@@ -541,16 +541,16 @@ object XFormsInstance extends Logging {
 
     val (caching, documentInfo) =
       instanceState.cachingOrDocument match {
-        case Left(caching)  =>
+        case Left(instanceCaching)  =>
           debug("restoring instance from instance cache", Seq("id" -> instanceState.effectiveId))
 
           // NOTE: No XInclude supported to read instances with @src for now
           // TODO: must pass method and request body in case of POST/PUT
 
           (
-            Some(caching),
+            Some(instanceCaching),
             XFormsServerSharedInstancesCache.findContentOrLoad(
-              caching,
+              instanceCaching,
               instanceState.readonly,
               instance.exposeXPathTypes,
               loader

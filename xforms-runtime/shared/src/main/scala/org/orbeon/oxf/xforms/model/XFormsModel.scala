@@ -415,9 +415,9 @@ trait XFormsModelInstances {
           UrlRewriteMode.Absolute
         )
       ),
-      handleXInclude = instanceCaching.handleXInclude,
-      method = instanceCaching.method,
-      content = instanceCaching.requestContent.map(StreamedContent.apply)
+      handleXInclude      = instanceCaching.handleXInclude,
+      method              = instanceCaching.method,
+      content             = instanceCaching.requestContent.map(StreamedContent.apply)
     )._1
   }
 
@@ -499,16 +499,16 @@ trait XFormsModelInstances {
     val instanceResource = instance.instanceSource.get
     try {
       if (instance.cache && ! Instance.isProcessorInputScheme(instanceResource)) {
-        // Instance 1) has cache hint and 2) is not input:*, so it can be cached
-        // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
-        val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
+        // Instance 1) has `cache` hint and 2) is not `input:*`, so it can be cached
+        // NOTE: We don't allow sharing for `input:*` URLs as the data will likely differ per request
+        val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), HttpMethod.GET, None)
         val documentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(caching, instance.readonly, instance.exposeXPathTypes, loadInstance)
-        indexInstance(new XFormsInstance(selfModel, instance, Option(caching), documentInfo, instance.readonly, _modified = false, valid = true))
+        indexInstance(new XFormsInstance(selfModel, instance, Some(caching), documentInfo, instance.readonly, _modified = false, valid = true))
       } else {
         // Instance cannot be cached
-        // NOTE: Optimizing with include() for servlets has limitations, in particular
+        // NOTE: Optimizing with `include()` for servlets has limitations, in particular
         // the proper split between servlet path and path info is not done.
-        // TODO: Temporary. Use XFormsModelSubmission to load instances instead
+        // TODO: Temporary. Use `XFormsModelSubmission` to load instances instead
         if (! PathUtils.urlHasProtocol(instanceResource) && containingDocument.isPortletContainer)
           throw new UnsupportedOperationException("<xf:instance src=\"\"> with relative path within a portlet")
 

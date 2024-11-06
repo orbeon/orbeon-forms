@@ -75,10 +75,10 @@ object ComponentParamSupport {
   // level.
   def fromElemAlsoTryAvt(
      atts            : QName => Option[String],
-     evaluateAvt     : String => String,
+     evaluateAvt     : String => Option[String],
      paramName       : QName
    ): Option[StringValue] =
-     atts(paramName) map evaluateAvt map stringToStringValue
+     atts(paramName) flatMap evaluateAvt map stringToStringValue
 
   def fromElem(
     atts            : QName => Option[String],

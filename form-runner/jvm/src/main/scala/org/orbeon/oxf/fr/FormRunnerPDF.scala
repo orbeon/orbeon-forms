@@ -95,9 +95,9 @@ trait FormRunnerPDF {
 
   // Used by:
   //
-  // - `print-pdf-notemplate.xsl`
-  // - Form Builder
-  // - form compilation in `view.xsl`
+  // - `print-pdf-notemplate.xsl`: `rendered-page-orientation`/`rendered-page-size`
+  // - Form Builder: `html-page-layout`
+  // - `view.xsl`: `html-page-layout`
   //
   //@XPathFunction
   def optionFromMetadataOrPropertiesXPath(
@@ -109,8 +109,9 @@ trait FormRunnerPDF {
   ): Option[String] =
     FormRunner.optionFromMetadataOrProperties(
       metadataInstanceRootElem = metadataInstanceRootElem,
-      featureName              = featureName)(
-      p                        = FormRunnerParams(app, form, 1, None, None, mode)
+      featureName              = featureName
+    )(
+      formRunnerParams         = FormRunnerParams(app, form, 1, None, None, mode)
     )
 
   import URLFinder._

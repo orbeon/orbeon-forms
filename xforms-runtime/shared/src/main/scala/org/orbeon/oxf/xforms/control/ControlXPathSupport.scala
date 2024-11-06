@@ -43,15 +43,15 @@ trait ControlXPathSupport {
     if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
 
   def evaluateBooleanAvt(attributeValue: String, collector: ErrorEventCollector): Boolean =
-    evaluateAvt(attributeValue, collector) == "true"
+    evaluateAvt(attributeValue, collector).contains("true")
 
   /**
    * Evaluate an attribute of the control as an AVT.
    *
    * @param attributeValue    value of the attribute
-   * @return                  value of the AVT or null if cannot be computed
+   * @return                  value of the AVT or `None` if cannot be computed
    */
-  def evaluateAvt(attributeValue: String, collector: ErrorEventCollector): String = {
+  def evaluateAvt(attributeValue: String, collector: ErrorEventCollector): Option[String] = {
 
     assert(isRelevant)
 
@@ -63,7 +63,7 @@ trait ControlXPathSupport {
       locationData      = getLocationData,
       eventTarget       = this,
       collector         = collector
-    )(newFunctionContext).orNull
+    )(newFunctionContext)
   }
 
   // Evaluate an XPath expression as a string in the context of this control.
@@ -130,8 +130,10 @@ object ControlXPathSupport {
     container        : XBLContainer, // used for `PartAnalysis` and `XFCD`
     locationData     : LocationData,
     eventTarget      : XFormsEventTarget,
-    collector        : ErrorEventCollector,
-  )(implicit xfc: XFormsFunction.Context): Option[String] = {
+    collector        : ErrorEventCollector
+  )(implicit
+    xfc              : XFormsFunction.Context
+  ): Option[String] = {
 
     if (! XMLUtils.maybeAVT(attributeValue))
       // Definitely not an AVT

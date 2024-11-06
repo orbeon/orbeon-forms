@@ -49,9 +49,9 @@ object FRComponentParamSupport {
           property      = property
         )
 
-      fromAttributes orElse fromMetadataAndProperties map {
-        case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue, EventCollector.Throw))
-        case paramValue              => paramValue
+      fromAttributes orElse fromMetadataAndProperties flatMap {
+        case paramValue: StringValue => sourceComponent.evaluateAvt(paramValue.getStringValue, EventCollector.Throw).map(stringToStringValue)
+        case paramValue              => paramValue.some
       }
     }
 

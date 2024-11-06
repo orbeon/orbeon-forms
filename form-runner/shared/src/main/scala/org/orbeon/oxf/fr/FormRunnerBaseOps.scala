@@ -421,8 +421,9 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   def optionFromMetadataOrProperties(
     metadataInstanceRootElem : NodeInfo,
-    featureName              : String)(implicit
-    p                        : FormRunnerParams
+    featureName              : String
+  )(implicit
+    formRunnerParams         : FormRunnerParams
   ): Option[String] =
     metadataInstanceRootElem.elemValueOpt(featureName) orElse
     formRunnerProperty(s"oxf.fr.detail.$featureName")

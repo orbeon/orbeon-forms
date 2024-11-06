@@ -38,7 +38,7 @@ trait ControlExtensionAttributesSupport {
         else if (isRelevant)
           // NOTE: evaluateAvt can return null if there is no context
           // WARNING: don't use `mapValues`, which return a view which can't be stored in the back control tree
-          staticControl.extensionAttributes map { case (k, v) => k -> (Option(evaluateAvt(v, EventCollector.ToReview)) getOrElse "") }
+          staticControl.extensionAttributes map { case (k, v) => k -> evaluateAvt(v, EventCollector.ToReview).getOrElse("") }
         else
           // Don't attempt to evaluate expression when the control is non-relevant
           staticControl.nonRelevantExtensionAttributes

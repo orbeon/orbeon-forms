@@ -38,7 +38,7 @@ case class DynamicState(
   uuid              : String,
   sequence          : Long,
   deploymentType    : Option[String],
-  requestMethod     : Option[HttpMethod],
+  requestMethod     : Option[String], // avoid `HttpMethod` as it causes serialization issues
   requestContextPath: Option[String],
   requestPath       : Option[String],
   requestHeaders    : List[(String, List[String])],
@@ -207,7 +207,7 @@ object DynamicState {
       uuid               = document.uuid,
       sequence           = document.sequence,
       deploymentType     = Option(document.getDeploymentType) map (_.toString),
-      requestMethod      = Option(document.getRequestMethod),
+      requestMethod      = Option(document.getRequestMethod.entryName),
       requestContextPath = Option(document.getRequestContextPath),
       requestPath        = Option(document.getRequestPath),
       requestHeaders     = document.getRequestHeaders.view.mapValues(_.toList).toList, // mapValues ok because of `toList`

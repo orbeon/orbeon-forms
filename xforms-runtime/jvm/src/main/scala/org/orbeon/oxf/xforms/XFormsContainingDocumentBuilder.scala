@@ -179,7 +179,7 @@ object XFormsContainingDocumentBuilder {
           deploymentTypeOpt map (deploymentType =>
             RequestInformation(
               deploymentType        = deploymentType,
-              requestMethod         = dynamicState.requestMethod.orNull,
+              requestMethod         = dynamicState.requestMethod.map(HttpMethod.withName).orNull,
               requestContextPath    = dynamicState.requestContextPath.orNull,
               requestPath           = dynamicState.requestPath.orNull,
               requestHeaders        = requestHeaders,

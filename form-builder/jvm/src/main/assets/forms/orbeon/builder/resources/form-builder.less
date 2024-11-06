@@ -1705,7 +1705,7 @@ body.orbeon {
                 .fr-grid-td {
                     & > .xbl-component, & > .xforms-control {
                         // At design-time, the cells also have internal padding for the icons.
-                        margin: @densityMarginTopBottom, @densityMarginLeftRight;
+                        margin: @densityMarginTopBottom @densityMarginLeftRight;
 
                         & > .xforms-label, & > .xforms-hint {
                             min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
@@ -1738,10 +1738,10 @@ body.orbeon {
             }
         }
 
-        .xbl-fr-grid(@frGridDensityMarginCompactTopBottom, @frGridDensityMarginCompactLeftRight); // Default density
-        .fr-density-compact     { .xbl-fr-grid(@frGridDensityMarginCompactTopBottom    , @frGridDensityMarginCompactLeftRight);     }
-        .fr-density-comfortable { .xbl-fr-grid(@frGridDensityMarginComfortableTopBottom, @frGridDensityMarginComfortableLeftRight); }
-        .fr-density-roomy       { .xbl-fr-grid(@frGridDensityMarginRoomyTopBottom      , @frGridDensityMarginRoomyLeftRight);       }
+        .xbl-fr-grid(@fbGridDensityMarginCompactTopBottom, @fbGridDensityMarginCompactLeftRight); // Default density
+        .fr-density-compact     { .xbl-fr-grid(@fbGridDensityMarginCompactTopBottom    , @fbGridDensityMarginCompactLeftRight);     }
+        .fr-density-comfortable { .xbl-fr-grid(@fbGridDensityMarginComfortableTopBottom, @fbGridDensityMarginComfortableLeftRight); }
+        .fr-density-roomy       { .xbl-fr-grid(@fbGridDensityMarginRoomyTopBottom      , @fbGridDensityMarginRoomyLeftRight);       }
     }
 
     .fb-use-toolbar-message, .fb-click-message {

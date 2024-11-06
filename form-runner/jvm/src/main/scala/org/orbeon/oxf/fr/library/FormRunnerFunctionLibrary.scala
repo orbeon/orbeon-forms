@@ -16,8 +16,8 @@ package org.orbeon.oxf.fr.library
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
@@ -30,15 +30,14 @@ import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.`type`.Type.ITEM_TYPE
-import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.function.{AncestorOrganizations, Property, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.*
 import org.orbeon.saxon.value.*
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits.*
-import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
@@ -401,28 +400,9 @@ private object FormRunnerFunctions {
       FormRunnerRenderedFormat.usePdfTemplate(NetUtils.getExternalContext.getRequest)
   }
 
-  // TODO: Remove code duplication with `def createdWithOrNewer()`
   class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(context: XPathContext): BooleanValue = {
-
-      val metadataVersionOpt =
-        for {
-          sourceControl      <- XFormsFunction.context.container.associatedControlOpt
-          part               = sourceControl.container.partAnalysis
-          metadata           <- FRComponentParamSupport.findConstantMetadataRootElem(part)
-          createdWithVersion <- metadata elemValueOpt Names.CreatedWithVersion
-        } yield
-          createdWithVersion
-
-      metadataVersionOpt match {
-        case None =>
-          // If no version info the metadata, or no metadata, do as if the form was created with an old version
-          false
-        case Some(metadataVersion) =>
-          val paramVersion = stringArgument(0)(context)
-          Version.compare(metadataVersion, paramVersion).exists(_ >= 0)
-      }
-    }
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      FRCreatedWithOrNewerSupport.isCreatedWithOrNewer(XFormsFunction.context.container, stringArgument(0)(context))
   }
 
   class FRFormRunnerLink extends FunctionSupport with RuntimeDependentFunction {

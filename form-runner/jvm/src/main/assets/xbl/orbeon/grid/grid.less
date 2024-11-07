@@ -75,224 +75,253 @@
     }
 
     .xbl-fr-grid(@densityMarginTopBottom, @densityMarginLeftRight) {
+        .xbl-fr-grid {
 
-        .fr-grid-th,
-        .fr-grid-td,
-        .fr-repeat-column-left,
-        .fr-repeat-column-number,
-        .fr-repeat-column-right,
-        &.fr-repeat-multiple-rows .fr-grid-head {
+            .fr-grid-th,
+            .fr-grid-td,
+            .fr-repeat-column-left,
+            .fr-repeat-column-number,
+            .fr-repeat-column-right,
+            &.fr-repeat-multiple-rows .fr-grid-head {
 
-            // Don't use padding on grids, so empty grids don't take space
-            // Instead use a margin on the control inside the cell (see below)
-            padding: 0;
+                // Don't use padding on grids, so empty grids don't take space
+                // Instead use a margin on the control inside the cell (see below)
+                padding: 0;
 
-            &> .xforms-control,
-            &> .xbl-component,
-            &> .xforms-group {
-                margin: @densityMarginTopBottom @densityMarginLeftRight;
-                display: block;
-            }
+                & > .xforms-control,
+                & > .xbl-component,
+                & > .xforms-group {
+                    margin: @densityMarginTopBottom @densityMarginLeftRight;
+                    display: block;
+                }
 
-            // https://github.com/orbeon/orbeon-forms/issues/4213
-            .input-prepend, .input-append {
-                display: flex;
-            }
-         }
-
-        .fr-table {
-            max-width: 100%;
-            background-color: @tableBackground;
-        }
-
-        // Space after non-empty grids and repeated grids
-        .fr-grid-non-empty, .fr-repeat {
-            margin-bottom: 10px;
-        }
-
-        // =============================================================================================================
-        // Change the layout in narrow layout
-        // This now also applies to repeated grids:
-        // https://github.com/orbeon/orbeon-forms/issues/4491
-        // =============================================================================================================
-        @media (max-width: 640px) {
-            .fr-grid {
-                &.fr-norepeat, &.fr-repeat-single-row, &.fr-repeat-multiple-rows { // to make rule stronger
-                    // https://github.com/orbeon/orbeon-forms/issues/4805
-                    &:not(.fr-grid-css) {
-                        &> .fr-grid-body .fr-grid-tr .fr-grid-td {
-                            display: block;
-                        }
-                        &.fr-repeat-multiple-rows {
-                            // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
-                            .fr-grid-th:nth-child(n+3) {
-                                display: none
-                            }
-                        }
-                    }
-
-                    &.fr-grid-css {
-                        & > .fr-grid-body, & > .fr-grid-repeat-iteration > .fr-grid-body {
-                            display: block;
-                        }
-                    }
+                // https://github.com/orbeon/orbeon-forms/issues/4213
+                .input-prepend, .input-append {
+                    display: flex;
                 }
             }
-        }
 
+            .fr-table {
+                max-width: 100%;
+                background-color: @tableBackground;
+            }
 
-        // =============================================================================================================
-        // Hide LHH when needed
-        // =============================================================================================================
-        .fr-grid.fr-repeat {
-            // Don't show LHH for controls inside a repeated table which repeats over a single row only (they are shown
-            // in the column header). But only do this for the top-level control within a cell. Also, we now only do
-            // this in wide layout, as in narrow layout we need to show again the LHH on each individual control.
+            // Space after non-empty grids and repeated grids
+            .fr-grid-non-empty, .fr-repeat {
+                margin-bottom: 10px;
+            }
+
+            // =============================================================================================================
+            // Change the layout in narrow layout
+            // This now also applies to repeated grids:
             // https://github.com/orbeon/orbeon-forms/issues/4491
+            // =============================================================================================================
+            @media (max-width: 640px) {
+                .fr-grid {
+                    &.fr-norepeat, &.fr-repeat-single-row, &.fr-repeat-multiple-rows { // to make rule stronger
+                        // https://github.com/orbeon/orbeon-forms/issues/4805
+                        &:not(.fr-grid-css) {
+                            & > .fr-grid-body .fr-grid-tr .fr-grid-td {
+                                display: block;
+                            }
 
-            // Use a mixin because Less CSS doesn't parse `@media` correctly
-            .hide-lhh() {
-                &.fr-repeat-single-row {
-                    .fr-grid-body .fr-grid-td {
-                        &> .xforms-control, &> .xbl-component, &> .xforms-group {
-                            &> .xforms-label,
-                            &> .xforms-help,
-                            &> .xforms-hint {
-                                display: none;
+                            &.fr-repeat-multiple-rows {
+                                // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
+                                .fr-grid-th:nth-child(n+3) {
+                                    display: none
+                                }
+                            }
+                        }
+
+                        &.fr-grid-css {
+                            & > .fr-grid-body, & > .fr-grid-repeat-iteration > .fr-grid-body {
+                                display: block;
                             }
                         }
                     }
                 }
             }
-            @media not (max-width: 640px) {
-                .hide-lhh();
-            }
-            // For the PDF renderer which doesn't support `@media` queries properly
-            @media print {
-                .hide-lhh();
-            }
-        }
 
-        // =============================================================================================================
-        // Repeated grid top row/header row visibility
-        // NOTE: Keep all the code related to top row/header row visibility here.
-        // NOTE: In readonly AND multiple, the markup for the header row is not even present.
-        // =============================================================================================================
-        .fr-grid.fr-repeat {
 
-            &.fr-repeat-multiple-rows.fr-grid-table:has(.fr-grid-repeat-iteration) { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
-                & > .fr-grid-head {
-                    display: none;
-                }
-            }
-            &.fr-repeat-multiple-rows.fr-grid-css:has(.fr-grid-repeat-iteration) {
-                & > .fr-grid-repeat-top-row {
-                    display: none;
-                }
-            }
+            // =============================================================================================================
+            // Hide LHH when needed
+            // =============================================================================================================
+            .fr-grid.fr-repeat {
+                // Don't show LHH for controls inside a repeated table which repeats over a single row only (they are shown
+                // in the column header). But only do this for the top-level control within a cell. Also, we now only do
+                // this in wide layout, as in narrow layout we need to show again the LHH on each individual control.
+                // https://github.com/orbeon/orbeon-forms/issues/4491
 
-            // We never have a header row in narrow layout
-            @media (max-width: 640px) {
-                &.fr-repeat-single-row, &.fr-repeat-multiple-rows:has(.fr-grid-repeat-iteration) { // to make rule stronger
-                    &.fr-grid-table > .fr-grid-head { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
-                        display: none;
-                    }
-                    &.fr-grid-css > .fr-grid-repeat-top-row {
-                        display: none;
+                // Use a mixin because Less CSS doesn't parse `@media` correctly
+                .hide-lhh() {
+                    &.fr-repeat-single-row {
+                        .fr-grid-body .fr-grid-td {
+                            & > .xforms-control, & > .xbl-component, & > .xforms-group {
+                                & > .xforms-label,
+                                & > .xforms-help,
+                                & > .xforms-hint {
+                                    display: none;
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        }
-
-        // =============================================================================================================
-        // Repeated grid alignments
-        // NOTE: This section is incomplete, and other alignment rules are all over the place.
-        // =============================================================================================================
-        .fr-grid.fr-repeat {
-            .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
-                text-align: center;
-                vertical-align: top;
-                align-self: normal; // not `center`, as that has a completely different behavior
-            }
-            .fr-grid-head {
-                .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
-                    vertical-align: middle;
+                @media not (max-width: 640px) {
+                    .hide-lhh();
+                }
+                // For the PDF renderer which doesn't support `@media` queries properly
+                @media print {
+                    .hide-lhh();
                 }
             }
-            .fr-grid-repeat-top-row {
+
+            // =============================================================================================================
+            // Repeated grid top row/header row visibility
+            // NOTE: Keep all the code related to top row/header row visibility here.
+            // NOTE: In readonly AND multiple, the markup for the header row is not even present.
+            // =============================================================================================================
+            .fr-grid.fr-repeat {
+
+                &.fr-repeat-multiple-rows.fr-grid-table:has(.fr-grid-repeat-iteration) { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
+                    & > .fr-grid-head {
+                        display: none;
+                    }
+                }
+
+                &.fr-repeat-multiple-rows.fr-grid-css:has(.fr-grid-repeat-iteration) {
+                    & > .fr-grid-repeat-top-row {
+                        display: none;
+                    }
+                }
+
+                // We never have a header row in narrow layout
+                @media (max-width: 640px) {
+                    &.fr-repeat-single-row, &.fr-repeat-multiple-rows:has(.fr-grid-repeat-iteration) { // to make rule stronger
+                        &.fr-grid-table > .fr-grid-head { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
+                            display: none;
+                        }
+
+                        &.fr-grid-css > .fr-grid-repeat-top-row {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
+            // =============================================================================================================
+            // Repeated grid alignments
+            // NOTE: This section is incomplete, and other alignment rules are all over the place.
+            // =============================================================================================================
+            .fr-grid.fr-repeat {
                 .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
+                    text-align: center;
+                    vertical-align: top;
                     align-self: normal; // not `center`, as that has a completely different behavior
                 }
-            }
-        }
 
-        // =============================================================================================================
-        // Repeated grid borders
-        // NOTE: Keep all the code related to borders here.
-        // =============================================================================================================
-
-        // The `minimal` appearance doesn't have many borders
-        &.xforms-grid-appearance-minimal {
-            .fr-grid.fr-repeat {
-                &.fr-grid-css {
-                    .fr-grid-repeat-iteration {
-                        border-top: 2px solid #ddd;
-                        margin-top: @minimalRepeatSeparatorSpacing;  // to surround the border with more space on top and bottom
-                        padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
+                .fr-grid-head {
+                    .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
+                        vertical-align: middle;
                     }
                 }
-                &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
-                    // Apparently the PDF renderer doesn't support `:first-of-type` :(
-                    .fr-grid-tr:first-child > {
-                        .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
-                            // Use a mixin because Less CSS doesn't parse `@media` correctly
+
+                .fr-grid-repeat-top-row {
+                    .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
+                        align-self: normal; // not `center`, as that has a completely different behavior
+                    }
+                }
+            }
+
+            // =============================================================================================================
+            // Repeated grid borders
+            // NOTE: Keep all the code related to borders here.
+            // =============================================================================================================
+
+            // The `minimal` appearance doesn't have many borders
+            &.xforms-grid-appearance-minimal {
+                .fr-grid.fr-repeat {
+                    &.fr-grid-css {
+                        .fr-grid-repeat-iteration {
                             border-top: 2px solid #ddd;
+                            margin-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                             padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                         }
                     }
-                }
-            }
-        }
 
-        // The `full` appearance uses more borders, but as of 2024-07-30 we decided to remove the cell borders
-        // around form controls to make the look lighter.
-        .full-appearance-borders() {
-            .fr-grid.fr-repeat {
-
-                border: 1px solid #ddd;
-                border-radius: @baseBorderRadius;
-
-                .fr-repeat-column-left, .fr-repeat-column-number {
-                    border-right: 1px solid #ddd;
-                }
-
-                .fr-repeat-column-right {
-                    border-left: 1px solid #ddd;
-                    vertical-align: top;
-                    align-self: normal;
-                }
-
-                &.fr-grid-css {
-
-                    // Show the top border for each iteration except for cases excluded further below
-                    & > .xforms-repeat-delimiter {
-                        & + .fr-grid-repeat-iteration,                                   // expected case
-                        & + span.xforms-update-full:empty + .fr-grid-repeat-iteration {  // curious case where there is an intermediate span
-                            border-top: 1px solid #ddd;
+                    &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
+                        // Apparently the PDF renderer doesn't support `:first-of-type` :(
+                        .fr-grid-tr:first-child > {
+                            .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
+                                // Use a mixin because Less CSS doesn't parse `@media` correctly
+                                border-top: 2px solid #ddd;
+                                padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
+                            }
                         }
                     }
+                }
+            }
 
-                    // Wide layout
-                    @media not (max-width: 640px) {
-                        // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
-                        // the "multiple" case.
-                        // The difficulty is to exclude the first iteration.
-                        &.fr-repeat-multiple-rows {                                                  // multiple only
-                            & > .fr-grid-repeat-top-row + .xforms-repeat-begin-end,                  // if there is a top row
-                            & > .xforms-repeat-begin-end:first-child {                               // OR if there is no top row (readonly AND multiple)
+            // The `full` appearance uses more borders, but as of 2024-07-30 we decided to remove the cell borders
+            // around form controls to make the look lighter.
+            .full-appearance-borders() {
+                .fr-grid.fr-repeat {
+
+                    border: 1px solid #ddd;
+                    border-radius: @baseBorderRadius;
+
+                    .fr-repeat-column-left, .fr-repeat-column-number {
+                        border-right: 1px solid #ddd;
+                    }
+
+                    .fr-repeat-column-right {
+                        border-left: 1px solid #ddd;
+                        vertical-align: top;
+                        align-self: normal;
+                    }
+
+                    &.fr-grid-css {
+
+                        // Show the top border for each iteration except for cases excluded further below
+                        & > .xforms-repeat-delimiter {
+                            & + .fr-grid-repeat-iteration, // expected case
+                            & + span.xforms-update-full:empty + .fr-grid-repeat-iteration { // curious case where there is an intermediate span
+                                border-top: 1px solid #ddd;
+                            }
+                        }
+
+                        // Wide layout
+                        @media not (max-width: 640px) {
+                            // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
+                            // the "multiple" case.
+                            // The difficulty is to exclude the first iteration.
+                            &.fr-repeat-multiple-rows { // multiple only
+                                & > .fr-grid-repeat-top-row + .xforms-repeat-begin-end, // if there is a top row
+                                & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
+                                    & + .xforms-repeat-delimiter {
+                                        & + .fr-grid-repeat-iteration, // expected case
+                                        & + span.xforms-update-full:empty + .fr-grid-repeat-iteration { // curious case where there is an intermediate span
+                                            border: none;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Narrow layout
+                        @media (max-width: 640px) {
+
+                            // To align the grid with controls above and below it
+                            margin-left: 4px;
+                            margin-right: 4px;
+
+                            // In narrow layout, we must never show the top border for the first
+                            // `.fr-grid-repeat-iteration`.
+                            // The difficulty is to exclude the first iteration.
+                            & > .fr-grid-repeat-top-row + .xforms-repeat-begin-end, // if there is a top row
+                            & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
                                 & + .xforms-repeat-delimiter {
-                                    & + .fr-grid-repeat-iteration,                                   // expected case
-                                    & + span.xforms-update-full:empty + .fr-grid-repeat-iteration {  // curious case where there is an intermediate span
+                                    & + .fr-grid-repeat-iteration, // expected case
+                                    & + span.xforms-update-full:empty + .fr-grid-repeat-iteration { // curious case where there is an intermediate span
                                         border: none;
                                     }
                                 }
@@ -300,45 +329,63 @@
                         }
                     }
 
-                    // Narrow layout
-                    @media (max-width: 640px) {
+                    // Case of legacy table layout (also used for PDF)
+                    &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
 
-                        // To align the grid with controls above and below it
-                        margin-left: 4px;
-                        margin-right: 4px;
+                        border-collapse: separate; // otherwise we cannot have rounded corners
 
-                        // In narrow layout, we must never show the top border for the first
-                        // `.fr-grid-repeat-iteration`.
-                        // The difficulty is to exclude the first iteration.
-                        & > .fr-grid-repeat-top-row + .xforms-repeat-begin-end,                  // if there is a top row
-                        & > .xforms-repeat-begin-end:first-child {                               // OR if there is no top row (readonly AND multiple)
-                            & + .xforms-repeat-delimiter {
-                                & + .fr-grid-repeat-iteration,                                   // expected case
-                                & + span.xforms-update-full:empty + .fr-grid-repeat-iteration {  // curious case where there is an intermediate span
-                                    border: none;
+                        // Use a mixin because Less CSS doesn't parse `@media` correctly
+                        .table-border-top() {
+                            & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
+                                > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
+                                    border-top: 1px solid #ddd;
+                                }
+                            }
+                            // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
+                            // the "multiple" case.
+                            &.fr-repeat-multiple-rows { // multiple only
+                                & > .fr-grid-head + .xforms-repeat-begin-end, // if there is a top row
+                                & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
+                                    & + .xforms-repeat-delimiter {
+                                        & + .fr-grid-repeat-iteration {
+                                            > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
+                                                border-top: none;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-
-                // Case of legacy table layout (also used for PDF)
-                &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
-
-                    border-collapse: separate; // otherwise we cannot have rounded corners
-
-                    // Use a mixin because Less CSS doesn't parse `@media` correctly
-                    .table-border-top() {
-                        & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                            > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                border-top: 1px solid #ddd;
-                            }
+                        // Wide layout
+                        @media not (max-width: 640px) {
+                            .table-border-top();
                         }
-                        // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
-                        // the "multiple" case.
-                        &.fr-repeat-multiple-rows {                                                  // multiple only
-                            & > .fr-grid-head + .xforms-repeat-begin-end,                            // if there is a top row
-                            & > .xforms-repeat-begin-end:first-child {                               // OR if there is no top row (readonly AND multiple)
+                        // The PDF renderer doesn't support `@media` queries properly
+                        @media print {
+                            .table-border-top();
+                        }
+
+                        // Narrow layout
+                        @media (max-width: 640px) {
+
+                            // To align the grid with controls above and below it
+                            margin-left: 4px;
+                            margin-right: 4px;
+
+                            & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
+                                > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
+                                    &.fr-repeat-column-number, &.fr-repeat-column-left, &.fr-repeat-column-right, &.fr-grid-td {
+                                        border-top: 1px solid #ddd;
+                                    }
+
+                                    &.fr-grid-td + .fr-grid-td { // trick to cancel the above for subsequent `.fr-grid-td`s
+                                        border-top: none;
+                                    }
+                                }
+                            }
+
+                            & > .fr-grid-head + .xforms-repeat-begin-end, // if there is a top row
+                            & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
                                 & + .xforms-repeat-delimiter {
                                     & + .fr-grid-repeat-iteration {
                                         > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
@@ -349,468 +396,463 @@
                             }
                         }
                     }
-                    // Wide layout
-                    @media not (max-width: 640px) {
-                        .table-border-top();
-                    }
-                    // The PDF renderer doesn't support `@media` queries properly
-                    @media print {
-                        .table-border-top();
-                    }
+                }
+            }
 
-                    // Narrow layout
+            // For PDF renderer (which doesn't support `:not()`), class added in `print-pdf-notemplate.xsl`
+            &.xforms-grid-appearance-full {
+                .full-appearance-borders();
+            }
+
+            // For browser
+            &:not(.xforms-grid-appearance-minimal) {
+                .full-appearance-borders();
+            }
+
+            // =============================================================================================================
+
+            // Minimal appearance buttons
+            &.xforms-grid-appearance-minimal .fr-grid-bottom-buttons {
+
+                display: block;
+                margin-top: -10px; // reduce the space as the grid above has `margin-bottom: 10px`
+                margin-bottom: 10px;
+
+                .xforms-trigger {
+                    margin-right: 1em;
+                }
+            }
+
+            // Overrides for minimal appearance
+            &.xforms-grid-appearance-minimal {
+                .fr-grid {
+                    &.fr-repeat {
+
+                        .fr-grid-repeat-iteration {
+
+                            .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
+                                border: none; // reset default, as we import other styles that set a border
+                            }
+
+                            .fr-grid-tr:last-child > {
+                                .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
+                                    padding-bottom: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
+                                }
+                            }
+
+                            .fr-repeat-column-number {
+                                background-color: transparent;
+                                border: none;
+                            }
+                        }
+                    }
+                }
+
+                .fr-grid.fr-grid-css {
+                    &.fr-repeat {
+
+                        &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
+                            .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                                grid-template-columns: auto 35px;
+                            }
+                        }
+
+                        &:not(.fr-grid-readonly).fr-grid-number-rows {
+                            .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                                grid-template-columns: 35px auto 35px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // For readonly MIP, see: https://github.com/orbeon/orbeon-forms/issues/5743
+            &.xforms-readonly {
+                & > .fr-grid.fr-grid-css {
+                    &.fr-repeat:not(.fr-grid-readonly) {
+                        &:not(.fr-grid-number-rows) {
+                            .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                                grid-template-columns: auto;
+                            }
+                        }
+
+                        &.fr-grid-number-rows {
+                            .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                                grid-template-columns: 35px auto;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Grid displayed with CSS grids
+            .fr-grid.fr-grid-css {
+
+                &.fr-repeat {
                     @media (max-width: 640px) {
-
                         // To align the grid with controls above and below it
                         margin-left: 4px;
                         margin-right: 4px;
+                    }
 
-                        & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                            > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                &.fr-repeat-column-number, &.fr-repeat-column-left, &.fr-repeat-column-right, &.fr-grid-td {
-                                    border-top: 1px solid #ddd;
-                                }
+                    .fr-grid-th,
+                    .fr-grid-td,
+                    .fr-repeat-column-left,
+                    .fr-repeat-column-number,
+                    .fr-repeat-column-right,
+                    &.fr-repeat-multiple-rows .fr-grid-head {
+                        line-height: 20px;
+                        vertical-align: top;
+                    }
 
-                                &.fr-grid-td + .fr-grid-td { // trick to cancel the above for subsequent `.fr-grid-td`s
-                                    border-top: none;
-                                }
-                            }
-                        }
+                    .fr-grid-repeat-top-row .fr-grid-head .fr-grid-th {
+                        align-self: flex-end; // align the header row content at the bottom
+                    }
 
-                        & > .fr-grid-head + .xforms-repeat-begin-end,                            // if there is a top row
-                        & > .xforms-repeat-begin-end:first-child {                               // OR if there is no top row (readonly AND multiple)
-                            & + .xforms-repeat-delimiter {
-                                & + .fr-grid-repeat-iteration {
-                                    > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                        border-top: none;
-                                    }
-                                }
-                            }
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        display: grid;
+                        width: 100%;
+                    }
+
+                    // For `readonly="true"` attribute, see: https://github.com/orbeon/orbeon-forms/issues/5743
+                    &.fr-grid-readonly:not(.fr-grid-number-rows) {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: auto;
                         }
                     }
-                }
-            }
-        }
 
-        // For PDF renderer (which doesn't support `:not()`), class added in `print-pdf-notemplate.xsl`
-        &.xforms-grid-appearance-full {
-            .full-appearance-borders();
-        }
-        // For browser
-        &:not(.xforms-grid-appearance-minimal) {
-            .full-appearance-borders();
-        }
-
-        // =============================================================================================================
-
-        // Minimal appearance buttons
-        &.xforms-grid-appearance-minimal .fr-grid-bottom-buttons {
-
-            display: block;
-            margin-top: -10px; // reduce the space as the grid above has `margin-bottom: 10px`
-            margin-bottom: 10px;
-
-            .xforms-trigger {
-                margin-right: 1em;
-            }
-        }
-
-        // Overrides for minimal appearance
-        &.xforms-grid-appearance-minimal {
-            .fr-grid {
-                &.fr-repeat {
-
-                    .fr-grid-repeat-iteration {
-
-                        .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
-                            border: none; // reset default, as we import other styles that set a border
-                        }
-
-                        .fr-grid-tr:last-child > {
-                            .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
-                                padding-bottom: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
-                            }
-                        }
-
-                        .fr-repeat-column-number {
-                            background-color: transparent;
-                            border: none;
+                    &.fr-grid-readonly.fr-grid-number-rows {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: 35px auto;
                         }
                     }
-                }
-            }
-            .fr-grid.fr-grid-css {
-                &.fr-repeat {
 
                     &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
                         .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                            grid-template-columns: auto 35px;
+                            grid-template-columns: 35px auto;
                         }
                     }
 
                     &:not(.fr-grid-readonly).fr-grid-number-rows {
                         .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                            grid-template-columns: 35px auto 35px;
+                            grid-template-columns: 35px 35px auto;
                         }
                     }
                 }
-            }
-        }
 
-        // For readonly MIP, see: https://github.com/orbeon/orbeon-forms/issues/5743
-        &.xforms-readonly {
-            & > .fr-grid.fr-grid-css {
-                &.fr-repeat:not(.fr-grid-readonly) {
-                    &:not(.fr-grid-number-rows) {
-                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                            grid-template-columns: auto;
-                        }
+                .generateColumnStart(@x) when (@x > 0) {
+                    .fr-grid-td[data-fr-x =  '@{x}'], .fr-grid-th[data-fr-x =  '@{x}'] {
+                        grid-column-start: @x;
                     }
-                    &.fr-grid-number-rows {
-                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                            grid-template-columns: 35px auto;
-                        }
+                    .generateColumnStart(@x - 1)
+                }
+
+                .generateRowStart(@y) when (@y > 0) {
+                    .fr-grid-td[data-fr-y =  '@{y}'] {
+                        grid-row-start: @y;
+                    }
+                    .generateRowStart(@y - 1)
+                }
+
+                .generateColumnEnd(@w) when (@w > 0) {
+                    .fr-grid-td[data-fr-w =  '@{w}'], .fr-grid-th[data-fr-w =  '@{w}'] {
+                        grid-column-end: span @w;
+                    }
+                    .generateColumnEnd(@w - 1)
+                }
+
+                .generateRowEnd(@h) when (@h > 0) {
+                    .fr-grid-td[data-fr-h =  '@{h}'] {
+                        grid-row-end: span @h;
+                    }
+                    .generateRowEnd(@h - 1)
+                }
+
+                &.fr-grid-12 {
+                    .fr-grid-head, .fr-grid-body {
+                        grid-template-columns: repeat(12, 1fr);
+                        //grid-template-rows: repeat(3, minmax(120px, max-content));
+                        //grid-template-rows: repeat(auto-fill, 1fr); // TODO: vertical repeat sizes must be definite; figure out how to do min-height
+                        .generateColumnStart(12);
+                        .generateColumnEnd(12);
                     }
                 }
-            }
-        }
 
-        // Grid displayed with CSS grids
-        .fr-grid.fr-grid-css {
-
-            &.fr-repeat {
-                @media (max-width: 640px) {
-                    // To align the grid with controls above and below it
-                    margin-left: 4px;
-                    margin-right: 4px;
+                &.fr-grid-24 {
+                    .fr-grid-head, .fr-grid-body {
+                        grid-template-columns: repeat(24, 1fr);
+                        .generateColumnStart(24);
+                        .generateColumnEnd(24);
+                    }
                 }
 
-                .fr-grid-th,
-                .fr-grid-td,
-                .fr-repeat-column-left,
-                .fr-repeat-column-number,
-                .fr-repeat-column-right,
-                &.fr-repeat-multiple-rows .fr-grid-head {
-                    line-height: 20px;
-                    vertical-align: top;
-                }
-
-                .fr-grid-repeat-top-row .fr-grid-head .fr-grid-th {
-                    align-self: flex-end; // align the header row content at the bottom
-                }
-
-                .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                .fr-grid-head, .fr-grid-body {
                     display: grid;
+
+                    .fr-grid-td {
+                        grid-column-end: span 1;
+                        grid-column-end: span 1;
+                        grid-row-end: span 1;
+                    }
+
+                    .generateRowStart(20);
+                    .generateRowEnd(20);
+                }
+            }
+
+            // Grid NOT displayed with CSS grids
+            .fr-grid:not(.fr-grid-css) { // this is the enclosing `<div>` or `<table>` element
+                .grid-not-css();
+            }
+
+            .fr-grid {
+
+                &.fr-repeat .fr-grid-th {
+                    &.fr-field-align-left {
+                        .xforms-label, .xforms-hint {
+                            text-align: left;
+                        }
+                    }
+
+                    &.fr-field-align-right {
+                        .xforms-label, .xforms-hint {
+                            text-align: right;
+                        }
+                    }
+                }
+
+                .xforms-help {
+                    float: left;
+                    margin-top: (@baseLineHeight - 14)/2 + 1; // Vertically center help image on first line
+                    margin-right: 3px;
+
+                    .help-icon();
+                }
+
+                .xforms-label {
+                    font-weight: 600; // Help label stand out
+                    margin-top: 2px; // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
+                    margin-bottom: @frGridCellPadding; // Insert some space between the label / help and the control (we add spacing below the label rather
+                    // than above the control to make the CSS more generally applicable to XBL components)
+                    overflow: hidden; // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
+                    display: table; // Instead of block, so:
+                    // - We don't capture clicks to the right of the text
+                    // - We prevent further content on the same line
+                    > div:first-child {
+                        display: inline;
+                    }
+
+                    // Don't go on a new line after a required '*'
+                }
+
+                .xforms-label:empty {
+                    display: none; // no reason for the label to take space in this case
+                }
+
+                // Controls
+                select,
+                textarea,
+                input[type="text"], // Like Bootstrap, use all the specific types to exclude checkbox/radio
+                input[type="password"],
+                input[type="datetime"],
+                input[type="datetime-local"],
+                input[type="date"],
+                input[type="month"],
+                input[type="time"],
+                input[type="week"],
+                input[type="number"],
+                input[type="email"],
+                input[type="url"],
+                input[type="search"],
+                input[type="tel"],
+                input[type="color"],
+                .uneditable-input,
+                .input-append {
                     width: 100%;
                 }
 
-                // For `readonly="true"` attribute, see: https://github.com/orbeon/orbeon-forms/issues/5743
-                &.fr-grid-readonly:not(.fr-grid-number-rows) {
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: auto;
-                    }
+                .xforms-textarea textarea {
+                    width: 100%; // It's a reasonable default for textareas to be as wide as allowed
                 }
 
-                &.fr-grid-readonly.fr-grid-number-rows {
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: 35px auto;
-                    }
-                }
-
-                &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: 35px auto;
-                    }
-                }
-
-                &:not(.fr-grid-readonly).fr-grid-number-rows {
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: 35px 35px auto;
-                    }
-                }
-            }
-
-            .generateColumnStart(@x) when (@x > 0) {
-                .fr-grid-td[data-fr-x =  '@{x}'], .fr-grid-th[data-fr-x =  '@{x}'] { grid-column-start: @x; }
-                .generateColumnStart(@x - 1)
-            }
-
-            .generateRowStart(@y) when (@y > 0) {
-                .fr-grid-td[data-fr-y =  '@{y}'] { grid-row-start: @y; }
-                .generateRowStart(@y - 1)
-            }
-
-            .generateColumnEnd(@w) when (@w > 0) {
-                .fr-grid-td[data-fr-w =  '@{w}'], .fr-grid-th[data-fr-w =  '@{w}'] { grid-column-end: span @w; }
-                .generateColumnEnd(@w - 1)
-            }
-
-            .generateRowEnd(@h) when (@h > 0) {
-                .fr-grid-td[data-fr-h =  '@{h}'] { grid-row-end: span @h; }
-                .generateRowEnd(@h - 1)
-            }
-
-            &.fr-grid-12 {
-                .fr-grid-head, .fr-grid-body {
-                    grid-template-columns: repeat(12, 1fr);
-                    //grid-template-rows: repeat(3, minmax(120px, max-content));
-                    //grid-template-rows: repeat(auto-fill, 1fr); // TODO: vertical repeat sizes must be definite; figure out how to do min-height
-                    .generateColumnStart(12);
-                    .generateColumnEnd(12);
-                }
-            }
-
-            &.fr-grid-24 {
-                .fr-grid-head, .fr-grid-body {
-                    grid-template-columns: repeat(24, 1fr);
-                    .generateColumnStart(24);
-                    .generateColumnEnd(24);
-                }
-            }
-
-            .fr-grid-head, .fr-grid-body {
-                display: grid;
-                .fr-grid-td {
-                    grid-column-end: span  1;
-                    grid-column-end: span  1;
-                    grid-row-end: span  1;
-                }
-                .generateRowStart(20);
-                .generateRowEnd(20);
-            }
-        }
-
-        // Grid NOT displayed with CSS grids
-        .fr-grid:not(.fr-grid-css) { // this is the enclosing `<div>` or `<table>` element
-            .grid-not-css();
-        }
-
-        .fr-grid {
-
-            &.fr-repeat .fr-grid-th {
-                &.fr-field-align-left {
-                    .xforms-label, .xforms-hint {
-                        text-align: left;
-                    }
-                }
-                &.fr-field-align-right {
-                    .xforms-label, .xforms-hint {
-                        text-align: right;
-                    }
-                }
-            }
-
-            .xforms-help {
-                float: left;
-                margin-top: (@baseLineHeight - 14)/2 + 1;   // Vertically center help image on first line
-                margin-right: 3px;
-
-                .help-icon();
-            }
-
-            .xforms-label {
-                font-weight: 600;                           // Help label stand out
-                margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
-                margin-bottom: @frGridCellPadding;          // Insert some space between the label / help and the control (we add spacing below the label rather
-                                                            // than above the control to make the CSS more generally applicable to XBL components)
-                overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
-                display: table;                             // Instead of block, so:
-                                                            // - We don't capture clicks to the right of the text
-                                                            // - We prevent further content on the same line
-                > div:first-child { display: inline; }      // Don't go on a new line after a required '*'
-            }
-
-            .xforms-label:empty {
-                display: none; // no reason for the label to take space in this case
-            }
-
-            // Controls
-            select,
-            textarea,
-            input[type="text"],                             // Like Bootstrap, use all the specific types to exclude checkbox/radio
-            input[type="password"],
-            input[type="datetime"],
-            input[type="datetime-local"],
-            input[type="date"],
-            input[type="month"],
-            input[type="time"],
-            input[type="week"],
-            input[type="number"],
-            input[type="email"],
-            input[type="url"],
-            input[type="search"],
-            input[type="tel"],
-            input[type="color"],
-            .uneditable-input,
-            .input-append {
-                width: 100%;
-            }
-
-            .xforms-textarea textarea {
-                width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
-            }
-
-            .xforms-select-appearance-full, .xforms-select1-appearance-full {
-                .xforms-items {
-                    width: 100%;
-                    box-sizing: border-box;
-                    &[role = group][tabindex = '0'],
-                    &[role = radiogroup][tabindex = '0'] {
-                        padding: 4px 6px;
-                    }
-                }
-            }
-
-            .xbl-fr-checkbox-input {
                 .xforms-select-appearance-full, .xforms-select1-appearance-full {
                     .xforms-items {
-                        padding: 4px 0; // for alignment with horizontal selection controls
+                        width: 100%;
+                        box-sizing: border-box;
+
+                        &[role = group][tabindex = '0'],
+                        &[role = radiogroup][tabindex = '0'] {
+                            padding: 4px 6px;
+                        }
                     }
                 }
-            }
 
-            // Usually there is no `rows` attribute used, but if there is the
-            textarea[rows] {
-                height: auto;
-            }
+                .xbl-fr-checkbox-input {
+                    .xforms-select-appearance-full, .xforms-select1-appearance-full {
+                        .xforms-items {
+                            padding: 4px 0; // for alignment with horizontal selection controls
+                        }
+                    }
+                }
 
-            input[type="file"] {
-                width: auto;
-            }
+                // Usually there is no `rows` attribute used, but if there is the
+                textarea[rows] {
+                    height: auto;
+                }
 
-            // Better to be wide as well
-            .xbl-fr-inplace-input {
-                width: 100%;
-                input {
+                input[type="file"] {
+                    width: auto;
+                }
+
+                // Better to be wide as well
+                .xbl-fr-inplace-input {
                     width: 100%;
-                }
-            }
 
-            // Fixed-width pre-2018.2 date and time width, kept for backward compatibility
-            .xforms-input input {
-                &.xforms-type-date, &.xforms-type-time {
-                    width: 7.5em;
-                }
-            }
-
-            // Image output
-            .xforms-mediatype-image {
-                width: 100%;
-                overflow: auto;
-                display: block;
-            }
-            .xforms-mediatype-image img {
-                display: block;
-                border-radius: @baseBorderRadius;
-            }
-
-            //  Buttons
-            .fr-grid-td {
-                .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
-                .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
-
-                // Try not to allow buttons to go over the width of a cell
-                .xforms-trigger-appearance-full button {
-                    max-width: 100%;
-                    word-wrap: break-word;
-                    white-space: break-spaces;
-                }
-            }
-        }
-
-        .fr-grid.fr-repeat {
-
-            .fr-grid-body .fr-grid-td {
-                &> .xforms-control, &> .xbl-component, &> .xforms-group {
-                    padding-top: 0;                                                 // No top/bottom padding in repeated grid cells
-                    padding-bottom: 0.1px;                                          // 0 causes https://github.com/orbeon/orbeon-forms/issues/2690
-                }
-            }
-
-            &.fr-repeat-single-row {
-                .fr-grid-master-row > .fr-grid-th span.xforms-group {               // So the group that contains the control label is sized, to allow
-                    display: block;                                                 // the help popover to be correctly positioned
-                }
-            }
-
-            // But if there is a nested table, show those in the label in the column header of that table
-            .fr-grid-head .fr-grid-th {
-                overflow-wrap: break-word;
-                // https://github.com/orbeon/orbeon-forms/issues/5716
-                word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
-                .xforms-label {
-                    display: block; // label in repeat table header is block so yellow background in FB takes the whole width
-                    margin: @frGridCellPadding @frGridCellPadding;
-                }
-                .xforms-help {
-                    margin-top: @frGridCellPadding + 2;
-                    margin-left: @frGridCellPadding;
-                }
-                .xforms-hint {
-                    margin-left: @frGridCellPadding;
-                }
-            }
-
-            .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
-                width: 35px;
-                box-sizing: border-box;
-
-                .xforms-trigger .btn-link {
-                    text-decoration: none;
-                    color: black;
+                    input {
+                        width: 100%;
+                    }
                 }
 
-                button {
+                // Fixed-width pre-2018.2 date and time width, kept for backward compatibility
+                .xforms-input input {
+                    &.xforms-type-date, &.xforms-type-time {
+                        width: 7.5em;
+                    }
+                }
+
+                // Image output
+                .xforms-mediatype-image {
+                    width: 100%;
+                    overflow: auto;
                     display: block;
-                    margin: auto;
+                }
+
+                .xforms-mediatype-image img {
+                    display: block;
+                    border-radius: @baseBorderRadius;
+                }
+
+                //  Buttons
+                .fr-grid-td {
+                    .xforms-trigger button, .xforms-trigger input {
+                        margin-top: 1.72em
+                    }
+
+                    // hand-tuned so it appears at about the same pos as input fields
+                    .xforms-trigger button, .yui-button .xforms-trigger input {
+                        margin-top: 0
+                    }
+
+                    // except YUI buttons don't appear right with top margin!
+
+                    // Try not to allow buttons to go over the width of a cell
+                    .xforms-trigger-appearance-full button {
+                        max-width: 100%;
+                        word-wrap: break-word;
+                        white-space: break-spaces;
+                    }
                 }
             }
 
-            .fr-repeat-column-left, .fr-repeat-column-right {
-                text-align: left;
-            }
+            .fr-grid.fr-repeat {
 
-            .fr-repeat-column-number {
-                .badge {
-                    margin: @frGridCellPadding + 2 @frGridCellPadding;
-                    font-size: smaller;
+                .fr-grid-body .fr-grid-td {
+                    & > .xforms-control, & > .xbl-component, & > .xforms-group {
+                        padding-top: 0; // No top/bottom padding in repeated grid cells
+                        padding-bottom: 0.1px; // 0 causes https://github.com/orbeon/orbeon-forms/issues/2690
+                    }
                 }
-                @media print {
+
+                &.fr-repeat-single-row {
+                    .fr-grid-master-row > .fr-grid-th span.xforms-group { // So the group that contains the control label is sized, to allow
+                        display: block; // the help popover to be correctly positioned
+                    }
+                }
+
+                // But if there is a nested table, show those in the label in the column header of that table
+                .fr-grid-head .fr-grid-th {
+                    overflow-wrap: break-word;
+                    // https://github.com/orbeon/orbeon-forms/issues/5716
+                    word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
+                    .xforms-label {
+                        display: block; // label in repeat table header is block so yellow background in FB takes the whole width
+                        margin: @frGridCellPadding @frGridCellPadding;
+                    }
+
+                    .xforms-help {
+                        margin-top: @frGridCellPadding + 2;
+                        margin-left: @frGridCellPadding;
+                    }
+
+                    .xforms-hint {
+                        margin-left: @frGridCellPadding;
+                    }
+                }
+
+                .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
+                    width: 35px;
+                    box-sizing: border-box;
+
+                    .xforms-trigger .btn-link {
+                        text-decoration: none;
+                        color: black;
+                    }
+
+                    button {
+                        display: block;
+                        margin: auto;
+                    }
+                }
+
+                .fr-repeat-column-left, .fr-repeat-column-right {
+                    text-align: left;
+                }
+
+                .fr-repeat-column-number {
                     .badge {
-                        color: @textColor;
-                        background-color: transparent;
+                        margin: @frGridCellPadding + 2 @frGridCellPadding;
+                        font-size: smaller;
+                    }
+
+                    @media print {
+                        .badge {
+                            color: @textColor;
+                            background-color: transparent;
+                        }
                     }
                 }
-            }
 
-            // Highlight the current grid row
-            .xforms-repeat-selected-item-1 {
-                .fr-repeat-column-left, .fr-repeat-column-number {
-                    @media not print {
-                        background-color: @grayLighter;
+                // Highlight the current grid row
+                .xforms-repeat-selected-item-1 {
+                    .fr-repeat-column-left, .fr-repeat-column-number {
+                        @media not print {
+                            background-color: @grayLighter;
+                        }
                     }
                 }
-            }
 
-            // Hide menu button...
-            .fr-repeat-column-left .dropdown {
-                display: none;
-            }
-
-            // ... but show it if there is at least one operation
-            .can-remove, .can-move-up, .can-move-down, .can-insert-above, .can-insert-below {
-                .dropdown {
-                    display: block;
-                    // Margin around button, but not menu itself, which also has the `dropdown` class
-                    &:not(.open) { margin: @frGridCellPadding }
+                // Hide menu button...
+                .fr-repeat-column-left .dropdown {
+                    display: none;
                 }
-            }
 
-            // Update caret icon with Font Awesome
-            .dropdown .fa-caret-down {
-                width: 8px;
-                height: 12px;
-                margin: 4px auto;
+                // ... but show it if there is at least one operation
+                .can-remove, .can-move-up, .can-move-down, .can-insert-above, .can-insert-below {
+                    .dropdown {
+                        display: block;
+                        // Margin around button, but not menu itself, which also has the `dropdown` class
+                        &:not(.open) {
+                            margin: @frGridCellPadding
+                        }
+                    }
+                }
+
+                // Update caret icon with Font Awesome
+                .dropdown .fa-caret-down {
+                    width: 8px;
+                    height: 12px;
+                    margin: 4px auto;
+                }
             }
         }
     }

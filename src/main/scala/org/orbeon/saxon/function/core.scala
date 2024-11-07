@@ -14,14 +14,17 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
+
+
+// 2024-11-06: Some of this code is also present in `CoreSupport`, which is currently only on the JS side. It would be
+// good to reduce code duplication. But where to put the common code?
 
 class Property extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): AtomicValue =
@@ -34,7 +37,7 @@ object Property {
     if (propertyName.toLowerCase.contains("password"))
       None
     else {
-      Properties.instance.getPropertySet.getObjectOpt(propertyName) map
+      CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
       SaxonUtils.convertJavaObjectToSaxonObject                     flatMap
       collectByErasedType[AtomicValue]
     }
@@ -52,7 +55,7 @@ object PropertiesStartsWith {
 
   def propertiesStartsWith(propertyName: String): List[AtomicValue] =
     for {
-      property <- Properties.instance.getPropertySet.propertiesStartsWith(propertyName)
+      property <- CoreCrossPlatformSupport.properties.propertiesStartsWith(propertyName)
       if ! property.toLowerCase.contains("password")
     } yield
       SaxonUtils.convertJavaObjectToSaxonObject(property).asInstanceOf[AtomicValue]
@@ -71,14 +74,15 @@ class RewriteResourceURI extends DefaultFunctionSupport {
 }
 
 object RewriteResourceURI {
-  def rewriteResourceURI(uri: String, absolute: Boolean): String =
-    NetUtils.getExternalContext.getResponse.rewriteResourceURL(
+  def rewriteResourceURI(uri: String, absolute: Boolean): String = {
+    CoreCrossPlatformSupport.externalContext.getResponse.rewriteResourceURL(
       uri,
       if (absolute)
         UrlRewriteMode.Absolute
       else
         UrlRewriteMode.AbsolutePathOrRelative
     )
+  }
 }
 
 trait EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFunction {
@@ -99,7 +103,7 @@ trait EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFu
 
 class EnvironmentVariableEnabledByProperty extends EnvironmentVariable {
   override def enabled: Boolean =
-    Properties.instance.getPropertySet.getBooleanOpt("oxf.xpath.environment-variable.enabled").contains(true)
+    CoreCrossPlatformSupport.properties.getBooleanOpt("oxf.xpath.environment-variable.enabled").contains(true)
 }
 
 class EnvironmentVariableAlwaysEnabled extends EnvironmentVariable {

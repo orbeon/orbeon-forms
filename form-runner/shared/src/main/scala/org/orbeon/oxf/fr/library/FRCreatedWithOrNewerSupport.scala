@@ -10,10 +10,10 @@ object FRCreatedWithOrNewerSupport {
 
   def isCreatedWithOrNewer(xblContainer: XBLContainer, paramVersion: String): Boolean = {
 
+    val part = xblContainer.associatedControlOpt.map(_.container).getOrElse(xblContainer.containingDocument).partAnalysis
+
     val metadataVersionOpt =
       for {
-        sourceControl      <- xblContainer.associatedControlOpt
-        part               = sourceControl.container.partAnalysis
         metadata           <- FRComponentParamSupport.findConstantMetadataRootElem(part)
         createdWithVersion <- metadata elemValueOpt Names.CreatedWithVersion
       } yield

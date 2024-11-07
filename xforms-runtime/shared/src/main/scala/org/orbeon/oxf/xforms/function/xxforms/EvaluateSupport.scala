@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
 import org.orbeon.oxf.util.{XPath, XPathCache}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.XPathContext
@@ -44,13 +45,11 @@ object EvaluateSupport {
 
   def evaluateInContextFromXPathExpr(
     expr       : CompiledExpression,
-    effectiveId: String
-  )(implicit
-    xpc        : XPathContext,
-    xfc        : XFormsFunction.Context
+    effectiveId: String,
+    xfcd       : XFormsContainingDocument,
+    contextItem: om.Item
   ): LazyList[om.Item] = {
 
-    val xfcd = xfc.containingDocument
     val contextObject =
       xfcd.findObjectByEffectiveId(effectiveId)
         .getOrElse(throw new IllegalArgumentException(effectiveId))
@@ -66,7 +65,7 @@ object EvaluateSupport {
     }
 
     XPath.evaluateKeepItems(
-      contextItems       = List(xpc.getContextItem).asJava,
+      contextItems       = List(contextItem).asJava,
       contextPosition    = 1,
       compiledExpression = expr,
       functionContext    = newXPc,

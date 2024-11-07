@@ -24,6 +24,7 @@ object FRComponentParamSupport {
 
   import org.orbeon.scaxon.SimplePath.*
 
+  // Implementation of `fr:component-param-value()`
   def componentParamValue(
     paramName            : QName,
     sourceComponentIdOpt : Option[String],
@@ -55,6 +56,8 @@ object FRComponentParamSupport {
       }
     }
 
+  // Implementation of `fr:component-param-value-by-type()`
+  // 2024-11-06: undocumented and no callers.
   def componentParamValueByType(
     paramName  : QName,
     directName : QName,
@@ -110,7 +113,7 @@ object FRComponentParamSupport {
   //   </xbl>
   // </metadata>
   //
-  def findHierarchicalElem(directNameOpt: Option[QName], paramName: QName, rootElem: om.NodeInfo): Option[String] =
+  def findHierarchicalElem(directNameOpt: Option[QName])(paramName: QName, rootElem: om.NodeInfo): Option[String] =
     for {
       directName    <- directNameOpt
       xblElem       <- rootElem.firstChildOpt(ComponentParamSupport.XblLocalName)
@@ -118,6 +121,15 @@ object FRComponentParamSupport {
       paramValue    <- componentElem.attValueOpt(paramName)
     } yield
       paramValue
+
+  // Find in a top-level name, such as:
+  //
+  // <metadata>
+  //   <data-migration>enabled</data-migration>
+  // </metadata>
+  //
+  def findTopLevelElem(paramName: QName, rootElem: om.NodeInfo): Option[String] =
+    rootElem.elemValueOpt(paramName)
 
   // Instead of using `FormRunnerParams()`, we use the form definition metadata.
   // This also allows support of the edited form in Form Builder.
@@ -133,6 +145,19 @@ object FRComponentParamSupport {
     directNameOpt : Option[QName],
     paramName     : QName,
     property      : String => Option[AtomicValue]
+  ): Option[AtomicValue] =
+    fromMetadataAndPropertiesSupport(
+      partAnalysis     = partAnalysis,
+      findInMetadata   = findHierarchicalElem(directNameOpt),
+      findInProperties = (paramName, appFormOpt) => ComponentParamSupport.fromProperties(paramName, appFormOpt.map(_.toList).getOrElse(Nil), directNameOpt, property),
+      paramName        = paramName
+    )
+
+  def fromMetadataAndPropertiesSupport(
+    partAnalysis    : PartAnalysisForStaticMetadataAndProperties,
+    findInMetadata  : (QName, om.NodeInfo)     => Option[String],
+    findInProperties: (QName, Option[AppForm]) => Option[AtomicValue],
+    paramName       : QName,
   ): Option[AtomicValue] = {
 
     def iterateMetadataInParts =
@@ -140,8 +165,8 @@ object FRComponentParamSupport {
 
     def fromMetadataInstance: Option[StringValue] =
       (
-        iterateMetadataInParts                              flatMap
-        (findHierarchicalElem(directNameOpt, paramName, _)) map
+        iterateMetadataInParts         flatMap
+        (findInMetadata(paramName, _)) map
         StringValue.makeStringValue
       ).nextOption()
 
@@ -149,11 +174,11 @@ object FRComponentParamSupport {
       (
         iterateMetadataInParts flatMap
         appFormFromMetadata    flatMap
-        (appForm => ComponentParamSupport.fromProperties(paramName, appForm.toList, directNameOpt, property))
+        (appForm => findInProperties(paramName, appForm.some))
       ).nextOption()
 
     def fromPropertiesWithoutSuffix: Option[AtomicValue] =
-      ComponentParamSupport.fromProperties(paramName, Nil, directNameOpt, property)
+      findInProperties(paramName, None)
 
     fromMetadataInstance       orElse
       fromPropertiesWithSuffix orElse

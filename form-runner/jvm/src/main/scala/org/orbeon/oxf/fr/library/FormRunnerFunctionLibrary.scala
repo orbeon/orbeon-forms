@@ -435,7 +435,9 @@ private object FormRunnerFunctions {
       .map { rewrittenXPathExpr =>
         EvaluateSupport.evaluateInContextFromXPathExpr(
           rewrittenXPathExpr,
-          stringArgument(1)
+          stringArgument(1),
+          xfc.containingDocument,
+          xpc.getContextItem
         )
       }
     }

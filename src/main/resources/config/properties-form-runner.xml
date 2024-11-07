@@ -166,7 +166,7 @@
     <property as="xs:string"  name="oxf.fr.summary.bulk-processes.*.*"                             value=""/>
 
     <!-- Whether simple data migration takes place by default -->
-    <property as="xs:string"  name="oxf.fr.detail.data-migration.*.*"                              value="disabled"/>
+    <property as="xs:string"  name="oxf.fr.detail.data-migration.*.*"                              value="{if (fr:created-with-or-newer('2024.1')) then 'enabled' else 'disabled'}"/>
 
     <property as="xs:string"  name="oxf.fr.detail.warn-when-data-unsafe.*.*"                       value="true"/>
 

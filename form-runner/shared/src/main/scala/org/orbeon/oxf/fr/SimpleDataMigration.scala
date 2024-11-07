@@ -19,15 +19,18 @@ import org.log4s
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.http.StatusCode
-import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
@@ -39,8 +42,8 @@ import scala.reflect.ClassTag
 
 object SimpleDataMigration {
 
-  import Private._
-  import enumeratum._
+  import Private.*
+  import enumeratum.*
 
   sealed trait DataMigrationBehavior extends EnumEntry with Lowercase
 
@@ -138,7 +141,7 @@ object SimpleDataMigration {
       enclosingModelAbsoluteId,
       templateInstanceRootElem,
       dataToMigrateRootElem,
-      getConfiguredDataMigrationBehavior(inScopeContainingDocument.staticState).entryName,
+      getConfiguredDataMigrationBehavior(inScopeContainingDocument).entryName,
       isSubmit = false
     )
 
@@ -290,7 +293,7 @@ object SimpleDataMigration {
         parents flatMap { parent =>
 
           val nestedElems =
-            parent / bindName toList
+            (parent / bindName).toList
 
           nestedElems ::: processLevel(
             parents = nestedElems,
@@ -560,21 +563,56 @@ object SimpleDataMigration {
     val DataMigrationFeatureName  = "data-migration"
     val DataMigrationPropertyName = s"oxf.fr.detail.$DataMigrationFeatureName"
 
-    def getConfiguredDataMigrationBehavior(staticState: XFormsStaticState): DataMigrationBehavior = {
+    def getConfiguredDataMigrationBehavior(xfcd: XFormsContainingDocument): DataMigrationBehavior = {
 
       implicit val formRunnerParams = FormRunnerParams()
+      implicit val indentedLogger   = new IndentedLogger(logger)
+
+      def buildPropertyName(appFormOpt: Option[AppForm]) =
+        appFormOpt match {
+          case Some(appForm) => frc.buildPropertyName(DataMigrationPropertyName, appForm)
+          case None          => DataMigrationPropertyName
+        }
+
+      def findInProperties(appFormOpt: Option[AppForm]): Option[AtomicValue] = {
+        FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsExpr(
+          propertyName    = buildPropertyName(appFormOpt),
+          avt             = true,
+          libraryName     = None,
+          norewrite       = Set.empty,
+          functionLibrary = xfcd.functionLibrary
+        )
+        .map { rewrittenXPathExpr =>
+          EvaluateSupport.evaluateInContextFromXPathExpr(
+            rewrittenXPathExpr,
+            Names.FormModel,
+            xfcd,
+            xfcd.getDefaultModel.getDefaultInstance.rootElement
+          )
+        }
+        .map(_.collect { case v: AtomicValue => v }) // we know this returns only a `StringValue` since it is an AVT
+        .flatMap(_.headOption)
+      }
+
+      // `fromMetadataAndPropertiesSupport()` doesn't evaluate AVTs, so we need to do it via `findInProperties()`
+      def fromMetadataAndProperties: Option[String] =
+        FRComponentParamSupport.fromMetadataAndPropertiesSupport(
+          partAnalysis     = xfcd.staticState.topLevelPart,
+          findInMetadata   = FRComponentParamSupport.findTopLevelElem,
+          findInProperties = (_, appFormOpt) => findInProperties(appFormOpt),
+          paramName        = DataMigrationFeatureName
+        ).map(_.getStringValue)
 
       val behavior =
         if (frc.isDesignTime)
           DataMigrationBehavior.Disabled
         else
-          frc.metadataInstance map (_.rootElement)                          flatMap
-          (frc.optionFromMetadataOrProperties(_, DataMigrationFeatureName)) flatMap
-          DataMigrationBehavior.withNameOption                              getOrElse
+          fromMetadataAndProperties            flatMap
+          DataMigrationBehavior.withNameOption getOrElse
           DataMigrationBehavior.Disabled
 
       def isFeatureEnabled =
-        staticState.isPEFeatureEnabled(
+        xfcd.staticState.isPEFeatureEnabled(
           featureRequested = true,
           "Form Runner simple data migration"
         )
@@ -653,7 +691,7 @@ object SimpleDataMigration {
           bindName   : String
         ): List[DataMigrationOp.InsertOrDelete] =
           parents flatMap { parent =>
-            parent / bindName toList match {
+            (parent / bindName).toList match {
               case Nil =>
                 // 2022-08-24: Don't create an `Insert` operation if, for some reason (error?) we can't find the
                 // template. We were not making use of the `Insert` in that case anyway.
@@ -718,7 +756,7 @@ object SimpleDataMigration {
     // happen in other cases.
     def inferMoveOps(migrationOps: List[DataMigrationOp.InsertOrDelete]): List[DataMigrationOp] = {
 
-      import DataMigrationOp._
+      import DataMigrationOp.*
 
       val moves = {
 

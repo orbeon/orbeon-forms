@@ -12,7 +12,7 @@ import shapeless.syntax.typeable.*
 
 object ComponentParamSupport {
 
-  val XblLocalName = XFormsNames.XBL_XBL_QNAME.localName
+  val XblLocalName: String = XFormsNames.XBL_XBL_QNAME.localName
 
   def componentParamValue(
     paramName : QName,

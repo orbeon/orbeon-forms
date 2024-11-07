@@ -24,20 +24,20 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsProperties.*
 import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.event.ClientEvents.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEvents.*
-import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
@@ -46,8 +46,8 @@ import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionPa
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic, UploadSupport}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions.*
-import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms.*
+import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms.runtime.{DelayedEvent, XFormsObject}
 import shapeless.syntax.typeable.*
 
@@ -158,7 +158,7 @@ trait ContainingDocumentTransientState {
 
   self: XBLContainer & ContainingDocumentDelayedEvents =>
 
-  import CollectionUtils._
+  import CollectionUtils.*
 
   def getShowMaxRecoverableErrors: Int
   def findControlByEffectiveId(effectiveId: String): Option[XFormsControl]
@@ -434,7 +434,7 @@ trait ContainingDocumentProperties {
     }
   }
 
-  import Memo._
+  import Memo.*
 
   // Dynamic properties
   def staticReadonly: Boolean =
@@ -506,7 +506,7 @@ trait ContainingDocumentProperties {
     staticBooleanProperty(LocalSubmissionForwardProperty) &&
     staticBooleanProperty(OptimizeLocalSubmissionReplaceAllProperty)
 
-  import ContainingDocumentProperties._
+  import ContainingDocumentProperties.*
 
   def getTypeOutputFormat(typeName: String) =
     SupportedTypesForOutputFormat(typeName) option

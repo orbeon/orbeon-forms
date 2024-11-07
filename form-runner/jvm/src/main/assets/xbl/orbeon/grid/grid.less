@@ -93,8 +93,12 @@
                 & > .xforms-group {
                     margin: @densityMarginTopBottom @densityMarginLeftRight;
                     display: block;
-                }
 
+                    &:has(.btn-link) {
+                        // Keep margin constant around +/- buttons
+                        margin: @frGridDensityMarginCompactTopBottom @frGridDensityMarginCompactLeftRight;
+                    }
+                }
                 // https://github.com/orbeon/orbeon-forms/issues/4213
                 .input-prepend, .input-append {
                     display: flex;

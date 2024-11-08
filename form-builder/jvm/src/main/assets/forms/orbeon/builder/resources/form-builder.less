@@ -601,6 +601,22 @@ body.orbeon {
     // All dialogs
     .xforms-dialog {
 
+        .xbl-fb-language-choice {
+
+            position: absolute;
+            right: 0;
+            top: 1px;
+            width: fit-content;
+
+            .navbar {
+                .navbar-inner {
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    background-color: transparent;
+                }
+            }
+        }
+
         // Things look better when the headings are centered
         .xbl-fr-grid .fr-grid.fr-repeat .fr-grid-head .fr-grid-th {
             vertical-align: middle;
@@ -1212,16 +1228,6 @@ body.orbeon {
 
         width: 1000px;
         max-width: none;
-
-        .xbl-fb-language-choice {
-            .navbar {
-                margin: 0;
-
-                .navbar-inner {
-                    padding: 3px;
-                }
-            }
-        }
 
         .xforms-label {
             margin-top: 5px;

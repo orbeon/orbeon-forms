@@ -48,8 +48,8 @@
                             xxf:get-request-header('orbeon-liferay-language') (: AND no language selection via header    :)
                         )
                     ]">
-                <div class="navbar">
-                    <div class="navbar-inner">
+                <xh:div class="navbar">
+                    <xh:div class="navbar-inner">
                         <xh:div class="fr-language-choice pull-right">
                             <xf:select1 ref="xxf:binding('fb-language-choice')" appearance="bootstrap" fr:dropdown-align="right">
                                 <xf:label value="xxf:label('fb-language-choice')"/>
@@ -64,8 +64,8 @@
                                 </xf:itemset>
                             </xf:select1>
                         </xh:div>
-                    </div>
-                </div>
+                    </xh:div>
+                </xh:div>
             </xf:group>
         </xbl:template>
     </xbl:binding>

@@ -355,7 +355,7 @@ body.orbeon {
         margin-bottom: 0;                   // Not sure why Bootstrap adds a @baseLineHeight / 2 margin here
         .add-on {
             height: @baseLineHeight - 2px;
-            border: 1px solid @fieldBorderColor;
+            .fieldBorder();
         }
     }
 
@@ -417,7 +417,7 @@ body.orbeon {
             font-size: @baseFontSize - 1;       // 14px to 13px
             line-height: @baseLineHeight;
             background-color: darken(@inputBackground, 5%);
-            border: 1px solid @fieldBorderColor;
+            .fieldBorder();
             border-radius: @inputBorderRadius;
         }
 

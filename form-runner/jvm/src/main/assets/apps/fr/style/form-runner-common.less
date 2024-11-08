@@ -54,7 +54,8 @@
 @controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
 @multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
 
-@fieldBorderColor: var(--fr-min-gray-on-white);
+@minGrayOnWhiteFallback: #ccc;
+@minGrayOnWhiteVariable: var(--fr-min-gray-on-white);
 @focusBorderColor: #3396FF;
 @focusHighlightColor: rgba(0,123,255,.25);
 
@@ -134,8 +135,15 @@
     &> * { background-color: white }
 }
 
+.fieldBorder() {
+    border-width: 1px;
+    border-style: solid;
+    border-color: @minGrayOnWhiteFallback;
+    border-color: @minGrayOnWhiteVariable;
+}
+
 .fieldDecorations() {
-    border: 1px solid @fieldBorderColor;
+    .fieldBorder();
     border-radius: @inputBorderRadius;
     box-shadow: none;
 }

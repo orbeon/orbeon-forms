@@ -1577,7 +1577,11 @@ object XFormsUI {
             computedStyle.visibility != "hidden" &&
             computedStyle.display    != "none"
           }
-        firstVisibleButtonOpt.foreach(_.click())
+        firstVisibleButtonOpt.foreach { button =>
+          // Blur active element so to send a possible value change before closing the dialog
+          Option(dom.document.activeElement).foreach(_.asInstanceOf[html.Element].blur())
+          button.click()
+        }
       }
     }
   }

@@ -48,7 +48,7 @@
         -->
 
         <Root level="info">
-            <AppenderRef ref="SingleFileAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
         </Root>
     </Loggers>
 

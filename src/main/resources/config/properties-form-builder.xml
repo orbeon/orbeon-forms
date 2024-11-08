@@ -65,6 +65,7 @@
         oxf:/xbl/orbeon/checkbox-input/checkbox-input.xbl
         oxf:/xbl/orbeon/yesno-input/yesno-input.xbl
         oxf:/forms/orbeon/builder/xbl/selection-input-boolean.xbl
+        oxf:/forms/orbeon/builder/xbl/selection-select1-minimal.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*">

@@ -48,12 +48,19 @@ html {
     }
 
     .card .list-group-item {
+        padding: 0;
+        a {
+            display: block;
+            padding: 0.5em 1em;
+        }
         &:has(a:focus-visible) {
             box-shadow: 0 0 0 0.2rem inset @focusHighlightColor;
         }
+    }
+
+    a figure, .card .list-group-item {
         &:hover {
             background-color: @frRowHoverBackground;
-            filter: brightness(0.95);
         }
     }
 
@@ -92,13 +99,14 @@ html {
     .img-thumbnail {
         padding: 15%;
         border: none;
+        background-color: transparent;
         border-top-left-radius: 10px; // avoid stepping over enclosing border
         border-top-right-radius: 10px;
         opacity: .8;
+        transition: all ease 100ms;
 
         &:hover {
             padding: 1rem;
-            transition: all ease 100ms;
         }
     }
 

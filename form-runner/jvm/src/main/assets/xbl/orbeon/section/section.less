@@ -17,8 +17,11 @@
 
         display: block;
 
-        // Spacing between section, so the new section doesn't start right after the previous grid
-        padding-bottom: 20px;
+        &:has(+ .xbl-fr-section > .fr-section-title, + .xbl-fr-section > .xforms-group > .fr-section-title) { // hoping to remove the nested `.xforms-group` in the future so handling both cases
+            // Spacing between section, so the new section doesn't start right after the previous grid
+            padding-bottom: 20px;
+        }
+
         &:last-of-type { padding-bottom: 0; }
 
         h2, h3, h4, h5, h6 {

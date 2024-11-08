@@ -91,26 +91,18 @@
                 & > .xforms-control,
                 & > .xbl-component,
                 & > .xforms-group {
+
                     margin: @densityMarginTopBottom @densityMarginLeftRight;
                     display: block;
+
+                    &:has(.fr-fixed-density) {
+                        // Keep margin constant around +/- buttons
+                        margin: @frGridDensityMarginCompactTopBottom @frGridDensityMarginCompactLeftRight;
+                    }
                 }
                 // https://github.com/orbeon/orbeon-forms/issues/4213
                 .input-prepend, .input-append {
                     display: flex;
-                }
-            }
-
-            .fr-repeat-column-left,
-            .fr-repeat-column-right {
-
-                & > .xforms-control,
-                & > .xbl-component,
-                & > .xforms-group {
-
-                    &:has(.btn-link) {
-                        // Keep margin constant around +/- buttons
-                        margin: @frGridDensityMarginCompactTopBottom @frGridDensityMarginCompactLeftRight;
-                    }
                 }
             }
 

@@ -321,10 +321,10 @@
                                                     ref="$repeat-context[$can-add]"
                                                     id="fr-grid-add"
                                                     xxf:title="{{xxf:r('components.grid.add-another.hint', '|fr-fr-resources|')}}">
-                                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle "/></xf:label>
+                                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle fr-fixed-density"/></xf:label>
                                                 </xf:trigger>
                                                 <xf:group ref="$repeat-context[not($can-add)]">
-                                                    <xh:i class="fa fa-fw fa-plus-circle disabled"/>
+                                                    <xh:i class="fa fa-fw fa-plus-circle fr-fixed-density disabled"/>
                                                 </xf:group>
                                             </xsl:if>
                                         </xsl:element>
@@ -498,7 +498,7 @@
                                                     ref="$repeat-context[$can-remove]"
                                                     id="fr-grid-remove"
                                                     xxf:title="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
-                                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
+                                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle fr-fixed-density"/></xf:label>
                                                     <xf:dispatch
                                                         event="DOMActivate"
                                                         name="fr-remove"
@@ -507,7 +507,7 @@
                                                     </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:group ref="$repeat-context[not($can-remove)]">
-                                                    <xh:i class="fa fa-fw fa-minus-circle disabled"/>
+                                                    <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density disabled"/>
                                                 </xf:group>
                                             </xsl:otherwise>
                                         </xsl:choose>

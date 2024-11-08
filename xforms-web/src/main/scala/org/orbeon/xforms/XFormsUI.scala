@@ -1568,9 +1568,17 @@ object XFormsUI {
       }
 
       // Cmd-Enter or Ctrl-Enter is equivalent to clicking the primary button
-      if (event.key == "Enter" && (event.metaKey || event.ctrlKey))
-        for (primaryButton <- Option(dialogElem.querySelector("button.btn-primary").asInstanceOf[html.Button]))
-          primaryButton.click()
+      if (event.key == "Enter" && (event.metaKey || event.ctrlKey)) {
+        val allButtons            = dialogElem.querySelectorAll("button.btn-primary")
+        val firstVisibleButtonOpt = allButtons.toList
+          .map(_.asInstanceOf[html.Button])
+          .find { button =>
+            val computedStyle = dom.window.getComputedStyle(button)
+            computedStyle.visibility != "hidden" &&
+            computedStyle.display    != "none"
+          }
+        firstVisibleButtonOpt.foreach(_.click())
+      }
     }
   }
 }

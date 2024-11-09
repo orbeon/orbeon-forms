@@ -3,14 +3,16 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.SimpleDataMigration.{FormDiff, diffSimilarXmlData}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon, StringUtils}
+import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon, StaticXPath, StringUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport
 import org.orbeon.oxf.xforms.model.XFormsInstance
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{Constants, XFormsId}
+import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
 
 
 trait FormRunnerRevisionHistory {
@@ -18,6 +20,26 @@ trait FormRunnerRevisionHistory {
   //@XPathFunction
   def compareRfc1123AndIsoDates(rfc1123: String, iso: String): Boolean =
     DateUtilsUsingSaxon.tryParseISODateOrDateTime(iso, DateUtilsUsingSaxon.TimeZone.UTC).contains(DateUtils.parseRFC1123(rfc1123))
+
+  //@XPathFunction
+  def diffMessageForFormDefinitions(
+    d1: om.NodeInfo,
+    d2: om.NodeInfo
+  ): om.NodeInfo = {
+
+    val same =
+      SaxonUtils.deepCompare(
+        StaticXPath.GlobalConfiguration,
+        Iterator(d1),
+        Iterator(d2),
+        excludeWhitespaceTextNodes = false
+      )
+
+    if (same)
+      <_/>
+    else
+      <_><c t="other-changed"/></_>
+  }
 
   //@XPathFunction
   def diffMessage(
@@ -56,8 +78,6 @@ trait FormRunnerRevisionHistory {
 
     def getLabelOrNull(name: String) =
       (resourcesRootElem / name / "label").headOption.map(_.stringValue).orNull
-
-    import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
 
     val MaxValueLength = 20
 

@@ -159,6 +159,7 @@
                 <named-user>User {0}</named-user>
                 <anonymous-user>An anonymous user</anonymous-user>
 
+                <unknown-changes>made some changes.</unknown-changes>
                 <initial-revision>saved the initial revision.</initial-revision>
                 <no-changes>saved with no changes detected.</no-changes>
                 <specific-changes>made the following changes:</specific-changes>
@@ -855,6 +856,7 @@
                 <named-user>L'utilisateur {0}</named-user>
                 <anonymous-user>Un utilisateur anonyme</anonymous-user>
 
+                <unknown-changes>a effectué des changements.</unknown-changes>
                 <initial-revision>a sauvegardé la révision initiale.</initial-revision>
                 <no-changes>a sauvegardé, avec aucun changement détecté.</no-changes>
                 <specific-changes>a effectué les changements suivants:</specific-changes>
@@ -1555,6 +1557,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -2250,6 +2253,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -2970,6 +2974,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -3656,6 +3661,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -4341,6 +4347,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -5036,6 +5043,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -5731,6 +5739,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -6426,6 +6435,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -7121,6 +7131,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -7816,6 +7827,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -8511,6 +8523,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -9197,6 +9210,7 @@
                 <named-user todo="true">User {0}</named-user>
                 <anonymous-user todo="true">An anonymous user</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision todo="true">saved the initial revision.</initial-revision>
                 <no-changes todo="true">saved with no changes detected.</no-changes>
                 <specific-changes todo="true">made the following changes:</specific-changes>
@@ -9892,6 +9906,7 @@
                 <named-user>{0} kullanıcısı</named-user>
                 <anonymous-user>Anonim bir kullanıcı</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision>ilk revizyonu kaydetti.</initial-revision>
                 <no-changes>hiçbir değişiklik tespit edilmeden kaydedildi.</no-changes>
                 <specific-changes>aşağıdaki değişiklikleri yaptı:</specific-changes>
@@ -10582,6 +10597,7 @@
                 <named-user>用户 {0}</named-user>
                 <anonymous-user>一位匿名用户</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision>保存了初始修订。</initial-revision>
                 <no-changes>保存时未检测到更改。</no-changes>
                 <specific-changes>进行了以下更改：</specific-changes>
@@ -11276,6 +11292,7 @@
                 <named-user>用戶 {0}</named-user>
                 <anonymous-user>匿名用戶</anonymous-user>
 
+                <unknown-changes todo="true">made some changes.</unknown-changes>
                 <initial-revision>保存了初始修訂。</initial-revision>
                 <no-changes>保存時未檢測到更改。</no-changes>
                 <specific-changes>進行了以下更改：</specific-changes>

@@ -74,7 +74,7 @@
         }
     }
 
-    .xbl-fr-grid(@densityMarginTopBottom, @densityMarginLeftRight) {
+    .xbl-fr-grid(@densityMarginTopBottom, @densityMarginLeftRight, @densityMarginHelpTop) {
         .xbl-fr-grid {
 
             .fr-grid-th,
@@ -96,8 +96,8 @@
                     display: block;
 
                     &:has(.fr-fixed-density) {
-                        // Keep margin constant around +/- buttons
-                        margin: @frGridDensityMarginCompactTopBottom @frGridDensityMarginCompactLeftRight;
+                        // Reduced margin around +/- buttons
+                        margin: @densityMarginTopBottom @frGridDensityMarginCompactLeftRight;
                     }
                 }
                 // https://github.com/orbeon/orbeon-forms/issues/4213
@@ -779,18 +779,26 @@
                     overflow-wrap: break-word;
                     // https://github.com/orbeon/orbeon-forms/issues/5716
                     word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
+
                     .xforms-label {
                         display: block; // label in repeat table header is block so yellow background in FB takes the whole width
-                        margin: @frGridCellPadding @frGridCellPadding;
+                        margin: @densityMarginTopBottom @densityMarginLeftRight;
+                    }
+
+                    &:has(.xforms-hint) .xforms-label {
+                        // Keep bottom margin low even with more spacious densities
+                        margin-bottom: @frGridDensityMarginCompactTopBottom;
                     }
 
                     .xforms-help {
-                        margin-top: @frGridCellPadding + 2;
-                        margin-left: @frGridCellPadding;
+                        margin-top: @densityMarginHelpTop;
+                        margin-left: @densityMarginLeftRight;
                     }
 
                     .xforms-hint {
-                        margin-left: @frGridCellPadding;
+                        // Keep top margin low even with more spacious densities
+                        margin-top: @frGridDensityMarginCompactTopBottom;
+                        margin-left: @densityMarginLeftRight;
                     }
                 }
 
@@ -862,10 +870,10 @@
         }
     }
 
-    .xbl-fr-grid(@frGridDensityMarginCompactTopBottom, @frGridDensityMarginCompactLeftRight); // Default density
-    .fr-density-compact     { .xbl-fr-grid(@frGridDensityMarginCompactTopBottom    , @frGridDensityMarginCompactLeftRight);     }
-    .fr-density-comfortable { .xbl-fr-grid(@frGridDensityMarginComfortableTopBottom, @frGridDensityMarginComfortableLeftRight); }
-    .fr-density-roomy       { .xbl-fr-grid(@frGridDensityMarginRoomyTopBottom      , @frGridDensityMarginRoomyLeftRight);       }
+    .xbl-fr-grid(@frGridDensityMarginCompactTopBottom, @frGridDensityMarginCompactLeftRight, @frGridDensityMarginCompactHelpTop); // Default density
+    .fr-density-compact     { .xbl-fr-grid(@frGridDensityMarginCompactTopBottom    , @frGridDensityMarginCompactLeftRight    , @frGridDensityMarginCompactHelpTop);     }
+    .fr-density-comfortable { .xbl-fr-grid(@frGridDensityMarginComfortableTopBottom, @frGridDensityMarginComfortableLeftRight, @frGridDensityMarginComfortableHelpTop); }
+    .fr-density-roomy       { .xbl-fr-grid(@frGridDensityMarginRoomyTopBottom      , @frGridDensityMarginRoomyLeftRight      , @frGridDensityMarginRoomyHelpTop);       }
 
     // Changes for view mode only
     .fr-mode-view {

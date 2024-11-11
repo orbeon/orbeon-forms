@@ -26,6 +26,7 @@ import scala.scalajs.js.JSConverters.*
 object FormRunnerPrivateAPI extends js.Object {
 
   private val ListenerEvents = "beforeunload"
+  private val ErrorScrollOffset = -100
 
   // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
   private val ReturnMessage: (dom.Event) => String = (_) => "You may lose some unsaved changes."
@@ -167,6 +168,4 @@ object FormRunnerPrivateAPI extends js.Object {
       sectionNames.splitTo[Array]().toJSArray
     )
   }
-
-  private val ErrorScrollOffset = -100
 }

@@ -24,7 +24,10 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fb-dialog-control-settings" element="fb|dialog-control-settings" xxbl:mode="binding">
+    <xbl:binding
+            id="fb-dialog-control-settings"
+            element="fb|dialog-control-settings"
+            xxbl:mode="binding">
         <xbl:handlers>
             <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog fb-load" phase="target" defaultAction="cancel">

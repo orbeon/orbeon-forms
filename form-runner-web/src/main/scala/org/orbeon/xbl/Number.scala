@@ -49,7 +49,7 @@ object Number {
 
     val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
     val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
-    private val eventListenerSupport = new EventListenerSupport {}
+    private object EventSupport extends EventListenerSupport
 
     var visibleInputElemOpt: Option[html.Input] = None
 
@@ -61,7 +61,7 @@ object Number {
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
       // Switch the input type after cleaning up the value for edition
-      eventListenerSupport.addListeners(visibleInputElem, List(DomEventNames.FocusIn, DomEventNames.TouchStart), (e: dom.Event) => {
+      EventSupport.addListeners(visibleInputElem, List(DomEventNames.FocusIn, DomEventNames.TouchStart), (e: dom.Event) => {
         if (! isMarkedReadonly) {
 
           logger.debug(s"reacting to event ${e.`type`}")
@@ -77,7 +77,7 @@ object Number {
       })
 
       // Restore input type, send the value to the server, and updates value after server response
-      eventListenerSupport.addListener(visibleInputElem, DomEventNames.FocusOut, (e: dom.Event) => {
+      EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut, (e: dom.Event) => {
         if (! isMarkedReadonly) {
           logger.debug(s"reacting to event ${e.`type`}")
 
@@ -105,7 +105,7 @@ object Number {
         }
       })
 
-      eventListenerSupport.addListener(visibleInputElem, DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
+      EventSupport.addListener(visibleInputElem, DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
         if (! isMarkedReadonly) {
 
           logger.debug(s"reacting to event ${e.`type`}")
@@ -126,7 +126,7 @@ object Number {
 
     override def destroy(): Unit = {
       logger.debug("destroy")
-      eventListenerSupport.clearAllListeners()
+      EventSupport.clearAllListeners()
       companion.visibleInputElemOpt = None
     }
 

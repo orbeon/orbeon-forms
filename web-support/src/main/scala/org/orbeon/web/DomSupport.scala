@@ -137,4 +137,31 @@ object DomSupport {
     }
     element.id
   }
+
+  def moveIntoViewIfNeeded(containerElem: html.Element, innerContainer: html.Element, itemElem: html.Element): Unit = {
+    val containerRect       = containerElem.getBoundingClientRect()
+    val itemRect            = itemElem.getBoundingClientRect()
+    val isEntirelyContained =
+      itemRect.left   >= containerRect.left   &&
+      itemRect.top    >= containerRect.top    &&
+      itemRect.bottom <= containerRect.bottom &&
+      itemRect.right  <= containerRect.right
+    if (! isEntirelyContained) {
+
+      val overflowsBelow = itemRect.bottom > containerRect.bottom
+
+      val Margin = 50
+
+      val mainInnerRect = innerContainer.getBoundingClientRect()
+      val scrollTop =
+        if (overflowsBelow)
+          containerRect.top - mainInnerRect.top + itemRect.bottom - containerRect.bottom + Margin
+        else
+          containerRect.top - mainInnerRect.top - (containerRect.top - itemRect.top + Margin)
+
+      containerElem.asInstanceOf[js.Dynamic].scrollTo(
+        js.Dynamic.literal(top = scrollTop, behavior = "smooth")
+      )
+    }
+  }
 }

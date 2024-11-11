@@ -729,14 +729,18 @@ body.orbeon {
 
         .fb-dialog-form-settings-fields {
 
+            div.fb-template-cards-container {
+                overflow-y: scroll;
+                padding: 5px; // so that selection outline/shadow is not clipped
+            }
+
             div.fb-template-cards { // try to make stronger
                 display: flex;
                 flex-wrap: wrap;
                 gap: 1em;
                 min-height: 234px; // empirically fit one line
                 max-height: 482px; // empirically fit two lines
-                overflow-y: scroll;
-                padding: 5px; // so that selection outline/shadow is not clipped
+
                 justify-content: space-around;
 
                 & > span {

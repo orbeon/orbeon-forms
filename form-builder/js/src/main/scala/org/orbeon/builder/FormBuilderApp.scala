@@ -59,6 +59,7 @@ object FormBuilderApp extends App {
     ControlEditor
     ControlLabelHintTextEditor
     GridWallDnD
+    FormSettings
 
     BrowserCheck.checkSupportedBrowser()
   }

@@ -24,7 +24,10 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fb-dialog-form-settings" element="fb|dialog-form-settings">
+    <xbl:binding
+            id="fb-dialog-form-settings"
+            element="fb|dialog-form-settings"
+            xxbl:mode="javascript-lifecycle">
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog xxforms-dialog-open" phase="target">
@@ -316,6 +319,10 @@
                         control="fb-general-settings-grid"/>
                 </xf:action>
 
+                <xf:action type="javascript" event="xxforms-dialog-open" target="#observer">
+                    ORBEON.xforms.XBL.instanceForControl(this).dialogOpening();
+                </xf:action>
+
             </xbl:handler>
 
             <!-- Save and close if valid -->
@@ -466,8 +473,14 @@
 
                     <!-- Hide this dialog -->
                     <xxf:hide dialog="dialog"/>
+
                 </xf:action>
             </xbl:handler>
+            <xbl:handler observer="dialog" event="xxforms-dialog-close" phase="target">
+                <xf:action type="javascript" event="xxforms-dialog-close" target="#observer">
+                    ORBEON.xforms.XBL.instanceForControl(this).dialogClosing();
+                </xf:action>
+            </xbl:handler>.
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
@@ -881,39 +894,41 @@
 
                                 <fr:grid id="fb-templates-grid">
                                     <fr:c x="1" y="1" w="12" h="1">
-                                        <xh:div class="fb-template-cards">
-                                            <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
-                                                <xh:div class="fb-template-card" title="{{title}}">
-                                                    <xf:output class="fb-template-title" value="title"/>
-                                                    <xf:output class="fb-template-thumbnail" mediatype="image/*" ref="thumbnail[xxf:non-blank()]"/>
-                                                </xh:div>
-                                            </xf:repeat>
-                                            <!-- If the user selects a template, and there is an app name associated,
-                                                 then set the app name to the selected template's app name. This makes
-                                                 sense because the user is more likely to be creating a form in an app
-                                                 that matches the template's app. The user can change this later.
+                                        <xh:div class="fb-template-cards-container">
+                                            <xh:div class="fb-template-cards">
+                                                <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
+                                                    <xh:div class="fb-template-card" title="{{title}}">
+                                                        <xf:output class="fb-template-title" value="title"/>
+                                                        <xf:output class="fb-template-thumbnail" mediatype="image/*" ref="thumbnail[xxf:non-blank()]"/>
+                                                    </xh:div>
+                                                </xf:repeat>
+                                                <!-- If the user selects a template, and there is an app name associated,
+                                                     then set the app name to the selected template's app name. This makes
+                                                     sense because the user is more likely to be creating a form in an app
+                                                     that matches the template's app. The user can change this later.
 
-                                                 The user can have access to any app, or to a specific set. The search
-                                                 only searches for and returns templates from apps the user has access
-                                                 to. So it is safe to use those app names here.
+                                                     The user can have access to any app, or to a specific set. The search
+                                                     only searches for and returns templates from apps the user has access
+                                                     to. So it is safe to use those app names here.
 
-                                                 Some templates are in no app (like the "blank" template), which means
-                                                 they are global. If the user changes between a template with an app,
-                                                 and then a template without an app, we don't want the new app to be
-                                                 sticky. So we restore it to the original app. This makes sense because
-                                                 the user cannot directly change the app name in `new` mode.
-                                            -->
-                                            <xf:setvalue
-                                                event="xxforms-index-changed"
-                                                observer="form-template-repeat"
-                                                ref="$i/app"
-                                                value="
-                                                    (
-                                                        (: Selected app if present :)
-                                                        instance('template-forms')/*[event('xxf:new-index')]/app[xxf:non-blank()]/string(),
-                                                        (: Original app passed when the dialog opened otherwise :)
-                                                        $i/original-app
-                                                    )[1]"/>
+                                                     Some templates are in no app (like the "blank" template), which means
+                                                     they are global. If the user changes between a template with an app,
+                                                     and then a template without an app, we don't want the new app to be
+                                                     sticky. So we restore it to the original app. This makes sense because
+                                                     the user cannot directly change the app name in `new` mode.
+                                                -->
+                                                <xf:setvalue
+                                                    event="xxforms-index-changed"
+                                                    observer="form-template-repeat"
+                                                    ref="$i/app"
+                                                    value="
+                                                        (
+                                                            (: Selected app if present :)
+                                                            instance('template-forms')/*[event('xxf:new-index')]/app[xxf:non-blank()]/string(),
+                                                            (: Original app passed when the dialog opened otherwise :)
+                                                            $i/original-app
+                                                        )[1]"/>
+                                            </xh:div>
                                         </xh:div>
                                     </fr:c>
                                     <fr:c x="1" y="2" w="12" h="1">

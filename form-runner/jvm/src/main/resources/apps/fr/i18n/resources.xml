@@ -172,8 +172,9 @@
                 <iteration-added>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed>internal information changed</other-changed>
-
                 <workflow-stage-changed>Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more>Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Untitled Form</untitled-form>
@@ -869,8 +870,9 @@
                 <iteration-added>{0,number,integer} {0,choice,1#répétition ajoutée|1&lt;répétitions ajoutées}</iteration-added>
                 <iteration-removed>{0,number,integer} {0,choice,1#répétition supprimée|1&lt;répétitions supprimées}</iteration-removed>
                 <other-changed>information interne changée</other-changed>
-
                 <workflow-stage-changed>Étape du workflow changée de "{0}" à "{1}"</workflow-stage-changed>
+
+                <load-more>Charger plus</load-more>
             </revision-history>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
@@ -1570,8 +1572,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
@@ -2266,8 +2269,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Formulari sense Títol</untitled-form>
@@ -2987,8 +2991,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Skjema ikke navngitt</untitled-form>
@@ -3674,8 +3679,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
@@ -4360,8 +4366,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
@@ -5056,8 +5063,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
@@ -5752,8 +5760,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                 <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
@@ -6448,8 +6457,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
@@ -7144,8 +7154,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Naamloos form</untitled-form>
@@ -7840,8 +7851,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
@@ -8536,8 +8548,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Blanket uden navn</untitled-form>
@@ -9223,8 +9236,9 @@
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
-
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Bez tytułu</untitled-form>
@@ -9919,8 +9933,9 @@
                 <iteration-added>{0,number,integer} {0,choice,1#tekrar|1&lt;tekrar} eklendi</iteration-added>
                 <iteration-removed>{0,number,integer} {0,choice,1#tekrar|1&lt;tekrar} kaldırıldı</iteration-removed>
                 <other-changed>dahili bilgiler değiştirildi</other-changed>
-
                 <workflow-stage-changed>İş akışı aşaması "{0}" değerinden "{1}" değerine değiştirildi</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>Başlıksız Form</untitled-form>
@@ -10610,8 +10625,9 @@
                 <iteration-added>添加了{0,number,integer}个{0,choice,1#重复|1&lt;重复}</iteration-added>
                 <iteration-removed>删除了{0,number,integer}个{0,choice,1#重复|1&lt;重复}</iteration-removed>
                 <other-changed>内部信息已更改</other-changed>
-
                 <workflow-stage-changed>工作流阶段从"{0}"更改为"{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>无标题表单</untitled-form>
@@ -11305,8 +11321,9 @@
                 <iteration-added>添加了 {0,number,integer} {0,choice,1#重複|1&lt;重複}</iteration-added>
                 <iteration-removed>刪除了 {0,number,integer} {0,choice,1#重複|1&lt;重複}</iteration-removed>
                 <other-changed>內部信息已更改</other-changed>
-
                 <workflow-stage-changed>工作流階段從 "{0}" 更改為 "{1}"</workflow-stage-changed>
+
+                <load-more todo="true">Load More</load-more>
             </revision-history>
         </components>
         <untitled-form>未命名表單</untitled-form>

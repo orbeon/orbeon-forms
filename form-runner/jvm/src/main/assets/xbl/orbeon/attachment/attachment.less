@@ -139,12 +139,7 @@
                 width: 100%;
                 box-sizing: border-box;
 
-                // https://github.com/orbeon/orbeon-forms/issues/6598
-                // @fieldBorderColor uses `var`, so the following doesn't work:
-                // .fieldDecorations();
-                border: 1px solid #ccc;
-                border-radius: @inputBorderRadius;
-                box-shadow: none;
+                .fieldDecorations();
 
                 // 2022-12-02: Font Awesome icons now show
                 .fr-attachment-icon {

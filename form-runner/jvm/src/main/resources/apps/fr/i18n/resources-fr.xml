@@ -14,7 +14,7 @@
         <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</view>
         <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approuver</approve>
         <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rejeter</reject>
-
+`
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil</home>
         <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil3</landing>
         <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>
@@ -52,6 +52,9 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"&gt;&lt;/i&gt;</refresh>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Tout fermer</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Tout ouvrir</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Rafraîchir"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Suivant</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Précédent</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenu</wizard-toc>

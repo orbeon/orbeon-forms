@@ -52,6 +52,9 @@
         <collapse-all>&lt;i class="icon-resize-small"/></collapse-all>
         <expand-all>&lt;i class="icon-resize-full"/></expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
+        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
+        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
+        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>

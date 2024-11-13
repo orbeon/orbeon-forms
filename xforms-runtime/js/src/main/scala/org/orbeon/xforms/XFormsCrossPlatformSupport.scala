@@ -23,8 +23,10 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewr
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StaticXPath.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
@@ -92,31 +94,37 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     xhtmlPrefix  : String
   )(implicit
     xmlReceiver  : XMLReceiver
-  ): Unit = {
+  ): Unit =
+    if (value.nonAllBlank) {
 
     // The Scala.js implementation uses the HTML environment's `DOMParser`, unlike on the JVM where
     // we have to use a library like `TagSoup`.
     val parser = new DOMParser()
     val doc    = parser.parseFromString(value, org.scalajs.dom.MIMEType.`text/html`).asInstanceOf[HTMLDocument]
 
-    def outputFragment(nodes: org.scalajs.dom.NodeList[org.scalajs.dom.Node]): Unit = {
-      nodes.toList.foreach {
-        case v: org.scalajs.dom.Element =>
-          withElement(
-            v.tagName,
-            atts = v.attributes.toList map { case (name, att) => name -> att.value }
-          ) {
-            outputFragment(v.childNodes)
-          }
-        case v: org.scalajs.dom.Text    =>
-          val s = v.nodeValue
-          xmlReceiver.characters(s.toCharArray, 0, s.length)
-        case _ =>
-      }
-    }
-
-    outputFragment(doc.body.childNodes)
+    // Also filter out icons for ARIA support
+    // https://github.com/orbeon/orbeon-forms/issues/6624
+    outputFragment(doc.body.childNodes)(new IconAriaXMLReceiver(xmlReceiver))
   }
+
+  private def outputFragment(
+    nodes      : org.scalajs.dom.NodeList[org.scalajs.dom.Node]
+  )(implicit
+    xmlReceiver: XMLReceiver
+  ): Unit =
+    nodes.toList.foreach {
+      case v: org.scalajs.dom.Element =>
+        withElement(
+          v.tagName,
+          atts = v.attributes.toList map { case (name, att) => name -> att.value }
+        ) {
+          outputFragment(v.childNodes)
+        }
+      case v: org.scalajs.dom.Text    =>
+        val s = v.nodeValue
+        xmlReceiver.characters(s.toCharArray, 0, s.length)
+      case _ =>
+    }
 
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
   // proxy resources as `data:` or `blob:` URLs.

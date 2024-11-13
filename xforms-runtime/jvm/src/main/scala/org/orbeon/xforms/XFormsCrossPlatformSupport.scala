@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
@@ -146,8 +147,20 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     xhtmlPrefix : String)(implicit
     xmlReceiver : XMLReceiver
   ): Unit =
-    if (value.nonAllBlank)
-      htmlStringToResult(value, locationData, new SAXResult(new HTMLBodyXMLReceiver(xmlReceiver, "")))
+    if (value.nonAllBlank) {
+      htmlStringToResult(
+        value,
+        locationData,
+        new SAXResult(
+          new HTMLBodyXMLReceiver(
+            // Also filter out icons for ARIA support
+            // https://github.com/orbeon/orbeon-forms/issues/6624
+            new IconAriaXMLReceiver(xmlReceiver),
+            ""
+          )
+        )
+      )
+    }
 
   def proxyURI(
     urlString      : String,

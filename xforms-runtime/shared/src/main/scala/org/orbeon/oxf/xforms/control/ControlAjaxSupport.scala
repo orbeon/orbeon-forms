@@ -263,6 +263,7 @@ object ControlAjaxSupport {
 
   val AriaRequired    = "aria-required"
   val AriaInvalid     = "aria-invalid"
+  val AriaHidden      = "aria-hidden"
 
   val AriaAttsWithLhha: List[(String, List[LHHA])] = List(
     AriaLabelledby   -> List(LHHA.Label),

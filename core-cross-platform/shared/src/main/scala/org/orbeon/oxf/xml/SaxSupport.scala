@@ -2,6 +2,7 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -95,6 +96,12 @@ object SaxSupport {
           oldClassAttribute + ' ' + newClasses
       atts.addOrReplace("class", newClassAttribute)
     }
+
+    def containsClass(clazz: String): Boolean =
+      atts.getValue("class") match {
+        case null    => false
+        case classes => classes.containsToken(clazz)
+      }
   }
 
   def newAttributes(qName: QName, value: String): Attributes =

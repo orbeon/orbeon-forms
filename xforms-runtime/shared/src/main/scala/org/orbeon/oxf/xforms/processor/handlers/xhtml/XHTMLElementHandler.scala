@@ -13,9 +13,12 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaHidden
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.XMLReceiverSupport.{element, _}
-import org.orbeon.oxf.xml.{XMLConstants, XMLNames, XMLReceiver}
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as XH
+import org.orbeon.oxf.xml.XMLReceiverSupport.{element, *}
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLConstants, XMLReceiver}
 import org.xml.sax.Attributes
 
 
@@ -30,6 +33,25 @@ object XHTMLElementHandler {
       uri       = XMLConstants.XHTML_NAMESPACE_URI,
       atts      = List("type" -> "hidden", "name" -> name, "value" -> value)
     )
+
+  // Consider separate handler for `xh:i`?
+  def processIconAria(
+    uri      : String,
+    localname: String,
+    atts     : Attributes,
+  ): Attributes =
+    if ((uri == XH || uri == "") && localname == "i" && (atts.getValue("", AriaHidden) eq null) && atts.containsClass("fa"))
+      atts.addOrReplace(AriaHidden, true.toString)
+    else
+      atts
+
+  class IconAriaXMLReceiver(XMLReceiver: XMLReceiver)
+    extends ForwardingXMLReceiver(XMLReceiver) {
+
+    override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+      super.startElement(uri, localname, qName, processIconAria(uri, localname, attributes))
+    }
+  }
 }
 
 // Handle `xh:*` for handling AVTs as well as rewriting `@id` and `@for`.
@@ -55,7 +77,11 @@ class XHTMLElementHandler(
       uri,
       localname,
       qName,
-      XFormsBaseHandler.handleAVTsAndIDs(attributes, XHTMLElementHandler.RefIdAttributeNames, handlerContext)
+      XHTMLElementHandler.processIconAria(
+        uri,
+        localname,
+        XFormsBaseHandler.handleAVTsAndIDs(attributes, XHTMLElementHandler.RefIdAttributeNames, handlerContext)
+      )
     )
 
   override def end(): Unit =

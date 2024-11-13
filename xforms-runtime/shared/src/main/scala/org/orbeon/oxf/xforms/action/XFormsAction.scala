@@ -49,13 +49,14 @@ abstract class XFormsAction extends Logging {
       actionContext.overriddenContext.orNull
     )
 
-  // Legacy execute()
+  // Legacy `execute()`
   def execute(
-     actionInterpreter: XFormsActionInterpreter,
-     actionElement: Element,
-     actionScope: Scope,
+     actionInterpreter   : XFormsActionInterpreter,
+     actionElement       : Element,
+     actionScope         : Scope,
      hasOverriddenContext: Boolean,
-     overriddenContext: om.Item): Unit = ()
+     overriddenContext   : om.Item
+  ): Unit = ()
 
   // Resolve a control given the name of an AVT
   def resolveControlAvt(attName: String, required: Boolean = true)(implicit context: DynamicActionContext): Option[XFormsControl] = {

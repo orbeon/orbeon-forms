@@ -215,7 +215,7 @@
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                                 </xf:trigger>
                                 <xf:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                                    <xf:label><xh:i class="fa fa-minus-circle" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-minus-circle" title="{$form-resources/dialog-add-language/remove-language/label}" aria-hidden="true"/></xf:label>
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Ask confirmation -->
                                         <xxf:show dialog="fb-confirmation-dialog">
@@ -1065,7 +1065,8 @@
                                     <xh:i
                                         class="fb-control-delete fa fa-minus-circle fa-fw"
                                         role="button"
-                                        title="{$fb-resources/delete-control-icon/label}"/>
+                                        title="{$fb-resources/delete-control-icon/label}"
+                                        aria-hidden="true"/>
                                     <xh:i
                                         class="fb-control-edit-items fa fa-th-list fa-fw"
                                         role="button"
@@ -1092,7 +1093,8 @@
                                     <xh:i
                                         class="fb-container-delete fa fa-minus-circle fa-fw"
                                         role="button"
-                                        title="{$fb-resources/delete-container-icon/label}"/>
+                                        title="{$fb-resources/delete-container-icon/label}"
+                                        aria-hidden="true"/>
                                     <xh:i
                                         class="fb-container-move-up fa fa-arrow-up fa-fw"
                                         role="button"
@@ -1135,7 +1137,8 @@
                                 <xh:i
                                     class="fb-row-delete fa fa-minus-circle fa-fw"
                                     role="button"
-                                    title="{$fb-resources/delete-row-icon/label}"/>
+                                    title="{$fb-resources/delete-row-icon/label}"
+                                    aria-hidden="true"/>
                                 <!-- Insert row below -->
                                 <xh:i
                                     class="fb-row-insert-below fa fa-chevron-down fa-fw"

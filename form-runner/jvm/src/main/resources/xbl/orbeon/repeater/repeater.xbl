@@ -67,7 +67,7 @@
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle" aria-hidden="true"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
                     </li>
                 </ul>
             </div>

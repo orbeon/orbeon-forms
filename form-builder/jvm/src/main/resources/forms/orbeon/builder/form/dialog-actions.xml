@@ -427,7 +427,7 @@
                                 <xf:trigger
                                     appearance="minimal"
                                     ref="if ($can-remove-action) then $request-actions-container else ''">
-                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle" aria-hidden="true"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                     <xf:action event="DOMActivate">
                                         <xf:delete ref="$current-action"/>
                                     </xf:action>
@@ -554,7 +554,7 @@
                                 <xf:trigger
                                     appearance="minimal"
                                     ref="if ($can-remove-action) then $request-actions-container else ''">
-                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle" aria-hidden="true"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                     <xf:action event="DOMActivate">
                                         <xf:delete ref="$current-action"/>
                                     </xf:action>
@@ -740,7 +740,7 @@
                             <xf:trigger
                                 appearance="minimal"
                                 ref="if ($can-remove-action) then $response-actions-container else ''">
-                                <xf:label><xh:i class="fa fa-fw fa-minus-circle" aria-hidden="true"/></xf:label>
+                                <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                 <xf:action event="DOMActivate">
                                     <xf:delete ref="$current-action"/>
                                 </xf:action>

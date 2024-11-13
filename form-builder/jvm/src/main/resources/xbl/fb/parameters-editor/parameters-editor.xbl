@@ -274,7 +274,7 @@
                             <xf:trigger
                                 appearance="minimal"
                                 ref="if ($can-remove-param) then $i else ''">
-                                <xf:label><xh:i class="fa fa-fw fa-minus-circle" aria-hidden="true"/></xf:label>
+                                <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                 <xf:action event="DOMActivate">
                                     <xf:delete ref="$current-param"/>
                                 </xf:action>

@@ -74,7 +74,7 @@
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle" aria-hidden="true"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
                     </li>
                 </ul>
             </div>
@@ -498,7 +498,7 @@
                                                     ref="$repeat-context[$can-remove]"
                                                     id="fr-grid-remove"
                                                     xxf:title="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
-                                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle fr-fixed-density" aria-hidden="true"/></xf:label>
+                                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle fr-fixed-density"/></xf:label>
                                                     <xf:dispatch
                                                         event="DOMActivate"
                                                         name="fr-remove"
@@ -507,7 +507,7 @@
                                                     </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:group ref="$repeat-context[not($can-remove)]">
-                                                    <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density disabled" aria-hidden="true"/>
+                                                    <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density disabled"/>
                                                 </xf:group>
                                             </xsl:otherwise>
                                         </xsl:choose>

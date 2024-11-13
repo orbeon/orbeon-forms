@@ -244,11 +244,11 @@
                                                                     <xh:button
                                                                         class="btn btn-link fr-repeater-remove-button"
                                                                         title="{{xxf:r('components.section.remove.hint', '|fr-fr-resources|')}}">
-                                                                        <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density" aria-hidden="true"/>
+                                                                        <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density"/>
                                                                     </xh:button>
                                                                 </xf:group>
                                                                 <xf:group ref=".[not($fr-repeater-can-remove)]">
-                                                                    <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density disabled" aria-hidden="true"/>
+                                                                    <xh:i class="fa fa-fw fa-minus-circle fr-fixed-density disabled"/>
                                                                 </xf:group>
                                                             </xh:div>
                                                         </xsl:if>

@@ -18,7 +18,6 @@ import org.orbeon.oxf.util.CoreUtils.*
 import scala.annotation.tailrec
 import scala.collection.Factory
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.util.Try
 
 
 @JSExportTopLevel("OrbeonStringUtils")
@@ -116,6 +115,12 @@ object StringUtils {
     }
 
     def tokenizeToSet: Set[String] = splitTo[Set]()
+
+    def containsToken(token: String): Boolean =
+      s == token                                                            ||
+      (s.startsWith(token) && s.charAt(token.length) == ' ')                ||
+      (s.endsWith  (token) && s.charAt(s.length - token.length - 1) == ' ') ||
+      s.contains(" " + token + " ")
 
     private def isNonBreakingSpace(c: Int) =
       c == '\u00A0' || c == '\u2007' || c == '\u202F'

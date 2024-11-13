@@ -331,6 +331,26 @@ class SharedUtilsTest extends AnyFunSpec {
       }
   }
 
+  describe("The `containsToken` function") {
+
+    val expected = List(
+      ("fa",                       "fa",             true),
+      ("fa fa-fw fa-plus-circle",  "fa",             true),
+      ("fa fa-fw fa-plus-circle",  "fa-fw",          true),
+      ("fa fa-fw fa-plus-circle",  "fa-plus-circle", true),
+      (" fa fa-fw fa-plus-circle", "fa",             true),
+      ("fa fa-fw fa-plus-circle ", "fa-plus-circle", true),
+      ("abcd",                     "ab",             false),
+      ("abcd",                     "bc",             false),
+      ("abcd",                     "cd",             false),
+    )
+
+    for ((classes, clazz, result) <- expected)
+      it(s"must return `$result` for `$clazz` in `$classes`") {
+        assert(result == classes.containsToken(clazz))
+      }
+  }
+
   describe("`TryUtils`") {
 
     describe("The `sequenceLazily` function") {

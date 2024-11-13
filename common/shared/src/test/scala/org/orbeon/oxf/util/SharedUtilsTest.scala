@@ -27,31 +27,31 @@ import scala.util.{Success, Try}
 class SharedUtilsTest extends AnyFunSpec {
 
   describe("The `dropTrailingSlash()` function") {
-    assert("/a" === "/a/".dropTrailingSlash)
-    assert("/a" === "/a".dropTrailingSlash)
-    assert(""   === "/".dropTrailingSlash)
-    assert("/"  === "//".dropTrailingSlash)
+    assert("/a" == "/a/".dropTrailingSlash)
+    assert("/a" == "/a".dropTrailingSlash)
+    assert(""   == "/".dropTrailingSlash)
+    assert("/"  == "//".dropTrailingSlash)
   }
 
   describe("The `dropStartingSlash()` function") {
-    assert("a/" === "/a/".dropStartingSlash)
-    assert("a/" === "a/".dropStartingSlash)
-    assert(""   === "/".dropStartingSlash)
-    assert("/"  === "//".dropStartingSlash)
+    assert("a/" == "/a/".dropStartingSlash)
+    assert("a/" == "a/".dropStartingSlash)
+    assert(""   == "/".dropStartingSlash)
+    assert("/"  == "//".dropStartingSlash)
   }
 
   describe("The `appendStartingSlash()` function") {
     it("must not append if already present") {
-      assert("/a/" === "/a/".prependSlash)
+      assert("/a/" == "/a/".prependSlash)
     }
     it("must append if not present") {
-      assert("/a/" === "a/".prependSlash)
+      assert("/a/" == "a/".prependSlash)
     }
     it("must keep single slash") {
-      assert("/"   === "/".prependSlash)
+      assert("/"   == "/".prependSlash)
     }
     it("must keep double slash") {
-      assert("//"  === "//".prependSlash)
+      assert("//"  == "//".prependSlash)
     }
   }
 
@@ -59,7 +59,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     def inc(i: Int) = i + 1
 
-    assert("43" === (42 |> inc |> (_.toString)))
+    assert("43" == (42 |> inc |> (_.toString)))
   }
 
   describe("The `tokenizeToSet()` function") {
@@ -70,11 +70,11 @@ class SharedUtilsTest extends AnyFunSpec {
   }
 
   describe("The `splitQuery()` function") {
-    assert(("", None)                === splitQuery(""))
-    assert(("", Some("bar"))         === splitQuery("?bar"))
-    assert(("/foo", None)            === splitQuery("/foo"))
-    assert(("/foo", Some("bar"))     === splitQuery("/foo?bar"))
-    assert(("/foo", Some("bar?baz")) === splitQuery("/foo?bar?baz"))
+    assert(("", None)                == splitQuery(""))
+    assert(("", Some("bar"))         == splitQuery("?bar"))
+    assert(("/foo", None)            == splitQuery("/foo"))
+    assert(("/foo", Some("bar"))     == splitQuery("/foo?bar"))
+    assert(("/foo", Some("bar?baz")) == splitQuery("/foo?bar?baz"))
   }
 
   describe("The `decodeSimpleQuery()` function") {
@@ -83,7 +83,7 @@ class SharedUtilsTest extends AnyFunSpec {
     val expected = Seq("p1" -> "v11", "p2" -> "v21", "p1" -> "v12", "p2" -> "", "p2" -> "v23", "p1" -> "", "p3" -> "")
 
     it(s"must parse `$query`") {
-      assert(expected === decodeSimpleQuery(query))
+      assert(expected == decodeSimpleQuery(query))
     }
   }
 
@@ -91,9 +91,9 @@ class SharedUtilsTest extends AnyFunSpec {
 
     val pathQuery = """/foo?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
 
-    assert(Some("v11") === getFirstQueryParameter(pathQuery, "p1"))
-    assert(Some("v21") === getFirstQueryParameter(pathQuery, "p2"))
-    assert(None        === getFirstQueryParameter(pathQuery, "p3"))
+    assert(Some("v11") == getFirstQueryParameter(pathQuery, "p1"))
+    assert(Some("v21") == getFirstQueryParameter(pathQuery, "p2"))
+    assert(None        == getFirstQueryParameter(pathQuery, "p3"))
   }
 
   describe("The `combineValues()` function") {
@@ -103,29 +103,29 @@ class SharedUtilsTest extends AnyFunSpec {
     val expectedAsVector = Seq(("p1", Vector("v11", "v12", "")), ("p2", Vector("v21", "", "v23")))
     val expectedAsSet    = Seq(("p1", Set("v11", "v12", "")), ("p2", Set("v21", "", "v23")))
 
-    assert(expectedAsList   === combineValues[String, String, List](parameters))
-    assert(expectedAsVector === combineValues[String, String, Vector](parameters))
-    assert(expectedAsSet    === combineValues[String, String, Set](parameters))
-    assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) => k -> v.to(List)}))
+    assert(expectedAsList   == combineValues[String, String, List](parameters))
+    assert(expectedAsVector == combineValues[String, String, Vector](parameters))
+    assert(expectedAsSet    == combineValues[String, String, Set](parameters))
+    assert(expectedAsList   == (combineValues[String, AnyRef, Array](parameters) map { case (k, v) => k -> v.to(List)}))
   }
 
   describe("The `trimAllToOpt` function") {
-    assert(None        === "".trimAllToOpt)
-    assert(None        === "  ".trimAllToOpt)
-    assert(Some("foo") === "foo".trimAllToOpt)
-    assert(Some("foo") === "  foo  ".trimAllToOpt)
+    assert(None        == "".trimAllToOpt)
+    assert(None        == "  ".trimAllToOpt)
+    assert(Some("foo") == "foo".trimAllToOpt)
+    assert(Some("foo") == "  foo  ".trimAllToOpt)
   }
 
   describe("The boolean `option` function") {
     locally {
       var invoked = false
-      assert(Some("foo") === true.option({invoked = true; "foo"}))
+      assert(Some("foo") == true.option({invoked = true; "foo"}))
       assert(invoked)
     }
 
     locally {
       var invoked = false
-      assert(None === false.option({invoked = true; "foo"}))
+      assert(None == false.option({invoked = true; "foo"}))
       assert(! invoked)
     }
   }
@@ -157,10 +157,10 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((desc, in, out) <- expected) {
       it(s"must pass $desc") {
-        assert(out === in.splitTo[List]())
-        assert(out === in.splitTo[Array]().to(List))
-        assert(out.to(Set) === in.splitTo[Set]())
-        assert(out.to(mutable.LinkedHashSet).to(List) === in.splitTo[mutable.LinkedHashSet]().to(List))
+        assert(out == in.splitTo[List]())
+        assert(out == in.splitTo[Array]().to(List))
+        assert(out.to(Set) == in.splitTo[Set]())
+        assert(out.to(mutable.LinkedHashSet).to(List) == in.splitTo[mutable.LinkedHashSet]().to(List))
       }
     }
   }
@@ -181,7 +181,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((desc, in, out) <- expected) {
       it(s"must pass $desc") {
-        assert(out === in.splitTo[List]("="))
+        assert(out == in.splitTo[List]("="))
       }
     }
   }
@@ -207,7 +207,7 @@ class SharedUtilsTest extends AnyFunSpec {
     val truncateWithEllipsisTupled = (truncateWithEllipsis _).tupled
 
     for ((in, out) <- expected)
-      assert(out === truncateWithEllipsisTupled(in))
+      assert(out == truncateWithEllipsisTupled(in))
   }
 
   describe("The `trimAllToEmpty` function") {
@@ -239,7 +239,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     it("must pass all") {
       for ((in, out) <- expected)
-        assert(out === in.trimAllToEmpty)
+        assert(out == in.trimAllToEmpty)
     }
   }
 
@@ -256,7 +256,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((s, search, expected) <- expected)
       it(s"must pass with `$s`/`$search`") {
-        assert(expected === s.substringAfter(search))
+        assert(expected == s.substringAfter(search))
       }
 
   }
@@ -278,7 +278,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((s, stringsToEscape, escapeString, expected) <- expected)
       it(s"must pass with `$s`/`$stringsToEscape`/`$escapeString`") {
-        assert(expected === s.escaped(stringsToEscape, escapeString))
+        assert(expected == s.escaped(stringsToEscape, escapeString))
       }
 
   }
@@ -292,17 +292,17 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((left, right) <- expected)
       it(s"must escape with `$left`") {
-        assert(right === left.escapeXmlMinimal)
+        assert(right == left.escapeXmlMinimal)
       }
 
     for ((left, right) <- expected)
       it(s"must unescape with `$left`") {
-        assert(left === right.unescapeXmlMinimal)
+        assert(left == right.unescapeXmlMinimal)
       }
 
     for ((left, _) <- expected)
       it(s"must roundtrip with `$left`") {
-        assert(left === left.escapeXmlMinimal.unescapeXmlMinimal)
+        assert(left == left.escapeXmlMinimal.unescapeXmlMinimal)
       }
   }
 
@@ -315,7 +315,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((left, right) <- expected)
       it(s"must escape with `$left`") {
-        assert(right === left.escapeXmlForAttribute)
+        assert(right == left.escapeXmlForAttribute)
       }
   }
 
@@ -327,7 +327,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     for ((desc, left, right) <- expected)
       it(desc) {
-        assert(right === left.normalizeSerializedHtml)
+        assert(right == left.normalizeSerializedHtml)
       }
   }
 

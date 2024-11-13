@@ -146,7 +146,7 @@ class OutputInterceptor(
     }
 
     if (newClassAttribute != null)
-      XMLReceiverSupport.addOrReplaceAttribute(originalAttributes, "", "", "class", newClassAttribute)
+      originalAttributes.addOrReplace("class", newClassAttribute)
     else
       originalAttributes
   }

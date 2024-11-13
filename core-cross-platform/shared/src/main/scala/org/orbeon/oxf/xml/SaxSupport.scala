@@ -49,6 +49,52 @@ object SaxSupport {
       }
       newAttributes
     }
+
+    def addOrReplace(
+      localname  : String,
+      value      : String
+    ): AttributesImpl =
+      addOrReplace("", "", localname, value)
+
+    def addOrReplace(
+      uri        : String,
+      prefix     : String,
+      localname  : String,
+      value      : String
+    ): AttributesImpl = {
+      val newAttributes = new AttributesImpl
+      var replaced = false
+      for (i <- 0 until atts.getLength) {
+        val attributeURI       = atts.getURI(i)
+        val attributeValue     = atts.getValue(i)
+        val attributeType      = atts.getType(i)
+        val attributeQName     = atts.getQName(i)
+        val attributeLocalname = atts.getLocalName(i)
+        if (uri == attributeURI && localname == attributeLocalname) {
+          // Found existing attribute
+          replaced = true
+          newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value)
+        } else {
+          // Not a matched attribute
+          newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue)
+        }
+      }
+
+      if (! replaced) // attribute did not exist already so add it
+        newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value)
+
+      newAttributes
+    }
+
+    def appendToClass(newClasses: String): AttributesImpl = {
+      val oldClassAttribute = atts.getValue("class")
+      val newClassAttribute =
+        if (oldClassAttribute == null)
+          newClasses
+        else
+          oldClassAttribute + ' ' + newClasses
+      atts.addOrReplace("class", newClassAttribute)
+    }
   }
 
   def newAttributes(qName: QName, value: String): Attributes =
@@ -68,4 +114,11 @@ object SaxSupport {
     def getValue    (s: String, s1: String)    : String = null
     def getValue    (s: String)                : String = null
   }
+
+  def addOrReplaceAttributeJava(
+    attributes : Attributes,
+    localname  : String,
+    value      : String
+  ): AttributesImpl =
+    attributes.addOrReplace(localname, value)
 }

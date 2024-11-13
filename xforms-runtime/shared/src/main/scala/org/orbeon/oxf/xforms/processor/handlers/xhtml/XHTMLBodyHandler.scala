@@ -18,9 +18,10 @@ import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
+import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as XH
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
-import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants
 import org.xml.sax.Attributes
 
@@ -28,9 +29,8 @@ import java.lang as jl
 
 
 private object XHTMLBodyHandler {
-
-  def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes = {
-    val newAtts = XMLReceiverSupport.appendToClassAttribute(atts, Constants.YuiSkinSamClass)
+  private def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes = {
+    val newAtts = atts.appendToClass(Constants.YuiSkinSamClass)
     XFormsBaseHandler.handleAVTsAndIDs(newAtts, XHTMLElementHandler.RefIdAttributeNames, xformsHandlerContext)
   }
 }

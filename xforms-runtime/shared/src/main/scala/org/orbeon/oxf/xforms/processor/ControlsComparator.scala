@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.handlers.*
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.xforms.Constants.RepeatSeparator
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, rpc}
@@ -36,12 +37,12 @@ class ControlsComparator(
   document                       : XFormsContainingDocument,
   valueChangeControlIdsAndValues : i.Map[String, String],
   isTestMode                     : Boolean
-) extends XMLReceiverSupport {
+) {
 
   private val FullUpdateThreshold = document.getAjaxFullUpdateThreshold
 
   private val breaks = new Breaks
-  import breaks._
+  import breaks.*
 
   def diffChildren(
     left             : Iterable[XFormsControl],
@@ -440,8 +441,8 @@ class ControlsComparator(
         val controlsToInitialize = ScriptBuilder.gatherJavaScriptInitializations(control, isInit)
         if (controlsToInitialize.nonEmpty) {
 
-          import io.circe.generic.auto._
-          import io.circe.syntax._
+          import io.circe.generic.auto.*
+          import io.circe.syntax.*
 
           val controls =
             controlsToInitialize map { case (id, value) => rpc.Control(document.namespaceId(id), value) }

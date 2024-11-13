@@ -4,8 +4,8 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -155,7 +155,7 @@ object XFormsBaseHandler {
   def handleAVTsAndIDs(
     _attributes          : Attributes,
     refIdAttributeNames  : Array[String],
-    handlerContext: HandlerContext
+    handlerContext       : HandlerContext
   ): Attributes = {
 
     var attributes = _attributes
@@ -193,20 +193,20 @@ object XFormsBaseHandler {
             // NOTE: This also handles dummy images for the xhtml:img/@src case
             val effectiveAttributeValue = XXFormsAttributeControl.getExternalValueHandleSrc(attributeControl, controlAnalysis, handlerContext.collector)
             // Set the value of the attribute
-            attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, attributes.getURI(i), XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue)
+            attributes = attributes.addOrReplace(attributes.getURI(i), XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue)
           }
         }
         if (found) // update the value of the id attribute
-          attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
+          attributes = attributes.addOrReplace("id", containingDocument.namespaceId(effectiveId))
       }
       if (! found) // id was not replaced as part of AVT processing
-        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
+        attributes = attributes.addOrReplace("id", containingDocument.namespaceId(effectiveId))
     }
     // Check `@for` or other attribute
     for (refIdAttributeName <- refIdAttributeNames) {
       val forAttribute = attributes.getValue(refIdAttributeName)
       if (forAttribute != null)
-        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, handlerContext.getIdPrefix + forAttribute + handlerContext.getIdPostfix)
+        attributes = attributes.addOrReplace(refIdAttributeName, handlerContext.getIdPrefix + forAttribute + handlerContext.getIdPostfix)
     }
     attributes
   }

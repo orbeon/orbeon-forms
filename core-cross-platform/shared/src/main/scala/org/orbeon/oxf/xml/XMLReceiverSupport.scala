@@ -20,7 +20,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 
-trait XMLReceiverSupport {
+object XMLReceiverSupport {
 
   support =>
 
@@ -133,53 +133,5 @@ trait XMLReceiverSupport {
           saxAtts.addOrReplace(name, value)
     }
     saxAtts
-  }
-}
-
-object XMLReceiverSupport extends XMLReceiverSupport {
-
-  // Match on URI and localname
-  // Used by handlers/extractor/annotator
-  def addOrReplaceAttribute(
-    attributes : Attributes,
-    uri        : String,
-    prefix     : String,
-    localname  : String,
-    value      : String
-  ): AttributesImpl = {
-    val newAttributes = new AttributesImpl
-    var replaced = false
-    for (i <- 0 until attributes.getLength) {
-      val attributeURI       = attributes.getURI(i)
-      val attributeValue     = attributes.getValue(i)
-      val attributeType      = attributes.getType(i)
-      val attributeQName     = attributes.getQName(i)
-      val attributeLocalname = attributes.getLocalName(i)
-      if (uri == attributeURI && localname == attributeLocalname) {
-        // Found existing attribute
-        replaced = true
-        newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value)
-      } else {
-        // Not a matched attribute
-        newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue)
-      }
-    }
-
-    if (! replaced) // attribute did not exist already so add it
-      newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value)
-
-    newAttributes
-  }
-
-  // Append classes to existing attributes. This creates a new `AttributesImpl` object.
-  // Used by handlers/annotator
-  def appendToClassAttribute(attributes: Attributes, newClasses: String): AttributesImpl = {
-    val oldClassAttribute = attributes.getValue("class")
-    val newClassAttribute =
-      if (oldClassAttribute == null)
-        newClasses
-      else
-        oldClassAttribute + ' ' + newClasses
-    addOrReplaceAttribute(attributes, "", "", "class", newClassAttribute)
   }
 }

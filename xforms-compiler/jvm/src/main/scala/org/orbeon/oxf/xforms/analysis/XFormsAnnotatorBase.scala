@@ -21,8 +21,9 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl.RendererBaseUriAttributeNam
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
-import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.xforms.Constants.DocumentId
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames.*
@@ -37,7 +38,7 @@ abstract class XFormsAnnotatorBase(
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents {
 
-  import XFormsAnnotatorBase._
+  import XFormsAnnotatorBase.*
 
   private val keepLocationData = XFormsGlobalProperties.isKeepLocation
   private var _documentLocator: Locator = null
@@ -131,7 +132,7 @@ abstract class XFormsAnnotatorBase(
         metadata.putMark(templateSAXStore.createAndRememberMark(rewriteId(xformsElementId)))
 
       def attsWithNewClass =
-        XMLReceiverSupport.appendToClassAttribute(atts, "xforms-update-full")
+        atts.appendToClass("xforms-update-full")
 
       if (isSwitch && stackElement.isFullUpdate) {
         // Don't remember mark but produce class

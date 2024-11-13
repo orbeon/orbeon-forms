@@ -22,10 +22,12 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import shapeless.syntax.typeable.*
 
 import java.lang as jl
+
 
 //
 // TODO:
@@ -41,7 +43,7 @@ import java.lang as jl
 // - prune internals of XBL value controls
 // - show XFormsVariableControl | XXFormsAttributeControl | XFormsActionControl | internal XFormsGroupControl
 //
-object XMLOutput extends XMLReceiverSupport {
+object XMLOutput {
 
   private val collector = EventCollector.Throw
 

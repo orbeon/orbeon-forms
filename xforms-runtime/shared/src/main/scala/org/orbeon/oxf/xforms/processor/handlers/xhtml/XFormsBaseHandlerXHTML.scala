@@ -14,22 +14,21 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option.*
-
-import java.lang as jl
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
-import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.dom.Extensions.*
-import org.orbeon.oxf.xml.*
-import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+
+import java.lang as jl
 
 
 // Created this just so we can reuse `getContainerAttributes`.
@@ -55,7 +54,7 @@ abstract class XFormsBaseHandlerXHTML (
     forwarding
   ) {
 
-  import XFormsBaseHandlerXHTML._
+  import XFormsBaseHandlerXHTML.*
 
   final val getPrefixedId  = handlerContext.getPrefixedId(attributes)
   final val getEffectiveId = handlerContext.getEffectiveId(attributes)
@@ -427,10 +426,7 @@ object XFormsBaseHandlerXHTML {
       controlEffectiveIdOpt match {
         case Some(controlEffectiveId) =>
           // Add or replace existing id attribute
-          XMLReceiverSupport.addOrReplaceAttribute(
-            attributes,
-            "",
-            "",
+          attributes.addOrReplace(
             "id",
             if (isExternal)
               handlerContext.containingDocument.namespaceId(controlEffectiveId)

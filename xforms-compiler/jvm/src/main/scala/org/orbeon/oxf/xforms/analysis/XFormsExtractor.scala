@@ -13,8 +13,6 @@
   */
 package org.orbeon.oxf.xforms.analysis
 
-import java.net.URI
-
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
@@ -23,15 +21,17 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.XFormsProperties.*
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
+import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
-import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{Constants, Namespaces, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
+import java.net.URI
 import scala.collection.mutable as m
 
 
@@ -133,7 +133,7 @@ class XFormsExtractor(
      with ExtractorProperties
      with ExtractorOutput {
 
-  import XFormsExtractor._
+  import XFormsExtractor.*
 
   require(baseURI ne null)
 
@@ -342,7 +342,7 @@ class XFormsExtractor(
       outputFirstElementIfNeeded()
 
       // Add xml:base on element
-      outputAttributes = XMLReceiverSupport.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
+      outputAttributes = outputAttributes.addOrReplace(XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
 
       // Add xml:lang on element if found
       elementStack.head.xmlLangOpt foreach { xmlLang =>
@@ -357,7 +357,7 @@ class XFormsExtractor(
               xmlLang
           }
 
-        outputAttributes = XMLReceiverSupport.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "lang", newXMLLang)
+        outputAttributes = outputAttributes.addOrReplace(XML_URI, "xml", "lang", newXMLLang)
       }
     }
 

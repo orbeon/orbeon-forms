@@ -213,21 +213,21 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Rewrite elements / add appearances
                 if (inTitle && "output".equals(localname)) {
                     // Special case of `xf:output` within title, which produces an `xxf:text` control
-                    attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
+                    attributes = SaxSupport.addOrReplaceAttributeJava(attributes, "for", htmlTitleElementId);
                     startPrefixMapping2("xxf", XFormsNames.XXFORMS_NAMESPACE_URI());
                     stackElement.startElement(XFormsNames.XXFORMS_NAMESPACE_URI(), "text", "xxf:text", attributes);
                 } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
                     // Append the `xxf:separator` appearance
                     final String existingAppearance = attributes.getValue("appearance");
                     // See: https://github.com/orbeon/orbeon-forms/issues/418
-                    attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", XFormsNames.APPEARANCE_QNAME().localName(),
+                    attributes = SaxSupport.addOrReplaceAttributeJava(attributes, XFormsNames.APPEARANCE_QNAME().localName(),
                             (existingAppearance != null ? existingAppearance + " " : "") + XFormsNames.XXFORMS_SEPARATOR_APPEARANCE_QNAME().qualifiedName());
                     stackElement.startElement(uri, localname, qName, attributes);
                 } else if (stackElement.isXForms() && "repeat".equals(localname)) {
                     // Add separator appearance
                     if (doesClosestXHTMLRequireSeparatorAppearance()) {
                         final String existingAppearance = attributes.getValue("appearance");
-                        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", XFormsNames.APPEARANCE_QNAME().localName(),
+                        attributes = SaxSupport.addOrReplaceAttributeJava(attributes, XFormsNames.APPEARANCE_QNAME().localName(),
                                 (existingAppearance != null ? existingAppearance + " " : "") + XFormsNames.XXFORMS_SEPARATOR_APPEARANCE_QNAME().qualifiedName());
                     }
 

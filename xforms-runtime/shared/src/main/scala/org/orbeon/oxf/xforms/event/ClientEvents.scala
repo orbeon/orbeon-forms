@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
@@ -33,9 +34,9 @@ import java.util as ju
 
 
 // Process events sent by the client, including sorting, filtering, and security
-object ClientEvents extends Logging with XMLReceiverSupport {
+object ClientEvents extends Logging  {
 
-  import Private._
+  import Private.*
 
   case class EventsFindings(
     valueChangeControlIdsAndValues : Map[String, String],

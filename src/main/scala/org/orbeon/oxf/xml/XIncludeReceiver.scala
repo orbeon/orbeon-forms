@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.transformer.{TransformerURIResolver, XPathProcessor}
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{LoggerFactory, XPath, XPathCache}
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XIncludeReceiver.*
 import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.XMLNames.*
@@ -149,7 +150,7 @@ class XIncludeReceiver(
 
     val newAttributes =
       if (! topLevel && level == 0 && generateXMLBase && xmlBase.isDefined)
-        XMLReceiverSupport.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase.orNull)
+        attributes.addOrReplace(XML_URI, "xml", "base", xmlBase.orNull)
       else
         attributes
 

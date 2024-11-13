@@ -14,7 +14,7 @@
         <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</view>
         <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approuver</approve>
         <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rejeter</reject>
-`
+
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil</home>
         <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil3</landing>
         <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>

@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromStrin
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps

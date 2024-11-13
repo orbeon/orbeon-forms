@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr.excel
 
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.util.regex.Pattern
 import scala.util.control.Breaks.*

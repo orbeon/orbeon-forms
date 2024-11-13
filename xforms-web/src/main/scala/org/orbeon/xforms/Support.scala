@@ -15,7 +15,7 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom

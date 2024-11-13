@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.FormRunner.getDefaultLang
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator.*
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.time.Instant
 

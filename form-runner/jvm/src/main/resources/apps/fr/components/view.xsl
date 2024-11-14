@@ -529,7 +529,11 @@
                                     false()
                         )
                     ]
-                }} {$density-class}"
+                }} {$density-class}{{
+                    ' fr-keyboard-shortcuts-hidden'[
+                        not(xxf:property(string-join(('oxf.fr.keyboard-shortcuts.show-hints', fr:app-name(), fr:form-name()), '.')) = true())
+                    ]
+                }}"
                 xxf:element="div">
                 <xsl:choose>
                     <xsl:when test="$is-detail and not($is-form-builder)">

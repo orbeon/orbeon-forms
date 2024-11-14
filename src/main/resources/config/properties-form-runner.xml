@@ -606,6 +606,7 @@
     <property as="xs:string"  name="oxf.fr.available-languages"                                    value="en es fr it de pt sv fi nl da"/>
     <!-- For forms, don't restrict the list of languages by default: https://github.com/orbeon/orbeon-forms/issues/1223 -->
     <property as="xs:string"  name="oxf.fr.available-languages.*.*"                                value="*"/>
+    <property as="xs:boolean" name="oxf.fr.keyboard-shortcuts.show-hints.*.*"                      value="true"/>
 
     <!-- Service processes -->
     <property as="xs:string"  name="oxf.fr.service.duplicate.transform.*.*"                        value=""/>

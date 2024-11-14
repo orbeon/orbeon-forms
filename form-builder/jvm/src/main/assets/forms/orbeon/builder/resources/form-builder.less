@@ -335,6 +335,10 @@ body.orbeon {
 
     // ***** Toolbox ***************************************************************************************************
 
+    // Show keyboard shortcuts hints on hover, except if `oxf.fr.keyboard-shortcuts.show-hints.*.*` is set to `false`
+                                  .fb-toolbox .tab-content:hover kbd { display: block; }
+    .fr-keyboard-shortcuts-hidden .fb-toolbox .tab-content:hover kbd { display: none;  }
+
     .fb-toolbox {
         position: absolute;
         left: @fbGutter;
@@ -349,10 +353,6 @@ body.orbeon {
             line-height: 18px; // try not to cause the enclosing button to become taller
             min-width: 3.7em;
             text-align: center;
-        }
-
-        .tab-content:hover kbd:not(:empty) {
-            display: block;
         }
 
         .fb-tool .fb-add-control button {

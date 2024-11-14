@@ -22,23 +22,24 @@
         }
     }
 
+    .fr-keyboard-shortcuts-hidden {
+        .fr-buttons, .fr-dialog-buttons {
+            &:hover kbd { display: none; }                                  // Hide `kbd` if inside `.fr-keyboard-shortcuts-hidden`
+        }
+    }
+    .fr-buttons, .fr-dialog-buttons {
+        &:hover kbd {
+            & { display: inline-block; }                                    // Show `kbd` on hover
+            // REVIEW: doesn't look like this is needed, as we seem to be careful to not have empty `kbd` elements
+            //&:empty, &:has(.xforms-output-output:empty) { display: none; }  // But hide `kbd` is empty
+        }
+    }
+
     .fr-buttons, .fr-dialog-buttons {
 
         display: block;
         width: 100%;
         box-sizing: border-box;
-
-        kbd {
-            display: none;
-        }
-
-        &:hover kbd:not(:empty) {
-            display: inline-block;
-        }
-
-        &:hover kbd:has(.xforms-output-output:empty) {
-            display: none;
-        }
 
         // Space between the image and the text in a button, only for the buttons bar
         //   (not other buttons in the form which might contain just an image)

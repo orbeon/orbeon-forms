@@ -45,6 +45,12 @@ html {
     }
 
     .fr-landing-quick-links-card {
+        & > div {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap : 1em; // Same spacing between and around icons
+            padding  : 1em;
+        }
         a {
             &:hover {
                 color: var(--bs-body-color);
@@ -90,7 +96,7 @@ html {
 
     .card {
         figure {
-            margin-bottom: .5rem;
+            margin-bottom: 0;
             border: 1px solid rgba(0, 0, 0, 0.125);
             border-radius: 10px;
         }
@@ -109,10 +115,10 @@ html {
         border-top-right-radius: 10px;
         opacity: .8;
         transition: all ease 100ms;
+    }
 
-        &:hover {
-            padding: 1rem;
-        }
+    figure:hover .img-thumbnail {
+        padding: 1rem; // Make image larger on hover by reducing padding
     }
 
     .card-body {

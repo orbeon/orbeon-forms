@@ -1,0 +1,697 @@
+<resource xml:lang="hu">
+    <common>
+        <formats>
+            <within-day>[h]:[m01] [P,*-2]</within-day>
+            <day-this-year>[MNn,*-3] [D]</day-this-year>
+            <short-date>[Y01].[M01].[D01]</short-date>
+        </formats>
+        <messages>
+            <incomplete-configuration>Az Orbeon Forms konfigurációja hiányos. További részletekért ellenőrizze az Orbeon Forms naplófájlját, és látogasson el &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;a dokumentációhoz&lt;/a&gt;.</incomplete-configuration>
+        </messages>
+    </common>
+    <buttons>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Létrehozás</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Megtekintés</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Jóváhagyás</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Elutasítás</reject>
+
+        <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Kezdőlap</home>
+        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Kezdőlap</landing>
+        <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Áttekintés</review>
+        <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+        <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+        <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Törlés</delete>
+        <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importálás</import>
+        <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Új</new>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Új adat létrehozása</new-long>
+        <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Másolás</duplicate>
+
+        <!-- Szokásos folyamatgombok -->
+        <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Mentés</save>
+        <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Mentés</save-final>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Előrehaladás mentése</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Előrehaladás mentése</save-progress>
+        <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Szerkesztés</edit>
+        <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Küldés</send>
+        <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; E-mail</email>
+        <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Érvényesítés</validate>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Teszt PDF</test-pdf>
+
+        <!-- Régi gombok -->
+        <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Küldés</submit>
+        <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Áttekintés</workflow-review>
+        <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Szerkesztés</workflow-edit>
+        <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Küldés</workflow-send>
+
+        <!-- Egyéb szokásos gombok -->
+        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Összegzés</summary>
+        <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Bezárás</close>
+        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Törlés</clear>
+        <cancel>Mégse</cancel>
+        <save-locally>Helyi mentés</save-locally>
+        <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+        <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Frissítés"&gt;&lt;/i&gt;</refresh>
+        <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</wizard-next>
+        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</wizard-prev>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Tartalom</wizard-toc>
+
+        <!-- Küldési párbeszédpanel -->
+        <submit-dialog-clear>Törlés és bezárás</submit-dialog-clear>
+        <submit-dialog-keep>Értékek megtartása és bezárás</submit-dialog-keep>
+        <submit-dialog-go>OK</submit-dialog-go>
+        <submit-dialog-close-window>Ablak bezárása</submit-dialog-close-window>
+
+        <!-- Figyelmeztetési párbeszédpanel -->
+        <validation-dialog-review>Áttekintés</validation-dialog-review>
+        <validation-dialog-continue>Folytatás</validation-dialog-continue>
+
+        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Teszt</test>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Képletek vizsgálata (Béta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Offline teszt (Béta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel exportálás</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel exportálás</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML exportálás</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML exportálás</form-definition-xhtml-export>
+        <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Közzététel</publish>
+        <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Közzététel</save-publish>
+
+        <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Igen</yes>
+        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nem</no>
+        <ok>OK</ok>
+        <previous>Előző</previous>
+        <next>Következő</next>
+    </buttons>
+    <components>
+        <labels>
+            <open-section>Szakasz megjelenítése</open-section>
+            <close-section>Szakasz elrejtése</close-section>
+            <section-name>Szakasz neve</section-name>
+            <yes>Igen</yes>
+            <no>Nem</no>
+            <other>Egyéb</other>
+            <clear>Érték törlése</clear>
+            <please-select>Kérem, válasszon:</please-select>
+        </labels>
+        <grid>
+            <menu>Menü</menu>
+            <insert-above>Beszúrás fölé</insert-above>
+            <insert-below>Beszúrás alá</insert-below>
+            <move-up>Mozgatás fel</move-up>
+            <move-down>Mozgatás le</move-down>
+            <clear>
+                <label>Sor törlése</label>
+            </clear>
+            <remove>
+                <label>Sor eltávolítása</label>
+                <hint>Sor eltávolítása az ismétlődő rácsból</hint>
+            </remove>
+            <add-another>
+                <label>Másik sor hozzáadása</label>
+                <hint>Másik sor hozzáadása az ismétlődő rácshoz</hint>
+            </add-another>
+        </grid>
+        <section>
+            <remove>
+                <label>Ismétlés eltávolítása</label>
+                <hint>Ismétlés eltávolítása az ismétlődő szakaszból</hint>
+            </remove>
+            <add-another>
+                <label>Másik ismétlés hozzáadása</label>
+                <hint>Másik ismétlés hozzáadása az ismétlődő szakaszhoz</hint>
+            </add-another>
+        </section>
+        <date-time>
+            <year>Év</year>
+            <month>Hónap</month>
+            <day>Nap</day>
+        </date-time>
+        <wizard>
+            <errors>Hibák</errors>
+            <incomplete>Hiányos</incomplete>
+            <complete>Teljes</complete>
+            <not-started>Nincs elkezdve</not-started>
+            <edit>Szerkesztés</edit>
+        </wizard>
+        <error-summary>
+            <show-more>Több megjelenítése</show-more>
+            <show-less>Kevesebb megjelenítése</show-less>
+        </error-summary>
+        <revision-history>
+            <label>Módosítási előzmények</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Kezdeti verzió)}'|1# (Jelenlegi verzió)}</date>
+            <date-format>[Y]. [MNn,*-3]. [D]. [H01]:[m01]:[s01]</date-format>
+
+            <named-user>{0} felhasználó</named-user>
+            <anonymous-user>Névtelen felhasználó</anonymous-user>
+
+            <unknown-changes>néhány módosítást végzett.</unknown-changes>
+            <initial-revision>mentette a kezdeti verziót.</initial-revision>
+            <no-changes>mentette változtatások nélkül.</no-changes>
+            <specific-changes>a következő módosításokat végezte:</specific-changes>
+
+            <view-data>Verzió megtekintése</view-data>
+
+            <value-entered>"{0}" megadva</value-entered>
+            <value-cleared>"{0}" törölve</value-cleared>
+            <value-changed>"{0}"-ról/ről "{1}"-ra/re módosítva</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#ismétlés|1&lt;ismétlés} hozzáadva</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#ismétlés|1&lt;ismétlés} eltávolítva</iteration-removed>
+            <other-changed>belső információ módosítva</other-changed>
+            <workflow-stage-changed>Munkafolyamat állapota "{0}"-ról/ről "{1}"-ra/re módosítva</workflow-stage-changed>
+
+            <load-more>Továbbiak betöltése</load-more>
+        </revision-history>
+    </components>
+    <untitled-form>Cím nélküli űrlap</untitled-form>
+    <errors>
+        <summary-title>Az űrlap {1,choice,
+            0#nem tartalmaz üzenetet|
+            1#a következő '{0,choice,0#hibát|1#figyelmeztetést|2#információs üzenetet|3#üzenetet}' tartalmazza|
+            1&lt;a következő '{0,choice,0#hibákat|1#figyelmeztetéseket|2#információs üzeneteket|3#üzeneteket}' tartalmazza}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer} '{0,choice,0#Hiba|1#Figyelmeztetés|2#Információs üzenet|3#Üzenet}' - |
+            1&lt;{1,number,integer} '{0,choice,0#Hiba|1#Figyelmeztetés|2#Információs üzenet|3#Üzenet}' - }{2}</form-title>
+        <none>Nincs hiba az űrlapon</none>
+        <unsaved>Nem mentett módosítások</unsaved>
+        <canvas-not-supported>A képek megjegyzéséhez a böngészőnek támogatnia kell a HTML5 canvas elemet</canvas-not-supported>
+        <search>Hiba a keresés során</search>
+    </errors>
+    <email>
+        <subject>Orbeon Forms visszaigazolás</subject>
+        <body>Mellékelve találja az űrlapot PDF és XML formátumban.</body>
+        <na>N/A</na>
+        <iteration>{$iteration}. ismétlés</iteration>
+    </email>
+    <!-- PDF sablon formátumai -->
+    <print>
+        <formats>
+            <date>[Y]. [MNn] [D].</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[Y]. [MNn] [D]. [H01]:[m01]:[s01]</dateTime>
+        </formats>
+    </print>
+    <summary>
+        <titles>
+            <summary-title>Összefoglaló</summary-title>
+            <delete-confirmation>Törlés megerősítése</delete-confirmation>
+            <document-id>Dokumentum azonosító</document-id>
+            <workflow-stage>Munkafolyamat állapota</workflow-stage>
+            <created-by>Létrehozta</created-by>
+            <selected>Kiválasztva</selected>
+            <refresh>Ez a művelet frissíti az oldalt</refresh>
+            <toc>Tartalomjegyzék</toc>
+            <description>Leírás</description>
+            <help>Súgó</help>
+            <error-count>Hiba az űrlapon</error-count>
+            <errors-count>Hibák az űrlapon</errors-count>
+        </titles>
+        <buttons>
+            <select-all>Összes kijelölése</select-all>
+            <deselect-all>Kijelölés megszüntetése</deselect-all>
+            <select-saved>Csak a mentettek kiválasztása</select-saved>
+            <select-drafts>Csak a piszkozatok kiválasztása</select-drafts>
+        </buttons>
+        <bulk-edit>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Tömeges szerkesztés megjelenítése</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Tömeges szerkesztés elrejtése</close-bulk-edit>
+            <bulk-edit>Tömeges szerkesztés</bulk-edit>
+            <apply>Alkalmaz</apply>
+            <value-required>Érték megadása kötelező</value-required>
+            <submission-error>Hiba az űrlapadatok szerkesztése közben.</submission-error>
+        </bulk-edit>
+        <paging>
+            <to>-</to>
+            <of>/</of>
+        </paging>
+        <messages>
+            <no-form-data-found>Nem található űrlapadat.</no-form-data-found>
+            <delete-confirmation>Biztosan törölni szeretne egy vagy több űrlapot? Ne feledje, hogy a mentett dokumentum törlésekor a kapcsolódó automatikusan mentett dokumentumok is törlődnek.</delete-confirmation>
+            <version>Űrlapverzió: {0,number,integer}</version>
+        </messages>
+        <labels>
+            <draft>Automatikusan mentve</draft>
+            <read-only>Csak olvasható</read-only>
+            <language-choice>Válasszon nyelvet</language-choice>
+            <form-choice>Válasszon űrlapot</form-choice>
+            <free-search>Szabad keresés</free-search>
+            <clear-value>[Érték törlése]</clear-value>
+            <script>Teljes verzió</script>
+            <refresh>Frissítés</refresh>
+            <close-box>[bezárás]</close-box>
+            <help-back>Vissza</help-back>
+            <goto-content>Ugrás a tartalomhoz</goto-content>
+        </labels>
+        <formats>
+            <date>[Y]. [MNn] [D].</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[Y]. [MNn] [D]. [H01]:[m01]:[s01]</dateTime>
+            <save-datetime>[Y]. [MNn] [D]. [H01]:[m01]:[s01]</save-datetime>
+        </formats>
+        <export-with-search-dialog>
+            <label>Excel exportálási beállítások</label>
+            <headings-labels>Címkék használata fejlécként</headings-labels>
+            <selection-controls-labels>Címkék használata kiválasztó vezérlőkhöz</selection-controls-labels>
+            <include-document-id>Dokumentum azonosító oszlop beillesztése</include-document-id>
+        </export-with-search-dialog>
+    </summary>
+    <detail>
+        <messages>
+            <save-success>A dokumentum mentése sikeres!</save-success>
+            <save-draft-success>Az előrehaladás mentése sikeres!</save-draft-success>
+            <save-progress-success>Az előrehaladás mentése sikeres!</save-progress-success>
+            <email-success>E-mail sikeresen elküldve!</email-success>
+            <form-validation-error>Érvényesítési hibák vannak. Kérjük, próbálja újra, miután minden mezőt megfelelően kitöltött.</form-validation-error>
+            <database-error>Hiba történt az adatbázissal való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</database-error>
+            <service-error>Hiba történt egy háttérszolgáltatással való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</service-error>
+            <action-error>Hiba történt egy háttérszolgáltatással való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</action-error>
+            <process-error>Hiba történt a folyamat futtatása közben. Kérjük, forduljon az alkalmazás rendszergazdájához.</process-error>
+            <wizard-prev-error>A visszalépés előtt javítsa a hibákat</wizard-prev-error>
+            <wizard-next-error>A továbblépés előtt javítsa a hibákat</wizard-next-error>
+            <clear-confirm-message>Biztosan törölni szeretné az összes mezőt ezen az oldalon? Az adatok elvesznek, ha nem mentette azokat.</clear-confirm-message>
+            <error-dialog-title>A művelet nem hajtható végre</error-dialog-title>
+            <confirmation-dialog-title>Megerősítés</confirmation-dialog-title>
+            <confirmation-dialog-message>Biztosan folytatja?</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>Ez a művelet egyes űrlapadatok felülírását okozhatja. Biztosan folytatja?</confirmation-dialog-message-overwrite>
+            <submit-dialog-title>Űrlap elküldve</submit-dialog-title>
+            <submit-dialog-message>Az információit elküldtük, köszönjük.</submit-dialog-message>
+            <validation-dialog-title>Az űrlap érvényesítési üzenetei</validation-dialog-title>
+            <validation-dialog-message>Az űrlap {1,choice,
+                0#nem tartalmaz üzenetet|
+                1#egy '{0,choice,0#hibát|1#figyelmeztetést|2#információs üzenetet|3#üzenetet}' tartalmaz|
+                1&lt;{1,number,integer} '{0,choice,0#hibát|1#figyelmeztetést|2#információs üzenetet|3#üzenetet}' tartalmaz}.
+                {0,choice,
+                    0#Kérjük, próbálja újra, miután minden mezőt megfelelően kitöltött|
+                    0&lt;Választhatja az '{1,choice,1#áttekintését|1&lt;áttekintésüket}' vagy figyelmen kívül hagyhatja '{1,choice,1#azt|1&lt;azokat}' és folytathatja a műveletet}.
+            </validation-dialog-message>
+            <buttons-message/>
+            <saved-locally-open>Kattintson ide a dokumentum megnyitásához. A megadott adatok a mentés időpontjának megfelelő állapotban fognak megjelenni.</saved-locally-open>
+            <upload-in-progress>Fájlfeltöltések vannak folyamatban. Kérjük, próbálja újra, miután a fájlfeltöltés befejeződött vagy megszakadt.</upload-in-progress>
+            <upload-start>Feltöltés elindult</upload-start>
+            <upload-cancel>A felhasználó megszakította a feltöltést</upload-cancel>
+            <upload-done>Feltöltés kész</upload-done>
+            <upload-error>Hiba történt a feltöltés során. Kérjük, próbálja újra.</upload-error>
+            <upload-error-empty-file>A feltöltött fájl üres.</upload-error-empty-file>
+            <upload-error-size>A feltöltött fájl túl nagy. A megengedett maximális méret {0,number,integer} bájt, a ténylegesen fogadott méret {1,number,integer} bájt.</upload-error-size>
+            <upload-error-mediatype>A feltöltött fájl típusa helytelen: {0}</upload-error-mediatype>
+            <upload-error-file-scan>A feltöltött fájlt a fájlszkenner elutasította. Kérjük, győződjön meg arról, hogy ez nem fertőzött fájl. Itt van a fájlszkenner üzenete: „{0}".</upload-error-file-scan>
+            <lost-attachments>Néhány fájlmelléklet elveszett egy szerverprobléma miatt. Kérjük, ellenőrizze az összes mellékletet, és szükség esetén töltse fel újra.</lost-attachments>
+        </messages>
+        <draft-singleton>
+            <found-draft>Automatikusan mentett dokumentum található</found-draft>
+            <found-drafts>Automatikusan mentett dokumentumok találhatók</found-drafts>
+            <found-draft-for-document>A dokumentum mentése után egy dokumentum automatikusan mentésre került, amely további munkát tartalmazhat. Szeretné megnyitni a mentett dokumentumot vagy az automatikusan mentett dokumentumot?</found-draft-for-document>
+            <found-draft-for-never-saved>Elérhető egy automatikusan mentett dokumentum ehhez az űrlaphoz. Szeretne újrakezdeni mindent, vagy megnyitni az automatikusan mentett dokumentumot?</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>Több automatikusan mentett dokumentum érhető el ehhez az űrlaphoz. Szeretne újrakezdeni mindent, vagy megtekinteni az automatikusan mentett dokumentumokat (és esetleg szerkeszteni az egyiket)?</found-drafts-for-never-saved>
+            <open-saved>Explicit módon mentett dokumentum megnyitása</open-saved>
+            <open-draft>Automatikusan mentett dokumentum megnyitása</open-draft>
+            <view-drafts>Automatikusan mentett dokumentumok megtekintése</view-drafts>
+            <start-new>Kezdés elölről</start-new>
+            <multiple-docs-title>Létező űrlapadatok találhatók</multiple-docs-title>
+            <multiple-docs-explanation>Nem hozhat létre új adatokat ehhez az űrlapdefinícióhoz, de esetleg szerkesztheti a meglévő űrlapadatokat.</multiple-docs-explanation>
+            <multiple-docs-view-data>Meglévő űrlapadatok megtekintése</multiple-docs-view-data>
+        </draft-singleton>
+        <labels>
+            <language-choice>Nyelv</language-choice>
+            <errors>Hibák összefoglalása</errors>
+            <check-errors-in-form>Az űrlap hibákat tartalmaz</check-errors-in-form>
+            <error-details>Hiba részletei</error-details>
+            <confirm>Megerősít</confirm>
+            <alert>Hiányzó vagy helytelen érték</alert>
+            <alert-out-of-range>Tartományon kívüli érték, kérjük, válasszon egy elérhető értéket</alert-out-of-range>
+            <alert-out-of-range-multiple>Tartományon kívüli érték(ek)</alert-out-of-range-multiple>
+            <clear-out-of-range>Tartományon kívüli érték(ek) törlése</clear-out-of-range>
+            <captcha-label>CAPTCHA</captcha-label>
+            <captcha-alert>Kérjük, ellenőrizze a választ a CAPTCHA kihívásra</captcha-alert>
+        </labels>
+        <hints>
+            <upload-max-size-per-file>A fájloknak {0} alattinak kell lenniük.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>A teljes fájlméretnek a vezérlőben {0} alattinak kell lennie.</upload-max-size-aggregate-per-control>
+            <upload-mediatypes>Csak {0} fájlok elfogadottak.</upload-mediatypes>
+            <upload-image>kép</upload-image>
+            <upload-video>videó</upload-video>
+            <upload-audio>hang</upload-audio>`
+        </hints>
+        <view>
+            <explanation>
+                Ez az Ön adatainak írásvédett nézete.
+            </explanation>
+        </view>
+        <lease>
+            <no-lease-title>Bérlés</no-lease-title>
+            <renew-lease-title>Bérlés megújítása?</renew-lease-title>
+            <renew-lease-message>A bérlése hamarosan lejár. Szeretné most megújítani?</renew-lease-message>
+            <current-user-left>Ön még </current-user-left>
+            <current-user-right> ideig bérli ezt a dokumentumot.</current-user-right>
+            <relinquished>Ön már nem bérli ezt a dokumentumot.</relinquished>
+            <other-user>Egy másik felhasználó, „{0}" felhasználónévvel, jelenleg bérli ezt a dokumentumot.</other-user>
+            <relinquish>Bérlésről lemondás</relinquish>
+            <renew>Bérlés megújítása</renew>
+            <try-acquire>Bérlés megszerzésének kísérlete</try-acquire>
+            <show-in-view-mode>Megjelenítés írásvédett módban</show-in-view-mode>
+        </lease>
+        <session-expiration>
+            <title>
+                <expiring>A munkamenet hamarosan lejár</expiring>
+                <expired>A munkamenet lejárt</expired>
+            </title>
+            <message>
+                <expiring>A munkamenete hamarosan lejár. Kattintson az alábbi gombra, ha folytatni szeretné az oldal használatát.</expiring>
+                <expired>A munkamenete lejárt.</expired>
+            </message>
+            <renew-button>Munkamenet megújítása</renew-button>
+        </session-expiration>
+        <available-from>
+            <message>Ez az űrlap még nem érhető el</message>
+        </available-from>
+        <available-to>
+            <message>Ez az űrlap már nem érhető el</message>
+        </available-to>
+    </detail>
+    <save-locally>
+        <dialog-title>Helyi mentés</dialog-title>
+        <dialog-body>
+            <div>
+                <p>
+                    Kattintson az alábbi Mentés gombra az űrlapadatok számítógépre mentéséhez HTML fájlként.
+                </p>
+                <p>
+                    Az űrlapadatok újbóli megnyitásához:
+                </p>
+                <ul>
+                    <li>Nyissa meg a HTML fájlt a böngészőben (a fájlra kattintva vagy a böngészőablakba húzva).</li>
+                    <li>A megerősítéshez kattintson a megjelenő Megnyitás gombra.</li>
+                </ul>
+                <p>
+                    <b>FIGYELMEZTETÉS:</b> A szerveren nem tárolunk adatokat, és ha törli a mentett fájlt, az adatok elvesznek.
+                </p>
+            </div>
+        </dialog-body>
+    </save-locally>
+    <share-dialog>
+        <label>Megosztási link létrehozása</label>
+        <body>Bárki, akinek van linkje, megtekintheti vagy szerkesztheti ezeket az adatokat.</body>
+        <link>Link</link>
+        <select-operations>Műveletek kiválasztása</select-operations>
+        <readonly>Csak olvasható</readonly>
+        <readwrite>Olvasás és írás</readwrite>
+    </share-dialog>
+    <admin>
+        <title>Űrlapok adminisztrációja</title>
+    </admin>
+    <landing>
+        <title>Orbeon Form Runner</title>
+        <titles>
+            <published-forms>Közzétett űrlapok</published-forms>
+            <form-builder-forms>Form Builder űrlapok</form-builder-forms>
+            <form-builder-new>Új Form Builder űrlap</form-builder-new>
+            <form-builder-summary>Form Builder űrlapok</form-builder-summary>
+            <demo-forms>Demó űrlapok</demo-forms>
+            <quick-links>Gyors linkek</quick-links>
+            <form-runner-admin>Űrlapok adminisztrációja</form-runner-admin>
+        </titles>
+        <descriptions>
+            <published-forms>Hozzáférés a közzétett űrlapjaihoz</published-forms>
+            <form-builder-forms>A Form Builder segítségével létrehozott, folyamatban lévő űrlapok megtekintése és szerkesztése</form-builder-forms>
+            <demo-forms>Próbálja ki az Orbeon Forms-szal szállított demó űrlapokat</demo-forms>
+        </descriptions>
+        <show-more>Több megjelenítése…</show-more>
+    </landing>
+    <home>
+        <title>Közzétett űrlapok</title>
+        <buttons>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Elérhetetlenné tétel</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Elérhetővé tétel</publish>
+            <cancel>Mégse</cancel>
+            <connect>Csatlakozás</connect>
+            <select>Kiválasztás</select>
+            <operation>Művelet</operation>
+            <reindex>Adatbázis(ok) újraindexelése</reindex>
+            <stop-reindex>Újraindexelés leállítása</stop-reindex>
+            <all>Összes</all>
+            <none>Egyik sem</none>
+            <unpublished-local>Helyi, nem elérhető űrlapok</unpublished-local>
+            <published-local>Helyi, elérhető űrlapok</published-local>
+            <unpublished-remote>Távoli, nem elérhető űrlapok</unpublished-remote>
+            <published-remote>Távoli, elérhető űrlapok</published-remote>
+            <newer-local>Helyi, újabb űrlapok</newer-local>
+            <newer-remote>Távoli, újabb űrlapok</newer-remote>
+            <publish-local>Helyi űrlapok elérhetővé tétele</publish-local>
+            <unpublish-local>Helyi űrlapok elérhetetlenné tétele</unpublish-local>
+            <publish-remote>Távoli űrlapok elérhetővé tétele</publish-remote>
+            <unpublish-remote>Távoli űrlapok elérhetetlenné tétele</unpublish-remote>
+            <push-to-remote>Feltöltés távolra</push-to-remote>
+            <pull-from-remote>Letöltés távolról</pull-from-remote>
+            <navigate-summary>Ugrás az összegzéshez</navigate-summary>
+            <navigate-new>Ugrás az újhoz</navigate-new>
+            <upgrade-local>Helyi űrlapdefiníciók frissítése</upgrade-local>
+            <upgrade-remote>Távoli űrlapdefiníciók frissítése</upgrade-remote>
+            <delete-local>Helyi űrlapok törlése</delete-local>
+            <delete-remote>Távoli űrlapok törlése</delete-remote>
+            <reencrypt>Űrlapdefiníciók újratitkosítása</reencrypt>
+            <reload-resources>Erőforrások újratöltése</reload-resources>
+        </buttons>
+        <titles>
+            <publish-confirmation>Űrlap elérhetőségi változtatásának megerősítése</publish-confirmation>
+            <credentials>Távoli szerver hitelesítő adatai</credentials>
+            <status>Állapot</status>
+            <view>Nézet</view>
+            <new>Új</new>
+            <local>Helyi</local>
+            <remote>Távoli</remote>
+            <form-identification>Űrlap azonosítása</form-identification>
+            <reindexing-confirmation>Újraindexelés megerősítése</reindexing-confirmation>
+            <reencrypt-confirmation>Újratitkosítás megerősítése</reencrypt-confirmation>
+            <purge-confirmation>Törlés megerősítése</purge-confirmation>
+        </titles>
+        <messages>
+            <no-form-found>Nem található telepített űrlap.</no-form-found>
+            <publish-confirmation>Biztosan {0,choice,0#elérhetővé|1#elérhetetlenné|2#frissíteni|3#törölni} szeretné {1,choice,1#ezt az űrlapot|1&lt;ezt a(z) {1,number,integer} űrlapot}? Ez a művelet nem vonható vissza.</publish-confirmation>
+            <reindexing-confirmation>Az újraindexelés során egyes funkciók, például az Form Runner összegző oldalak, nem a várt módon működnek. Ezért javasoljuk, hogy az újraindexelést a rendszer offline állapotában végezze el. Biztosan folytatja az újraindexelést?</reindexing-confirmation>
+            <reencrypt-confirmation>Javasoljuk, hogy az újratitkosítást a rendszer offline állapotában végezze el. Biztosan folytatja az újratitkosítást?</reencrypt-confirmation>
+            <purge-confirmation>Biztosan törölni szeretné a kiválasztott adatokat?</purge-confirmation>
+        </messages>
+        <labels>
+            <available>Elérhető</available>
+            <unavailable>Nem elérhető</unavailable>
+            <library>Könyvtár</library>
+            <newer>Újabb</newer>
+            <remote-server>Távoli szerver</remote-server>
+            <username>Felhasználónév</username>
+            <password>Jelszó</password>
+            <reindexing-generic>Újraindexelés &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>{0} újraindexelése ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>Az újraindexelési művelet leáll &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>Az újraindexelési művelet befejeződött</reindexing-finished>
+            <reencrypt-state>Újratitkosítás {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Újratitkosítás elindult</reencrypt-started>
+            <reencrypt-finished>Újratitkosítás befejeződött</reencrypt-finished>
+        </labels>
+        <export-purge>
+            <export>Exportálás</export>
+            <purge>Törlés</purge>
+            <or>vagy</or>
+            <selected-forms>Kiválasztott űrlapok ({0,number,integer})</selected-forms>
+            <following-forms>A következő űrlapok:</following-forms>
+            <application>Alkalmazás:</application>
+            <form>Űrlap:</form>
+            <version>Verzió:</version>
+            <all-applications>Minden alkalmazás</all-applications>
+            <all-forms>Minden űrlap</all-forms>
+            <all-versions>Minden verzió</all-versions>
+            <latest-version>Legújabb verzió</latest-version>
+            <definitions-data>
+                <label>Űrlapdefiníciók / adatok:</label>
+                <definitions>Csak definíciók</definitions>
+                <data>Csak adatok</data>
+                <both>Definíciók és adatok</both>
+            </definitions-data>
+            <current-history>
+                <label>Aktuális adatok / módosítási előzmények:</label>
+                <current-data>Csak aktuális adatok</current-data>
+                <revision-history>Csak módosítási előzmények</revision-history>
+                <both>Aktuális adatok és módosítási előzmények</both>
+            </current-history>
+            <from-date>Ettől:</from-date>
+            <until-date>Eddig:</until-date>
+            <redundant-values>Redundáns értékek</redundant-values>
+            <invalid-date>Érvénytelen dátum</invalid-date>
+            <wrong-date-order>Hibás dátum sorrend</wrong-date-order>
+        </export-purge>
+    </home>
+    <import>
+        <form-version>
+            <label>Űrlapverzió</label>
+            <alert>Hiányzó űrlapverzió</alert>
+        </form-version>
+        <application-name>
+            <label>Alkalmazás neve</label>
+        </application-name>
+        <form-name>
+            <label>Űrlap neve</label>
+        </form-name>
+        <version-comment>
+            <label>Verzió megjegyzése</label>
+        </version-comment>
+        <upload>
+            <label>Feltöltés</label>
+        </upload>
+        <file>
+            <label>Importálandó fájl</label>
+            <hint>A fájlnak Excel 2007 (.xlsx) vagy XML (.xml) formátumúnak kell lennie</hint>
+            <alert>Hiányzó vagy nem támogatott fájl</alert>
+            <excel-headings-format>Excel 2007 nevesített fejlécekkel (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 nevesített tartományokkal (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML exportálási formátum (.xml)</xml-form-structure-and-data-format>
+        </file>
+        <validation>
+            <label>Érvényesítés</label>
+            <alert>Kérjük, indítsa el az érvényesítést, mielőtt továbblépne az importáláshoz</alert>
+        </validation>
+        <start-validation>
+            <label>Érvényesítés indítása</label>
+        </start-validation>
+        <total>Összesen</total>
+        <valid>Érvényes</valid>
+        <invalid>Érvénytelen</invalid>
+        <imported>Importált</imported>
+        <skipped>Kihagyott</skipped>
+        <eta>Várható időtartam</eta>
+        <cancel-validation>
+            <label>Érvényesítés megszakítása</label>
+        </cancel-validation>
+        <validation-canceled>Az érvényesítés megszakítva.</validation-canceled>
+        <import>
+            <label>Importálás</label>
+        </import>
+        <existing-records>
+            <label>Meglévő adatbázisrekordok</label>
+            <item id="0">Megtartás</item>
+            <item id="1">Törlés</item>
+        </existing-records>
+        <invalid-data>
+            <label>Érvénytelen adatokat tartalmazó rekordok</label>
+            <item id="0">Kihagyás</item>
+            <item id="1">Importálás</item>
+        </invalid-data>
+        <start-import>
+            <label>Importálás indítása</label>
+        </start-import>
+        <cancel-import>
+            <label>Importálás megszakítása</label>
+        </cancel-import>
+        <import-canceled>Az importálás megszakítva.</import-canceled>
+        <start-over>
+            <label>Újrakezdés</label>
+        </start-over>
+        <review-data>
+            <label>Adatok áttekintése</label>
+        </review-data>
+        <existing-records-message>
+            {0,number,integer} meglévő dokumentum található az adatbázisban a(z) {1}/{2} űrlap {3} verziójához.
+        </existing-records-message>
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} óra} {1,choice,0#|0&lt;{1, number, integer} perc} {2,choice,0#|0&lt;{2, number, integer} másodperc}
+        </eta-message>
+        <invalid-records-message>
+            {1,number,integer} dokumentumból {0,number,integer} érvénytelen.
+        </invalid-records-message>
+        <valid-records-message>
+            {0,number,integer} dokumentum érvényesítve lett, és importálva lesz.
+        </valid-records-message>
+        <invalid-document-message>
+            A feltöltött dokumentum érvényesítési hibákat tartalmaz. Az "Adatok áttekintése" gomb használatával tekintse át és javítsa ki a hibákat a mentés előtt.
+        </invalid-document-message>
+        <valid-document-message>
+            A feltöltött dokumentum érvényes adatokat tartalmaz. Az "Adatok áttekintése" gomb használatával tekintse át az űrlap adatait a mentés előtt.
+        </valid-document-message>
+        <import-complete-message>
+            {0,number,integer} dokumentum importálása befejeződött. {1,number,integer} érvénytelen dokumentum kihagyva.
+        </import-complete-message>
+        <na>N/A</na>
+        <fields-found>Talált mezők</fields-found>
+        <values-found>Talált értékek</values-found>
+        <errors>Hibák</errors>
+        <warnings>Figyelmeztetések</warnings>
+        <error-messages>
+            <validating>Hiba történt az adatok érvényesítése közben.</validating>
+            <importing>Hiba történt az adatok importálása közben.</importing>
+            <deleting>Hiba történt az adatok törlése közben.</deleting>
+            <unauthorized>Nincs jogosultsága az adatok eléréséhez.</unauthorized>
+            <reading-form-data>Hiba történt az űrlapadatok lekérése közben.</reading-form-data>
+            <reading-form-metadata>Hiba történt az űrlap metaadatainak olvasása közben.</reading-form-metadata>
+            <reading-form-definition>Hiba történt az űrlapdefiníció olvasása közben.</reading-form-definition>
+        </error-messages>
+    </import>
+    <authentication>
+        <menu>
+            <logged-in-as>Bejelentkezve mint {0}</logged-in-as>
+            <logout>Kijelentkezés</logout>
+            <login>Bejelentkezés</login>
+            <register>Regisztráció</register>
+        </menu>
+        <login>
+            <title>Form Runner bejelentkezés</title>
+            <username>Felhasználónév</username>
+            <password>Jelszó</password>
+            <login>Bejelentkezés</login>
+        </login>
+        <logout-done>
+            <title>Form Runner kijelentkezés</title>
+            <message>Ön kijelentkezett.</message>
+        </logout-done>
+        <login-error>
+            <title>Form Runner bejelentkezési hiba</title>
+            <unrecognized>A megadott felhasználónevet vagy jelszót nem ismerjük fel.</unrecognized>
+            <try-again>Kérjük, próbálja újra.</try-again>
+        </login-error>
+    </authentication>
+    <home-summary>
+        <titles>
+            <created>Létrehozva</created>
+            <last-modified>Módosítva</last-modified>
+            <last-modified-by>Módosította</last-modified-by>
+            <application-name>Alkalmazás neve</application-name>
+            <form-name>Űrlap neve</form-name>
+            <version>Verzió</version>
+            <form-title>Űrlap címe</form-title>
+        </titles>
+        <search>
+            <search>Keresés</search>
+            <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Űrlapok keresése</search-forms>
+            <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Keresési beállítások megjelenítése</show-search-options>
+            <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Keresési beállítások elrejtése</close-search-options>
+            <search-options>Keresési beállítások</search-options>
+            <any>[Bármely]</any>
+            <dates>
+                <item>
+                    <label>Ma</label>
+                    <value>today</value>
+                </item>
+                <item>
+                    <label>Tegnap</label>
+                    <value>yesterday</value>
+                </item>
+                <item>
+                    <label>Utolsó 7 nap</label>
+                    <value>last-7-days</value>
+                </item>
+                <item>
+                    <label>Utolsó 30 nap</label>
+                    <value>last-30-days</value>
+                </item>
+                <item>
+                    <label>Utolsó 90 nap</label>
+                    <value>last-90-days</value>
+                </item>
+                <item>
+                    <label>Egyedi...</label>
+                    <value>custom</value>
+                </item>
+            </dates>
+            <date-after>Utána</date-after>
+            <date-before>Előtte</date-before>
+        </search>
+   </home-summary>
+</resource>

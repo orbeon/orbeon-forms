@@ -1,0 +1,691 @@
+<resource xml:lang="zh-Hans">
+    <common>
+        <formats>
+            <within-day>[h]:[m01] [P,*-2]</within-day>
+            <day-this-year>[MNn,*-3] [D]</day-this-year>
+            <short-date>[M01]/[D01]/[Y01]</short-date>
+        </formats>
+        <messages>
+            <incomplete-configuration>您的Orbeon Forms配置不完整。有关更多详细信息，请查看Orbeon Forms日志文件并访问&lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;文档&lt;/a&gt;。</incomplete-configuration>
+        </messages>
+    </common>
+    <buttons>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 创建</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; 查看</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; 批准</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; 拒绝</reject>
+
+        <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; 首页</home>
+        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; 首页</landing>
+        <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; 审核</review>
+        <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+        <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+        <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 删除</delete>
+        <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; 导入</import>
+        <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新建</new>
+        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; 复制</duplicate>
+
+        <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save>
+        <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save-final>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 保存进度</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 保存进度</save-progress>
+        <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; 编辑</edit>
+        <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 发送</send>
+        <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; 电子邮件</email>
+        <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; 验证</validate>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; 测试PDF</test-pdf>
+
+        <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 提交</submit>
+        <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 审核</workflow-review>
+        <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; 编辑</workflow-edit>
+        <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 发送</workflow-send>
+
+        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 摘要</summary>
+        <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; 关闭</close>
+        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 清除</clear>
+        <cancel>取消</cancel>
+        <save-locally>本地保存</save-locally>
+        <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+        <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="刷新"&gt;&lt;/i&gt;</refresh>
+        <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一步</wizard-next>
+        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一步</wizard-prev>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 内容</wizard-toc>
+
+        <submit-dialog-clear>清除并关闭</submit-dialog-clear>
+        <submit-dialog-keep>保留值并关闭</submit-dialog-keep>
+        <submit-dialog-go>确定</submit-dialog-go>
+        <submit-dialog-close-window>关闭窗口</submit-dialog-close-window>
+
+        <validation-dialog-review>审核</validation-dialog-review>
+        <validation-dialog-continue>继续</validation-dialog-continue>
+
+        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; 测试</test>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 检查公式（测试版）</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; 离线测试（测试版）</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; 导出Excel</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; 导出Excel</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; 导出XML</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; 导出XHTML</form-definition-xhtml-export>
+        <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 发布</publish>
+        <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 发布</save-publish>
+
+        <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; 是</yes>
+        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; 否</no>
+        <ok>确定</ok>
+        <previous>上一步</previous>
+        <next>下一步</next>
+    </buttons>
+    <components>
+        <labels>
+            <open-section>显示部分</open-section>
+            <close-section>隐藏部分</close-section>
+            <section-name>部分名称</section-name>
+            <yes>是</yes>
+            <no>否</no>
+            <other>其他</other>
+            <clear>清除值</clear>
+            <please-select>请选择：</please-select>
+        </labels>
+        <grid>
+            <menu>菜单</menu>
+            <insert-above>在上方插入</insert-above>
+            <insert-below>在下方插入</insert-below>
+            <move-up>向上移动</move-up>
+            <move-down>向下移动</move-down>
+            <clear>
+                <label>清除行</label>
+            </clear>
+            <remove>
+                <label>删除行</label>
+                <hint>从重复网格中删除行</hint>
+            </remove>
+            <add-another>
+                <label>添加另一行</label>
+                <hint>向重复网格添加另一行</hint>
+            </add-another>
+        </grid>
+        <section>
+            <remove>
+                <label>删除重复</label>
+                <hint>从重复部分中删除重复</hint>
+            </remove>
+            <add-another>
+                <label>添加另一个重复</label>
+                <hint>向重复部分添加另一个重复</hint>
+            </add-another>
+        </section>
+        <date-time>
+            <year>年</year>
+            <month>月</month>
+            <day>日</day>
+        </date-time>
+        <wizard>
+            <errors>错误</errors>
+            <incomplete>未完成</incomplete>
+            <complete>完成</complete>
+            <not-started>未开始</not-started>
+            <edit>编辑</edit>
+        </wizard>
+        <error-summary>
+            <show-more>显示更多</show-more>
+            <show-less>显示更少</show-less>
+        </error-summary>
+        <revision-history>
+            <label>修订历史</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (初始修订)}'|1# (当前修订)}</date>
+            <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] 在 [h]:[m] [P,*-2]</date-format>
+
+            <named-user>用户 {0}</named-user>
+            <anonymous-user>一位匿名用户</anonymous-user>
+
+            <unknown-changes todo="true">made some changes.</unknown-changes>
+            <initial-revision>保存了初始修订。</initial-revision>
+            <no-changes>保存时未检测到更改。</no-changes>
+            <specific-changes>进行了以下更改：</specific-changes>
+
+            <view-data>查看此修订</view-data>
+
+            <value-entered>输入了"{0}"</value-entered>
+            <value-cleared>清除了"{0}"</value-cleared>
+            <value-changed>从"{0}"更改为"{1}"</value-changed>
+            <iteration-added>添加了{0,number,integer}个{0,choice,1#重复|1&lt;重复}</iteration-added>
+            <iteration-removed>删除了{0,number,integer}个{0,choice,1#重复|1&lt;重复}</iteration-removed>
+            <other-changed>内部信息已更改</other-changed>
+            <workflow-stage-changed>工作流阶段从"{0}"更改为"{1}"</workflow-stage-changed>
+
+            <load-more todo="true">Load More</load-more>
+        </revision-history>
+    </components>
+    <untitled-form>无标题表单</untitled-form>
+    <errors>
+        <summary-title>您的表单{1,choice,
+            0#不包含任何消息|
+            1#包含以下'{0,choice,0#错误|1#警告|2#信息消息|3#消息}'|
+            1&lt;包含以下'{0,choice,0#错误|1#警告|2#信息消息|3#消息}'}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer}个'{0,choice,0#错误|1#警告|2#信息消息|3#消息}' - |
+            1&lt;{1,number,integer}个'{0,choice,0#错误|1#警告|2#信息消息|3#消息}' - }{2}</form-title>
+        <none>表单无错误</none>
+        <unsaved>未保存的更改</unsaved>
+        <canvas-not-supported>要进行图像注释，您的浏览器需要支持HTML5画布</canvas-not-supported>
+        <search>执行搜索时出错</search>
+    </errors>
+    <email>
+        <subject>Orbeon Forms 确认</subject>
+        <body>请找到附加的PDF和XML格式的表单。</body>
+        <na>不适用</na>
+        <iteration>迭代 {$iteration}</iteration>
+    </email>
+    <print>
+        <formats>
+            <date>[MNn] [D], [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+        </formats>
+    </print>
+    <summary>
+        <titles>
+            <summary-title>摘要</summary-title>
+            <delete-confirmation>确认删除</delete-confirmation>
+            <document-id>文档ID</document-id>
+            <workflow-stage>工作流阶段</workflow-stage>
+            <created-by>创建者</created-by>
+            <selected>已选择</selected>
+            <refresh>此操作将刷新页面</refresh>
+            <toc>目录</toc>
+            <description>描述</description>
+            <help>帮助</help>
+            <error-count>表单中的错误</error-count>
+            <errors-count>表单中的错误</errors-count>
+        </titles>
+        <buttons>
+            <select-all>全选</select-all>
+            <deselect-all>取消全选</deselect-all>
+            <select-saved>仅选择明确保存的</select-saved>
+            <select-drafts>仅选择自动保存的</select-drafts>
+        </buttons>
+        <bulk-edit>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 显示批量编辑</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隐藏批量编辑</close-bulk-edit>
+            <bulk-edit>批量编辑</bulk-edit>
+            <apply>应用</apply>
+            <value-required>需要填写值</value-required>
+            <submission-error>编辑表单数据时出错。</submission-error>
+        </bulk-edit>
+        <paging>
+            <to>至</to>
+            <of>共</of>
+        </paging>
+        <messages>
+            <no-form-data-found>未找到表单数据。</no-form-data-found>
+            <delete-confirmation>您确定要删除一个或多个表单吗？请注意，删除已保存的文档时，相应的自动保存文档也会被删除。</delete-confirmation>
+            <version>表单版本 {0,number,integer}</version>
+        </messages>
+        <labels>
+            <draft>自动保存</draft>
+            <read-only>只读</read-only>
+            <language-choice>选择语言</language-choice>
+            <form-choice>选择表单</form-choice>
+            <free-search>自由搜索</free-search>
+            <clear-value>[清除值]</clear-value>
+            <script>完整版本</script>
+            <refresh>刷新</refresh>
+            <close-box>[关闭]</close-box>
+            <help-back>返回</help-back>
+            <goto-content>转到内容</goto-content>
+        </labels>
+        <formats>
+            <date>[MNn] [D], [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+            <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+        </formats>
+        <export-with-search-dialog>
+            <label>Excel导出选项</label>
+            <headings-labels>使用标签作为标题</headings-labels>
+            <selection-controls-labels>使用标签作为选择控件</selection-controls-labels>
+            <include-document-id>包含文档ID列</include-document-id>
+        </export-with-search-dialog>
+    </summary>
+    <detail>
+        <messages>
+            <save-success>文档保存成功！</save-success>
+            <save-draft-success>进度保存成功！</save-draft-success>
+            <save-progress-success>进度保存成功！</save-progress-success>
+            <email-success>电子邮件发送成功！</email-success>
+            <form-validation-error>存在验证错误。请在所有字段正确填写后重试。</form-validation-error>
+            <database-error>与数据库通信时出错。请联系应用程序管理员。</database-error>
+            <service-error>与后端服务通信时出错。请联系应用程序管理员。</service-error>
+            <action-error>与后端服务通信时出错。请联系应用程序管理员。</action-error>
+            <process-error>运行流程时出错。请联系应用程序管理员。</process-error>
+            <wizard-prev-error>请在向后移动前修复错误</wizard-prev-error>
+            <wizard-next-error>请在向前移动前修复错误</wizard-next-error>
+            <clear-confirm-message>您确定要清除此页面上的所有字段吗？如果您尚未保存，您的数据将会丢失。</clear-confirm-message>
+            <error-dialog-title>无法完成操作</error-dialog-title>
+            <confirmation-dialog-title>确认</confirmation-dialog-title>
+            <confirmation-dialog-message>您确定要继续吗？</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>此操作可能会导致某些表单数据被覆盖。您确定要继续吗？</confirmation-dialog-message-overwrite>
+            <submit-dialog-title>表单已提交</submit-dialog-title>
+            <submit-dialog-message>您的信息已提交，谢谢。</submit-dialog-message>
+            <validation-dialog-title>查看表单验证消息</validation-dialog-title>
+            <validation-dialog-message>您的表单{1,choice,
+                0#不包含任何消息|
+                1#包含一个'{0,choice,0#错误|1#警告|2#信息消息|3#消息}'|
+                1&lt;包含{1,number,integer}个'{0,choice,0#错误|1#警告|2#信息消息|3#消息}'}.
+                {0,choice,
+                    0#请在所有字段正确填写后重试|
+                    0&lt;您可以选择先查看'{1,choice,1#它|1&lt;它们}'或忽略'{1,choice,1#它|1&lt;它们}'并继续操作}.
+            </validation-dialog-message>
+            <buttons-message/>
+            <saved-locally-open>点击此处打开文档。将显示您在保存工作时输入的数据。</saved-locally-open>
+            <upload-in-progress>文件上传正在进行中。请在文件上传完成或被取消后重试。</upload-in-progress>
+            <upload-start>上传开始</upload-start>
+            <upload-cancel>上传被用户取消</upload-cancel>
+            <upload-done>上传完成</upload-done>
+            <upload-error>上传过程中出错。请重试。</upload-error>
+            <upload-error-empty-file>上传的文件为空。</upload-error-empty-file>
+            <upload-error-size>上传的文件太大。允许的最大大小为{0,number,integer}字节，实际收到的大小为{1,number,integer}字节。</upload-error-size>
+            <upload-error-mediatype>上传的文件类型不正确：{0}</upload-error-mediatype>
+            <upload-error-file-scan>上传的文件被文件扫描程序拒绝。请确保这不是受感染的文件。以下是文件扫描程序的消息："{0}"。</upload-error-file-scan>
+            <lost-attachments>由于服务器问题，一些文件附件丢失。请检查所有附件，如有需要请重新上传。</lost-attachments>
+        </messages>
+        <draft-singleton>
+            <found-draft>找到自动保存的文档</found-draft>
+            <found-drafts>找到自动保存的文档</found-drafts>
+            <found-draft-for-document>在保存此文档后，自动保存了一个可能包含额外工作的文档。您想打开已保存的文档还是自动保存的文档？</found-draft-for-document>
+            <found-draft-for-never-saved>有一个此表单的自动保存文档可用。您想从头开始还是打开自动保存的文档？</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>此表单有多个自动保存的文档可用。您想从头开始还是查看自动保存的文档（然后可能编辑其中一个）？</found-drafts-for-never-saved>
+            <open-saved>打开明确保存的文档</open-saved>
+            <open-draft>打开自动保存的文档</open-draft>
+            <view-drafts>查看自动保存的文档</view-drafts>
+            <start-new>从头开始</start-new>
+            <multiple-docs-title>找到现有表单数据</multiple-docs-title>
+            <multiple-docs-explanation>您无法为此表单定义创建新数据，但您可能可以编辑现有表单数据。</multiple-docs-explanation>
+            <multiple-docs-view-data>查看现有表单数据</multiple-docs-view-data>
+        </draft-singleton>
+        <labels>
+            <language-choice>语言</language-choice>
+            <errors>错误摘要</errors>
+            <check-errors-in-form>此表单包含错误</check-errors-in-form>
+            <error-details>查看错误详情</error-details>
+            <confirm>确认</confirm>
+            <alert>缺少或不正确的值</alert>
+            <alert-out-of-range>超出范围的值，请选择一个可用值</alert-out-of-range>
+            <alert-out-of-range-multiple>超出范围的值</alert-out-of-range-multiple>
+            <clear-out-of-range>清除超出范围的值</clear-out-of-range>
+            <captcha-label>验证码</captcha-label>
+            <captcha-alert>请检查您对验证码挑战的回答</captcha-alert>
+        </labels>
+        <hints>
+            <upload-max-size-per-file>文件必须小于{0}。</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>控件中的总文件大小必须小于{0}。</upload-max-size-aggregate-per-control>
+            <upload-mediatypes>仅接受{0}文件。</upload-mediatypes>
+            <upload-image>图像</upload-image>
+            <upload-video>视频</upload-video>
+            <upload-audio>音频</upload-audio>
+        </hints>
+        <view>
+            <explanation>
+                这是您数据的只读视图。
+            </explanation>
+        </view>
+        <lease>
+            <no-lease-title>租约</no-lease-title>
+            <renew-lease-title>续租？</renew-lease-title>
+            <renew-lease-message>您的租约即将到期。您想现在续租吗？</renew-lease-message>
+            <current-user-left>您拥有此文档的租约，还剩</current-user-left>
+            <current-user-right>。</current-user-right>
+            <relinquished>您不再拥有此文档的租约。</relinquished>
+            <other-user>另一个用户（用户名为"{0}"）目前拥有此文档的租约。</other-user>
+            <relinquish>放弃租约</relinquish>
+            <renew>续租</renew>
+            <try-acquire>尝试获取租约</try-acquire>
+            <show-in-view-mode>以只读模式显示</show-in-view-mode>
+        </lease>
+        <session-expiration>
+            <title>
+                <expiring>会话即将过期</expiring>
+                <expired>会话已过期</expired>
+            </title>
+            <message>
+                <expiring>您的会话即将过期。如果您希望继续使用此页面，请点击下方的按钮。</expiring>
+                <expired>您的会话已过期。</expired>
+            </message>
+            <renew-button>续期会话</renew-button>
+        </session-expiration>
+        <available-from>
+            <message>此表单尚未开放</message>
+        </available-from>
+        <available-to>
+            <message>此表单已不再开放</message>
+        </available-to>
+    </detail>
+    <save-locally>
+        <dialog-title>本地保存</dialog-title>
+        <dialog-body>
+            <div>
+                <p>
+                    点击下方的保存按钮，将您的表单数据作为HTML文件保存在计算机上。
+                </p>
+                <p>
+                    要重新打开您的表单数据：
+                </p>
+                <ul>
+                    <li>在浏览器中打开HTML文件（通过点击文件或将其拖放到浏览器窗口）。</li>
+                    <li>点击显示的打开按钮以确认。</li>
+                </ul>
+                <p>
+                    <b>警告：</b>服务器上不保留任何数据，如果您删除保存的文件，您的数据将会丢失。
+                </p>
+            </div>
+        </dialog-body>
+    </save-locally>
+    <share-dialog>
+        <label>创建共享链接</label>
+        <body>让任何拥有链接的人查看或编辑此数据。</body>
+        <link>链接</link>
+        <select-operations>选择操作</select-operations>
+        <readonly>只读</readonly>
+        <readwrite>读写</readwrite>
+    </share-dialog>
+    <admin>
+        <title>表单管理</title>
+    </admin>
+    <landing>
+        <title>Orbeon Form Runner</title>
+        <titles>
+            <published-forms>已发布的表单</published-forms>
+            <form-builder-forms>Form Builder表单</form-builder-forms>
+            <form-builder-new>新建Form Builder表单</form-builder-new>
+            <form-builder-summary>Form Builder表单</form-builder-summary>
+            <demo-forms>演示表单</demo-forms>
+            <quick-links>快速链接</quick-links>
+            <form-runner-admin>表单管理</form-runner-admin>
+        </titles>
+        <descriptions>
+            <published-forms>访问您已发布的表单</published-forms>
+            <form-builder-forms>查看和编辑您用Form Builder创建的进行中的表单</form-builder-forms>
+            <demo-forms>试用随Orbeon Forms一起提供的演示表单</demo-forms>
+        </descriptions>
+        <show-more>显示更多…</show-more>
+    </landing>
+    <home>
+        <title>已发布的表单</title>
+        <buttons>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; 设为不可用</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 设为可用</publish>
+            <cancel>取消</cancel>
+            <connect>连接</connect>
+            <select>选择</select>
+            <operation>操作</operation>
+            <reindex>重新索引数据库</reindex>
+            <stop-reindex>停止重新索引</stop-reindex>
+            <all>全部</all>
+            <none>无</none>
+            <unpublished-local>不可用的本地表单</unpublished-local>
+            <published-local>可用的本地表单</published-local>
+            <unpublished-remote>不可用的远程表单</unpublished-remote>
+            <published-remote>可用的远程表单</published-remote>
+            <newer-local>本地较新的表单</newer-local>
+            <newer-remote>远程较新的表单</newer-remote>
+            <publish-local>设置本地表单为可用</publish-local>
+            <unpublish-local>设置本地表单为不可用</unpublish-local>
+            <publish-remote>设置远程表单为可用</publish-remote>
+            <unpublish-remote>设置远程表单为不可用</unpublish-remote>
+            <push-to-remote>推送到远程</push-to-remote>
+            <pull-from-remote>从远程拉取</pull-from-remote>
+            <navigate-summary>导航到摘要</navigate-summary>
+            <navigate-new>导航到新建</navigate-new>
+            <upgrade-local>升级本地表单定义</upgrade-local>
+            <upgrade-remote>升级远程表单定义</upgrade-remote>
+            <delete-local>删除本地表单</delete-local>
+            <delete-remote>删除远程表单</delete-remote>
+            <reencrypt>重新加密表单定义</reencrypt>
+            <reload-resources>重新加载资源</reload-resources>
+        </buttons>
+        <titles>
+            <publish-confirmation>确认表单可用性更改</publish-confirmation>
+            <credentials>远程服务器凭证</credentials>
+            <status>状态</status>
+            <view>查看</view>
+            <new>新建</new>
+            <local>本地</local>
+            <remote>远程</remote>
+            <form-identification>表单识别</form-identification>
+            <reindexing-confirmation>确认重新索引</reindexing-confirmation>
+            <reencrypt-confirmation>确认重新加密</reencrypt-confirmation>
+            <purge-confirmation>确认清除</purge-confirmation>
+        </titles>
+        <messages>
+            <no-form-found todo="true">[未找到已部署的表單。]</no-form-found>
+            <publish-confirmation>您确定要{0,choice,0#设为可用|1#设为不可用|2#升级|3#删除}{1,choice,1#一个表单|1&lt;{1,number,integer}个表单}吗？此操作无法撤消。</publish-confirmation>
+            <reindexing-confirmation>在重新索引期间，一些功能（如Form Runner摘要页面）可能无法正常工作。因此，我们建议您在系统离线时执行重新索引。您确定要继续重新索引吗？</reindexing-confirmation>
+            <reencrypt-confirmation>我们建议您在系统离线时执行重新加密。您确定要继续重新加密吗？</reencrypt-confirmation>
+            <purge-confirmation>您确定要清除所选数据吗？</purge-confirmation>
+        </messages>
+        <labels>
+            <available>可用</available>
+            <unavailable>不可用</unavailable>
+            <library>库</library>
+            <newer>较新</newer>
+            <remote-server>远程服务器</remote-server>
+            <username>用户名</username>
+            <password>密码</password>
+            <reindexing-generic>正在重新索引 &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>正在重新索引 {0} ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>重新索引操作正在停止 &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>重新索引操作已完成</reindexing-finished>
+            <reencrypt-state>正在重新加密 {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>重新加密已开始</reencrypt-started>
+            <reencrypt-finished>重新加密已完成</reencrypt-finished>
+        </labels>
+        <export-purge>
+            <export>导出</export>
+            <purge>清除</purge>
+            <or>或</or>
+            <selected-forms>已选择的表单 ({0,number,integer})</selected-forms>
+            <following-forms>以下表单：</following-forms>
+            <application>应用：</application>
+            <form>表单：</form>
+            <version>版本：</version>
+            <all-applications>所有应用</all-applications>
+            <all-forms>所有表单</all-forms>
+            <all-versions>所有版本</all-versions>
+            <latest-version>最新版本</latest-version>
+            <definitions-data>
+                <label>表单定义/数据：</label>
+                <definitions>仅定义</definitions>
+                <data>仅数据</data>
+                <both>定义和数据</both>
+            </definitions-data>
+            <current-history>
+                <label>当前数据/修订历史：</label>
+                <current-data>仅当前数据</current-data>
+                <revision-history>仅修订历史</revision-history>
+                <both>当前数据和修订历史</both>
+            </current-history>
+            <from-date>从：</from-date>
+            <until-date>至：</until-date>
+            <redundant-values>冗余值</redundant-values>
+            <invalid-date>无效日期</invalid-date>
+            <wrong-date-order>日期顺序错误</wrong-date-order>
+        </export-purge>
+    </home>
+    <import>
+        <form-version>
+            <label>表单版本</label>
+            <alert>缺少表单版本</alert>
+        </form-version>
+        <application-name>
+            <label>应用名称</label>
+        </application-name>
+        <form-name>
+            <label>表单名称</label>
+        </form-name>
+        <version-comment>
+            <label>版本注释</label>
+        </version-comment>
+        <upload>
+            <label>上传</label>
+        </upload>
+        <file>
+            <label>要导入的文件</label>
+            <hint>文件必须为Excel 2007格式（.xlsx）或XML格式（.xml）</hint>
+            <alert>缺少文件或不支持的文件格式</alert>
+            <excel-headings-format>Excel 2007命名标题格式（.xlsx）</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007命名范围格式（.xlsx）</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML导出格式（.xml）</xml-form-structure-and-data-format>
+        </file>
+        <validation>
+            <label>验证</label>
+            <alert>请在进行导入之前开始验证</alert>
+        </validation>
+        <start-validation>
+            <label>开始验证</label>
+        </start-validation>
+        <total>总计</total>
+        <valid>有效</valid>
+        <invalid>无效</invalid>
+        <imported>已导入</imported>
+        <skipped>已跳过</skipped>
+        <eta>预计完成时间</eta>
+        <cancel-validation>
+            <label>取消验证</label>
+        </cancel-validation>
+        <validation-canceled>验证已取消。</validation-canceled>
+        <import>
+            <label>导入</label>
+        </import>
+        <existing-records>
+            <label>现有数据库记录</label>
+            <item id="0">保留</item>
+            <item id="1">删除</item>
+        </existing-records>
+        <invalid-data>
+            <label>包含无效数据的记录</label>
+            <item id="0">跳过</item>
+            <item id="1">导入</item>
+        </invalid-data>
+        <start-import>
+            <label>开始导入</label>
+        </start-import>
+        <cancel-import>
+            <label>取消导入</label>
+        </cancel-import>
+        <import-canceled>导入已取消。</import-canceled>
+        <start-over>
+            <label>重新开始</label>
+        </start-over>
+        <review-data>
+            <label>审核数据</label>
+        </review-data>
+        <existing-records-message>
+            数据库中表单{1}/{2}的版本{3}已有{0,choice,1#一个现有文档|1&lt;{0,number,integer}个现有文档}。
+        </existing-records-message>
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer}小时} {1,choice,0#|0&lt;{1, number, integer}分钟} {2,choice,0#|0&lt;{2, number, integer}秒}
+        </eta-message>
+        <invalid-records-message>
+            {1,number,integer}个文档中有{0,number,integer}个无效。
+        </invalid-records-message>
+        <valid-records-message>
+            {0,number,integer}个文档已通过验证，将被导入。
+        </valid-records-message>
+        <invalid-document-message>
+            上传的文档包含验证错误。使用"审核数据"按钮查看并修复错误，然后再保存。
+        </invalid-document-message>
+        <valid-document-message>
+            上传的文档包含有效数据。使用"审核数据"按钮在保存前审核表单数据。
+        </valid-document-message>
+        <import-complete-message>
+            {0,number,integer}个文档的导入已完成。{1,number,integer}个无效文档被跳过。
+        </import-complete-message>
+        <na>不适用</na>
+        <fields-found>找到的字段</fields-found>
+        <values-found>找到的值</values-found>
+        <errors>错误</errors>
+        <warnings>警告</warnings>
+        <error-messages>
+            <validating>验证数据时发生错误。</validating>
+            <importing>导入数据时发生错误。</importing>
+            <deleting>删除数据时发生错误。</deleting>
+            <unauthorized>您无权访问此数据。</unauthorized>
+            <reading-form-data>检索表单数据时发生错误。</reading-form-data>
+            <reading-form-metadata>读取表单元数据时发生错误。</reading-form-metadata>
+            <reading-form-definition>读取表单定义时发生错误。</reading-form-definition>
+        </error-messages>
+    </import>
+    <authentication>
+        <menu>
+            <logged-in-as>已登录为 {0}</logged-in-as>
+            <logout>退出登录</logout>
+            <login>登录</login>
+            <register>注册</register>
+        </menu>
+        <login>
+            <title>Form Runner 登录</title>
+            <username>用户名</username>
+            <password>密码</password>
+            <login>登录</login>
+        </login>
+        <logout-done>
+            <title>Form Runner 退出登录</title>
+            <message>您已退出登录。</message>
+        </logout-done>
+        <login-error>
+            <title>Form Runner 登录错误</title>
+            <unrecognized>无法识别您输入的用户名或密码。</unrecognized>
+            <try-again>请重试。</try-again>
+        </login-error>
+    </authentication>
+    <home-summary>
+        <titles>
+            <created>创建时间</created>
+            <last-modified>修改时间</last-modified>
+            <last-modified-by>最后修改者</last-modified-by>
+            <application-name>应用</application-name>
+            <form-name>表单</form-name>
+            <version>版本</version>
+            <form-title>表单标题</form-title>
+        </titles>
+        <search>
+            <search>搜索</search>
+            <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; 搜索表单</search-forms>
+            <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 显示搜索选项</show-search-options>
+            <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隐藏搜索选项</close-search-options>
+            <search-options>搜索选项</search-options>
+            <any>[任何]</any>
+            <dates>
+                <item>
+                    <label>今天</label>
+                    <value>today</value>
+                </item>
+                <item>
+                    <label>昨天</label>
+                    <value>yesterday</value>
+                </item>
+                <item>
+                    <label>最近7天</label>
+                    <value>last-7-days</value>
+                </item>
+                <item>
+                    <label>最近30天</label>
+                    <value>last-30-days</value>
+                </item>
+                <item>
+                    <label>最近90天</label>
+                    <value>last-90-days</value>
+                </item>
+                <item>
+                    <label>自定义...</label>
+                    <value>custom</value>
+                </item>
+            </dates>
+            <date-after>之后</date-after>
+            <date-before>之前</date-before>
+        </search>
+    </home-summary>
+</resource>

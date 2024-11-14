@@ -1,0 +1,697 @@
+<resource xml:lang="tr">
+    <common>
+        <formats>
+            <within-day>[h]:[m01] [P,*-2]</within-day>
+            <day-this-year>[MNn,*-3] [D]</day-this-year>
+            <short-date>[D01]/[M01]/[Y01]</short-date>
+        </formats>
+        <messages>
+            <incomplete-configuration>Orbeon Forms yapılandırmanız eksik. Daha fazla bilgi için lütfen Orbeon Forms günlük dosyanızı kontrol edin ve &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;belgelere&lt;/a&gt; bakın.</incomplete-configuration>
+        </messages>
+    </common>
+    <buttons>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Oluştur</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Görüntüle</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Onayla</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Reddet</reject>
+
+        <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Ana Sayfa</home>
+        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Ana Sayfa</landing>
+        <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; İncele</review>
+        <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+        <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+        <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Sil</delete>
+        <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; İçe Aktar</import>
+        <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Yeni</new>
+        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Çoğalt</duplicate>
+
+        <!-- Standard process buttons -->
+        <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Kaydet</save>
+        <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Kaydet</save-final>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; İlerlemeyi Kaydet</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; İlerlemeyi Kaydet</save-progress>
+        <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Düzenle</edit>
+        <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Gönder</send>
+        <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; E-posta</email>
+        <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Doğrula</validate>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF'i Test Et</test-pdf>
+
+        <!-- Legacy buttons -->
+        <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Gönder</submit>
+        <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; İncele</workflow-review>
+        <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Düzenle</workflow-edit>
+        <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Gönder</workflow-send>
+
+        <!-- Other standard buttons -->
+        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Özet</summary>
+        <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Kapat</close>
+        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Temizle</clear>
+        <cancel>İptal</cancel>
+        <save-locally>Yerel Olarak Kaydet</save-locally>
+        <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+        <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Yenile"&gt;&lt;/i&gt;</refresh>
+        <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İleri</wizard-next>
+        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Geri</wizard-prev>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; İçerik</wizard-toc>
+
+        <!-- Submit dialog -->
+        <submit-dialog-clear>Temizle ve kapat</submit-dialog-clear>
+        <submit-dialog-keep>Değerleri koru ve kapat</submit-dialog-keep>
+        <submit-dialog-go>Tamam</submit-dialog-go>
+        <submit-dialog-close-window>Pencereyi kapat</submit-dialog-close-window>
+
+        <!-- Warning dialog -->
+        <validation-dialog-review>İncele</validation-dialog-review>
+        <validation-dialog-continue>Devam Et</validation-dialog-continue>
+
+        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Formülleri İncele (Beta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Çevrimdışı Test Et (Beta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel'e Aktar</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel'e Aktar</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML'e Aktar</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML'e Aktar</form-definition-xhtml-export>
+        <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Yayınla</publish>
+        <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Yayınla</save-publish>
+
+        <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Evet</yes>
+        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Hayır</no>
+        <ok>Tamam</ok>
+        <previous>Önceki</previous>
+        <next>Sonraki</next>
+    </buttons>
+    <components>
+        <labels>
+            <open-section>Bölümü Göster</open-section>
+            <close-section>Bölümü Gizle</close-section>
+            <section-name>Bölüm Adı</section-name>
+            <yes>Evet</yes>
+            <no>Hayır</no>
+            <other>Diğer</other>
+            <clear>Değeri Temizle</clear>
+            <please-select>Lütfen seçin:</please-select>
+        </labels>
+        <grid>
+            <menu>Menü</menu>
+            <insert-above>Üste Ekle</insert-above>
+            <insert-below>Alta Ekle</insert-below>
+            <move-up>Yukarı Taşı</move-up>
+            <move-down>Aşağı Taşı</move-down>
+            <clear>
+                <label>Satırı Temizle</label>
+            </clear>
+            <remove>
+                <label>Satırı Kaldır</label>
+                <hint>Tekrarlanan Izgaradan Satırı Kaldır</hint>
+            </remove>
+            <add-another>
+                <label>Başka Bir Satır Ekle</label>
+                <hint>Tekrarlanan Izgaraya Başka Bir Satır Ekle</hint>
+            </add-another>
+        </grid>
+        <section>
+            <remove>
+                <label>Tekrarı Kaldır</label>
+                <hint>Tekrarlanan Bölümden Tekrarı Kaldır</hint>
+            </remove>
+            <add-another>
+                <label>Başka Bir Tekrar Ekle</label>
+                <hint>Tekrarlanan Bölüme Başka Bir Tekrar Ekle</hint>
+            </add-another>
+        </section>
+        <date-time>
+            <year>Yıl</year>
+            <month>Ay</month>
+            <day>Gün</day>
+        </date-time>
+        <wizard>
+            <errors>Hatalar</errors>
+            <incomplete>Eksik</incomplete>
+            <complete>Tamamlandı</complete>
+            <not-started>Başlanmadı</not-started>
+            <edit>Düzenle</edit>
+        </wizard>
+        <error-summary>
+            <show-more>Daha Fazla Göster</show-more>
+            <show-less>Daha Az Göster</show-less>
+        </error-summary>
+        <revision-history>
+            <label>Revizyon Geçmişi</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (İlk Revizyon)}'|1# (Mevcut Revizyon)}</date>
+            <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] saat [h]:[m] [P,*-2]</date-format>
+
+            <named-user>{0} kullanıcısı</named-user>
+            <anonymous-user>Anonim bir kullanıcı</anonymous-user>
+
+            <unknown-changes todo="true">made some changes.</unknown-changes>
+            <initial-revision>ilk revizyonu kaydetti.</initial-revision>
+            <no-changes>hiçbir değişiklik tespit edilmeden kaydedildi.</no-changes>
+            <specific-changes>aşağıdaki değişiklikleri yaptı:</specific-changes>
+
+            <view-data>Bu revizyonu görüntüle</view-data>
+
+            <value-entered>"{0}" girildi</value-entered>
+            <value-cleared>"{0}" temizlendi</value-cleared>
+            <value-changed>"{0}" değerinden "{1}" değerine değiştirildi</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#tekrar|1&lt;tekrar} eklendi</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#tekrar|1&lt;tekrar} kaldırıldı</iteration-removed>
+            <other-changed>dahili bilgiler değiştirildi</other-changed>
+            <workflow-stage-changed>İş akışı aşaması "{0}" değerinden "{1}" değerine değiştirildi</workflow-stage-changed>
+
+            <load-more todo="true">Load More</load-more>
+        </revision-history>
+    </components>
+    <untitled-form>Başlıksız Form</untitled-form>
+    <errors>
+        <summary-title>Formunuz {1,choice,
+            0#hiçbir mesaj içermiyor|
+            1#aşağıdaki '{0,choice,0#hatayı|1#uyarıyı|2#bilgi mesajını|3#mesajı}' içeriyor|
+            1&lt;aşağıdaki '{0,choice,0#hataları|1#uyarıları|2#bilgi mesajlarını|3#mesajları}' içeriyor}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer} '{0,choice,0#Hata|1#Uyarı|2#Bilgi Mesajı|3#Mesaj}' - |
+            1&lt;{1,number,integer} '{0,choice,0#Hata|1#Uyarı|2#Bilgi Mesajı|3#Mesaj}' - }{2}</form-title>
+        <none>Formda hata yok</none>
+        <unsaved>Kaydedilmemiş değişiklikler</unsaved>
+        <canvas-not-supported>Görüntü ek açıklamaları yapmak için tarayıcınızın HTML5 canvas'ı desteklemesi gerekir</canvas-not-supported>
+        <search>Arama gerçekleştirilirken hata oluştu</search>
+    </errors>
+    <email>
+        <subject>Orbeon Forms Onayı</subject>
+        <body>Lütfen ekteki PDF ve XML formatındaki formu bulun.</body>
+        <na>Geçerli Değil</na>
+        <iteration>Tekrar {$iteration}</iteration>
+    </email>
+    <!-- Formats used for PDF template -->
+    <print>
+        <formats>
+            <date>[D] [MNn] [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
+        </formats>
+    </print>
+    <summary>
+        <titles>
+            <summary-title>Özet</summary-title>
+            <delete-confirmation>Silmeyi Onayla</delete-confirmation>
+            <document-id>Belge Kimliği</document-id>
+            <workflow-stage>İş akışı aşaması</workflow-stage>
+            <created-by>Oluşturan</created-by>
+            <selected>Seçili</selected>
+            <refresh>Bu işlem sayfayı yenileyecektir</refresh>
+            <toc>İçindekiler</toc>
+            <description>Açıklama</description>
+            <help>Yardım</help>
+            <error-count>Formunuzda Hata</error-count>
+            <errors-count>Formunuzda Hatalar</errors-count>
+        </titles>
+        <buttons>
+            <select-all>Tümünü seç</select-all>
+            <deselect-all>Tüm seçimi kaldır</deselect-all>
+            <select-saved>Sadece açıkça kaydedilenleri seç</select-saved>
+            <select-drafts>Sadece otomatik kaydedilenleri seç</select-drafts>
+        </buttons>
+        <bulk-edit>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Toplu Düzenlemeyi Göster</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Toplu Düzenlemeyi Gizle</close-bulk-edit>
+            <bulk-edit>Toplu düzenleme</bulk-edit>
+            <apply>Uygula</apply>
+            <value-required>Değer gerekli</value-required>
+            <submission-error>Form verilerini düzenlerken hata oluştu.</submission-error>
+        </bulk-edit>
+        <paging>
+            <to>-</to>
+            <of>/</of>
+        </paging>
+        <messages>
+            <no-form-data-found>Hiçbir form verisi bulunamadı.</no-form-data-found>
+            <delete-confirmation>Bir veya daha fazla formu silmek istediğinizden emin misiniz? Kaydedilmiş bir belgeyi silerken, ilgili otomatik kaydedilmiş belgeler de silinir.</delete-confirmation>
+            <version>Form Sürümü {0,number,integer}</version>
+        </messages>
+        <labels>
+            <draft>Otomatik kaydedilmiş</draft>
+            <read-only>Salt okunur</read-only>
+            <language-choice>Dil Seçin</language-choice>
+            <form-choice>Bir Form Seçin</form-choice>
+            <free-search>Serbest Arama</free-search>
+            <clear-value>[Değeri temizle]</clear-value>
+            <script>Tam Sürüm</script>
+            <refresh>Yenile</refresh>
+            <close-box>[kapat]</close-box>
+            <help-back>Geri</help-back>
+            <goto-content>İçeriğe Git</goto-content>
+        </labels>
+        <formats>
+            <date>[D] [MNn] [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
+            <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
+        </formats>
+        <export-with-search-dialog>
+            <label>Excel'e Aktarma Seçenekleri</label>
+            <headings-labels>Başlıklar için etiketleri kullan</headings-labels>
+            <selection-controls-labels>Seçim kontrolleri için etiketleri kullan</selection-controls-labels>
+            <include-document-id>Belge kimliği sütununu dahil et</include-document-id>
+        </export-with-search-dialog>
+    </summary>
+    <detail>
+        <messages>
+            <save-success>Belge başarıyla kaydedildi!</save-success>
+            <save-draft-success>İlerleme başarıyla kaydedildi!</save-draft-success>
+            <save-progress-success>İlerleme başarıyla kaydedildi!</save-progress-success>
+            <email-success>E-posta başarıyla gönderildi!</email-success>
+            <form-validation-error>Doğrulama hataları var. Lütfen tüm alanlar doğru şekilde doldurulduktan sonra tekrar deneyin.</form-validation-error>
+            <database-error>Veritabanı ile iletişim kurulurken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</database-error>
+            <service-error>Bir arka uç hizmetiyle iletişim kurulurken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</service-error>
+            <action-error>Bir arka uç hizmetiyle iletişim kurulurken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</action-error>
+            <process-error>İşlem çalıştırılırken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</process-error>
+            <wizard-prev-error>Geriye gitmeden önce lütfen hataları düzeltin</wizard-prev-error>
+            <wizard-next-error>İleriye gitmeden önce lütfen hataları düzeltin</wizard-next-error>
+            <clear-confirm-message>Bu sayfadaki tüm alanları temizlemek istediğinizden emin misiniz? Kaydetmediyseniz verileriniz kaybolacaktır.</clear-confirm-message>
+            <error-dialog-title>İşlem tamamlanamıyor</error-dialog-title>
+            <confirmation-dialog-title>Onay</confirmation-dialog-title>
+            <confirmation-dialog-message>Devam etmek istediğinizden emin misiniz?</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>Bu işlem bazı form verilerinin üzerine yazılmasına neden olabilir. Devam etmek istediğinizden emin misiniz?</confirmation-dialog-message-overwrite>
+            <submit-dialog-title>Form Gönderildi</submit-dialog-title>
+            <submit-dialog-message>Bilgileriniz gönderildi, teşekkür ederiz.</submit-dialog-message>
+            <validation-dialog-title>Form Doğrulama Mesajlarını İncele</validation-dialog-title>
+            <validation-dialog-message>Formunuz {1,choice,
+                0#hiçbir mesaj içermiyor|
+                1#bir '{0,choice,0#hata|1#uyarı|2#bilgi mesajı|3#mesaj}' içeriyor|
+                1&lt;{1,number,integer} '{0,choice,0#hata|1#uyarı|2#bilgi mesajı|3#mesaj}' içeriyor}.
+                {0,choice,
+                    0#Lütfen tüm alanlar doğru şekilde doldurulduktan sonra tekrar deneyin|
+                    0&lt;'{1,choice,1#Onu|1&lt;Onları}' önce incelemeyi veya '{1,choice,1#onu|1&lt;onları}' görmezden gelip işleme devam etmeyi seçebilirsiniz}.
+            </validation-dialog-message>
+            <buttons-message/>
+            <saved-locally-open>Belgeyi açmak için buraya tıklayın. Girdiğiniz veriler, çalışmanızı kaydettiğiniz zamanki haliyle gösterilecektir.</saved-locally-open>
+            <upload-in-progress>Devam eden dosya yüklemeleri var. Lütfen dosya yüklemesi tamamlandıktan veya iptal edildikten sonra tekrar deneyin.</upload-in-progress>
+            <upload-start>Yükleme başladı</upload-start>
+            <upload-cancel>Yükleme kullanıcı tarafından iptal edildi</upload-cancel>
+            <upload-done>Yükleme tamamlandı</upload-done>
+            <upload-error>Yükleme sırasında bir hata oluştu. Lütfen tekrar deneyin.</upload-error>
+            <upload-error-empty-file>Yüklenen dosya boş.</upload-error-empty-file>
+            <upload-error-size>Yüklenen dosya çok büyük. İzin verilen maksimum boyut {0,number,integer} bayt ve alınan gerçek boyut {1,number,integer} bayt.</upload-error-size>
+            <upload-error-mediatype>Yüklenen dosya yanlış türde: {0}</upload-error-mediatype>
+            <upload-error-file-scan>Yüklenen dosya dosya tarayıcısı tarafından reddedildi. Lütfen bunun virüslü bir dosya olmadığından emin olun. İşte dosya tarayıcısı mesajı: "{0}".</upload-error-file-scan>
+            <lost-attachments>Bazı dosya ekleri bir sunucu sorunu nedeniyle kayboldu. Lütfen tüm eklerinizi kontrol edin ve gerekirse tekrar yükleyin.</lost-attachments>
+        </messages>
+        <draft-singleton>
+            <found-draft>Otomatik kaydedilmiş belge bulundu</found-draft>
+            <found-drafts>Otomatik kaydedilmiş belgeler bulundu</found-drafts>
+            <found-draft-for-document>Bu belge kaydedildikten sonra, ek çalışma içerebilecek bir belge otomatik olarak kaydedildi. Kaydedilen belgeyi mi yoksa otomatik kaydedilen belgeyi mi açmak istersiniz?</found-draft-for-document>
+            <found-draft-for-never-saved>Bu form için otomatik kaydedilmiş bir belge mevcut. Sıfırdan başlamak mı yoksa otomatik kaydedilen belgeyi açmak mı istersiniz?</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>Bu form için birkaç otomatik kaydedilmiş belge mevcut. Sıfırdan başlamak mı yoksa otomatik kaydedilen belgeleri görmek mi istersiniz (ve sonra muhtemelen birini düzenlemek)?</found-drafts-for-never-saved>
+            <open-saved>Açıkça kaydedilen belgeyi aç</open-saved>
+            <open-draft>Otomatik kaydedilen belgeyi aç</open-draft>
+            <view-drafts>Otomatik kaydedilen belgeleri görüntüle</view-drafts>
+            <start-new>Sıfırdan başla</start-new>
+            <multiple-docs-title>Mevcut form verisi bulundu</multiple-docs-title>
+            <multiple-docs-explanation>Bu form tanımı için yeni veri oluşturamazsınız, ancak mevcut form verilerini düzenleyebilirsiniz.</multiple-docs-explanation>
+            <multiple-docs-view-data>Mevcut form verilerini görüntüle</multiple-docs-view-data>
+        </draft-singleton>
+        <labels>
+            <language-choice>Dil</language-choice>
+            <errors>Hata özeti</errors>
+            <check-errors-in-form>Bu form hatalar içeriyor</check-errors-in-form>
+            <error-details>Hata ayrıntılarını görüntüle</error-details>
+            <confirm>Onayla</confirm>
+            <alert>Eksik veya yanlış değer</alert>
+            <alert-out-of-range>Aralık dışı değer, lütfen mevcut bir değer seçin</alert-out-of-range>
+            <alert-out-of-range-multiple>Aralık dışı değer(ler)</alert-out-of-range-multiple>
+            <clear-out-of-range>Aralık dışı değer(ler)i temizle</clear-out-of-range>
+            <captcha-label>CAPTCHA</captcha-label>
+            <captcha-alert>Lütfen CAPTCHA zorluğuna verdiğiniz cevabı kontrol edin</captcha-alert>
+        </labels>
+        <hints>
+            <upload-max-size-per-file>Dosyalar {0} altında olmalıdır.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>Kontroldeki toplam dosya boyutu {0} altında olmalıdır.</upload-max-size-aggregate-per-control>
+            <upload-mediatypes>Sadece {0} dosyaları kabul edilir.</upload-mediatypes>
+            <upload-image>resim</upload-image>
+            <upload-video>video</upload-video>
+            <upload-audio>ses</upload-audio>
+        </hints>
+        <view>
+            <explanation>
+                Bu, verilerinizin salt okunur bir görünümüdür.
+            </explanation>
+        </view>
+        <lease>
+            <no-lease-title>Kiralama</no-lease-title>
+            <renew-lease-title>Kiralamayı yenile?</renew-lease-title>
+            <renew-lease-message>Kiralama süreniz dolmak üzere. Şimdi yenilemek ister misiniz?</renew-lease-message>
+            <current-user-left>Bu belge üzerinde </current-user-left>
+            <current-user-right> daha kiralama süreniz var.</current-user-right>
+            <relinquished>Bu belge üzerindeki kiralama süreniz artık sona erdi.</relinquished>
+            <other-user>Şu anda "{0}" kullanıcı adına sahip başka bir kullanıcı bu belgeyi kiralamış durumda.</other-user>
+            <relinquish>Kiralamadan vazgeç</relinquish>
+            <renew>Kiralamayı yenile</renew>
+            <try-acquire>Kiralamayı almayı dene</try-acquire>
+            <show-in-view-mode>Salt okunur modda göster</show-in-view-mode>
+        </lease>
+        <session-expiration>
+            <title>
+                <expiring>Oturum Süresi Dolmak Üzere</expiring>
+                <expired>Oturum Süresi Doldu</expired>
+            </title>
+            <message>
+                <expiring>Oturumunuzun süresi dolmak üzere. Bu sayfayı kullanmaya devam etmek istiyorsanız aşağıdaki düğmeye tıklayın.</expiring>
+                <expired>Oturumunuzun süresi doldu.</expired>
+            </message>
+            <renew-button>Oturumu Yenile</renew-button>
+        </session-expiration>
+        <available-from>
+            <message>Bu form henüz kullanılabilir değil</message>
+        </available-from>
+        <available-to>
+            <message>Bu form artık kullanılabilir değil</message>
+        </available-to>
+    </detail>
+    <save-locally>
+        <dialog-title>Yerel Olarak Kaydet</dialog-title>
+        <dialog-body>
+            <div>
+                <p>
+                    Form verilerinizi bilgisayarınıza HTML dosyası olarak kaydetmek için aşağıdaki Kaydet düğmesine tıklayın.
+                </p>
+                <p>
+                    Form verilerinizi yeniden açmak için:
+                </p>
+                <ul>
+                    <li>HTML dosyasını tarayıcınızda açın (dosyaya tıklayarak veya tarayıcı pencerenize sürükleyerek).</li>
+                    <li>Onaylamak için görüntülenecek Aç düğmesine tıklayın.</li>
+                </ul>
+                <p>
+                    <b>UYARI:</b> Sunucuda hiçbir veri tutulmaz ve kaydettiğiniz dosyayı silerseniz verileriniz kaybolacaktır.
+                </p>
+            </div>
+        </dialog-body>
+    </save-locally>
+    <share-dialog>
+        <label>Paylaşmak için bağlantı oluştur</label>
+        <body>Bu veriyi görüntülemek veya düzenlemek için bağlantıya sahip herkese izin ver.</body>
+        <link>Bağlantı</link>
+        <select-operations>İşlemleri seçin</select-operations>
+        <readonly>Salt okunur</readonly>
+        <readwrite>Okuma-yazma</readwrite>
+    </share-dialog>
+    <admin>
+        <title>Form Yönetimi</title>
+    </admin>
+    <landing>
+        <title>Orbeon Form Runner</title>
+        <titles>
+            <published-forms>Yayınlanan Formlar</published-forms>
+            <form-builder-forms>Form Oluşturucu Formları</form-builder-forms>
+            <form-builder-new>Yeni Form Oluşturucu Formu</form-builder-new>
+            <form-builder-summary>Form Oluşturucu Formları</form-builder-summary>
+            <demo-forms>Demo Formları</demo-forms>
+            <quick-links>Hızlı Bağlantılar</quick-links>
+            <form-runner-admin>Form Yönetimi</form-runner-admin>
+        </titles>
+        <descriptions>
+            <published-forms>Yayınlanan formlarınıza erişin</published-forms>
+            <form-builder-forms>Form Oluşturucu ile oluşturulan devam eden formlarınızı görüntüleyin ve düzenleyin</form-builder-forms>
+            <demo-forms>Orbeon Forms ile birlikte gelen demo formlarını deneyin</demo-forms>
+        </descriptions>
+        <show-more>Daha fazla göster…</show-more>
+    </landing>
+    <home>
+        <title>Yayınlanan Formlar</title>
+        <buttons>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Kullanılamaz Yap</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Kullanılabilir Yap</publish>
+            <cancel>İptal</cancel>
+            <connect>Bağlan</connect>
+            <select>Seç</select>
+            <operation>İşlem</operation>
+            <reindex>Veritabanı(ları)nı yeniden indeksle</reindex>
+            <stop-reindex>Yeniden indekslemeyi durdur</stop-reindex>
+            <all>Tümü</all>
+            <none>Hiçbiri</none>
+            <unpublished-local>Kullanılamaz yerel formlar</unpublished-local>
+            <published-local>Kullanılabilir yerel formlar</published-local>
+            <unpublished-remote>Kullanılamaz uzak formlar</unpublished-remote>
+            <published-remote>Kullanılabilir uzak formlar</published-remote>
+            <newer-local>Yerel olarak daha yeni olan formlar</newer-local>
+            <newer-remote>Uzakta daha yeni olan formlar</newer-remote>
+            <publish-local>Yerel formları kullanılabilir yap</publish-local>
+            <unpublish-local>Yerel formları kullanılamaz yap</unpublish-local>
+            <publish-remote>Uzak formları kullanılabilir yap</publish-remote>
+            <unpublish-remote>Uzak formları kullanılamaz yap</unpublish-remote>
+            <push-to-remote>Uzağa gönder</push-to-remote>
+            <pull-from-remote>Uzaktan çek</pull-from-remote>
+            <navigate-summary>Özete Git</navigate-summary>
+            <navigate-new>Yeniye Git</navigate-new>
+            <upgrade-local>Yerel form tanımlarını yükselt</upgrade-local>
+            <upgrade-remote>Uzak form tanımlarını yükselt</upgrade-remote>
+            <delete-local>Yerel formları sil</delete-local>
+            <delete-remote>Uzak formları sil</delete-remote>
+            <reencrypt>Form tanımlarını yeniden şifrele</reencrypt>
+            <reload-resources>Kaynakları yeniden yükle</reload-resources>
+        </buttons>
+        <titles>
+            <publish-confirmation>Form Kullanılabilirlik Değişikliğini Onayla</publish-confirmation>
+            <credentials>Uzak Sunucu Kimlik Bilgileri</credentials>
+            <status>Durum</status>
+            <view>Görüntüle</view>
+            <new>Yeni</new>
+            <local>Yerel</local>
+            <remote>Uzak</remote>
+            <form-identification>Form Tanımlama</form-identification>
+            <reindexing-confirmation>Yeniden İndekslemeyi Onayla</reindexing-confirmation>
+            <reencrypt-confirmation>Yeniden Şifrelemeyi Onayla</reencrypt-confirmation>
+            <purge-confirmation>Temizlemeyi Onayla</purge-confirmation>
+        </titles>
+        <messages>
+            <no-form-found todo="true">[Dağıtılmış form bulunamadı.]</no-form-found>
+            <publish-confirmation>{1,choice,1#Bir formu|1&lt;{1,number,integer} formu} {0,choice,0#kullanılabilir yapmak|1#kullanılamaz yapmak|2#yükseltmek|3#silmek} istediğinizden emin misiniz? Bu işlem geri alınamaz.</publish-confirmation>
+            <reindexing-confirmation>Yeniden indeksleme sırasında, Form Runner özet sayfaları gibi bazı özellikler beklendiği gibi çalışmayacaktır. Bu nedenle, yeniden indeksleme işlemini sistem çevrimdışıyken gerçekleştirmenizi öneririz. Yeniden indekslemeye devam etmek istediğinizden emin misiniz?</reindexing-confirmation>
+            <reencrypt-confirmation>Yeniden şifreleme işlemini sistem çevrimdışıyken gerçekleştirmenizi öneririz. Yeniden şifrelemeye devam etmek istediğinizden emin misiniz?</reencrypt-confirmation>
+            <purge-confirmation>Seçili verileri temizlemek istediğinizden emin misiniz?</purge-confirmation>
+        </messages>
+        <labels>
+            <available>Kullanılabilir</available>
+            <unavailable>Kullanılamaz</unavailable>
+            <library>Kütüphane</library>
+            <newer>Daha Yeni</newer>
+            <remote-server>Uzak sunucu</remote-server>
+            <username>Kullanıcı adı</username>
+            <password>Şifre</password>
+            <reindexing-generic>Yeniden indeksleniyor &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>{0} yeniden indeksleniyor ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>Yeniden indeksleme işlemi durduruluyor &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>Yeniden indeksleme işlemi tamamlandı</reindexing-finished>
+            <reencrypt-state>Yeniden şifreleniyor {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Yeniden şifreleme başladı</reencrypt-started>
+            <reencrypt-finished>Yeniden şifreleme tamamlandı</reencrypt-finished>
+        </labels>
+        <export-purge>
+            <export>Dışa Aktar</export>
+            <purge>Temizle</purge>
+            <or>veya</or>
+            <selected-forms>Seçili formlar ({0,number,integer})</selected-forms>
+            <following-forms>Aşağıdaki formlar:</following-forms>
+            <application>Uygulama:</application>
+            <form>Form:</form>
+            <version>Sürüm:</version>
+            <all-applications>Tüm uygulamalar</all-applications>
+            <all-forms>Tüm formlar</all-forms>
+            <all-versions>Tüm sürümler</all-versions>
+            <latest-version>En son sürüm</latest-version>
+            <definitions-data>
+                <label>Form tanımları / veriler:</label>
+                <definitions>Sadece tanımlar</definitions>
+                <data>Sadece veriler</data>
+                <both>Tanımlar ve veriler</both>
+            </definitions-data>
+            <current-history>
+                <label>Mevcut veriler / revizyon geçmişi:</label>
+                <current-data>Sadece mevcut veriler</current-data>
+                <revision-history>Sadece revizyon geçmişi</revision-history>
+                <both>Mevcut veriler ve revizyon geçmişi</both>
+            </current-history>
+            <from-date>Başlangıç:</from-date>
+            <until-date>Bitiş:</until-date>
+            <redundant-values>Gereksiz değerler</redundant-values>
+            <invalid-date>Geçersiz tarih</invalid-date>
+            <wrong-date-order>Yanlış tarih sırası</wrong-date-order>
+        </export-purge>
+    </home>
+    <import>
+        <form-version>
+            <label>Form Sürümü</label>
+            <alert>Form sürümü eksik</alert>
+        </form-version>
+        <application-name>
+            <label>Uygulama Adı</label>
+        </application-name>
+        <form-name>
+            <label>Form Adı</label>
+        </form-name>
+        <version-comment>
+            <label>Sürüm yorumu</label>
+        </version-comment>
+        <upload>
+            <label>Yükle</label>
+        </upload>
+        <file>
+            <label>İçe aktarılacak dosya</label>
+            <hint>Dosya Excel 2007 formatında (.xlsx) veya XML formatında (.xml) olmalıdır</hint>
+            <alert>Eksik veya desteklenmeyen dosya</alert>
+            <excel-headings-format>Adlandırılmış başlıklarla Excel 2007 formatı (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Adlandırılmış aralıklarla Excel 2007 formatı (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML dışa aktarma formatı (.xml)</xml-form-structure-and-data-format>
+        </file>
+        <validation>
+            <label>Doğrulama</label>
+            <alert>Lütfen içe aktarmaya geçmeden önce doğrulamayı başlatın</alert>
+        </validation>
+        <start-validation>
+            <label>Doğrulamayı Başlat</label>
+        </start-validation>
+        <total>Toplam</total>
+        <valid>Geçerli</valid>
+        <invalid>Geçersiz</invalid>
+        <imported>İçe Aktarıldı</imported>
+        <skipped>Atlandı</skipped>
+        <eta>Tahmini Süre</eta>
+        <cancel-validation>
+            <label>Doğrulamayı İptal Et</label>
+        </cancel-validation>
+        <validation-canceled>Doğrulama iptal edildi.</validation-canceled>
+        <import>
+            <label>İçe Aktar</label>
+        </import>
+        <existing-records>
+            <label>Mevcut veritabanı kayıtları</label>
+            <item id="0">Koru</item>
+            <item id="1">Sil</item>
+        </existing-records>
+        <invalid-data>
+            <label>Geçersiz veri içeren kayıtlar</label>
+            <item id="0">Atla</item>
+            <item id="1">İçe Aktar</item>
+        </invalid-data>
+        <start-import>
+            <label>İçe Aktarmayı Başlat</label>
+        </start-import>
+        <cancel-import>
+            <label>İçe Aktarmayı İptal Et</label>
+        </cancel-import>
+        <import-canceled>İçe aktarma iptal edildi.</import-canceled>
+        <start-over>
+            <label>Baştan Başla</label>
+        </start-over>
+        <review-data>
+            <label>Verileri İncele</label>
+        </review-data>
+        <existing-records-message>
+            {1}/{2} formunun {3} sürümü için veritabanında {0,choice,1#bir mevcut belge|1&lt;{0,number,integer} mevcut belge} var.
+        </existing-records-message>
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} saat} {1,choice,0#|0&lt;{1, number, integer} dakika} {2,choice,0#|0&lt;{2, number, integer} saniye}
+        </eta-message>
+        <invalid-records-message>
+            {1,number,integer} belgenin {0,number,integer} tanesi geçersiz.
+        </invalid-records-message>
+        <valid-records-message>
+            {0,number,integer} belge doğrulandı ve içe aktarılacak.
+        </valid-records-message>
+        <invalid-document-message>
+            Yüklenen belge doğrulama hataları içeriyor. Kaydetmeden önce hataları incelemek ve düzeltmek için "Verileri İncele" düğmesini kullanın.
+        </invalid-document-message>
+        <valid-document-message>
+            Yüklenen belge geçerli veriler içeriyor. Kaydetmeden önce form verilerini incelemek için "Verileri İncele" düğmesini kullanın.
+        </valid-document-message>
+        <import-complete-message>
+            {0,number,integer} belgenin içe aktarımı tamamlandı. {1,number,integer} geçersiz belge atlandı.
+        </import-complete-message>
+        <na>Geçerli Değil</na>
+        <fields-found>Bulunan Alanlar</fields-found>
+        <values-found>Bulunan Değerler</values-found>
+        <errors>Hatalar</errors>
+        <warnings>Uyarılar</warnings>
+        <error-messages>
+            <validating>Verileri doğrularken bir hata oluştu.</validating>
+            <importing>Verileri içe aktarırken bir hata oluştu.</importing>
+            <deleting>Verileri silerken bir hata oluştu.</deleting>
+            <unauthorized>Bu verilere erişim yetkiniz yok.</unauthorized>
+            <reading-form-data>Form verilerini alırken bir hata oluştu.</reading-form-data>
+            <reading-form-metadata>Form meta verilerini okurken bir hata oluştu.</reading-form-metadata>
+            <reading-form-definition>Form tanımını okurken bir hata oluştu.</reading-form-definition>
+        </error-messages>
+    </import>
+    <authentication>
+        <menu>
+            <logged-in-as>{0} olarak giriş yapıldı</logged-in-as>
+            <logout>Çıkış Yap</logout>
+            <login>Giriş Yap</login>
+            <register>Kayıt Ol</register>
+        </menu>
+        <login>
+            <title>Form Runner Giriş</title>
+            <username>Kullanıcı adı</username>
+            <password>Şifre</password>
+            <login>Giriş Yap</login>
+        </login>
+        <logout-done>
+            <title>Form Runner Çıkış</title>
+            <message>Çıkış yaptınız.</message>
+        </logout-done>
+        <login-error>
+            <title>Form Runner Giriş Hatası</title>
+            <unrecognized>Girdiğiniz kullanıcı adı veya şifre tanınmadı.</unrecognized>
+            <try-again>Lütfen tekrar deneyin.</try-again>
+        </login-error>
+    </authentication>
+    <home-summary>
+        <titles>
+            <created>Oluşturuldu</created>
+            <last-modified>Değiştirildi</last-modified>
+            <last-modified-by>Değiştiren</last-modified-by>
+            <application-name>Uygulama</application-name>
+            <form-name>Form</form-name>
+            <version>Sürüm</version>
+            <form-title>Form Başlığı</form-title>
+        </titles>
+        <search>
+            <search>Ara</search>
+            <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formlarda Ara</search-forms>
+            <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Arama Seçeneklerini Göster</show-search-options>
+            <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Arama Seçeneklerini Gizle</close-search-options>
+            <search-options>Arama seçenekleri</search-options>
+            <any>[Herhangi biri]</any>
+            <dates>
+                <item>
+                    <label>Bugün</label>
+                    <value>today</value>
+                </item>
+                <item>
+                    <label>Dün</label>
+                    <value>yesterday</value>
+                </item>
+                <item>
+                    <label>Son 7 gün</label>
+                    <value>last-7-days</value>
+                </item>
+                <item>
+                    <label>Son 30 gün</label>
+                    <value>last-30-days</value>
+                </item>
+                <item>
+                    <label>Son 90 gün</label>
+                    <value>last-90-days</value>
+                </item>
+                <item>
+                    <label>Özel...</label>
+                    <value>custom</value>
+                </item>
+            </dates>
+            <date-after>Sonra</date-after>
+            <date-before>Önce</date-before>
+        </search>
+    </home-summary>
+</resource>

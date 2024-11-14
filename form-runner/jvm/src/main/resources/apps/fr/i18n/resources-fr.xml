@@ -1,0 +1,702 @@
+<resource xml:lang="fr">
+    <common>
+        <formats>
+            <within-day>[h]:[m01] [P,*-2]</within-day>
+            <day-this-year>[D] [MNn]</day-this-year>
+            <short-date>[D01]/[M01]/[Y01]</short-date>
+        </formats>
+        <messages>
+            <incomplete-configuration>Votre configuration Orbeon Forms est incomplète. Veuillez vérifier vos fichiers de log Orbeon Forms pour les détails, ainsi que &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;la documentation&lt;/a&gt;.</incomplete-configuration>
+        </messages>
+    </common>
+    <buttons>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Créer</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approuver</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rejeter</reject>
+
+        <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil</home>
+        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil3</landing>
+        <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>
+        <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+        <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+        <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Supprimer</delete>
+        <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
+        <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nouveau</new>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Créer de nouvelles données</new-long>
+        <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliquer</duplicate>
+
+        <!-- Standard process buttons -->
+        <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save>
+        <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save-final>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Enregistrer travail en cours</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Enregistrer travail en cours</save-progress>
+        <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editer</edit>
+        <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</send>
+        <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+        <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valider</validate>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+
+        <!-- Legacy buttons -->
+        <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</submit>
+        <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Valider</workflow-review>
+        <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editer</workflow-edit>
+        <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</workflow-send>
+
+        <!-- Other standard buttons -->
+        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sommaire</summary>
+        <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Fermer</close>
+        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Effacer</clear>
+        <cancel>Annuler</cancel>
+        <save-locally>Enreg. Local</save-locally>
+        <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+        <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"&gt;&lt;/i&gt;</refresh>
+        <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Suivant</wizard-next>
+        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Précédent</wizard-prev>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenu</wizard-toc>
+
+        <!-- Submit dialog -->
+        <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
+        <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
+        <submit-dialog-go>OK</submit-dialog-go>
+        <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
+
+        <!-- Warning dialog -->
+        <validation-dialog-review>Revoir</validation-dialog-review>
+        <validation-dialog-continue>Continuer</validation-dialog-continue>
+
+        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester</test>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspecter formules (expérimental)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Tester hors ligne (expérimental)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export Excel</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export Excel</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export XML</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export XHTML</form-definition-xhtml-export>
+        <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</publish>
+        <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</save-publish>
+
+        <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Oui</yes>
+        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Non</no>
+        <ok>OK</ok>
+        <previous>Précédent</previous>
+        <next>Suivant</next>
+    </buttons>
+    <components>
+        <labels>
+            <open-section>Montrer section</open-section>
+            <close-section>Cacher section</close-section>
+            <section-name>Nom de la section</section-name>
+            <yes>Oui</yes>
+            <no>Non</no>
+            <other>Autre</other>
+            <clear>Réinitialiser</clear>
+            <please-select>Veuillez sélectionner :</please-select>
+        </labels>
+        <grid>
+            <menu>Menu</menu>
+            <insert-above>Insérer dessus</insert-above>
+            <insert-below>Insérer dessous</insert-below>
+            <move-up>Déplacer vers le haut</move-up>
+            <move-down>Déplacer vers le bas</move-down>
+            <clear>
+                <label>Réinitialiser la ligne</label>
+            </clear>
+            <remove>
+                <label>Supprimer</label>
+                <hint>Supprimer la ligne du tableau répété</hint>
+            </remove>
+            <add-another>
+                <label>Ajouter une ligne</label>
+                <hint>Ajouter une nouvelle ligne au tableau répété</hint>
+            </add-another>
+        </grid>
+        <section>
+            <remove>
+                <label>Supprimer la répétition</label>
+                <hint>Supprimer la répétition de section</hint>
+            </remove>
+            <add-another>
+                <label>Ajouter une répétition</label>
+                <hint>Ajouter une nouvelle répétition de section</hint>
+            </add-another>
+        </section>
+        <date-time>
+            <year>Année</year>
+            <month>Mois</month>
+            <day>Jour</day>
+        </date-time>
+        <wizard>
+            <errors>Erreurs</errors>
+            <incomplete>En cours</incomplete>
+            <complete>Rempli</complete>
+            <not-started>A remplir</not-started>
+            <edit>Editer</edit>
+        </wizard>
+        <error-summary>
+            <show-more>Montrer plus</show-more>
+            <show-less>Montrer moins</show-less>
+        </error-summary>
+        <revision-history>
+            <label>Historique des révisions</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Révision initiale)}'|1# (Révision courante)}</date>
+            <date-format>[FNn,*-3] [D] [MNn,*-3] [Y] à [H01]:[m01]</date-format>
+
+            <named-user>L'utilisateur {0}</named-user>
+            <anonymous-user>Un utilisateur anonyme</anonymous-user>
+
+            <unknown-changes>a effectué des changements.</unknown-changes>
+            <initial-revision>a sauvegardé la révision initiale.</initial-revision>
+            <no-changes>a sauvegardé, avec aucun changement détecté.</no-changes>
+            <specific-changes>a effectué les changements suivants:</specific-changes>
+
+            <view-data>Visualiser cette révision</view-data>
+
+            <value-entered>valeur "{0}" entrée</value-entered>
+            <value-cleared>valeur "{0}" effacée</value-cleared>
+            <value-changed>valeur changée de "{0}" à "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#répétition ajoutée|1&lt;répétitions ajoutées}</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#répétition supprimée|1&lt;répétitions supprimées}</iteration-removed>
+            <other-changed>information interne changée</other-changed>
+            <workflow-stage-changed>Étape du workflow changée de "{0}" à "{1}"</workflow-stage-changed>
+
+            <load-more>Charger plus</load-more>
+        </revision-history>
+    </components>
+    <untitled-form>Formulaire sans titre</untitled-form>
+    <errors>
+        <summary-title>Votre formulaire {1,choice,
+            0#ne contient aucun message|
+            1#contient '{0,choice,0#l''''erreur suivante|1#l''''avertissement suivant|
+            2#le message d''''information suivant|3#le message suivant}'|
+            1&lt;contient '{0,choice,
+                0#les erreurs suivantes|
+                1#les avertissements suivants|
+                2#les messages d''''information suivants|3#les messages suivants}'}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer} '{0,choice,0#erreur|1#avertissement|2#message d''''information|3#message}' - |
+            1&lt;{1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}' - }{2}</form-title>
+        <none>Ce formulaire ne contient pas d'erreurs</none>
+        <unsaved>Modifications non enregistrées</unsaved>
+        <canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported>
+        <search>Erreur lors de la recherche</search>
+    </errors>
+    <email>
+        <subject>Orbeon Forms Confirmation</subject>
+        <body>Veuillez trouver en attachement le formulaire au formats XML et PDF.</body>
+        <na>-</na>
+        <iteration>Répétition {$iteration}</iteration>
+    </email>
+    <print>
+        <formats>
+            <date>Le [D] [Mn] [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>Le [D] [Mn] [Y] à [H01]:[m01]:[s01]</dateTime>
+        </formats>
+    </print>
+    <summary>
+        <titles>
+            <summary-title>Sommaire</summary-title>
+            <delete-confirmation>Confirmer la suppression</delete-confirmation>
+            <document-id>Document Id</document-id>
+            <workflow-stage>Étape du workflow</workflow-stage>
+            <created-by>Créé par</created-by>
+            <selected>Sélection</selected>
+            <refresh>Cette opération rafraichit la page</refresh>
+            <toc>Table des matières</toc>
+            <description>Description</description>
+            <help>Aide</help>
+            <error-count>erreur de saisie dans votre formulaire</error-count>
+            <errors-count>erreurs de saisie dans votre formulaire</errors-count>
+        </titles>
+        <buttons>
+            <select-all>Tout sélectionner</select-all>
+            <deselect-all>Tout désélectionner</deselect-all>
+            <select-saved>Sélectionner documents enregistrés explicitement seulement</select-saved>
+            <select-drafts>Sélectionner documents enregistrés automatiquement seulement</select-drafts>
+        </buttons>
+        <bulk-edit>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer la modification groupée</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher la modification groupée</close-bulk-edit>
+            <bulk-edit>Modification groupée</bulk-edit>
+            <apply>Appliquer</apply>
+            <value-required>Valeur requise</value-required>
+            <submission-error>Erreur lors de la mise à jour des données.</submission-error>
+        </bulk-edit>
+        <paging>
+            <to>à</to>
+            <of>sur</of>
+        </paging>
+        <messages>
+            <no-form-data-found>Aucun formulaire trouvé.</no-form-data-found>
+            <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document explicitement enregistré, les documents enregistrés automatiquement correspondants sont également supprimés.</delete-confirmation>
+            <version>Version de formulaire {0,number,integer}</version>
+        </messages>
+        <labels>
+            <draft>Sauv. aut.</draft>
+            <read-only>Lecture seule</read-only>
+            <language-choice>Choix de la langue</language-choice>
+            <form-choice>Choisisez un formulaire</form-choice>
+            <free-search>Recherche libre</free-search>
+            <clear-value>[Effacer la valeur]</clear-value>
+            <script>Version complète</script>
+            <refresh>Rafraîchir</refresh>
+            <close-box>[fermer]</close-box>
+            <help-back>Retour</help-back>
+            <goto-content>Aller au contenu</goto-content>
+        </labels>
+        <formats>
+            <date>Le [D] [Mn] [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</dateTime>
+            <save-datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</save-datetime>
+        </formats>
+        <export-with-search-dialog>
+            <label>Options Export Excel</label>
+            <headings-labels>Utiliser les libellés pour l'en-tête</headings-labels>
+            <selection-controls-labels>Utiliser les libellés pour les contrôles de selection</selection-controls-labels>
+            <include-document-id>Inclure la column identifiant de document</include-document-id>
+        </export-with-search-dialog>
+    </summary>
+    <detail>
+        <messages>
+            <save-success>Document enregistré avec succès!</save-success>
+            <save-draft-success>Travail en cours enregistré avec succès!</save-draft-success>
+            <save-progress-success>Travail en cours enregistré avec succès!</save-progress-success>
+            <email-success>Email envoyé avec succès!</email-success>
+            <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer après les avoir corrigées.</form-validation-error>
+            <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre administrateur système.</database-error>
+            <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre administrateur système.</service-error>
+            <action-error>Une erreur s'est produite en exécutant une action. Veuillez contacter votre administrateur système.</action-error>
+            <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre administrateur système.</process-error>
+            <wizard-prev-error>Veuillez corriger les erreurs avant de revenir en arrière</wizard-prev-error>
+            <wizard-next-error>Veuillez corriger les erreurs avant d'avancer</wizard-next-error>
+            <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
+            <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
+            <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
+            <confirmation-dialog-message>Etes-vous sûr de vouloir continuer ?</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>Cette action peut causer l'effacement de certaines données du formulaire. Etes-vous sûr de vouloir continuer ?</confirmation-dialog-message-overwrite>
+            <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
+            <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
+            <validation-dialog-title>Revoir les messages de validation</validation-dialog-title>
+            <validation-dialog-message>Votre formulaire {1,choice,
+                    0#ne contient aucun message|
+                    1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|
+                    1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}.
+                {0,choice,
+                    0#Veuillez ressayer après avoir corrigé les problèmes|
+                    0&lt;Vous pouvez choisir de '{1,choice,1#le|1&lt;les}' passer en revue ou de '{1,choice,1#l''ignorer|1&lt;les ignorer}' et de poursuivre l''opération}.
+            </validation-dialog-message>
+            <buttons-message/>
+            <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été enregistrées.</saved-locally-open>
+            <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
+            <upload-start>Téléchargement vers le serveur commencé</upload-start>
+            <upload-cancel>Téléchargement vers le serveur annulé par l'utilisateur</upload-cancel>
+            <upload-done>Téléchargement vers le serveur terminé</upload-done>
+            <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
+            <upload-error-empty-file>Le fichier téléchargé est vide.</upload-error-empty-file>
+            <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {1,number,integer} bytes.</upload-error-size>
+            <upload-error-mediatype>Le fichier téléchargé est d''un type incorrect: {0}</upload-error-mediatype>
+            <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu''il ne s'agit pas d''un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
+            <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
+        </messages>
+        <draft-singleton>
+            <found-draft>Un document enregistré automatiquement est disponible</found-draft>
+            <found-drafts>Plusieurs documents enregistrés automatiquement sont disponibles</found-drafts>
+            <found-draft-for-document>Après que ce document ait été enregistré, un document enregistré automatiquement a été enregistré, et il se peut que ce dernier contienne des informations supplémentaires. Voulez-vous ouvrir le document enregistré, ou le document enregistré automatiquement?</found-draft-for-document>
+            <found-draft-for-never-saved>Un document enregistré automatiquement pour ce formulaire a éte enregistré. Voulez-vous commencer à partir de zéro ou ouvrir le document enregistré automatiquement?</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>Plusieurs documents enregistrés automatiquement pour ce formulaire ont été enregistrés. Voulez-vous commencer à partir de zéro ou voir ces documents enregistrés automatiquement (pour ensuite peut-être modifier l'un d'entre eux)?</found-drafts-for-never-saved>
+            <open-saved>Ouvrir le document enregistré explicitement</open-saved>
+            <open-draft>Ouvrir le document enregistré automatiquement</open-draft>
+            <view-drafts>Voir les documents enregistrés automatiquement</view-drafts>
+            <start-new>Recommencer à zéro</start-new>
+            <multiple-docs-title>Données de formulaire existantes</multiple-docs-title>
+            <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données _ _, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
+            <multiple-docs-view-data>Voir les données de formulaire existantes</multiple-docs-view-data>
+        </draft-singleton>
+        <labels>
+            <language-choice>Langue</language-choice>
+            <errors>Résumé des erreurs</errors>
+            <check-errors-in-form>Ce formulaire contient des erreurs</check-errors-in-form>
+            <error-details>Détail des erreurs</error-details>
+            <confirm>Confirmer</confirm>
+            <alert>Valeur manquante ou incorrecte</alert>
+            <alert-out-of-range>Valeur hors plage, veuillez sélectionner une valeur disponible</alert-out-of-range>
+            <alert-out-of-range-multiple>Valeur hors plage</alert-out-of-range-multiple>
+            <clear-out-of-range>Supprimer valeur(s) hors plage</clear-out-of-range>
+            <captcha-label>CAPTCHA</captcha-label>
+            <captcha-alert>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-alert>
+        </labels>
+        <hints>
+            <upload-max-size-per-file>La taille des fichiers doit être inférieurs à {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>La taille totale des fichiers pour ce contrôle doit être inférieure à {0}.</upload-max-size-aggregate-per-control>
+            <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
+            <upload-image>image</upload-image>
+            <upload-video>vidéo</upload-video>
+            <upload-audio>audio</upload-audio>
+        </hints>
+        <view>
+            <explanation>
+                Ceci est une vue en lecture seule de vos données.
+            </explanation>
+        </view>
+        <lease>
+            <no-lease-title>Bail</no-lease-title>
+            <renew-lease-title>Renouvellement du bail?</renew-lease-title>
+            <renew-lease-message>Votre bail est sur le point d'expirer. Souhaitez-vous le renouveller?</renew-lease-message>
+            <current-user-left>Votre bail sur ce document encore valable pour </current-user-left>
+            <current-user-right>.</current-user-right>
+            <relinquished>Vous ne possédez plus de bail sur ce document.</relinquished>
+            <other-user>Un autre utilisateur, "{0}", possède maintenant le bail sur ce document.</other-user>
+            <relinquish>Renoncer au bail</relinquish>
+            <renew>Renouveler le bail</renew>
+            <try-acquire>Essayer d'obtenir le bail</try-acquire>
+            <show-in-view-mode>Visualiser en lecture seule</show-in-view-mode>
+        </lease>
+        <session-expiration>
+            <title>
+                <expiring todo="true">[Session About To Expire]</expiring>
+                <expired todo="true">[Session Expired]</expired>
+            </title>
+            <message>
+                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                <expired todo="true">[Your session has expired.]</expired>
+            </message>
+            <renew-button todo="true">[Renew Session]</renew-button>
+        </session-expiration>
+        <available-from>
+            <message>Ce formulaire n'est pas encore disponible</message>
+        </available-from>
+        <available-to>
+            <message>Ce formulaire n'est plus disponible</message>
+        </available-to>
+    </detail>
+    <save-locally>
+        <dialog-title>Enregistrer Localement</dialog-title>
+        <dialog-body>
+            <div>
+                <p>
+                    Cliquez sur le bouton Enregistrer ci-dessous pour enregistrer les données de votre formulaire
+                    dans un fichier HTML.
+                </p>
+                <p>
+                    Pour rouvrir les données :
+                </p>
+                <ul>
+                    <li>Ouvrir le fichier HTML dans votre navigateur (en cliquant sur le fichier, ou en le déposant sur une fenêtre du navigateur).</li>
+                    <li>Cliquez le bouton Open qui s'affichera pour confirmer.</li>
+                </ul>
+                <p>
+                    <b>ATTENTION:</b> Les données ne seront pas conservées sur le serveur, et si vous supprimez le
+                    fichier sur disque celles-ci seront perdues.
+                </p>
+            </div>
+        </dialog-body>
+    </save-locally>
+    <share-dialog>
+        <label>Création d'un lien de partage</label>
+        <body>Permettre à des tiers possédant le lien de lire ou d'écrire ces donnes.</body>
+        <link>Lien</link>
+        <select-operations>Sélectionner les operations</select-operations>
+        <readonly>Lecture seule</readonly>
+        <readwrite>Lecture et écriture</readwrite>
+    </share-dialog>
+    <admin>
+        <title>Admin formulaires</title>
+    </admin>
+    <landing>
+        <title>Orbeon Form Runner</title>
+        <titles>
+            <published-forms>Formulaires publiés</published-forms>
+            <form-builder-forms>Formulaires de Form Builder</form-builder-forms>
+            <form-builder-new>Nouveau formulaire Form Builder</form-builder-new>
+            <form-builder-summary>Formulaires Form Builder</form-builder-summary>
+            <demo-forms>Formulaires de démonstration</demo-forms>
+            <quick-links>Raccourcis</quick-links>
+            <form-runner-admin>Admin formulaires</form-runner-admin>
+        </titles>
+        <descriptions>
+            <published-forms>Accédez vos formulaires publiés</published-forms>
+            <form-builder-forms>Visualisez et éditez vos formulaires en cours créés avec Form Builder</form-builder-forms>
+            <demo-forms>Essayez les formulaires de démonstration</demo-forms>
+        </descriptions>
+        <show-more>Voir plus…</show-more>
+    </landing>
+    <home>
+        <title>Formulaires Publiés</title>
+        <buttons>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rendre non disponible</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Rendre disponible</publish>
+            <cancel>Annuler</cancel>
+            <connect>Connecter</connect>
+            <select>Sélectionner</select>
+            <operation>Opération</operation>
+            <reindex>Réindexer la ou les bases de donnée(s)</reindex>
+            <stop-reindex>Arrêter le réindexage</stop-reindex>
+            <all>Tous</all>
+            <none>Aucun</none>
+            <unpublished-local>Formulaires locaux non disponibles</unpublished-local>
+            <published-local>Formulaires locaux disponibles</published-local>
+            <unpublished-remote>Formulaires distants non disponibles</unpublished-remote>
+            <published-remote>Formulaires distants disponibles</published-remote>
+            <newer-local>Formulaires locaux plus récents</newer-local>
+            <newer-remote>Formulaires distants plus récents</newer-remote>
+            <publish-local>Rendre disponible les formulaires locaux</publish-local>
+            <unpublish-local>Rendre non disponible les formulaires locaux</unpublish-local>
+            <publish-remote>Rendre disponible les formulaires distants</publish-remote>
+            <unpublish-remote>Rendre non disponible les formulaires distants</unpublish-remote>
+            <push-to-remote>Transférer vers le serveur distant</push-to-remote>
+            <pull-from-remote>Transférer depuis le serveur distant</pull-from-remote>
+            <navigate-summary>Naviguer à la page de sommaire</navigate-summary>
+            <navigate-new>Naviguer à la page de création</navigate-new>
+            <upgrade-local>Mettre à jour les formulaires locaux</upgrade-local>
+            <upgrade-remote>Mettre à jour les formulaires distants</upgrade-remote>
+            <delete-local>Supprimer les formulaires locaux</delete-local>
+            <delete-remote>Supprimer les formulaires distants</delete-remote>
+            <reencrypt>Réencrypter les formulaires</reencrypt>
+            <reload-resources>Recharger les resources</reload-resources>
+        </buttons>
+        <titles>
+            <publish-confirmation>Confirmer le changement de disponibilité de formulaires</publish-confirmation>
+            <credentials>Autorisation du serveur distant</credentials>
+            <status>Status</status>
+            <view>Voir</view>
+            <new>Nouveau</new>
+            <local>Local</local>
+            <remote>Distant</remote>
+            <form-identification>Identification du formulaire</form-identification>
+            <reindexing-confirmation>Confirmer le réindexage</reindexing-confirmation>
+            <reencrypt-confirmation>Confirmer le recryptage</reencrypt-confirmation>
+            <purge-confirmation>Confirmer la purge</purge-confirmation>
+        </titles>
+        <messages>
+            <no-form-found>Aucun formulaire déployé n'a été trouvé.</no-form-found>
+            <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour|3#supprimer} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}? Cette opération ne peut pas être annulée.</publish-confirmation>
+            <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
+            <reencrypt-confirmation>Nous vous recommandons d'effectuez le recryptage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de recryptage?</reencrypt-confirmation>
+            <purge-confirmation>Êtes-vous sûr de vouloir purger les données sélectionnées?</purge-confirmation>
+        </messages>
+        <labels>
+            <available>Disponible</available>
+            <unavailable>Indisponible</unavailable>
+            <library>Bibliothèque</library>
+            <newer>Plus récent</newer>
+            <remote-server>Serveur distant</remote-server>
+            <username>Nom d'utilisateur</username>
+            <password>Mot de passe</password>
+            <reindexing-generic>En cours de réindexage &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>En cours de réindexage {0} ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>Réindexage en cours d'arrêt &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>L'opération de réindexage est terminée</reindexing-finished>
+            <reencrypt-state>Recryptage en cours {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Recryptage commencé</reencrypt-started>
+            <reencrypt-finished>Recryptage terminé</reencrypt-finished>
+        </labels>
+        <export-purge>
+            <export>Exporter</export>
+            <purge>Purger</purge>
+            <or>ou</or>
+            <selected-forms>Formulaires sélectionnés ({0,number,integer})</selected-forms>
+            <following-forms>Formulaires suivants:</following-forms>
+            <application>Application:</application>
+            <form>Formulaire:</form>
+            <version>Version:</version>
+            <all-applications>Toutes les applications</all-applications>
+            <all-forms>Tous les formulaires</all-forms>
+            <all-versions>Toutes les versions</all-versions>
+            <latest-version>Dernière version</latest-version>
+            <definitions-data>
+                <label>Définitions / données des formulaires:</label>
+                <definitions>Définitions uniquement</definitions>
+                <data>Données uniquement</data>
+                <both>Définitions et données</both>
+            </definitions-data>
+            <current-history>
+                <label>Données courantes / historique des révisions:</label>
+                <current-data>Données courantes uniquement</current-data>
+                <revision-history>Historique des révisions uniquement</revision-history>
+                <both>Données courantes et historique des révisions</both>
+            </current-history>
+            <from-date>Depuis:</from-date>
+            <until-date>Jusqu'à:</until-date>
+            <redundant-values>Valeurs redondantes</redundant-values>
+            <invalid-date>Date invalide</invalid-date>
+            <wrong-date-order>Ordre des dates incorrect</wrong-date-order>
+        </export-purge>
+    </home>
+    <import>
+        <form-version>
+            <label>Version du formulaire</label>
+            <alert>Version du formulaire manquante</alert>
+        </form-version>
+        <application-name>
+            <label>Nom de l'application</label>
+        </application-name>
+        <form-name>
+            <label>Nom du formulaire</label>
+        </form-name>
+        <version-comment>
+            <label>Commentaire sur la version</label>
+        </version-comment>
+        <upload>
+            <label>Télécharger vers le serveur</label>
+        </upload>
+        <file>
+            <label>Importer le fichier</label>
+            <hint>Le fichier doit être au format Excel 2007 (.xlsx) ou XML (.xml)</hint>
+            <alert>Fichier manquant ou non supporté</alert>
+            <excel-headings-format>Format Excel 2007 avec en-têtes nommés (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Format Excel 2007 avec cellules nommées (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Format export Orbeon XML (.xml)</xml-form-structure-and-data-format>
+        </file>
+        <validation>
+            <label>Validation</label>
+            <alert>Veuillez démarrer la validation avant de procéder à l'importation</alert>
+        </validation>
+        <start-validation>
+            <label>Démarrer la validation</label>
+        </start-validation>
+        <total>Total</total>
+        <valid>Valides</valid>
+        <invalid>Invalides</invalid>
+        <imported>Importés</imported>
+        <skipped>Ignorés</skipped>
+        <eta>Temps restant</eta>
+        <cancel-validation>
+            <label>Annuler la validation</label>
+        </cancel-validation>
+        <validation-canceled>La validation a été annulée.</validation-canceled>
+        <import>
+            <label>Importer</label>
+        </import>
+        <existing-records>
+            <label>Enregistrements existant dans la base de données</label>
+            <item id="0">Garder</item>
+            <item id="1">Supprimer</item>
+        </existing-records>
+        <invalid-data>
+            <label>Enregistrements avec des données invalides</label>
+            <item id="0">Ignorer</item>
+            <item id="1">Importer</item>
+        </invalid-data>
+        <start-import>
+            <label>Démarrer l'importation</label>
+        </start-import>
+        <cancel-import>
+            <label>Annuler l'importation</label>
+        </cancel-import>
+        <import-canceled>L'imporation a été annulée.</import-canceled>
+        <start-over>
+            <label>Recommencer à zéro</label>
+        </start-over>
+        <review-data>
+            <label>Revoir les données</label>
+        </review-data>
+        <existing-records-message>
+            Il existe {0,choice,1#document|1&lt;documents} dans la base de données pour la version {3} du formulaire {1}/{2}.
+        </existing-records-message>
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} heures} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} secondes}
+        </eta-message>
+        <invalid-records-message>
+            {0,number,integer} sur {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#est|1&lt;sont} {0,choice,1#invalide|1&lt;invalides}.
+        </invalid-records-message>
+        <valid-records-message>
+            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé|1&lt;ont été validés} et {0,choice,1#sera importé|1&lt;seront importés}.
+        </valid-records-message>
+        <invalid-document-message>
+            Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant d'enregistrer.
+        </invalid-document-message>
+        <valid-document-message>
+            Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant d'enregistrer.
+        </valid-document-message>
+        <import-complete-message>
+            L'importation de {0,number,integer} {0,choice,1#document|1&lt;documents} est terminée. {1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}
+        </import-complete-message>
+        <na>n/d</na>
+        <fields-found>Champs trouvés</fields-found>
+        <values-found>Valeurs trouvées</values-found>
+        <errors>Erreurs</errors>
+        <warnings>Avertissements</warnings>
+        <error-messages>
+            <validating>Une erreur s'est produite lors de la validation des données.</validating>
+            <importing>Une erreur s'est produite lors de l'import des données.</importing>
+            <deleting>Une erreur s'est produite lors de la suppression des données.</deleting>
+            <unauthorized>Vous n'avez pas l'autorisation d'accéder ces données.</unauthorized>
+            <reading-form-data>Une erreur s'est produite lors de la lecture des données du formulaire.</reading-form-data>
+            <reading-form-metadata>Une erreur s'est produite lors de la lecture des métadonnées du formulaire.</reading-form-metadata>
+            <reading-form-definition>Une erreur s'est produite lors de la lecture du formulaire.</reading-form-definition>
+        </error-messages>
+    </import>
+    <authentication>
+        <menu>
+            <logged-in-as>Connecté comme {0}</logged-in-as>
+            <logout>Se déconnecter</logout>
+            <login>Se connecter</login>
+            <register>S'enregistrer</register>
+        </menu>
+        <login>
+            <title>Form Runner - Connection</title>
+            <username>Nom d'utilisateur</username>
+            <password>Mot de passe</password>
+            <login>Se connecter</login>
+        </login>
+        <logout-done>
+            <title>Form Runner - Déconnexion</title>
+            <message>Vous êtes déconnecté(e).</message>
+        </logout-done>
+        <login-error>
+            <title>Form Runner - Error de connection</title>
+            <unrecognized>Le nom d'utilisateur ou le mot de passe entré n'ont pas été reconnus.</unrecognized>
+            <try-again>Réessayer.</try-again>
+        </login-error>
+    </authentication>
+    <home-summary>
+        <titles>
+            <created>Création</created>
+            <last-modified>Modification</last-modified>
+            <last-modified-by>Modifié par</last-modified-by>
+            <application-name>Application</application-name>
+            <form-name>Formulaire</form-name>
+            <version>Version</version>
+            <form-title>Titre du formulaire</form-title>
+        </titles>
+        <search>
+            <search>Recherche</search>
+            <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
+            <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-search-options>
+            <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-search-options>
+            <search-options>Options de recherche</search-options>
+            <any>[Tous]</any>
+            <dates>
+                <item>
+                    <label>Aujourd'hui</label>
+                    <value>today</value>
+                </item>
+                <item>
+                    <label>Hier</label>
+                    <value>yesterday</value>
+                </item>
+                <item>
+                    <label>7 derniers jours</label>
+                    <value>last-7-days</value>
+                </item>
+                <item>
+                    <label>30 derniers jours</label>
+                    <value>last-30-days</value>
+                </item>
+                <item>
+                    <label>90 derniers jours</label>
+                    <value>last-90-days</value>
+                </item>
+                <item>
+                    <label>Personnalisé...</label>
+                    <value>custom</value>
+                </item>
+            </dates>
+            <date-after>Après le</date-after>
+            <date-before>Avant le</date-before>
+        </search>
+    </home-summary>
+</resource>

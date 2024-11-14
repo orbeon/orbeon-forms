@@ -288,7 +288,7 @@ class ResourcesPatcherTest
   )
 
   private def resourcesDoc(url: String) = useAndClose(URLFactory.createURL(url).openStream()) { is =>
-    TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
+    TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, url, true, false)
   }
 
   describe("Resources consistency") {

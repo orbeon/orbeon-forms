@@ -36,8 +36,10 @@ trait XMLReceiverSupport {
     prefix    : String = "",
     uri       : String = "",
     atts      : Attributes = SaxSupport.EmptyAttributes,
-    extraNs   : Seq[(String, String)] = Nil)(
-    body      : => T)(implicit
+    extraNs   : Seq[(String, String)] = Nil
+  )(
+    body      : => T
+  )(implicit
     receiver  : XMLReceiver
   ): T = {
 
@@ -62,7 +64,8 @@ trait XMLReceiverSupport {
     prefix    : String = "",
     uri       : String = "",
     atts      : Attributes = SaxSupport.EmptyAttributes,
-    text      : String = "")(implicit
+    text      : String = ""
+  )(implicit
     receiver  : XMLReceiver
   ): Unit =
     withElement(localName, prefix, uri, atts) {
@@ -74,7 +77,8 @@ trait XMLReceiverSupport {
     localName : String,
     prefix    : String = "",
     uri       : String = "",
-    atts      : Attributes = SaxSupport.EmptyAttributes)(implicit
+    atts      : Attributes = SaxSupport.EmptyAttributes
+  )(implicit
     receiver  : XMLReceiver
   ): Unit =
     receiver.startElement(uri, localName, XMLUtils.buildQName(prefix, localName), atts)
@@ -82,7 +86,8 @@ trait XMLReceiverSupport {
   def closeElement(
     localName : String,
     prefix    : String = "",
-    uri       : String = "")(implicit
+    uri       : String = ""
+  )(implicit
     receiver  : XMLReceiver
   ): Unit =
     receiver.endElement(uri, localName, XMLUtils.buildQName(prefix, localName))

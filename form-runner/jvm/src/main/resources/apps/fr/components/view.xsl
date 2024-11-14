@@ -966,8 +966,8 @@
                 fr:mode() = ('edit', 'view')
             ]">
 
-            <xf:trigger appearance="minimal" class="fr-revision-history-button">
-                <xf:label><xh:i class="fa fa-fw fa-history" title="{{xxf:r('components.revision-history.label', '|fr-fr-resources|')}}"/></xf:label>
+            <xf:trigger appearance="minimal" class="fr-revision-history-button" xxf:title="{{xxf:r('components.revision-history.label', '|fr-fr-resources|')}}">
+                <xf:label><xh:i class="fa fa-fw fa-history"/></xf:label>
                 <xf:dispatch
                     event="DOMActivate"
                     name="fr-open"

@@ -27,7 +27,7 @@ class HTMLBodyXMLReceiver(xmlReceiver: XMLReceiver, private var xhtmlPrefix: Str
     else if (inBody && level > 1) {
       val xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname)
       var newAttributes: Attributes = null
-      // Filter out attributes in a namespace
+      // Remove attributes which are in a namespace other than `""`
       val attributesCount = attributes.getLength
       if (attributesCount > 0) {
         val newAttributesImpl = new AttributesImpl
@@ -39,7 +39,8 @@ class HTMLBodyXMLReceiver(xmlReceiver: XMLReceiver, private var xhtmlPrefix: Str
         }
         newAttributes = newAttributesImpl
       }
-      else newAttributes = attributes
+      else
+        newAttributes = attributes
       super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, newAttributes)
     }
     level += 1

@@ -18,8 +18,8 @@ import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.CoreUtils.*
@@ -104,8 +104,6 @@ trait XFormsCrossPlatformSupportTrait {
   }
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String
-
-  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document
 
   def serializeToByteArray(
     document           : dom.Document,

@@ -43,7 +43,6 @@ import org.xml.sax.InputSource
 import java.io.*
 import java.net.URI
 import java.nio.charset.Charset
-import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.{SAXResult, TransformerHandler}
 import javax.xml.transform.{Result, Transformer}
 import scala.util.control.NonFatal
@@ -129,13 +128,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     //			r.setFeature(Parser.ignorableWhitespaceFeature, true);
     //			r.setProperty(Parser.scannerProperty, new PYXScanner());
     //          r.setProperty(Parser.lexicalHandlerProperty, h);
-  }
-
-  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document = {
-    val document = XMLParsing.createDocument
-    val domResult = new DOMResult(document)
-    htmlStringToResult(value, locationData, domResult)
-    document
   }
 
   // TODO: implement server-side plain text output with <br> insertion

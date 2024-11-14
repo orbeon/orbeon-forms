@@ -86,9 +86,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String =
     throw new NotImplementedError("resolveActionURL")
 
-  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document =
-    throw new NotImplementedError("htmlStringToDocumentTagSoup")
-
   def streamHTMLFragment(
     value        : String,
     locationData : LocationData,

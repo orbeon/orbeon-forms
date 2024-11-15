@@ -56,16 +56,16 @@ class FormBuilderFunctionsTest
       val doc = ctx.formDefinitionRootElem
 
       it("must find the model") {
-        assert(getModelElem(doc).getDisplayName === "xf:model")
+        assert(getModelElem(doc).getDisplayName == "xf:model")
         assert(getModelElem(doc).hasIdValue(Names.FormModel))
       }
 
       it("must find the instance") {
-        assert((ctx.dataRootElem parent * head).name === "xf:instance")
+        assert((ctx.dataRootElem parent * head).name == "xf:instance")
       }
 
       it("must find the body group") {
-        assert(ctx.bodyElem.uriQualifiedName === URIQualifiedName(XF, "group"))
+        assert(ctx.bodyElem.uriQualifiedName == URIQualifiedName(XF, "group"))
       }
     }
   }
@@ -74,12 +74,12 @@ class FormBuilderFunctionsTest
     withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       it("must return the control names") {
-        assert(controlNameFromId(controlId(Control1)) === Control1)
-        assert(controlNameFromId(bindId(Control1))    === Control1)
+        assert(controlNameFromId(controlId(Control1)) == Control1)
+        assert(controlNameFromId(bindId(Control1))    == Control1)
       }
 
       it("must find the control element") {
-        assert(findControlByName(Control1).get.uriQualifiedName === URIQualifiedName(XF, "input"))
+        assert(findControlByName(Control1).get.uriQualifiedName == URIQualifiedName(XF, "input"))
         assert(findControlByName(Control1).get.hasIdValue(controlId(Control1)))
       }
     }
@@ -89,13 +89,13 @@ class FormBuilderFunctionsTest
     withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       it("must find the bind element") {
-        assert(findBindByName(Control1).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
+        assert(findBindByName(Control1).get.uriQualifiedName == URIQualifiedName(XF, "bind"))
         assert(findBindByName(Control1).get.hasIdValue(bindId(Control1)))
       }
 
       it("must check the content of the value holder") {
         assert(findDataHolders(Control1).length == 1)
-        assert(findDataHolders(Control1).head.getStringValue === "")
+        assert(findDataHolders(Control1).head.getStringValue == "")
       }
 
       // TODO
@@ -109,8 +109,8 @@ class FormBuilderFunctionsTest
       val doc = ctx.formDefinitionRootElem
 
       it("must find the section name") {
-        assert(findSectionName(Control1).get === Section1)
-        assert(getControlNameOpt(doc descendant "*:section" head).get === Section1)
+        assert(findSectionName(Control1).get == Section1)
+        assert(getControlNameOpt(doc descendant "*:section" head).get == Section1)
       }
     }
   }
@@ -121,12 +121,12 @@ class FormBuilderFunctionsTest
 
         ensureBinds(List(Section1, Control2))
 
-        assert(findBindByName(Control2).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
+        assert(findBindByName(Control2).get.uriQualifiedName == URIQualifiedName(XF, "bind"))
         assert(findBindByName(Control2).get.hasIdValue(bindId(Control2)))
 
         ensureBinds(List(Section2, "grid-1", Control3))
 
-        assert(findBindByName(Control3).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
+        assert(findBindByName(Control3).get.uriQualifiedName == URIQualifiedName(XF, "bind"))
         assert(findBindByName(Control3).get.hasIdValue(bindId(Control3)))
       }
     }
@@ -135,8 +135,8 @@ class FormBuilderFunctionsTest
   describe("Find the next id") {
     it("must find ids without collisions") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx =>
-        assert(nextId("control") === "control-2-control")
-        assert(nextId("section") === "section-2-section")
+        assert(nextId("control") == "control-2-control")
+        assert(nextId("section") == "section-2-section")
       }
       // TODO: test more collisions
     }
@@ -150,10 +150,10 @@ class FormBuilderFunctionsTest
       val containers = findAncestorContainersLeafToRoot(firstTd)
 
       it("must find the containers") {
-        assert(containers(0).localname === "grid")
-        assert(containers(1).localname === "section")
+        assert(containers(0).localname == "grid")
+        assert(containers(1).localname == "section")
 
-        assert(findContainerNamesForModel(firstTd) === List("section-1", "grid-1"))
+        assert(findContainerNamesForModel(firstTd) == List("section-1", "grid-1"))
       }
     }
   }
@@ -171,7 +171,7 @@ class FormBuilderFunctionsTest
         val newControlNameOption = insertNewControl(<binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
         // Check the control's name
-        assert(newControlNameOption === Some("control-2"))
+        assert(newControlNameOption.contains("control-2"))
         val newControlName = newControlNameOption.get
 
         // Test result
@@ -179,18 +179,18 @@ class FormBuilderFunctionsTest
 
         val newlySelectedCell = findSelectedCell
         assert(newlySelectedCell.isDefined)
-        assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
+        assert((newlySelectedCell.get / *).ids == List(controlId(newControlName)))
 
         val containerNames = findContainerNamesForModel(newlySelectedCell.get)
         assert(containerNames == List("section-1", "grid-1"))
 
         // NOTE: We should maybe just compare the XML for holders, binds, and resources
         val dataHolder = assertDataHolder(newControlName)
-        assert((dataHolder.head precedingSibling * head).name === "control-1")
+        assert((dataHolder.head precedingSibling * head).name == "control-1")
 
         val controlBind = findBindByName(newControlName).get
         assert(controlBind.hasIdValue(bindId(newControlName)))
-        assert((controlBind precedingSibling * att "id") === bindId("control-1"))
+        assert((controlBind precedingSibling *).ids == List(bindId("control-1")))
 
         assert(allResources(ctx.resourcesRootElem) / newControlName nonEmpty)
 
@@ -225,7 +225,7 @@ class FormBuilderFunctionsTest
           val controlName = FormRunner.controlNameFromId(frExplanation.id)
           val actualRef = frExplanation.child("*:text").head.attValue("ref")
           val expectedRef = "$form-resources/" ++ controlName ++ "/text"
-          assert(actualRef === expectedRef)
+          assert(actualRef == expectedRef)
         }
       }
     }
@@ -241,7 +241,7 @@ class FormBuilderFunctionsTest
         selectFirstCell()
         val newRepeatNameOption = insertNewGrid(repeated = true)
 
-        assert(newRepeatNameOption === Some("grid-2"))
+        assert(newRepeatNameOption.contains("grid-2"))
         val newRepeatName          = newRepeatNameOption.get
         val newRepeatIterationName = defaultIterationName(newRepeatName)
 
@@ -249,18 +249,18 @@ class FormBuilderFunctionsTest
 
           val newlySelectedCell = findSelectedCell
           assert(newlySelectedCell.isDefined)
-          assert((newlySelectedCell flatMap (_ parent * headOption) head) /@ "id" === gridId(newRepeatName))
+          assert((newlySelectedCell flatMap (_ parent * headOption) head).id == gridId(newRepeatName))
 
           val containerNames = findContainerNamesForModel(newlySelectedCell.get)
-          assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
+          assert(containerNames == List("section-1", newRepeatName, newRepeatIterationName))
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
           val dataHolder = assertDataHolder(containerNames.init.last)
-          assert((dataHolder.head precedingSibling * head).name === "grid-1")
+          assert((dataHolder.head precedingSibling * head).name == "grid-1")
 
           val controlBind = findBindByName(newRepeatName).get
           assert(controlBind.hasIdValue(bindId(newRepeatName)))
-          assert((controlBind precedingSibling * att "id") === bindId("grid-1"))
+          assert((controlBind precedingSibling *).ids == List(bindId("grid-1")))
 
           assert(getModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-2-template")))
         }
@@ -268,7 +268,7 @@ class FormBuilderFunctionsTest
         // Insert a new control
         val newControlNameOption = insertNewControl(<binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
-        assert(newControlNameOption === Some("control-2"))
+        assert(newControlNameOption.contains("control-2"))
         val newControlName = newControlNameOption.get
 
         // Test result
@@ -276,17 +276,17 @@ class FormBuilderFunctionsTest
 
           val newlySelectedCell = findSelectedCell
           assert(newlySelectedCell.isDefined)
-          assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
+          assert((newlySelectedCell.get / *).ids == List(controlId(newControlName)))
 
           val containerNames = findContainerNamesForModel(newlySelectedCell.get)
-          assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
+          assert(containerNames == List("section-1", newRepeatName, newRepeatIterationName))
 
           assert(findControlByName(newControlName).get.hasIdValue(controlId(newControlName)))
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
           val dataHolder = assertDataHolder(newControlName)
           assert(dataHolder.head precedingSibling * isEmpty)
-          assert((dataHolder.head parent * head).name === newRepeatIterationName)
+          assert((dataHolder.head parent * head).name == newRepeatIterationName)
 
           val controlBind = findBindByName(newControlName).get
           assert(controlBind.hasIdValue(bindId(newControlName)))
@@ -298,7 +298,7 @@ class FormBuilderFunctionsTest
 
           assert(templateHolder.isDefined)
           assert(templateHolder.get precedingSibling * isEmpty)
-          assert((templateHolder.get parent * head).name === newRepeatIterationName)
+          assert((templateHolder.get parent * head).name == newRepeatIterationName)
         }
       }
     }
@@ -340,17 +340,17 @@ class FormBuilderFunctionsTest
           val section1 = doc.getControlByEffectiveId("section-1-section")
           val control1 = doc.getControlByEffectiveId("control-1-control")
 
-          assert(true  === DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
-          assert(false === DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node
-          assert(false === DataModel.isAllowedBindingExpression(section1, "("))         // invalid expression
-          assert(true  === DataModel.isAllowedBindingExpression(section1, "/"))         // root node
-          assert(true  === DataModel.isAllowedBindingExpression(section1, ".."))        // complex content
+          assert(  DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
+          assert(! DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node
+          assert(! DataModel.isAllowedBindingExpression(section1, "("))         // invalid expression
+          assert(  DataModel.isAllowedBindingExpression(section1, "/"))         // root node
+          assert(  DataModel.isAllowedBindingExpression(section1, ".."))        // complex content
 
-          assert(true  === DataModel.isAllowedBindingExpression(control1, "control-1")) // existing node
-          assert(false === DataModel.isAllowedBindingExpression(control1, "foo/bar"))   // non-existing node
-          assert(false === DataModel.isAllowedBindingExpression(control1, "("))         // invalid expression
-          assert(false === DataModel.isAllowedBindingExpression(control1, "/"))         // root node
-          assert(false === DataModel.isAllowedBindingExpression(control1, ".."))        // complex content
+          assert(  DataModel.isAllowedBindingExpression(control1, "control-1")) // existing node
+          assert(! DataModel.isAllowedBindingExpression(control1, "foo/bar"))   // non-existing node
+          assert(! DataModel.isAllowedBindingExpression(control1, "("))         // invalid expression
+          assert(! DataModel.isAllowedBindingExpression(control1, "/"))         // root node
+          assert(! DataModel.isAllowedBindingExpression(control1, ".."))        // complex content
         }
       }
     }
@@ -368,7 +368,7 @@ class FormBuilderFunctionsTest
         )
 
         for ((expected, id) <- expected)
-          assert(expected === buildFormBuilderControlAbsoluteIdOrEmpty(id))
+          assert(expected == buildFormBuilderControlAbsoluteIdOrEmpty(id))
       }
     }
   }
@@ -412,7 +412,8 @@ class FormBuilderFunctionsTest
         assertSectionsKeepName()
         assertUniqueIds()
 
-        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
         for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "", "")
@@ -428,7 +429,8 @@ class FormBuilderFunctionsTest
         assertSectionsKeepName()
         assertUniqueIds()
 
-        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
         // First 2 sections will have `my-` prefixes, but other 2 sections not as they are the same
         // section templates and using `my-` would cause conflicts.
@@ -445,7 +447,7 @@ class FormBuilderFunctionsTest
             getControlNameOpt count
             (_ startsWith "my-")
 
-          assert(expectedCount === nestedControlsStartingWithMyCount, s"for `$sectionName`")
+          assert(expectedCount == nestedControlsStartingWithMyCount, s"for `$sectionName`")
         }
       }
     }

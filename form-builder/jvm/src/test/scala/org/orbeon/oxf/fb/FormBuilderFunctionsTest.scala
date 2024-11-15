@@ -392,11 +392,11 @@ class FormBuilderFunctionsTest
     val SectionNames = SectionsNamesAndControls map (_._1)
     val SectionIds   = SectionNames map (_ + "-section")
 
-    def assertSectionsKeepName()(implicit ctx: FormBuilderDocContext) =
-      for (sectionName <- SectionNames)
+    def assertSectionsKeepName(sectionNames: List[String])(implicit ctx: FormBuilderDocContext): Unit =
+      for (sectionName <- sectionNames)
         assert(findControlByName(sectionName).isDefined, s"for $sectionName")
 
-    def assertUniqueIds()(implicit ctx: FormBuilderDocContext) = {
+    def assertUniqueIds()(implicit ctx: FormBuilderDocContext): Unit = {
 
       val visited = mutable.Set[String]()
 
@@ -409,7 +409,7 @@ class FormBuilderFunctionsTest
     it("Must merge all section templates without errors") {
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
-        assertSectionsKeepName()
+        assertSectionsKeepName(SectionNames)
         assertUniqueIds()
 
         implicit val formRunnerParams: FormRunnerParams =
@@ -418,7 +418,7 @@ class FormBuilderFunctionsTest
         for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "", "")
 
-        assertSectionsKeepName()
+        assertSectionsKeepName(SectionNames)
         assertUniqueIds()
       }
     }
@@ -426,7 +426,7 @@ class FormBuilderFunctionsTest
     it("Must merge all section templates using a prefix") {
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
-        assertSectionsKeepName()
+        assertSectionsKeepName(SectionNames)
         assertUniqueIds()
 
         implicit val formRunnerParams: FormRunnerParams =
@@ -437,7 +437,7 @@ class FormBuilderFunctionsTest
         for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "my-", "")
 
-        assertSectionsKeepName()
+        assertSectionsKeepName(SectionNames)
         assertUniqueIds()
 
         for ((sectionName, expectedCount) <- SectionsNamesAndControls) {
@@ -449,6 +449,62 @@ class FormBuilderFunctionsTest
 
           assert(expectedCount == nestedControlsStartingWithMyCount, s"for `$sectionName`")
         }
+      }
+    }
+
+    it("Must merge a section template that is the only section") {
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
+
+        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+
+        // Remove all but one section
+        for (i <- 0 to 4)
+          FormBuilder.deleteSectionByIdIfPossible(s"section-$i-section")
+
+        assert(FormBuilderXPathApi.countAllContainers(ctx.formDefinitionRootElem) == 1)
+
+        ToolboxOps.containerMerge("section-5-section", "", "")
+
+        // Check that all section template controls are present
+        assert(findControlByName("section-5").isDefined)
+        assert(findControlByName("grid-5").isDefined)
+        assert(findControlByName("control-1").isDefined)
+        assert(findControlByName("control-2").isDefined)
+
+        assert(FormBuilderXPathApi.countAllContainers(ctx.formDefinitionRootElem) == 2)
+        assert(FormBuilderXPathApi.countAllNonContainers(ctx.formDefinitionRootElem) == 2)
+
+        assertUniqueIds()
+      }
+    }
+
+    it("Must merge a section template nested in a section") {
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
+
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+
+        // Remove all but two sections
+        for (i <- 2 to 5)
+          FormBuilder.deleteSectionByIdIfPossible(s"section-$i-section")
+
+        assert(FormBuilderXPathApi.countAllContainers(ctx.formDefinitionRootElem) == 3)
+
+        // Move the second one into the first one
+        moveSectionRight(findControlByName("section-1").get)
+        assert(FormBuilderXPathApi.countAllContainers(ctx.formDefinitionRootElem) == 3)
+
+        ToolboxOps.containerMerge("section-1-section", "", "")
+
+        // Check resulting structure
+        assert(findControlByName("section-1").isDefined)
+        assert(findControlByName("grid-1").isDefined)
+        assert(findControlByName("control-11").isDefined)
+
+        assert(FormBuilderXPathApi.countAllContainers(ctx.formDefinitionRootElem) == 4)
+        assert(FormBuilderXPathApi.countAllNonContainers(ctx.formDefinitionRootElem) == 3)
+
+        assertUniqueIds()
       }
     }
   }

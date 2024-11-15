@@ -26,7 +26,7 @@ import org.orbeon.scaxon.Implicits.*
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   def isFBBody(node: NodeInfo): Boolean =
-    (node self XFGroupTest effectiveBooleanValue) && node.attClasses("fb-body")
+    (node self XFGroupTest).effectiveBooleanValue && node.attClasses("fb-body")
 
   val RepeatContentToken       = "content"
   val LegacyRepeatContentToken = "true"
@@ -62,7 +62,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     IsSection(node) || IsGrid(node)
 
   val IsContainer: NodeInfo => Boolean =
-    node => (node self FRContainerTest effectiveBooleanValue) || isFBBody(node)
+    node => (node self FRContainerTest).effectiveBooleanValue || isFBBody(node)
 
   def controlRequiresNestedIterationElement(node: NodeInfo): Boolean =
     isRepeat(node)
@@ -139,7 +139,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       control       <- findControlByName(controlName)
       if controlRequiresNestedIterationElement(control)
       bind          <- control attValueOpt XFormsNames.BIND_QNAME flatMap findInBindsTryIndex
-      iterationBind <- bind / XFBindTest headOption // there should be only a single nested bind
+      iterationBind <- (bind / XFBindTest).headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)
 

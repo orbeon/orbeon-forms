@@ -26,6 +26,10 @@
 
     <xbl:binding id="fb-dialog-messages" element="fb|dialog-messages">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/fb/dialog-messages/dialog-messages.css"/>
+        </xbl:resources>
+
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target">
                 <xf:delete ref="$i/*"/>

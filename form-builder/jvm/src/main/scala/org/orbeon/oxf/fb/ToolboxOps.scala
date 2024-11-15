@@ -797,7 +797,10 @@ object ToolboxOps {
           )
         }
 
-      deleteSectionByIdIfPossible(containerId)
+      deleteSectionByIdIfPossible(
+        containerId,
+        force = true // https://github.com/orbeon/orbeon-forms/issues/6541
+      )
       // Also copy attachments when merging https://github.com/orbeon/orbeon-forms/issues/
       pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)), copyAttachments = true)
 
@@ -997,10 +1000,18 @@ object ToolboxOps {
     // NOTE: Now non-repeated grids also have a control name.
     val precedingContainerNameOpt = afterElemOpt flatMap getControlNameOpt
 
+    // See scenario 2 in https://github.com/orbeon/orbeon-forms/issues/6541
+    //
+    val updatedAfterElemOpt =
+      if (isFBBody(intoContainerElem))
+        (intoContainerElem / "*:var").lastOption
+      else
+        afterElemOpt
+
     val newContainerElem =
       insert(
         into   = intoContainerElem,
-        after  = afterElemOpt.toList,
+        after  = updatedAfterElemOpt.toList,
         origin = containerControlElem
       ).head
 

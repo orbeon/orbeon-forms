@@ -727,19 +727,29 @@ body.orbeon {
             }
         }
 
+        .fb-settings-mode-new .tab-content {
+            &, & > div {
+              overflow: visible; // In new mode, the scrolling is done at the `.fb-template-cards-container` level
+              display: flex;
+              flex-direction: column;
+              min-height: 0;
+            }
+        }
+
         .fb-dialog-form-settings-fields {
+
 
             div.fb-template-cards-container {
                 overflow-y: scroll;
                 padding: 5px; // so that selection outline/shadow is not clipped
+                min-height: 234px; // empirically fit one line
+                max-height: 482px; // empirically fit two lines
             }
 
             div.fb-template-cards { // try to make stronger
                 display: flex;
                 flex-wrap: wrap;
                 gap: 1em;
-                min-height: 234px; // empirically fit one line
-                max-height: 482px; // empirically fit two lines
 
                 justify-content: space-around;
 
@@ -748,8 +758,8 @@ body.orbeon {
                 }
 
                 .fb-template-card {
-                    width: 190px; // empirically fit 4 cards in a row
-                    height: 220px;
+                    width: 200px; // empirically fit 4 cards in a row
+                    height: 230px;
                     display: flex;
                     flex-direction: column;
                     white-space: nowrap;
@@ -757,6 +767,8 @@ body.orbeon {
                     padding: .5em;
                     border-radius: 10px;
                     row-gap: 2px;
+                    overflow: hidden;
+                    box-sizing: border-box;
 
                     &.xforms-repeat-selected-item-1 {
                         border-color: @focusBorderColor;
@@ -778,6 +790,10 @@ body.orbeon {
                     }
                 }
             }
+
+            .fb-form-description {
+                margin-top: 1em;
+            }
         }
 
         .popover.xforms-help-popover {
@@ -795,6 +811,7 @@ body.orbeon {
 
         div[class ^= "fb-settings-mode-"] {
             display: grid;
+            min-height: 0;
             grid-template-columns: auto 1fr;
 
             &> .alert-error {

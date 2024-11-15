@@ -21,6 +21,11 @@
         width: 600px;
         max-width: none;
 
+        .fb-permissions-body {
+            overflow-y: auto;
+            padding: 5px; // Avoid the checkbox focus box-shadow being clipped on the left, scrollbars to close to content
+        }
+
         .xforms-items {
             float: none;
             .xforms-selected, .xforms-deselected {

@@ -739,7 +739,7 @@ object ToolboxOps {
 
         val newBindElem = {
 
-          val nestedBindElems = findXblBinds(bindingElem) / *
+          val nestedBindElems = findXblBinds(bindingElem)
 
           val newElem = TransformerUtils.extractAsMutableDocument(findBindByName(containerName).get).rootElement
           XFormsAPI.delete(newElem / *)

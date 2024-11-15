@@ -27,7 +27,7 @@ trait FormBuilderSupport extends XFormsSupport {
 
   self: DocumentTestBase =>
 
-  val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
+  val TemplateWithSingleControlDoc  = "oxf:/org/orbeon/oxf/fb/template-with-single-control.xml"
 
   // Run the body in the action context of a form which simulates the main Form Builder model
   def withActionAndFBDoc[T](url: String)(body: FormBuilderDocContext => T): T =

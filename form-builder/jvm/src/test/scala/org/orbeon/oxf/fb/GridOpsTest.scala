@@ -227,7 +227,7 @@ class GridOpsTest
 
   describe("Last grid in section") {
     it("must allow inserting a new grid") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 

@@ -185,7 +185,7 @@ class ItemsetTest
         }.toMap
       }
 
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 

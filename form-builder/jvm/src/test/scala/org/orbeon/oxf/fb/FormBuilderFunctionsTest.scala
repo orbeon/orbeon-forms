@@ -51,7 +51,7 @@ class FormBuilderFunctionsTest
   val Section2 = "section-2"
 
   describe("Model instance body elements") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+    withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
       val doc = ctx.formDefinitionRootElem
 
@@ -71,7 +71,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Name and id") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+    withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
       it("must return the control names") {
         assert(controlNameFromId(controlId(Control1)) == Control1)
@@ -86,7 +86,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Control elements") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+    withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
       it("must find the bind element") {
         assert(findBindByName(Control1).get.uriQualifiedName == URIQualifiedName(XF, "bind"))
@@ -104,7 +104,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Section name") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+    withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
       val doc = ctx.formDefinitionRootElem
 
@@ -117,7 +117,7 @@ class FormBuilderFunctionsTest
 
   describe("New binds") {
     it("must find the newly-created binds") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
         ensureBinds(List(Section1, Control2))
 
@@ -134,7 +134,7 @@ class FormBuilderFunctionsTest
 
   describe("Find the next id") {
     it("must find ids without collisions") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
         assert(nextId("control") == "control-2-control")
         assert(nextId("section") == "section-2-section")
       }
@@ -143,7 +143,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Containers") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+    withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
       val firstTd = ctx.bodyElem descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
 
@@ -164,7 +164,7 @@ class FormBuilderFunctionsTest
 
   describe("Insert `xf:input` control") {
     it("must insert all elements in the right places") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
         // Insert a new control into the next empty td
         selectFirstCell()
@@ -200,7 +200,7 @@ class FormBuilderFunctionsTest
 
   describe("Insert `fr:explanation` control") {
     it("must insert all elements in the right places") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -233,7 +233,7 @@ class FormBuilderFunctionsTest
 
   describe("Insert repeat") {
     it("must insert all elements in the right places") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 

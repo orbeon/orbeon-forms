@@ -274,7 +274,7 @@ object Controls {
             case Some(repeatControl) if followIndexes =>
               searchNextRepeatLevel(repeatControl.getIndex :: indexes, remainingPrefixedIds)
             case Some(repeatControl) =>
-              1 to repeatControl.getSize flatMap (i => searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)) toList
+              (1 to repeatControl.getSize).flatMap(i => searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)).toList
             case _ =>
               throw new IllegalStateException
           }
@@ -442,7 +442,7 @@ object Controls {
             //
             // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates
             // controls and dispatches events
-            this.newIterationsIds = newIterations map (_.effectiveId) toSet
+            this.newIterationsIds = newIterations.map(_.effectiveId).toSet
 
           case _ =>
 

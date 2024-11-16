@@ -46,6 +46,7 @@ import shapeless.syntax.typeable.*
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
+
 /**
  * xxf:dynamic control
  *
@@ -305,8 +306,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   // We want to remember the state of switches
   private def gatherRelevantSwitchState(start: XFormsControl) =
-    ControlsIterator(start, includeSelf = false) collect
-      { case switch: XFormsSwitchControl if switch.isRelevant => switch.effectiveId -> switch.controlState.get } toMap
+    ControlsIterator(start, includeSelf = false)
+      .collect { case switch: XFormsSwitchControl if switch.isRelevant => switch.effectiveId -> switch.controlState.get }
+      .toMap
 
   private def gatherInstanceControls(containerOpt: Option[XBLContainer], start: XFormsControl): InstancesControls = {
 
@@ -326,7 +328,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   // If more than one change touches a given id, processed it once using the last element
   private def groupChanges(changes: Iterable[(String, Element)]): List[(String, Element)] =
     changes.toList groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) =>
-      prefixedId -> (prefixedIdsToElemsInSource map (_._2) last)
+      prefixedId -> prefixedIdsToElemsInSource.map(_._2).last
     }
 
   private def processXBLUpdates(collector: ErrorEventCollector): Unit = {
@@ -420,13 +422,13 @@ object XXFormsDynamicControl {
       }
 
   // Find whether the given node is a bind element or attribute and return the associated model id -> element mapping
-  def findBindChange(node: om.NodeInfo): Option[(String, Element)] = {
+  private def findBindChange(node: om.NodeInfo): Option[(String, Element)] = {
 
     val XF = XFORMS_NAMESPACE_URI
 
     // Any change to a model bind element or a descendant element or attribute
     val modelOption =
-      node ancestorOrSelf (XF -> "bind") ancestor (XF -> "model") headOption
+      (node ancestorOrSelf (XF -> "bind") ancestor (XF -> "model")).headOption
 
     modelOption map { modelNode =>
       val modelElement = unsafeUnwrapElement(modelNode)
@@ -435,7 +437,7 @@ object XXFormsDynamicControl {
   }
 
   // Find whether a change occurred in a descendant of a top-level XBL binding
-  def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {
+  private def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {
 
     if (node.getNodeKind == SaxonUtils.NodeType.Namespace)
       None // can't find ancestors of namespace nodes with Orbeon DOM
@@ -445,7 +447,7 @@ object XXFormsDynamicControl {
         node.isElement && LHHA.isLHHA(unsafeUnwrapElement(node))
 
       // Go from root to leaf
-      val ancestorsFromRoot = node ancestor * reverse
+      val ancestorsFromRoot = (node ancestor *).reverse
 
       // Find first element whose prefixed id has a binding and return the mapping prefixedId -> element
       val all =

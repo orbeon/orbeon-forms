@@ -417,12 +417,12 @@ class XFormsComponentControl(
   private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Option[XFormsInstance] = {
 
     // NOTE: Must be called after xforms-model-construct so that instances are present
-    def findMirrorInstance: Option[XFormsInstance] = (
-      nestedContainerOpt.iterator
-      flatMap (_.models.iterator)
-      flatMap (_.instancesIterator)
-      find    (_.instance.mirror)
-    )
+    def findMirrorInstance: Option[XFormsInstance] =
+      nestedContainerOpt
+        .iterator
+        .flatMap(_.models.iterator)
+        .flatMap(_.instancesIterator)
+        .find(_.instance.mirror)
 
     // Process mirror instance if any
     findMirrorInstance map { mirrorInstance =>
@@ -542,7 +542,10 @@ class XFormsComponentControl(
       )
 
   // Get the control at the root of the inner scope of the component
-  def innerRootControl: XXFormsComponentRootControl = children collectFirst { case root: XXFormsComponentRootControl => root } get
+  def innerRootControl: XXFormsComponentRootControl =
+    children
+      .collectFirst { case root: XXFormsComponentRootControl => root }
+      .get
 
   override def ajaxLhhaSupport: Seq[LHHA] = staticControl.commonBinding.standardLhhaAsSeq
   override def htmlLhhaSupport: Set[LHHA] = staticControl.commonBinding.standardLhhaAsSet

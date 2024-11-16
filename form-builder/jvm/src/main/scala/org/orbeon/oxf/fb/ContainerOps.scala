@@ -74,7 +74,8 @@ trait ContainerOps extends ControlOps {
   // Delete the entire container and contained controls
   def deleteContainerById(
     canDelete   : NodeInfo => Boolean,
-    containerId : String)(implicit
+    containerId : String
+  )(implicit
     ctx         : FormBuilderDocContext
   ): Option[UndoAction] = {
     val container = containerById(containerId)

@@ -17,8 +17,8 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.xforms.control.Controls.{BindingUpdater, ControlsIterator}
 import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.Controls.{BindingUpdater, ControlsIterator}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl, XFormsSelect1Control}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsRefreshDoneEvent
@@ -26,9 +26,10 @@ import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector}
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.state.ControlState
 
+
 class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
-  import Private._
+  import Private.*
 
   implicit val indentedLogger: IndentedLogger =
     containingDocument.getIndentedLogger("control") // Q: Not "controls"?
@@ -341,13 +342,15 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
       )
 
     def gatherControlsForRefresh: List[String] =
-      ControlsIterator(containingDocument.controls.getCurrentControlTree) filter
-        XFormsControl.controlSupportsRefreshEvents                        map
-        (_.effectiveId)                                                   toList
+      ControlsIterator(containingDocument.controls.getCurrentControlTree)
+        .filter(XFormsControl.controlSupportsRefreshEvents)
+        .map(_.effectiveId)
+        .toList
 
     def gatherControlsForRefresh(containerControl: XFormsContainerControl): List[String] =
-      ControlsIterator(containerControl, includeSelf = true) filter
-        XFormsControl.controlSupportsRefreshEvents           map
-        (_.effectiveId)                                      toList
-  }
+      ControlsIterator(containerControl, includeSelf = true)
+        .filter(XFormsControl.controlSupportsRefreshEvents)
+        .map(_.effectiveId)
+        .toList
+   }
 }

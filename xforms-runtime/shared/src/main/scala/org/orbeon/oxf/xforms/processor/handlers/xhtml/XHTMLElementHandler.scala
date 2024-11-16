@@ -48,9 +48,8 @@ object XHTMLElementHandler {
   class IconAriaXMLReceiver(XMLReceiver: XMLReceiver)
     extends ForwardingXMLReceiver(XMLReceiver) {
 
-    override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+    override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
       super.startElement(uri, localname, qName, processIconAria(uri, localname, attributes))
-    }
   }
 }
 

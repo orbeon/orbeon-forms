@@ -151,7 +151,12 @@ object DomSupport {
     element.id
   }
 
-  def moveIntoViewIfNeeded(containerElem: html.Element, innerContainer: html.Element, itemElem: html.Element): Unit = {
+  def moveIntoViewIfNeeded(
+    containerElem : html.Element,
+    innerContainer: html.Element,
+    itemElem      : html.Element,
+    margin        : Int
+  ): Unit = {
     val containerRect       = containerElem.getBoundingClientRect()
     val itemRect            = itemElem.getBoundingClientRect()
     val isEntirelyContained =
@@ -163,14 +168,12 @@ object DomSupport {
 
       val overflowsBelow = itemRect.bottom > containerRect.bottom
 
-      val Margin = 50
-
       val mainInnerRect = innerContainer.getBoundingClientRect()
       val scrollTop =
         if (overflowsBelow)
-          containerRect.top - mainInnerRect.top + itemRect.bottom - containerRect.bottom + Margin
+          containerRect.top - mainInnerRect.top + itemRect.bottom - containerRect.bottom + margin
         else
-          containerRect.top - mainInnerRect.top - (containerRect.top - itemRect.top + Margin)
+          containerRect.top - mainInnerRect.top - (containerRect.top - itemRect.top + margin)
 
       containerElem.asInstanceOf[js.Dynamic].scrollTo(
         js.Dynamic.literal(top = scrollTop, behavior = "smooth")

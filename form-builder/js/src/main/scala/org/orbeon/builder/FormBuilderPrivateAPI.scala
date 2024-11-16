@@ -66,6 +66,6 @@ object FormBuilderPrivateAPI extends js.Object {
       mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
       mainElem      <- dom.document.querySelectorOpt(".fb-main")
     } locally {
-      moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem)
+      moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
     }
 }

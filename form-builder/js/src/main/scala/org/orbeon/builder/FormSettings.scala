@@ -28,33 +28,35 @@ object FormSettings {
 
       val isNew = containerElem.querySelectorOpt(".fb-settings-mode-new").nonEmpty
 
-      def findCardsForDirections: Map[Direction, html.Element] = {
+      def findCardsForDirections(direction: Direction): Option[html.Element] = {
         val cards = containerElem.querySelectorAllT(".fb-template-card")
+
+        val CardsOnRow = 4 // this is what the CSS allows right now; could we determine it dynamically?
 
         Some(cards.indexWhere(_.classList.contains("xforms-repeat-selected-item-1")))
           .filter(_ >= 0)
-          .map { index =>
+          .flatMap { index =>
 
             val lifted = cards.lift
 
-            (
-              lifted(index - 1).map((Direction.Left : Direction) -> _).toList :::
-              lifted(index + 1).map((Direction.Right: Direction) -> _).toList :::
-              lifted(index - 4).map((Direction.Up   : Direction) -> _).toList :::
-              lifted(index + 4).map((Direction.Down : Direction) -> _).toList
-            ).toMap
+            direction match {
+              case Direction.Left  => lifted(index - 1)
+              case Direction.Right => lifted(index + 1)
+              case Direction.Up    => lifted(index - CardsOnRow)
+              case Direction.Down  => lifted(index + CardsOnRow)
+            }
           }
-          .getOrElse(Map.empty)
       }
 
       if (isNew)
         EventSupport.addListener[KeyboardEvent](containerElem, "keydown", e =>
           KeyMapping.get(e.key).foreach { direction =>
-            findCardsForDirections.get(direction).foreach { card =>
+            findCardsForDirections(direction).foreach { card =>
               moveIntoViewIfNeeded(
                 containerElem.querySelectorOpt(".fb-template-cards-container").get,
                 containerElem.querySelectorOpt(".fb-template-cards").get,
-                card
+                card,
+                margin = 10
               )
               card.click()
             }

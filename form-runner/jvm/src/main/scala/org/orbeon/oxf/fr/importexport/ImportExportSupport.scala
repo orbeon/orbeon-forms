@@ -30,6 +30,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.*
 
+import java.net.URI
 import scala.collection.mutable.ListBuffer
 import scala.util.matching.Regex
 
@@ -457,11 +458,13 @@ object ImportExportSupport {
       phase1
   }
 
+  private val FrResourcesUrl = URI.create("oxf:/apps/fr/i18n/resources.xml")
+
   def frResourcesForRequestedLang(requestedLang: String): NodeInfo = {
 
     val frResources =
-      useAndClose(ResourceManagerWrapper.instance.getContentAsStream("/apps/fr/i18n/resources.xml")) { is =>
-        TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
+      useAndClose(ResourceManagerWrapper.instance.getContentAsStream(FrResourcesUrl.getPath)) { is =>
+        TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, FrResourcesUrl.toString, true, false)
       }
 
     FormRunner.formResourcesInGivenLangOrFirst(frResources.rootElement, requestedLang)

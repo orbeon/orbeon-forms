@@ -26,6 +26,9 @@ object DomSupport {
     def closestT(selector: String): T =
       elem.closest(selector).asInstanceOf[T]
 
+    def closestOpt(selector: String): Option[T] =
+      Option(elem.closestT(selector))
+
     def childrenT: collection.Seq[T] =
       elem.children.asInstanceOf[HTMLCollection[T]]
 
@@ -55,6 +58,16 @@ object DomSupport {
 
     def querySelectorOpt(selectors: String): Option[html.Element] =
       Option(querySelectorT(selectors))
+  }
+
+  implicit class DomEventOps(private val event: dom.Event) extends AnyVal {
+
+    def targetT: html.Element =
+      event.target.asInstanceOf[html.Element]
+
+    def targetOpt: Option[html.Element] =
+      Option(event.targetT)
+
   }
 
   private var lastUsedSuffix: Int = 0

@@ -33,7 +33,7 @@ trait GridSectionMenus {
 
   // Keep pointing to menu so we can move it around as needed
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
-  val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
+  private val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
 
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {
@@ -55,13 +55,18 @@ trait GridSectionMenus {
   // Initialization
   if (globalMenuElem != null) {
     // Click on our own button moves and shows the menu
-    document.addEventListener("click"  , (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-dropdown-button")) moveAndShowMenuHandler(e))
-    document.addEventListener("keydown", (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-dropdown-button")) delegateKeyEventToBootstrapButtonHandler(e))
-    document.addEventListener("click",   (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-remove-button"))   removeIterationHandler(e))
+    document.addEventListener("keydown", (e: dom.Event) =>
+      if (e.targetT.matches(s".fr-$componentName-dropdown-button"))
+        delegateKeyEventToBootstrapButtonHandler(e)
+    )
 
-    // Listeners for all menu actions
     document.addEventListener("click", (e: dom.Event) => {
-      val target  = e.target.asInstanceOf[html.Element]
+
+      val target  = e.targetT
+      if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(e)
+      if (target.matches   (s".fr-$componentName-remove-button")           ) removeIterationHandler(e)
+
+      // Menu actions
       Operation.values foreach { op =>
         val liOpOpt = Option(target.closest(s".fr-$componentName-dropdown-menu .fr-${op.entryName}"))
         liOpOpt.foreach(_ => actionHandler(op, e))
@@ -103,9 +108,9 @@ trait GridSectionMenus {
   // Both callers are in response to  events flowing through `.fr-$componentName-dropdown-button`.
   private def moveMenu(e: dom.Event): Unit = {
 
-    val target    = e.target.asInstanceOf[html.Element]
-    val button    = target.closest(s".fr-$componentName-dropdown-button").asInstanceOf[html.Element]
-    val dropdown  = target.closest(".dropdown")
+    val target    = e.targetT
+    val button    = target.closestT(s".fr-$componentName-dropdown-button")
+    val dropdown  = target.closestT(".dropdown")
 
     // Move globalMenuElem in the DOM just below the button (for positioning, dialog)
     dropdown.parentNode.insertBefore(globalMenuElem, dropdown.nextSibling)
@@ -113,7 +118,7 @@ trait GridSectionMenus {
     globalMenuElem.style.position = "absolute"
 
     Operation.values foreach { op =>
-      val menuItems = globalMenuElem.querySelectorAll(s".dropdown-menu .fr-${op.entryName}").toList.asInstanceOf[List[html.Element]]
+      val menuItems = globalMenuElem.querySelectorAllT(s".dropdown-menu .fr-${op.entryName}").toList
       menuItems.foreach { item =>
         val canDo       = iteration(e).classList.contains(s"can-${op.entryName}")
         val toggleClass = if (canDo) item.classList.remove _ else item.classList.add _

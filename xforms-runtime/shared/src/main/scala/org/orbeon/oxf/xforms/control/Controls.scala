@@ -563,7 +563,6 @@ object Controls {
 
   // Get state to restore
   private def restoringDynamicState = instancesControlsToRestore.value
-  def isRestoringDynamicState   : Boolean                           = restoringDynamicState.isDefined
   def restoringInstanceControls : Option[InstancesControls]         = restoringDynamicState
   def restoringControls         : Option[Map[String, ControlState]] = restoringInstanceControls map (_.controls)
 

@@ -26,12 +26,12 @@ import org.orbeon.oxf.xforms.control.Controls.*
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror.*
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl.*
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsSingleNodeContainerControl}
-import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{DefaultsStrategy, XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
+import org.orbeon.oxf.xforms.state.{ContainersState, ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.Extensions.*
@@ -320,8 +320,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     )
 
     InstancesControls(
-      instances = Controls.iterateInstancesToSerialize(containerOpt, mustSerializeInstance).toList,
-      controls  = gatherRelevantSwitchState(start)
+      containers = ContainersState.Some(containerOpt.map(_.iterateRelevantDescendantOrSelfContainers.map(_.effectiveId).toSet).getOrElse(Set.empty)),
+      instances  = Controls.iterateInstancesToSerialize(containerOpt, mustSerializeInstance).toList,
+      controls   = gatherRelevantSwitchState(start)
     )
   }
 

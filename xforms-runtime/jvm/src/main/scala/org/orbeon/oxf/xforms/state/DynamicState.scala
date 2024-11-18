@@ -62,7 +62,8 @@ case class DynamicState(
   def decodeControls         : List[ControlState]          = fromByteSeq[List[ControlState]](controls)
   def decodeDelayedEvents    : immutable.Seq[DelayedEvent] = fromByteSeq[List[DelayedEvent]](delayedEvents)
 
-  def decodeInstancesControls: InstancesControls = InstancesControls(decodeInstances, decodeControls map (c => (c.effectiveId, c)) toMap)
+  def decodeInstancesControls: InstancesControls =
+    InstancesControls(ContainersState.All, decodeInstances, decodeControls map (c => (c.effectiveId, c)) toMap)
 
   // Encode to a string representation
   def encodeToString(compress: Boolean, isForceEncryption: Boolean): String =

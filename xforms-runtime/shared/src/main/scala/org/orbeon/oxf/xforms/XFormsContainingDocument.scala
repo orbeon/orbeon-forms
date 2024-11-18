@@ -195,13 +195,14 @@ class XFormsContainingDocument(
     this._lastAjaxResponse = lastAjaxResponse
 
     XFormsAPI.withContainingDocument(this) {
-      Controls.withDynamicStateToRestore(decodeControls) {
+      val instancesControls = decodeControls
+      Controls.withDynamicStateToRestore(instancesControls) {
 
         // Restore models state
         addAllModels()
 
         // Restore top-level models state, including instances
-        restoreModelsState(deferRRR = false)
+        restoreModelsState(instancesControls.instances, deferRRR = false)
 
         // Restore controls state
         // Store serialized control state for retrieval later

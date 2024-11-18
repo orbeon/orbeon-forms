@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XForms
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{DefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
-import org.orbeon.oxf.xforms.state.ControlState
+import org.orbeon.oxf.xforms.state.{ContainersState, ControlState, InstanceState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om
@@ -303,10 +303,21 @@ class XFormsComponentControl(
         XXFormsDynamicControl.updateDynamicShadowTree(this, collector)
     }
 
-    if (Controls.isRestoringDynamicState)
-      restoreModels()
-    else
-      initializeModels()
+    val nestedContainer = nestedContainerOpt.getOrElse(throw new IllegalStateException)
+
+    // Restore only containers marked as needed restoration:
+    // https://github.com/orbeon/orbeon-forms/issues/5856
+
+    Controls.restoringInstanceControls match {
+      case Some(InstancesControls(ContainersState.All, instances, _)) =>
+        // Case of a full state restoration of the `DynamicState`
+        restoreModels(instances)
+      case Some(InstancesControls(ContainersState.Some(containers), instances, _)) if containers(nestedContainer.effectiveId) =>
+        // Case of an `xxf:dynamic` state restoration where only some containers must be restored
+        restoreModels(instances)
+      case _ =>
+        initializeModels()
+    }
 
     addEnabledListener()
   }
@@ -404,9 +415,9 @@ class XFormsComponentControl(
         Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model), EventCollector.ToReview)
     }
 
-  private def restoreModels(): Unit =
+  private def restoreModels(instances: List[InstanceState]): Unit =
     nestedContainerOpt foreach { nestedContainer =>
-      nestedContainer.restoreModelsState(deferRRR = true)
+      nestedContainer.restoreModelsState(instances, deferRRR = true)
       initializeMirrorListenerIfNeeded(dispatch = false)
       // Do RRR as isRestoringDynamicState() didn't do it
       for (model <- nestedContainer.models) {

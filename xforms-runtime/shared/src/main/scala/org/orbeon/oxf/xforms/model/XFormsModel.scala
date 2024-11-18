@@ -26,12 +26,11 @@ import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentatio
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
-import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.state.InstancesControls
+import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
@@ -365,15 +364,10 @@ trait XFormsModelInstances {
   }
 
   // Restore all the instances serialized as children of the given container element.
-  def restoreInstances(): Unit = {
+  def restoreInstances(instances: List[InstanceState]): Unit = {
 
     val instanceStatesIt =
-      for {
-        InstancesControls(instanceStates, _) <- Controls.restoringInstanceControls.iterator
-        instanceState                        <- instanceStates
-        if effectiveId == instanceState.modelEffectiveId  // NOTE: Here instance must contain document
-      } yield
-        instanceState
+      instances.iterator.filter(_.modelEffectiveId == effectiveId)
 
     instanceStatesIt foreach { state =>
 

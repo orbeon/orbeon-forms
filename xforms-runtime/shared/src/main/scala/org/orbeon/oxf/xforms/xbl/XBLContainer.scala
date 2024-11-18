@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
@@ -97,6 +98,12 @@ class XBLContainer(
 
   private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = mutable.ArrayBuffer()
   def childrenXBLContainers: Iterator[XBLContainer] = _childrenXBLContainers.iterator
+
+  def iterateRelevantDescendantOrSelfContainers: Iterator[XBLContainer] =
+    if (isRelevant)
+      Iterator(this) ++ childrenXBLContainers.flatMap(_.iterateRelevantDescendantOrSelfContainers)
+    else
+      Iterator.empty
 
   def effectiveId: String = _effectiveId
   def partAnalysis: PartAnalysis = parentXBLContainer.map(_.partAnalysis).orNull
@@ -232,12 +239,12 @@ trait ModelContainer {
       (models.iterator flatMap (_.findObjectById(staticId, contextItemOpt))).nextOption()
     }
 
-  def restoreModelsState(deferRRR: Boolean): Unit = {
+  def restoreModelsState(instances: List[InstanceState], deferRRR: Boolean): Unit = {
     // Handle this container only
 
     // 1: Restore all instances
     for (model <- _models)
-      model.restoreInstances()
+      model.restoreInstances(instances)
 
     // 2: Restore everything else
     // NOTE: It's important to do this as a separate step, because variables which might refer to other models'

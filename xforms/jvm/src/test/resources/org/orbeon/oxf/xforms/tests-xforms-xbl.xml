@@ -5281,6 +5281,97 @@
         </output>
     </test>
 
+    <test description="#5856: xxf:dynamic must initialize newly-created components" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <xh:html>
+                                <xh:head>
+                                    <xf:model id="model"/>
+                                    <xbl:xbl>
+                                        <xbl:binding id="fr-foo" element="fr|foo">
+                                            <xbl:implementation>
+                                                <xf:model id="my-model">
+                                                    <xf:instance id="my-instance">
+                                                        <_/>
+                                                    </xf:instance>
+                                                    <xf:action event="xforms-model-construct-done">
+                                                        <xf:message value="concat('xforms-model-construct-done: ', event('xxf:absolute-targetid'))"/>
+                                                    </xf:action>
+                                                </xf:model>
+                                            </xbl:implementation>
+                                            <xbl:template/>
+                                        </xbl:binding>
+                                    </xbl:xbl>
+                                </xh:head>
+                                <xh:body>
+                                    <fr:foo id="my-foo-1"/>
+                                </xh:body>
+                            </xh:html>
+                        </xf:instance>
+                        <xf:action event="xforms-ready">
+                            <xf:insert
+                                ref="//fr:foo"
+                                origin="xf:element('fr:foo', xf:attribute('id', 'my-foo-2'))"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xxf:dynamic ref="instance()" id="my-dynamic"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <xh:html>
+                                    <xh:head>
+                                        <xf:model id="model" xxf:state-handling="client"/>
+                                        <xbl:xbl>
+                                            <xbl:binding id="fr-foo" element="fr|foo">
+                                                <xbl:implementation>
+                                                    <xf:model id="my-model" xxf:state-handling="client">
+                                                        <xf:instance id="my-instance">
+                                                            <_/>
+                                                        </xf:instance>
+                                                        <xf:action event="xforms-model-construct-done">
+                                                            <xf:message value="concat('xforms-model-construct-done: ', event('xxf:absolute-targetid'))"/>
+                                                        </xf:action>
+                                                    </xf:model>
+                                                </xbl:implementation>
+                                                <xbl:template/>
+                                            </xbl:binding>
+                                        </xbl:xbl>
+                                    </xh:head>
+                                    <xh:body>
+                                        <fr:foo id="my-foo-1"/>
+                                        <fr:foo id="my-foo-2"/>
+                                    </xh:body>
+                                </xh:html>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:inner-html id="my-dynamic">
+                            <xxf:value>&lt;div id="my-dynamic≡my-foo-1" class="xbl-component xbl-fr-foo"&gt;&lt;/div&gt;&lt;div id="my-dynamic≡my-foo-2" class="xbl-component xbl-fr-foo"&gt;&lt;/div&gt;</xxf:value>
+                        </xxf:inner-html>
+                    </xxf:control-values>
+                    <xxf:message level="modal">xforms-model-construct-done: |my-dynamic≡my-foo-1≡my-model|</xxf:message>
+                    <xxf:message level="modal">xforms-model-construct-done: |my-dynamic≡my-foo-2≡my-model|</xxf:message>
+                </xxf:action>
+
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

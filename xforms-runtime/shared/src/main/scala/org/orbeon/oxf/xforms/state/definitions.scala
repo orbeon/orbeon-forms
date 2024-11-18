@@ -45,7 +45,13 @@ case class InstanceState(
     )
 }
 
-case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState])
+sealed trait ContainersState
+object ContainersState {
+  case object All                           extends ContainersState
+  case class  Some(containers: Set[String]) extends ContainersState
+}
+
+case class InstancesControls(containers: ContainersState, instances: List[InstanceState], controls: Map[String, ControlState])
 
 case class RequestParameters(
   uuid                         : String,

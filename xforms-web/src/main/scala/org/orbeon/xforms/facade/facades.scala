@@ -17,7 +17,7 @@ import org.orbeon.xforms.{$, Page, YUICustomEvent}
 import org.scalajs
 import org.scalajs.dom
 import org.scalajs.dom.Element
-import org.scalajs.dom.{FocusEvent, UIEvent, html, raw}
+import org.scalajs.dom.{FocusEvent, UIEvent, html}
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.xforms
 
@@ -158,7 +158,7 @@ class Property[T] extends js.Object {
 @js.native
 object Utils extends js.Object {
   def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
-  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element      = js.native
+  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : Element          = js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
 }
 

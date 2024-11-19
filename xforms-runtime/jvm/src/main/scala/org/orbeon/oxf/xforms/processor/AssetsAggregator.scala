@@ -28,6 +28,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable.{Buffer, LinkedHashSet}
+import scala.collection.mutable
 
 
 // Aggregate CSS and JS resources under `<head>`.
@@ -177,7 +178,7 @@ class AssetsAggregator extends ProcessorImpl {
                   element("script", xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "src" -> resource :: attsBase)
 
                 aggregate(baselineJS, outputJSElement, namespaceOpt, isCSS = false)
-                aggregate(supplementalJS.view.filterNot(baselineJS).to(Set), outputJSElement, namespaceOpt, isCSS = false)
+                aggregate(supplementalJS.view.filterNot(baselineJS).to(mutable.LinkedHashSet), outputJSElement, namespaceOpt, isCSS = false)
                 preservedJS foreach outputPreservedElement
               }
 

@@ -678,13 +678,13 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td colspan="2">
-                                        <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
+                                        <fb:boolean-or-formula ref="relevant">
                                             <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td colspan="2">
-                                        <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
+                                        <fb:boolean-or-formula ref="readonly">
                                             <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
                                         </fb:boolean-or-formula>

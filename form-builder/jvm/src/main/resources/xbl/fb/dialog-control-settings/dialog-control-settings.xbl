@@ -1591,7 +1591,7 @@
                                             value="@type"/>
 
                                         <xf:group ref=".[$validation-type = 'required']/required">
-                                            <fb:boolean-or-formula ref="." resources-ref="$resources"/>
+                                            <fb:boolean-or-formula ref="."/>
                                         </xf:group>
 
                                         <!-- Built-in type -->
@@ -1745,13 +1745,13 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
+                                        <fb:boolean-or-formula ref="relevant">
                                             <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
-                                        <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
+                                        <fb:boolean-or-formula ref="readonly">
                                             <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
                                         </fb:boolean-or-formula>

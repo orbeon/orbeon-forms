@@ -41,12 +41,10 @@
         </xbl:handlers>
 
         <xbl:template>
-            <!-- Bindings specified on control -->
-            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
             <xf:var name="binding"       value="xxf:binding('fb-boolean-or-formula')"/>
             <xf:var name="true-or-false" value="$binding = ('true()', 'false()')"/>
-            <xf:var name="items"         value="$resources/dialog-control-settings/required/item"/>
+            <xf:var name="items"         value="xxf:resource-elements('dialog-control-settings.required.item', '|fr-form-resources|')"/>
 
             <xh:div id="fr-boolean-or-formula-elem" class="fr-component-group" xxf:control="true">
                 <xf:select1 ref="$binding" appearance="full xxf:horizontal" id="select1">
@@ -68,8 +66,8 @@
                     id="xpath-textarea"
                     ref="if ($true-or-false) then '' else $binding">
 
-                    <xf:label ref="$resources/dialog-control-settings/formula/label" appearance="minimal"/>
-                    <xf:alert ref="$resources/dialog-control-settings/formula/alert"/>
+                    <xf:label ref="xxf:r('dialog-control-settings.formula.label', '|fr-form-resources|')" appearance="minimal"/>
+                    <xf:alert ref="xxf:r('dialog-control-settings.formula.alert', '|fr-form-resources|')"/>
 
                     <!-- When the control appears and its value is empty, it means that the
                          user just chose the "Formula" option. -->

@@ -484,9 +484,10 @@ object FormBuilderXPathApi {
     val lhhaTest: Test = LHHA.QNameForValue(lhha)
 
     val allHelpElementsWithControlNames =
-      ctx.bodyElem descendant lhhaTest map
-      (lhhaElem => lhhaElem -> lhhaElem.attValue("ref")) collect
-      { case (lhhaElem, HelpRefMatcher(controlName)) => lhhaElem -> controlName }
+      ctx.bodyElem
+        .descendant(lhhaTest)
+        .map(lhhaElem => lhhaElem -> lhhaElem.attValue("ref"))
+        .collect { case (lhhaElem, HelpRefMatcher(controlName)) => lhhaElem -> controlName }
 
     allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) =>
 

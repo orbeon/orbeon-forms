@@ -187,7 +187,11 @@
                             value="event('xxf:item-value')"/>
 
                     </xf:select1>
-                    <xf:input id="if-formula" ref="$if-attribute[not($is-predefined-condition)]" incremental="true">
+                    <xf:input
+                        id="if-formula"
+                        ref="$if-attribute[not($is-predefined-condition)]"
+                        incremental="true"
+                        appearance="xpath-completion">
                         <xf:label ref="$form-resources/dialog-control-settings/formula/label" appearance="minimal"/>
                         <xf:alert ref="$form-resources/dialog-control-settings/formula/alert"/>
                         <xf:setfocus
@@ -397,6 +401,7 @@
                                     <xf:case value="'source-path'">
                                         <xf:input
                                             class="fb-action-option-3-col-span-1"
+                                            appearance="xpath-completion"
                                             ref="*:var[@name[. = ('control-name', 'source-path')]]/(@value | @select)">
                                             <xf:label ref="$form-resources/components/parameters-editor/xpath/label" appearance="minimal"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
@@ -415,6 +420,7 @@
                                 <!-- Input for XPath expression to request body -->
                                 <xf:input
                                     ref="xf:var[@name = 'path']/@value"
+                                    appearance="xpath-completion"
                                     incremental="true"
                                     class="fb-action-option-3-col-span-1">
                                     <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
@@ -534,6 +540,7 @@
                                     <xf:case value="'source-path'">
                                         <xf:input
                                             class="fb-action-option-3-col-span-1"
+                                            appearance="xpath-completion"
                                             ref="*:var[@name[. != 'path']]/(@value | @select)">
                                             <xf:label ref="$form-resources/components/parameters-editor/xpath/label" appearance="minimal"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
@@ -683,6 +690,7 @@
                                     </xf:select1>
                                     <xf:textarea
                                         ref="(*:variable | *:var)[@name = 'control-value']/(@value | @select)[1]"
+                                        appearance="xpath-completion"
                                         incremental="true"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/source-xpath/label" appearance="minimal"/>
@@ -704,22 +712,42 @@
                                         </xf:itemset>
                                     </xf:select1>
                                     <xh:div class="fb-action-option-3-col-span-1">
-                                        <xf:textarea ref="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]" id="fb-actions-items" incremental="true" class="fb-action-xpath">
+                                        <xf:textarea
+                                                ref="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]"
+                                                id="fb-actions-items"
+                                                incremental="true"
+                                                class="fb-action-xpath"
+                                                appearance="xpath-completion">
                                             <xf:label ref="$form-resources/dialog-actions/items/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/items/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:textarea>
-                                        <xf:input ref=".//(*:variable | *:var)[@name = 'item-label']/(@value | @select)[1]" id="fb-actions-label" incremental="true" class="fb-action-xpath">
+                                        <xf:input
+                                                ref=".//(*:variable | *:var)[@name = 'item-label']/(@value | @select)[1]"
+                                                id="fb-actions-label"
+                                                incremental="true"
+                                                class="fb-action-xpath"
+                                                appearance="xpath-completion">
                                             <xf:label ref="$form-resources/dialog-actions/item-label/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-label/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
-                                        <xf:input ref=".//(*:variable | *:var)[@name = 'item-value']/(@value | @select)[1]" id="fb-actions-value" incremental="true" class="fb-action-xpath">
+                                        <xf:input
+                                                ref=".//(*:variable | *:var)[@name = 'item-value']/(@value | @select)[1]"
+                                                id="fb-actions-value"
+                                                incremental="true"
+                                                class="fb-action-xpath"
+                                                appearance="xpath-completion">
                                             <xf:label ref="$form-resources/dialog-actions/item-value/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-value/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
-                                        <xf:input ref=".//(*:variable | *:var)[@name = 'item-hint']/(@value | @select)[1]" id="fb-actions-hint" incremental="true" class="fb-action-xpath">
+                                        <xf:input
+                                                ref=".//(*:variable | *:var)[@name = 'item-hint']/(@value | @select)[1]"
+                                                id="fb-actions-hint"
+                                                incremental="true"
+                                                class="fb-action-xpath"
+                                                appearance="xpath-completion">
                                             <xf:label ref="$form-resources/dialog-actions/item-hint/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-hint/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>

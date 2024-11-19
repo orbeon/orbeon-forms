@@ -83,7 +83,7 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
-                            <xf:input ref="@resource">
+                            <xf:input ref="@resource" appearance="xpath-completion">
                                 <xf:label ref="xxf:r('dialog-http-services.resource.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-http-services.resource.hint',  '|fr-form-resources|')"/>
                                 <xf:alert ref="xxf:r('alerts.required',                     '|fr-form-resources|')"/>
@@ -92,14 +92,14 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td>
-                            <xf:input ref="xf:itemset/@ref">
+                            <xf:input ref="xf:itemset/@ref" appearance="xpath-completion">
                                 <xf:label ref="xxf:r('dialog-actions.items.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.items.hint',  '|fr-form-resources|')"/>
                                 <xf:alert ref="xxf:r('alerts.xpath',               '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                         <xh:td>
-                            <xf:input ref="xf:itemset/xf:label/@ref">
+                            <xf:input ref="xf:itemset/xf:label/@ref" appearance="xpath-completion">
                                 <xf:label ref="xxf:r('dialog-actions.item-label.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-label.hint',  '|fr-form-resources|')"/>
                                 <xf:alert ref="xxf:r('alerts.xpath',                    '|fr-form-resources|')"/>
@@ -108,14 +108,14 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td>
-                            <xf:input ref="xf:itemset/xf:value/@ref">
+                            <xf:input ref="xf:itemset/xf:value/@ref" appearance="xpath-completion">
                                 <xf:label ref="xxf:r('dialog-actions.item-value.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-value.hint',  '|fr-form-resources|')"/>
                                 <xf:alert ref="xxf:r('alerts.xpath',                    '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                         <xh:td>
-                            <xf:input ref="xf:itemset/xf:hint/@ref">
+                            <xf:input ref="xf:itemset/xf:hint/@ref" appearance="xpath-completion">
                                 <xf:label ref="xxf:r('dialog-actions.item-hint.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-hint.hint',  '|fr-form-resources|')"/>
                                 <xf:alert ref="xxf:r('alerts.xpath',                   '|fr-form-resources|')"/>

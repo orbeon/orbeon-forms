@@ -27,7 +27,6 @@ import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.collection.mutable.{Buffer, LinkedHashSet}
 import scala.collection.mutable
 
 
@@ -68,13 +67,13 @@ class AssetsAggregator extends ProcessorImpl {
             var currentInlineElement: InlineElement = _
 
             // Resources gathered
-            val baselineCSS     = LinkedHashSet[String]()
-            val baselineJS      = LinkedHashSet[String]()
-            val supplementalCSS = LinkedHashSet[String]()
-            val supplementalJS  = LinkedHashSet[String]()
+            val baselineCSS     = mutable.LinkedHashSet[String]()
+            val baselineJS      = mutable.LinkedHashSet[String]()
+            val supplementalCSS = mutable.LinkedHashSet[String]()
+            val supplementalJS  = mutable.LinkedHashSet[String]()
 
-            val preservedCSS    = Buffer[HeadElement]()
-            val preservedJS     = Buffer[HeadElement]()
+            val preservedCSS    = mutable.Buffer[HeadElement]()
+            val preservedJS     = mutable.Buffer[HeadElement]()
 
             // Whether we are in separate deployment as in that case we don't combine paths to user resources
             val request  = XFormsCrossPlatformSupport.externalContext.getRequest
@@ -255,7 +254,7 @@ object AssetsAggregator extends Logging {
       val appVersion = URLRewriterUtils.getApplicationResourceVersion
 
       // All resource paths are hashed
-      val itemsToHash = assets ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set())
+      val itemsToHash = assets ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set.empty)
       val resourcesHash = SecureUtils.digestStringToHexShort(itemsToHash mkString "|")
 
       // Cache mapping so that resource can be served by resource server

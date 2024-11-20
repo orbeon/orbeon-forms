@@ -572,433 +572,6 @@
                                 </xf:switch>
                             </xf:group>
 
-                            <!-- Some common form edition functions -->
-                            <xf:group ref="instance('fb-form-instance')" appearance="xxf:internal">
-
-                                <!-- Don't let any event go out from within this group -->
-                                <!-- Q: Do we still need this? -->
-                                <xf:action ev:event="#all" ev:propagate="stop"/>
-
-                                <!-- Form settings dialog -->
-                                <fb:dialog-form-settings
-                                    id="dialog-form-settings"
-                                    resources-ref="$form-resources"
-                                    fr-resources-ref="$fr-resources"
-                                    body-ref="$body">
-
-                                    <!-- Update title/description -->
-                                    <xf:action event="fb-update-metadata">
-                                        <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
-                                        <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
-
-                                        <xf:delete ref="bind('description-bind')/@mediatype"/>
-                                        <xf:insert
-                                            if="event('description-mediatype') = 'text/html'"
-                                            context="bind('description-bind')"
-                                            origin="xf:attribute('mediatype', 'text/html')"/>
-
-                                        <xf:delete
-                                            bind="thumbnail-bind"/>
-                                        <xf:insert
-                                            if="xxf:non-blank(event('thumbnail'))"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="
-                                                xf:element(
-                                                    'thumbnail',
-                                                    (
-                                                        xf:attribute('filename',  event('thumbnail-filename')),
-                                                        xf:attribute('mediatype', event('thumbnail-mediatype')),
-                                                        xf:attribute('size',      event('thumbnail-size')),
-                                                        event('thumbnail')
-                                                    )
-                                                )"/>
-
-                                        <!-- Add/remove allow-template-use setting as needed -->
-                                        <xf:delete
-                                            bind="allow-template-use-bind"/>
-                                        <xf:insert
-                                            if="event('allow-template-use') = 'true'"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('allow-template-use', event('allow-template-use'))"/>
-
-                                        <!-- Add/remove singleton setting as needed -->
-                                        <xf:delete
-                                            bind="singleton-bind"/>
-                                        <xf:insert
-                                            if="event('singleton') = 'true'"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('singleton', event('singleton'))"/>
-
-                                        <!-- Add/remove wizard setting as needed -->
-                                        <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status'">
-                                            <xf:var name="name" value="."/>
-                                            <xf:delete
-                                                ref="bind(concat($name, '-bind'))"/>
-                                            <xf:insert
-                                                if="event($name) = ('true', 'false')"
-                                                context="bind('metadata-bind')"
-                                                ref="*"
-                                                origin="xf:element($name, event($name))"/>
-                                        </xf:action>
-
-                                        <!-- Add/remove wizard mode setting as needed -->
-                                        <xf:delete
-                                            bind="wizard-mode-bind"/>
-                                        <xf:insert
-                                            if="event('wizard-mode') = ('free', 'lax', 'strict')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('wizard-mode', event('wizard-mode'))"/>
-
-                                        <xf:delete
-                                            bind="wizard-subsections-toc-bind"/>
-                                        <xf:insert
-                                            if="event('wizard-subsections-toc') = ('active', 'all', 'none')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('wizard-subsections-toc', event('wizard-subsections-toc'))"/>
-
-                                        <!-- Add/remove XForms properties as needed -->
-                                        <xf:delete
-                                            bind="attachment-max-size-per-file-bind"/>
-                                        <xf:insert
-                                            if="event('attachment-max-size-per-file') castable as xs:integer and
-                                                xs:integer(event('attachment-max-size-per-file')) ge 0"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:upload.max-size-per-file', event('attachment-max-size-per-file'))"/>
-
-                                        <xf:delete
-                                            bind="attachment-max-size-aggregate-per-control-bind"/>
-                                        <xf:insert
-                                            if="event('attachment-max-size-aggregate-per-control') castable as xs:integer and
-                                                xs:integer(event('attachment-max-size-aggregate-per-control')) ge 0"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:upload.max-size-aggregate-per-control', event('attachment-max-size-aggregate-per-control'))"/>
-
-                                        <xf:delete
-                                            bind="attachment-max-size-aggregate-per-form-bind"/>
-                                        <xf:insert
-                                            if="event('attachment-max-size-aggregate-per-form') castable as xs:integer and
-                                                xs:integer(event('attachment-max-size-aggregate-per-form')) ge 0"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:upload.max-size-aggregate-per-form', event('attachment-max-size-aggregate-per-form'))"/>
-
-                                        <xf:delete
-                                            bind="attachment-mediatypes-bind"/>
-                                        <xf:insert
-                                            if="xxf:non-blank(event('attachment-mediatypes'))"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:upload.mediatypes', event('attachment-mediatypes'))"/>
-
-                                        <xf:delete
-                                            bind="labels-bind"/>
-                                        <xf:insert
-                                            if="exists(event('labels'))"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:label.appearance', event('labels'))"/>
-
-                                        <xf:delete
-                                            bind="hints-bind"/>
-                                        <xf:insert
-                                            if="exists(event('hints'))"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
-
-                                        <xf:delete
-                                            bind="automatic-hints-bind"/>
-                                        <xf:insert
-                                            if="event('automatic-hints') = ('true', 'false')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('automatic-hints', event('automatic-hints'))"/>
-
-                                        <xf:delete
-                                            bind="data-migration-bind"/>
-                                        <xf:insert
-                                            if="event('data-migration') = ('enabled', 'disabled', 'error')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('data-migration', event('data-migration'))"/>
-
-                                        <xf:action iterate="'rendered-page-orientation', 'rendered-page-size', 'html-page-layout', 'density', 'grid-tab-order'">
-                                            <xf:var name="n" value="."/>
-                                            <xf:delete
-                                                ref="bind(concat($n, '-bind'))"/>
-                                            <xf:insert
-                                                if="not(event($n) = 'default')"
-                                                context="bind('metadata-bind')"
-                                                ref="*"
-                                                origin="xf:element($n, event($n))"/>
-                                        </xf:action>
-
-                                        <xf:delete
-                                            bind="readonly-disable-calculate-bind"/>
-                                        <xf:insert
-                                            if="event('readonly-disable-calculate') = ('true', 'false')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('readonly-disable-calculate', event('readonly-disable-calculate'))"/>
-
-                                        <xf:action iterate="'relevant', 'readonly'" type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
-                                            fbf:writeAndNormalizeCalculatedMip((), ., event(.))
-                                        </xf:action>
-
-                                        <xf:delete
-                                            bind="analysis-calculate-bind"/>
-                                        <xf:insert
-                                            if="event('analysis-calculate') = ('true', 'false')"
-                                            context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
-
-                                        <xf:delete
-                                            bind="xbl-bind"/>
-                                        <xf:insert
-                                            if="exists(event('control-settings-elems')/@*)"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="
-                                                xf:element(
-                                                    'xbl',
-                                                    event('control-settings-elems')[exists(@*)]
-                                                )"/>
-
-                                        <!-- Load a specific form template to get started -->
-                                        <xf:send
-                                            if="event('mode') = 'new' and xxf:non-blank(event('template-url'))"
-                                            submission="fr-get-document-submission">
-                                            <xf:property name="data-or-draft" value="'data'"/>
-                                            <xf:property name="document-url"  value="event('template-url')"/>
-                                            <xf:property name="for"           value="'load-template'" xxf:tunnel="true"/>
-                                        </xf:send>
-
-                                    </xf:action>
-                                    <!-- Continuation of `fr-get-document-submission` after success loading the form template -->
-                                    <xf:action
-                                        observer="fr-get-document-submission"
-                                        event="xforms-submit-done"
-                                        if="event('for') = 'load-template'">
-                                        <!-- Continue data setup -->
-                                        <xf:dispatch name="fb-data-ready" targetid="fr-form-model">
-                                            <!-- Don't enable the new form to be a template! -->
-                                            <xf:property name="allow-template-use" value="false()"/>
-                                        </xf:dispatch>
-                                    </xf:action>
-                                    <!-- Update app/form name if changed -->
-                                    <xf:action
-                                            event="fb-update-metadata"
-                                            if="event('mode') = 'new' or bind('application-name-bind') != event('app') or bind('form-name-bind') != event('form')">
-
-                                        <!-- Copy data to main instance -->
-                                        <xf:setvalue ref="bind('application-name-bind')" value="event('app')"/>
-                                        <xf:setvalue ref="bind('form-name-bind')"        value="event('form')"/>
-
-                                        <!-- Refresh components -->
-                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
-                                            <xf:property name="deannotate" value="true()"/>
-                                        </xf:dispatch>
-                                    </xf:action>
-                                    <!--  *After* app/form name change, continue the process in `app-form` mode -->
-                                    <xf:action
-                                            event="fb-update-metadata"
-                                            if="event('mode') = 'app-form'"
-                                            type="xpath">
-                                        fr:run-process('oxf.fr.detail.process', 'resume')
-                                    </xf:action>
-                                    <!-- "Save as" -->
-<!--                                    <xf:action-->
-<!--                                            event="fb-update-metadata"-->
-<!--                                            if="event('mode') = 'save-as'">-->
-<!--                                        &lt;!&ndash; Create new document id &ndash;&gt;-->
-<!--                                        <xf:setvalue-->
-<!--                                            ref="xxf:instance('fr-parameters-instance')/document"-->
-<!--                                            value="secure:randomHexId()"/>-->
-<!--                                        &lt;!&ndash; Actually save &ndash;&gt;-->
-<!--                                        <xf:action type="xpath">-->
-<!--                                            fbf:saveAs(-->
-<!--                                                fr:document-id()-->
-<!--                                            )-->
-<!--                                        </xf:action>-->
-<!--                                    </xf:action>-->
-                                </fb:dialog-form-settings>
-
-                                <fb:dialog-email-settings
-                                    id="dialog-email-settings"
-                                    resources-ref="$form-resources"
-                                    fr-resources-ref="$fr-resources"
-                                    body-ref="$body">
-
-                                    <xf:action ev:event="fb-update">
-                                        <xf:delete
-                                            bind="email-bind"/>
-                                        <xf:insert
-                                            if="exists(event('email'))"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="event('email')"/>
-                                    </xf:action>
-
-                                </fb:dialog-email-settings>
-
-                                <fb:dialog-messages
-                                    id="dialog-messages"
-                                    resources-ref="$form-resources"
-                                    fr-resources-ref="$fr-resources"/>
-
-                                <!-- Other dialogs -->
-                                <xf:var name="form" value="."/>
-
-                                <fb:dialog-control-settings   id="dialog-control-settings"   ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-itemsets           id="dialog-itemsets"                            resources-ref="$form-resources"/>
-                                <fb:dialog-edit-source        id="dialog-edit-source"        ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-http-services      id="dialog-http-services"      ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-ids                id="dialog-ids"                ref="$form"      resources-ref="$form-resources"/>
-
-                                <fb:dialog-search             id="dialog-search"             ref="$form"      resources-ref="$form-resources">
-                                    <xf:action
-                                        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-                                        event="fb-apply"
-                                        if="xxf:non-blank(event('control-name'))">
-
-                                        <xf:var
-                                            name="control-id"
-                                            value="fbf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
-
-                                        <!-- This is done again if we open the settings dialog, but it's ok -->
-                                        <xf:action type="xpath">
-                                            fbf:selectCellForControlId($control-id)
-                                        </xf:action>
-
-                                        <xf:dispatch
-                                            name="fb-move-selected-cell-into-view"
-                                            targetid="fr-form-model"/>
-
-                                        <xf:dispatch
-                                            if="event('open-settings')"
-                                            name="fb-show-dialog"
-                                            targetid="dialog-control-settings">
-                                            <xf:property
-                                                name="control-id"
-                                                value="$control-id"/>
-                                        </xf:dispatch>
-
-                                    </xf:action>
-                                </fb:dialog-search>
-
-                                <fb:dialog-pdf                id="dialog-pdf"                ref="$form"      resources-ref="$form-resources">
-                                    <xf:action ev:event="fb-apply">
-                                        <xf:delete bind="pdf-attachments-bind"/>
-                                        <xf:insert
-                                            context="bind('attachments-bind')"
-                                            ref="*"
-                                            origin="event('pdf-attachments')"/>
-                                    </xf:action>
-                                </fb:dialog-pdf>
-
-                                <fb:dialog-test-pdf           id="dialog-test-pdf"           ref="$form"      resources-ref="$form-resources">
-                                    <xf:action event="fb-apply">
-
-                                        <!-- Set these globally so they stay "sticky" -->
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-calculate"    value="event('disable-calculate')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-default"      value="event('disable-default')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-relevant"     value="event('disable-relevant')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-hints"    value="event('show-hints')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-alerts"   value="event('show-alerts')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-required" value="event('show-required')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-use-pdf-template"  value="event('use-pdf-template')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-name" value="event('pdf-template-name')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-lang" value="event('pdf-template-lang')"/>
-
-                                        <xf:var
-                                            name="for-form-being-tested"
-                                            value="event('for-form-being-tested') = true()"/>
-
-                                        <xf:action if="$for-form-being-tested">
-                                            <!-- Run indirectly by asking the form being tested to prepare data -->
-                                            <!-- NOTE: If `event('use-form-data')` is `false()` we still go through
-                                                 the indirection so we can get the form language. -->
-                                            <xf:action type="javascript">
-                                                <xf:param
-                                                    name="useFormData"
-                                                    value="event('use-form-data')"/>
-                                                <xf:body>
-                                                    const contentWindow = window.document.querySelector("iframe.fb-test-iframe").contentWindow;
-                                                    contentWindow.ORBEON.xforms.Document.dispatchEvent(
-                                                        {
-                                                            targetId:  'fr-form-model',
-                                                            form: contentWindow.document.querySelector('form'),
-                                                            eventName: 'fb-test-pdf-prepare-data',
-                                                            properties: { 'use-form-data': useFormData }
-                                                        }
-                                                    );
-                                                </xf:body>
-                                            </xf:action>
-                                        </xf:action>
-                                        <xf:action if="not($for-form-being-tested)">
-                                            <!-- Run directly -->
-                                            <xf:send submission="fb-test-pdf-submission">
-                                                <xf:property name="fr-form-data"         value="''"/>
-                                                <xf:property name="language"             value="$fb-lang"/>
-                                                <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
-                                            </xf:send>
-                                        </xf:action>
-                                    </xf:action>
-                                </fb:dialog-test-pdf>
-
-                                <xf:group bind="fb-toolbox-workflow-bind">
-                                    <fb:workflow20201
-                                        id="fb-workflow20201-dialog"
-                                        resources-ref="$form-resources"
-                                        ref="frf:metadataInstanceRootOpt(xxf:instance('fb-form-instance'))"/>
-                                </xf:group>
-                                <xf:group bind="fb-toolbox-permissions-bind">
-                                    <fb:permissions
-                                        id="fb-permissions-dialog"
-                                        resources-ref="$form-resources"
-                                        metadata-ref="frf:metadataInstanceRootOpt(xxf:instance('fb-form-instance'))"/>
-                                </xf:group>
-
-                                <xf:action event="fr-save" observer="dialog-edit-source">
-                                    <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
-                                        <xf:property name="data" value="event('value')"/>
-                                    </xf:dispatch>
-                                </xf:action>
-
-                                <fr:alert-dialog id="dialog-confirmation">
-                                    <fr:label ref="$form-resources/dialog-confirmation/label"/>
-                                    <fr:negative-choice><fr:label value="$fr-resources/buttons/no"  mediatype="text/html"/></fr:negative-choice>
-                                    <fr:positive-choice><fr:label value="$fr-resources/buttons/yes" mediatype="text/html"/></fr:positive-choice>
-                                </fr:alert-dialog>
-
-                                <xf:action event="fb-request-delete-http-service" observer="dialog-http-services">
-                                    <xf:var name="service-name"     value="event('service-name')"/>
-                                    <xf:var name="impacted-actions" value="fbf:countImpactedActions($model, $service-name)" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
-                                    <xf:dispatch name="fr-show" targetid="dialog-confirmation">
-                                        <xf:property
-                                            name="message"
-                                            value="
-                                                xxf:format-message(
-                                                    $form-resources/messages/delete-service,
-                                                    (
-                                                        $service-name,    (: service name              :)
-                                                        $impacted-actions (: count of impacted actions :)
-                                                    )
-                                                )"/>
-                                        <xf:property
-                                            name="positive-targetid"
-                                            value="xxf:absolute-id('dialog-http-services')"/>
-                                    </xf:dispatch>
-                                </xf:action>
-
-                                <xf:action event="fr-positive" observer="dialog-http-services">
-                                    <xf:dispatch name="fb-confirm-delete-http-service" targetid="dialog-http-services"/>
-                                </xf:action>
-
-                            </xf:group>
-
                             <xf:group class="fb fb-hide-alert">
                                 <!-- Dynamically display the form being edited -->
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
@@ -1149,6 +722,445 @@
                 </xh:div>
             </xh:div>
         </xh:div>
+
+        <xf:group ref="instance('fb-form-instance')" appearance="xxf:internal">
+
+            <!-- Don't let any event go out from within this group -->
+            <!-- Q: Do we still need this? -->
+            <xf:action event="#all" propagate="stop"/>
+
+            <!-- Other dialogs -->
+            <xf:var name="form" value="."/>
+
+            <!-- Form settings dialog -->
+            <fb:dialog-form-settings
+                id="dialog-form-settings"
+                resources-ref="$form-resources"
+                fr-resources-ref="$fr-resources"
+                body-ref="$body">
+
+                <!-- Update title/description -->
+                <xf:action event="fb-update-metadata">
+                    <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
+                    <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
+
+                    <xf:delete ref="bind('description-bind')/@mediatype"/>
+                    <xf:insert
+                        if="event('description-mediatype') = 'text/html'"
+                        context="bind('description-bind')"
+                        origin="xf:attribute('mediatype', 'text/html')"/>
+
+                    <xf:delete
+                        bind="thumbnail-bind"/>
+                    <xf:insert
+                        if="xxf:non-blank(event('thumbnail'))"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'thumbnail',
+                                (
+                                    xf:attribute('filename',  event('thumbnail-filename')),
+                                    xf:attribute('mediatype', event('thumbnail-mediatype')),
+                                    xf:attribute('size',      event('thumbnail-size')),
+                                    event('thumbnail')
+                                )
+                            )"/>
+
+                    <!-- Add/remove allow-template-use setting as needed -->
+                    <xf:delete
+                        bind="allow-template-use-bind"/>
+                    <xf:insert
+                        if="event('allow-template-use') = 'true'"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('allow-template-use', event('allow-template-use'))"/>
+
+                    <!-- Add/remove singleton setting as needed -->
+                    <xf:delete
+                        bind="singleton-bind"/>
+                    <xf:insert
+                        if="event('singleton') = 'true'"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('singleton', event('singleton'))"/>
+
+                    <!-- Add/remove wizard setting as needed -->
+                    <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status'">
+                        <xf:var name="name" value="."/>
+                        <xf:delete
+                            ref="bind(concat($name, '-bind'))"/>
+                        <xf:insert
+                            if="event($name) = ('true', 'false')"
+                            context="bind('metadata-bind')"
+                            ref="*"
+                            origin="xf:element($name, event($name))"/>
+                    </xf:action>
+
+                    <!-- Add/remove wizard mode setting as needed -->
+                    <xf:delete
+                        bind="wizard-mode-bind"/>
+                    <xf:insert
+                        if="event('wizard-mode') = ('free', 'lax', 'strict')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('wizard-mode', event('wizard-mode'))"/>
+
+                    <xf:delete
+                        bind="wizard-subsections-toc-bind"/>
+                    <xf:insert
+                        if="event('wizard-subsections-toc') = ('active', 'all', 'none')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('wizard-subsections-toc', event('wizard-subsections-toc'))"/>
+
+                    <!-- Add/remove XForms properties as needed -->
+                    <xf:delete
+                        bind="attachment-max-size-per-file-bind"/>
+                    <xf:insert
+                        if="event('attachment-max-size-per-file') castable as xs:integer and
+                            xs:integer(event('attachment-max-size-per-file')) ge 0"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:upload.max-size-per-file', event('attachment-max-size-per-file'))"/>
+
+                    <xf:delete
+                        bind="attachment-max-size-aggregate-per-control-bind"/>
+                    <xf:insert
+                        if="event('attachment-max-size-aggregate-per-control') castable as xs:integer and
+                            xs:integer(event('attachment-max-size-aggregate-per-control')) ge 0"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:upload.max-size-aggregate-per-control', event('attachment-max-size-aggregate-per-control'))"/>
+
+                    <xf:delete
+                        bind="attachment-max-size-aggregate-per-form-bind"/>
+                    <xf:insert
+                        if="event('attachment-max-size-aggregate-per-form') castable as xs:integer and
+                            xs:integer(event('attachment-max-size-aggregate-per-form')) ge 0"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:upload.max-size-aggregate-per-form', event('attachment-max-size-aggregate-per-form'))"/>
+
+                    <xf:delete
+                        bind="attachment-mediatypes-bind"/>
+                    <xf:insert
+                        if="xxf:non-blank(event('attachment-mediatypes'))"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:upload.mediatypes', event('attachment-mediatypes'))"/>
+
+                    <xf:delete
+                        bind="labels-bind"/>
+                    <xf:insert
+                        if="exists(event('labels'))"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:label.appearance', event('labels'))"/>
+
+                    <xf:delete
+                        bind="hints-bind"/>
+                    <xf:insert
+                        if="exists(event('hints'))"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
+
+                    <xf:delete
+                        bind="automatic-hints-bind"/>
+                    <xf:insert
+                        if="event('automatic-hints') = ('true', 'false')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('automatic-hints', event('automatic-hints'))"/>
+
+                    <xf:delete
+                        bind="data-migration-bind"/>
+                    <xf:insert
+                        if="event('data-migration') = ('enabled', 'disabled', 'error')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('data-migration', event('data-migration'))"/>
+
+                    <xf:delete
+                        bind="available-from-bind"/>
+                    <xf:insert
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="event('available-from')"/>
+
+                    <xf:delete
+                        bind="available-to-bind"/>
+                    <xf:insert
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="event('available-to')"/>
+
+                    <xf:action iterate="'rendered-page-orientation', 'rendered-page-size', 'html-page-layout', 'density', 'grid-tab-order'">
+                        <xf:var name="n" value="."/>
+                        <xf:delete
+                            ref="bind(concat($n, '-bind'))"/>
+                        <xf:insert
+                            if="not(event($n) = 'default')"
+                            context="bind('metadata-bind')"
+                            ref="*"
+                            origin="xf:element($n, event($n))"/>
+                    </xf:action>
+
+                    <xf:delete
+                        bind="readonly-disable-calculate-bind"/>
+                    <xf:insert
+                        if="event('readonly-disable-calculate') = ('true', 'false')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('readonly-disable-calculate', event('readonly-disable-calculate'))"/>
+
+                    <xf:action iterate="'relevant', 'readonly'" type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                        fbf:writeAndNormalizeCalculatedMip((), ., event(.))
+                    </xf:action>
+
+                    <xf:delete
+                        bind="analysis-calculate-bind"/>
+                    <xf:insert
+                        if="event('analysis-calculate') = ('true', 'false')"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
+
+                    <xf:delete
+                        bind="xbl-bind"/>
+                    <xf:insert
+                        if="exists(event('control-settings-elems')/@*)"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'xbl',
+                                event('control-settings-elems')[exists(@*)]
+                            )"/>
+
+                    <!-- Load a specific form template to get started -->
+                    <xf:send
+                        if="event('mode') = 'new' and xxf:non-blank(event('template-url'))"
+                        submission="fr-get-document-submission">
+                        <xf:property name="data-or-draft" value="'data'"/>
+                        <xf:property name="document-url"  value="event('template-url')"/>
+                        <xf:property name="for"           value="'load-template'" xxf:tunnel="true"/>
+                    </xf:send>
+
+                </xf:action>
+                <!-- Continuation of `fr-get-document-submission` after success loading the form template -->
+                <xf:action
+                    observer="fr-get-document-submission"
+                    event="xforms-submit-done"
+                    if="event('for') = 'load-template'">
+                    <!-- Continue data setup -->
+                    <xf:dispatch name="fb-data-ready" targetid="fr-form-model">
+                        <!-- Don't enable the new form to be a template! -->
+                        <xf:property name="allow-template-use" value="false()"/>
+                    </xf:dispatch>
+                </xf:action>
+                <!-- Update app/form name if changed -->
+                <xf:action
+                        event="fb-update-metadata"
+                        if="event('mode') = 'new' or bind('application-name-bind') != event('app') or bind('form-name-bind') != event('form')">
+
+                    <!-- Copy data to main instance -->
+                    <xf:setvalue ref="bind('application-name-bind')" value="event('app')"/>
+                    <xf:setvalue ref="bind('form-name-bind')"        value="event('form')"/>
+
+                    <!-- Refresh components -->
+                    <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
+                        <xf:property name="deannotate" value="true()"/>
+                    </xf:dispatch>
+                </xf:action>
+                <!--  *After* app/form name change, continue the process in `app-form` mode -->
+                <xf:action
+                        event="fb-update-metadata"
+                        if="event('mode') = 'app-form'"
+                        type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'resume')
+                </xf:action>
+                <!-- "Save as" -->
+<!--                                    <xf:action-->
+<!--                                            event="fb-update-metadata"-->
+<!--                                            if="event('mode') = 'save-as'">-->
+<!--                                        &lt;!&ndash; Create new document id &ndash;&gt;-->
+<!--                                        <xf:setvalue-->
+<!--                                            ref="xxf:instance('fr-parameters-instance')/document"-->
+<!--                                            value="secure:randomHexId()"/>-->
+<!--                                        &lt;!&ndash; Actually save &ndash;&gt;-->
+<!--                                        <xf:action type="xpath">-->
+<!--                                            fbf:saveAs(-->
+<!--                                                fr:document-id()-->
+<!--                                            )-->
+<!--                                        </xf:action>-->
+<!--                                    </xf:action>-->
+            </fb:dialog-form-settings>
+
+            <fb:dialog-email-settings
+                id="dialog-email-settings"
+                resources-ref="$form-resources"
+                fr-resources-ref="$fr-resources"
+                form-name="$metadata-instance/form-name">
+
+                <xf:action ev:event="fb-update">
+                    <xf:delete
+                        bind="email-bind"/>
+                    <xf:insert
+                        if="exists(event('email'))"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="event('email')"/>
+                </xf:action>
+
+            </fb:dialog-email-settings>
+
+            <fb:dialog-messages
+                id="dialog-messages"
+                resources-ref="$form-resources"
+                fr-resources-ref="$fr-resources"/>
+
+            <fb:dialog-control-settings   id="dialog-control-settings"   ref="$form"      resources-ref="$form-resources"/>
+            <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>
+            <fb:dialog-itemsets           id="dialog-itemsets"                            resources-ref="$form-resources"/>
+            <fb:dialog-edit-source        id="dialog-edit-source"        ref="$form"      resources-ref="$form-resources"/>
+            <fb:dialog-http-services      id="dialog-http-services"      ref="$form"      resources-ref="$form-resources"/>
+            <fb:dialog-ids                id="dialog-ids"                ref="$form"      resources-ref="$form-resources"/>
+
+            <fb:dialog-search             id="dialog-search"             ref="$form"      resources-ref="$form-resources">
+                <xf:action
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                    event="fb-apply"
+                    if="xxf:non-blank(event('control-name'))">
+
+                    <xf:var
+                        name="control-id"
+                        value="fbf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
+
+                    <!-- This is done again if we open the settings dialog, but it's ok -->
+                    <xf:action type="xpath">
+                        fbf:selectCellForControlId($control-id)
+                    </xf:action>
+
+                    <xf:dispatch
+                        name="fb-move-selected-cell-into-view"
+                        targetid="fr-form-model"/>
+
+                    <xf:dispatch
+                        if="event('open-settings')"
+                        name="fb-show-dialog"
+                        targetid="dialog-control-settings">
+                        <xf:property
+                            name="control-id"
+                            value="$control-id"/>
+                    </xf:dispatch>
+
+                </xf:action>
+            </fb:dialog-search>
+
+            <fb:dialog-pdf                id="dialog-pdf"                ref="$form"      resources-ref="$form-resources">
+                <xf:action ev:event="fb-apply">
+                    <xf:delete bind="pdf-attachments-bind"/>
+                    <xf:insert
+                        context="bind('attachments-bind')"
+                        ref="*"
+                        origin="event('pdf-attachments')"/>
+                </xf:action>
+            </fb:dialog-pdf>
+
+            <fb:dialog-test-pdf           id="dialog-test-pdf"           ref="$form"      resources-ref="$form-resources">
+                <xf:action event="fb-apply">
+
+                    <!-- Set these globally so they stay "sticky" -->
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-calculate"    value="event('disable-calculate')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-default"      value="event('disable-default')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-relevant"     value="event('disable-relevant')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-hints"    value="event('show-hints')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-alerts"   value="event('show-alerts')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-required" value="event('show-required')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-use-pdf-template"  value="event('use-pdf-template')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-name" value="event('pdf-template-name')"/>
+                    <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-lang" value="event('pdf-template-lang')"/>
+
+                    <xf:var
+                        name="for-form-being-tested"
+                        value="event('for-form-being-tested') = true()"/>
+
+                    <xf:action if="$for-form-being-tested">
+                        <!-- Run indirectly by asking the form being tested to prepare data -->
+                        <!-- NOTE: If `event('use-form-data')` is `false()` we still go through
+                             the indirection so we can get the form language. -->
+                        <xf:action type="javascript">
+                            <xf:param
+                                name="useFormData"
+                                value="event('use-form-data')"/>
+                            <xf:body>
+                                const contentWindow = window.document.querySelector("iframe.fb-test-iframe").contentWindow;
+                                contentWindow.ORBEON.xforms.Document.dispatchEvent(
+                                    {
+                                        targetId:  'fr-form-model',
+                                        form: contentWindow.document.querySelector('form'),
+                                        eventName: 'fb-test-pdf-prepare-data',
+                                        properties: { 'use-form-data': useFormData }
+                                    }
+                                );
+                            </xf:body>
+                        </xf:action>
+                    </xf:action>
+                    <xf:action if="not($for-form-being-tested)">
+                        <!-- Run directly -->
+                        <xf:send submission="fb-test-pdf-submission">
+                            <xf:property name="fr-form-data"         value="''"/>
+                            <xf:property name="language"             value="$fb-lang"/>
+                            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
+                        </xf:send>
+                    </xf:action>
+                </xf:action>
+            </fb:dialog-test-pdf>
+
+            <xf:group bind="fb-toolbox-workflow-bind">
+                <fb:workflow20201
+                    id="fb-workflow20201-dialog"
+                    resources-ref="$form-resources"
+                    ref="frf:metadataInstanceRootOpt(xxf:instance('fb-form-instance'))"/>
+            </xf:group>
+            <xf:group bind="fb-toolbox-permissions-bind">
+                <fb:permissions
+                    id="fb-permissions-dialog"
+                    resources-ref="$form-resources"
+                    metadata-ref="frf:metadataInstanceRootOpt(xxf:instance('fb-form-instance'))"/>
+            </xf:group>
+
+            <xf:action event="fr-save" observer="dialog-edit-source">
+                <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
+                    <xf:property name="data" value="event('value')"/>
+                </xf:dispatch>
+            </xf:action>
+
+            <fr:alert-dialog id="dialog-confirmation">
+                <fr:label ref="$form-resources/dialog-confirmation/label"/>
+                <fr:negative-choice><fr:label value="$fr-resources/buttons/no"  mediatype="text/html"/></fr:negative-choice>
+                <fr:positive-choice><fr:label value="$fr-resources/buttons/yes" mediatype="text/html"/></fr:positive-choice>
+            </fr:alert-dialog>
+
+            <xf:action event="fb-request-delete-http-service" observer="dialog-http-services">
+                <xf:var name="service-name"     value="event('service-name')"/>
+                <xf:var name="impacted-actions" value="fbf:countImpactedActions($model, $service-name)" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
+                <xf:dispatch name="fr-show" targetid="dialog-confirmation">
+                    <xf:property
+                        name="message"
+                        value="
+                            xxf:format-message(
+                                $form-resources/messages/delete-service,
+                                (
+                                    $service-name,    (: service name              :)
+                                    $impacted-actions (: count of impacted actions :)
+                                )
+                            )"/>
+                    <xf:property
+                        name="positive-targetid"
+                        value="xxf:absolute-id('dialog-http-services')"/>
+                </xf:dispatch>
+            </xf:action>
+
+            <xf:action event="fr-positive" observer="dialog-http-services">
+                <xf:dispatch name="fb-confirm-delete-http-service" targetid="dialog-http-services"/>
+            </xf:action>
+        </xf:group>
 
         <fr:revision-history
             id="fr-revision-history"

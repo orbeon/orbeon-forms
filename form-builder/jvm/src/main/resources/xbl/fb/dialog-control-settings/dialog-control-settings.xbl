@@ -1743,6 +1743,7 @@
                                             <xf:label ref="$resources/dialog-control-settings/calculate/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/calculate/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/calculate/hint"/>
+                                            <xf:help  ref="$resources/dialog-control-settings/calculate/help" mediatype="text/html"/>
                                         </xf:textarea>
                                     </xh:td>
                                     <xh:td>
@@ -1750,6 +1751,7 @@
                                             <xf:label ref="$resources/dialog-control-settings/default/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/default/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/default/hint"/>
+                                            <xf:help  ref="$resources/dialog-control-settings/default/help" mediatype="text/html"/>
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
@@ -1758,12 +1760,14 @@
                                         <fb:boolean-or-formula ref="relevant" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>
+                                            <xf:help  ref="$resources/dialog-control-settings/visibility/help" mediatype="text/html"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
                                         <fb:boolean-or-formula ref="readonly" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
+                                            <xf:help  ref="$resources/dialog-control-settings/readonly/help" mediatype="text/html"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>

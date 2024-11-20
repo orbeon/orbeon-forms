@@ -699,21 +699,88 @@
                 <label>Visibility</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>Boolean XPath expression</hint>
+                <help>
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their name preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Read-Only</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>Boolean XPath expression</hint>
+                <help>
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their name preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Initial Value</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
+                <help>
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their name preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Calculated Value</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
+                <help>
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their name preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label>Label</label>
@@ -2134,21 +2201,90 @@
                 <label>Visibilité</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath booléenne</hint>
+                <help>
+                    &lt;p>
+                        Ceci vous permet de spécifier si le contrôle de formulaire est visible ou non.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Oui :&lt;/b> Le contrôle de formulaire est visible.&lt;/li>
+                        &lt;li>&lt;b>Non :&lt;/b> Le contrôle de formulaire est caché.&lt;/li>
+                        &lt;li>&lt;b>Formule :&lt;/b> Le contrôle de formulaire est visible ou caché dynamiquement en fonction d'une formule.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        La formule vous permet de spécifier dynamiquement si le contrôle de formulaire est visible ou non. Elle doit renvoyer une valeur booléenne.
+                        Le contrôle de formulaire est visible si la formule évalue à &lt;code>true()&lt;/code>, et caché si elle évalue à &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        Vous pouvez faire référence à d'autres contrôles de formulaire dans la formule en utilisant leur nom précédé d'un signe &lt;code>$&lt;/code>.
+                        Lors de la saisie du signe &lt;code>$&lt;/code>, une liste des contrôles de formulaire disponibles s'affiche.
+                    &lt;/p>
+                    &lt;p>
+                        Pour en savoir plus sur les formules, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">documentation du Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
+
             </visibility>
             <readonly>
                 <label>Lecture seule</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath booléenne</hint>
+                <help>
+                    &lt;p>
+                        Ceci vous permet de spécifier si le contrôle de formulaire est en lecture seule ou en lecture-écriture.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Oui :&lt;/b> Le contrôle de formulaire est en lecture seule.&lt;/li>
+                        &lt;li>&lt;b>Non :&lt;/b> Le contrôle de formulaire est en lecture-écriture.&lt;/li>
+                        &lt;li>&lt;b>Formule :&lt;/b> Le contrôle de formulaire est en lecture seule ou en lecture-écriture dynamiquement en fonction d'une formule.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        La formule vous permet de spécifier dynamiquement si le contrôle de formulaire est en lecture seule ou en lecture-écriture. Elle doit renvoyer une valeur booléenne.
+                        Le contrôle de formulaire est en lecture seule si la formule évalue à &lt;code>true()&lt;/code>, et en lecture-écriture si elle évalue à &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        Vous pouvez faire référence à d'autres contrôles de formulaire dans la formule en utilisant leur nom précédé d'un signe &lt;code>$&lt;/code>.
+                        Lors de la saisie du signe &lt;code>$&lt;/code>, une liste des contrôles de formulaire disponibles s'affiche.
+                    &lt;/p>
+                    &lt;p>
+                        Pour en savoir plus sur les formules, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">documentation du Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Valeur initiale</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
+                <help>
+                    &lt;p>
+                        Cette formule vous permet de spécifier une valeur initiale pour le contrôle de formulaire uniquement en mode "nouveau".
+                    &lt;/p>
+                    &lt;p>
+                        Vous pouvez faire référence à d'autres contrôles de formulaire dans la formule en utilisant leur nom précédé d'un signe &lt;code>$&lt;/code>.
+                        Lors de la saisie du signe &lt;code>$&lt;/code>, une liste des contrôles de formulaire disponibles s'affiche.
+                    &lt;/p>
+                    &lt;p>
+                        Pour en savoir plus sur les formules, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">documentation du Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
+
             </default>
             <calculate>
                 <label>Valeur calculée</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
+                <help>
+                    &lt;p>
+                        Cette formule vous permet de spécifier une valeur calculée pour le contrôle de formulaire.
+                        Cette valeur est réévaluée pour rester à jour selon les besoins.
+                    &lt;/p>
+                    &lt;p>
+                        Vous pouvez faire référence à d'autres contrôles de formulaire dans la formule en utilisant leur nom précédé d'un signe &lt;code>$&lt;/code>.
+                        Lors de la saisie du signe &lt;code>$&lt;/code>, une liste des contrôles de formulaire disponibles s'affiche.
+                    &lt;/p>
+                    &lt;p>
+                        Pour en savoir plus sur les formules, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">documentation du Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label>Libellé</label>
@@ -3553,21 +3689,88 @@
                 <label>Synlighet</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>Boolsk XPath-uttrykk</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Skrivebeskyttelse</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>Boolsk XPath-uttrykk</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Forhåndsutfylt verdi</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Utregnet verdi</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>
@@ -4998,21 +5201,88 @@
                 <label>Настройки видимости</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Только для чтения</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Начальное значение</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Вычисляемое значение</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>
@@ -6444,21 +6714,88 @@
                 <label>Visibiltà</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath booleana</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Solo lettura</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath booleana</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Valore iniziale</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Valore calcolato</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath</hint>
+                 <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>
@@ -7854,21 +8191,88 @@
                 <label>Sichtbarkeit</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Schreibgeschützt</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Initialwert</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>XPath-Ausdruck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Berechneter Wert</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>XPath-Ausdruck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label>Beschriftung</label>
@@ -9267,21 +9671,88 @@
                 <label>Näkyvyys</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Vain luku</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Alkuperäinen arvo</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>XPath-lauseke</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Laskettu arvo</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>XPath-lauseke</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>
@@ -10705,21 +11176,88 @@
                 <label>Visibilidad</label>
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath booleana</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Sólo-Lectura</label>
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath debe ser booleana</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Valor Inicial</label>
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Valor Calculado</label>
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>
@@ -12144,21 +12682,88 @@
                 <label>Zichtbaarheid</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>Boolean XPath expressie</hint>
+                 <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Alleen-lezen</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>Boolean XPath expressie</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Initiële waarde</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>XPath expressie</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
                 <label>Berekende waarde</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>XPath expressie</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label>Label</label>
@@ -13562,21 +14167,88 @@
                 <label>Visibilidade</label>
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath do tipo Boolean</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Apenas Leitura</label>
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath do tipo Boolean</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Valor Inicial</label>
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
 				<label>Valor Calculado</label>
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>
@@ -15007,21 +15679,88 @@
                 <label>Synlighet</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>Booleskt XPath-uttryck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is visible or not.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </visibility>
             <readonly>
                 <label>Skrivskydd</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>Booleskt XPath-uttryck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This allows you to specify whether the form control is readonly or read-write.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
+                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
+                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </readonly>
             <default>
                 <label>Förvalt värde</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>XPath-uttryck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </default>
             <calculate>
-	        <label>Beräknat värde</label>
+	            <label>Beräknat värde</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>XPath-uttryck</hint>
+                <help todo="true">
+                    &lt;p>
+                        This formula allows you to specify a calculated value for the form control.
+                        This value is re-evaluated to remain up to date as needed.
+                    &lt;/p>
+                    &lt;p>
+                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
+                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                    &lt;/p>
+                    &lt;p>
+                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                    &lt;/p>
+                </help>
             </calculate>
             <control-label>
                 <label todo="true">[Label]</label>

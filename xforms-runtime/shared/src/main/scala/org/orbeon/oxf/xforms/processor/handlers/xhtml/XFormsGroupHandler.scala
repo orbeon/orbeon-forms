@@ -59,11 +59,11 @@ abstract class XFormsGroupHandler(
     labelClasses
   }
 
-  protected def getLabelValue(xformsControl: XFormsSingleNodeControl): String =
-    if (xformsControl eq null) {
-      // Q: Can this happen?
-      // 2020-11-13: Not 100% sure but haven't seen it yet. Probably safe to remove.
-      null
-    } else
-      xformsControl.getLabel(handlerContext.collector)
+  protected def getLabelValue(xformsControl: XFormsSingleNodeControl): Option[String] = {
+    // Q: Can this happen?
+    // 2020-11-13: Not 100% sure but haven't seen it yet. Probably safe to remove.
+    // 2024-11-19: Adding `assert`.
+    assert(xformsControl ne null)
+    xformsControl.getLabel(handlerContext.collector)
+  }
 }

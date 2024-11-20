@@ -74,10 +74,10 @@ private object XFormsUIEvent {
   def controlPosition(e: XFormsUIEvent) =
     e.targetControl.container.partAnalysis.getControlPosition(e.targetControl.getPrefixedId)
 
-  def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel(EventCollector.Throw))
-  def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp(EventCollector.Throw))
-  def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint(EventCollector.Throw))
-  def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert(EventCollector.Throw))
+  def label(e: XFormsUIEvent): Option[String] = e.targetControl.getLabel(EventCollector.Throw)
+  def help(e: XFormsUIEvent) : Option[String] = e.targetControl.getHelp(EventCollector.Throw)
+  def hint(e: XFormsUIEvent) : Option[String] = e.targetControl.getHint(EventCollector.Throw)
+  def alert(e: XFormsUIEvent): Option[String] = e.targetControl.getAlert(EventCollector.Throw)
 
   def level(e: XFormsUIEvent): Option[String] = e.targetControl match {
     case c: XFormsSingleNodeControl => c.alertLevel map (_.entryName)

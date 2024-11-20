@@ -22,8 +22,8 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
-import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -50,7 +50,7 @@ object FormRunnerMetadata {
     repeated     : Boolean,
     iterations   : List[Int],
     datatype     : Option[String],
-    lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[ItemNode]))],
+    lhhaAndItems : List[(Lang, (List[(LHHA, Option[String])], List[ItemNode]))],
     value        : Option[ControlValue],
     forHashes    : List[String]
   )
@@ -165,7 +165,7 @@ object FormRunnerMetadata {
           val headingLevel = nextLevel + 1 // so we start at `<h2>` for top-level sections
 
           // TODO: use current/requested lang
-          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line =>
+          createLine(name, typ, lhhas.toMap.get(LHHA.Label).flatten, value, isFirst = false) foreach { line =>
             sb ++= s"<h$headingLevel>"
             sb ++= line
             sb ++= s"</h$headingLevel>"
@@ -181,7 +181,7 @@ object FormRunnerMetadata {
         case ControlDetails(name, typ, _, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest if ! ControlsToIgnore(typ) =>
 
           // TODO: use current/requested lang
-          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line =>
+          createLine(name, typ, lhhas.toMap.get(LHHA.Label).flatten, value, isFirst = false) foreach { line =>
             sb ++= "<li>"
             sb ++= line
             sb ++= "</li>"
@@ -374,7 +374,7 @@ object FormRunnerMetadata {
 
         dataHashOpt -> {
 
-          val lhhaAndItemsList: List[(Lang, (List[(LHHA, String)], List[ItemNode]))] =
+          val lhhaAndItemsList: List[(Lang, (List[(LHHA, Option[String])], List[ItemNode]))] =
             List(
               (
                 currentLang,

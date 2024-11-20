@@ -29,8 +29,8 @@ abstract class XFormsTriggerHandler(
     forwarding = false
   ) {
 
-  protected def getTriggerLabel(xformsControl: XFormsSingleNodeControl): String =
-    Option(xformsControl.getLabel(handlerContext.collector)).getOrElse("")
+  protected def getTriggerLabel(xformsControl: XFormsSingleNodeControl): Option[String] =
+    xformsControl.getLabel(handlerContext.collector)
 
   // Don't output anything in static readonly mode
   override def isMustOutputControl(control: XFormsControl): Boolean =

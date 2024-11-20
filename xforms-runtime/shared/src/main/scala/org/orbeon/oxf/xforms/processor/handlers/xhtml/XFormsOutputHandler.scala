@@ -391,9 +391,9 @@ class XFormsOutputDownloadHandler(
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, aAttributes)
 
       withElement(localName = "a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
-        val labelValue             = currentControl.getLabel(handlerContext.collector)
+        val labelValueOpt          = currentControl.getLabel(handlerContext.collector)
         val mustOutputHTMLFragment = currentControl.isHTMLLabel(handlerContext.collector)
-        XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, Option(currentControl.getLocationData))
+        XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValueOpt, xhtmlPrefix, mustOutputHTMLFragment, Option(currentControl.getLocationData))
       }
     }
   }

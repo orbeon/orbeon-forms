@@ -4,7 +4,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{GroupControl, LHHA, LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport.*
-import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
+import org.orbeon.oxf.xml.{XMLConstants, XMLReceiver, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -33,7 +33,7 @@ class XFormsGroupFieldsetHandler(
 
     val groupControl = currentControl.asInstanceOf[XFormsGroupControl]
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
-    val contentHandler = handlerContext.controller.output
+    implicit val receiver: XMLReceiver = handlerContext.controller.output
 
     // Output an `xh:legend` element if and only if there is an `xf:label` element. This help with
     // styling in particular.
@@ -45,11 +45,9 @@ class XFormsGroupFieldsetHandler(
 
       // Output `xh:legend` with label content
       val legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend")
-      contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, atts)
-      val labelValue = getLabelValue(groupControl)
-      if ((labelValue ne null) && labelValue.nonEmpty)
-        contentHandler.characters(labelValue.toCharArray, 0, labelValue.length)
-      contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName)
+      receiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, atts)
+      XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(getLabelValue(groupControl), xhtmlPrefix, mustOutputHTMLFragment = false, Option(groupControl.getLocationData))
+      receiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName)
     }
   }
 

@@ -36,48 +36,48 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
     withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
 
       // number-control
-      assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
-      assert(DefaultAlertMessage === numberControl.getAlert(EventCollector.Throw))
+      assert(numberControl.alertLevel.contains(ValidationLevel.ErrorLevel))
+      assert(numberControl.getAlert(EventCollector.Throw).contains(DefaultAlertMessage))
 
       setControlValue(NumberControlId, "a")
-      assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
-      assert(DefaultAlertMessage === numberControl.getAlert(EventCollector.Throw))
+      assert(numberControl.alertLevel.contains(ValidationLevel.ErrorLevel))
+      assert(numberControl.getAlert(EventCollector.Throw).contains(DefaultAlertMessage))
 
       setControlValue(NumberControlId, "10")
-      assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
-      assert("Must be 50 or more" === numberControl.getAlert(EventCollector.Throw))
+      assert(numberControl.alertLevel.contains(ValidationLevel.ErrorLevel))
+      assert(numberControl.getAlert(EventCollector.Throw).contains("Must be 50 or more"))
 
       setControlValue(NumberControlId, "50")
-      assert(Some(ValidationLevel.WarningLevel) === numberControl.alertLevel)
-      assert("Should be 100 or more" === numberControl.getAlert(EventCollector.Throw))
+      assert(numberControl.alertLevel.contains(ValidationLevel.WarningLevel))
+      assert(numberControl.getAlert(EventCollector.Throw).contains("Should be 100 or more"))
 
       setControlValue(NumberControlId, "1000")
-      assert(None === numberControl.alertLevel)
-      assert(null eq numberControl.getAlert(EventCollector.Throw))
+      assert(numberControl.alertLevel.isEmpty)
+      assert(numberControl.getAlert(EventCollector.Throw).isEmpty)
 
       setControlValue(NumberControlId, "1001")
-      assert(Some(ValidationLevel.InfoLevel) === numberControl.alertLevel)
-      assert("Nice, greater than 1000!" == numberControl.getAlert(EventCollector.Throw))
+      assert(numberControl.alertLevel.contains(ValidationLevel.InfoLevel))
+      assert(numberControl.getAlert(EventCollector.Throw).contains("Nice, greater than 1000!"))
 
       // text-control
-      assert(None === textControl.alertLevel)
-      assert(null eq textControl.getAlert(EventCollector.Throw))
+      assert(textControl.alertLevel.isEmpty)
+      assert(textControl.getAlert(EventCollector.Throw).isEmpty)
 
       setControlValue(TextControlId, "This is…")
-      assert(None === textControl.alertLevel)
-      assert(null eq textControl.getAlert(EventCollector.Throw))
+      assert(textControl.alertLevel.isEmpty)
+      assert(textControl.getAlert(EventCollector.Throw).isEmpty)
 
       setControlValue(TextControlId, "This is a little bit too long!")
-      assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
-      assert("Should be shorter than 10 characters" === textControl.getAlert(EventCollector.Throw))
+      assert(textControl.alertLevel.contains(ValidationLevel.WarningLevel))
+      assert(textControl.getAlert(EventCollector.Throw).contains("Should be shorter than 10 characters"))
 
       setControlValue(TextControlId, "this!")
-      assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
-      assert("Should not start with a lowercase letter" === textControl.getAlert(EventCollector.Throw))
+      assert(textControl.alertLevel.contains(ValidationLevel.WarningLevel))
+      assert(textControl.getAlert(EventCollector.Throw).contains("Should not start with a lowercase letter"))
 
       setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
-      assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
-      assert("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>" === textControl.getAlert(EventCollector.Throw))
+      assert(textControl.alertLevel.contains(ValidationLevel.WarningLevel))
+      assert(textControl.getAlert(EventCollector.Throw).contains("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>"))
     }
 
   @Test def annotate(): Unit =

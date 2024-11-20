@@ -248,7 +248,7 @@ trait XFormsModelSubmissionSupportTrait {
           // constraints for the level, the sets of ids must match.
           for {
             level                <- control.alertLevel
-            controlAlert         <- Option(control.getAlert(EventCollector.Throw))
+            controlAlert         <- control.getAlert(EventCollector.Throw)
             failedValidationsIds = control.failedValidations.map(_.id).toSet
             elementsMap          <- elementsToAnnotate.get(level)
             element              <- elementsMap.get(failedValidationsIds)

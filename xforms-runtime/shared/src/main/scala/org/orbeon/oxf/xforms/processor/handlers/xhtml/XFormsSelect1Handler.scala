@@ -198,7 +198,7 @@ object XFormsSelect1Handler {
         ) {
           val itemLabel = item.label
           outputLabelTextIfNotEmpty(
-            itemLabel.label,
+            Option(itemLabel.label),
             xhtmlPrefix,
             itemLabel.isHTML,
             None
@@ -216,7 +216,7 @@ object XFormsSelect1Handler {
             forEffectiveIdWithNs   = None,
             lhha                   = LHHA.Help,
             elementName            = "span",
-            labelValue             = help.label,
+            labelValueOpt          = help.label.some,
             mustOutputHTMLFragment = help.isHTML,
             isExternal             = false
           )
@@ -232,7 +232,7 @@ object XFormsSelect1Handler {
             controlEffectiveIdOpt  = None,
             forEffectiveIdWithNs   = None,
             lhha                   = LHHA.Hint, elementName = "span",
-            labelValue             = hint.label,
+            labelValueOpt          = hint.label.some,
             mustOutputHTMLFragment = hint.isHTML,
             isExternal             = false
           )

@@ -60,11 +60,11 @@ class VariableDependenciesTest
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(TestDoc)) {
 
-          assert(getControl("my-output").getLabel(EventCollector.Throw) === "Name")
+          assert(getControl("my-output").getLabel(EventCollector.Throw).contains("Name"))
 
           setControlValue("my-input", "fr")
 
-          assert(getControl("my-output").getLabel(EventCollector.Throw) === "Nom")
+          assert(getControl("my-output").getLabel(EventCollector.Throw).contains("Nom"))
         }
       }
     }

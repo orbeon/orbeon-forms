@@ -246,23 +246,23 @@ abstract class XFormsBaseHandlerXHTML (
 
       // If no attributes were found, there is no such label / help / hint / alert
 
-      val (labelHintHelpAlertValue, mustOutputHTMLFragment) =
-        lhha match {
-          case LHHA.Label | LHHA.Hint if controlOrNull ne null =>
-            (controlOrNull.lhhaProperty(lhha).value(handlerContext.collector), lhhaAnalysis.containsHTML)
-          case LHHA.Label | LHHA.Hint =>
-            (null, lhhaAnalysis.containsHTML)
-          case LHHA.Help if controlOrNull ne null =>
+      val (labelHintHelpAlertValueOpt, mustOutputHTMLFragment) =
+        (lhha, Option(controlOrNull)) match {
+          case (LHHA.Label | LHHA.Hint, Some(control)) =>
+            (control.lhhaProperty(lhha).valueOpt(handlerContext.collector), lhhaAnalysis.containsHTML)
+          case (LHHA.Label | LHHA.Hint, _) =>
+            (None, lhhaAnalysis.containsHTML)
+          case (LHHA.Help, Some(control)) =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
             // case because it is stored as escaped HTML within a <label> element.
-            (controlOrNull.lhhaProperty(lhha).escapedValue(handlerContext.collector), false)
-          case LHHA.Help =>
-            (null, false)
-          case LHHA.Alert if controlOrNull ne null =>
+            (Option(control.lhhaProperty(lhha).escapedValue(handlerContext.collector)), false)
+          case (LHHA.Help, _) =>
+            (None, false)
+          case (LHHA.Alert, Some(control)) =>
             // Not known statically at this time because it currently depends on the number of active alerts
-            (controlOrNull.lhhaProperty(lhha).value(handlerContext.collector), controlOrNull.isHTMLAlert(handlerContext.collector))
-          case LHHA.Alert =>
-            (null, false)
+            (control.lhhaProperty(lhha).valueOpt(handlerContext.collector), control.isHTMLAlert(handlerContext.collector))
+          case (LHHA.Alert, _) =>
+            (None, false)
         }
 
       val elementName = requestedElementNameOpt getOrElse lhhaElementName(lhha)
@@ -326,7 +326,7 @@ abstract class XFormsBaseHandlerXHTML (
         forEffectiveIdWithNs   = forEffectiveIdWithNsOpt,
         lhha                   = lhha,
         elementName            = elementName,
-        labelValue             = labelHintHelpAlertValue,
+        labelValueOpt          = labelHintHelpAlertValueOpt,
         mustOutputHTMLFragment = mustOutputHTMLFragment,
         isExternal             = isExternal
       )
@@ -402,12 +402,12 @@ object XFormsBaseHandlerXHTML {
     forEffectiveIdWithNs  : Option[String],
     lhha                  : LHHA,
     elementName           : String,
-    labelValue            : String,
+    labelValueOpt         : Option[String],
     mustOutputHTMLFragment: Boolean,
     isExternal            : Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, controlEffectiveIdOpt, forEffectiveIdWithNs, lhha, elementName, isExternal)
-    outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)
+    outputLabelTextIfNotEmpty(labelValueOpt, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)
     outputLabelForEnd(handlerContext, elementName)
   }
 
@@ -464,13 +464,14 @@ object XFormsBaseHandlerXHTML {
   }
 
   def outputLabelTextIfNotEmpty(
-    value                  : String,
-    xhtmlPrefix            : String,
-    mustOutputHTMLFragment : Boolean,
-    locationDataOpt        : Option[LocationData])(implicit
-    xmlReceiver            : XMLReceiver
+    valueOpt              : Option[String],
+    xhtmlPrefix           : String,
+    mustOutputHTMLFragment: Boolean,
+    locationDataOpt       : Option[LocationData]
+  )(implicit
+    xmlReceiver           : XMLReceiver
   ): Unit =
-    if ((value ne null) && value.nonEmpty) {
+    valueOpt.filter(_.nonEmpty).foreach { value =>
       if (mustOutputHTMLFragment)
         XFormsCrossPlatformSupport.streamHTMLFragment(
           value,
@@ -479,7 +480,7 @@ object XFormsBaseHandlerXHTML {
         )
       else
         xmlReceiver.characters(value.toCharArray, 0, value.length)
-  }
+    }
 
   def outputDisabledAttribute(newAttributes: AttributesImpl): Unit =
     newAttributes.addOrReplace("disabled", "disabled")

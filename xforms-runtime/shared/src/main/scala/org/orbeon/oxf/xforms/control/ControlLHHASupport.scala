@@ -106,12 +106,12 @@ trait ControlLHHASupport {
     ajaxLhhaSupport forall (lhha => lhhaProperty(lhha).value(collector) == other.lhhaProperty(lhha).value(collector))
 
   // Convenience accessors
-  final def getLabel   (collector: ErrorEventCollector) = lhhaProperty(LHHA.Label).value(collector)
-  final def isHTMLLabel(collector: ErrorEventCollector) = lhhaProperty(LHHA.Label).isHTML(collector)
-  final def getHelp    (collector: ErrorEventCollector) = lhhaProperty(LHHA.Help).value(collector)
-  final def getHint    (collector: ErrorEventCollector) = lhhaProperty(LHHA.Hint).value(collector)
-  final def getAlert   (collector: ErrorEventCollector) = lhhaProperty(LHHA.Alert).value(collector)
-  final def isHTMLAlert(collector: ErrorEventCollector) = lhhaProperty(LHHA.Alert).isHTML(collector)
+  final def getLabel   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Label).value(collector))
+  final def isHTMLLabel(collector: ErrorEventCollector): Boolean = lhhaProperty(LHHA.Label).isHTML(collector)
+  final def getHelp    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Help).value(collector))
+  final def getHint    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Hint).value(collector))
+  final def getAlert   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Alert).value(collector))
+  final def isHTMLAlert(collector: ErrorEventCollector): Boolean = lhhaProperty(LHHA.Alert).isHTML(collector)
 
   lazy val referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] = {
     for {

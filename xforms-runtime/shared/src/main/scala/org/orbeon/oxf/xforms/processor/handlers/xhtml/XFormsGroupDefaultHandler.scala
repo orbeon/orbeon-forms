@@ -119,7 +119,7 @@ class XFormsGroupDefaultHandler(
       forEffectiveIdWithNs   = containingDocument.namespaceId(effectiveId).some,
       lhha                   = LHHA.Label,
       elementName            = handlerContext.labelElementName,
-      labelValue             = getLabelValue(groupControl),
+      labelValueOpt          = getLabelValue(groupControl),
       mustOutputHTMLFragment = isHtmlLabel,
       isExternal             = false
     )

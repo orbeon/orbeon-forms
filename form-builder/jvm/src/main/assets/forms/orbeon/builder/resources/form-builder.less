@@ -740,7 +740,6 @@ body.orbeon {
 
         .fb-dialog-form-settings-fields {
 
-
             div.fb-template-cards-container {
                 overflow-y: scroll;
                 padding: 5px; // so that selection outline/shadow is not clipped
@@ -796,19 +795,6 @@ body.orbeon {
             .fb-form-description {
                 margin-top: 1em;
             }
-        }
-
-        .popover.xforms-help-popover {
-            // Override `white-space: pre-wrap` which we set by default following
-            // https://github.com/orbeon/orbeon-forms/issues/1618. That works for
-            // plain text, but here we want HTML content and we want regular white-space.
-            // We need a better solution!
-            .popover-content {
-                white-space: normal;
-            }
-
-            // Make popover a bit narrower so it fits in the dialog
-            max-width: 350px;
         }
 
         div[class ^= "fb-settings-mode-"] {
@@ -1962,6 +1948,19 @@ body.orbeon {
 
     kbd {
         background-color: #ddd;
+    }
+
+    .popover.xforms-help-popover {
+        // Override `white-space: pre-wrap` which we set by default following
+        // https://github.com/orbeon/orbeon-forms/issues/1618. That works for
+        // plain text, but here we want HTML content and we want regular white-space.
+        // We need a better solution!
+        .popover-content {
+            white-space: normal;
+        }
+
+        // Make popover a bit narrower so it fits in the dialog
+        max-width: 350px;
     }
 }
 

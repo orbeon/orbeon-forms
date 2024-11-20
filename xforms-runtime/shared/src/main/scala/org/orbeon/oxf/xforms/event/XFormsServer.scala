@@ -197,8 +197,10 @@ object XFormsServer {
                                 beforeFocusedControlIdOpt = beforeFocusedControlIdOpt,
                                 repeatHierarchyOpt        = beforeRepeatHierarchyOpt,
                                 requestParametersForAll   = requestParametersForAll,
-                                testOutputAllActions      = false)(
+                                testOutputAllActions      = false
+                              )(
                                 xmlReceiver               = responseReceiver,
+                                externalContext           = externalContext,
                                 indentedLogger            = indentedLogger
                               )
 
@@ -269,8 +271,7 @@ object XFormsServer {
           info("Ajax update lock timeout exceeded, returning error to client")
 
           // Using 503 based on http://stackoverflow.com/questions/17862015/http-statuscode-to-retry-same-request
-          val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
-          ClientEvents.errorResponse(StatusCode.ServiceUnavailable)(xmlReceiver)
+          ClientEvents.errorResponse(StatusCode.ServiceUnavailable)
 
           Success(None)
       }
@@ -281,14 +282,12 @@ object XFormsServer {
         // See also `XFormsAssetServer`
         info(s"session not found while processing client events")
         // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
-        val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
-        ClientEvents.errorResponse(e.code)(xmlReceiver)
+        ClientEvents.errorResponse(e.code)
       case Failure(e) => // from downstream `acquireDocumentLock`
         // See also `XFormsAssetServer`
         info(s"error while processing client events: ${e.getMessage}")
         // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
-        val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
-        ClientEvents.errorResponse(StatusCode.InternalServerError)(xmlReceiver)
+        ClientEvents.errorResponse(StatusCode.InternalServerError)
       case Success(Success(Some(replaceAllFuture))) =>
         // Check and run submission with `replace="all"`
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
@@ -309,8 +308,10 @@ object XFormsServer {
     beforeFocusedControlIdOpt : Option[String],
     repeatHierarchyOpt        : Option[String],
     requestParametersForAll   : => RequestParameters,
-    testOutputAllActions      : Boolean)(implicit
+    testOutputAllActions      : Boolean
+  )(implicit
     xmlReceiver               : XMLReceiver,
+    externalContext           : ExternalContext,
     indentedLogger            : IndentedLogger
   ): Unit = {
 

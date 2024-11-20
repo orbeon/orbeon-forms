@@ -46,25 +46,22 @@ class XFormsServerProcessor extends ProcessorImpl {
   override def createOutput(outputName: String): ProcessorOutput = {
     val output = new ProcessorOutputImpl(self, outputName) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+        implicit val pc: PipelineContext = pipelineContext
+        implicit val ec: ExternalContext = XFormsCrossPlatformSupport.externalContext
         try {
-
-          implicit val pc: PipelineContext = pipelineContext
-          implicit val ec: ExternalContext = XFormsCrossPlatformSupport.externalContext
-
           XFormsServerRoute.doIt(
             requestDocument = readInputAsOrbeonDom(pipelineContext, XFormsServerProcessor.InputRequest),
-            xmlReceiverOpt = Some(xmlReceiver)
+            xmlReceiverOpt  = Some(xmlReceiver)
           )
         } catch {
           case e: SessionExpiredException =>
-            implicit val ec: ExternalContext = XFormsCrossPlatformSupport.externalContext
             LifecycleLogger.eventAssumingRequest("xforms", e.message, Nil)
             // Don't log whole exception
             Loggers.logger.info(e.message)
-            ClientEvents.errorDocument(e.message, e.code)(xmlReceiver)
+            ClientEvents.errorDocument(e.message, e.code)(xmlReceiver, ec)
           case NonFatal(t) =>
             Loggers.logger.error(OrbeonFormatter.format(t))
-            ClientEvents.errorDocument(OrbeonFormatter.message(t), StatusCode.InternalServerError)(xmlReceiver)
+            ClientEvents.errorDocument(OrbeonFormatter.message(t), StatusCode.InternalServerError)(xmlReceiver, ec)
         }
       }
     }

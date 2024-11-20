@@ -47,11 +47,12 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
   protected def produceOutput(
     pipelineContext    : PipelineContext,
     outputName         : String,
-    externalContext    : ExternalContext,
-    indentedLogger     : IndentedLogger,
     template           : AnnotatedTemplate,
     containingDocument : XFormsContainingDocument,
-    xmlReceiver        : XMLReceiver
+  )(implicit
+    xmlReceiver        : XMLReceiver,
+    externalContext    : ExternalContext,
+    indentedLogger     : IndentedLogger
   ): Unit
 
   addInputInfo(new ProcessorInputOutputInfo(InputAnnotatedDocument))
@@ -66,8 +67,10 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
       outputName,
       new URIProcessorOutputImpl(selfProcessor, outputName, InputAnnotatedDocument) {
 
-        def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
-          doIt(pipelineContext, xmlReceiver, this, outputName)
+        def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+          implicit val receiver: XMLReceiver = xmlReceiver
+          doIt(pipelineContext, this, outputName)
+        }
 
         override protected def supportsLocalKeyValidity = true
 
@@ -103,13 +106,14 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
   private def doIt(
     pipelineContext : PipelineContext,
-    xmlReceiver     : XMLReceiver,
     processorOutput : URIProcessorOutputImpl,
     outputName      : String
+  )(implicit
+    xmlReceiver     : XMLReceiver
   ): Unit = {
 
-    val externalContext = XFormsCrossPlatformSupport.externalContext
-    implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
+    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val indentedLogger : IndentedLogger  = XFormsStateManager.newIndentedLogger
 
     def newHtmlLogger: IndentedLogger =
       Loggers.newIndentedLogger("html")
@@ -233,7 +237,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
       // Output resulting document
       if (initializeXFormsDocument)
-        produceOutput(pipelineContext, outputName, externalContext, newHtmlLogger, stage2CacheableState.template, containingDocument, xmlReceiver)
+        produceOutput(pipelineContext, outputName, stage2CacheableState.template, containingDocument)(xmlReceiver, externalContext, newHtmlLogger)
 
       // Notify state manager
       // Scope because dynamic properties can cause lazy XPath evaluations

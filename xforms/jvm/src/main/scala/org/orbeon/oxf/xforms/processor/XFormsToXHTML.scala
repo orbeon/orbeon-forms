@@ -17,13 +17,13 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsServer}
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.*
-import org.orbeon.oxf.util.Logging.*
 
 
 /**
@@ -32,39 +32,37 @@ import org.orbeon.oxf.util.Logging.*
  */
 class XFormsToXHTML extends XFormsProcessorBase {
 
-  import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
+  import org.orbeon.oxf.xforms.processor.XFormsToXHTML.*
 
   protected def produceOutput(
-    pipelineContext      : PipelineContext,
-    outputName           : String,
-    externalContext      : ExternalContext,
-    indentedLogger       : IndentedLogger,
-    template             : AnnotatedTemplate,
-    containingDocument   : XFormsContainingDocument,
-    xmlReceiver          : XMLReceiver): Unit =
-  if (outputName == "document")
-    outputResponseDocument(
-      externalContext,
-      template,
-      containingDocument,
-      xmlReceiver
-    )(indentedLogger)
-  else
-    testOutputResponseState(
-      containingDocument,
-      indentedLogger,
-      xmlReceiver
-    )
+    pipelineContext    : PipelineContext,
+    outputName         : String,
+    template           : AnnotatedTemplate,
+    containingDocument : XFormsContainingDocument,
+  )(implicit
+    xmlReceiver        : XMLReceiver,
+    externalContext    : ExternalContext,
+    indentedLogger     : IndentedLogger
+  ): Unit =
+    if (outputName == "document")
+      outputResponseDocument(
+        template,
+        containingDocument,
+      )
+    else
+      testOutputResponseState(
+        containingDocument
+      )
 }
 
 private object XFormsToXHTML {
 
-  def outputResponseDocument(
-    externalContext    : ExternalContext,
+  private def outputResponseDocument(
     template           : AnnotatedTemplate,
-    containingDocument : XFormsContainingDocument,
-    xmlReceiver        : XMLReceiver
+    containingDocument : XFormsContainingDocument
   )(implicit
+    xmlReceiver        : XMLReceiver,
+    externalContext    : ExternalContext,
     indentedLogger     : IndentedLogger
   ): Unit =
     XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
@@ -101,10 +99,12 @@ private object XFormsToXHTML {
       containingDocument.afterInitialResponse()
     }
 
-  def testOutputResponseState(
-    containingDocument : XFormsContainingDocument,
-    indentedLogger     : IndentedLogger,
-    xmlReceiver        : XMLReceiver
+  private def testOutputResponseState(
+    containingDocument : XFormsContainingDocument
+  )(implicit
+    xmlReceiver        : XMLReceiver,
+    externalContext    : ExternalContext,
+    indentedLogger     : IndentedLogger
   ): Unit =
     if (! containingDocument.isGotSubmissionReplaceAll)
       XFormsServer.outputAjaxResponse(
@@ -114,8 +114,6 @@ private object XFormsToXHTML {
         beforeFocusedControlIdOpt = None,
         repeatHierarchyOpt        = None,
         requestParametersForAll   = null,
-        testOutputAllActions      = true)(
-        xmlReceiver               = xmlReceiver,
-        indentedLogger            = indentedLogger
+        testOutputAllActions      = true
       )
 }

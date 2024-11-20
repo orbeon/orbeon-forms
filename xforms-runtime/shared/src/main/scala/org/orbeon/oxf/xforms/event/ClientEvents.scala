@@ -118,19 +118,24 @@ object ClientEvents extends Logging  {
     }
 
   // Send an error document
-  def errorDocument(message: String, code: Int)(implicit receiver: XMLReceiver): Unit =
+  def errorDocument(
+    message        : String,
+    code           : Int
+  )(implicit
+    receiver       : XMLReceiver,
+    externalContext: ExternalContext
+  ): Unit = {
+    externalContext.getResponse.setStatus(code)
     withDocument {
-      processingInstruction("orbeon-serializer", List("status-code" -> code.toString))
       withElement("error") {
         element("title", text = message)
       }
     }
+  }
 
   // Send an error response consisting of just a status code
-  def errorResponse(code: Int)(implicit receiver: XMLReceiver): Unit =
-    withDocument {
-      processingInstruction("orbeon-serializer", List("status-code" -> code.toString))
-    }
+  def errorResponse(code: Int)(implicit externalContext: ExternalContext): Unit =
+    externalContext.getResponse.setStatus(code)
 
   // Check for and handle events that don't need access to the document but can return an Ajax response rapidly
   def handleQuickReturnEvents(

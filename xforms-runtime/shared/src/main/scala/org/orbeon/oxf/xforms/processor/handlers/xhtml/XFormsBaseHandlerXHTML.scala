@@ -254,7 +254,7 @@ abstract class XFormsBaseHandlerXHTML (
             (None, lhhaAnalysis.containsHTML)
           case (LHHA.Help, Some(control)) =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
-            // case because it is stored as escaped HTML within a <label> element.
+            // case because it is stored as escaped HTML within a `<button>` (by default) element.
             (Option(control.lhhaProperty(lhha).escapedValue(handlerContext.collector)), false)
           case (LHHA.Help, _) =>
             (None, false)

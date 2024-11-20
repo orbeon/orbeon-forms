@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.control.LHHASupport.*
 import org.orbeon.oxf.xforms.control.XFormsControl.*
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable.*
@@ -34,7 +35,7 @@ trait ControlLHHASupport {
   private[ControlLHHASupport] var lhhaArray = new Array[LHHAProperty](LHHA.size)
 
   // XBL Container in which dynamic LHHA elements like `xf:output` and AVTs evaluate
-  def lhhaContainer = container
+  def lhhaContainer: XBLContainer = container
 
   def markLHHADirty(): Unit =
     for (currentLHHA <- lhhaArray)
@@ -171,7 +172,7 @@ object LHHASupport {
 
       def alertsMatchingValidations = {
         val failedValidationsIds = control.failedValidations.map(_.id).to(Set)
-        nonEmptyOption(staticAlerts filter (_.forValidations intersect failedValidationsIds nonEmpty))
+        nonEmptyOption(staticAlerts.filter(_.forValidations.intersect(failedValidationsIds).nonEmpty))
       }
 
       // Find all alerts which match the given level, if there are any failed validations for that level
@@ -185,7 +186,7 @@ object LHHASupport {
         nonEmptyOption(staticAlerts filter (a => a.forValidations.isEmpty && a.forLevels.isEmpty))
 
       // For that given level, identify all matching alerts if any, whether they match by validations or by level.
-      // Alerts that specify neither a validation nor a level are considered a default, that is they are not added
+      // Alerts that specify neither a validation nor a level are considered a default, that is, they are not added
       // if other alerts have already been matched.
       // Alerts are returned in document order
       control.alertLevel flatMap { level =>
@@ -196,8 +197,8 @@ object LHHASupport {
           alertsMatchingAny          getOrElse
           Nil
 
-        val matchingAlertIds = alerts map (_.staticId) toSet
-        val matchingAlerts   = staticAlerts filter (a => matchingAlertIds(a.staticId))
+        val matchingAlertIds = alerts.map(_.staticId).toSet
+        val matchingAlerts   = staticAlerts.filter(a => matchingAlertIds(a.staticId))
 
         matchingAlerts.nonEmpty option (level, matchingAlerts)
       }

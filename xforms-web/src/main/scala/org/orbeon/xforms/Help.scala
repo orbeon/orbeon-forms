@@ -75,7 +75,7 @@ object Help {
         animation = false // [1]
       )).popover("show")
 
-      // Decorate an position popover
+      // Decorate and position popover
       val popover = $(controlEl).next()
       popover.addClass("xforms-help-popover")
       addClose(jControlEl, popover)

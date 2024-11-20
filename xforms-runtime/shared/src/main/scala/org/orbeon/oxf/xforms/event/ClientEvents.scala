@@ -137,7 +137,8 @@ object ClientEvents extends Logging  {
     xmlReceiver         : XMLReceiver,
     requestUuid         : String,
     logRequestResponse  : Boolean,
-    clientEvents        : List[WireAjaxEvent])(implicit
+    clientEvents        : List[WireAjaxEvent]
+  )(implicit
     indentedLogger      : IndentedLogger,
     externalContext     : ExternalContext
   ): List[WireAjaxEvent] = {
@@ -214,7 +215,7 @@ object ClientEvents extends Logging  {
                     Array[String]("id", externalContext.getRequest.getContainerNamespace + progress.fieldName,
                       "progress-state",    progress.state.name,
                       "progress-received", progress.receivedSize.toString,
-                      "progress-expected", progress.expectedSize map (_.toString) orNull
+                      "progress-expected", progress.expectedSize.map(_.toString).orNull
                     )
                   )
               }
@@ -318,7 +319,7 @@ object ClientEvents extends Logging  {
       if (checkEventTarget(event))
         Dispatch.dispatchEvent(event, EventCollector.ToReview)
 
-    implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
+    implicit val currentLogger: IndentedLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
 
     val target            = event.targetObject
     val targetEffectiveId = target.effectiveId
@@ -377,7 +378,7 @@ object ClientEvents extends Logging  {
       trusted : Boolean
     ): Option[XFormsEvent] = {
 
-      implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
+      implicit val currentLogger: IndentedLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
 
       // Get event target
       val eventTarget =
@@ -395,7 +396,7 @@ object ClientEvents extends Logging  {
       def checkAllowedExternalEvents = {
 
         // Whether an external event name is explicitly allowed by the configuration.
-        def isExplicitlyAllowedExternalEvent = {
+        def isExplicitlyAllowedExternalEvent: Boolean = {
           val externalEventsSet = doc.staticState.allowedExternalEvents
 
           ! XFormsEventFactory.isBuiltInEvent(event.eventName) && externalEventsSet(event.eventName)

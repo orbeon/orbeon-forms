@@ -22,12 +22,10 @@ object Globals {
 
   // TODO: Most of these should be removed
   var maskFocusEvents             : Boolean                   = _ // avoid catching focus event when we do call setfocus upon server request
-  var maskDialogCloseEvents       : Boolean                   = _ // avoid catching a dialog close event received from the server, so we don't sent it back to the server
   var currentFocusControlId       : String                    = _ // id of the control that got the focus last
   var currentFocusControlElement  : js.Object                 = _ // element for the control that got the focus last
 
   var activeControl               : js.Object                 = _ // the currently active control, used to disable hint
-  var dialogs                     : js.Dictionary[js.Dynamic] = _ // map for dialogs: id -> YUI dialog object
   var hintTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
   var alertTooltipForControl      : js.Dictionary[js.Any]     = _ // map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
   var helpTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
@@ -38,12 +36,10 @@ object Globals {
 
   def reset(): Unit = {
     maskFocusEvents            = false
-    maskDialogCloseEvents      = false
     currentFocusControlId      = null
     currentFocusControlElement = null
 
     activeControl              = null
-    dialogs                    = js.Dictionary.empty
     hintTooltipForControl      = js.Dictionary.empty
     alertTooltipForControl     = js.Dictionary.empty
     helpTooltipForControl      = js.Dictionary.empty

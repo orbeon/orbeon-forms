@@ -597,7 +597,7 @@ class XFormsSelect1Handler(
         controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = isSingleItemItemset.option(containingDocument.namespaceId(XFormsSelect1Handler.getItemId(getEffectiveId, 0))),
         requestedElementNameOpt = (! isSingleItemItemset).option("span"),
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
     } else {

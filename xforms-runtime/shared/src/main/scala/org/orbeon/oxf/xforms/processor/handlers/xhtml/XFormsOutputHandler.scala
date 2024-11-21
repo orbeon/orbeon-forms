@@ -122,7 +122,7 @@ class XFormsOutputDefaultHandler(
       controlEffectiveIdOpt   = None,
       forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
       requestedElementNameOpt = None,
-      controlOrNull           = currentControl,
+      control                 = currentControl,
       isExternal              = false
     )
 
@@ -133,7 +133,7 @@ class XFormsOutputDefaultHandler(
         controlEffectiveIdOpt   = hasDirectOrByLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
 
@@ -144,7 +144,7 @@ class XFormsOutputDefaultHandler(
         controlEffectiveIdOpt   = hasDirectOrByLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
 }

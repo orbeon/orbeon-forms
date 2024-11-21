@@ -236,7 +236,7 @@ abstract class XFormsBaseHandlerXHTML (
     controlEffectiveIdOpt  : Option[String],
     forEffectiveIdWithNsOpt: Option[String],
     requestedElementNameOpt: Option[String],
-    controlOrNull          : XFormsControl,
+    control                : XFormsControl,
     isExternal             : Boolean // if `true` adds contraint classes, `id` on labels, and don't add LHHA suffix to ids
   ): Unit =
     if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
@@ -247,22 +247,16 @@ abstract class XFormsBaseHandlerXHTML (
       // If no attributes were found, there is no such label / help / hint / alert
 
       val (labelHintHelpAlertValueOpt, mustOutputHTMLFragment) =
-        (lhha, Option(controlOrNull)) match {
-          case (LHHA.Label | LHHA.Hint, Some(control)) =>
+        lhha match {
+          case LHHA.Label | LHHA.Hint =>
             (control.lhhaProperty(lhha).valueOpt(handlerContext.collector), lhhaAnalysis.containsHTML)
-          case (LHHA.Label | LHHA.Hint, _) =>
-            (None, lhhaAnalysis.containsHTML)
-          case (LHHA.Help, Some(control)) =>
+          case LHHA.Help =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
             // case because it is stored as escaped HTML within a `<button>` (by default) element.
             (Option(control.lhhaProperty(lhha).escapedValue(handlerContext.collector)), false)
-          case (LHHA.Help, _) =>
-            (None, false)
-          case (LHHA.Alert, Some(control)) =>
+          case LHHA.Alert =>
             // Not known statically at this time because it currently depends on the number of active alerts
             (control.lhhaProperty(lhha).valueOpt(handlerContext.collector), control.isHTMLAlert(handlerContext.collector))
-          case (LHHA.Alert, _) =>
-            (None, false)
         }
 
       val elementName = requestedElementNameOpt getOrElse lhhaElementName(lhha)
@@ -282,7 +276,7 @@ abstract class XFormsBaseHandlerXHTML (
 
       // Mark alert as active if needed
       if (lhha == LHHA.Alert)
-        controlOrNull match {
+        control match {
           case singleNodeControl: XFormsSingleNodeControl =>
 
             val constraintLevelOpt = singleNodeControl.alertLevel
@@ -300,13 +294,13 @@ abstract class XFormsBaseHandlerXHTML (
 
       // Handle visibility
       // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
-      if (controlOrNull ne null) {
-        if (! controlOrNull.isRelevant)
+//      if (controlOrNull ne null) {
+        if (! control.isRelevant)
           appendWithSpace("xforms-disabled")
-      } else if (lhha == LHHA.Help) {
-        // Null control outside of template OR help within template
-        appendWithSpace("xforms-disabled")
-      }
+//      } else if (lhha == LHHA.Help) {
+//        // Null control outside of template OR help within template
+//        appendWithSpace("xforms-disabled")
+//      }
       // LHHA name
       appendWithSpace("xforms-")
       classes.append(lhha.entryName)

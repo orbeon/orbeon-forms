@@ -99,7 +99,7 @@ class XXFormsComponentHandler(
         controlEffectiveIdOpt   = forEffectiveIdWithNsOpt.isEmpty option getEffectiveId, // id could be omitted if unused
         forEffectiveIdWithNsOpt = forEffectiveIdWithNsOpt,
         requestedElementNameOpt = forEffectiveIdWithNsOpt.isEmpty option "span",
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
     }

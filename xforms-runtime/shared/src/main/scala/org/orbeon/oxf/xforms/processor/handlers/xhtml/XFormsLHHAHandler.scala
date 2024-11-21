@@ -58,8 +58,8 @@ class XFormsLHHAHandler(
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
     // For https://github.com/orbeon/orbeon-forms/issues/3989
-    def mustOmitStaticReadonlyHint(currentControlOpt: Option[XFormsControl]): Boolean =
-      elementAnalysis.lhhaType == LHHA.Hint && ! containingDocument.staticReadonlyHint && XFormsBaseHandler.isStaticReadonly(currentControlOpt.orNull)
+    def mustOmitStaticReadonlyHint(currentControl: XFormsControl): Boolean =
+      elementAnalysis.lhhaType == LHHA.Hint && ! containingDocument.staticReadonlyHint && XFormsBaseHandler.isStaticReadonly(currentControl)
 
     elementAnalysis.lhhaPlacementType match {
       case LhhaPlacementType.External(_, _, Some(_)) =>
@@ -76,7 +76,7 @@ class XFormsLHHAHandler(
         // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use
         // `aria-*` attributes to point to this element.
 
-        if (! mustOmitStaticReadonlyHint(currentControl.some)) {
+        if (! mustOmitStaticReadonlyHint(currentControl)) {
           val containerAtts =
             getContainerAttributes(uri, localname, attributes, lhhaEffectiveId, elementAnalysis, currentControl, None)
 
@@ -115,7 +115,12 @@ class XFormsLHHAHandler(
         val effectiveTargetControlOpt: Option[XFormsControl] =
           Controls.resolveControlsById(containingDocument, lhhaEffectiveId, directTargetControl.staticId, followIndexes = true).headOption
 
-        if (! mustOmitStaticReadonlyHint(effectiveTargetControlOpt)) {
+        if (effectiveTargetControlOpt.isEmpty)
+          println(s"xxx effectiveTargetControlOpt.isEmpty: $lhhaEffectiveId")
+
+        val effectiveTargetControl = effectiveTargetControlOpt.getOrElse(throw new IllegalStateException)
+
+        if (! mustOmitStaticReadonlyHint(effectiveTargetControl)) {
 
           val labelForEffectiveIdWithNsOpt =
             elementAnalysis.lhhaType == LHHA.Label flatOption
@@ -126,7 +131,7 @@ class XFormsLHHAHandler(
             controlEffectiveIdOpt   = lhhaEffectiveId.some,
             forEffectiveIdWithNsOpt = labelForEffectiveIdWithNsOpt,
             requestedElementNameOpt = None,
-            controlOrNull           = effectiveTargetControlOpt.orNull, // to get the value; Q: When can this be `null`?
+            control                 = effectiveTargetControl,
             isExternal              = true
           )
         }

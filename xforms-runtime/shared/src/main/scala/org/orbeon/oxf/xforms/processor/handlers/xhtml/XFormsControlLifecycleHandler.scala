@@ -147,7 +147,7 @@ abstract class XFormsControlLifecycleHandler(
       controlEffectiveIdOpt   = XFormsBaseHandler.isStaticReadonly(currentControl) option getEffectiveId,
       forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
       requestedElementNameOpt = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
-      controlOrNull           = currentControl,
+      control                 = currentControl,
       isExternal              = false
     )
 
@@ -158,7 +158,7 @@ abstract class XFormsControlLifecycleHandler(
         controlEffectiveIdOpt   = None,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
 
@@ -169,7 +169,7 @@ abstract class XFormsControlLifecycleHandler(
         controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
 
@@ -180,7 +180,7 @@ abstract class XFormsControlLifecycleHandler(
         controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        controlOrNull           = currentControl,
+        control                 = currentControl,
         isExternal              = false
       )
 

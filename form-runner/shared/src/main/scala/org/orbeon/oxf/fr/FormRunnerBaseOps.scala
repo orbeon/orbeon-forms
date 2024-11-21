@@ -131,7 +131,7 @@ object AppFormOpt {
 
 trait FormRunnerBaseOps extends FormRunnerPlatform {
 
-  import FormRunnerBaseOps._
+  import FormRunnerBaseOps.*
 
   val LanguageParam                     = "fr-language"
   //@XPathFunction
@@ -258,7 +258,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def findFormRunnerBodyElem(inDoc: NodeInfo): Option[NodeInfo] = {
 
     def parentIsNotGridOrLegacyRepeat(n: NodeInfo) =
-      n parent FRGridOrLegacyRepeatTest isEmpty
+      (n parent FRGridOrLegacyRepeatTest).isEmpty
 
     def fromFbGroupId = SaxonUtils.selectID(inDoc, "fb-body")
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
@@ -275,7 +275,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def findModelElem(inDoc: NodeInfo): Option[NodeInfo] = {
 
     def fromHead           = inDoc.rootElement / "*:head" / XFModelTest find (_.hasIdValue(FormModel))
-    def fromImplementation = inDoc.rootElement / XBLImplementationTest / XFModelTest headOption
+    def fromImplementation = (inDoc.rootElement / XBLImplementationTest / XFModelTest).headOption
 
     fromHead orElse fromImplementation
   }
@@ -289,7 +289,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   // Find an inline instance's root element
   def inlineInstanceRootElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    instanceElem(inDoc, id).toList / * headOption
+    (instanceElem(inDoc, id).toList / *).headOption
 
   def isTemplateId(id: String): Boolean = id endsWith TemplateSuffix
 
@@ -400,10 +400,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
 
   // Used by user XPath functions
-  def canCreate: Boolean = authorizedOperations intersect CreateOps nonEmpty
-  def canRead  : Boolean = authorizedOperations intersect ReadOps   nonEmpty
-  def canUpdate: Boolean = authorizedOperations intersect UpdateOps nonEmpty
-  def canDelete: Boolean = authorizedOperations intersect DeleteOps nonEmpty
+  def canCreate: Boolean = (authorizedOperations intersect CreateOps).nonEmpty
+  def canRead  : Boolean = (authorizedOperations intersect ReadOps)  .nonEmpty
+  def canUpdate: Boolean = (authorizedOperations intersect UpdateOps).nonEmpty
+  def canDelete: Boolean = (authorizedOperations intersect DeleteOps).nonEmpty
 
   private def documentMetadataDate(name: String): Option[Long] =
     documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)

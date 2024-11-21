@@ -606,13 +606,18 @@ body.orbeon {
             position: absolute;
             right: 0;
             top: 1px;
+            margin-top: 0;
             width: fit-content;
 
             .navbar {
+                margin: 0;
                 .navbar-inner {
                     padding-top: 0;
                     padding-bottom: 0;
                     background-color: transparent;
+                    .nav > li >a {
+                        padding: 5px;
+                    }
                 }
             }
         }
@@ -1915,25 +1920,6 @@ body.orbeon {
 
         .fr-language-choice .nav {
             margin-right: 0;
-        }
-    }
-
-    .xforms-dialog {
-
-        // Make the language choice selector smaller and floating to the top right
-        .xbl-fb-language-choice {
-            float: right;
-
-            .navbar {
-                margin-bottom: 0;
-                .navbar-inner {
-                    min-height: 10px;
-                }
-
-                .nav > li >a {
-                    padding: 5px;
-                }
-            }
         }
     }
 

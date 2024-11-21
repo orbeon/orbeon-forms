@@ -19,18 +19,16 @@ import org.log4s
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.library.FRComponentParamSupport
+import org.orbeon.oxf.fr.library.FRComponentParamSupport.fromMetadataAndPropertiesEvaluateAvt
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
@@ -568,48 +566,17 @@ object SimpleDataMigration {
       implicit val formRunnerParams = FormRunnerParams()
       implicit val indentedLogger   = new IndentedLogger(logger)
 
-      def buildPropertyName(appFormOpt: Option[AppForm]) =
-        appFormOpt match {
-          case Some(appForm) => frc.buildPropertyName(DataMigrationPropertyName, appForm)
-          case None          => DataMigrationPropertyName
-        }
-
-      def findInProperties(appFormOpt: Option[AppForm]): Option[AtomicValue] = {
-        FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsExpr(
-          propertyName    = buildPropertyName(appFormOpt),
-          avt             = true,
-          libraryName     = None,
-          norewrite       = Set.empty,
-          functionLibrary = xfcd.functionLibrary
-        )
-        .map { rewrittenXPathExpr =>
-          EvaluateSupport.evaluateInContextFromXPathExpr(
-            rewrittenXPathExpr,
-            Names.FormModel,
-            xfcd,
-            xfcd.getDefaultModel.getDefaultInstance.rootElement
-          )
-        }
-        .map(_.collect { case v: AtomicValue => v }) // we know this returns only a `StringValue` since it is an AVT
-        .flatMap(_.headOption)
-      }
-
-      // `fromMetadataAndPropertiesSupport()` doesn't evaluate AVTs, so we need to do it via `findInProperties()`
-      def fromMetadataAndProperties: Option[String] =
-        FRComponentParamSupport.fromMetadataAndPropertiesSupport(
-          partAnalysis     = xfcd.staticState.topLevelPart,
-          findInMetadata   = FRComponentParamSupport.findTopLevelElem,
-          findInProperties = (_, appFormOpt) => findInProperties(appFormOpt),
-          paramName        = DataMigrationFeatureName
-        ).map(_.getStringValue)
-
       val behavior =
         if (frc.isDesignTime)
           DataMigrationBehavior.Disabled
         else
-          fromMetadataAndProperties            flatMap
-          DataMigrationBehavior.withNameOption getOrElse
-          DataMigrationBehavior.Disabled
+          fromMetadataAndPropertiesEvaluateAvt(
+            xfcd,
+            DataMigrationFeatureName,
+            DataMigrationPropertyName
+          )
+          .flatMap(DataMigrationBehavior.withNameOption)
+          .getOrElse(DataMigrationBehavior.Disabled)
 
       def isFeatureEnabled =
         xfcd.staticState.isPEFeatureEnabled(

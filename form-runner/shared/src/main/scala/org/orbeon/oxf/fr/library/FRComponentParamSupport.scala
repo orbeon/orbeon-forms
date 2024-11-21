@@ -3,8 +3,10 @@ package org.orbeon.oxf.fr.library
 import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
-import org.orbeon.oxf.fr.{AppForm, FormRunnerParams, Names, XMLNames}
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisForStaticMetadataAndProperties, model}
@@ -12,7 +14,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{ControlXPathSupport, XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
+import org.orbeon.oxf.xforms.function.xxforms.{ComponentParamSupport, EvaluateSupport}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits.*
@@ -152,6 +154,49 @@ object FRComponentParamSupport {
       findInProperties = (paramName, appFormOpt) => ComponentParamSupport.fromProperties(paramName, appFormOpt.map(_.toList).getOrElse(Nil), directNameOpt, property),
       paramName        = paramName
     )
+
+  def fromMetadataAndPropertiesEvaluateAvt(
+    xfcd          : XFormsContainingDocument,
+    featureName   : String,
+    propertyName  : String
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): Option[String] = {
+
+    def buildPropertyName(appFormOpt: Option[AppForm]) =
+      appFormOpt match {
+        case Some(appForm) => frc.buildPropertyName(propertyName, appForm)
+        case None          => propertyName
+      }
+
+    def findInProperties(appFormOpt: Option[AppForm]): Option[AtomicValue] = {
+      FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsExpr(
+        propertyName    = buildPropertyName(appFormOpt),
+        avt             = true,
+        libraryName     = None,
+        norewrite       = Set.empty,
+        functionLibrary = xfcd.functionLibrary
+      )
+      .map { rewrittenXPathExpr =>
+        EvaluateSupport.evaluateInContextFromXPathExpr(
+          rewrittenXPathExpr,
+          Names.FormModel,
+          xfcd,
+          xfcd.getDefaultModel.getDefaultInstance.rootElement
+        )
+      }
+      .map(_.collect { case v: AtomicValue => v }) // we know this returns only a `StringValue` since it is an AVT
+      .flatMap(_.headOption)
+    }
+
+    // `fromMetadataAndPropertiesSupport()` doesn't evaluate AVTs, so we need to do it via `findInProperties()`
+    FRComponentParamSupport.fromMetadataAndPropertiesSupport(
+      partAnalysis     = xfcd.staticState.topLevelPart,
+      findInMetadata   = FRComponentParamSupport.findTopLevelElem,
+      findInProperties = (_, appFormOpt) => findInProperties(appFormOpt),
+      paramName        = featureName
+    ).map(_.getStringValue)
+  }
 
   def fromMetadataAndPropertiesSupport(
     partAnalysis    : PartAnalysisForStaticMetadataAndProperties,

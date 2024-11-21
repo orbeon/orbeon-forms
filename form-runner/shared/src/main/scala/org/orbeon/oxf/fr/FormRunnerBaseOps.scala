@@ -13,19 +13,20 @@
  */
 package org.orbeon.oxf.fr
 
-import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
+import enumeratum.EnumEntry.Lowercase
 import org.log4s
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils, IndentedLogger}
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
@@ -427,6 +428,20 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   ): Option[String] =
     metadataInstanceRootElem.elemValueOpt(featureName) orElse
     formRunnerProperty(s"oxf.fr.detail.$featureName")
+
+  //@XPathFunction
+  def optionFromMetadataOrPropertiesDynamicXPath(
+    featureName: String,
+    default    : String
+  ): String = {
+    val xfcd = inScopeContainingDocument
+    implicit val indentedLogger: IndentedLogger = xfcd.getIndentedLogger("form-runner")
+    FRComponentParamSupport.fromMetadataAndPropertiesEvaluateAvt(
+      xfcd,
+      featureName,
+      s"oxf.fr.detail.$featureName"
+    ).getOrElse(default)
+  }
 
   def formTitleFromMetadata: Option[String] =
     metadataInstance  map

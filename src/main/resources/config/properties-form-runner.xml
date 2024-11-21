@@ -184,6 +184,9 @@
     <property as="xs:string"  name="oxf.fr.detail.toc.position.*.*"                                value="top"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.modes.*.*"                                   value="new edit view"/>
 
+    <property as="xs:string"  name="oxf.fr.detail.html-page-layout.*.*"                            value="fixed"/>
+    <property as="xs:string"  name="oxf.fr.detail.density.*.*"                                     value="{if (fr:created-with-or-newer('2024.1')) then 'comfortable' else 'compact'}"/>
+
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                               value="bottom"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                          value="false"/>

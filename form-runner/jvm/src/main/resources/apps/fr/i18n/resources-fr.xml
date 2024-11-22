@@ -359,14 +359,14 @@
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>Session proche de l'expiration</expiring>
+                <expired>Session expirée</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
-                <expired todo="true">[Your session has expired.]</expired>
+                <expiring>Votre session va expirer bientôt. Activez le bouton ci-dessous si vous désirez continuer à utiliser cette page.</expiring>
+                <expired>Votre session a expiré.</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
+            <renew-button>Renouveler la session</renew-button>
         </session-expiration>
         <available-from>
             <message>Ce formulaire n'est pas encore disponible</message>

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 // Special "control" which represents an LHHA value. This is used only when the LHHA element is not
 // local, that is that it has a `for` attribute.
 //
-// A side-effect of this being an `XFormsValueControl` is that it will dispatch value change events, etc.
+// A side effect of this being an `XFormsValueControl` is that it will dispatch value change events, etc.
 // This should probably be changed?
 //
 class XFormsLHHAControl(

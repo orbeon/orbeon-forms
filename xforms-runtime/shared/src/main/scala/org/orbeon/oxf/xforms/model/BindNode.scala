@@ -168,8 +168,8 @@ object BindNode {
   private def failedValidationsForAllLevels(node: Node): Validations =
     collectFailedValidationsForAllLevels(
       Option(InstanceData.getLocalInstanceData(node))
-      map (_.getBindNodes.asScala)
-      getOrElse Nil
+      .map(_.getBindNodes.asScala)
+      .getOrElse(Nil)
     )
 
   private def collectFailedValidationsForAllLevels(bindNodes: Iterable[BindNode]): Validations =
@@ -203,8 +203,8 @@ object BindNode {
   private def failedValidationsForHighestLevel(nodeInfo: om.NodeInfo): Option[(ValidationLevel, List[StaticBind.MIP])] =
     collectFailedValidationsForHighestLevel(
       Option(InstanceData.getLocalInstanceData(nodeInfo, forUpdate = false))
-      map (_.getBindNodes.asScala)
-      getOrElse Nil
+        .map(_.getBindNodes.asScala)
+        .getOrElse( Nil)
     )
 
   private def collectFailedValidationsForHighestLevel(
@@ -220,15 +220,16 @@ object BindNode {
       None
     else {
       val consideredLevels = bindNodes flatMap (node => findLevel(node) map (level => (level, node)))
-      val highestLevelOpt  = consideredLevels.nonEmpty option (consideredLevels map (_._1) max)
+      val highestLevelOpt  = consideredLevels.nonEmpty option consideredLevels.map(_._1).max
 
       highestLevelOpt map {
         highestLevel =>
 
           val failedForHighest =
-            consideredLevels.toList collect {
-              case (`highestLevel`, node) => node.failedValidations(highestLevel)
-            } flatten
+            consideredLevels
+              .toList
+              .collect { case (`highestLevel`, node) => node.failedValidations(highestLevel)}
+              .flatten
 
           (highestLevel, failedForHighest)
       }
@@ -252,12 +253,12 @@ class BindIteration(
     for (staticBind <- childrenStaticBinds)
       yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext, collector)
 
-  def forStaticId = parentBind.staticId
+  def forStaticId: String = parentBind.staticId
 
   def applyBinds(fn: BindNode => Unit): Unit =
     for (currentBind <- childrenBinds)
       currentBind.applyBinds(fn)
 
-  def findChildBindByStaticId(bindId: String) =
+  def findChildBindByStaticId(bindId: String): Option[RuntimeBind] =
     childrenBinds find (_.staticBind.staticId == bindId)
 }

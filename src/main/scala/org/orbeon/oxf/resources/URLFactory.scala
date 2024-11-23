@@ -49,9 +49,9 @@ object URLFactory {
   }
 
   private def protocol(context: URL, spec: String) =
-    Option(getProtocol(spec))          orElse
-    Option(context).map(_.getProtocol) getOrElse
-    (throw new IllegalArgumentException)
+    Option(getProtocol(spec))
+      .orElse(Option(context).map(_.getProtocol))
+      .getOrElse(throw new IllegalArgumentException)
 
   private val OXF    = new OXFHandler
   private val HTTP   = new HTTPHandler

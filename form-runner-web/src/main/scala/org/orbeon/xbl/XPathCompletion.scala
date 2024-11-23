@@ -6,7 +6,6 @@ import org.orbeon.xforms.{AjaxClient, AjaxEvent, DocumentAPI, EventListenerSuppo
 import org.scalajs.dom
 import org.scalajs.dom.CustomEvent
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
-import scalatags.JsDom
 import scalatags.JsDom.all.*
 
 import scala.concurrent.Promise

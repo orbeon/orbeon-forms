@@ -175,7 +175,7 @@ trait ControlBindingSupport {
 
   // By default: if there is a parent, we have the same relevance as the parent, otherwise we are top-level so
   // we are relevant by default. Also, we are not relevant if the parent says its content is not visible.
-  private final def parentContentRelevant = (parent eq null) || parent.contentRelevant
+  private final def parentContentRelevant: Boolean = (parent eq null) || parent.contentRelevant
 
   final def wasRelevantCommit() = {
     val result = _wasRelevant

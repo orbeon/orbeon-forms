@@ -566,6 +566,8 @@ object XFormsStaticStateSerializer {
             b += "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance)
           if (c.hasLocalLeftAppearance)
             b += "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
+          if (c.forValidationId.isDefined)
+            b += "forValidationId"           -> c.forValidationId.asJson
         case c: SelectionControl =>
           if (c.staticItemset.isDefined)
             b += "staticItemset"    -> c.staticItemset.asJson

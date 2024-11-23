@@ -28,7 +28,7 @@ class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, eleme
     extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
     with SingleNodeFocusableTrait {
 
-  import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl._
+  import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl.*
 
   override def htmlLhhaSupport = TriggerLhhaHtmlSupport
 

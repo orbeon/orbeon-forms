@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -24,10 +24,11 @@ import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
-import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.Attributes
 import shapeless.syntax.typeable.*
+
+import java.lang as jl
 
 
 /**
@@ -51,6 +52,17 @@ class XFormsLHHAHandler(
     forwarding = false
   ) {
 
+  private def findControl: Option[XFormsLHHAControl] =
+    containingDocument.findControlByEffectiveId(getEffectiveId).flatMap(_.narrowTo[XFormsLHHAControl])
+
+  protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit =
+    if (! elementAnalysis.isLocal) // which it shouldn't be, but see comments below
+      control.cast[XFormsLHHAControl].foreach { lhhaControl =>
+        if (lhhaControl.associatedControlsVisited)
+          classes.append(" xforms-visited")
+        lhhaControl.associatedControlsLevel.foreach(level => classes.append(s" xforms-active xforms-${level.entryName}"))
+      }
+
   override def start(): Unit = {
 
     val lhhaEffectiveId = getEffectiveId
@@ -61,24 +73,28 @@ class XFormsLHHAHandler(
     def mustOmitStaticReadonlyHint(currentControl: XFormsControl): Boolean =
       elementAnalysis.lhhaType == LHHA.Hint && ! containingDocument.staticReadonlyHint && XFormsBaseHandler.isStaticReadonly(currentControl)
 
+    lazy val currentLHHAControl =
+      findControl.getOrElse(throw new IllegalStateException(s"control not found for effective id: `$lhhaEffectiveId`"))
+
     elementAnalysis.lhhaPlacementType match {
+      case LhhaPlacementType.Local(_, _) =>
+        // Q: Can this happen? Do we match on local LHHA?
+        // 2020-11-13: This seems to happen.
+        // 2022-06-08: still happens! `currentControl eq null`
+        // 2024-11-25: This can be called for some local labels, like `<xf:label>` nested inside a `<xf:group>`. This shouldn't happen, right?
       case LhhaPlacementType.External(_, _, Some(_)) =>
 
         // In this case, we handle our own value and don't ask it to the (repeated) controls, since there might be
         // zero, one, or several of them. We also currently don't handle constraint classes.
 
-        // This duplicates code in `XFormsControlLifecycleHandler` as this handler doesn't derive from it.
-        val currentControl =
-          containingDocument.findControlByEffectiveId(lhhaEffectiveId)
-            .getOrElse(throw new IllegalStateException(s"control not found for effective id: `$lhhaEffectiveId`"))
-
         // Case where the LHHA is external and in a shallower level of nesting of repeats.
         // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use
         // `aria-*` attributes to point to this element.
 
-        if (! mustOmitStaticReadonlyHint(currentControl)) {
+        if (! mustOmitStaticReadonlyHint(currentLHHAControl)) {
+
           val containerAtts =
-            getContainerAttributes(uri, localname, attributes, lhhaEffectiveId, elementAnalysis, currentControl, None)
+            getContainerAttributes(uri, localname, attributes, lhhaEffectiveId, elementAnalysis, currentLHHAControl, None)
 
           val elementName =
             lhhaElementName(elementAnalysis.lhhaType)
@@ -92,12 +108,9 @@ class XFormsLHHAHandler(
             uri       = XHTML_NAMESPACE_URI,
             atts      = containerAtts
           ) {
-            for {
-              currentLHHAControl <- currentControl.narrowTo[XFormsLHHAControl]
-              externalValue      <- currentLHHAControl.externalValueOpt(handlerContext.collector)
-              if externalValue.nonEmpty
-            } locally {
-              if (elementAnalysis.element.attributeValueOpt("mediatype") contains "text/html")
+            // 2024-11-25: The external value is the same as the value.
+            currentLHHAControl.externalValueOpt(handlerContext.collector).filter(_.nonEmpty).foreach { externalValue =>
+              if (elementAnalysis.containsHTML)
                 XFormsCrossPlatformSupport.streamHTMLFragment(externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
               else
                 xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
@@ -115,9 +128,6 @@ class XFormsLHHAHandler(
         val effectiveTargetControlOpt: Option[XFormsControl] =
           Controls.resolveControlsById(containingDocument, lhhaEffectiveId, directTargetControl.staticId, followIndexes = true).headOption
 
-        if (effectiveTargetControlOpt.isEmpty)
-          println(s"xxx effectiveTargetControlOpt.isEmpty: $lhhaEffectiveId")
-
         val effectiveTargetControl = effectiveTargetControlOpt.getOrElse(throw new IllegalStateException)
 
         if (! mustOmitStaticReadonlyHint(effectiveTargetControl)) {
@@ -126,20 +136,41 @@ class XFormsLHHAHandler(
             elementAnalysis.lhhaType == LHHA.Label flatOption
               XFormsLHHAHandler.findLabelForEffectiveIdWithNs(elementAnalysis, XFormsId.getEffectiveIdSuffix(lhhaEffectiveId), handlerContext)
 
-          handleLabelHintHelpAlert(
-            lhhaAnalysis            = elementAnalysis,
-            controlEffectiveIdOpt   = lhhaEffectiveId.some,
-            forEffectiveIdWithNsOpt = labelForEffectiveIdWithNsOpt,
-            requestedElementNameOpt = None,
-            control                 = effectiveTargetControl,
-            isExternal              = true
-          )
-        }
+          if (elementAnalysis.lhhaType == LHHA.Alert) {
 
-      case LhhaPlacementType.Local(_, _) =>
-        // Q: Can this happen? Do we match on local LHHA?
-        // 2020-11-13: This seems to happen.
-        // 2022-06-08: still happens! `currentControl eq null`
+            val alertProperties =
+              effectiveTargetControl
+                .alertsForValidation(elementAnalysis.forValidationId, elementAnalysis.forLevels)
+
+            // The value of the alert is always the value computed by the associated control, not a value that we ask
+            // the target control. This is because the target control's `lhhaProperty(LHHA.Alert)` can return an
+            // aggregated value of all the alerts, for historical reasons. In addition, there is no reason to ask the
+            // target control for a value which we have in this control anyway.
+            val valueOpt =
+              alertProperties.nonEmpty flatOption
+                currentLHHAControl.externalValueOpt(handlerContext.collector).filter(_.nonEmpty)
+
+            handleLabelHintHelpAlertUseValue(
+              lhhaAnalysis               = elementAnalysis,
+              controlEffectiveIdOpt      = lhhaEffectiveId.some,
+              forEffectiveIdWithNsOpt    = labelForEffectiveIdWithNsOpt,
+              requestedElementNameOpt    = None,
+              control                    = effectiveTargetControl,
+              isExternal                 = true,
+              labelHintHelpAlertValueOpt = valueOpt,
+              mustOutputHTMLFragment     = elementAnalysis.containsHTML
+            )
+          } else {
+            handleLabelHintHelpAlert(
+              lhhaAnalysis               = elementAnalysis,
+              controlEffectiveIdOpt      = lhhaEffectiveId.some,
+              forEffectiveIdWithNsOpt    = labelForEffectiveIdWithNsOpt,
+              requestedElementNameOpt    = None,
+              control                    = effectiveTargetControl,
+              isExternal                 = true
+            )
+          }
+        }
     }
   }
 }

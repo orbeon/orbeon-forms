@@ -29,16 +29,17 @@ class LHHAAnalysis(
   parent                        : Option[ElementAnalysis],
   preceding                     : Option[ElementAnalysis],
   staticId                      : String,
-  prefixedId                    : String,
-  namespaceMapping              : NamespaceMapping,
-  scope                         : Scope,
-  containerScope                : Scope,
-  val expressionOrConstant      : Either[String, String],
-  val isPlaceholder             : Boolean,
-  val containsHTML              : Boolean,
-  val hasLocalMinimalAppearance : Boolean,
-  val hasLocalFullAppearance    : Boolean,
-  val hasLocalLeftAppearance    : Boolean
+  prefixedId                   : String,
+  namespaceMapping             : NamespaceMapping,
+  scope                        : Scope,
+  containerScope               : Scope,
+  val expressionOrConstant     : Either[String, String],
+  val isPlaceholder            : Boolean,
+  val containsHTML             : Boolean,
+  val hasLocalMinimalAppearance: Boolean,
+  val hasLocalFullAppearance   : Boolean,
+  val hasLocalLeftAppearance   : Boolean,
+  val forValidationId          : Option[String],
 ) extends ElementAnalysis(index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
    with OptionalSingleNode
    with ViewTrait
@@ -47,7 +48,7 @@ class LHHAAnalysis(
 
   self =>
 
-  import LHHAAnalysis._
+  import LHHAAnalysis.*
 
   require(parent.isDefined)
 
@@ -55,10 +56,13 @@ class LHHAAnalysis(
 
   def lhhaType: LHHA = LHHA.withNameOption(localName) getOrElse LHHA.Label // FIXME: Because `SelectionControlTrait` calls this for `value`!
 
-  val defaultToHTML: Boolean = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
-
   // Updated in `attachToControl()`
   var lhhaPlacementType: LhhaPlacementType = _
+
+  def isExternalBeforeAssociatedControl: Boolean = lhhaPlacementType match {
+    case LhhaPlacementType.External(directTargetControl, _, _) if index < directTargetControl.index => true
+    case _ => false
+  }
 
   def isLocal: Boolean = lhhaPlacementType match {
     case LhhaPlacementType.Local(_, _) => true

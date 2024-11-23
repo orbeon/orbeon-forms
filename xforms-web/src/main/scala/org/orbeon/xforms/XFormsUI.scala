@@ -1469,7 +1469,7 @@ object XFormsUI {
     }
 
     val HandleValueIgnoredControls    = List("xforms-trigger", "xforms-submit", "xforms-upload")
-    val HandleValueOutputOnlyControls = List("xforms-output", "xforms-static", "xforms-label", "xforms-hint", "xforms-help")
+    val HandleValueOutputOnlyControls = List("xforms-output", "xforms-static", "xforms-label", "xforms-hint", "xforms-help", "xforms-alert")
 
     def childrenWithLocalName(node: dom.Element, name: String): Iterator[dom.Element] =
       node.childNodes.iterator collect {

@@ -303,7 +303,6 @@ object XFormsControl {
   trait ControlProperty[T >: Null] {
     def value(collector: ErrorEventCollector): T
     def handleMarkDirty(force: Boolean = false): Unit
-    def copy: ControlProperty[T]
 
     def valueOpt(collector: ErrorEventCollector): Option[T] = Option(value(collector))
   }
@@ -312,7 +311,6 @@ object XFormsControl {
   class ImmutableControlProperty[T >: Null](private val _value: T) extends ControlProperty[T] {
     def value(collector: ErrorEventCollector): T = _value
     def handleMarkDirty(force: Boolean): Unit = ()
-    def copy: ImmutableControlProperty[T] = this
   }
 
   // Mutable control property supporting optimization
@@ -356,7 +354,7 @@ object XFormsControl {
 
     def handleMarkDirty(force: Boolean): Unit = {
 
-      def isDirty = ! isEvaluated
+      val isDirty = ! isEvaluated
       def markOptimized(): Unit = isOptimized = true
 
       if (! isDirty) {
@@ -379,8 +377,6 @@ object XFormsControl {
       isEvaluated = false
       isOptimized = false
     }
-
-    def copy: MutableControlProperty[T] = super.clone.asInstanceOf[MutableControlProperty[T]]
   }
 
   // Return the set of appearances for the given element, if any

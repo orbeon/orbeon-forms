@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
+import cats.data.NonEmptyList
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType, XPathAnalysis}
 import org.orbeon.xforms.XFormsNames
 
@@ -40,6 +41,7 @@ trait StaticLHHASupport extends ElementAnalysis {
   def allowMinimalLabelHint: Boolean
 
   def alerts: List[LHHAAnalysis] = _alerts
+  def alertsNel: Option[NonEmptyList[LHHAAnalysis]] = NonEmptyList.fromList(alerts)
 
   def firstByOrDirectLhhaOpt(lhhaType: LHHA): Option[LHHAAnalysis] =
     lhhaType match {
@@ -50,6 +52,12 @@ trait StaticLHHASupport extends ElementAnalysis {
   def firstDirectLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
     if (lhhaType == LHHA.Alert)
       alerts.headOption // for alerts, take the first one, but does this make sense?
+    else
+      directLhh(lhhaType)
+
+  def allDirectLhha(lhhaType: LHHA): Iterable[LHHAAnalysis] =
+    if (lhhaType == LHHA.Alert)
+      alerts // for alerts, take the first one, but does this make sense?
     else
       directLhh(lhhaType)
 

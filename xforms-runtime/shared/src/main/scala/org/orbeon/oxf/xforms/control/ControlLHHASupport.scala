@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.CoreUtils.*
+import cats.data.NonEmptyList
+import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.*
 import org.orbeon.oxf.xforms.control.XFormsControl.*
@@ -32,50 +34,152 @@ trait ControlLHHASupport {
   // Label, help, hint and alert (evaluated lazily)
   // 2013-06-19: We support multiple alerts, but only one client-facing alert value at this point.
   // NOTE: `var` because of cloning
-  private[ControlLHHASupport] var lhhaMap: Map[LHHA, LHHAProperty] = Map.empty
+  private[ControlLHHASupport] var lhhMap: Map[LHHA, LHHAProperty] = Map.empty
+  private[ControlLHHASupport] var alerts: Option[(List[LHHAProperty], LHHAProperty, LHHAProperty)] = None // separate, combined local, and combined active alerts
 
   // XBL Container in which dynamic LHHA elements like `xf:output` and AVTs evaluate
   def lhhaContainer: XBLContainer = container
 
-  def markLHHADirty(): Unit =
-    lhhaMap.valuesIterator.foreach(_.handleMarkDirty())
+  def markLHHADirty(): Unit = {
+    lhhMap.valuesIterator.foreach(_.handleMarkDirty())
+    // The overriding method will take care of calling `forceDirtyAlert()` if needed
+    alerts.foreach { case (separate, local, combined) =>
+      separate.foreach(_.handleMarkDirty())
+      local.handleMarkDirty()
+      combined.handleMarkDirty()
+    }
+  }
 
   // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
   // on the control's current validity and validations. Because we don't have yet a way of taking those in as
   // dependencies, we force dirty alerts whenever such validations change upon refresh.
   def forceDirtyAlert(): Unit =
-    lhhaMap.get(LHHA.Alert).foreach(_.handleMarkDirty(force = true))
+    alerts = None
 
-  def evaluateNonRelevantLHHA(): Unit =
-    lhhaMap = Map.empty
-
-  // Copy LHHA
-  def updateLHHACopy(copy: XFormsControl, collector: ErrorEventCollector): Unit = {
-    lhhaMap.valuesIterator.foreach(_.value(collector)) // evaluate lazy values before copying
-    copy.lhhaMap = lhhaMap // simply assign as we use an immutable `Map`
+  def evaluateNonRelevantLHHA(): Unit = {
+    lhhMap = Map.empty
+    alerts = None
   }
 
-  def lhhaProperty(lhha: LHHA): LHHAProperty =
-    lhhaMap.getOrElse(lhha, {
-      val property = evaluateLhha(lhha)
-      lhhaMap += lhha -> property
-      property
-    })
+  // Make immutable eager copies of all LHHA properties
+  def updateLHHACopy(copy: XFormsControl, collector: ErrorEventCollector): Unit = {
+
+    copy.lhhMap =
+      lhhMap.map {
+        case (lhha, property) =>
+          val value = property.value(collector)
+          lhha -> new ImmutableLHHAProperty(value, property.isHTML, property.locationData)
+      }
+
+    copy.alerts =
+      alerts.map { case (separate, local, combined) =>
+        (
+          separate.map { property =>
+            val value = property.value(collector)
+            new ImmutableLHHAProperty(value, property.isHTML, property.locationData)
+          },
+          new ImmutableLHHAProperty(local.value(collector), local.isHTML, local.locationData),
+          new ImmutableLHHAProperty(combined.value(collector), combined.isHTML, combined.locationData)
+        )
+      }
+  }
+
+  def lhhaProperty(lhha: LHHA, local: Boolean = false): LHHAProperty =
+    lhha match {
+      case LHHA.Alert =>
+
+        val tuple =
+          alerts.getOrElse {
+
+            val alertsOpt =
+              gatherActiveAlertsProperties.map { activeAlerts =>
+
+                val activeAlertsList = activeAlerts.toList
+
+                def combine(alerts: List[MutableLHHAProperty]): LHHAProperty =
+                  alerts match {
+                    case Nil =>
+                      NullLHHA // Q: should we use `Option`?
+                    case head :: Nil =>
+                      head
+                    case head :: tail =>
+                      // Combine multiple values as a single HTML value using `ul`/`li`
+                      new MutableLHHAProperty(self, head.lhhaAnalysis) { // NOTE: `head.lhhaAnalysis` will not be used
+                        override def isHTML: Boolean = true
+                        override protected def evaluateValue(collector: ErrorEventCollector): String = combinePropertiesAsUl(head :: tail, collector)
+                        // These shouldn't need to be implemented as the aggregated value is simply set to `None` when needed
+                        override protected def requireUpdate: Boolean = false
+                        override def handleMarkDirty(force: Boolean): Unit = () // (head :: tail).foreach(_.handleMarkDirty(force))
+                      }
+                    }
+
+                val local = activeAlertsList.filter(_.lhhaAnalysis.isLocal)
+
+                (activeAlertsList, combine(local), combine(activeAlertsList))
+              }
+
+            val alertsOrDefault =
+              alertsOpt.getOrElse((Nil, NullLHHA, NullLHHA))
+
+            alerts = Some(alertsOrDefault)
+            alertsOrDefault
+          }
+
+        if (local)
+          tuple._2
+        else
+          tuple._3
+
+      case lhh =>
+        lhhMap.getOrElse(lhh, {
+          val property = evaluateLhh(lhh)
+          lhhMap += lhh -> property
+          property
+        })
+    }
+
+  def alertsForValidation(
+    validationIdOpt: Option[String],
+    forLevels      : Set[ValidationLevel] // TODO
+  ): List[MutableLHHAProperty] = {
+    lhhaProperty(LHHA.Alert) // force evaluation?
+    validationIdOpt match {
+      case Some(validationId) =>
+        alerts
+          .toList
+          .map(_._1)
+          .flatMap(lHHAProperties => lHHAProperties.collect {
+            case mutableLhhaProperty: MutableLHHAProperty
+              if mutableLhhaProperty.lhhaAnalysis.forValidationId.contains(validationId) =>
+                mutableLhhaProperty
+          })
+      case None =>
+        alerts
+          .toList
+          .map(_._3)
+          .flatMap { combined =>
+            combined.cast[MutableLHHAProperty]
+          }
+    }
+  }
 
   // NOTE: Ugly because of imbalanced hierarchy between static/runtime controls
-  private def evaluateLhha(lhha: LHHA): LHHAProperty =
+  private def evaluateLhh(lhha: LHHA): LHHAProperty =
     self.staticControl match {
-      case staticLhhaSupport: StaticLHHASupport if staticLhhaSupport.hasDirectLhha(lhha) =>
-        self match {
-          case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert =>
-            new MutableAlertProperty(singleNodeControl, lhha, htmlLhhaSupport(lhha))
-          case control: XFormsControl if lhha != LHHA.Alert =>
-            new MutableLHHProperty(control, lhha, htmlLhhaSupport(lhha))
-          case _ =>
-            NullLHHA
-        }
+      case staticLhhaSupport: StaticLHHASupport =>
+        staticLhhaSupport
+          .firstDirectLhha(lhha)
+          .map(lhh => new MutableLHHAProperty(self, lhh))
+          .getOrElse(NullLHHA)
       case _ =>
         NullLHHA
+    }
+
+  private def gatherActiveAlertsProperties: Option[NonEmptyList[MutableLHHAProperty]] =
+    self.cast[XFormsSingleNodeControl].flatMap { singleNodeControl =>
+      LHHASupport.gatherActiveAlerts(singleNodeControl).map { case (_, activeAlerts) =>
+        activeAlerts.map(new MutableLHHAProperty(singleNodeControl, _))
+      }
     }
 
   def eagerlyEvaluateLhha(collector: ErrorEventCollector): Unit =
@@ -86,17 +190,16 @@ trait ControlLHHASupport {
   def ajaxLhhaSupport: Seq[LHHA] = LHHA.values
 
   def compareLHHA(other: XFormsControl, collector: ErrorEventCollector): Boolean =
-    ajaxLhhaSupport forall (lhha => lhhaProperty(lhha).value(collector) == other.lhhaProperty(lhha).value(collector))
+    ajaxLhhaSupport forall (lhha => lhhaProperty(lhha, local = true).value(collector) == other.lhhaProperty(lhha, local = true).value(collector))
 
   // Convenience accessors
   final def getLabel   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Label).value(collector))
-  final def isHTMLLabel(collector: ErrorEventCollector): Boolean = lhhaProperty(LHHA.Label).isHTML(collector)
+  final def isHTMLLabel(collector: ErrorEventCollector): Boolean = lhhaProperty(LHHA.Label).isHTML
   final def getHelp    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Help).value(collector))
   final def getHint    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Hint).value(collector))
   final def getAlert   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Alert).value(collector))
-  final def isHTMLAlert(collector: ErrorEventCollector): Boolean = lhhaProperty(LHHA.Alert).isHTML(collector)
 
-  lazy val referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] = {
+  lazy val referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] =
     for {
       lhhaSupport           <- self.staticControl.cast[StaticLHHASupport]
       staticRc              <- lhhaSupport.referencingControl
@@ -105,7 +208,6 @@ trait ControlLHHASupport {
       concreteSnRc          <- concreteRc.cast[XFormsSingleNodeControl]
     } yield
       staticRc -> concreteSnRc
-  }
 
   def lhhaValue(lhha: LHHA): Option[String] =
     (
@@ -115,26 +217,39 @@ trait ControlLHHASupport {
         case _                                             => None
       }
     )
-    .flatMap(_.lhhaProperty(lhha)
+    .flatMap(_.lhhaProperty(lhha, local = true)
     .valueOpt(EventCollector.Throw))
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy
 object LHHASupport {
 
-  val NullLHHA = new NullLHHAProperty
+  def combinePropertiesAsUl(properties: List[MutableLHHAProperty], collector: ErrorEventCollector): String =
+    properties
+      .map { property => if (! property.isHTML) property.value(collector).escapeXmlMinimal else property.value(collector) }
+      .mkString ("<ul><li>", "</li><li>", "</li></ul>")
+
+  // Immutable null LHHA property
+  object NullLHHA extends ImmutableLHHAProperty(null: String, isHTML = false, locationData = null) {
+    override def escapedValue(collector: ErrorEventCollector): String = null
+  }
 
   // Control property for LHHA
   trait LHHAProperty extends ControlProperty[String] {
-    def escapedValue(collector: ErrorEventCollector): String
-    def isHTML(collector: ErrorEventCollector): Boolean
+    def locationData: LocationData
+    def isHTML: Boolean
+    def escapedValue(collector: ErrorEventCollector): String = {
+      val rawValue = value(collector)
+      if (isHTML)
+        XFormsControl.getEscapedHTMLValue(locationData, rawValue)
+      else
+        rawValue.escapeXmlMinimal
+    }
   }
 
-  // Immutable null LHHA property
-  class NullLHHAProperty extends ImmutableControlProperty(null: String) with LHHAProperty {
-    def escapedValue(collector: ErrorEventCollector): String = null
-    def isHTML(collector: ErrorEventCollector) = false
-  }
+  class ImmutableLHHAProperty(value: String, val isHTML: Boolean, val locationData: LocationData)
+    extends ImmutableControlProperty(value)
+      with LHHAProperty
 
   // Gather all active alerts for the given control following a selection algorithm
   //
@@ -142,47 +257,48 @@ object LHHASupport {
   //     - the control validity
   //     - failed validations
   //     - alerts in the UI matching validations or not
-  // - If no alert is active for the control, return None.
-  // - Only alerts for the highest ValidationLevel are returned.
+  // - If no alert is active for the control, return `None`.
+  // - Only alerts for the highest `ValidationLevel` are returned.
   //
-  def gatherActiveAlerts(control: XFormsSingleNodeControl): Option[(ValidationLevel, List[LHHAAnalysis])] =
+  def gatherActiveAlerts(control: XFormsSingleNodeControl): Option[(ValidationLevel, NonEmptyList[LHHAAnalysis])] =
     if (control.isRelevant) {
+      control
+        .staticControl
+        .cast[StaticLHHASupport]
+        .flatMap(_.alertsNel)
+        .flatMap { staticAlerts =>
 
-      val staticAlerts = control.staticControl.asInstanceOf[StaticLHHASupport].alerts
+        def alertsMatchingValidations: Option[NonEmptyList[LHHAAnalysis]] = {
+          val failedValidationsIds = control.failedValidations.map(_.id).to(Set)
+          NonEmptyList.fromList(staticAlerts.filter(_.forValidations.intersect(failedValidationsIds).nonEmpty))
+        }
 
-      def nonEmptyOption[T](l: List[T]) = l.nonEmpty option l
+        // Find all alerts which match the given level, if there are any failed validations for that level
+        // NOTE: ErrorLevel is handled specially: in addition to failed validations, the level matches if the
+        // control is not valid for any reason including failed schema validation.
+        def alertsMatchingLevel(level: ValidationLevel): Option[NonEmptyList[LHHAAnalysis]] =
+          NonEmptyList.fromList(staticAlerts.filter(_.forLevels(level)))
 
-      def alertsMatchingValidations = {
-        val failedValidationsIds = control.failedValidations.map(_.id).to(Set)
-        nonEmptyOption(staticAlerts.filter(_.forValidations.intersect(failedValidationsIds).nonEmpty))
-      }
+        // Alerts that specify neither a validations nor a level
+        def alertsMatchingAny: Option[NonEmptyList[LHHAAnalysis]] =
+          NonEmptyList.fromList(staticAlerts.filter(a => a.forValidations.isEmpty && a.forLevels.isEmpty))
 
-      // Find all alerts which match the given level, if there are any failed validations for that level
-      // NOTE: ErrorLevel is handled specially: in addition to failed validations, the level matches if the
-      // control is not valid for any reason including failed schema validation.
-      def alertsMatchingLevel(level: ValidationLevel) =
-        nonEmptyOption(staticAlerts filter (_.forLevels(level)))
+        // For that given level, identify all matching alerts if any, whether they match by validations or by level.
+        // Alerts that specify neither a validation nor a level are considered a default, that is, they are not added
+        // if other alerts have already been matched.
+        // Alerts are returned in document order
+        control.alertLevel.flatMap { level =>
 
-      // Alerts that specify neither a validations nor a level
-      def alertsMatchingAny =
-        nonEmptyOption(staticAlerts filter (a => a.forValidations.isEmpty && a.forLevels.isEmpty))
+          val alerts =
+            alertsMatchingValidations  orElse
+            alertsMatchingLevel(level) orElse
+            alertsMatchingAny
 
-      // For that given level, identify all matching alerts if any, whether they match by validations or by level.
-      // Alerts that specify neither a validation nor a level are considered a default, that is, they are not added
-      // if other alerts have already been matched.
-      // Alerts are returned in document order
-      control.alertLevel flatMap { level =>
+          val matchingAlertIds = alerts.iterator.flatMap(_.iterator.map(_.staticId)).toSet
+          val matchingAlerts   = staticAlerts.filter(a => matchingAlertIds(a.staticId))
 
-        val alerts =
-          alertsMatchingValidations  orElse
-          alertsMatchingLevel(level) orElse
-          alertsMatchingAny          getOrElse
-          Nil
-
-        val matchingAlertIds = alerts.map(_.staticId).toSet
-        val matchingAlerts   = staticAlerts.filter(a => matchingAlertIds(a.staticId))
-
-        matchingAlerts.nonEmpty option (level, matchingAlerts)
+          NonEmptyList.fromList(matchingAlerts).map(level -> _)
+        }
       }
     } else
       None

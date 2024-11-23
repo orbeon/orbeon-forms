@@ -481,7 +481,8 @@ object ElementAnalysisTreeXPathAnalyzer {
                   containsHTML              = false,
                   hasLocalMinimalAppearance = false,
                   hasLocalFullAppearance    = false,
-                  hasLocalLeftAppearance    = false
+                  hasLocalLeftAppearance    = false,
+                  forValidationId           = None
                 )
                 ElementAnalysisTreeBuilder.setModelOnElement(partAnalysisCtx, nestedAnalysis)
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, nestedAnalysis)

@@ -151,6 +151,9 @@ object LHHAAnalysisBuilder {
         case _ => false
       }
 
+    val forValidation =
+      element.attributeValueOpt(XFormsNames.VALIDATION_QNAME).filter(_.nonAllBlank)
+
     new LHHAAnalysis(
       index,
       element,
@@ -166,7 +169,8 @@ object LHHAAnalysisBuilder {
       containsHTML,
       hasLocalMinimalAppearance,
       hasLocalFullAppearance,
-      hasLocalLeftAppearance
+      hasLocalLeftAppearance,
+      forValidation
     )
   }
 }

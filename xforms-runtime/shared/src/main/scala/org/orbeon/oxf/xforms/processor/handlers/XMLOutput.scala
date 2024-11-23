@@ -71,7 +71,7 @@ object XMLOutput {
       lhhaProp = c.lhhaProperty(lhhaType)
       text     <- lhhaProp.valueOpt(collector)
     } locally {
-      writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML(collector))(xmlReceiver)
+      writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)(xmlReceiver)
     }
 
   def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =

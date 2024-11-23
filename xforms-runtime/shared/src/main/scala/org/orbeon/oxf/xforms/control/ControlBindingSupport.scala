@@ -14,10 +14,14 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.saxon.om
+import shapeless.syntax.typeable.typeableOps
 
+import scala.collection.View
 import scala.jdk.CollectionConverters.*
 
 trait ControlBindingSupport {
@@ -61,8 +65,29 @@ trait ControlBindingSupport {
   // Whether this control's content is relevant
   def contentRelevant = _isRelevant && contentVisible
 
+  private lazy val allExternalBeforeAssociatedLhha: Iterable[LHHAAnalysis] =
+    staticControl
+      .cast[StaticLHHASupport]
+      .view
+      .flatMap(staticLHHASupport =>
+        LHHA.values.flatMap(staticLHHASupport.allDirectLhha)
+      )
+      .filter(_.isExternalBeforeAssociatedControl)
+
+  protected def findExternalBeforeAssociatedLhha: Iterable[XFormsLHHAControl] =
+    allExternalBeforeAssociatedLhha
+      .flatMap(lhhaAnalysis =>
+        Controls.resolveControlsById(
+          containingDocument,
+          effectiveId,
+          lhhaAnalysis.staticId,
+          followIndexes = true
+        )
+      )
+      .flatMap(_.cast[XFormsLHHAControl])
+
   // Evaluate the control's binding and value either during create or update
-  final def evaluateBindingAndValues(
+  def evaluateBindingAndValues(
     parentContext : BindingContext,
     update        : Boolean,
     restoreState  : Boolean,
@@ -82,12 +107,18 @@ trait ControlBindingSupport {
       state,
       collector
     )
+    // Commit evaluation of any pending "before" external LHHA
+    findExternalBeforeAssociatedLhha
+      .foreach { lhhaControl =>
+        println(s"committing lazy binding and values for ${lhhaControl.staticControl.lhhaType} with id ${lhhaControl.effectiveId}")
+        lhhaControl.commitLazyBindingAndValues()
+      }
   }
 
   // Refresh the control's binding during update, in case a re-evaluation is not needed
-  final def refreshBindingAndValues(parentContext: BindingContext, collector: ErrorEventCollector): Unit = {
-    // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
-    // ensure that the chain of bindings is consistent
+  // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
+  // ensure that the chain of bindings is consistent
+  def refreshBindingAndValues(parentContext: BindingContext, collector: ErrorEventCollector): Unit =
     setBindingContext(
       bindingContext = bindingContext.copy(parent = parentContext),
       parentRelevant = parentContentRelevant,
@@ -96,7 +127,6 @@ trait ControlBindingSupport {
       state          = None,
       collector      = collector
     )
-  }
 
   // Default binding evaluation
   protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {

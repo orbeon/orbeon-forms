@@ -96,6 +96,21 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   def customMIPs: Map[String, String] = _customMIPs
   def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) => MipName.buildExternalCustomMIPName(k) + '-' + v }
 
+  override def markLHHADirty(): Unit = {
+    super.markLHHADirty()
+
+    // `setValidation()` has been called by the time we are here, so we can compare.
+    val relevanceChanged   = wasRelevant           != isRelevant
+    val validityChanged    = _wasValid             != isValid
+    val validationsChanged = _wasFailedValidations != failedValidations
+
+    // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
+    // on the control's current validity and validations. Because we don't have yet a way of taking those in as
+    // dependencies, we force dirty alerts whenever such validations change upon refresh.
+    if (relevanceChanged || validityChanged || validationsChanged)
+      forceDirtyAlert()
+  }
+
   override def onDestroy(update: Boolean): Unit = {
     super.onDestroy(update)
     // Set default MIPs so that diff picks up the right values
@@ -435,12 +450,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     val previousValidations = wasFailedValidationsCommit()
     val validationsChanged  = previousValidations         != failedValidations
-
-    // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
-    // on the control's current validity and validations. Because we don't have yet a way of taking those in as
-    // dependencies, we force dirty alerts whenever such validations change upon refresh.
-    if (validityChanged || validationsChanged)
-      forceDirtyAlert()
 
     // Value change
     if (isRelevant && valueChanged)

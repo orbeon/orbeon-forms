@@ -736,6 +736,7 @@ object XFormsStaticStateDeserializer {
                   hasLocalMinimalAppearance <- c.getOrElse[Boolean]("hasLocalMinimalAppearance")(false)
                   hasLocalFullAppearance    <- c.getOrElse[Boolean]("hasLocalFullAppearance")(false)
                   hasLocalLeftAppearance    <- c.getOrElse[Boolean]("hasLocalLeftAppearance")(false)
+                  forValidationId           <- c.getOrElse[Option[String]]("forValidationId")(None)
                 } yield
                   new LHHAAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     expressionOrConstant,
@@ -743,7 +744,8 @@ object XFormsStaticStateDeserializer {
                     containsHTML,
                     hasLocalMinimalAppearance,
                     hasLocalFullAppearance,
-                    hasLocalLeftAppearance
+                    hasLocalLeftAppearance,
+                    forValidationId
                   )
 
               lhha.getOrElse(throw new NoSuchElementException) // XXX TODO

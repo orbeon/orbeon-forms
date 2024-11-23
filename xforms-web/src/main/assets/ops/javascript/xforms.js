@@ -564,7 +564,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     jItem.toggleClass('xforms-selected',     selected);
                     jItem.toggleClass('xforms-deselected', ! selected);
                 });
-            } else if (jControl.is('.xforms-label, .xforms-hint, .xforms-help')) {
+            } else if (jControl.is('.xforms-label, .xforms-hint, .xforms-help, .xforms-alert')) {
                 // External LHH
                 if (jControl.is(".xforms-mediatype-text-html")) {
                     jControl[0].innerHTML = newControlValue;

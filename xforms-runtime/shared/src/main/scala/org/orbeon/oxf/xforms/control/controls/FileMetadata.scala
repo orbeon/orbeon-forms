@@ -129,7 +129,7 @@ trait FileMetadata extends XFormsValueControl {
   def compareFileMetadata(other: FileMetadata, collector: ErrorEventCollector): Boolean =
     props.size == other.props.size && (props forall { case (name, prop) => prop.value(collector) == other.props(name).value(collector) })
 
-  // Update other with an immutable version of the metadata
+  // Make immutable eager copies of all properties
   def updateFileMetadataCopy(other: FileMetadata, collector: ErrorEventCollector): Unit =
     other.props = props map { case (name, prop) => name -> new ImmutableControlProperty(prop.value(collector)) }
 }

@@ -153,7 +153,7 @@ trait ControlAjaxSupport {
 
 object ControlAjaxSupport {
 
-  import org.orbeon.oxf.util.StringUtils._
+  import org.orbeon.oxf.util.StringUtils.*
 
   private def tokenize(value: String) = value.splitTo[mutable.LinkedHashSet]()
 

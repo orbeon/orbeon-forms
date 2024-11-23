@@ -242,22 +242,47 @@ abstract class XFormsBaseHandlerXHTML (
     if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
 
       val lhha = lhhaAnalysis.lhhaType
-      val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
-
-      // If no attributes were found, there is no such label / help / hint / alert
-
       val (labelHintHelpAlertValueOpt, mustOutputHTMLFragment) =
         lhha match {
           case LHHA.Label | LHHA.Hint =>
-            (control.lhhaProperty(lhha).valueOpt(handlerContext.collector), lhhaAnalysis.containsHTML)
+            (control.lhhaProperty(lhha, local = ! isExternal).valueOpt(handlerContext.collector), lhhaAnalysis.containsHTML)
           case LHHA.Help =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
             // case because it is stored as escaped HTML within a `<button>` (by default) element.
-            (Option(control.lhhaProperty(lhha).escapedValue(handlerContext.collector)), false)
+            (Option(control.lhhaProperty(lhha, local = ! isExternal).escapedValue(handlerContext.collector)), false)
           case LHHA.Alert =>
             // Not known statically at this time because it currently depends on the number of active alerts
-            (control.lhhaProperty(lhha).valueOpt(handlerContext.collector), control.isHTMLAlert(handlerContext.collector))
+            (control.lhhaProperty(lhha, local = ! isExternal).valueOpt(handlerContext.collector), control.lhhaProperty(lhha, local = ! isExternal).isHTML)
         }
+
+      handleLabelHintHelpAlertUseValue(
+        lhhaAnalysis               = lhhaAnalysis,
+        controlEffectiveIdOpt      = controlEffectiveIdOpt,
+        forEffectiveIdWithNsOpt    = forEffectiveIdWithNsOpt,
+        requestedElementNameOpt    = requestedElementNameOpt,
+        control                    = control,
+        isExternal                 = isExternal,
+        labelHintHelpAlertValueOpt = labelHintHelpAlertValueOpt,
+        mustOutputHTMLFragment     = mustOutputHTMLFragment
+      )
+    }
+
+  final protected def handleLabelHintHelpAlertUseValue(
+    lhhaAnalysis              : LHHAAnalysis,
+    controlEffectiveIdOpt     : Option[String],
+    forEffectiveIdWithNsOpt   : Option[String],
+    requestedElementNameOpt   : Option[String],
+    control                   : XFormsControl,
+    isExternal                : Boolean, // if `true` adds contraint classes, `id` on labels, and don't add LHHA suffix to ids
+    labelHintHelpAlertValueOpt: Option[String],
+    mustOutputHTMLFragment    : Boolean
+  ): Unit =
+    if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
+
+      val lhha = lhhaAnalysis.lhhaType
+      val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
+
+      // If no attributes were found, there is no such label / help / hint / alert
 
       val elementName = requestedElementNameOpt getOrElse lhhaElementName(lhha)
 
@@ -269,9 +294,8 @@ abstract class XFormsBaseHandlerXHTML (
           appendWithSpace(userClass)
       }
 
-      // For now only place these on label and hint as that's the ones known statically
-      // AND useful for Form Builder.
-      if ((lhha == LHHA.Label || lhha == LHHA.Hint) && mustOutputHTMLFragment)
+      // 2024-11-27: Only not necessary (yet) for help.
+      if (lhha != LHHA.Help && mustOutputHTMLFragment)
         appendWithSpace("xforms-mediatype-text-html")
 
       // Mark alert as active if needed

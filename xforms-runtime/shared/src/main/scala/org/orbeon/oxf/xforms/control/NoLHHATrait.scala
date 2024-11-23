@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 
 
@@ -25,6 +26,8 @@ trait NoLHHATrait extends ControlLHHASupport {
   override def markLHHADirty(): Unit = ()
   override def forceDirtyAlert(): Unit = ()
   override def updateLHHACopy(copy: XFormsControl, collector: ErrorEventCollector): Unit = ()
-  override def lhhaProperty(lhhaType: LHHA): LHHASupport.LHHAProperty = LHHASupport.NullLHHA
+  override def lhhaProperty(lhhaType: LHHA, local: Boolean = false): LHHASupport.LHHAProperty = LHHASupport.NullLHHA
   override def compareLHHA(other: XFormsControl, collector: ErrorEventCollector): Boolean = true
+  override def findExternalBeforeAssociatedLhha: Iterable[XFormsLHHAControl] = Nil
+  override def evaluateNonRelevantLHHA(): Unit = ()
 }

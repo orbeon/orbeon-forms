@@ -19,9 +19,7 @@ object LHHA extends Enum[LHHA] with CirceEnum[LHHA] {
   case object Hint  extends LHHA
   case object Alert extends LHHA
 
-  val size = values.size
-
-  val QNameForValue: Map[LHHA, QName] = values map (value => value -> QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
+  val QNameForValue: Map[LHHA, QName] = values.map(value => value -> QName(value.entryName, XFORMS_NAMESPACE_SHORT)).toMap
   val NamesSet     : Set[String]      = values.map(_.entryName).toSet
   val QNamesSet    : Set[QName]       = QNameForValue.values.toSet
 

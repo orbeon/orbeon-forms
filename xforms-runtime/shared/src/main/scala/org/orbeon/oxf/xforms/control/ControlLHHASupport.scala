@@ -31,70 +31,52 @@ trait ControlLHHASupport {
 
   // Label, help, hint and alert (evaluated lazily)
   // 2013-06-19: We support multiple alerts, but only one client-facing alert value at this point.
-  // NOTE: var because of cloning
-  private[ControlLHHASupport] var lhhaArray = new Array[LHHAProperty](LHHA.size)
+  // NOTE: `var` because of cloning
+  private[ControlLHHASupport] var lhhaMap: Map[LHHA, LHHAProperty] = Map.empty
 
   // XBL Container in which dynamic LHHA elements like `xf:output` and AVTs evaluate
   def lhhaContainer: XBLContainer = container
 
   def markLHHADirty(): Unit =
-    for (currentLHHA <- lhhaArray)
-      if (currentLHHA ne null)
-        currentLHHA.handleMarkDirty()
+    lhhaMap.valuesIterator.foreach(_.handleMarkDirty())
 
   // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
   // on the control's current validity and validations. Because we don't have yet a way of taking those in as
   // dependencies, we force dirty alerts whenever such validations change upon refresh.
-  def forceDirtyAlert(): Unit = {
-    val alert = lhhaArray(LHHA.valuesToIndex(LHHA.Alert))
-    if (alert ne null)
-      alert.handleMarkDirty(force = true)
-  }
+  def forceDirtyAlert(): Unit =
+    lhhaMap.get(LHHA.Alert).foreach(_.handleMarkDirty(force = true))
 
   def evaluateNonRelevantLHHA(): Unit =
-    for (i <- lhhaArray.indices)
-      lhhaArray(i) = null
+    lhhaMap = Map.empty
 
-  // Copy LHHA if not null
+  // Copy LHHA
   def updateLHHACopy(copy: XFormsControl, collector: ErrorEventCollector): Unit = {
-    copy.lhhaArray = new Array[LHHAProperty](LHHA.size)
-    for {
-      i <- lhhaArray.indices
-      currentLHHA = lhhaArray(i)
-      if currentLHHA ne null
-    } yield {
-      // Evaluate lazy value before copying
-      currentLHHA.value(collector)
-
-      // Copy
-      copy.lhhaArray(i) = currentLHHA.copy.asInstanceOf[LHHAProperty]
-    }
+    lhhaMap.valuesIterator.foreach(_.value(collector)) // evaluate lazy values before copying
+    copy.lhhaMap = lhhaMap // simply assign as we use an immutable `Map`
   }
 
-  def lhhaProperty(lhha: LHHA): LHHAProperty = {
-    // TODO: Not great to work by index.
-    val index = LHHA.valuesToIndex(lhha)
-    // Evaluate lazily
-    Option(lhhaArray(index)) getOrElse {
-
-      // NOTE: Ugly because of imbalanced hierarchy between static/runtime controls
-      val property =
-        if (part.hasLHHA(prefixedId, lhha) && self.staticControl.isInstanceOf[StaticLHHASupport])
-          self match {
-            case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert =>
-              new MutableAlertProperty(singleNodeControl, lhha, htmlLhhaSupport(lhha))
-            case control: XFormsControl if lhha != LHHA.Alert =>
-              new MutableLHHProperty(control, lhha, htmlLhhaSupport(lhha))
-            case _ =>
-              NullLHHA
-          }
-        else
-          NullLHHA
-
-      lhhaArray(index) = property
+  def lhhaProperty(lhha: LHHA): LHHAProperty =
+    lhhaMap.getOrElse(lhha, {
+      val property = evaluateLhha(lhha)
+      lhhaMap += lhha -> property
       property
+    })
+
+  // NOTE: Ugly because of imbalanced hierarchy between static/runtime controls
+  private def evaluateLhha(lhha: LHHA): LHHAProperty =
+    self.staticControl match {
+      case staticLhhaSupport: StaticLHHASupport if staticLhhaSupport.hasDirectLhha(lhha) =>
+        self match {
+          case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert =>
+            new MutableAlertProperty(singleNodeControl, lhha, htmlLhhaSupport(lhha))
+          case control: XFormsControl if lhha != LHHA.Alert =>
+            new MutableLHHProperty(control, lhha, htmlLhhaSupport(lhha))
+          case _ =>
+            NullLHHA
+        }
+      case _ =>
+        NullLHHA
     }
-  }
 
   def eagerlyEvaluateLhha(collector: ErrorEventCollector): Unit =
     for (lhha <- LHHA.values)

@@ -81,8 +81,4 @@ trait PartGlobalOps {
       sb.append(controlClasses)
     }
   }
-
-  // LHHA
-  def hasLHHA(prefixedId: String, lhha: LHHA): Boolean =
-    collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasDirectLhha(lhha))
 }

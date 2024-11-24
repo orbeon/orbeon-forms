@@ -218,7 +218,7 @@ object XFormsNames {
   val XXFORMS_UPDATE_REPEATS_QNAME        = xxformsQName("update-repeats")
 
   val VALIDATION_QNAME                    = QName("validation")
-  val XFORMS_VALIDATION_QNAME             = xformsQName("validation")
+  val XFORMS_VALIDATION_QNAME             = xformsQName("validation") // obsolete, for backward compatibility only
 
   val XFORMS_TYPE_QNAME = xformsQName("type")
   val XFORMS_RELEVANT_QNAME               = xformsQName("relevant")
@@ -310,7 +310,7 @@ object XFormsNames {
   val XXFORMS_SHARED_QNAME                    = xxformsQName("shared")
   val XXFORMS_CACHE_QNAME                     = xxformsQName("cache")
   val XXFORMS_TIME_TO_LIVE_QNAME              = xxformsQName("ttl")
-  val XXFORMS_VALIDATION_QNAME                = xxformsQName("validation")
+  val XXFORMS_VALIDATION_QNAME                = xxformsQName("validation") // for instance Schema validation (`lax`|`strict`)
   val XXFORMS_EXPOSE_XPATH_TYPES_QNAME        = xxformsQName("expose-xpath-types")
   val XXFORMS_EXCLUDE_RESULT_PREFIXES         = xxformsQName("exclude-result-prefixes")
   val XXFORMS_CUSTOM_MIPS_QNAME               = xxformsQName("custom-mips")

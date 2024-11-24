@@ -36,7 +36,7 @@ object SaxSupport {
   implicit class AttributesOps(private val atts: Attributes) extends AnyVal {
 
     // Used by handlers
-    // 2022-03-22: Only one use.
+    // 2024-11-25: 2 uses.
     def remove(uri: String, localname: String): AttributesImpl = {
       val newAttributes = new AttributesImpl
       for (i <- 0 until atts.getLength) {

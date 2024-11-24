@@ -140,11 +140,9 @@ object Controls {
       else
         staticElement.prefixedId + RepeatSeparatorString + (idSuffix mkString RepeatIndexSeparatorString)
 
-    // Instantiate the control
-    // TODO LATER: controls must take ElementAnalysis, not Element
-
     val stats = container.containingDocument.getRequestStats
 
+    // Instantiate the control
     // NOTE: If we are unable to create a control (case of Model at least), this has no effect
     XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map { control =>
 

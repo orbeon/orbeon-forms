@@ -138,7 +138,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
     // Read and try to cache the complete XForms+XHTML document with annotations
     val (stage2CacheableState, containingDocumentFromReadOpt) = {
 
-      // Side-effects of calling `readCacheInputAsObject`
+      // Side effects of calling `readCacheInputAsObject`
       var containingDocumentOpt: Option[XFormsContainingDocument] = None
       var cachedStatus         : Boolean                          = false
 

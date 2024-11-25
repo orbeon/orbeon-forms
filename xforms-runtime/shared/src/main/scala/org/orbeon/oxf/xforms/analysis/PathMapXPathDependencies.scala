@@ -588,7 +588,7 @@ class PathMapXPathDependencies(
       lhhaControl.lhhaValueAnalyses(lhha)
     }
 
-    // NOTE: No side-effects except for stats
+    // NOTE: No side effects except for stats
     def requireUpdate = {
 
       def requireUpdateForAnalysis(analysis: XPathAnalysis) =

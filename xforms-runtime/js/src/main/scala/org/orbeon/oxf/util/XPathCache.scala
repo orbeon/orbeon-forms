@@ -516,7 +516,7 @@ object XPathCache extends XPathCacheTrait {
 
             val expr = StaticXPath.compileExpressionWithStaticContext(independentContext, xpathString, isAVT)
 
-            // Store in cache as side-effect
+            // Store in cache as side effect
             cache += cacheKeyString -> (expr, independentContext)
 
             (expr, independentContext)

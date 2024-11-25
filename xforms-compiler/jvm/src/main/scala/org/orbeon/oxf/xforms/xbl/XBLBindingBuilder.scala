@@ -65,7 +65,7 @@ object XBLBindingBuilder {
 
   // Can return `None` if the `AbstractBinding` does not have a template.
   //
-  // As a side-effect, this updates `partAnalysis`. We don't like these side-effects. How can we do better?
+  // As a side effect, this updates `partAnalysis`. We don't like these side effects. How can we do better?
   //
   // - `newScope`
   // - `mapScopeIds`

@@ -38,7 +38,7 @@ trait PartAnalysisContextImmutable {
 
   def staticProperties: XFormsStaticStateStaticProperties
 
-  def metadata: Metadata // NOTE: Using this will have side-effects like XBL registrations!
+  def metadata: Metadata // NOTE: Using this will have side effects like XBL registrations!
 
   def scopeForPrefixedId(prefixedId: String): Scope
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]

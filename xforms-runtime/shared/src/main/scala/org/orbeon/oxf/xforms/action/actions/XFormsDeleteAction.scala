@@ -197,7 +197,7 @@ object XFormsDeleteAction extends Logging {
         modifiedInstanceOpt -> descriptors
       }
 
-    // Side-effects: notify instances if needed
+    // Side effects: notify instances if needed
     instancesWithDescriptors foreach {
       case (Some(modifiedInstance), descriptors) =>
 

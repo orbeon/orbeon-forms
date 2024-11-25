@@ -106,7 +106,7 @@ object XFormsStaticStateDeserializer {
       }
     }
 
-    // Update this as side-effect of deserializing a `Mark` as we need to index all of them
+    // Update this as side effect of deserializing a `Mark` as we need to index all of them
     var collectedSAXStoreMarks: Map[String, SAXStore#Mark] = Map.empty
 
     implicit val decodeSAXStore: Decoder[SAXStore] = (c: HCursor) => {
@@ -155,7 +155,7 @@ object XFormsStaticStateDeserializer {
         attributeCount               <- c.get[Int]("attributeCount")
         stringBuilder                <- c.get[Array[Int]]("stringBuilder").map(_.map(collectedStrings))
         hasDocumentLocator           <- c.getOrElse[Boolean]("hasDocumentLocator")(false)
-        _                            <- c.getOrElse[Iterable[a.Mark]]("marks")(Nil) // decoding registers marks as side-effect!
+        _                            <- c.getOrElse[Iterable[a.Mark]]("marks")(Nil) // decoding registers marks as side effect!
       } yield {
 
         a.eventBufferPosition          = eventBufferPosition

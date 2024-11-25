@@ -35,7 +35,7 @@ class CallbackList[T] {
     fns.dequeueAll(_ eq fn)
 
   def fire(v: T): Unit =
-    fns.toList foreach { fn => // convert to `List` as `remove()` can be called as side-effect!
+    fns.toList foreach { fn => // convert to `List` as `remove()` can be called as side effect!
       try {
         fn(v)
       } catch {

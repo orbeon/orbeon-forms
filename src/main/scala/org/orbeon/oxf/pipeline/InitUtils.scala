@@ -46,7 +46,7 @@ object InitUtils {
   // Run with a pipeline context and destroy the pipeline when done
   def withPipelineContext[T](body: PipelineContext => T): T = {
     var success = false
-    val pipelineContext = new PipelineContext // side-effect of creating a `ThreadLocal`
+    val pipelineContext = new PipelineContext // side effect of creating a `ThreadLocal`
     try {
       val result = body(pipelineContext)
       success = true

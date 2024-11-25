@@ -53,7 +53,7 @@ object XFormsServerRoute extends XmlNativeRoute {
     // to get the lock, and (except for client state) to retrieve form state.
     //
     // NOTE: We should test this at the beginning of this method, but calling readInputAsOrbeonDom() in unit tests
-    // can cause the side-effect to create the session, so doing so without changing some tests doesn't work.
+    // can cause the side effect to create the session, so doing so without changing some tests doesn't work.
     externalContext.getSessionOpt(false) getOrElse
       (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
 

@@ -101,7 +101,7 @@ object FormRunnerApp extends App {
   }
 
   private def initSessionExpirationDialog(): Unit =
-    Option(document.querySelector(".fr-session-expiration-dialog")) foreach { dialog =>
+    Option(document.querySelectorT(".fr-session-expiration-dialog")) foreach { dialog =>
 
       val modal = Bootstrap.newModal(dialog, new js.Object {
         val backdrop = "static" // Click on the background doesn't hide dialog
@@ -168,19 +168,20 @@ object FormRunnerApp extends App {
         }
 
       def updateDialog(): Unit = {
-        val headerContainer = dialog.querySelector(".modal-header")
-        val bodyContainer   = dialog.querySelector(".modal-body")
-        val footer          = dialog.querySelector(".modal-footer")
+        val headerContainer = dialog.querySelectorT(".modal-header")
+        val bodyContainer   = dialog.querySelectorT(".modal-body")
+        val footer          = dialog.querySelectorT(".modal-footer")
 
-        val visibleWhenExpiring = List(headerContainer.firstElementChild, bodyContainer.firstElementChild, footer)
-        val visibleWhenExpired  = List(headerContainer.lastElementChild,  bodyContainer.lastElementChild)
+        val visibleWhenExpiring = List(headerContainer.childrenT.head, bodyContainer.childrenT.head, footer)
+        val visibleWhenExpired  = List(headerContainer.childrenT.last, bodyContainer.childrenT.last)
 
-        def setDisplay(elements: List[Element], display: String): Unit =
-          elements.foreach(_.asInstanceOf[html.Element].style.display = display)
+        def setDisplay(elements: List[html.Element], display: String): Unit =
+          elements.foreach(_.style.display = display)
 
         val (toShow, toHide) = if (Session.expired)
           (visibleWhenExpired , visibleWhenExpiring) else
           (visibleWhenExpiring, visibleWhenExpired )
+
         setDisplay(toShow, "block")
         setDisplay(toHide, "none")
       }

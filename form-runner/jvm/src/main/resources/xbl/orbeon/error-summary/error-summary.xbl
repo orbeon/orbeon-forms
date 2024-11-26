@@ -64,8 +64,8 @@
             </xbl:handler>
             <xbl:handler event="fr-show" phase="target">
                 <!-- Show the error summary, possibly for specific sections -->
-                <xf:setvalue ref="$state/section-name" value="event('section-name')"/>
-                <xf:setvalue ref="$state/show"         value="true()"/>
+                <xf:setvalue ref="$state/section-name-opt" value="event('section-name')"/>
+                <xf:setvalue ref="$state/show"             value="true()"/>
             </xbl:handler>
             <xbl:handler event="fr-focus-first-error" phase="target">
                 <!-- Focus on the first focusable error -->
@@ -152,8 +152,8 @@
                                 )[. castable as xs:integer][1]"/>
                 </xf:bind>
 
-                <xf:var name="state"        value="instance('fr-state-instance')"/>
-                <xf:var name="section-name" value="$state/section-name[xxf:non-blank()]"/>
+                <xf:var name="state"            value="instance('fr-state-instance')"/>
+                <xf:var name="section-name-opt" value="$state/section-name[xxf:non-blank()]"/>
 
                 <!-- Errors for controls that have been visited AND which have a non-blank alert message -->
                 <xf:var
@@ -190,7 +190,7 @@
                     as="element(error)*"
                     value="
                         $visible-errors[
-                            (empty($section-name) or $section-name = @section-name) and @level = $levels-to-show
+                            (empty($section-name-opt) or $section-name-opt = @section-name) and @level = $levels-to-show
                         ]"/>
 
                 <xf:bind ref="$state">
@@ -371,10 +371,9 @@
                                 <!-- Include optional header -->
                                 <xbl:content includes=":root > fr|header > *"/>
 
-                                <!-- Body of the error summary -->
-                                <xf:group
-                                    id="body"
-                                    class="fr-error-summary-body {{
+                                <xf:var
+                                    name="max-level-opt"
+                                    value="
                                         let $levels :=
                                             distinct-values(
                                                 $visible-errors-for-section/
@@ -382,10 +381,19 @@
                                                 string()
                                             )
                                         return
-                                                 if ($levels = 'error'  ) then 'fr-level-error'
-                                            else if ($levels = 'warning') then 'fr-level-warning'
-                                            else if ($levels = 'info'   ) then 'fr-level-info'
-                                            else ''
+                                                 if ($levels = 'error'  ) then 'error'
+                                            else if ($levels = 'warning') then 'warning'
+                                            else if ($levels = 'info'   ) then 'info'
+                                            else ()"/>
+
+                                <!-- Body of the error summary -->
+                                <xf:group
+                                    id="body"
+                                    class="fr-error-summary-body {{
+                                        if (exists($max-level-opt) ) then
+                                            concat('fr-level-', $max-level-opt)
+                                        else
+                                            ''
                                     }}">
                                     <!-- Include optional fr:label into xf:label -->
                                     <xsl:for-each select="/*/fr:label[1]">

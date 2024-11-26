@@ -128,6 +128,11 @@
         </xsl:element>
     </xsl:template>
 
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6648 -->
+    <xsl:template match="@class" mode="within-body">
+        <xsl:attribute name="fb:{local-name()}" select="."/>
+    </xsl:template>
+
     <!-- Prevent fr:buttons from showing/running -->
     <xsl:template match="fr:buttons">
         <xf:group class="fr-buttons" ref="()">

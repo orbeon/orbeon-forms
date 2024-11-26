@@ -115,6 +115,11 @@
                     </xsl:element>
                 </xsl:template>
 
+                <!-- https://github.com/orbeon/orbeon-forms/issues/6648 -->
+                <xsl:template match="@fb:class">
+                    <xsl:attribute name="{local-name()}" select="."/>
+                </xsl:template>
+
                 <!-- Restore xxf:custom-mips if we had added it -->
                 <xsl:template match="
                     xh:head/xf:model[

@@ -244,6 +244,13 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template
+        match="@class"
+        mode="within-controls">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:attribute name="class" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
+    </xsl:template>
+
     <!-- Process dynamic LHHA with parameters -->
     <xsl:template
         match="

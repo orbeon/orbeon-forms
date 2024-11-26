@@ -7,7 +7,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
@@ -252,6 +252,7 @@ object XFormsServer {
               LifecycleLogger.eventAssumingRequest("xforms", "replay response", List("uuid" -> requestParameters.uuid))
               withDebug("replaying previous Ajax response") {
                 try {
+                  externalContext.getResponse.setContentType(ContentTypes.XmlContentType)
                   containingDocument.lastAjaxResponse foreach (_.replay(xmlReceiver))
                   debugResults(List("success" -> "true"))
                 } finally {
@@ -321,6 +322,7 @@ object XFormsServer {
         info(s"document not found in store while computing all initialization events")
         ClientEvents.errorResponse(StatusCode.LoginTimeOut) // status code debatable
       case initialContainingDocumentOptOpt =>
+        externalContext.getResponse.setContentType(ContentTypes.XmlContentType)
         withDocument {
           xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
           withElement(localName = "event-response", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {

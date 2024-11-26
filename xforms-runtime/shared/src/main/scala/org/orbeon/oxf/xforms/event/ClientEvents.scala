@@ -167,6 +167,7 @@ object ClientEvents extends Logging  {
           } else
             (xmlReceiver, None)
 
+        externalContext.getResponse.setContentType(ContentTypes.XmlContentType)
         val helper = new XMLReceiverHelper(responseReceiver)
         helper.startDocument()
         helper.startPrefixMapping("xxf", XXFORMS_NAMESPACE_URI)

@@ -174,9 +174,24 @@
                                 ()"/>
 
                 <xf:var
+                    name="levels-to-show"
+                    value="
+                        let $lowest := (fr:component-param-value('lowest-level-to-show')[. = ('error', 'warning', 'info')], 'info')[1]
+                        return
+                            if ($lowest = 'info') then
+                                ('error', 'warning', 'info')
+                            else if ($lowest = 'warning') then
+                                ('error', 'warning')
+                            else
+                                'info'"/>
+
+                <xf:var
                     name="visible-errors-for-section"
                     as="element(error)*"
-                    value="$visible-errors[empty($section-name) or $section-name = @section-name]"/>
+                    value="
+                        $visible-errors[
+                            (empty($section-name) or $section-name = @section-name) and @level = $levels-to-show
+                        ]"/>
 
                 <xf:bind ref="$state">
                     <xf:bind ref="counts/@alert"                     calculate="count(instance('fr-errors-instance')/error)"/>

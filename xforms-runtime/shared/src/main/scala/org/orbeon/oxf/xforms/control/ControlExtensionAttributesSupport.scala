@@ -20,6 +20,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
 
+
 trait ControlExtensionAttributesSupport {
 
   self: XFormsControl =>

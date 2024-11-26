@@ -268,6 +268,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   def getBuiltinOrCustomTypeCSSClassOpt =
     (getBuiltinTypeNameOpt map ("xforms-type-" +)) orElse (getTypeLocalNameOpt map ("xforms-type-custom-" +))
+
   override def computeRelevant: Boolean = {
     // If parent is not relevant then we are not relevant either
     if (! super.computeRelevant)
@@ -335,12 +336,16 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     addExtensionAttributesExceptClassAndAcceptForAjax(previousControlOpt, "")
   }
 
-  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControl: Option[XFormsControl], collector: ErrorEventCollector): Boolean = {
+  override def addAjaxAttributes(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
 
-    val control1Opt = previousControl.asInstanceOf[Option[XFormsSingleNodeControl]]
+    val control1Opt = previousControlOpt.asInstanceOf[Option[XFormsSingleNodeControl]]
     val control2    = this
 
-    var added = super.addAjaxAttributes(attributesImpl, previousControl, collector)
+    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt, collector)
 
     added |= addAjaxMIPs(attributesImpl, control1Opt, control2)
 

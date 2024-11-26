@@ -264,7 +264,7 @@ class XFormsComponentControl(
       super.computeBindingCopy(parentContext)
 
   override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] =
-    _nestedContainerOpt map { nestedContainer =>
+    _nestedContainerOpt.filter(_ => isRelevant).map { nestedContainer =>
       // Start with inner context
       // For nested event handlers, this still works, because the nested handler can never match the inner scope. So
       // the context goes inner context -> component binding.

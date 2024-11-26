@@ -59,7 +59,7 @@ class XFormsVariableControl(
   def getVariableName = variable.staticVariable.name
 
   override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] = Option(_bindingContextForChild)
-  override def bindingContextForFollowing : BindingContext         = _bindingContextForFollowing
+  override def bindingContextForFollowing : BindingContext = _bindingContextForFollowing
 
   override def onCreate(
     restoreState: Boolean,

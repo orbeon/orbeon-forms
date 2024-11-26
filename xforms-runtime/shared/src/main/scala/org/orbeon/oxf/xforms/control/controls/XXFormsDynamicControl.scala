@@ -82,9 +82,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   def newScripts: List[ShareableScript] = _newScripts
   def clearNewScripts(): Unit = _newScripts = Nil
 
-  // TODO: This might blow if the control is non-relevant
   override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] =
-    _nested map { case Nested(container, _, _, _) =>
+    _nested.filter(_ => isRelevant).map { case Nested(container, _, _, _) =>
       val contextStack = container.contextStack
       contextStack.setParentBindingContext(bindingContext)
       contextStack.resetBindingContext(collector)

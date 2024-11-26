@@ -114,10 +114,10 @@ trait ControlBindingSupport {
 
   // Return the bindings in effect within and after this control
   def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] = Option(_bindingContext)
-  def bindingContextForFollowing : BindingContext         = _bindingContext.parent
+  def bindingContextForFollowing : BindingContext = _bindingContext.parent
 
   final def bindingContextForChildOrEmpty(collector: ErrorEventCollector): BindingContext =
-    bindingContextForChildOpt(collector) getOrElse (throw new IllegalStateException)
+    bindingContextForChildOpt(collector) getOrElse BindingContext.empty(staticControl.element, staticControl.scope)
 
   // Set this control's binding context and handle create/destroy/update lifecycle
   private def setBindingContext(

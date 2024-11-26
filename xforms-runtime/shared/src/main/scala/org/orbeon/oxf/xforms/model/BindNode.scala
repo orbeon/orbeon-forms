@@ -220,7 +220,7 @@ object BindNode {
       None
     else {
       val consideredLevels = bindNodes flatMap (node => findLevel(node) map (level => (level, node)))
-      val highestLevelOpt  = consideredLevels.nonEmpty option consideredLevels.map(_._1).max
+      val highestLevelOpt  = consideredLevels.maxByOption(_._1).map(_._1)
 
       highestLevelOpt map {
         highestLevel =>

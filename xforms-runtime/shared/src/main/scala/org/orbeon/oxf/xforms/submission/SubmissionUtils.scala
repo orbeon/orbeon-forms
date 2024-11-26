@@ -252,15 +252,11 @@ object SubmissionUtils {
     forwardClientHeaders : Boolean
   ): Map[String, List[String]] =
     if (forwardClientHeaders) {
-      // Forwarding the user agent and accept headers makes sense when dealing with resources that
-      // typically would come from the client browser, including:
-      //
-      // - submission with replace="all"
-      // - dynamic resources loaded by xf:output
-      //
+      // Forwarding the user agent
+      // https://github.com/orbeon/orbeon-forms/issues/6651
       val toForward =
         for {
-          name   <- List("user-agent", "accept")
+          name   <- List("user-agent")
           values <- allHeaders.get(name)
         } yield
           name -> values

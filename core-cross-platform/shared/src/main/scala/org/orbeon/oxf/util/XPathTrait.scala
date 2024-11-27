@@ -1,13 +1,11 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
-
-import java.util as ju
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.Item
 import org.orbeon.xml.NamespaceMapping
 
+import java.util as ju
 import java.util.List as JList
 
 
@@ -74,14 +72,14 @@ trait XPathTrait {
   ): Any
 
   def evaluateKeepItems(
-    contextItems        : JList[Item],
+    contextItems        : JList[om.Item],
     contextPosition     : Int,
     compiledExpression  : CompiledExpression,
     functionContext     : FunctionContext,
     variableResolver    : VariableResolver
   )(implicit
     reporter            : Reporter
-  ): LazyList[Item]
+  ): LazyList[om.Item]
 
   def isXPath2ExpressionOrValueTemplate(
     xpathString      : String,

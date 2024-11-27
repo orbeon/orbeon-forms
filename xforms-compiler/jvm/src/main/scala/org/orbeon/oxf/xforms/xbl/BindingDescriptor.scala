@@ -48,7 +48,8 @@ import org.orbeon.xml.NamespaceMapping
 case class BindingDescriptor(
   elementName : Option[QName],
   datatype    : Option[QName],
-  att         : Option[BindingAttributeDescriptor])(
+  att         : Option[BindingAttributeDescriptor]
+)(
   val binding : Option[NodeInfo] // not part of the case-classiness
 )
 

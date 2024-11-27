@@ -1,7 +1,6 @@
 package org.orbeon.oxf.fr
 
 import org.log4s.Logger
-import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
@@ -18,7 +17,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, ELEMENT_QNAME}
+import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.xml.NamespaceMapping
 
 

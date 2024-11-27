@@ -83,11 +83,15 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   def clearNewScripts(): Unit = _newScripts = Nil
 
   override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] =
-    _nested.filter(_ => isRelevant).map { case Nested(container, _, _, _) =>
-      val contextStack = container.contextStack
-      contextStack.setParentBindingContext(bindingContext)
-      contextStack.resetBindingContext(collector)
-      contextStack.getCurrentBindingContext
+    _nested.map { case Nested(container, _, _, _) =>
+      if (isRelevant) {
+        val contextStack = container.contextStack
+        contextStack.setParentBindingContext(bindingContext)
+        contextStack.resetBindingContext(collector)
+        contextStack.getCurrentBindingContext
+      } else {
+        BindingContext.empty(staticControl.element, staticControl.scope)
+      }
     }
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean, collector: ErrorEventCollector): Unit = {

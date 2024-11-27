@@ -20,6 +20,7 @@ import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.{document, html}
 import io.udash.wrappers.jquery.JQuery
+import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -92,7 +93,7 @@ object WPaint {
       }
 
       // Re-register listener, as imagesLoaded() calls listener only once
-      imageEl.one("load", (_, _) => backgroundImageChanged())
+      imageEl.get(0).foreach(el => el.addEventListenerOne("load", (_: dom.Event) => backgroundImageChanged()))
     }
 
     // Test canvas support, see http://stackoverflow.com/a/2746983/5295

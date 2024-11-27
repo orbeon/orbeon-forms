@@ -3,7 +3,7 @@ package org.orbeon.web
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
-import org.scalajs.dom.{DocumentReadyState, HTMLCollection, document, html}
+import org.scalajs.dom.{DocumentReadyState, Event, HTMLCollection, document, html}
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
@@ -37,6 +37,13 @@ object DomSupport {
 
     def ancestorOrSelfElem: Iterator[T] =
       Iterator.iterate(elem)(_.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T]).takeWhile(_ ne null)
+
+    def addEventListenerOne[E <: Event](`type`: String, listener: js.Function1[E, ?]): Unit = {
+      lazy val wrapperListener: js.Function1[E, Unit] = (e: E) => {
+        listener(e)
+        elem.removeEventListener(`type`, wrapperListener)
+      }
+      elem.addEventListener(`type`, wrapperListener)    }
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {

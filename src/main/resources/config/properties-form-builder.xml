@@ -393,8 +393,72 @@
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-grid"
         value="ISG"/>
-     <property
+    <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-repeated-grid"
         value="ISR"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-input"
+        value="ICI"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-textarea"
+        value="ICT"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-tinymce"
+        value="ICF"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-explanation"
+        value="IUE"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-output"
+        value="IUC"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-hidden"
+        value="IUH"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-input-decimal"
+        value="ITN"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-input-email"
+        value="ITE"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-input-date"
+        value="ITD"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-input-time"
+        value="ITT"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-select1-appearance-dropdown"
+        value="ISD"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-select1-appearance-full"
+        value="ISR"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-select-appearance-full"
+        value="ISC"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-attachment"
+        value="IAF"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-image-attachment"
+        value="IAI"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-video-attachment"
+        value="IAV"/>
 </properties>

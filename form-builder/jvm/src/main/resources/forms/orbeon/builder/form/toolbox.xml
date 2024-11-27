@@ -300,9 +300,23 @@
 
                                 <xh:div class="fb-tool">
                                     <!-- The class is added so unit tests can find the trigger more easily -->
-                                    <xf:trigger id="fb-add-component-trigger"
-                                                ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
-                                                class="fb-add-{$binding/@id} {if ($is-section-component) then 'fb-add-template' else 'fb-add-control'}">
+                                    <!-- 2024-11-26: Reworked to be automatically based on the selector names, also
+                                         used for configuration keyboard shortcuts. -->
+                                    <xf:var
+                                        name="insert-class-name"
+                                        value="
+                                            concat(
+                                                'insert-',
+                                                if ($is-section-component) then 'template' else 'control',
+                                                '-',
+                                                $binding/@fb:binding-class-name
+                                            )"/>
+                                    <fr:trigger
+                                        id="fb-insert-component-trigger"
+                                        ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
+                                        class="fb-{$insert-class-name} {if ($is-section-component) then 'fb-insert-template' else 'fb-insert-control'}"
+                                        name="toolbox.{$insert-class-name}">
+                                    >
                                         <xf:label>
                                             <xf:output mediatype="text/html"
                                                 value="
@@ -340,7 +354,7 @@
                                                 </xf:action>
                                             </xf:action>
                                         </xf:action>
-                                    </xf:trigger>
+                                    </fr:trigger>
                                 </xh:div>
                             </xf:repeat>
                         </xf:group>

@@ -1,19 +1,106 @@
 package org.orbeon.oxf.fr
 
 import org.log4s.Logger
+import org.orbeon.css.CSSSelectorParser
+import org.orbeon.css.CSSSelectorParser.AttributePredicate
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FileUtils, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.xbl.{BindingAttributeDescriptor, BindingDescriptor}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
+import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, ELEMENT_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
 
 trait FormRunnerComponentsCompileTime {
+
+  // Called from XSLT only
+  //@XPathFunction
+  def bindingClassNameForToolbox(bindingElem: om.NodeInfo): String = {
+
+    val relatedDescriptors = BindingDescriptor.getAllRelevantDescriptors(List(bindingElem))
+
+    def buildName(name: QName, datatype: Option[QName], appearance: Option[String]): String = {
+
+      def replaceColon(s: String): String = s.replace(':', '-')
+      def replaceXsXfPrefix(qName: QName): String = {
+        val uri = qName.namespace.uri
+        if (uri == XMLConstants.XSD_URI || uri == XFormsNames.XFORMS_NAMESPACE_URI)
+          qName.localName
+        else
+          replaceColon(qName.qualifiedName)
+      }
+
+      val nameToken       = replaceColon(name.qualifiedName)
+      val datatypeToken   = datatype.map(replaceXsXfPrefix)
+      val appearanceToken = appearance.map(replaceColon).map("appearance-" + _)
+
+      (nameToken :: datatypeToken.toList ::: appearanceToken.toList ::: Nil).mkString("-")
+    }
+
+    def findByNameAndDatatypeAndAppearance: Option[String] =
+      relatedDescriptors collectFirst {
+        case BindingDescriptor(
+            Some(name),
+            d @ Some(_),
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+          ) => buildName(name, d, Some(appearance))
+        case BindingDescriptor(
+            Some(name),
+            d @ Some(_),
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+          ) => buildName(name, d, Some(appearance))
+      }
+
+    def findByNameAndDatatype: Option[String] =
+      relatedDescriptors collectFirst {
+        case BindingDescriptor(
+            Some(name),
+            d @ Some(_),
+            None
+          ) => buildName(name, d, None)
+      }
+
+  def findByNameAndAppearance: Option[String] =
+      relatedDescriptors collectFirst {
+        case BindingDescriptor(
+            Some(name),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+          ) => buildName(name, None, Some(appearance))
+        case BindingDescriptor(
+            Some(name),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+          ) => buildName(name, None, Some(appearance))
+      }
+
+    def findDirect: Option[String] =
+      relatedDescriptors collectFirst {
+        case BindingDescriptor(
+            Some(name),
+            None,
+            None
+          ) => buildName(name, None, None)
+      }
+
+    (
+      findByNameAndDatatypeAndAppearance orElse
+        findByNameAndDatatype            orElse
+        findByNameAndAppearance          orElse
+        findDirect
+    ).orNull
+  }
 
   // Called from XSLT only
   // In an XPath expression, replace non-local variable references.

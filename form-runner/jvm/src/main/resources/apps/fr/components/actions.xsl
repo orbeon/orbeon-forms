@@ -820,7 +820,7 @@
     </xsl:template>
 
     <!-- Match itemsets of controls which can be the target of an itemset action -->
-    <xsl:template match="xf:itemset" mode="within-controls">
+    <xsl:template match="xf:itemset" mode="within-grid">
         <xsl:param name="itemset-action-control-names" tunnel="yes"/>
         <xsl:choose>
             <xsl:when test="frf:controlNameFromId(../@id) = $itemset-action-control-names">

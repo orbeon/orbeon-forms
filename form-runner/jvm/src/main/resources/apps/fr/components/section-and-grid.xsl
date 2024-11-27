@@ -140,7 +140,7 @@
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
             </xsl:for-each>
 
-            <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint | @clear-constraint | @markup) | node()" mode="#current"/>
+            <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint | @clear-constraint | @markup) | node()" mode="within-grid"/>
 
         </xsl:copy>
     </xsl:template>

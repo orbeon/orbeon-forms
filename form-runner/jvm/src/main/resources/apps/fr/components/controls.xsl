@@ -52,7 +52,7 @@
 
     <!-- Convert `xf:input` of type `date` and `time` to `fr:date` and `fr:time` -->
     <xsl:template
-        mode="within-controls"
+        mode="within-grid"
         match="xf:input[@bind]">
         <xsl:param name="binds-root" tunnel="yes"/>
         <xsl:variable name="bind-id" select="@bind"/>
@@ -100,7 +100,7 @@
         match="
             fr:*      [generate-id() = $controls-to-check-for-pdf-appearance-ids] |
             xf:select1[generate-id() = $controls-to-check-for-pdf-appearance-ids]"
-        mode="within-controls">
+        mode="within-grid">
         <!-- For now this only applies to controls that have an `xf:select1` binding -->
         <xsl:element name="xf:select1">
             <xsl:apply-templates select="@* except (@appearance, @fr:pdf-appearance)" mode="#current"/>
@@ -126,7 +126,7 @@
         See https://github.com/orbeon/orbeon-forms/issues/6008
      -->
     <xsl:template
-        mode="within-controls"
+        mode="within-grid"
         match="*[$validate-selection-controls-choices and frf:isMaybeSelectionControl(.)]">
         <xsl:param name="choice-validation-selection-control-names" tunnel="yes"/>
         <xsl:variable name="is-multiple" select="frf:isMultipleSelectionControl(local-name(.))"/>
@@ -183,7 +183,7 @@
 
     <xsl:template
         match="xf:output[exists(xf:label) and empty(@appearance)]"
-        mode="within-controls">
+        mode="within-grid">
         <xsl:copy>
             <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
                 <xsl:attribute name="appearance" select="."/>
@@ -195,7 +195,7 @@
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
         match="fr:number[exists(@prefix | @suffix)] | fr:currency[exists(@prefix | @suffix)]"
-        mode="within-controls">
+        mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
             <xsl:for-each select="@prefix | @suffix">
@@ -208,7 +208,7 @@
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
         match="fr:databound-select1 | fr:databound-select1-search"
-        mode="within-controls">
+        mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
             <xsl:if test="exists(@resource | @selection)">
@@ -236,8 +236,8 @@
     <!-- NOTE: Lower priority so that `xf:input[@bind]` rules match. -->
     <xsl:template
         priority="-20"
-        match="fr:grid//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
-        mode="within-controls">
+        match="xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
+        mode="within-grid">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()" mode="#current"/>
             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
@@ -246,7 +246,7 @@
 
     <xsl:template
         match="@class"
-        mode="within-controls">
+        mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:attribute name="class" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
     </xsl:template>
@@ -262,7 +262,7 @@
             fr:short-label        [exists(fr:param)] |
             fr:iteration-label    [exists(fr:param)] |
             fr:add-iteration-label[exists(fr:param)]"
-        mode="within-controls">
+        mode="within-grid">
 
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
 
@@ -289,10 +289,10 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:attachment/xf:hint[exists(@ref) and empty(text())]" mode="within-controls">
+    <xsl:template match="fr:attachment/xf:hint[exists(@ref) and empty(text())]" mode="within-grid">
         <xsl:param name="binds-root" tunnel="yes"/>
         <xsl:copy>
-            <xsl:apply-templates select="@* except (@ref, @fr:automatic)"/>
+            <xsl:apply-templates select="@* except (@ref, @fr:automatic)" mode="#current"/>
             <xsl:variable name="control" select=".."/>
             <xsl:variable name="bind-id" select="$control/@bind"/>
             <xsl:variable name="bind"    select="$binds-root//xf:bind[@id = $bind-id]"/>

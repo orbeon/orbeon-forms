@@ -40,30 +40,14 @@ class XXFormsAttributeControl(
   _effectiveId
 ) with XFormsValueControl {
 
-  import XXFormsAttributeControl._
+  import XXFormsAttributeControl.*
 
   //override type Control <: AttributeControl
 
   private val attributeControl = staticControl.asInstanceOf[AttributeControl]
-  private var attributeName    = if (attributeControl ne null) attributeControl.attributeName  else null
-  private var attributeValue   = if (attributeControl ne null) attributeControl.attributeValue else null
-  private var forName          = if (attributeControl ne null) attributeControl.forName        else null
-
-  /**
-   * Special constructor used for label, etc. content AVT handling.
-   *
-   * @param container             container
-   * @param element               control element (should not be used here)
-   * @param attributeName         name of the attribute
-   * @param avtExpression         attribute template expression
-   * @param forName               name of the element the attribute is on
-   */
-  def this(container: XBLContainer, element: Element, attributeName: String, avtExpression: String, forName: String) = {
-    this(container, null, element, null)
-    this.attributeName  = attributeName
-    this.attributeValue = avtExpression
-    this.forName        = forName
-  }
+  private val attributeName    = if (attributeControl ne null) attributeControl.attributeName else null
+  private val attributeValue   = if (attributeControl ne null) attributeControl.attributeValue else null
+  private val forName          = if (attributeControl ne null) attributeControl.forName else null
 
   // Value comes from the AVT value attribute
   override def computeValue(collector: ErrorEventCollector): String =
@@ -84,13 +68,10 @@ class XXFormsAttributeControl(
         }
       case _ => externalValue
     }
-
   }
 
   override def evaluateExternalValue(collector: ErrorEventCollector): Unit =
     setExternalValue(getExternalValueHandleSrc(getValue(collector), attributeName, forName))
-
-  def getAttributeName: String = attributeName
 
   def getEffectiveForAttribute: String =
     XFormsId.getRelatedEffectiveId(effectiveId, attributeControl.forStaticId)
@@ -106,7 +87,6 @@ class XXFormsAttributeControl(
         super.getNonRelevantEscapedExternalValue
     }
 
-
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
@@ -119,7 +99,7 @@ class XXFormsAttributeControl(
     // If we get here, it means that `super.compareExternalUseExternalValue()` returned `false`, which means that either
     // `previousControl.isEmpty == true` or that there is a difference in value (or other aspects which don't matter here).
 
-    import ControlAjaxSupport._
+    import ControlAjaxSupport.*
 
     val atts                  = new AttributesImpl
     val attributeControl2     = this
@@ -143,7 +123,7 @@ class XXFormsAttributeControl(
       addOrAppendToAttributeIfNeeded(
         attributesImpl       = atts,
         name                 = "name",
-        value                = attributeControl2.getAttributeName,
+        value                = attributeControl2.attributeName,
         isNewRepeatIteration = false, // doesn't matter because `isDefaultValue == false`
         isDefaultValue       = false
       )

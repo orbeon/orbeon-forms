@@ -113,12 +113,21 @@
                 <!-- Don't keep potentially large instances -->
                 <xf:insert ref="instance('fr-form')" origin="xf:element('_')"/>
 
-                <xf:action if="instance()/request-parameters-loaded = 'false'">
-                    <xf:var name="fr-search-app" value="xxf:get-request-parameter('fr-search-app')"/>
+                <xf:var name="fr-search-app-opt"  value="xxf:trim(xxf:get-request-parameter('fr-search-app'))[. != '']"/>
+                <xf:var name="fr-search-form-opt" value="xxf:trim(xxf:get-request-parameter('fr-search-form'))[. != '']"/>
 
-                    <!-- If we have a fr-search-app URL parameter, use it as a search option and show search options -->
-                    <xf:action if="$fr-search-app != ''">
-                        <xf:setvalue ref="instance()/search-options/local/application-name" value="$fr-search-app"/>
+                <xf:action if="instance()/request-parameters-loaded = 'false'">
+
+                    <!-- If we have a search URL parameters, use it as a search option and show search options -->
+                    <xf:setvalue
+                        if="exists($fr-search-app-opt)"
+                        ref="instance()/search-options/local/application-name"
+                        value="$fr-search-app-opt"/>
+                    <xf:setvalue
+                        if="exists($fr-search-form-opt)"
+                        ref="instance()/search-options/local/form-name"
+                        value="$fr-search-form-opt"/>
+                    <xf:action if="exists($fr-search-app-opt) or exists($fr-search-form-opt)">
                         <xf:toggle case="fr-search-options-shown"/>
                     </xf:action>
 
@@ -126,12 +135,15 @@
                 </xf:action>
 
                 <xf:action if="instance()/request-parameters-loaded = 'true'">
-                    <xf:var name="fr-search-app" value="xxf:get-request-parameter('fr-search-app')"/>
 
-                    <xf:action if="$fr-search-app != '' and instance()/search-options/local/application-name != $fr-search-app">
-                        <!-- Clear search option passed as URL parameter (do not manage browser history for now) -->
-                        <xf:action type="javascript">ORBEON.fr.private.API.removeUrlParameter("fr-search-app");</xf:action>
-                    </xf:action>
+                    <!-- Clear search option passed as URL parameter (do not manage browser history for now) -->
+                    <!-- TODO: Instead, sync parameters with values -->
+                    <xf:action
+                        if="exists($fr-search-app-opt) and instance()/search-options/local/application-name != $fr-search-app-opt"
+                        type="javascript">ORBEON.fr.private.API.removeUrlParameter("fr-search-app");</xf:action>
+                    <xf:action
+                        if="exists($fr-search-form-opt) and instance()/search-options/local/form-name != $fr-search-form-opt"
+                        type="javascript">ORBEON.fr.private.API.removeUrlParameter("fr-search-form");</xf:action>
                 </xf:action>
 
                 <xf:action type="xpath">

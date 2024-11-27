@@ -469,7 +469,7 @@
         <xsl:variable name="output">
             <xsl:copy>
                 <xsl:if test="exists($filtered-classes)">
-                    <xsl:attribute name="class" select="string-join($filtered-classes, ' ')"/>
+                    <xsl:attribute name="fb:class" select="string-join($filtered-classes, ' ')"/>
                 </xsl:if>
                 <xsl:copy-of select="@* except @class | node() except (fr:index | fr:encrypt)"/>
                 <xsl:if test="$has-index">

@@ -1,3 +1,5 @@
+(function() {// ORBEON
+
 const ctrlBindings = !!navigator.userAgent.match(/Macintosh/);
 class Combobox {
     constructor(input, list) {
@@ -835,3 +837,5 @@ if (!window.customElements.get('text-expander')) {
 
 // ORBEON
 // export { TextExpanderElement as default };
+
+})();

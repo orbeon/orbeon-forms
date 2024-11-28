@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
+import org.orbeon.oxf.xforms.control.MutableControlProperty
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 import org.orbeon.xforms.XFormsId
+
 
 class MutableItemsetProperty(private val control: XFormsSelect1Control) extends MutableControlProperty[Itemset] {
   protected def isRelevant                                   : Boolean = control.isRelevant

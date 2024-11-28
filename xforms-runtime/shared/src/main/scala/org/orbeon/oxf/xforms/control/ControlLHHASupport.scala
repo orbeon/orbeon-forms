@@ -18,7 +18,6 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.*
-import org.orbeon.oxf.xforms.control.XFormsControl.*
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer

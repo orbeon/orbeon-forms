@@ -19,9 +19,8 @@ import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControl, SelectionControlTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.outputAriaDiff
-import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
@@ -39,6 +38,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.*
 
 import scala.util.control.NonFatal
+
 
 class XFormsSelect1Control(
   container : XBLContainer,

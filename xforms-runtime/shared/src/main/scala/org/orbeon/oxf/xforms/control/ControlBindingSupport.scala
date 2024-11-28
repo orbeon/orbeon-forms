@@ -110,7 +110,6 @@ trait ControlBindingSupport {
     // Commit evaluation of any pending "before" external LHHA
     findExternalBeforeAssociatedLhha
       .foreach { lhhaControl =>
-        println(s"committing lazy binding and values for ${lhhaControl.staticControl.lhhaType} with id ${lhhaControl.effectiveId}")
         lhhaControl.commitLazyBindingAndValues()
       }
   }

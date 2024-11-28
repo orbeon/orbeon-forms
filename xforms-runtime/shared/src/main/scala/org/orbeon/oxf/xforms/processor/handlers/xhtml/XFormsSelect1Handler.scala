@@ -597,8 +597,7 @@ class XFormsSelect1Handler(
         controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = isSingleItemItemset.option(containingDocument.namespaceId(XFormsSelect1Handler.getItemId(getEffectiveId, 0))),
         requestedElementNameOpt = (! isSingleItemItemset).option("span"),
-        control                 = currentControl,
-        isExternal              = false
+        control                 = currentControl
       )
     } else {
       super.handleLabel(lhhaAnalysis)

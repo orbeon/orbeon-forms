@@ -49,7 +49,7 @@ class XFormsTriggerMinimalHandler(
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, XFormsTriggerMinimalHandler.EnclosingElementName)
     xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, XFormsTriggerMinimalHandler.EnclosingElementName, spanQName, buttonAttributes)
     val labelValueOpt = getTriggerLabel(triggerControl)
-    val mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel(handlerContext.collector)
+    val mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel
     XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValueOpt, xhtmlPrefix, mustOutputHTMLFragment, Option(triggerControl.getLocationData))(xmlReceiver)
     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, XFormsTriggerMinimalHandler.EnclosingElementName, spanQName)
   }

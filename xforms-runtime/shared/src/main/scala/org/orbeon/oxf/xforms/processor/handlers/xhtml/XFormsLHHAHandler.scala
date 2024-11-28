@@ -161,13 +161,15 @@ class XFormsLHHAHandler(
               mustOutputHTMLFragment     = elementAnalysis.containsHTML
             )
           } else {
-            handleLabelHintHelpAlert(
+            handleLabelHintHelpAlertUseValue(
               lhhaAnalysis               = elementAnalysis,
               controlEffectiveIdOpt      = lhhaEffectiveId.some,
               forEffectiveIdWithNsOpt    = labelForEffectiveIdWithNsOpt,
               requestedElementNameOpt    = None,
               control                    = effectiveTargetControl,
-              isExternal                 = true
+              isExternal                 = true,
+              labelHintHelpAlertValueOpt = currentLHHAControl.valueOpt(handlerContext.collector),
+              mustOutputHTMLFragment     = elementAnalysis.containsHTML
             )
           }
         }

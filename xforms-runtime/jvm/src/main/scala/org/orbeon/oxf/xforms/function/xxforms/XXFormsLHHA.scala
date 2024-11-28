@@ -37,7 +37,7 @@ class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
         case 3 => LHHA.Alert
       }
 
-    LHHAFunctionSupport.lhhaValue(arguments.head.evaluateAsString(ctx).toString, lhha)
+    LHHAFunctionSupport.directOrByLocalLhhaValue(arguments.head.evaluateAsString(ctx).toString, lhha)
   }
 }
 

@@ -12,7 +12,7 @@ object LHHAFunctionSupport {
   // This returns a control's LHHA value, if it has one. It also handles the case where the LHHA is obtained from a
   // referencing control via `label-for`.
   // See https://github.com/orbeon/orbeon-forms/issues/6333
-  def lhhaValue(
+  def directOrByLocalLhhaValue(
     controlId: String,
     lhha     : LHHA
   )(implicit
@@ -20,7 +20,7 @@ object LHHAFunctionSupport {
     xfc      : XFormsFunction.Context
   ): Option[String] =
     relevantControl(controlId)
-      .flatMap(_.lhhaValue(lhha))
+      .flatMap(_.directOrByLocalLhhaValue(lhha))
 
   def labelHintAppearance(
     controlId: String,

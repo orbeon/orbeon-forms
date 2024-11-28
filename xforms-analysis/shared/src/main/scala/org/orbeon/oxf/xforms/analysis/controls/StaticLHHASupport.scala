@@ -26,52 +26,40 @@ trait StaticLHHASupport extends ElementAnalysis {
 
   // Because an LHHA might follow a control in the document, attachment must be deferred
   def attachDirectLhha(lhhaAnalysis: LHHAAnalysis): Unit =
-    lhhaAnalysis.lhhaType match {
-      case LHHA.Alert => _alerts :+= lhhaAnalysis
-      case _          => _lhh     += lhhaAnalysis.lhhaType -> lhhaAnalysis
-    }
+     _directLhh += lhhaAnalysis.lhhaType -> (_directLhh.getOrElse(lhhaAnalysis.lhhaType, Nil) :+ lhhaAnalysis) // xxx or `::` ?
 
   // We called this "By" in reference to `aria-labelledy`/`aria-describedby`
   def attachByLhha(lhhaAnalysis: LHHAAnalysis): Unit =
-    lhhaAnalysis.lhhaType match {
-      case LHHA.Alert => _alertsBy :+= lhhaAnalysis // 2022-06-14: unused
-      case _          => _lhhBy     += lhhaAnalysis.lhhaType -> lhhaAnalysis
-    }
+     _byLhh += lhhaAnalysis.lhhaType -> (_byLhh.getOrElse(lhhaAnalysis.lhhaType, Nil) :+ lhhaAnalysis) // xxx or `::` ?
 
   def allowMinimalLabelHint: Boolean
 
-  def alerts: List[LHHAAnalysis] = _alerts
+  def alerts: List[LHHAAnalysis] = directLhh(LHHA.Alert)
   def alertsNel: Option[NonEmptyList[LHHAAnalysis]] = NonEmptyList.fromList(alerts)
 
   def firstByOrDirectLhhaOpt(lhhaType: LHHA): Option[LHHAAnalysis] =
-    lhhaType match {
-      case LHHA.Alert => alertsBy.headOption orElse alerts.headOption
-      case _          => lhhBy(lhhaType)     orElse directLhh(lhhaType)
-    }
+    byLhh(lhhaType).headOption orElse directLhh(lhhaType).headOption
 
   def firstDirectLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
-    if (lhhaType == LHHA.Alert)
-      alerts.headOption // for alerts, take the first one, but does this make sense?
-    else
-      directLhh(lhhaType)
+    directLhh(lhhaType).headOption
+
+  def firstDirectLocalLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
+    directLhh(lhhaType).find(_.isLocal)
 
   def allDirectLhha(lhhaType: LHHA): Iterable[LHHAAnalysis] =
-    if (lhhaType == LHHA.Alert)
-      alerts // for alerts, take the first one, but does this make sense?
-    else
-      directLhh(lhhaType)
+    directLhh(lhhaType)
 
   def hasDirectLhha(lhhaType: LHHA): Boolean =
-    firstDirectLhha(lhhaType).nonEmpty
+    allDirectLhha(lhhaType).nonEmpty
 
   def hasByLhha(lhhaType: LHHA): Boolean =
     firstLhhaBy(lhhaType).nonEmpty
 
   def hasLocal(lhhaType: LHHA): Boolean =
-    lhhaAsList(lhhaType).exists(_.isLocal)
+    directLhh(lhhaType).exists(_.isLocal)
 
   def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
-    lhhaAsList(lhhaType).flatMap(_.valueAnalysis)
+    directLhh(lhhaType).flatMap(_.valueAnalysis)
 
   def hasLhhaPlaceholder(lhhaType: LHHA): Boolean =
     firstByOrDirectLhhaOpt(lhhaType) match {
@@ -121,31 +109,22 @@ trait StaticLHHASupport extends ElementAnalysis {
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()
-    allLhha foreach (_.freeTransientState())
+    allLhha.foreach(_.freeTransientState())
   }
 
   private object Private {
 
     // All LHHA, local or external
     // There can only be multiple alerts for now, not multiple LHH, so store alerts separately
-    var _lhh      = Map.empty[LHHA, LHHAAnalysis] // at most 3 entries
-    var _lhhBy    = Map.empty[LHHA, LHHAAnalysis] // at most 3 entries
-    var _alerts   = List.empty[LHHAAnalysis]
-    var _alertsBy = List.empty[LHHAAnalysis]
+    var _directLhh      = Map.empty[LHHA, List[LHHAAnalysis]] // at most 4 entries
+    var _byLhh    = Map.empty[LHHA, List[LHHAAnalysis]] // at most 4 entries
 
-    def lhhaAsList(lhhaType: LHHA) =
-      if (lhhaType == LHHA.Alert) alerts else directLhh(lhhaType).toList
+    def allLhha: Iterable[LHHAAnalysis] = _directLhh.values.flatten
 
-    def allLhha = _lhh.values ++ _alerts
-
-    def directLhh(lhhaType: LHHA): Option[LHHAAnalysis] = _lhh.get(lhhaType)
-    def lhhBy    (lhhaType: LHHA): Option[LHHAAnalysis] = _lhhBy.get(lhhaType)
-    def alertsBy                 : List[LHHAAnalysis]   = _alertsBy
+    def directLhh(lhhaType: LHHA): List[LHHAAnalysis] = _directLhh.getOrElse(lhhaType, Nil)
+    def byLhh    (lhhaType: LHHA): List[LHHAAnalysis] = _byLhh.getOrElse(lhhaType, Nil)
 
     def firstLhhaBy(lhhaType: LHHA): Option[LHHAAnalysis] =
-      if (lhhaType == LHHA.Alert)
-        alertsBy.headOption // for alerts, take the first one, but does this make sense?
-      else
-        lhhBy(lhhaType)
+      byLhh(lhhaType).headOption
   }
 }

@@ -86,7 +86,7 @@ abstract class XFormsControlLifecycleHandler(
             getEffectiveId,
             elementAnalysis,
             currentControl,
-            lhhaIfLocal(LHHA.Label)
+            firstLocalLhha(LHHA.Label)
           )
 
         // Remove autocomplete attribute if it doesn't make sense on this element
@@ -108,10 +108,10 @@ abstract class XFormsControlLifecycleHandler(
       for (current <- beforeAfterTokens._1)
         current match {
           case "control" => handleControlStart()
-          case "label"   => lhhaIfLocal(LHHA.Label).foreach(handleLabel)
-          case "alert"   => lhhaIfLocal(LHHA.Alert).foreach(handleAlert)
-          case "hint"    => lhhaIfLocal(LHHA.Hint).foreach(handleHint)
-          case "help"    => lhhaIfLocal(LHHA.Help).foreach(handleHelp)
+          case "label"   => firstLocalLhha(LHHA.Label).foreach(handleLabel)
+          case "alert"   => firstLocalLhha(LHHA.Alert).foreach(handleAlert)
+          case "hint"    => firstLocalLhha(LHHA.Hint).foreach(handleHint)
+          case "help"    => firstLocalLhha(LHHA.Help).foreach(handleHelp)
         }
     }
 
@@ -122,10 +122,10 @@ abstract class XFormsControlLifecycleHandler(
       for (current <- beforeAfterTokens._2)
         current match {
           case "control" => handleControlEnd()
-          case "label"   => lhhaIfLocal(LHHA.Label).foreach(handleLabel)
-          case "alert"   => lhhaIfLocal(LHHA.Alert).foreach(handleAlert)
-          case "hint"    => lhhaIfLocal(LHHA.Hint).foreach(handleHint)
-          case "help"    => lhhaIfLocal(LHHA.Help).foreach(handleHelp)
+          case "label"   => firstLocalLhha(LHHA.Label).foreach(handleLabel)
+          case "alert"   => firstLocalLhha(LHHA.Alert).foreach(handleAlert)
+          case "hint"    => firstLocalLhha(LHHA.Hint).foreach(handleHint)
+          case "help"    => firstLocalLhha(LHHA.Help).foreach(handleHelp)
         }
 
       // Close control element, usually `<span>`
@@ -147,8 +147,7 @@ abstract class XFormsControlLifecycleHandler(
       controlEffectiveIdOpt   = XFormsBaseHandler.isStaticReadonly(currentControl) option getEffectiveId,
       forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
       requestedElementNameOpt = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
-      control                 = currentControl,
-      isExternal              = false
+      control                 = currentControl
     )
 
   protected def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit =
@@ -158,8 +157,7 @@ abstract class XFormsControlLifecycleHandler(
         controlEffectiveIdOpt   = None,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        control                 = currentControl,
-        isExternal              = false
+        control                 = currentControl
       )
 
   protected def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
@@ -169,8 +167,7 @@ abstract class XFormsControlLifecycleHandler(
         controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        control                 = currentControl,
-        isExternal              = false
+        control                 = currentControl
       )
 
   protected def handleHelp(lhhaAnalysis: LHHAAnalysis): Unit =
@@ -180,8 +177,7 @@ abstract class XFormsControlLifecycleHandler(
         controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        control                 = currentControl,
-        isExternal              = false
+        control                 = currentControl
       )
 
   protected def handleControlStart(): Unit
@@ -260,7 +256,7 @@ abstract class XFormsControlLifecycleHandler(
       (_.beforeAfterTokensOpt)                    getOrElse
       handlerContext.documentOrder
 
-    def lhhaIfLocal(lhhaType: LHHA): Option[LHHAAnalysis] =
-      elementAnalysis.narrowTo[StaticLHHASupport].flatMap(_.firstDirectLhha(lhhaType)).filter(_.isLocal)
+    def firstLocalLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
+      elementAnalysis.narrowTo[StaticLHHASupport].iterator.flatMap(_.allDirectLhha(lhhaType).iterator).find(_.isLocal)
   }
 }

@@ -42,9 +42,9 @@ object PlaceHolderInfo {
           .isRelevant
           .flatOption {
             if (isLabelPlaceholder)
-              control.lhhaValue(LHHA.Label)
+              control.directOrByLocalLhhaValue(LHHA.Label)
             else
-              control.lhhaValue(LHHA.Hint)
+              control.directOrByLocalLhhaValue(LHHA.Hint)
           }
           .getOrElse("")
 

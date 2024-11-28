@@ -122,8 +122,7 @@ class XFormsOutputDefaultHandler(
       controlEffectiveIdOpt   = None,
       forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
       requestedElementNameOpt = None,
-      control                 = currentControl,
-      isExternal              = false
+      control                 = currentControl
     )
 
   protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
@@ -133,8 +132,7 @@ class XFormsOutputDefaultHandler(
         controlEffectiveIdOpt   = hasDirectOrByLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        control                 = currentControl,
-        isExternal              = false
+        control                 = currentControl
       )
 
   protected override def handleHelp(lhhaAnalysis: LHHAAnalysis): Unit =
@@ -144,8 +142,7 @@ class XFormsOutputDefaultHandler(
         controlEffectiveIdOpt   = hasDirectOrByLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
-        control                 = currentControl,
-        isExternal              = false
+        control                 = currentControl
       )
 }
 
@@ -392,7 +389,7 @@ class XFormsOutputDownloadHandler(
 
       withElement(localName = "a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
         val labelValueOpt          = currentControl.getLabel(handlerContext.collector)
-        val mustOutputHTMLFragment = currentControl.isHTMLLabel(handlerContext.collector)
+        val mustOutputHTMLFragment = currentControl.isHTMLLabel
         XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValueOpt, xhtmlPrefix, mustOutputHTMLFragment, Option(currentControl.getLocationData))
       }
     }

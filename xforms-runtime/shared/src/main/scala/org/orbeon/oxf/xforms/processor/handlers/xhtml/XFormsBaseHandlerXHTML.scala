@@ -236,8 +236,7 @@ abstract class XFormsBaseHandlerXHTML (
     controlEffectiveIdOpt  : Option[String],
     forEffectiveIdWithNsOpt: Option[String],
     requestedElementNameOpt: Option[String],
-    control                : XFormsControl,
-    isExternal             : Boolean // if `true` adds contraint classes, `id` on labels, and don't add LHHA suffix to ids
+    control                : XFormsControl
   ): Unit =
     if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
 
@@ -245,14 +244,14 @@ abstract class XFormsBaseHandlerXHTML (
       val (labelHintHelpAlertValueOpt, mustOutputHTMLFragment) =
         lhha match {
           case LHHA.Label | LHHA.Hint =>
-            (control.lhhaProperty(lhha, local = ! isExternal).valueOpt(handlerContext.collector), lhhaAnalysis.containsHTML)
+            (control.lhhaProperty(lhha, local = true).valueOpt(handlerContext.collector), lhhaAnalysis.containsHTML)
           case LHHA.Help =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
             // case because it is stored as escaped HTML within a `<button>` (by default) element.
-            (Option(control.lhhaProperty(lhha, local = ! isExternal).escapedValue(handlerContext.collector)), false)
+            (Option(control.lhhaProperty(lhha, local = true).escapedValue(handlerContext.collector)), false)
           case LHHA.Alert =>
             // Not known statically at this time because it currently depends on the number of active alerts
-            (control.lhhaProperty(lhha, local = ! isExternal).valueOpt(handlerContext.collector), control.lhhaProperty(lhha, local = ! isExternal).isHTML)
+            (control.lhhaProperty(lhha, local = true).valueOpt(handlerContext.collector), control.lhhaProperty(lhha, local = true).isHTML)
         }
 
       handleLabelHintHelpAlertUseValue(
@@ -261,7 +260,7 @@ abstract class XFormsBaseHandlerXHTML (
         forEffectiveIdWithNsOpt    = forEffectiveIdWithNsOpt,
         requestedElementNameOpt    = requestedElementNameOpt,
         control                    = control,
-        isExternal                 = isExternal,
+        isExternal                 = false,
         labelHintHelpAlertValueOpt = labelHintHelpAlertValueOpt,
         mustOutputHTMLFragment     = mustOutputHTMLFragment
       )

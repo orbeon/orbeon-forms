@@ -83,7 +83,9 @@ trait ControlLHHASupport {
       }
   }
 
-  def lhhaProperty(lhha: LHHA, local: Boolean = false): LHHAProperty =
+  // 2024-12-05: always `local = true` for now. For alerts in particular, however, in particular for the Error Summary,
+  // we might want to call this with `local = false` to get the combined value.
+  def lhhaProperty(lhha: LHHA, local: Boolean): LHHAProperty =
     lhha match {
       case LHHA.Alert =>
 
@@ -141,7 +143,7 @@ trait ControlLHHASupport {
     validationIdOpt: Option[String],
     forLevels      : Set[ValidationLevel] // TODO
   ): List[MutableLHHAProperty] = {
-    lhhaProperty(LHHA.Alert) // force evaluation?
+    lhhaProperty(LHHA.Alert, local = true) // force evaluation?
     validationIdOpt match {
       case Some(validationId) =>
         alerts
@@ -167,7 +169,7 @@ trait ControlLHHASupport {
     self.staticControl match {
       case staticLhhaSupport: StaticLHHASupport =>
         staticLhhaSupport
-          .firstDirectLhha(lhha)
+          .firstDirectLocalLhha(lhha)
           .map(lhh => new MutableLHHAProperty(self, lhh))
           .getOrElse(NullLHHA)
       case _ =>
@@ -183,7 +185,7 @@ trait ControlLHHASupport {
 
   def eagerlyEvaluateLhha(collector: ErrorEventCollector): Unit =
     for (lhha <- LHHA.values)
-      lhhaProperty(lhha).value(collector)
+      lhhaProperty(lhha, local = true).value(collector)
 
   def htmlLhhaSupport: Set[LHHA] = LHHA.DefaultLHHAHTMLSupport
   def ajaxLhhaSupport: Seq[LHHA] = LHHA.values
@@ -192,11 +194,11 @@ trait ControlLHHASupport {
     ajaxLhhaSupport forall (lhha => lhhaProperty(lhha, local = true).value(collector) == other.lhhaProperty(lhha, local = true).value(collector))
 
   // Convenience accessors
-  final def getLabel   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Label).value(collector))
-  final def isHTMLLabel(collector: ErrorEventCollector): Boolean = lhhaProperty(LHHA.Label).isHTML
-  final def getHelp    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Help).value(collector))
-  final def getHint    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Hint).value(collector))
-  final def getAlert   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Alert).value(collector))
+  final def getLabel   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Label, local = true).value(collector))
+  final def isHTMLLabel                                : Boolean        = lhhaProperty(LHHA.Label,        local = true).isHTML
+  final def getHelp    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Help,  local = true).value(collector))
+  final def getHint    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Hint,  local = true).value(collector))
+  final def getAlert   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Alert, local = true).value(collector))
 
   lazy val referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] =
     for {
@@ -208,7 +210,7 @@ trait ControlLHHASupport {
     } yield
       staticRc -> concreteSnRc
 
-  def lhhaValue(lhha: LHHA): Option[String] =
+  def directOrByLocalLhhaValue(lhha: LHHA): Option[String] =
     (
       self.staticControl match { // Scala 3: `.match`
         case s: StaticLHHASupport if s.hasDirectLhha(lhha) => Some(self)

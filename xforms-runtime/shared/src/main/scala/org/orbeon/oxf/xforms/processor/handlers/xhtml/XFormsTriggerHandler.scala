@@ -50,7 +50,7 @@ abstract class XFormsTriggerHandler(
 
       val hintValue =
         if (control != null)
-          control.lhhaValue(LHHA.Hint)
+          control.directOrByLocalLhhaValue(LHHA.Hint)
         else
           None
 

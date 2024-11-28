@@ -37,7 +37,7 @@ class XFormsGroupFieldsetHandler(
 
     // Output an `xh:legend` element if and only if there is an `xf:label` element. This help with
     // styling in particular.
-    elementAnalysis.firstDirectLhha(LHHA.Label) foreach { lhhaAnalysis =>
+    elementAnalysis.firstDirectLocalLhha(LHHA.Label) foreach { lhhaAnalysis =>
       // Handle label classes
       val atts = new AttributesImpl
       atts.addOrReplace(XFormsNames.CLASS_QNAME, getLabelClasses(groupControl, lhhaAnalysis).toString)

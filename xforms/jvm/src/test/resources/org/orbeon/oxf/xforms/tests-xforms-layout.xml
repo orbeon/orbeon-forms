@@ -3029,4 +3029,57 @@
             </controls>
         </output>
     </test>
+
+    <test description="#4758: XForms support for multiple labels" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="my-outer-model">
+                        <xf:instance id="my-outer-instance">
+                            <_>
+                                <external-label>My external label</external-label>
+                                <nested-label>My nested label</nested-label>
+                                <_>1</_>
+                                <_>2</_>
+                            </_>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:label for="my-repeated-control" id="my-external-label" ref="instance()/external-label"/>
+                    <xf:repeat ref="_" id="my-repeat">
+                        <xf:input ref="." id="my-repeated-control">
+                            <xf:label id="my-nested-label" ref="instance()/nested-label"/>
+                        </xf:input>
+                    </xf:repeat>
+                    <xf:output value="xxf:label('my-repeated-control')" id="my-xxf-label-output"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:label id="my-external-label" class="xforms-control xforms-label">My external label</xh:label>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-repeated-control⊙1" class="xforms-control xforms-input xforms-repeat-selected-item-1 xforms-update-full">
+                    <xh:label class="xforms-label" for="my-repeated-control≡xforms-input-1⊙1">My nested label</xh:label>
+                    <xh:input id="my-repeated-control≡xforms-input-1⊙1" type="text" name="my-repeated-control≡xforms-input-1⊙1" value="1" class="xforms-input-input" aria-labelledby="my-external-label"/>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-repeated-control⊙2" class="xforms-control xforms-input xforms-update-full">
+                    <xh:label class="xforms-label" for="my-repeated-control≡xforms-input-1⊙2">My nested label</xh:label>
+                    <xh:input id="my-repeated-control≡xforms-input-1⊙2" type="text" name="my-repeated-control≡xforms-input-1⊙2" value="2" class="xforms-input-input" aria-labelledby="my-external-label"/>
+                </xh:span>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="my-xxf-label-output" class="xforms-control xforms-output">
+                    <xh:span id="my-xxf-label-output≡≡c" class="xforms-output-output">My nested label</xh:span>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
 </group>

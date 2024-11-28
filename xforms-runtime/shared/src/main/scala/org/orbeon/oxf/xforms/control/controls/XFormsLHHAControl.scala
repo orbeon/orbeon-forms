@@ -76,7 +76,7 @@ class XFormsLHHAControl(
     collector     : ErrorEventCollector
   ): Unit = {
     _parentBindingContext = parentContext
-    if (staticControl.lhhaType == Alert && staticControl.isExternalBeforeAssociatedControl)
+    if (staticControl.isExternalBeforeAssociatedControl)
       lazyEval = Some(Eval.later(super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)))
     else
       super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)
@@ -84,8 +84,10 @@ class XFormsLHHAControl(
 
   override def onDestroy(update: Boolean): Unit = {
     super.onDestroy(update)
-    _associatedControlsLevel = None
-    _associatedControlsVisited = false
+    if (staticControl.lhhaType == LHHA.Alert) {
+      _associatedControlsLevel = None
+      _associatedControlsVisited = false
+    }
   }
 
   final override def refreshBindingAndValues(
@@ -93,7 +95,7 @@ class XFormsLHHAControl(
     collector    : ErrorEventCollector
   ): Unit = {
     _parentBindingContext = parentContext
-    if (staticControl.lhhaType == Alert && staticControl.isExternalBeforeAssociatedControl)
+    if (staticControl.isExternalBeforeAssociatedControl)
       lazyEval = Some(Eval.later(super.refreshBindingAndValues(parentContext, collector)))
     else
       super.refreshBindingAndValues(parentContext, collector)
@@ -151,8 +153,10 @@ class XFormsLHHAControl(
       )
     }
 
-    _associatedControlsLevel = associatedControls.flatMap(_.alertLevel).maxOption
-    _associatedControlsVisited = associatedControls.exists(_.visited)
+    if (staticControl.lhhaType == LHHA.Alert) {
+      _associatedControlsLevel   =  associatedControls.flatMap(_.alertLevel).maxOption
+      _associatedControlsVisited = associatedControls.exists(_.visited)
+    }
 
     resultOpt getOrElse ""
   }

@@ -68,7 +68,7 @@ object XMLOutput {
   def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
     for {
       lhhaType <- LHHA.values
-      lhhaProp = c.lhhaProperty(lhhaType)
+      lhhaProp = c.lhhaProperty(lhhaType, local = true)
       text     <- lhhaProp.valueOpt(collector)
     } locally {
       writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)(xmlReceiver)

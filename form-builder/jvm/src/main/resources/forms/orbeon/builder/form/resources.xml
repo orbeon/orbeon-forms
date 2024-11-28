@@ -1452,7 +1452,7 @@
                 Le nom est visible dans les URLs du formulaire déployé, et il est recommandé d'utiliser des minuscules uniquement.
                 &lt;/p>
             </help>
-            <alert>Utiliser aux maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
+            <alert>Utiliser au maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
         </application-name>
         <form-name>
             <label>Nom du formulaire</label>
@@ -1465,7 +1465,7 @@
                 Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.
                 &lt;/p>
             </help>
-            <alert>Utiliser aux maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
+            <alert>Utiliser au maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
         </form-name>
         <title>
             <label>Titre du formulaire</label>

@@ -25,7 +25,7 @@ import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
 import org.scalajs.dom.ext.*
-import org.scalajs.dom.html
+import org.scalajs.dom.{EventListenerOptions, html}
 import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -175,11 +175,14 @@ object AjaxClient {
       }
 
       dialogEl.find("button").get().foreach((el: dom.Element) =>
-        el.addEventListenerOne("click", (_: dom.Event) => {
-          // Reloading the page will redirect us to the login page if necessary
-          dom.window.location.href = dom.window.location.href
-        })
-      )
+        el.addEventListener(
+          `type` = "click",
+          listener = (_: dom.Event) =>
+            // Reloading the page will redirect us to the login page if necessary
+            dom.window.location.href = dom.window.location.href,
+          options  = new EventListenerOptions { once = true })
+        )
+
       dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
         val backdrop = "static" // Click on the background doesn't hide dialog
         val keyboard = false    // Can't use esc to close the dialog

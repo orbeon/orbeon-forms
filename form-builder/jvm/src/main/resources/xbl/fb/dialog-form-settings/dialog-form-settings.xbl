@@ -477,7 +477,7 @@
                 </xf:action>
             </xbl:handler>
             <xbl:handler observer="dialog" event="xxforms-dialog-close" phase="target">
-                <xf:action type="javascript" event="xxforms-dialog-close" target="#observer">
+                <xf:action type="javascript">
                     ORBEON.xforms.XBL.instanceForControl(this).dialogClosing();
                 </xf:action>
             </xbl:handler>.

@@ -100,8 +100,8 @@ trait ControlAjaxSupport {
       // could be nested, some external, but in the end we only get one value. For now (2022-06-09) the constraint
       // remains that we should either have all local alerts, or all separate.
       if staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLhhaPlaceholder(lhha)
-      value1            = previousControlOpt.map(_.lhhaProperty(lhha).value(collector)).orNull
-      lhha2             = self.lhhaProperty(lhha)
+      value1            = previousControlOpt.map(_.lhhaProperty(lhha, local = true).value(collector)).orNull
+      lhha2             = self.lhhaProperty(lhha, local = true)
       value2            = lhha2.value(collector)
       if value1 != value2
       attributeValue    = Option(lhha2.escapedValue(collector)) getOrElse ""

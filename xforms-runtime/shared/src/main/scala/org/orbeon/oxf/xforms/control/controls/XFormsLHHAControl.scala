@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import cats.Eval
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xforms.analysis.controls.LHHA.Alert
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, ValueControl}
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -75,7 +76,7 @@ class XFormsLHHAControl(
     collector     : ErrorEventCollector
   ): Unit = {
     _parentBindingContext = parentContext
-    if (staticControl.isExternalBeforeAssociatedControl)
+    if (staticControl.lhhaType == Alert && staticControl.isExternalBeforeAssociatedControl)
       lazyEval = Some(Eval.later(super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)))
     else
       super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)
@@ -92,7 +93,7 @@ class XFormsLHHAControl(
     collector    : ErrorEventCollector
   ): Unit = {
     _parentBindingContext = parentContext
-    if (staticControl.isExternalBeforeAssociatedControl)
+    if (staticControl.lhhaType == Alert && staticControl.isExternalBeforeAssociatedControl)
       lazyEval = Some(Eval.later(super.refreshBindingAndValues(parentContext, collector)))
     else
       super.refreshBindingAndValues(parentContext, collector)

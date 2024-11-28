@@ -260,7 +260,7 @@
             <url-pattern>/fr/login-error</url-pattern>
         </web-resource-collection>
     </security-constraint>
-    <!-- This will cause redirect from HTTP to HTTPS but not for eXist -->
+    <!-- This will cause redirect from HTTP to HTTPS -->
     <!--
     <security-constraint>
         <web-resource-collection>
@@ -269,15 +269,6 @@
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>eXist</web-resource-name>
-            <url-pattern>/exist/*</url-pattern>
-        </web-resource-collection>
-        <user-data-constraint>
-            <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
     -->

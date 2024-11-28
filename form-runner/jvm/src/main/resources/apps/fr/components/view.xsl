@@ -529,6 +529,8 @@
                         )
                     ]
                 }}{{
+                    (: In theory, this could be done statically, as this doesn't change for a given form, but we don't
+                       have code to do this that is able to handle AVTs. :)
                     if (not(fr:is-design-time()) and not(fr:mode() = ('summary', 'home', 'landing', ''))) then
                         concat(' fr-density-', frf:optionFromMetadataOrPropertiesDynamicXPath('density', 'compact'))
                     else

@@ -1449,7 +1449,7 @@
                     &lt;li>un nom de projet comme "mercury" ou "phoenix"&lt;/li>
                 &lt;/ul>
                 &lt;p>
-                Le nom est visible dans les URLs du formulaire déployé, et il est recommandé d'utiliser des minuscules uniquement.
+                Ce nom est visible dans l'URL du formulaire déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.
                 &lt;/p>
             </help>
             <alert>Utiliser au maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
@@ -1462,7 +1462,7 @@
                 Le nom du formulaire est un nom qui est local à une application, par exemple "adresse" ou "demande".
                 &lt;/p>
                 &lt;p>
-                Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.
+                Ce nom est visible dans l'URL du formulaire déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.
                 &lt;/p>
             </help>
             <alert>Utiliser au maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>

@@ -720,6 +720,33 @@ body.orbeon {
         width: 1130px; // larger so that tab titles in French, in particular, fit
         max-width: none;
 
+        .fb-info-alerts {
+            display: flex;
+            flex-direction: column;
+            row-gap: .5em;
+            margin: 0;
+            padding: 0;
+            .xforms-alert.xforms-active {
+                background: @infoText;
+                margin: 0;
+                &::before {
+                    content: none;
+                }
+                a {
+                    color: white;
+                }
+            }
+        }
+
+        .fr-grid-td > .alert {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 1em;
+        }
+
         .fb-settings-mode-edit {
             min-height: 0;
         }

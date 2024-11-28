@@ -45,6 +45,19 @@
                 &lt;/p>
             </help>
             <alert>Use a maximum of 255 ASCII letters, digits, "-" or "_"</alert>
+            <no-form-alert>
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert>
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert>
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Form Title</label>
@@ -1466,6 +1479,19 @@
                 &lt;/p>
             </help>
             <alert>Utiliser au maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
+            <no-form-alert>
+                Aucun formulaire avec ce nom d'application et nom de formulaire n'a été trouvé dans ce système.
+            </no-form-alert>
+            <form-published-alert>
+                {0,choice,1#Un formulaire|1&lt;{0,number,integer} formulaires}
+                avec ce nom d''application et nom de formulaire {0,choice,1#est publié|1&lt;sont publiés}.
+                &lt;a href="{1}" target="_blank">Voir dans la page d''administration.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert>
+                {0,choice,1#Un formulaire|1&lt;{0,number,integer} formulaires}
+                avec ce nom d''application et nom de formulaire {0,choice,1#est publié|1&lt;sont publiés}.
+                &lt;a href="{1}" target="_blank">Voir dans la page d''accueil de Form Builder.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Titre du formulaire</label>
@@ -2870,6 +2896,19 @@
             <hint todo="true">Identifiserer et spesifikt skjema. Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
             <help todo="true"/>
             <alert todo="true">[Use a maximum of 255 ASCII letters, digits, "-" or "_"]</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Skjematittel</label>
@@ -4302,6 +4341,19 @@
             <hint todo="true">Определяет данную конкретную форму (например, "health-record"). Название формы входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
             <help todo="true"/>
             <alert todo="true">[Use a maximum of 255 ASCII letters, digits, "-" or "_"]</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Заголовок формы</label>
@@ -5734,6 +5786,19 @@
             <hint todo="true">Identifica il modulo specifico (esempio: "health-record" o "claim"). Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
             <help todo="true"/>
             <alert>Utilizza un massimo di 255 lettere ASCII, cifre, "-" o "_"</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Titolo del modulo</label>
@@ -7130,6 +7195,19 @@
             <hint todo="true">Wird zu Identifikation des Formulars verwendet(z.B.: "Krankenakte"). Da dieser Name im URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
             <help todo="true"/>
             <alert>Verwenden Sie maximal 255 ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Formulartitel</label>
@@ -8528,6 +8606,19 @@
             <hint todo="true">Tunnistaa juuri tämän lomakkeen (esim. "terveysrekisteri" tai "korvausvaatimus"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
             <help todo="true"/>
             <alert todo="true">Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Lomakkeen otsikko</label>
@@ -9954,6 +10045,19 @@
             <hint todo="true">Identifica el formulario especifico (e.g. "denuncias" or "consulta"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
             <help todo="true"/>
             <alert>Usar un máximo de caracteres ASCII , números, "-" o "_"</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Título del Formulario</label>
@@ -11378,6 +11482,19 @@
             <hint todo="true">Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
             <help todo="true"/>
             <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Form titel</label>
@@ -12782,6 +12899,19 @@
             <hint todo="true">Identifica este formulário específico (ex.: boletim de saúde). Este nome é visível no URL pelo que recomendamos o uso de minúsculas.</hint>
             <help todo="true"/>
             <alert>Use no máximo 255 letras ASCII, algarismos, "-" ou "_"</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Título do Formulário</label>
@@ -14213,6 +14343,19 @@
             <hint todo="true">Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
             <help todo="true"/>
             <alert todo="true">Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+            <no-form-alert todo="true">
+                No form with this specific application and form name in this system have been found in this system.
+            </no-form-alert>
+            <form-published-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} published.
+                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert todo="true">
+                {0,choice,1#One form|1&lt;{0,number,integer} forms}
+                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
+                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            </form-in-progress-alert>
         </form-name>
         <title>
             <label>Titel</label>

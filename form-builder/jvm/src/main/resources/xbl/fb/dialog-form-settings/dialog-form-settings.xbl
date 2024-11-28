@@ -323,6 +323,15 @@
                     ORBEON.xforms.XBL.instanceForControl(this).dialogOpening();
                 </xf:action>
 
+                <!-- Mark app and form fields visited so that their associated info alerts show -->
+                <xf:action
+                    if="$i/app != '' and $i/form != ''"
+                    iterate="'fb-app-name-input', 'fb-app-name-select1', 'fb-form-name-input'">
+                    <xxf:setvisited
+                        control="{.}"
+                        recurse="true"/>
+                </xf:action>
+
             </xbl:handler>
 
             <!-- Save and close if valid -->
@@ -573,8 +582,47 @@
                     ref="title | description"
                     xxf:whitespace="trim"/>
                 <xf:bind
+                    id="app-bind"
                     ref="app"
                     constraint="not($has-roles and not($allowed-apps-if-has-roles = ('*', .)))"/>
+                <xf:bind
+                    id="form-bind"
+                    ref="form">
+                    <xf:constraint
+                        level="info"
+                        value="xxf:non-blank() and xxf:non-blank(../app)"
+                        id="blank-form-alert-constraint"/>
+                    <xf:constraint
+                        level="info"
+                        value="
+                            not(
+                                xxf:non-blank()                                                         and
+                                xxf:non-blank(../app)                                                   and
+                                instance('fr-counts-instance')/published-forms castable as xs:integer   and
+                                instance('fr-counts-instance')/in-progress-forms castable as xs:integer and
+                                instance('fr-counts-instance')/published-forms = 0                      and
+                                instance('fr-counts-instance')/in-progress-forms = 0
+                            )"
+                        id="no-form-alert-constraint"/>
+                    <xf:constraint
+                        level="info"
+                        value="
+                            not(
+                                xxf:non-blank()                                                         and
+                                instance('fr-counts-instance')/published-forms castable as xs:integer   and
+                                instance('fr-counts-instance')/published-forms != 0
+                            )"
+                        id="form-published-constraint"/>
+                    <xf:constraint
+                        level="info"
+                        value="
+                            not(
+                                xxf:non-blank()                                                         and
+                                instance('fr-counts-instance')/in-progress-forms castable as xs:integer and
+                                instance('fr-counts-instance')/in-progress-forms != 0
+                            )"
+                        id="form-in-progress-constraint"/>
+                </xf:bind>
                 <xf:bind
                     ref="singleton"
                     calculate="if (string() = '') then 'false' else ."
@@ -789,40 +837,122 @@
                     </xf:action>
                 </xf:submission>
 
+                <xf:action
+                    observer="fb-general-settings-grid"
+                    target="#observer"
+                    event="xforms-enabled"
+
+                    if="xxf:non-blank($i/app) and xxf:non-blank($i/form) and valid($i/app) and valid($i/form)">
+
+                    <xf:send submission="search-published-forms-submission">
+                        <xf:property name="app"  value="$i/app/string()"  xxf:tunnel="true"/>
+                        <xf:property name="form" value="$i/form/string()" xxf:tunnel="true"/>
+                    </xf:send>
+                    <xf:send submission="search-in-progress-forms-submission">
+                        <xf:property name="app"  value="$i/app/string()"  xxf:tunnel="true"/>
+                        <xf:property name="form" value="$i/form/string()" xxf:tunnel="true"/>
+                    </xf:send>
+
+                </xf:action>
+
+                <xf:action
+                    observer="fb-app-name-input fb-app-name-select1 fb-form-name-input"
+                    event="xforms-value-changed"
+
+                    if="xxf:non-blank($i/app) and xxf:non-blank($i/form) and valid($i/app) and valid($i/form)">
+
+                    <xf:send submission="search-published-forms-submission">
+                        <xf:property name="app"  value="$i/app/string()"  xxf:tunnel="true"/>
+                        <xf:property name="form" value="$i/form/string()" xxf:tunnel="true"/>
+                    </xf:send>
+                    <xf:send submission="search-in-progress-forms-submission">
+                        <xf:property name="app"  value="$i/app/string()"  xxf:tunnel="true"/>
+                        <xf:property name="form" value="$i/form/string()" xxf:tunnel="true"/>
+                    </xf:send>
+                </xf:action>
+
+                <xf:instance id="fr-counts-instance">
+                    <_>
+                        <published-apps/>
+                        <published-forms/>
+                        <in-progress-apps/>
+                        <in-progress-forms/>
+                    </_>
+                </xf:instance>
                 <xf:submission
-                    id="read-demo-forms-submission"
+                    id="search-published-forms-submission"
                     method="get"
                     serialization="none"
-                    resource="/fr/service/persistence/form/orbeon?all-versions=false&amp;ignore-admin-permissions=true"
+                    resource="/fr/service/persistence/form/{
+                            event('app')
+                        }{
+                            if (exists(event('form'))) then
+                                concat('/', event('form'))
+                            else
+                                ()
+                        }?all-versions=true&amp;ignore-admin-permissions=true"
                     replace="none"
                     mode="asynchronous"
                     xxf:response-must-await="200ms"
                 >
 
-<!--                    <xf:setvalue-->
-<!--                        event="xforms-submit"-->
-<!--                        ref="instance('fr-landing-demo-forms-instance')/@state"-->
-<!--                        value="'loading'"/>-->
+                    <xf:message
+                        event="xforms-submit-error"
+                        value="'submit error 1'"/>
 
-<!--                    <xf:setvalue-->
-<!--                        event="xforms-submit-error"-->
-<!--                        ref="instance('fr-landing-form-metadata-instance')/@state"-->
-<!--                        value="'error'"/>-->
-
-                    <!-- Sort alphabetically by title -->
                     <xf:action event="xforms-submit-done">
-                        <xf:insert
-                            ref="instance('template-forms')"
-                            origin="
-                                xf:element('forms',
-                                    xxf:sort(
-                                        event('response-body')/*/form,
-                                        title[1],
-                                        'text',
-                                        'ascending'
-                                    )
-                                )"/>
+                        <xf:setvalue
+                            ref="instance('fr-counts-instance')/(if (exists(event('form'))) then published-forms else published-apps)"
+                            value="event('response-body')/*/@search-total"/>
                     </xf:action>
+                </xf:submission>
+
+                <xf:instance id="fr-search-in-progress-forms-instance">
+                    <search xmlns="" return-all-indexed-fields="true">
+                        <query/>
+                        <query name="application-name"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name"
+                               match="exact"/>
+                        <query name="form-name"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name"
+                               match="exact"/>
+                        <page-size/>
+                        <page-number>1</page-number>
+                        <lang/>
+                    </search>
+                </xf:instance>
+
+                <xf:submission
+                    id="search-in-progress-forms-submission"
+                    ref="instance('fr-search-in-progress-forms-instance')"
+                    validate="false"
+                    method="post"
+                    resource="/fr/service/persistence/search/orbeon/builder"
+                    replace="none"
+                    mode="asynchronous"
+                    xxf:response-must-await="200ms"
+                >
+
+                    <xf:header>
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="1"/>
+                    </xf:header>
+
+                    <xf:action event="xforms-submit">
+                        <xf:setvalue ref="query[@name = 'application-name']" value="event('app')"/>
+                        <xf:setvalue ref="query[@name = 'form-name']"        value="event('form')"/>
+                    </xf:action>
+
+                    <xf:message
+                        event="xforms-submit-error"
+                        value="'submit error 2'"/>
+
+                    <xf:action event="xforms-submit-done">
+                        <xf:setvalue
+                            ref="instance('fr-counts-instance')/(if (exists(event('form'))) then in-progress-forms else in-progress-apps)"
+                            value="event('response-body')/*/@search-total"/>
+                    </xf:action>
+
                 </xf:submission>
 
             </xf:model>
@@ -965,7 +1095,7 @@
                                             <xf:alert ref="$resources/application-name/alert"/>
                                         </xf:input>
                                         <!-- Otherwise, if there are multiple choices, use a dropdown -->
-                                        <fr:dropdown-select1 ref="app[$app-chooser = 'select1']">
+                                        <fr:dropdown-select1 ref="app[$app-chooser = 'select1']" id="fb-app-name-select1">
                                             <xf:label ref="$resources/application-name/label"/>
                                             <xf:itemset ref="$allowed-apps-if-has-roles">
                                                 <xf:label ref="."/>
@@ -983,10 +1113,55 @@
                                             <xf:label ref="$resources/form-name/label"/>
                                             <xf:hint ref="$resources/form-name/hint"/>
                                             <xf:help ref="$resources/form-name/help" mediatype="text/html"/>
-                                            <xf:alert ref="$resources/form-name/alert"/>
+                                            <xf:alert ref="$resources/form-name/alert" level="error"/>
                                         </xf:input>
                                     </fr:c>
                                     <fr:c x="1" y="2" w="12" h="1">
+                                        <xh:div class="fb-info-alerts">
+                                            <xf:alert
+                                                id="no-form-alert-external"
+                                                for="fb-form-name-input"
+                                                validation="no-form-alert-constraint"
+                                                value="xxf:r('form-name.no-form-alert', '|fr-form-resources|'),"/>
+                                            <xf:alert
+                                                id="form-published-alert-external"
+                                                for="fb-form-name-input"
+                                                validation="form-published-constraint"
+                                                mediatype="text/html"
+                                                value="
+                                                    xxf:format-message(
+                                                        xxf:r('form-name.form-published-alert', '|fr-form-resources|'),
+                                                        (
+                                                            instance('fr-counts-instance')/published-forms/xs:integer(.),
+                                                            concat(
+                                                                '/fr/admin?fr-search-app=',
+                                                                bind('app-bind'),
+                                                                '&amp;fr-search-form=',
+                                                                bind('form-bind')
+                                                            )
+                                                        )
+                                                    )"/>
+                                            <xf:alert
+                                                id="form-in-progress-alert-external"
+                                                for="fb-form-name-input"
+                                                validation="form-in-progress-constraint"
+                                                mediatype="text/html"
+                                                value="
+                                                    xxf:format-message(
+                                                        xxf:r('form-name.form-in-progress-alert', '|fr-form-resources|'),
+                                                        (
+                                                            instance('fr-counts-instance')/in-progress-forms/xs:integer(.),
+                                                            concat(
+                                                                '/fr/orbeon/builder/summary?fr-search-app',
+                                                                bind('app-bind'),
+                                                                '&amp;fr-search-form=',
+                                                                bind('form-bind')
+                                                            )
+                                                        )
+                                                    )"/>
+                                        </xh:div>
+                                    </fr:c>
+                                    <fr:c x="1" y="3" w="12" h="1">
                                         <!-- Title -->
                                         <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
                                             <xf:label ref="$resources/title/label"/>
@@ -994,7 +1169,7 @@
                                             <xf:alert ref="$resources/title/alert"/>
                                         </xf:input>
                                     </fr:c>
-                                    <fr:c x="1" y="3" w="12" h="1">
+                                    <fr:c x="1" y="4" w="12" h="1">
                                         <xf:var name="is-html" value="description/@isHTML = 'true'"/>
                                         <xf:textarea ref="description[not($is-html)]" id="fb-description-textarea">
                                             <xf:label ref="$resources/description/label"/>
@@ -1007,7 +1182,7 @@
                                             <xf:alert ref="$resources/description/alert"/>
                                         </xf:textarea>
                                     </fr:c>
-                                    <fr:c x="1" y="4" w="12" h="1">
+                                    <fr:c x="1" y="5" w="12" h="1">
                                         <fr:checkbox-input ref="description/@isHTML" appearance="full">
                                             <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                         </fr:checkbox-input>
@@ -1514,7 +1689,7 @@
 
                         </fr:tabbable>
 
-                        <fr:error-summary id="error-summary" observer="fb-tabbable" valid-ref="$i/@valid">
+                        <fr:error-summary id="error-summary" observer="fb-tabbable" valid-ref="$i/@valid" lowest-level-to-show="warning">
                             <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
                         </fr:error-summary>
 

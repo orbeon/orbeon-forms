@@ -21,37 +21,37 @@
     <!-- === Persistence configuration === -->
 
     <!-- Default provider -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                             value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                                          value="sqlite"/>
     <!-- Define resource, relational, and attachments providers with their parameters -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                               value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                                 value="/fr/service/oracle"/>
-    <property as="xs:string"  name="oxf.fr.persistence.oracle.datasource"                          value="oracle"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.oracle.create-flat-view"                    value="false"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.oracle.flat-view.fully-qualified-names"     value="false"/>
-    <property as="xs:integer" name="oxf.fr.persistence.oracle.flat-view.max-identifier-length"     value="128"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                                  value="/fr/service/mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                           value="mysql"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.mysql.flat-view.fully-qualified-names"      value="false"/>
-    <property as="xs:integer" name="oxf.fr.persistence.mysql.flat-view.max-identifier-length"      value="64"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.postgresql.uri"                             value="/fr/service/postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.postgresql.datasource"                      value="postgresql"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.create-flat-view"                value="false"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.flat-view.fully-qualified-names" value="false"/>
-    <property as="xs:integer" name="oxf.fr.persistence.postgresql.flat-view.max-identifier-length" value="63"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                    value="/fr/service/db2"/>
-    <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                             value="db2"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.db2.flat-view.fully-qualified-names"        value="false"/>
-    <property as="xs:integer" name="oxf.fr.persistence.db2.flat-view.max-identifier-length"        value="128"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                              value="/fr/service/sqlserver"/>
-    <property as="xs:string"  name="oxf.fr.persistence.sqlserver.datasource"                       value="sqlserver"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.flat-view.fully-qualified-names"  value="false"/>
-    <property as="xs:integer" name="oxf.fr.persistence.sqlserver.flat-view.max-identifier-length"  value="128"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.sqlite.uri"                                 value="/fr/service/sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.sqlite.datasource"                          value="sqlite"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.create-flat-view"                    value="false"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.flat-view.fully-qualified-names"     value="false"/>
-    <property as="xs:integer" name="oxf.fr.persistence.sqlite.flat-view.max-identifier-length"     value="256"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.filesystem.uri"                             value="/fr/service/filesystem"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                                            value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                                              value="/fr/service/oracle"/>
+    <property as="xs:string"  name="oxf.fr.persistence.oracle.datasource"                                       value="oracle"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.oracle.create-flat-view"                                 value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.oracle.flat-view.prefixes-in-main-view-column-names"     value="false"/>
+    <property as="xs:integer" name="oxf.fr.persistence.oracle.flat-view.max-identifier-length"                  value="128"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                                               value="/fr/service/mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                                        value="mysql"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.mysql.flat-view.prefixes-in-main-view-column-names"      value="false"/>
+    <property as="xs:integer" name="oxf.fr.persistence.mysql.flat-view.max-identifier-length"                   value="64"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.postgresql.uri"                                          value="/fr/service/postgresql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.postgresql.datasource"                                   value="postgresql"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.create-flat-view"                             value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.flat-view.prefixes-in-main-view-column-names" value="false"/>
+    <property as="xs:integer" name="oxf.fr.persistence.postgresql.flat-view.max-identifier-length"              value="63"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                                 value="/fr/service/db2"/>
+    <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                                          value="db2"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.db2.flat-view.prefixes-in-main-view-column-names"        value="false"/>
+    <property as="xs:integer" name="oxf.fr.persistence.db2.flat-view.max-identifier-length"                     value="128"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                                           value="/fr/service/sqlserver"/>
+    <property as="xs:string"  name="oxf.fr.persistence.sqlserver.datasource"                                    value="sqlserver"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.flat-view.prefixes-in-main-view-column-names"  value="false"/>
+    <property as="xs:integer" name="oxf.fr.persistence.sqlserver.flat-view.max-identifier-length"               value="128"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.sqlite.uri"                                              value="/fr/service/sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.sqlite.datasource"                                       value="sqlite"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.create-flat-view"                                 value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.flat-view.prefixes-in-main-view-column-names"     value="false"/>
+    <property as="xs:integer" name="oxf.fr.persistence.sqlite.flat-view.max-identifier-length"                  value="256"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.filesystem.uri"                                          value="/fr/service/filesystem"/>
 
     <!-- Whether providers support autosave -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.autosave"                                 value="false"/>

@@ -436,9 +436,9 @@ trait CreateUpdateDelete {
         if (createFlatView)
           withDebug("CRUD: creating flat view") {
 
-            val fullyQualifiedNames = FormRunner.providerPropertyAsBoolean(
+            val prefixesInMainViewColumnNames = FormRunner.providerPropertyAsBoolean(
               req.provider.entryName,
-              "flat-view.fully-qualified-names",
+              "flat-view.prefixes-in-main-view-column-names",
               default = true
             )
 
@@ -448,7 +448,7 @@ trait CreateUpdateDelete {
               default = FlatView.CompatibilityMaxIdentifierLength
             )
 
-            FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, fullyQualifiedNames, maxIdentifierLength)
+            FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, prefixesInMainViewColumnNames, maxIdentifierLength)
           }
       }
 

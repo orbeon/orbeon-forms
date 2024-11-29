@@ -59,35 +59,35 @@ private object FlatView {
   // - https://github.com/orbeon/orbeon-forms/issues/1069
   // - https://github.com/orbeon/orbeon-forms/issues/1571
   def createFlatViews(
-    req                : CrudRequest,
-    reqBodyOpt         : Option[RequestReader.Body],
-    version            : Int,
-    connection         : Connection,
-    fullyQualifiedNames: Boolean,
-    maxIdentifierLength: Int
+    req                          : CrudRequest,
+    reqBodyOpt                   : Option[RequestReader.Body],
+    version                      : Int,
+    connection                   : Connection,
+    prefixesInMainViewColumnNames: Boolean,
+    maxIdentifierLength          : Int
   )(implicit
-    externalContext    : ExternalContext
+    externalContext              : ExternalContext
   ): Unit =
     RequestReader.xmlDocument(reqBodyOpt).foreach { documentInfo =>
-      createFlatViewsForDocument(req, version, connection, documentInfo, fullyQualifiedNames, maxIdentifierLength)
+      createFlatViewsForDocument(req, version, connection, documentInfo, prefixesInMainViewColumnNames, maxIdentifierLength)
     }
 
   def createFlatViewsForDocument(
-    req                : CrudRequest,
-    version            : Int,
-    connection         : Connection,
-    documentInfo       : DocumentInfo,
-    fullyQualifiedNames: Boolean,
-    maxIdentifierLength: Int
+    req                          : CrudRequest,
+    version                      : Int,
+    connection                   : Connection,
+    documentInfo                 : DocumentInfo,
+    prefixesInMainViewColumnNames: Boolean,
+    maxIdentifierLength          : Int
   ): Unit =
     FlatView.views(documentInfo, req.provider, req.appForm, version).foreach { view =>
-      val viewName = view.name(fullyQualifiedNames, maxIdentifierLength)
+      val viewName = view.name(maxIdentifierLength)
 
       if (Provider.flatViewDelete(req.provider)) {
         deleteViewIfExists(req.provider, connection, viewName)
       }
 
-      val viewSelectQuery = view.sql(fullyQualifiedNames, maxIdentifierLength)
+      val viewSelectQuery = view.sql(prefixesInMainViewColumnNames, maxIdentifierLength)
       val createViewQuery = Provider.flatViewCreateView(req.provider, viewName, viewSelectQuery)
 
       useAndClose(connection.prepareStatement(createViewQuery))(_.executeUpdate())
@@ -184,9 +184,14 @@ private object FlatView {
     fullPath.drop(referencePath.size)
   }
 
-  case class ViewControl(name: String, relativePath: Seq[String], templateSectionNameOpt: Option[String]) {
-    def columnNamePath(fullyQualifiedNames: Boolean): Seq[String] =
-      if (fullyQualifiedNames)
+  case class ViewControl(
+    name                  : String,
+    relativePath          : Seq[String],
+    templateSectionNameOpt: Option[String]
+  ) {
+
+    def columnNamePath(prefixesInColumnNames: Boolean): Seq[String] =
+      if (prefixesInColumnNames)
         relativePath
       else
         templateSectionNameOpt.toSeq :+ name
@@ -204,8 +209,9 @@ private object FlatView {
     controls     : Seq[ViewControl]
   ) {
 
-    private def level: Int = parentViewOpt.map(_.level + 1).getOrElse(0)
-    private val tableAlias = s"view_$level"
+    private val mainView: Boolean  = parentViewOpt.isEmpty
+    private def level: Int         = parentViewOpt.map(_.level + 1).getOrElse(0)
+    private val tableAlias: String = s"view_$level"
 
     private val relativePath: Seq[String] = parentViewOpt match {
       case None         => formNode.path
@@ -215,15 +221,10 @@ private object FlatView {
     private val repetitionColumnNameOpt: Option[String] = formNode.nameOpt.map(name => xmlToSQLId(name + "_repetition"))
     private val repetitionColumnNames: Seq[String]      = parentViewOpt.toSeq.flatMap(_.repetitionColumnNames) ++ repetitionColumnNameOpt.toSeq
 
-    def name(fullyQualifiedNames: Boolean, maxIdentifierLength: Int): String = {
+    def name(maxIdentifierLength: Int): String = {
 
-      val viewParts = if (fullyQualifiedNames) {
-        // Include all segments from path relative to parent view (if any)
-        relativePath
-      } else {
-        // Only include name of section/grid
-        formNode.nameOpt.toSeq
-      }
+      // Only include name of section/grid (i.e. we never include the whole relative path to the parent view, if any)
+      val viewParts = formNode.nameOpt.toSeq
 
       TablePrefix + joinParts(
         (List(appForm.app, appForm.form, version.toString) ++ viewParts).map(xmlToSQLId),
@@ -231,15 +232,17 @@ private object FlatView {
       )
     }
 
-    def sql(fullyQualifiedNames: Boolean, maxIdentifierLength: Int): String = {
+    def sql(prefixesInMainViewColumnNames: Boolean, maxIdentifierLength: Int): String = {
+
+      val prefixesInColumnNames = prefixesInMainViewColumnNames && mainView
 
       val deduplicatedColumnNames = FlatView.deduplicatedColumnNames(
-        controls.map(_.columnNamePath(fullyQualifiedNames)),
+        controls.map(_.columnNamePath(prefixesInColumnNames)),
         maxIdentifierLength
       )
 
       val controlColumns = controls.map { control =>
-        val columnName = deduplicatedColumnNames(control.columnNamePath(fullyQualifiedNames))
+        val columnName = deduplicatedColumnNames(control.columnNamePath(prefixesInColumnNames))
 
         Column(Provider.flatViewExtractFunction(provider, tableAlias, control.xpath), Some(columnName))
       }

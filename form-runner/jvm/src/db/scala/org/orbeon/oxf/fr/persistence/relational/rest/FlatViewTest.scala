@@ -87,7 +87,7 @@ class FlatViewTest
 
     case class Data(doc: String, dataFile: String)
 
-    case class ExpectedResult(fullyQualifiedNames: Boolean, maxIdentifierLength: Int, views: Seq[View])
+    case class ExpectedResult(prefixesInMainViewColumnNames: Boolean, maxIdentifierLength: Int, views: Seq[View])
 
     case class View(
       providers             : Set[Provider] = Provider.FlatViewSupportedProviders,
@@ -110,7 +110,7 @@ class FlatViewTest
         ),
         Seq(
           ExpectedResult(
-            fullyQualifiedNames = true,
+            prefixesInMainViewColumnNames = true,
             maxIdentifierLength = FlatView.CompatibilityMaxIdentifierLength,
             Seq(
               View(
@@ -145,7 +145,7 @@ class FlatViewTest
         ),
         Seq(
           ExpectedResult(
-            fullyQualifiedNames = false,
+            prefixesInMainViewColumnNames = false,
             maxIdentifierLength = 63,
             Seq(
               View(
@@ -228,7 +228,22 @@ class FlatViewTest
         Seq(Data("1", "form-flat-views-long-name-data-1.xml")),
         Seq(
           ExpectedResult(
-            fullyQualifiedNames = false,
+            prefixesInMainViewColumnNames = false,
+            maxIdentifierLength = 128,
+            Seq(
+              View(
+                providers              = Set(Provider.Oracle, Provider.DB2, Provider.SQLServer),
+                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_3_1",
+                createdColumn          = true,
+                lastModifiedTimeColumn = true,
+                lastModifiedByColumn   = true,
+                columns                = Seq("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrst"),
+                values                 = Seq(Seq("1", "Value"))
+              )
+            )
+          ),
+          ExpectedResult(
+            prefixesInMainViewColumnNames = false,
             maxIdentifierLength = 64,
             Seq(
               View(
@@ -243,7 +258,7 @@ class FlatViewTest
             )
           ),
           ExpectedResult(
-            fullyQualifiedNames = false,
+            prefixesInMainViewColumnNames = false,
             maxIdentifierLength = 63,
             Seq(
               View(
@@ -308,7 +323,7 @@ class FlatViewTest
           form.version,
           connection,
           documentInfo(formURL, form.version),
-          expectedResult.fullyQualifiedNames,
+          expectedResult.prefixesInMainViewColumnNames,
           expectedResult.maxIdentifierLength
         )
 

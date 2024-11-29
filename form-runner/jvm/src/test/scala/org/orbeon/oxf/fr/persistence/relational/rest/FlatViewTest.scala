@@ -77,7 +77,7 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
       ).head
 
       val actual = FlatView.deduplicatedColumnNames(
-        view.controls.map(_.columnNamePath(fullyQualifiedNames = true)),
+        view.controls.map(_.columnNamePath(prefixesInColumnNames = true)),
         maxIdentifierLength = FlatView.CompatibilityMaxIdentifierLength
       ).toList.map(kv => kv._1.mkString("/") -> kv._2).sortBy(_._1)
 

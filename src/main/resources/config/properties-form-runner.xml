@@ -641,6 +641,7 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.lazy-section-relevance.*.*"           value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.full-update.*.*"                      value="true"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.allow-url-param.*.*"                  value="true"/>
+    <property as="xs:string" name="oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*"              value="always"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                   value="lax"/>
 

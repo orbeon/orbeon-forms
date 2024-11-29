@@ -172,20 +172,22 @@
                         <validate/>
                         <separate-toc/>
                         <section-status/>
+                        <visit-on-page-change/>
                     </_>
                 </xf:instance>
 
                 <xf:var name="local" value="instance('local')"/>
 
-                <xf:bind ref="@initialized"   type="xs:boolean" xxf:default="false()"/>
+                <xf:bind ref="@initialized"         type="xs:boolean" xxf:default="false()"/>
 
-                <xf:bind ref="validate"                         xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
-                <xf:bind ref="separate-toc"   type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'), 'false')[1]"/>
-                <xf:bind ref="section-status" type="xs:boolean" xxf:default="../separate-toc/data(.) or fr:component-param-value('section-status') = 'true'"/>
+                <xf:bind ref="validate"                               xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
+                <xf:bind ref="separate-toc"         type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'), 'false')[1]"/>
+                <xf:bind ref="section-status"       type="xs:boolean" xxf:default="../separate-toc/data(.) or fr:component-param-value('section-status') = 'true'"/>
+                <xf:bind ref="visit-on-page-change" type="xs:string"  xxf:default="fr:component-param-value('visit-on-page-change')"/>
 
-                <xf:bind ref="current-index"  type="xs:integer" xxf:default="1"/>
-                <xf:bind ref="show-toc"       type="xs:boolean" xxf:default="true()"/>
-                <xf:bind ref="show-body"      type="xs:boolean" xxf:default="not(../separate-toc/data(.))"/>
+                <xf:bind ref="current-index"        type="xs:integer" xxf:default="1"/>
+                <xf:bind ref="show-toc"             type="xs:boolean" xxf:default="true()"/>
+                <xf:bind ref="show-body"            type="xs:boolean" xxf:default="not(../separate-toc/data(.))"/>
 
                 <xf:instance id="available-top-level-sections" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                     <_/>
@@ -1146,7 +1148,10 @@
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-to-current" appearance="xxf:internal">
                                             <!-- NOTE: We visit the current page upon xforms-deselect too. -->
-                                            <xf:action event="fr-wizard-visit-all-to-current">
+                                            <xf:action
+                                                event="fr-wizard-visit-all-to-current"
+                                                if="not(xxf:instance('local')/visit-on-page-change = 'never')">
+
                                                 <!-- This is called upon "next". -->
                                                 <!-- The current section, since it is current, is obviously already
                                                      expanded. So we make sure we expand anything before it. -->
@@ -1422,6 +1427,7 @@
                                             <xf:dispatch
                                                 event="xforms-deselect"
                                                 target="#observer"
+                                                if="not(xxf:instance('local')/visit-on-page-change = ('never', 'only-forward'))"
 
                                                 name="fr-wizard-section-deselected"
                                                 targetid="fr-wizard-section-deselected">

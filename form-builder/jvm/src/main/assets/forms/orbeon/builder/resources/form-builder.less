@@ -762,7 +762,7 @@ body.orbeon {
         }
 
         .fb-settings-mode-new .tab-content {
-            &, & > div {
+            &, & > div.active {
               overflow: visible; // In new mode, the scrolling is done at the `.fb-template-cards-container` level
               display: flex;
               flex-direction: column;
@@ -833,6 +833,7 @@ body.orbeon {
             display: grid;
             min-height: 0;
             grid-template-columns: auto 1fr;
+            column-gap: 10px;
 
             &> .alert-error {
                 grid-row-start: 1;
@@ -846,9 +847,23 @@ body.orbeon {
                 grid-column-end: span 2;
             }
 
-            &> img {
-                grid-row-start: 3;
-                grid-column-start: 1;
+            &.fb-settings-mode-new {
+                &> .icon {
+                    grid-row-start: 3;
+                    grid-column-start: 1;
+
+                    font-size: 50px;
+                    font-family: sans-serif; // looks better (or at least a little different)  on OS X, what about other platforms?
+                    line-height: 50px;
+                    width: 50px;
+                    height: 50px;
+                    text-align: center;
+                    color: white;
+                    background-color: @textColor;
+                    padding: 10%;
+                    margin: 10px 10px 0 0;
+                    border-radius: 50%;
+                }
             }
 
             &> .xbl-fr-tabbable {

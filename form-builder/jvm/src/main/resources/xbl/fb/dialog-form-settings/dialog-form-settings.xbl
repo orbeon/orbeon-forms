@@ -337,7 +337,8 @@
             <!-- Save and close if valid -->
             <xbl:handler
                 event="DOMActivate"
-                observer="fb-app-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger">
+                observer="fb-app-name-input fb-form-name-input fb-title-input fb-continue-button"
+                if="$i/mode != 'new' or instance('navigation') = 'general'">
 
                 <xf:action if="$i/@valid = 'true'">
 
@@ -485,6 +486,17 @@
 
                 </xf:action>
             </xbl:handler>
+
+            <!-- Put his handler after the above handler, otherwise the above handler condition will be satisfied as we
+                 set `instance('navigation') = 'templates'`. -->
+            <xbl:handler
+                event="DOMActivate"
+                observer="fb-continue-button"
+                if="$i/mode = 'new' and instance('navigation') = 'templates'">
+                <xf:setfocus control="fb-general-settings-grid"/>
+                <xf:setvalue ref="instance('navigation')" value="'general'"/>
+            </xbl:handler>
+
             <xbl:handler observer="dialog" event="xxforms-dialog-close" phase="target">
                 <xf:action type="javascript">
                     ORBEON.xforms.XBL.instanceForControl(this).dialogClosing();
@@ -686,6 +698,10 @@
                     <_ i="" dynamic=""/>
                 </xf:instance>
 
+                <xf:instance id="navigation">
+                    <_>templates</_>
+                </xf:instance>
+
                 <xf:instance id="template-forms">
                     <_>
                         <_>
@@ -879,6 +895,7 @@
                         <in-progress-forms/>
                     </_>
                 </xf:instance>
+
                 <xf:submission
                     id="search-published-forms-submission"
                     method="get"
@@ -1013,7 +1030,17 @@
                             <a href="mailto:info@orbeon.com?subject=Form Builder Microsoft Browser Version">let us know</a>.
                         </xf:group>
 
-                        <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
+                        <!-- Show a number "icon" in new mode only -->
+                        <xf:output
+                            class="icon"
+                            value="
+                                if ($is-new-form) then
+                                    if (instance('navigation') = 'templates') then
+                                        1
+                                    else
+                                        2
+                                 else
+                                    ()"/>
 
                         <fr:tabbable id="fb-tabbable" class="fb-dialog-form-settings-fields">
                             <fr:tab visible="$is-new-form">
@@ -1022,7 +1049,8 @@
                                     <xf:output value="$resources/messages/select-template-output"/>
                                 </xh:p>
 
-                                <xh:div class="fb-template-cards-container">
+                                <!-- Make this an `xf:group` so we can focus on it -->
+                                <xf:group xxf:element="div" class="fb-template-cards-container" id="fb-template-cards-container">
                                     <xh:div class="fb-template-cards">
                                         <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
                                             <xh:div class="fb-template-card" title="{{title}}">
@@ -1057,7 +1085,7 @@
                                                     $i/original-app
                                                 )[1]"/>
                                     </xh:div>
-                                </xh:div>
+                                </xf:group>
 
                                 <!-- Languages are not separated, so we cannot see the description in the current language :( -->
                                 <xf:var
@@ -1077,10 +1105,11 @@
 
                             </fr:tab>
 
-                            <fr:tab visible="$is-app-form or $is-form-settings">
+                            <fr:tab visible="$is-new-form or $is-app-form or $is-form-settings">
+<!--                            <fr:tab visible="$is-app-form or $is-form-settings">-->
                                 <fr:label ref="$resources/general-settings[$is-form-settings]"/>
 
-                                <xh:div class="alert alert-{{if ($is-form-settings) then 'info' else 'error'}}">
+                                <xh:div class="alert alert-{{if ($is-new-form or $is-form-settings) then 'info' else 'error'}}">
                                     <xf:output value="$resources/messages/new-metadata-output" mediatype="text/html"/>
                                 </xh:div>
 
@@ -1697,7 +1726,7 @@
 
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
-                        <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary">
+                        <xf:trigger id="fb-continue-button" appearance="xxf:primary">
                             <xf:label mediatype="text/html" value="$resources/(if ($is-new-form or $is-app-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
@@ -1708,9 +1737,7 @@
                                 event="DOMActivate"
                                 if="not($is-new-form)"
                                 dialog="dialog"/>
-                            <!-- Or go back to the summary -->
-                            <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
-                                 window.close() in the old home/back button. But it's a bit unclear what's best. -->
+                            <!-- Or go back to the list of forms-->
                             <xf:action
                                 event="DOMActivate"
                                 if="$is-new-form"

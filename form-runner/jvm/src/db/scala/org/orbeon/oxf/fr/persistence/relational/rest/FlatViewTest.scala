@@ -229,21 +229,6 @@ class FlatViewTest
         Seq(
           ExpectedResult(
             prefixesInMainViewColumnNames = false,
-            maxIdentifierLength = 128,
-            Seq(
-              View(
-                providers              = Set(Provider.Oracle, Provider.DB2, Provider.SQLServer),
-                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_3_1",
-                createdColumn          = true,
-                lastModifiedTimeColumn = true,
-                lastModifiedByColumn   = true,
-                columns                = Seq("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrst"),
-                values                 = Seq(Seq("1", "Value"))
-              )
-            )
-          ),
-          ExpectedResult(
-            prefixesInMainViewColumnNames = false,
             maxIdentifierLength = 64,
             Seq(
               View(

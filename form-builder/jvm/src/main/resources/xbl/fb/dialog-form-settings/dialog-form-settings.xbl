@@ -1110,7 +1110,9 @@
                                 <fr:label ref="$resources/general-settings[$is-form-settings]"/>
 
                                 <xh:div class="alert alert-{{if ($is-new-form or $is-form-settings) then 'info' else 'error'}}">
-                                    <xf:output value="$resources/messages/new-metadata-output" mediatype="text/html"/>
+                                    <xf:output
+                                        value="if ($is-app-form) then $resources/messages/app-form-required else $resources/messages/app-form-optional"
+                                        mediatype="text/html"/>
                                 </xh:div>
 
                                 <fr:grid id="fb-general-settings-grid">

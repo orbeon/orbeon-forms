@@ -1183,9 +1183,9 @@
                                                         (
                                                             instance('fr-counts-instance')/in-progress-forms/xs:integer(.),
                                                             concat(
-                                                                '/fr/orbeon/builder/summary?fr-search-app',
+                                                                '/fr/orbeon/builder/summary?fr-search-app=exact:',
                                                                 bind('app-bind'),
-                                                                '&amp;fr-search-form=',
+                                                                '&amp;fr-search-form=exact:',
                                                                 bind('form-bind')
                                                             )
                                                         )

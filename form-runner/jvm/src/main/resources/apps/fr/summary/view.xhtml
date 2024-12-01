@@ -123,6 +123,9 @@
                     xxf:property(string-join(('oxf.fr.summary.show-version-selector', $app, $form), '.'))
                 "/>
 
+            <xf:var name="fr-search-app-param-opt"  value="if ($is-fb) then xxf:trim(xxf:get-request-parameter('fr-search-app')) [. != ''] else ()"/>
+            <xf:var name="fr-search-form-param-opt" value="if ($is-fb) then xxf:trim(xxf:get-request-parameter('fr-search-form'))[. != ''] else ()"/>
+
             <!-- NOTE: use xxf:cache="false" otherwise updates to the form won't work in the summary page -->
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
                  improve submissions to handle conditional GET as well when using caching. -->
@@ -352,13 +355,12 @@
                 <xf:bind
                     ref="$app-query/@match"
                     readonly="false()"
-                    calculate="if ($app-is-dropdown) then 'exact' else 'substring'"/>
+                    xxf:initial="if ($app-is-dropdown) then 'exact' else 'substring'"/>
                 <!-- Force exact query match if there is a form constraint -->
                 <xf:bind
                     ref="$form-query/@match"
                     readonly="false()"
-                    calculate="if ($form-is-dropdown) then 'exact' else 'substring'"/>
-
+                    xxf:initial="if ($form-is-dropdown) then 'exact' else 'substring'"/>
             </xf:bind>
 
             <xf:instance id="fr-bulk-edit-instance">
@@ -531,10 +533,68 @@
                     </xf:action>
                 </xf:action>
 
+                <!-- Form Builder only for now: set search parameters if they are on the URL -->
+                <xf:action if="$is-fb">
+
+                    <xf:var name="fr-search-app-tokens"     value="tokenize($fr-search-app-param-opt,  ':')"/>
+                    <xf:var name="fr-search-form-tokens"    value="tokenize($fr-search-form-param-opt, ':')"/>
+
+                    <xf:var name="fr-search-app-opt"        value="if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens[2]  else $fr-search-app-tokens[1]"/>
+                    <xf:var name="fr-search-form-opt"       value="if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[2] else $fr-search-form-tokens[1]"/>
+
+                    <xf:var name="fr-search-app-match-opt"  value="(if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens [1][. = ('exact', 'substring')] else (), 'substring')"/>
+                    <xf:var name="fr-search-form-match-opt" value="(if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[1][. = ('exact', 'substring')] else (), 'substring')"/>
+
+                    <!-- If we have a fr-search-app URL parameter, use it as a search option and show search options -->
+                    <!-- If the app value is constrained, make sure to check that the parameter is within the constraint -->
+                    <xf:action if="exists($fr-search-app-opt)">
+                        <xf:var
+                            name="app-in-bounds"
+                            value="not($app-is-dropdown) or $fr-search-app-opt = xxf:instance('fb-permissions')/app/@name"/>
+                        <xf:action if="$app-in-bounds">
+                            <xf:var
+                                name="query"
+                                value="
+                                    instance('fr-search-instance')/query[
+                                        ends-with(@path, '/application-name') and
+                                        @summary-search = 'true'
+                                    ]"/>
+                            <xf:setvalue
+                                ref="$query"
+                                value="$fr-search-app-opt"/>
+                            <xf:setvalue
+                                ref="$query/@match"
+                                value="$fr-search-app-match-opt"/>
+                            <!-- Assume that an app needs to be specified in order for a form to be specified -->
+                            <xf:action if="exists($fr-search-form-opt)">
+                                <xf:var
+                                    name="form-in-bounds"
+                                    value="not($form-is-dropdown) or xxf:instance('fb-permissions')/app[@name = $fr-search-app-opt]/form"/>
+                                <xf:var
+                                    name="query"
+                                    value="
+                                        instance('fr-search-instance')/query[
+                                            ends-with(@path, '/form-name') and
+                                            @summary-search = 'true'
+                                        ]"/>
+                                <xf:setvalue
+                                    if="$form-in-bounds"
+                                    ref="$query"
+                                    value="$fr-search-form-opt"/>
+                                <xf:setvalue
+                                    if="$form-in-bounds"
+                                    ref="$query/@match"
+                                    value="$fr-search-form-match-opt"/>
+                            </xf:action>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
+
                 <!-- Query initial list of documents -->
                 <xf:send submission="fr-summary-search-submission"/>
 
             </xf:action>
+
 
             <!-- 5. If roles are enabled but no role applies, the page is unauthorized.
                 NOTE: Do this upon `xforms-ready` because `fb-permissions` instance is not ready upon
@@ -544,6 +604,12 @@
                 if="$has-fb-roles and not($has-fb-roles-for-all-apps) and empty($initial-app-value)"
                 type="xpath">
                 frf:sendError(403)
+            </xf:action>
+
+            <xf:action
+                event="xforms-ready"
+                if="exists($fr-search-app-param-opt) or exists($fr-search-form-param-opt)">
+                <xf:toggle case="fr-search-options-case"/>
             </xf:action>
 
             <!-- Date range search logic -->
@@ -1262,7 +1328,7 @@
                                     <!-- Special form builder search: use input or select1 for app/form name -->
 
                                     <!-- Application -->
-                                    <xf:group ref="$app-query[not($app-is-dropdown)]" class="fr-search-item">
+                                    <xf:group ref="$app-query[not($app-is-dropdown)]" class="fr-search-item fr-application-name">
                                         <xf:var name="control-name" value="@name"/>
                                         <xf:var
                                             name="label"
@@ -1274,13 +1340,14 @@
                                                         @lang = xxf:instance('fr-language-instance')
                                                     ]/label"/>
                                         <xf:input ref=".">
-                                            <xf:label>
-                                                <xf:output mediatype="text/html" value="$label"/>
-                                            </xf:label>
+                                            <xf:label mediatype="text/html" value="$label"/>
                                         </xf:input>
+                                        <fr:checkbox-input ref="@match" selected-value="exact" deselected-value="substring">
+                                            <xf:hint appearance="minimal"/>
+                                        </fr:checkbox-input>
                                     </xf:group>
                                     <!-- Form -->
-                                    <xf:group ref="$form-query" class="fr-search-item">
+                                    <xf:group ref="$form-query" class="fr-search-item fr-form-name">
                                         <xf:var name="control-name" value="@name"/>
                                         <xf:var
                                             name="label"
@@ -1293,14 +1360,13 @@
                                                     ]/label"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
                                         <xf:input ref=".[not($form-is-dropdown)]">
-                                            <xf:label>
-                                                <xf:output mediatype="text/html" value="$label"/>
-                                            </xf:label>
+                                            <xf:label mediatype="text/html" value="$label"/>
                                         </xf:input>
+                                        <fr:checkbox-input ref="@match[not($form-is-dropdown)]" selected-value="exact" deselected-value="substring">
+                                            <xf:hint appearance="minimal"/>
+                                        </fr:checkbox-input>
                                         <xf:select1 ref=".[$form-is-dropdown]">
-                                            <xf:label>
-                                                <xf:output mediatype="text/html" value="$label"/>
-                                            </xf:label>
+                                            <xf:label mediatype="text/html" value="$label"/>
                                             <xf:itemset ref="$current-app/form">
                                                 <xf:label ref="@name"/>
                                                 <xf:value ref="@name"/>

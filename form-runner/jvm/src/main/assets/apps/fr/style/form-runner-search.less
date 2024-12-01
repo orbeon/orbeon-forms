@@ -91,6 +91,21 @@
 
         width: 215px;
 
+        &.fr-application-name, &.fr-form-name {
+          display: inline-flex;
+          align-items: end;
+          column-gap: 1em;
+
+          .xforms-select-appearance-full .xforms-help {
+            display: none; // curiously this displays part of the icon
+          }
+
+          > .xbl-fr-checkbox-input {
+            flex-basis: content; // try to make it take the minimum space
+            margin-bottom: .3em; // empirical to align with the input field
+          }
+        }
+
         .xforms-label {
           margin-bottom: 2px;
           display: block;

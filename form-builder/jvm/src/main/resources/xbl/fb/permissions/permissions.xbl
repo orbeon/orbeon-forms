@@ -427,7 +427,7 @@
                                                         ()
                                                     else if ($is-anyone) then
                                                         operations
-                                                    else if ($is-anyone-with-token) then
+                                                    else if ($is-anyone-with-token or $is-owner-group) then
                                                         ()
                                                     else if ($is-any-authenticated-user) then
                                                         if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then

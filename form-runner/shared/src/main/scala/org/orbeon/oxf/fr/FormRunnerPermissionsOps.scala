@@ -60,7 +60,7 @@ trait FormRunnerPermissionsOps {
       normalized = true
     ).mkString(" ")
 
-  // 2023-03-08: Used by Summary and legacy eXist code
+  // 2024-12-02: Used by the Summary page.
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] = {
     implicit val logger: IndentedLogger =

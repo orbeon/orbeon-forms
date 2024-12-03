@@ -34,21 +34,23 @@
         .focusHighlight();
     }
 
-    // 2022-09-08: These don't work anymore in `inline` mode as the TOC is placed under `<body>`.
-    .tox .tox-tbtn {
-        height: 25px;                   // Make icons smaller
-        margin: 3px 0 3px 0;            // Default margin isn't the same on top and bottom
-    }
-    .tox .tox-toolbar__primary {
-        border-bottom: 1px solid #ccc;  // Line below the icons, which other doesn't show with smaller icons
-    }
-
     .tox-tinymce {
         border-radius: @baseBorderRadius;             // Slightly rounded border, like we do for other controls
     }
 }
 
 body {
+    .tox .tox-tbtn {
+        height: 25px;                   // Make icons smaller
+        margin: 3px 0 3px 0;            // Default margin isn't the same on top and bottom
+    }
+
+    .tox .tox-toolbar__primary {
+        &, & > div {
+          flex-wrap: nowrap;            // Don't wrap toolbar buttons when page is zoomed in or zoomed out
+        }
+    }
+
     .xforms-dialog .tox-tinymce--toolbar-sticky-off {
         // For the `top` and `left` to be relative to the viewport, not the dialog,
         // as TinyMCE sets those assuming the toolbar is in the document body.

@@ -344,10 +344,10 @@ trait FormRunnerActionsCommon {
       dispatch(name = "fr-reload", targetId = "fr-view-component")
     }
 
-  private val StateParams = List[(String, (() => String, String => Boolean))](
-    frc.LanguageParam    -> (() => frc.currentLang,                                           _ => false ),
-    EmbeddableParam      -> (() => inScopeContainingDocument.isEmbeddedFromUrlParam.toString, _ == true.toString),
-    frc.FormVersionParam -> (() => FormRunnerParams().formVersion.toString,                   _ => false )
+  private val StateParams = List[(String, () => String, String => Boolean)](
+    (frc.LanguageParam   , () => frc.currentLang                                          , _ => false),
+    (EmbeddableParam     , () => inScopeContainingDocument.isEmbeddedFromUrlParam.toString, _ == true.toString),
+    (frc.FormVersionParam, () => FormRunnerParams().formVersion.toString                  , _ => false)
   )
 
   protected val StateParamNames = StateParams.map(_._1).toSet
@@ -367,7 +367,7 @@ trait FormRunnerActionsCommon {
 
       val newParams =
         for {
-          (name, (valueFromCurrent, keepValue)) <- StateParams
+          (name, valueFromCurrent, keepValue) <- StateParams
           valueFromPath                         = params collectFirst { case (`name`, v) => v }
           effectiveValue                        = valueFromPath getOrElse valueFromCurrent()
           if ! forNavigate || forNavigate && (valueFromPath.isDefined || keepValue(effectiveValue)) // keep parameter if explicit!

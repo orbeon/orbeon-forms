@@ -151,7 +151,7 @@ trait FormRunnerActions
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )
 
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE, path, sourceModeType = formRunnerParams.modeType)
+      tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
     }
 
   def trySend(params: ActionParams): ActionResult = {
@@ -344,7 +344,7 @@ trait FormRunnerActions
     }
 
   private def tryChangeMode(
-    replace            : String,
+    replace            : ReplaceType,
     path               : String,
     sourceModeType     : ModeType,
     formTargetOpt      : Option[String] = None,
@@ -354,7 +354,7 @@ trait FormRunnerActions
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
     trySendImpl(
       SendActionParams(
-        uri                 = prependUserAndStandardParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false), currentDataFormatVersion),
+        uri                 = prependCommonFormRunnerParameters(prependUserAndStandardParamsForModeChange(path, currentDataFormatVersion), forNavigate = false),
         method              = HttpMethod.POST,
         relevanceHandling   = RelevanceHandling.Keep,
         annotateWith        = Set.empty,
@@ -365,7 +365,7 @@ trait FormRunnerActions
         dataFormatVersion   = currentDataFormatVersion,
         pruneMetadata       = false,
         pruneTmpAttMetadata = false,
-        replace             = ReplaceType.All,
+        replace             = replace,
         headersOpt          = None,
         serialization       = ContentTypes.XmlContentType,
         binaryContentUrlOpt = None,
@@ -378,13 +378,13 @@ trait FormRunnerActions
   def tryNavigateToReview(params: ActionParams): ActionResult =
     ActionResult.trySync {
       val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
+      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
     }
 
   def tryNavigateToEdit(params: ActionParams): ActionResult =
     ActionResult.trySync {
       val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
+      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
     }
 
   def tryOpenRenderedFormat(params: ActionParams): ActionResult =
@@ -420,7 +420,7 @@ trait FormRunnerActions
         }
 
       tryChangeMode(
-        replace            = XFORMS_SUBMIT_REPLACE_ALL,
+        replace            = ReplaceType.All,
         path               = path,
         sourceModeType     = frParams.modeType,
         showProgress       = false,
@@ -542,7 +542,7 @@ trait FormRunnerActions
               currentFormLang = currentFormLang
             )
 
-          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE, path, sourceModeType = frParams.modeType).get
+          tryChangeMode(ReplaceType.Instance, path, sourceModeType = frParams.modeType).get
 
           locally {
 

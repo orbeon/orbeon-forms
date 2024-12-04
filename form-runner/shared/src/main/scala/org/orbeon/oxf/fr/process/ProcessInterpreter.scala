@@ -130,11 +130,10 @@ trait ProcessInterpreter extends Logging {
       def runAction(action: ActionNode): InternalActionResult =
         withDebug("process: running action", List("action" -> action.toString)) {
 
-          val actionResult = (
+          val actionResult =
             AllAllowedActions
-            getOrElse (action.name, (_: ActionParams) => tryProcess(Map(Some("name") -> action.name)))
-            apply     action.params
-          )
+              .getOrElse(action.name, (_: ActionParams) => tryProcess(Map(Some("name") -> action.name)))
+              .apply(action.params)
 
           actionResult match {
             case r @ ActionResult.Sync(Success(_)) =>

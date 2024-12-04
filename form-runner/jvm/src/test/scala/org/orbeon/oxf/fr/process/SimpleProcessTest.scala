@@ -148,7 +148,7 @@ extends DocumentTestBase
       it(s"must pass with `$process/$context`") {
         interpreter.xpathContext = context
         interpreter.runProcessByName("", process)
-        assert(interpreter.savedProcess.contains((ConstantProcessId, normalize(continuation))))
+        assert(interpreter.savedProcess.contains((ConstantProcessId, continuation)))
         assert(trace == interpreter.trace)
         interpreter.runProcess("", "resume") match {
           case Left(t)  => t.get
@@ -160,8 +160,8 @@ extends DocumentTestBase
 
   describe("renderedFormatParametersSelection") {
 
-    import FormRunnerRenderedFormat._
-    import org.orbeon.scaxon.NodeConversions._
+    import FormRunnerRenderedFormat.*
+    import org.orbeon.scaxon.NodeConversions.*
 
     val Tests = List[(String, NodeInfo, ActionParams, String, List[(String, String)])](
       (

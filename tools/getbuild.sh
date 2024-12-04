@@ -41,9 +41,6 @@ if $extract; then
   base_name=${zip_file%.zip}
   echo "Extracting ${base_name}/orbeon.war to current directory..."
   unzip -j -q "${zip_file}" "${base_name}/orbeon.war"
-  rm -rf orbeon
-  unzip -q -d orbeon orbeon.war
-  rm orbeon.war
 fi
 
 # Clean up if -c flag was provided

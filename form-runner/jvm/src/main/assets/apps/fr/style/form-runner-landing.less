@@ -59,10 +59,12 @@ html {
     }
 
     .card .list-group-item {
-        padding: 0;
+        padding: 0.5em 1em;
         a {
             display: block;
-            padding: 0.5em 1em;
+            padding: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         &:has(a:focus-visible) {
             box-shadow: 0 0 0 0.2rem inset @focusHighlightColor;

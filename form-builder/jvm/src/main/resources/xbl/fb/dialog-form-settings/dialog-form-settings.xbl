@@ -1119,7 +1119,7 @@
                                     <fr:c x="1" y="1" w="6" h="1">
                                         <!-- Application name -->
                                         <!-- Use an input if app name is a wildcard -->
-                                        <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off" autofocus="true">
+                                        <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off" autofocus="true" incremental="true">
                                             <xf:label ref="$resources/application-name/label"/>
                                             <xf:hint ref="$resources/application-name/hint"/>
                                             <xf:help ref="$resources/application-name/help" mediatype="text/html"/>
@@ -1140,7 +1140,7 @@
                                     </fr:c>
                                     <fr:c x="7" y="1" w="6" h="1">
                                         <!-- Form name -->
-                                        <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
+                                        <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off" incremental="true">
                                             <xf:label ref="$resources/form-name/label"/>
                                             <xf:hint ref="$resources/form-name/hint"/>
                                             <xf:help ref="$resources/form-name/help" mediatype="text/html"/>
@@ -1153,7 +1153,7 @@
                                                 id="no-form-alert-external"
                                                 for="fb-form-name-input"
                                                 validation="no-form-alert-constraint"
-                                                value="xxf:r('form-name.no-form-alert', '|fr-form-resources|'),"/>
+                                                value="xxf:r('form-name.no-form-alert', '|fr-form-resources|')"/>
                                             <xf:alert
                                                 id="form-published-alert-external"
                                                 for="fb-form-name-input"

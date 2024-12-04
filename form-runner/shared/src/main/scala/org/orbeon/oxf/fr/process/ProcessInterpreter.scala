@@ -118,7 +118,9 @@ trait ProcessInterpreter extends Logging {
         }
 
       // Continuation is either empty or starts with a combinator. We prepend the (always successful) "nop".
-      val serializedContinuation = "nop" :: continuation mkString ("(", " ", ")")
+      // Don't add parentheses around the continuation: adding parentheses changes the meaning of the expression:
+      // https://github.com/orbeon/orbeon-forms/issues/6639
+      val serializedContinuation = ("nop" :: continuation).mkString(" ")
       (process.processId, serializedContinuation)
     }
 

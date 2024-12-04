@@ -18,7 +18,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
-import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
+import org.orbeon.oxf.fr.process.ProcessParser.Combinator
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils.*
@@ -129,7 +129,7 @@ trait SimpleProcessCommon
         RollbackContent(
           data           = NodeInfoConversions.getNodeFromNodeInfoConvert(formInstance.root).deepCopy.asInstanceOf[Document], // ugly way to copy
           saveStatus     = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement elemValue "data-status"),
-          autoSaveStatus = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement / "autosave" / "status" stringValue)
+          autoSaveStatus = DataStatus.withNameInsensitiveOption((persistenceInstance.rootElement / "autosave" / "status").stringValue)
         )
       )
 
@@ -170,7 +170,7 @@ trait SimpleProcessCommon
   private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
 
     def booleanPropertySet(name: String) = booleanFormRunnerProperty(name)
-    def stringPropertySet (name: String) = formRunnerProperty(name) flatMap trimAllToOpt isDefined
+    def stringPropertySet (name: String) = formRunnerProperty(name).flatMap(trimAllToOpt).isDefined
 
     buttonName match {
       case "workflow-send" =>
@@ -181,15 +181,15 @@ trait SimpleProcessCommon
         val buffer = ListBuffer[String]()
 
         buffer += "require-uploads"
-        buffer += ThenCombinator.name
+        buffer += Combinator.Then.name
         buffer += "require-valid"
-        buffer += ThenCombinator.name
+        buffer += Combinator.Then.name
         buffer += "save"
-        buffer += ThenCombinator.name
+        buffer += Combinator.Then.name
         buffer += """success-message("save-success")"""
 
         if (isLegacySendEmail) {
-          buffer += ThenCombinator.name
+          buffer += Combinator.Then.name
           buffer += "email"
         }
 
@@ -198,12 +198,12 @@ trait SimpleProcessCommon
 
         // Workaround is to change config from oxf.fr.detail.send.pdf = true to oxf.fr.detail.send.success.content = "pdf-url"
         if (isLegacyNavigateSuccess) {
-          buffer += ThenCombinator.name
+          buffer += Combinator.Then.name
           buffer += """send("oxf.fr.detail.send.success")"""
         }
 
         if (isLegacyNavigateError) {
-          buffer += RecoverCombinator.name
+          buffer += Combinator.Recover.name
           buffer += """send("oxf.fr.detail.send.error")"""
         }
 

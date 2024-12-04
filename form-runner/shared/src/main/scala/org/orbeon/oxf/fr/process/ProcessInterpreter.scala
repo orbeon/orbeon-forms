@@ -187,7 +187,7 @@ trait ProcessInterpreter extends Logging {
             val newActionResult =
               withStackFrame(group, pos) {
                 nextCombinator match {
-                  case ThenCombinator =>
+                  case Combinator.Then =>
                     debug("process: combining with then", List("action" -> nextExpr.toString))
                     tried match {
                       case Success(_) =>
@@ -195,7 +195,7 @@ trait ProcessInterpreter extends Logging {
                       case Failure(_) =>
                         previousActionResult
                     }
-                  case RecoverCombinator =>
+                  case Combinator.Recover =>
                     debug("process: combining with recover", List("action" -> nextExpr.toString))
                     tried match {
                       case Success(_) =>

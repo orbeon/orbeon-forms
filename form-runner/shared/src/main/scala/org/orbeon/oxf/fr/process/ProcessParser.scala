@@ -66,7 +66,7 @@ class ProcessParser(val input: ParserInput) extends Parser {
   }
 
   def Combinator: Rule1[Combinator] = rule {
-    capture(ThenCombinator.name | RecoverCombinator.name) ~> CombinatorsByName
+    capture(ProcessParser.Combinator.Then.name | ProcessParser.Combinator.Recover.name) ~> CombinatorsByName
   }
 
   def Character     = rule { EscapedChar | NormalChar }
@@ -83,11 +83,13 @@ object ProcessParser {
 
   // Combinators
   sealed abstract class Combinator(val name: String)
-  case object ThenCombinator    extends Combinator("then")
-  case object RecoverCombinator extends Combinator("recover")
+  object Combinator {
+    case object Then    extends Combinator("then")
+    case object Recover extends Combinator("recover")
+  }
 
   val CombinatorsByName: Map[String, Combinator] =
-    List(ThenCombinator, RecoverCombinator).map(c => c.name -> c).toMap
+    List(Combinator.Then, Combinator.Recover).map(c => c.name -> c).toMap
 
   private def quote(s: String) =
     "\"" + escapeJava(s) + "\""
@@ -131,11 +133,9 @@ object ProcessParser {
     def serialize: String = "if (" + quote(xpath) + ") then " + thenBranch.serialize + serializeElse
   }
 
-  def parse(process: String): GroupNode = {
-    val parsingResult = new ProcessParser(process).Process.run()
-    parsingResult match {
+  def parse(process: String): GroupNode =
+     new ProcessParser(process).Process.run() match {
       case Success(astRoot) => astRoot
       case Failure(t)       => throw t
     }
-  }
 }

@@ -28,7 +28,7 @@ import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.util.concurrent.ConcurrentLinkedQueue
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Failure, Success, Try}
@@ -71,7 +71,7 @@ trait TestProcessInterpreter extends ProcessInterpreter {
   override def extensionActions: Iterable[(String, Action)] =
     (1 to 20 map ("a" + _) map (name => name -> mySuccessAction(name) _))
 
-  protected val _trace = ListBuffer[String]()
+  protected val _trace = mutable.ListBuffer[String]()
   def trace: String = _trace mkString " "
 
   def mySuccessAction(name: String)(params: ActionParams): ActionResult =
@@ -85,10 +85,7 @@ extends DocumentTestBase
    with ResourceManagerSupport // access to resources is needed because `XPathCache` needs the default cache size
    with AnyFunSpecLike {
 
-
-  def normalize(s: String) = "(" + s.trimAllToEmpty + ")"
-
-  describe("serialization") {
+  describe("Serialization") {
 
     val processes = Seq(
       """save""",
@@ -97,13 +94,16 @@ extends DocumentTestBase
       """if ("//secret = 42") then success-message(message = "yea") else error-message(message = "nay")"""
     )
 
+    // Because `parse()` creates a top-leve group
+    def parenthesize(s: String): String = "(" + s.trimAllToEmpty + ")"
+
     for (p <- processes)
       it(s"must pass with `$p`") {
-        assert(normalize(p) === parse(p).serialize)
+        assert(parenthesize(p) == parse(p).serialize)
       }
   }
 
-  describe("invalid") {
+  describe("Invalid processes") {
     val processes = Seq(
       """if ("xpath") then a1 then a2 else a3""",
       """if ("xpath") a1 then a2"""
@@ -115,7 +115,7 @@ extends DocumentTestBase
       }
   }
 
-  describe("suspendResume") {
+  describe("`suspend`/`resume`") {
 
     val interpreter = new TestProcessInterpreter {
 
@@ -158,7 +158,7 @@ extends DocumentTestBase
     }
   }
 
-  describe("renderedFormatParametersSelection") {
+  describe("Rendered format parameters selection") {
 
     import FormRunnerRenderedFormat.*
     import org.orbeon.scaxon.NodeConversions.*
@@ -269,7 +269,7 @@ extends DocumentTestBase
     for ((description, elem, params, defaultLang, expected) <- Tests)
       it(s"must pass with $description") {
         assert(
-          expected ===
+          expected ==
             createPdfOrTiffParams(
               Some(elem),
               params,
@@ -279,7 +279,7 @@ extends DocumentTestBase
       }
   }
 
-  describe("submitContinuation") {
+  describe("`submitContinuation()` function") {
 
     val MyAsyncSuccessAction = "my-async-success"
     val MyAsyncFailureAction = "my-async-failure"

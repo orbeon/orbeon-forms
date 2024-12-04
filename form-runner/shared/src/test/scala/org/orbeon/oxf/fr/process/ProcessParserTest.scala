@@ -14,7 +14,7 @@ class ProcessParserTest extends AnyFunSpec {
         GroupNode(
           ActionNode("validate", Map()),
           List(
-            (ThenCombinator, ActionNode("save", Map()))
+            (Combinator.Then, ActionNode("save", Map()))
           )
         )
       ),
@@ -28,11 +28,11 @@ class ProcessParserTest extends AnyFunSpec {
         GroupNode(
           ActionNode("require-uploads", Map()),
           List(
-            (ThenCombinator,    ActionNode("validate-all",    Map())),
-            (ThenCombinator,    ActionNode("save",            Map())),
-            (ThenCombinator,    ActionNode("new-to-edit",     Map())),
-            (ThenCombinator,    ActionNode("success-message", Map(None -> "save-success"))),
-            (RecoverCombinator, ActionNode("error-message",   Map(None -> "database-error")))
+            (Combinator.Then,    ActionNode("validate-all",    Map())),
+            (Combinator.Then,    ActionNode("save",            Map())),
+            (Combinator.Then,    ActionNode("new-to-edit",     Map())),
+            (Combinator.Then,    ActionNode("success-message", Map(None -> "save-success"))),
+            (Combinator.Recover, ActionNode("error-message",   Map(None -> "database-error")))
           )
         )
       ),
@@ -56,7 +56,7 @@ class ProcessParserTest extends AnyFunSpec {
         GroupNode(
           ActionNode("success-message", Map(None -> "save-success")),
           List(
-            (RecoverCombinator, ActionNode("error-message",   Map(None -> "database-error")))
+            (Combinator.Recover, ActionNode("error-message",   Map(None -> "database-error")))
           )
         )
       ),

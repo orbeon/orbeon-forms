@@ -218,7 +218,10 @@ object FormRunnerRenderedFormat {
 
       def langParamForPdfAutomatic = {
         val lang = paramByNameUseAvt(params, "lang") getOrElse defaultLang
-        List("fr-remember-language" -> false.toString, LanguageParam -> lang)
+        List(
+          "fr-remember-language" -> false.toString,
+          LanguageParam -> lang
+        )
       }
 
       pdfTemplateOpt match {

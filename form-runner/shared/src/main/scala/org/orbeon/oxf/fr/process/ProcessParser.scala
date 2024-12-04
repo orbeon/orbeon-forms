@@ -87,7 +87,7 @@ object ProcessParser {
   case object RecoverCombinator extends Combinator("recover")
 
   val CombinatorsByName: Map[String, Combinator] =
-    Seq(ThenCombinator, RecoverCombinator) map (c => c.name -> c) toMap
+    List(ThenCombinator, RecoverCombinator).map(c => c.name -> c).toMap
 
   private def quote(s: String) =
     "\"" + escapeJava(s) + "\""

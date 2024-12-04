@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future, Promise}
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 
 object TestProcessInterpreter {
@@ -281,16 +281,24 @@ extends DocumentTestBase
 
   describe("submitContinuation") {
 
-    val Interpreter = new TestProcessInterpreter {
+    val MyAsyncSuccessAction = "my-async-success"
+    val MyAsyncFailureAction = "my-async-failure"
 
-      val processes = Map(
-        "my-process" -> """a1 then a2 then my-async then a3 then my-async then a4""",
-      )
+    val MyProcesses = Map(
+      "my-process"              -> s"""a1 then a2 then $MyAsyncSuccessAction(v = "after a2") then a3 then $MyAsyncSuccessAction(v = "after a3") then a4""",
+      "my-process-with-failure" -> s"""a1 then a2 then $MyAsyncFailureAction(v = "after a2") then a3 then $MyAsyncSuccessAction(v = "after a3") then a4 recover $MyAsyncSuccessAction(v = "after a4") then a5 then a6""",
+    )
 
-      override def findProcessByName(scope: String, name: String): Option[String] = processes.get(name)
+    class ContinuationTestProcessInterpreter extends TestProcessInterpreter {
+
+      override def findProcessByName(scope: String, name: String): Option[String] = MyProcesses.get(name)
 
       override def extensionActions: List[(String, Action)] =
-        super.extensionActions ++: (("my-async" -> myASyncAction("my-async") _) :: Nil)
+        super.extensionActions ++: (
+          (MyAsyncSuccessAction -> myASyncAction(MyAsyncSuccessAction, Success(())) _) ::
+          (MyAsyncFailureAction -> myASyncAction(MyAsyncFailureAction, Failure(new IllegalArgumentException)) _) ::
+          Nil
+        )
 
       val completionQueue = new ConcurrentLinkedQueue[(Try[Any] => Either[Try[Any], Future[Any]], Promise[Any], Try[Any])]
       var pendingList     = List.empty[Future[Any]]
@@ -329,36 +337,58 @@ extends DocumentTestBase
         }
       }
 
-      def myASyncAction(name: String)(params: ActionParams): ActionResult =
+      def myASyncAction[T](name: String, continuationResult: Try[T])(params: ActionParams): ActionResult =
         ActionResult.tryAsync {
 
-          _trace += name
+          _trace += s"$name-start"
 
-          val io = IO(42)
+          val io = IO(params.getOrElse(Some("v"), throw new IllegalArgumentException))
 
-          def continuation(t: Try[Int]): Try[Any] = {
-            _trace += s"async-continuation($t)"
-            Success(())
+          def continuation(t: Try[String]): Try[Any] = {
+            _trace += s"$name-continuation($t)"
+            continuationResult
           }
 
           (io, continuation _)
         }
     }
 
-    it(s"must pass process with async action and continuations") {
+    it(s"must pass process with async action and continuations that return a `Success`") {
+
+      val Interpreter = new ContinuationTestProcessInterpreter
 
       Interpreter.xpathContext = null
       Interpreter.runProcessByName("", "my-process")
 
-      assert("a1 a2 my-async" == Interpreter.trace)
+      assert(s"a1 a2 $MyAsyncSuccessAction-start" == Interpreter.trace)
       assert(Interpreter.pendingList.nonEmpty)
 
       Interpreter.awaitResultAndProcessSingleBatch()
-      assert("a1 a2 my-async async-continuation(Success(42)) a3 my-async" == Interpreter.trace)
+      assert(s"a1 a2 $MyAsyncSuccessAction-start $MyAsyncSuccessAction-continuation(Success(after a2)) a3 $MyAsyncSuccessAction-start" == Interpreter.trace)
       assert(Interpreter.pendingList.nonEmpty)
 
       Interpreter.awaitResultAndProcessSingleBatch()
-      assert("a1 a2 my-async async-continuation(Success(42)) a3 my-async async-continuation(Success(42)) a4" == Interpreter.trace)
+      assert(s"a1 a2 $MyAsyncSuccessAction-start $MyAsyncSuccessAction-continuation(Success(after a2)) a3 $MyAsyncSuccessAction-start $MyAsyncSuccessAction-continuation(Success(after a3)) a4" == Interpreter.trace)
+      assert(Interpreter.pendingList.isEmpty)
+    }
+
+    it(s"must pass process with async action and continuations that returns a `Failure`") {
+
+      val Interpreter = new ContinuationTestProcessInterpreter
+
+      Interpreter.xpathContext = null
+      Interpreter.runProcessByName("", "my-process-with-failure")
+
+      assert(s"a1 a2 $MyAsyncFailureAction-start" == Interpreter.trace)
+      assert(Interpreter.pendingList.nonEmpty)
+
+      Interpreter.awaitResultAndProcessSingleBatch()
+      assert(s"a1 a2 $MyAsyncFailureAction-start $MyAsyncFailureAction-continuation(Success(after a2)) $MyAsyncSuccessAction-start" == Interpreter.trace)
+      assert(Interpreter.pendingList.nonEmpty)
+
+      Interpreter.awaitResultAndProcessSingleBatch()
+      assert(s"a1 a2 $MyAsyncFailureAction-start $MyAsyncFailureAction-continuation(Success(after a2)) $MyAsyncSuccessAction-start $MyAsyncSuccessAction-continuation(Success(after a4)) a5 a6" == Interpreter.trace)
+      assert(Interpreter.pendingList.isEmpty)
     }
   }
 }

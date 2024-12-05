@@ -113,20 +113,38 @@
                 <!-- Don't keep potentially large instances -->
                 <xf:insert ref="instance('fr-form')" origin="xf:element('_')"/>
 
-                <xf:var name="fr-search-app-opt"  value="xxf:trim(xxf:get-request-parameter('fr-search-app'))[. != '']"/>
-                <xf:var name="fr-search-form-opt" value="xxf:trim(xxf:get-request-parameter('fr-search-form'))[. != '']"/>
+                <xf:var name="fr-search-app-param-opt"  value="xxf:trim(xxf:get-request-parameter('fr-search-app'))[. != '']"/>
+                <xf:var name="fr-search-form-param-opt" value="xxf:trim(xxf:get-request-parameter('fr-search-form'))[. != '']"/>
+
+                <!-- TODO: avoid duplication with Summary page -->
+                <xf:var name="fr-search-app-tokens"     value="tokenize($fr-search-app-param-opt,  ':')"/>
+                <xf:var name="fr-search-form-tokens"    value="tokenize($fr-search-form-param-opt, ':')"/>
+
+                <xf:var name="fr-search-app-opt"        value="if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens[2]  else $fr-search-app-tokens[1]"/>
+                <xf:var name="fr-search-form-opt"       value="if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[2] else $fr-search-form-tokens[1]"/>
+
+                <xf:var name="fr-search-app-match"      value="(if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens [1][. = ('exact', 'substring')] else (), 'substring')"/>
+                <xf:var name="fr-search-form-match"     value="(if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[1][. = ('exact', 'substring')] else (), 'substring')"/>
 
                 <xf:action if="instance()/request-parameters-loaded = 'false'">
 
                     <!-- If we have a search URL parameters, use it as a search option and show search options -->
-                    <xf:setvalue
-                        if="exists($fr-search-app-opt)"
-                        ref="instance()/search-options/local/application-name"
-                        value="$fr-search-app-opt"/>
-                    <xf:setvalue
-                        if="exists($fr-search-form-opt)"
-                        ref="instance()/search-options/local/form-name"
-                        value="$fr-search-form-opt"/>
+                    <xf:action if="exists($fr-search-app-opt)">
+                        <xf:setvalue
+                            ref="instance()/search-options/local/application-name"
+                            value="$fr-search-app-opt"/>
+                        <xf:setvalue
+                            ref="instance()/search-options/local/application-name/@match"
+                            value="$fr-search-app-match"/>
+                    </xf:action>
+                    <xf:action if="exists($fr-search-form-opt)">
+                        <xf:setvalue
+                            ref="instance()/search-options/local/form-name"
+                            value="$fr-search-form-opt"/>
+                        <xf:setvalue
+                            ref="instance()/search-options/local/form-name/@match"
+                            value="$fr-search-form-match"/>
+                    </xf:action>
                     <xf:action if="exists($fr-search-app-opt) or exists($fr-search-form-opt)">
                         <xf:toggle case="fr-search-options-shown"/>
                     </xf:action>
@@ -218,8 +236,8 @@
                             <last-modified-after/>
                             <last-modified-before/>
                             <last-modified-by/>
-                            <application-name/>
-                            <form-name/>
+                            <application-name match="substring"/>
+                            <form-name match="substring"/>
                             <form-version/>
                             <title/>
                         </local>
@@ -489,6 +507,10 @@
                         <xf:setvalue
                             ref="$queries/local/filter[@metadata = $field]"
                             value="$search-options/local/*[local-name() = $field]"/>
+                        <xf:setvalue
+                            iterate="$search-options/local/*[local-name() = $field]/@match"
+                            ref="$queries/local/filter[@metadata = $field]/@match"
+                            value="context()"/>
                     </xf:action>
 
                     <!-- Remote filters -->
@@ -866,7 +888,14 @@
                         <!-- Search also when dropdown value changes -->
                         <xf:dispatch
                             event="xforms-value-changed"
-                            target="status-select-local status-select-remote last-modified-select-local last-modified-select-remote last-modified-after-local last-modified-after-remote last-modified-before-local last-modified-before-remote form-version-select"
+                            target="
+                                status-select-local        status-select-remote
+                                last-modified-select-local last-modified-select-remote
+                                last-modified-after-local  last-modified-after-remote
+                                last-modified-before-local last-modified-before-remote
+                                form-version-select
+                                fr-application-name-match  fr-form-name-match
+                            "
                             name="fr-initialize"
                             targetid="fr-form-model">
 
@@ -1377,20 +1406,22 @@
                                         <xh:fieldset class="fr-search-options">
                                             <xh:legend><xf:output ref="$fr-resources/home/titles/form-identification"/></xh:legend>
 
-                                            <xf:group ref="$search-options/local/application-name" class="fr-search-item">
+                                            <xf:group ref="$search-options/local/application-name" class="fr-search-item fr-application-name">
                                                 <xf:input ref=".">
-                                                    <xf:label>
-                                                        <xf:output mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
-                                                    </xf:label>
+                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
                                                 </xf:input>
+                                                <fr:checkbox-input ref="@match" selected-value="exact" deselected-value="substring" id="fr-application-name-match">
+                                                    <xf:hint appearance="minimal"/>
+                                                </fr:checkbox-input>
                                             </xf:group>
 
-                                            <xf:group ref="$search-options/local/form-name" class="fr-search-item">
+                                            <xf:group ref="$search-options/local/form-name" class="fr-search-item fr-form-name">
                                                 <xf:input ref=".">
-                                                    <xf:label>
-                                                        <xf:output mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
-                                                    </xf:label>
+                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
                                                 </xf:input>
+                                                <fr:checkbox-input ref="@match" selected-value="exact" deselected-value="substring" id="fr-form-name-match">
+                                                    <xf:hint appearance="minimal"/>
+                                                </fr:checkbox-input>
                                             </xf:group>
 
                                             <xf:group ref="$search-options/local/form-version" class="fr-search-item">
@@ -1410,9 +1441,7 @@
 
                                             <xf:group ref="$search-options/local/title" class="fr-search-item">
                                                 <xf:input ref=".">
-                                                    <xf:label>
-                                                        <xf:output mediatype="text/html" value="$fr-resources/home-summary/titles/form-title"/>
-                                                    </xf:label>
+                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-title"/>
                                                 </xf:input>
                                             </xf:group>
                                         </xh:fieldset>

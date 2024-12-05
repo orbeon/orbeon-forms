@@ -536,14 +536,15 @@
                 <!-- Form Builder only for now: set search parameters if they are on the URL -->
                 <xf:action if="$is-fb">
 
+                    <!-- TODO: avoid duplication with Admin/Forms page -->
                     <xf:var name="fr-search-app-tokens"     value="tokenize($fr-search-app-param-opt,  ':')"/>
                     <xf:var name="fr-search-form-tokens"    value="tokenize($fr-search-form-param-opt, ':')"/>
 
                     <xf:var name="fr-search-app-opt"        value="if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens[2]  else $fr-search-app-tokens[1]"/>
                     <xf:var name="fr-search-form-opt"       value="if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[2] else $fr-search-form-tokens[1]"/>
 
-                    <xf:var name="fr-search-app-match-opt"  value="(if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens [1][. = ('exact', 'substring')] else (), 'substring')"/>
-                    <xf:var name="fr-search-form-match-opt" value="(if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[1][. = ('exact', 'substring')] else (), 'substring')"/>
+                    <xf:var name="fr-search-app-match"      value="(if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens [1][. = ('exact', 'substring')] else (), 'substring')"/>
+                    <xf:var name="fr-search-form-match"     value="(if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[1][. = ('exact', 'substring')] else (), 'substring')"/>
 
                     <!-- If we have a fr-search-app URL parameter, use it as a search option and show search options -->
                     <!-- If the app value is constrained, make sure to check that the parameter is within the constraint -->
@@ -564,7 +565,7 @@
                                 value="$fr-search-app-opt"/>
                             <xf:setvalue
                                 ref="$query/@match"
-                                value="$fr-search-app-match-opt"/>
+                                value="$fr-search-app-match"/>
                             <!-- Assume that an app needs to be specified in order for a form to be specified -->
                             <xf:action if="exists($fr-search-form-opt)">
                                 <xf:var
@@ -584,7 +585,7 @@
                                 <xf:setvalue
                                     if="$form-in-bounds"
                                     ref="$query/@match"
-                                    value="$fr-search-form-match-opt"/>
+                                    value="$fr-search-form-match"/>
                             </xf:action>
                         </xf:action>
                     </xf:action>
@@ -1344,6 +1345,7 @@
                                         </xf:input>
                                         <fr:checkbox-input ref="@match" selected-value="exact" deselected-value="substring">
                                             <xf:hint appearance="minimal"/>
+                                            <xf:dispatch event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
                                         </fr:checkbox-input>
                                     </xf:group>
                                     <!-- Form -->
@@ -1364,6 +1366,7 @@
                                         </xf:input>
                                         <fr:checkbox-input ref="@match[not($form-is-dropdown)]" selected-value="exact" deselected-value="substring">
                                             <xf:hint appearance="minimal"/>
+                                            <xf:dispatch event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
                                         </fr:checkbox-input>
                                         <xf:select1 ref=".[$form-is-dropdown]">
                                             <xf:label mediatype="text/html" value="$label"/>

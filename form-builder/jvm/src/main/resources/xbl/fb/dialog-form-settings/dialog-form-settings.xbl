@@ -1165,9 +1165,9 @@
                                                         (
                                                             instance('fr-counts-instance')/published-forms/xs:integer(.),
                                                             concat(
-                                                                '/fr/admin?fr-search-app=',
+                                                                '/fr/admin?fr-search-app=exact:',
                                                                 bind('app-bind'),
-                                                                '&amp;fr-search-form=',
+                                                                '&amp;fr-search-form=exact:',
                                                                 bind('form-bind')
                                                             )
                                                         )

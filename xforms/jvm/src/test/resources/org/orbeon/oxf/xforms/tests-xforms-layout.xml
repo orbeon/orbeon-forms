@@ -3082,4 +3082,45 @@
             </controls>
         </output>
     </test>
+
+    <test description="#6645: External `xf:alert` doesn't work" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="my-outer-model">
+                        <xf:instance id="my-outer-instance">
+                            <_/>
+                        </xf:instance>
+                        <xf:bind ref="instance()">
+                            <xf:constraint id="my-constraint-1" level="info" value="false()"/>
+                            <xf:constraint id="my-constraint-2" level="info" value="false()"/>
+                            <xf:constraint id="my-constraint-3" level="info" value="false()"/>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:alert id="my-alert-1" for="my-control" validation="my-constraint-1">Before alert</xf:alert>
+                    <xf:input ref="." id="my-control">
+                        <xf:alert id="my-alert-2" validation="my-constraint-2">Nested alert</xf:alert>
+                    </xf:input>
+                    <xf:alert id="my-alert-3" for="my-control" validation="my-constraint-3">After alert</xf:alert>
+                    <xf:output value="xxf:alert('my-control')" id="my-xxf-alert-output"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xh="http://www.w3.org/1999/xhtml">
+                <xh:span class="xforms-active xforms-info xforms-alert" id="my-alert-1">Before alert</xh:span>
+                <xh:span id="my-control" class="xforms-control xforms-input xforms-info">
+                    <xh:input id="my-control≡xforms-input-1" type="text" name="my-control≡xforms-input-1" value="" class="xforms-input-input" aria-errormessage="my-alert-1"/>
+                    <xh:span class="xforms-active xforms-alert">Nested alert</xh:span>
+                </xh:span>
+                <xh:span class="xforms-active xforms-info xforms-alert" id="my-alert-3">After alert</xh:span>
+                <xh:span id="my-xxf-alert-output" class="xforms-control xforms-output">
+                    <xh:span id="my-xxf-alert-output≡≡c" class="xforms-output-output">Nested alert</xh:span>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
 </group>

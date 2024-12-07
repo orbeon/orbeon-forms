@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.xml.dom
 
-import javax.xml.transform.SourceLocator
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.oxf.util.StringUtils.*
 import org.xml.sax.{Locator, SAXParseException}
+
+import javax.xml.transform.SourceLocator
+
 
 object XmlLocationData {
 

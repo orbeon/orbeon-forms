@@ -7,14 +7,14 @@ import org.orbeon.oxf.util.StringUtils.*
 
 
 case class IsoTime(
-  hour   : Int,
-  minute : Int,
-  second : Option[Int],
+  hour  : Int,
+  minute: Int,
+  second: Option[Int],
 //    millis : Option[Int]
 ) {
-  require(hour   >=0 && hour   <= 23) // with ISO, "24 then the values of the minutes element and the seconds element must be 00 and 00"
-  require(minute >=0 && minute <= 59) // with ISO, "60 or more is allowed only in the case of leap seconds"
-  require(second.isEmpty || second.exists(s => s >=0 && s <= 59))
+  require(hour   >= 0 && hour   <= 23) // with ISO, "24 then the values of the minutes element and the seconds element must be 00 and 00"
+  require(minute >= 0 && minute <= 59) // with ISO, "60 or more is allowed only in the case of leap seconds"
+  require(second.isEmpty || second.exists(s => s >= 0 && s <= 59))
 
   def toIsoString: String =
     formatTime(
@@ -168,13 +168,13 @@ object IsoTime {
   }
 
   def findMagicTimeAsIsoTimeWithNow(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =
-    magicTime.some.map(_.trimAllToEmpty) collect {
+    magicTime.some.map(_.trimAllToEmpty).collect {
       case "now" => currentTime
     } orElse
       findMagicTimeAsIsoTime(magicTime)
 
   def findMagicTimeAsIsoTime(magicTime: String): Option[IsoTime] =
-    magicTime.some.map(_.trimAllToEmpty) collect {
+    magicTime.some.map(_.trimAllToEmpty).collect {
       case MagicTimeRe(h, m, s, amPm)
         if h.toInt >=0 && h.toInt < 24  &&
           ((m eq null) || m.toInt >= 0 && m.toInt <= 59) &&

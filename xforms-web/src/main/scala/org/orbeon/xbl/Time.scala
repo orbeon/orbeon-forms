@@ -13,17 +13,16 @@
  */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.date.IsoTime
-import org.orbeon.date.IsoTime.*
 import org.orbeon.date.JSDateUtils.nowAsIsoTime
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
-import org.scalajs.dom.{Element, html}
-import io.udash.wrappers.jquery.{JQueryEvent, JQueryPromise}
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -40,17 +39,18 @@ object Time {
 
     companion =>
 
-    import Private._
-    import io.circe.generic.auto._
+    import Private.*
+    import io.circe.generic.auto.*
     import io.circe.{Decoder, Encoder}
 
     type State = TimeExternalValue
 
     val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
     val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
-    private val eventListenerSupport = new EventListenerSupport {}
 
-    var visibleInputElemOpt: Option[html.Input] = None
+    private object EventSupport extends EventListenerSupport
+
+    private var visibleInputElemOpt: Option[html.Input] = None
 
     override def init(): Unit = {
 
@@ -59,13 +59,13 @@ object Time {
       val visibleInputElem = containerElem.querySelector("input").asInstanceOf[html.Input]
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
-      eventListenerSupport.addListeners(visibleInputElem, List(DomEventNames.TouchStart, DomEventNames.FocusIn),
+      EventSupport.addListeners(visibleInputElem, List(DomEventNames.TouchStart, DomEventNames.FocusIn),
         (e: dom.Event) => {
           if (! isMarkedReadonly) {
 
             logger.debug(s"reacting to event ${e.`type`}")
 
-            stateOpt foreach { state =>
+            stateOpt.foreach { state =>
               // Upon `focusin`, if the format omits seconds, but the value has non-zero seconds, then we want to show
               // the value with seconds, so that the value is not lost.
               if (! state.format.hasSeconds)
@@ -79,7 +79,7 @@ object Time {
         }
       )
 
-      eventListenerSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
+      EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
         (e: dom.Event) => {
           if (! isMarkedReadonly) {
             logger.debug(s"reacting to event ${e.`type`}")
@@ -88,7 +88,7 @@ object Time {
 
             // Always update visible value with XForms value:
             //
-            // - relying just value change event from server is not enough
+            // - relying on just value change event from server is not enough
             // - value change is not dispatched if the server value hasn't changed
             // - if the visible changed, but XForms hasn't, we still need to show XForms value
             // - see: https://github.com/orbeon/orbeon-forms/issues/1026
@@ -103,13 +103,13 @@ object Time {
             //
 //            val formId = $(containerElem).parents("form").attr("id").get
             AjaxClient.allEventsProcessedF("time") foreach { _ =>
-              stateOpt foreach updateVisibleValue
+              stateOpt.foreach(updateVisibleValue)
             }
           }
         }
       )
 
-      eventListenerSupport.addListener(visibleInputElem, DomEventNames.KeyPress,
+      EventSupport.addListener(visibleInputElem, DomEventNames.KeyPress,
         (e: dom.KeyboardEvent) => {
           if (! isMarkedReadonly) {
 
@@ -132,7 +132,7 @@ object Time {
 
     override def destroy(): Unit = {
       logger.debug("destroy")
-      eventListenerSupport.clearAllListeners()
+      EventSupport.clearAllListeners()
       companion.visibleInputElemOpt = None
     }
 
@@ -156,7 +156,7 @@ object Time {
 
     override def xformsFocus(): Unit = {
       logger.debug(s"xformsFocus")
-      companion.visibleInputElemOpt foreach (_.focus())
+      companion.visibleInputElemOpt.foreach(_.focus())
     }
 
     override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
@@ -165,23 +165,20 @@ object Time {
     private object Private {
 
       def updateReadonly(readonly: Boolean): Unit =
-        visibleInputElemOpt foreach { visibleInputElem =>
-          if (readonly)
-            visibleInputElem.setAttribute("readonly", "readonly")
-          else
-            visibleInputElem.removeAttribute("readonly")
+        visibleInputElemOpt.foreach { visibleInputElem =>
+          visibleInputElem.readOnly = readonly
         }
 
       def updateStateAndSendValueToServer(read: html.Input => String): Unit =
-        visibleInputElemOpt foreach { visibleInputElem =>
-          stateOpt foreach { state =>
+        visibleInputElemOpt.foreach { visibleInputElem =>
+          stateOpt.foreach { state =>
 
             val visibleInputElemValue = read(visibleInputElem)
 
             val newState =
               state.copy(
                 isoOrUnrecognizedValue =
-                  findMagicTimeAsIsoTimeWithNow(visibleInputElemValue, nowAsIsoTime).toLeft(visibleInputElemValue)
+                  IsoTime.findMagicTimeAsIsoTimeWithNow(visibleInputElemValue, nowAsIsoTime).toLeft(visibleInputElemValue)
               )
 
             val stateUpdated =
@@ -196,7 +193,7 @@ object Time {
         }
 
       def updateVisibleValue(state: State): Unit =
-        companion.visibleInputElemOpt foreach { visibleInputElem =>
+        companion.visibleInputElemOpt.foreach { visibleInputElem =>
 
 //          val hasFocus = visibleInputElem eq dom.document.activeElement
 
@@ -204,10 +201,7 @@ object Time {
 //              if (hasFocus) state.editValue
 //              else          state.displayValue
 
-          val newStringValue =
-            state.isoOrUnrecognizedValue.fold(formatTime(_, state.format), identity)
-
-          writeValue(visibleInputElem, newStringValue)
+          writeValue(visibleInputElem, state.stringValue)
         }
 
       def readValue(input: html.Input): String =

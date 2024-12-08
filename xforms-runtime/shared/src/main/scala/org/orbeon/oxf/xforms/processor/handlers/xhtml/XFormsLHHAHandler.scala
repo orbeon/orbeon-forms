@@ -97,7 +97,10 @@ class XFormsLHHAHandler(
             getContainerAttributes(uri, localname, attributes, lhhaEffectiveId, elementAnalysis, currentLHHAControl, None)
 
           val elementName =
-            lhhaElementName(elementAnalysis.lhhaType)
+            if (elementAnalysis.lhhaType == LHHA.Label)
+              "span" // when external and for repeat, we cannot use `label` as that requires a single `for` attribute
+            else
+              lhhaElementName(elementAnalysis.lhhaType)
 
           if (elementName == "button")
             containerAtts.addOrReplace("type", "button")

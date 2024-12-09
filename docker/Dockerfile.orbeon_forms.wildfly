@@ -1,0 +1,42 @@
+FROM quay.io/wildfly/wildfly:latest
+
+ARG tag
+ARG file
+
+ENV WILDFLY_HOME=/opt/jboss/wildfly
+ENV CONFIG_DIR=$WILDFLY_HOME/standalone/configuration
+ENV DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
+
+USER root
+
+RUN mkdir -p /tmp/orbeon
+WORKDIR /tmp/orbeon
+
+RUN microdnf update -y && microdnf install -y unzip
+
+# Download Orbeon Forms and extract WAR file
+RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
+    && unzip $file \
+    && basename=${file%.zip} \
+    && mv $basename/orbeon.war . \
+    && unzip orbeon.war \
+    && rm -rf $DEPLOYMENT_DIR/* \
+    && mkdir -p $DEPLOYMENT_DIR/orbeon.war \
+    && mv WEB-INF $DEPLOYMENT_DIR/orbeon.war/
+
+# Allow auto-deployment of exploded WAR files (disabled by default)
+RUN sed -i 's|<deployment-scanner|<deployment-scanner auto-deploy-exploded="true"|g' $CONFIG_DIR/standalone.xml
+
+# Cleanup
+RUN rm -rf /tmp/orbeon \
+    && microdnf remove -y unzip \
+    && microdnf clean all
+
+# Use jboss user at runtime
+RUN chown -R jboss:root $WILDFLY_HOME
+USER jboss
+
+EXPOSE 8080
+
+# As of WildFly 34, we need the preview stability level for OIDC scopes
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "--stability=preview"]

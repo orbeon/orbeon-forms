@@ -94,9 +94,9 @@ private object ControlDnD {
           ) || el.classList.contains("fr-grid-td")
 
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
-          (handle ne null)                 &&
-          handle.classList.contains("btn") &&
-          handle.parentElementOpt.exists(_.classList.contains("fb-add-control"))
+            (handle ne null)                                   &&
+            handle.closestOpt(".btn").nonEmpty                 &&
+            handle.closestOpt(".fb-insert-control").nonEmpty
 
         // Can only drop into an empty cell
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
@@ -130,7 +130,7 @@ private object ControlDnD {
         AjaxClient.fireEvent(
           AjaxEvent(
             eventName = DomEventNames.DOMActivate,
-            targetId  = el.children(0).id
+            targetId  = el.querySelector(".xforms-trigger").id
           )
         )
       }

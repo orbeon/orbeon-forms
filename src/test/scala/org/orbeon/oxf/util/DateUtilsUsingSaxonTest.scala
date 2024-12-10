@@ -36,7 +36,7 @@ class DateUtilsUsingSaxonTest extends AnyFunSpec {
 
     for ((value, expected) <- valuesNoExplicitTz)
       it(s"must parse `$value` with no explicit timezone") {
-        assert(expected - defaultTzOffsetMs === DateUtilsUsingSaxon.parseISODateOrDateTime(value))
+        assert(expected - defaultTzOffsetMs == DateUtilsUsingSaxon.parseISODateOrDateTime(value))
       }
 
     for {
@@ -45,7 +45,7 @@ class DateUtilsUsingSaxonTest extends AnyFunSpec {
       valueWithTz       = value + utcTimezone
     } locally {
       it(s"must parse `$value` with timezone `$utcTimezone`") {
-        assert(expected === DateUtilsUsingSaxon.parseISODateOrDateTime(valueWithTz))
+        assert(expected == DateUtilsUsingSaxon.parseISODateOrDateTime(valueWithTz))
       }
     }
   }

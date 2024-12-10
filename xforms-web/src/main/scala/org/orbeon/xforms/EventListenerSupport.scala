@@ -35,10 +35,9 @@ trait EventListenerSupport {
   }
 
   def clearAllListeners(): Unit = {
-    listeners foreach { case (target, name, jsFn, useCapture) => target.removeEventListener(name, jsFn, useCapture) }
+    listeners.foreach { case (target, name, jsFn, useCapture) => target.removeEventListener(name, jsFn, useCapture) }
     listeners = Nil
   }
-
 }
 
 // This must be used only for listeners that are actually global, that is shared between forms

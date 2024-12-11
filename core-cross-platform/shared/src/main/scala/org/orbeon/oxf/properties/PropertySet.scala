@@ -184,8 +184,9 @@ class PropertySet private (
   def keySet: Set[String] = propertiesByName.keySet
   def size: Int = propertiesByName.size
 
+  // For form compilation
   def propertyParams: Iterable[PropertyParams] =
-    propertiesByName map { case (name, prop) =>
+    propertiesByName.collect { case (name, prop) if ! name.toLowerCase.contains("password") =>
 
       // Custom serialization to String, not ideal
       val stringValue = {

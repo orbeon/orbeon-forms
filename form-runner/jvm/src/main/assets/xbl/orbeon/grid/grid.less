@@ -187,18 +187,6 @@
             // =============================================================================================================
             .fr-grid.fr-repeat {
 
-                &.fr-repeat-multiple-rows.fr-grid-table:has(.fr-grid-repeat-iteration) { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
-                    & > .fr-grid-head {
-                        display: none;
-                    }
-                }
-
-                &.fr-repeat-multiple-rows.fr-grid-css:has(.fr-grid-repeat-iteration) {
-                    & > .fr-grid-repeat-top-row {
-                        display: none;
-                    }
-                }
-
                 // We never have a header row in narrow layout
                 @media (max-width: 640px) {
                     &.fr-repeat-single-row, &.fr-repeat-multiple-rows:has(.fr-grid-repeat-iteration) { // to make rule stronger
@@ -286,29 +274,14 @@
 
                     &.fr-grid-css {
 
-                        // Show the top border for each iteration except for cases excluded further below
-                        & > .xforms-repeat-delimiter {
-                            & + .fr-grid-repeat-iteration, // expected case
-                            & + span.xforms-update-full:empty + .fr-grid-repeat-iteration { // curious case where there is an intermediate span
-                                border-top: 1px solid #ddd;
-                            }
-                        }
-
                         // Wide layout
                         @media not (max-width: 640px) {
-                            // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
-                            // the "multiple" case.
-                            // The difficulty is to exclude the first iteration.
-                            &.fr-repeat-multiple-rows { // multiple only
-                                & > .fr-grid-repeat-top-row + .xforms-repeat-begin-end, // if there is a top row
-                                & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
-                                    & + .xforms-repeat-delimiter {
-                                        & + .fr-grid-repeat-iteration, // expected case
-                                        & + span.xforms-update-full:empty + .fr-grid-repeat-iteration { // curious case where there is an intermediate span
-                                            border: none;
-                                        }
-                                    }
-                                }
+                            // If we have a top row, it is shown in the wide layout, so we want all
+                            // `.fr-grid-repeat-iteration` to have a top border. If we don't have
+                            // a top row, we don't want the first `.fr-grid-repeat-iteration` to a top border.
+                            .fr-grid-repeat-top-row   ~ .fr-grid-repeat-iteration,
+                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                                border-top: 1px solid #ddd;
                             }
                         }
 
@@ -321,15 +294,8 @@
 
                             // In narrow layout, we must never show the top border for the first
                             // `.fr-grid-repeat-iteration`.
-                            // The difficulty is to exclude the first iteration.
-                            & > .fr-grid-repeat-top-row + .xforms-repeat-begin-end, // if there is a top row
-                            & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
-                                & + .xforms-repeat-delimiter {
-                                    & + .fr-grid-repeat-iteration, // expected case
-                                    & + span.xforms-update-full:empty + .fr-grid-repeat-iteration { // curious case where there is an intermediate span
-                                        border: none;
-                                    }
-                                }
+                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                                border-top: 1px solid #ddd;
                             }
                         }
                     }
@@ -339,65 +305,31 @@
 
                         border-collapse: separate; // otherwise we cannot have rounded corners
 
-                        // Use a mixin because Less CSS doesn't parse `@media` correctly
-                        .table-border-top() {
-                            & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                                > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                    border-top: 1px solid #ddd;
-                                }
-                            }
-                            // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
-                            // the "multiple" case.
-                            &.fr-repeat-multiple-rows { // multiple only
-                                & > .fr-grid-head + .xforms-repeat-begin-end, // if there is a top row
-                                & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
-                                    & + .xforms-repeat-delimiter {
-                                        & + .fr-grid-repeat-iteration {
-                                            > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                                border-top: none;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        // Wide layout
+                        // Web: wide layout
                         @media not (max-width: 640px) {
-                            .table-border-top();
-                        }
-                        // The PDF renderer doesn't support `@media` queries properly
-                        @media print {
-                            .table-border-top();
+                            .fr-grid-head             ~ .fr-grid-repeat-iteration,
+                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                                & > tr > td { border-top: 1px solid #ddd; }
+                            }
                         }
 
-                        // Narrow layout
+                        // Web: narrow layout
                         @media (max-width: 640px) {
 
                             // To align the grid with controls above and below it
                             margin-left: 4px;
                             margin-right: 4px;
 
-                            & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                                > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                    &.fr-repeat-column-number, &.fr-repeat-column-left, &.fr-repeat-column-right, &.fr-grid-td {
-                                        border-top: 1px solid #ddd;
-                                    }
-
-                                    &.fr-grid-td + .fr-grid-td { // trick to cancel the above for subsequent `.fr-grid-td`s
-                                        border-top: none;
-                                    }
-                                }
+                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                                & > tr > td { border-top: 1px solid #ddd; }
                             }
+                        }
 
-                            & > .fr-grid-head + .xforms-repeat-begin-end, // if there is a top row
-                            & > .xforms-repeat-begin-end:first-child { // OR if there is no top row (readonly AND multiple)
-                                & + .xforms-repeat-delimiter {
-                                    & + .fr-grid-repeat-iteration {
-                                        > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
-                                            border-top: none;
-                                        }
-                                    }
-                                }
+                        // PDF
+                        @media print {
+                            // The PDF renderer supports `+` but not `~`
+                            .fr-grid-repeat-iteration + .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
+                                & > tr > td { border-top: 1px solid #ddd; }
                             }
                         }
                     }

@@ -356,11 +356,13 @@
                 </xf:action>
             </xf:action>
 
-            <!-- Don't allow if we didn't get a submit and we don't have the proper id depending on the mode
-
-                 NOTE: 403 applies well to the first condition. For the second condition, a 404 could also be possible.
-             -->
-            <xf:action if="not($is-submit) and not($is-new-id and $mode = ('new', 'test') or not($mode = ('new', 'test')))" type="xpath">
+            <xf:action
+                if="
+                    not($is-submit)         and
+                    $mode = ('new', 'test') and
+                    not($is-new-id)
+                "
+                type="xpath">
                 frf:sendError(403)
             </xf:action>
         </xf:action>

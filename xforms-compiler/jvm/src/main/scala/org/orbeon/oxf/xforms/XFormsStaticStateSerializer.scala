@@ -372,11 +372,9 @@ object XFormsStaticStateSerializer {
       (distinct, distinct.zipWithIndex.toMap)
     }
 
-    implicit val encodeAttributeControl: Encoder[AttributeControl] = (a: AttributeControl) => Json.obj(
-      "foo" -> Json.fromString("bar") // XXX FIXME xxx
-    )
+    // https://github.com/orbeon/orbeon-forms/issues/6670
+    implicit val encodeAttributeControl: Encoder[LangRef] = (_: LangRef) => Json.Null
 
-    implicit val encodeLangRef           : Encoder[LangRef]           = deriveEncoder
 //    implicit val encodeNamespace         : Encoder[dom.Namespace]     = deriveEncoder
     implicit val encodeBasicCredentials  : Encoder[BasicCredentials]  = deriveEncoder
 

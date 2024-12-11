@@ -2,7 +2,9 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.FOR_QNAME
 import org.orbeon.xforms.xbl.Scope
 
@@ -99,4 +101,29 @@ object PartAnalysisSupport {
       case _ =>
     }
   }
+
+  def extractXMLLang(
+    getAttributeControl: (String, String) => AttributeControl,
+    elementAnalysis    : ElementAnalysis,
+    lang               : String
+  ): LangRef =
+    if (! lang.startsWith("#"))
+      LangRef.Literal(lang)
+    else {
+      val staticId   = lang.substring(1)
+      val prefixedId = XFormsId.getRelatedEffectiveId(elementAnalysis.prefixedId, staticId)
+      LangRef.AVT(getAttributeControl(prefixedId, "xml:lang"))
+    }
+
+  // This only sets the `lang` value on elements that have directly an `xml:lang`.
+  // Other elements will get their `lang` value lazily.
+  def setLangOnElement(
+    getAttributeControl: (String, String) => AttributeControl,
+    elementAnalysis    : ElementAnalysis
+  ): Unit =
+    elementAnalysis.lang =
+      elementAnalysis.element.attributeValueOpt(XML_LANG_QNAME) match {
+        case Some(v) => extractXMLLang(getAttributeControl, elementAnalysis, v)
+        case None    => LangRef.Undefined
+      }
 }

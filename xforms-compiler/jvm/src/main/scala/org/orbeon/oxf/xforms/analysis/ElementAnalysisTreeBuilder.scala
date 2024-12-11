@@ -19,21 +19,19 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
-import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
-import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.ValueOrSequenceQNames
 import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.ValueOrSequenceQNames
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, Submission}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.xforms.XFormsNames.*
-import org.orbeon.xforms.{BasicNamespaceMapping, XFormsId, XFormsNames, XXBLScope}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames, XXBLScope}
 
 
 object ElementAnalysisTreeBuilder {
 
-  import Private._
+  import Private.*
 
   type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) => ElementAnalysis
 
@@ -91,28 +89,10 @@ object ElementAnalysisTreeBuilder {
           }
     }
 
-  // This only sets the `lang` value on elements that have directly an `xml:lang`.
-  // Other elements will get their `lang` value lazily.
-  private def setLangOnElement(partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis): Unit =
-    e.lang =
-      e.element.attributeValueOpt(XML_LANG_QNAME) match {
-        case Some(v) => extractXMLLang(partAnalysisCtx, e, v)
-        case None    => LangRef.Undefined
-      }
-
   def setModelAndLangOnAllDescendants(partAnalysisCtx : PartAnalysisContextAfterTree, parentElem: WithChildrenTrait): Unit =
     parentElem.descendants foreach { e =>
       setModelOnElement(partAnalysisCtx, e)
-      setLangOnElement(partAnalysisCtx, e)
-    }
-
-  def extractXMLLang(partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis, lang: String): LangRef =
-    if (! lang.startsWith("#"))
-      LangRef.Literal(lang)
-    else {
-      val staticId   = lang.substring(1)
-      val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
-      LangRef.AVT(partAnalysisCtx.getAttributeControl(prefixedId, "xml:lang"))
+      PartAnalysisSupport.setLangOnElement(partAnalysisCtx.getAttributeControl, e)
     }
 
   // For the given bound node prefixed id, remove the current shadow tree and create a new one
@@ -302,10 +282,10 @@ object ElementAnalysisTreeBuilder {
       indentedLogger  : IndentedLogger
     ): Iterable[(Element, Scope)] = {
 
-      import VariableAnalysis.VariableQNames
       import EventHandler.isAction
       import LHHA.isLHHA
       import SelectionControlUtil.TopLevelItemsetQNames
+      import VariableAnalysis.VariableQNames
 
       def allChildren: Iterable[(Element, Scope)] =
         e.element.elements map ((_, e.containerScope))

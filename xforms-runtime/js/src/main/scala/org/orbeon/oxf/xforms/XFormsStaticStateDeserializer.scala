@@ -15,8 +15,8 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, ResourceResolver, StaticXPath, Whitespace, XPath}
 import org.orbeon.oxf.xforms.analysis.*
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -33,8 +33,8 @@ import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
 import java.net.URI
-import java.util.Base64
 import java.util as ju
+import java.util.Base64
 import scala.collection.mutable
 import scala.scalajs.js
 
@@ -291,7 +291,6 @@ object XFormsStaticStateDeserializer {
         )
 
     implicit val decodeAnnotatedTemplate : Decoder[AnnotatedTemplate] = deriveDecoder
-  //  implicit val decodeLangRef           : Decoder[LangRef]           = deriveDecoder
     implicit val decodeNamespace         : Decoder[dom.Namespace]     = deriveDecoder
     implicit val decodeBasicCredentials  : Decoder[BasicCredentials]  = deriveDecoder
     implicit val decodeLHHAValue         : Decoder[LHHAValue]         = deriveDecoder
@@ -410,12 +409,11 @@ object XFormsStaticStateDeserializer {
         scopeIndex          <- c.get[Int]("scopeRef")
         containerScopeIndex <- c.getOrElse[Int]("containerScopeRef")(scopeIndex)
         modelOptRef         <- c.get[Option[String]]("modelRef")
-  //      "langRef"           <- a.lang.asJson, // default is `LangRef.Undefined`
         bindingAnalysis     <- c.getOrElse[Option[XPathAnalysis]]("bindingAnalysis")(None)
         valueAnalysis       <- c.getOrElse[Option[XPathAnalysis]]("valueAnalysis")(None)
       } yield {
 
-        import org.orbeon.xforms.XFormsNames._
+        import org.orbeon.xforms.XFormsNames.*
 
         val index = currentIndex
         currentIndex += 1
@@ -1025,16 +1023,15 @@ object XFormsStaticStateDeserializer {
 
         CoreCrossPlatformSupport.properties = PropertySet(properties)
 
-        val enLangRef = LangRef.Literal("en")
-
         // Set collected `Model` information on elements
         for {
           (modelRef, elems) <- collectedModelRefs
-          modelOpt          = Index.controlAnalysisMap.get(modelRef) flatMap (_.narrowTo[Model])
+          modelOpt          = Index.controlAnalysisMap.get(modelRef).flatMap(_.narrowTo[Model])
           elem              <- elems
         } locally {
           elem.model = modelOpt
-          elem.lang  = enLangRef // XXX TODO: must deserialize
+          // https://github.com/orbeon/orbeon-forms/issues/6670
+          PartAnalysisSupport.setLangOnElement(topLevelPart.getAttributeControl, elem)
         }
 
         // Set collected `Model` orderings

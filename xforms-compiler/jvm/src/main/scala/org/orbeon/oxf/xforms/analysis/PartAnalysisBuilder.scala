@@ -22,15 +22,15 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.ReflectionUtils.loadClassByName
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
-import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
 import org.orbeon.oxf.xforms.*
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
+import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
 import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -462,7 +462,11 @@ object PartAnalysisBuilder {
         def fromChildElements =
           rootControlAnalysis.element.elements collectFirst {
             case e if e.hasAttribute(XML_LANG_QNAME) =>
-              ElementAnalysisTreeBuilder.extractXMLLang(partAnalysisCtx, rootControlAnalysis, e.attributeValue(XML_LANG_QNAME))
+              PartAnalysisSupport.extractXMLLang(
+                getAttributeControl = partAnalysisCtx.getAttributeControl,
+                elementAnalysis     = rootControlAnalysis,
+                lang                = e.attributeValue(XML_LANG_QNAME)
+              )
           }
 
         // Ask the parent part

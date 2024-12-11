@@ -328,7 +328,8 @@
                         // PDF
                         @media print {
                             // The PDF renderer supports `+` but not `~`
-                            .fr-grid-repeat-iteration + .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
+                            &.fr-repeat-single-row    .fr-grid-repeat-iteration,
+                            &.fr-repeat-multiple-rows .fr-grid-repeat-iteration + .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
                                 & > tr > td { border-top: 1px solid #ddd; }
                             }
                         }

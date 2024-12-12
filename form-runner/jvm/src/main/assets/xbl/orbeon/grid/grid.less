@@ -276,11 +276,11 @@
 
                         // Wide layout
                         @media not (max-width: 640px) {
-                            // If we have a top row, it is shown in the wide layout, so we want all
-                            // `.fr-grid-repeat-iteration` to have a top border. If we don't have
-                            // a top row, we don't want the first `.fr-grid-repeat-iteration` to a top border.
-                            .fr-grid-repeat-top-row   ~ .fr-grid-repeat-iteration,
-                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                            // In general, we want all rows except the first to have a top border
+                            // So: if we have a head, that's all the iteration; if we don't, it all the iterations after the first
+                            // Exception: readonly + multiple rows, where we have a head, but hide it with CSS, so here exclude it
+                            .fr-grid-repeat-top-row:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
+                            .fr-grid-repeat-iteration                                                ~ .fr-grid-repeat-iteration {
                                 border-top: 1px solid #ddd;
                             }
                         }
@@ -307,8 +307,9 @@
 
                         // Web: wide layout
                         @media not (max-width: 640px) {
-                            .fr-grid-head             ~ .fr-grid-repeat-iteration,
-                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                            // See comment above for the CSS grid / wide layout
+                            .fr-grid-head:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
+                            .fr-grid-repeat-iteration                                      ~ .fr-grid-repeat-iteration {
                                 & > tr > td { border-top: 1px solid #ddd; }
                             }
                         }

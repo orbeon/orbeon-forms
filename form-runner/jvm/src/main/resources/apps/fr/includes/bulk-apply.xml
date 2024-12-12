@@ -19,7 +19,7 @@
     xxf:xpath-analysis="true">
 
     <xf:submission
-        id            = "form-data"
+        id            = "fr-bulk-edit-form-data-submission"
         method        = "{event('method')}"
         serialization = "{event('serialization')}"
         resource      = "{event('url')}"
@@ -62,7 +62,7 @@
                         '/data.xml')"/>
 
             <!-- Retrieve form data for current document -->
-            <xf:send submission="form-data">
+            <xf:send submission="fr-bulk-edit-form-data-submission">
                 <xf:property name="url"                 value="$url"/>
                 <xf:property name="method"              value="'get'"                  xxf:tunnel="true"/>
                 <xf:property name="serialization"       value="'none'"/>
@@ -80,7 +80,7 @@
 
     <!-- Process form data if retrieved successfully -->
     <xf:action
-        observer="form-data"
+        observer="fr-bulk-edit-form-data-submission"
         event="xforms-submit-done"
         if="event('method') = 'get' and event('response-status-code') = 200">
 
@@ -112,7 +112,7 @@
             name="method"
             value="if (xxf:is-blank($process)) then 'put' else 'post'"/>
 
-        <xf:send submission="form-data">
+        <xf:send submission="fr-bulk-edit-form-data-submission">
             <xf:property name="url"            value="$url"/>
             <xf:property name="method"         value="$method"/>
             <xf:property name="serialization"  value="'application/xml'"/>
@@ -122,7 +122,7 @@
         </xf:send>
     </xf:action>
 
-    <xf:action observer="form-data" event="xforms-submit-error">
+    <xf:action observer="fr-bulk-edit-form-data-submission" event="xforms-submit-error">
 
         <xf:insert
             context="instance('fr-bulk-edit-errors')"
@@ -135,7 +135,7 @@
     </xf:action>
 
     <xf:action
-        observer="form-data"
+        observer="fr-bulk-edit-form-data-submission"
         event="xforms-submit-done"
         if="event('response-headers')[lower-case(name) = 'content-type']/value = 'application/xml' and
             event('response-body')/root()/*/process-success = 'false'">

@@ -84,42 +84,258 @@
             <control-details>
                 <xf:model xmlns="" id="fb-editor-date-model">
 
-                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/(* except output-format-details)">
                         <xf:var name="c" value="."/>
                         <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
                     </xf:action>
 
-                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:var
+                            name="use-default"
+                            value="empty(instance()/@output-format[xxf:non-blank()])"/>
+                        <xf:setvalue
+                            ref="instance('local')/output-format-details/@default"
+                            value="$use-default"/>
+                        <xf:delete
+                            ref="instance('local')/output-format-details/*"/>
+                        <xf:insert
+                            xmlns:dfui="java:org.orbeon.oxf.fb.xbl.DateFormatUi"
+                            context="instance('local')/output-format-details"
+                            origin="
+                                dfui:dateFormatToXml(
+                                    if (not($use-default)) then
+                                        instance()/@output-format
+                                    else
+                                        (: TODO: Should we take instead the form-level setting if present? :)
+                                        property('xxf:format.input.date')
+                                )/*/*"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <field-width/>
+                            <native-picker/>
+                            <week-start-day/>
+                            <output-format-details default="true">
+                                <firstComponent      type="Month"/>
+                                <separator/>
+                                <isPadDayMonthDigits type="boolean"/>
+                            </output-format-details>
                         </_>
                     </xf:instance>
+
+                    <xf:bind ref="instance('local')/output-format-details">
+                        <xf:bind ref="@default | is24Hour | isPadHourDigits | hasSeconds" type="xs:boolean"/>
+                        <xf:bind ref="*" readonly="instance('local')/output-format-details/@default/data(.)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <output-format>Date format</output-format>
+                                <native-picker>
+                                    <label>Use browser date picker</label>
+                                    <item id="0">Automatically</item>
+                                    <item id="1">Always</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Custom format</item>
+                                </default-custom>
+                                <format>
+                                    <label>Start date with</label>
+                                    <item id="0">Month</item>
+                                    <item id="1">Day</item>
+                                    <item id="2">Year</item>
+                                </format>
+                                <separator>
+                                    <label>Separator</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Space</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Pad month and day</label>
+                                    <item id="0">No Leading zero (1)</item>
+                                    <item id="1">Leading zero (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>First day of the week</label>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Sunday</item>
+                                    <item id="2">Monday</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Examples</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <output-format>Format de la date</output-format>
+                                <native-picker>
+                                    <label>Utiliser le sélecteur du navigateur</label>
+                                    <item id="0">Automatiquement</item>
+                                    <item id="1">Toujours</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Format sur mesure</item>
+                                </default-custom>
+                                <format>
+                                    <label>Commencer la date par</label>
+                                    <item id="0">Mois</item>
+                                    <item id="1">Jour</item>
+                                    <item id="2">Année</item>
+                                </format>
+                                <separator>
+                                    <label>Séparateur</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Espace</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Format mois et jour</label>
+                                    <item id="0">Sans zéro initial (1)</item>
+                                    <item id="1">Avec zéro initial (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Premier jour de la semaine</label>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Dimanche</item>
+                                    <item id="2">Lundi</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Exemples</label>
+                                </examples>
+                            </resource>
+                        </_>
+                    </xf:instance>
+
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-date-grid">
-                    <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
-                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
-                                    <xf:value/>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
-                                    <xf:value>full</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
-                                    <xf:value>natural</xf:value>
-                                </xf:item>
-                            </xf:select1>
-                        </xh:td>
-                    </xh:tr>
+                    <fr:c x="1" y="1" w="12">
+                        <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                            <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                            <xf:item>
+                                <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                <xf:value>full</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                <xf:value>natural</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="6">
+                        <xf:select1 ref="instance('local')/native-picker" appearance="full" id="native-picker-control">
+                            <xf:label ref="xxf:r('native-picker.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('native-picker.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 0) then
+                                            ''
+                                        else if (@id = 1) then
+                                            'always'
+                                        else
+                                            error()"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="7" y="2" w="6">
+                        <xf:select1 ref="instance('local')/week-start-day" appearance="full" id="week-start-day-control">
+                            <xf:label ref="xxf:r('week-start-day.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('week-start-day.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 0) then
+                                            ''
+                                        else if (@id = 1) then
+                                            'sunday'
+                                        else if (@id = 2) then
+                                            'monday'
+                                        else
+                                            error()"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="3" w="12">
+                        <xf:select1 ref="instance('local')/output-format-details/@default" appearance="full xxf:horizontal" id="output-format-control">
+                            <xf:label ref="xxf:r('output-format')"/>
+                            <xf:itemset ref="xxf:resource-elements('default-custom.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'true' else 'false'"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="4" w="4">
+                        <xf:select1 ref="instance('local')/output-format-details/firstComponent/@type" appearance="minimal" id="first-component-control">
+                            <xf:label ref="xxf:r('format.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('format.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 0) then
+                                            'Month'
+                                        else if (@id = 1) then
+                                            'Day'
+                                        else if (@id = 2) then
+                                            'Year'
+                                        else
+                                            error()"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="5" y="4" w="3">
+                        <xf:select1 ref="instance('local')/output-format-details/separator" appearance="minimal" id="separator-control">
+                            <xf:label ref="xxf:r('separator.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('separator.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 3) then
+                                            ' '
+                                        else
+                                            ."/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="8" y="4" w="5">
+                        <xf:select1 ref="instance('local')/output-format-details/isPadDayMonthDigits" appearance="full" id="is-pad-day-month-digits-control">
+                            <xf:label ref="xxf:r('pad-month-day.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('pad-month-day.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'false' else 'true'"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="5" w="12">
+                        <xf:output
+                            xmlns:dfui="java:org.orbeon.oxf.fb.xbl.DateFormatUi"
+                            value="
+                                string-join(
+                                    for $date in ('2024-03-31', '2024-12-01', string(adjust-date-to-timezone(current-date(), ())))
+                                    return
+                                        dfui:formatDateWithFormat(instance('local')/output-format-details, $date),
+                                    ', '
+                                )">
+                            <xf:label ref="xxf:r('examples.label')"/>
+                        </xf:output>
+                    </fr:c>
                 </fr:grid>
                 <xf:action
                     id="fb-editor-date-action"
                     event="xforms-value-changed"
-                    observer="field-width-control">
+                    observer="
+                        field-width-control
+                        native-picker-control
+                        week-start-day-control">
 
                     <xf:var name="name"      value="name(event('xxf:binding'))"/>
                     <xf:var name="new-value" value="string(event('xxf:binding'))"/>
@@ -130,6 +346,23 @@
                     <xf:delete
                         if="xxf:is-blank($new-value)"
                         ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-date-format-action"
+                    event="xforms-value-changed"
+                    observer="
+                        output-format-control
+                        first-component-control
+                        separator-control
+                        is-pad-day-month-digits-control">
+                    <xf:insert
+                        xmlns:dfui="java:org.orbeon.oxf.fb.xbl.DateFormatUi"
+                        if="not(instance('local')/output-format-details/@default/data(.))"
+                        context="instance()"
+                        origin="xf:attribute('output-format', dfui:xmlFormatToFormatString(instance('local')/output-format-details))"/>
+                    <xf:delete
+                        if="instance('local')/output-format-details/@default/data(.)"
+                        ref="instance()/@output-format"/>
                 </xf:action>
             </control-details>
         </metadata>

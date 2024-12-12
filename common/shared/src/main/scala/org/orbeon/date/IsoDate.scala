@@ -48,15 +48,17 @@ case class IsoDate(
 //
 // This means that we just need to indicate the first component. Other permutations are not needed.
 case class DateFormat(
-  firstComponent  : DateFormatComponent,
-  separator       : Char, // typically `/`, `.`, `-`, ` `
-  isPadDayDigits  : Boolean,
-  isPadMonthDigits: Boolean,
+  firstComponent     : DateFormatComponent,
+  separator          : Char, // typically `/`, `.`, `-`, ` `
+  isPadDayMonthDigits: Boolean
 ) {
   require(! separator.isDigit)
 
-  // Use a `java.time` format so we don't have to write our own parser
-  lazy val Format: DateTimeFormatter =
+  // Use a `java.time` format so we don't have to write our own parser. Currently, this is used only for parsing, not
+  // formatting. For parsing, we support non-padded day and month digits, as those are entered by the user and there is
+  // no point, currently to enforce padding there. But for printing, we will want to pad if requested.
+  // Q: Should we cache these formats, given that they are likely to be always the same?
+  lazy val ParseFormat: DateTimeFormatter =
     firstComponent match {
       case DateFormatComponent.Day   =>
         new DateTimeFormatterBuilder()
@@ -93,7 +95,7 @@ case class DateFormat(
 
 object IsoDate {
 
-  val IsoDateFormat = DateFormat(DateFormatComponent.Year, '-', isPadDayDigits = true, isPadMonthDigits = true)
+  val IsoDateFormat = DateFormat(DateFormatComponent.Year, '-', isPadDayMonthDigits = true)
 
   // Supported format only:
   //
@@ -106,21 +108,21 @@ object IsoDate {
   //  | `[M01]/[D01]/[Y]` | 11/05/2023 | force two digits for months and days |
   //  | `[Y]-[M01]-[D01]` | 2023-11-05 | ISO format                           |
 
-  def formatDate(time: IsoDate, dateFormat: DateFormat): String = {
+  def formatDate(date: IsoDate, dateFormat: DateFormat): String = {
 
     val dayString =
-      if (dateFormat.isPadDayDigits)
-        IsoTime.pad2(time.day)
+      if (dateFormat.isPadDayMonthDigits)
+        IsoTime.pad2(date.day)
       else
-        time.day.toString
+        date.day.toString
 
     val monthString =
-      if (dateFormat.isPadMonthDigits)
-        IsoTime.pad2(time.month)
+      if (dateFormat.isPadDayMonthDigits)
+        IsoTime.pad2(date.month)
       else
-        time.month.toString
+        date.month.toString
 
-    val yearString = time.year.toString
+    val yearString = date.year.toString
 
     dateFormat.firstComponent match {
       case DateFormatComponent.Day   => s"$dayString${dateFormat.separator}$monthString${dateFormat.separator}$yearString"
@@ -141,27 +143,23 @@ object IsoDate {
       else
         throw new IllegalArgumentException(s"Invalid format: `$formatInputDate`")
 
-    val isPadDayDigits = formatInputDate.contains("[D01]")
-    val isPadMonthDigits = formatInputDate.contains("[M01]")
-
     DateFormat(
-      firstComponent,
-      formatInputDate.dropWhile(_ != ']').drop(1).head, // first character after the first `]`
-      isPadDayDigits,
-      isPadMonthDigits
+      firstComponent      = firstComponent,
+      separator           = formatInputDate.dropWhile(_ != ']').drop(1).head, // first character after the first `]`
+      isPadDayMonthDigits = formatInputDate.contains("[D01]") || formatInputDate.contains("[M01]")
     )
   }
 
   def generateFormat(dateFormat: DateFormat): String = {
 
     val dayComponent =
-      if (dateFormat.isPadDayDigits)
+      if (dateFormat.isPadDayMonthDigits)
         "[D01]"
       else
         "[D]"
 
     val monthComponent =
-      if (dateFormat.isPadMonthDigits)
+      if (dateFormat.isPadDayMonthDigits)
         "[M01]"
       else
         "[M]"
@@ -196,13 +194,13 @@ object IsoDate {
   def generateBootstrapFormat(dateFormat: DateFormat): String = {
 
     val dayComponent =
-      if (dateFormat.isPadDayDigits)
+      if (dateFormat.isPadDayMonthDigits)
         "dd"
       else
         "d"
 
     val monthComponent =
-      if (dateFormat.isPadMonthDigits)
+      if (dateFormat.isPadDayMonthDigits)
         "mm"
       else
         "m"
@@ -227,7 +225,18 @@ object IsoDate {
   // The `java.time` format that we create validates dates against a chronology. So for example `2023-02-29` is not
   // valid.
   def parseUserDateValue(dateFormat: DateFormat, dateValue: String): Option[IsoDate] =
-    Try(dateFormat.Format.parse(dateValue))
+    Try(dateFormat.ParseFormat.parse(dateValue))
+      .toOption
+      .map { accessor =>
+        IsoDate(
+          accessor.get(ChronoField.YEAR),
+          accessor.get(ChronoField.MONTH_OF_YEAR),
+          accessor.get(ChronoField.DAY_OF_MONTH)
+        )
+      }
+
+  def parseIsoDate(isoDate: String): Option[IsoDate] =
+    Try(LocalDate.parse(isoDate))
       .toOption
       .map { accessor =>
         IsoDate(

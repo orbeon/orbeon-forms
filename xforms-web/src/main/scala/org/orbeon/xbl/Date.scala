@@ -221,7 +221,13 @@ object Date {
 
       def updateVisibleValue(state: State): Unit =
         companion.visibleInputElemOpt.foreach { visibleInputElem =>
-          writeValue(visibleInputElem, state.stringValue)
+            writeValue(
+              visibleInputElem,
+              if (isNativePicker)
+                state.isoOrUnrecognizedValue.fold(_.toIsoString, identity)
+              else
+                state.stringValue // date picker will clear field if the date is not an HTML "date string" (ISO-like)
+            )
         }
 
       def readValue(input: html.Input): String =

@@ -360,7 +360,8 @@
                 if="
                     not($is-submit)         and
                     $mode = ('new', 'test') and
-                    not($is-new-id)
+                    not($is-new-id)         and
+                    not($is-background and $mode = 'new') (: allow background `POST` in `new` while passing a document id :)
                 "
                 type="xpath">
                 frf:sendError(403)
@@ -442,158 +443,246 @@
             xforms-model-construct-done
             xforms-ready">
 
+        <!--
+            We handle two types of processes:
+
+            - implicit: entirely specified via configuration properties
+            - explicit: defined by properties, but selected by URL parameters
+
+            We introduce the following URL parameters:
+
+            - `fr-process-name` specifies optionally the name of an explicit process to run, and if present, and if
+              there is a matching process property, then run that process. Else, fallback on the implicit process if
+              present.
+            - `fr-process-phase` allows to specify when the explicit process should run. This does not impact implicit
+              processes.
+
+            Important algorithm notes:
+
+            - We also run the implicit process if the process value for the explicit process is blank. We could do
+              differently and report an error in that case. Not sure one way is better than the other.
+            - If we run an explicit process specified by the parameter, we don't run the implicit process. Here again,
+              we could do things differently and run both.
+            - For a process name passed by URL parameter, we only support running a single process during a single
+              phase. For implicit processes, we support running one process for each phase.
+        -->
         <xf:var
-            name="process-property-name"
+            name="process-property-tuple-opt"
             value="
-                string-join(
-                    (
-                        'oxf.fr.detail.process',
-                        for $name in event('xxf:type')
-                        return
-                            if ($name = 'xxforms-instances-ready') then
-                                'before-data'
-                            else if ($name = 'xforms-model-construct-done') then
-                                'after-data'
-                            else if ($name = 'xforms-ready') then
-                                'after-controls'
-                            else
-                                error(
-                                    QName('http://orbeon.org/oxf/xml/form-runner', 'fr:illegal-state'),
-                                    concat('unexpected event received: ', $name)
-                                ),
-                        if ($is-export) then
-                            'export'
-                        else if ($is-background) then
-                            'background'
+                let $current-event-phase :=
+                    for $name in event('xxf:type')
+                    return
+                        if ($name = 'xxforms-instances-ready') then
+                            'before-data'
+                        else if ($name = 'xforms-model-construct-done') then
+                            'after-data'
+                        else if ($name = 'xforms-ready') then
+                            'after-controls'
                         else
-                            'foreground',
-                        $mode
-                    ),
-                    '.'
-                )"/>
-
-        <xf:var
-            name="process-property-value"
-            value="frf:xpathFormRunnerStringProperty($process-property-name)"/>
-
-        <!-- Run service if defined -->
-        <xf:action if="exists($process-property-value)">
-
-            <xf:var
-                name="url-param-process"
-                value="if ($is-background) then xxf:get-request-parameter('fr-process-name') else ()"/>
-
-            <xf:var
-                name="url-param-process-present"
-                value="exists($url-param-process) and xxf:non-blank($url-param-process)"/>
-
-            <!-- Override the process retrieved from the property with the one from the URL parameter if present -->
-            <xf:var
-                name="process"
-                value="if ($url-param-process-present) then $url-param-process else $process-property-value"/>
-
-            <xf:var
-                name="process-result"
-                value="fr:run-process('oxf.fr.detail.process', $process)"/>
-
-            <xf:setvalue
-                if="exists($process-result)"
-                ref="instance('fr-background-response-instance')/process-success"
-                value="data(.) and $process-result"/>
-
-            <!-- Log error if any -->
-            <xf:message
-                if="not($url-param-process-present) and not($process-result)"
-                level="xxf:log-error"
-                value="concat('Process failed with error for property: `', $process-property-name, '`')"/>
-
-            <xf:message
-                if="not($url-param-process-present)"
-                level="xxf:log-debug"
-                value="concat('Result of running process with property: `', $process-property-name, '`: ', $process-result)"/>
-
-            <xf:message
-                if="$url-param-process-present and not($process-result)"
-                level="xxf:log-error"
-                value="concat('Process failed with error for URL param value: `', $url-param-process, '`')"/>
-
-            <xf:message
-                if="$url-param-process-present"
-                level="xxf:log-debug"
-                value="concat('Result of running process with URL param value: `', $url-param-process, '`: ', $process-result)"/>
-
-        </xf:action>
-
-        <!-- When done in background mode, send out service response -->
-        <xf:action if="($is-export or $is-background) and event('xxf:type') = 'xforms-ready'">
-
-            <xf:setvalue
-                ref="instance('fr-background-response-instance')/document-id"
-                value="fr:document-id()"/>
-
-            <xf:delete
-                ref="instance('fr-background-response-instance')/data"/>
-
-            <xf:action
-                if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)
-                    (
-                        $is-export                                                      or  (: export causes data out     :)
+                            error(
+                                QName('http://orbeon.org/oxf/xml/form-runner', 'fr:illegal-state'),
+                                concat('unexpected event received: ', $name)
+                            ),
+                    $required-event-phase :=
                         (
-                            xxf:get-request-parameter('return-data') = 'true'           and (: caller must request data   :)
-                            xxf:property(                                                   (: the property allows it     :)
+                            xxf:get-request-parameter('fr-process-phase')[. = ('before-data', 'after-data', 'after-controls')],
+                            'after-controls'
+                        )[1],
+                    $explicit-process-property-tuple-opt :=
+                        if ($is-background and $current-event-phase = $required-event-phase) then
+                            for $explicit-process-property-name in xxf:get-request-parameter('fr-process-name')[xxf:non-blank()]
+                            return
+                                for $explicit-process-property-value in
+                                    frf:xpathFormRunnerStringProperty(
+                                        concat(
+                                            'oxf.fr.detail.process.',
+                                            $explicit-process-property-name
+                                        )
+                                    )[xxf:non-blank()]
+                                return
+                                    ($current-event-phase, true(), $explicit-process-property-name, $explicit-process-property-value)
+                        else
+                            (),
+                    $implicit-process-property-tuple-opt :=
+                        if (exists($explicit-process-property-tuple-opt)) then
+                            ()
+                        else
+                            let $implicit-process-property-name :=
                                 string-join(
                                     (
-                                        'oxf.fr.detail.service',
-                                         if ($is-background) then 'background' else 'foreground',
-                                         'enable-return-data',
-                                         $app,
-                                         $form
-                                     ),
+                                        $current-event-phase,
+                                        if ($is-export) then
+                                            'export'
+                                        else if ($is-background) then
+                                            'background'
+                                        else
+                                            'foreground',
+                                        $mode
+                                    ),
                                     '.'
                                 )
+                            return
+                                for $implicit-process-property-value in
+                                    frf:xpathFormRunnerStringProperty(
+                                        concat(
+                                            'oxf.fr.detail.process.',
+                                            $implicit-process-property-name
+                                        )
+                                    )[xxf:non-blank()]
+                                return
+                                    ($current-event-phase, false(), $implicit-process-property-name, $implicit-process-property-value)
+                return
+                    ($explicit-process-property-tuple-opt, $implicit-process-property-tuple-opt)"/>
+
+        <xf:action if="empty($process-property-tuple-opt) and event('xxf:type') = 'xforms-ready'">
+            <!-- There is no process to run, and it's the last phase, so we send the response. -->
+            <xf:dispatch targetid="fr-persistence-model" name="fr-send-response-action"/>
+        </xf:action>
+        <xf:action if="exists($process-property-tuple-opt)">
+            <!-- There is a process to run, and the process can be asynchronous. So we modify the process so that in
+                 either case of success or failure, when the process completes, synchronously or not, it causes the
+                 execution of the continuation by dispatching an event. -->
+            <xf:var
+                name="ignored-process-result"
+                value="
+                    fr:run-process(
+                        'oxf.fr.detail.process',
+                        concat(
+                            '(',
+                                (: Original process found in properties :)
+                                $process-property-tuple-opt[4],
+                            ') then xf:dispatch(',
+                                'targetid            = ''fr-persistence-model'', ',
+                                'name                = ''fr-process-continuation'', ',
+                                'process-name        = ''', $process-property-tuple-opt[3], ''', ',
+                                'process-success     = ''true'', ',
+                                'process-from-param  = ''', $process-property-tuple-opt[2], ''', ',
+                                'process-event-phase = ''', $process-property-tuple-opt[1], ''', ',
+                                'process-event-type  = ''', event('xxf:type'), '''',
+                            ') recover xf:dispatch(' ,
+                                'targetid            = ''fr-persistence-model'', ',
+                                'name                = ''fr-process-continuation'', ',
+                                'process-name        = ''', $process-property-tuple-opt[3], ''', ',
+                                'process-success     = ''false'', ',
+                                'process-from-param  = ''', $process-property-tuple-opt[2], ''', ',
+                                'process-event-phase = ''', $process-property-tuple-opt[1], ''', ',
+                                'process-event-type  = ''', event('xxf:type'), '''',
+                            ')'
+                        )
+                    )"/>
+        </xf:action>
+
+    </xf:action>
+
+    <xf:action event="fr-process-continuation">
+
+        <xf:var name="process-name"        value="event('process-name')"/>
+        <xf:var name="process-success"     value="event('process-success') = 'true'"/>
+        <xf:var name="process-from-param"  value="event('process-from-param') = 'true'"/>
+        <xf:var name="process-event-type"  value="event('process-event-type')"/>
+        <xf:var name="process-event-phase" value="event('process-event-phase')"/>
+
+        <xf:setvalue
+            ref="instance('fr-background-response-instance')/process-success"
+            value="data(.) and $process-success"/>
+
+        <!-- Log error if any -->
+        <xf:action if="$process-success = false()">
+            <xf:message
+                if="$process-from-param = true()"
+                level="xxf:log-error"
+                value="concat('Process specified with `fr-process-name` URL parameter failed with error for process name: `', $process-name, '`')"/>
+            <xf:message
+                if="$process-from-param = false()"
+                level="xxf:log-error"
+                value="concat('Process specified implicitly failed with error for process name: `', $process-name, '`')"/>
+        </xf:action>
+        <xf:action if="$process-success = true()">
+            <xf:message
+                if="$process-from-param = true()"
+                level="xxf:log-debug"
+                value="concat('Process specified with `fr-process-name` URL parameter succeeded for process name: `', $process-name, '`')"/>
+            <xf:message
+                if="$process-from-param = false()"
+                level="xxf:log-debug"
+                value="concat('Process specified implicitly succeeded for process name: `', $process-name, '`')"/>
+        </xf:action>
+
+        <xf:action if="$process-event-phase = 'after-controls'">
+            <!-- It's the last phase, so we send the response. -->
+            <xf:dispatch targetid="fr-persistence-model" name="fr-send-response-action"/>
+        </xf:action>
+
+    </xf:action>
+
+    <!-- For export or in background mode, send out the service response -->
+    <xf:action event="fr-send-response-action" if="$is-export or $is-background">
+
+        <xf:setvalue
+            ref="instance('fr-background-response-instance')/document-id"
+            value="fr:document-id()"/>
+
+        <xf:delete
+            ref="instance('fr-background-response-instance')/data"/>
+
+        <xf:action
+            if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)
+                (
+                    $is-export                                                      or  (: export causes data out     :)
+                    (
+                        xxf:get-request-parameter('return-data') = 'true'           and (: caller must request data   :)
+                        xxf:property(                                                   (: the property allows it     :)
+                            string-join(
+                                (
+                                    'oxf.fr.detail.service',
+                                     if ($is-background) then 'background' else 'foreground',
+                                     'enable-return-data',
+                                     $app,
+                                     $form
+                                 ),
+                                '.'
                             )
                         )
-                    )">
+                    )
+                )">
 
-                <xf:insert
-                    ref="instance('fr-background-response-instance')/document-id"
-                    origin="
-                        let $data-format-version  :=
-                                if ($is-export) then
-                                    '2019.1.0' (: don't use the parameter as the output is only used internally :)
-                                 else
-                                    (xxf:get-request-parameter('data-format-version'), '4.0.0')[1],
-                            $prune-metadata-param := xxf:get-request-parameter('prune-metadata'),
-                            $prune-metadata       :=
-                                if ($is-export) then
-                                    false() (: don't use the parameter as the output is only used internally :)
-                                else if (exists($prune-metadata-param)) then
-                                    $prune-metadata-param = 'true'
-                                else if ($data-format-version = 'edge') then
-                                    false()
-                                else
-                                    true()
-                        return
-                            xf:element(
-                                'data',
-                                grid-migration:dataMaybeMigratedFromEdge(
-                                   fr:app-name(),
-                                   fr:form-name(),
-                                   xxf:instance('fr-form-instance')/root(),
-                                   xxf:instance('fr-form-metadata')/root(),
-                                   $data-format-version,
-                                   $prune-metadata,
-                                   true()
-                               )
-                            )
-                    "
-                />
-
-            </xf:action>
-
-            <xf:send submission="fr-send-background-response"/>
+            <xf:insert
+                ref="instance('fr-background-response-instance')/document-id"
+                origin="
+                    let $data-format-version  :=
+                            if ($is-export) then
+                                '2019.1.0' (: don't use the parameter as the output is only used internally :)
+                             else
+                                (xxf:get-request-parameter('data-format-version'), '4.0.0')[1],
+                        $prune-metadata-param := xxf:get-request-parameter('prune-metadata'),
+                        $prune-metadata       :=
+                            if ($is-export) then
+                                false() (: don't use the parameter as the output is only used internally :)
+                            else if (exists($prune-metadata-param)) then
+                                $prune-metadata-param = 'true'
+                            else if ($data-format-version = 'edge') then
+                                false()
+                            else
+                                true()
+                    return
+                        xf:element(
+                            'data',
+                            grid-migration:dataMaybeMigratedFromEdge(
+                               fr:app-name(),
+                               fr:form-name(),
+                               xxf:instance('fr-form-instance')/root(),
+                               xxf:instance('fr-form-metadata')/root(),
+                               $data-format-version,
+                               $prune-metadata,
+                               true()
+                           )
+                        )
+                "
+            />
 
         </xf:action>
+
+        <xf:send submission="fr-send-background-response"/>
 
     </xf:action>
 

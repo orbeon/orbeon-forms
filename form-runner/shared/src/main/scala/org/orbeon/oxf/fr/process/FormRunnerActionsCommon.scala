@@ -18,28 +18,30 @@ import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.{setCreateUpdateResponse, updateAttachments}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xbl.{ErrorSummary, Wizard}
 import org.orbeon.xforms.analysis.model.ValidationLevel.*
 
+import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
@@ -78,6 +80,7 @@ trait FormRunnerActionsCommon {
     "new-to-edit"            -> tryNewToEdit,
     "edit-to-new"            -> tryEditToNew,
     "callback"               -> tryCallback,
+    "sleep"                  -> trySleep,
   )
 
   // Check whether there are pending uploads
@@ -415,6 +418,16 @@ trait FormRunnerActionsCommon {
         val sectionId = frc.sectionId(sectionName)
         dispatch(name = "fr-expand", targetId = sectionId)
       }
+    }
+
+  def trySleep(params: ActionParams): ActionResult =
+    ActionResult.tryAsync[Unit] {
+      (
+        IO.sleep(
+          Duration(SubmissionUtils.normalizeDurationString(requiredParamByNameUseAvt(params, "sleep", "duration")))
+        ),
+        identity
+      )
     }
 }
 

@@ -479,6 +479,9 @@ object ProcessInterpreter {
   def paramByNameOrDefaultUseAvt(params: ActionParams, name: String): Option[String] =
     params.get(Some(name)).map(spc.evaluateValueTemplate).flatMap(_.trimAllToOpt).orElse(params.get(None))
 
+  def requiredParamByNameUseAvt(params: ActionParams, action: String, name: String): String =
+    params.get(Some(name)).map(spc.evaluateValueTemplate).flatMap(_.trimAllToOpt).getOrElse(missingArgument(action, name))
+
   // TODO: Obtain action name automatically.
   private def missingArgument(action: String, name: String): Nothing =
     throw new IllegalArgumentException(s"$action: `$name` parameter is required")

@@ -18,9 +18,9 @@ import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunnerSupport.*
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
+import org.orbeon.oxf.http.HttpResponse
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}
-import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -82,10 +82,33 @@ trait FormRunnerSupport extends DocumentTestBase {
       )
 
     val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)
-    val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
 
+    val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
     val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests
 
     (processorService, docOpt, events)
+  }
+
+  def runFormRunnerReturnContent(
+    app        : String,
+    form       : String,
+    mode       : String,
+    formVersion: String  = "", // not used yet
+    documentId : Option[String] = None,
+    query      : IterableOnce[(String, String)] = Nil,
+    initialize : Boolean = true,
+    content    : Option[StreamedContent] = None,
+    background : Boolean = false
+  ): (ProcessorService, BufferedContent, HttpResponse) = {
+
+    val (processorService, response, _, _) =
+      TestHttpClient.connect(
+        url     = PathUtils.recombineQuery(s"/fr/${if (background) "service/"}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query),
+        method  = if (content.isDefined) POST else GET,
+        headers = Map.empty,
+        content = content
+      )
+
+    (processorService, BufferedContent(response.content)(IOUtils.toByteArray), response)
   }
 }

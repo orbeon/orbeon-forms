@@ -62,8 +62,11 @@
 
                      The case where we have a document id and data was POSTed to us is the case of switching between
                      modes. In that case, there is no data in the database and the persistence layer must use the
-                     version if any. -->
-                <xsl:variable name="use-document-id"                 select="$params/document     != '' and empty(p:get-request-attribute('fr-form-data'))"/>
+                     version if any.
+
+                     2024-12-11: Also don't use the document id in case of `new`.
+                 -->
+                <xsl:variable name="use-document-id"                 select="$params/mode != 'new' and $params/document != '' and empty(p:get-request-attribute('fr-form-data'))"/>
                 <xsl:variable name="specific-form-version-requested" select="$params/form-version != ''"/>
 
                 <xsl:if test="$use-document-id">

@@ -92,4 +92,47 @@
         $my-field = 'show-enabled'
     </property>
 
+    <!-- For background process tests -->
+
+    <property as="xs:boolean" name="oxf.fr.detail.service.background.enable-return-data.issue.6669" value="true"/>
+
+    <!-- Implicit processes -->
+    <property as="xs:string" name="oxf.fr.detail.process.before-data.background.new.issue.6669">
+        xf:setvalue(ref = "//before-data-no-initial-value", value = "'before-data'")
+        then xf:setvalue(ref = "//before-data-with-initial-value", value = "'before-data'")
+    </property>
+    <property as="xs:string" name="oxf.fr.detail.process.after-data.background.new.issue.6669">
+        xf:setvalue(ref = "//after-data-no-initial-value", value = "'after-data'")
+        then xf:setvalue(ref = "//after-data-with-initial-value", value = "'after-data'")
+    </property>
+    <property as="xs:string" name="oxf.fr.detail.process.after-controls.background.new.issue.6669">
+        xf:setvalue(ref = "//after-controls-no-initial-value", value = "'after-controls'")
+        then xf:setvalue(ref = "//after-controls-with-initial-value", value = "'after-controls'")
+    </property>
+
+    <!-- Explicit processes -->
+    <property as="xs:string" name="oxf.fr.detail.process.my-before-data.issue.6669">
+        xf:setvalue(ref = "//before-data-no-initial-value", value = "'my-before-data'")
+        then xf:setvalue(ref = "//before-data-with-initial-value", value = "'my-before-data'")
+    </property>
+    <property as="xs:string" name="oxf.fr.detail.process.my-after-data.issue.6669">
+        xf:setvalue(ref = "//after-data-no-initial-value", value = "'my-after-data'")
+        then xf:setvalue(ref = "//after-data-with-initial-value", value = "'my-after-data'")
+    </property>
+    <property as="xs:string" name="oxf.fr.detail.process.my-after-controls.issue.6669">
+        xf:setvalue(ref = "//after-controls-no-initial-value", value = "'my-after-controls'")
+        then xf:setvalue(ref = "//after-controls-with-initial-value", value = "'my-after-controls'")
+    </property>
+
+    <!-- Async processes -->
+    <property as="xs:string" name="oxf.fr.detail.process.my-async-success.issue.6669">
+        sleep(duration = "1s")
+        then xf:setvalue(ref = "//after-controls-no-initial-value", value = "'my-after-async-completion'")
+        then xf:setvalue(ref = "//after-controls-with-initial-value", value = "'my-after-async-completion'")
+    </property>
+    <property as="xs:string" name="oxf.fr.detail.process.my-async-failure.issue.6669">
+        sleep(duration = "1s")
+        then continue-with-failure
+    </property>
+
 </properties>

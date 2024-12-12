@@ -35,6 +35,7 @@
             <xf:name>Orbeon-Operations</xf:name>
             <xf:value value="."/>
         </xf:header>
+
     </xf:submission>
 
     <xf:action event="apply">
@@ -122,6 +123,22 @@
     </xf:action>
 
     <xf:action observer="form-data" event="xforms-submit-error">
+
+        <xf:insert
+            context="instance('fr-bulk-edit-errors')"
+            origin="xf:element(
+                        'error',
+                        (xf:attribute('uri',         event('resource-uri')),
+                         xf:attribute('status-code', event('response-status-code'))))"/>
+
+        <xf:message value="xxf:r('summary.bulk-edit.submission-error', '|fr-fr-resources|')"/>
+    </xf:action>
+
+    <xf:action
+        observer="form-data"
+        event="xforms-submit-done"
+        if="event('response-headers')[lower-case(name) = 'content-type']/value = 'application/xml' and
+            event('response-body')/root()/*/process-success = 'false'">
 
         <xf:insert
             context="instance('fr-bulk-edit-errors')"

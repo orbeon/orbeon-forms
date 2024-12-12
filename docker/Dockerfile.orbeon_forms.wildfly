@@ -33,7 +33,8 @@ RUN rm -rf /tmp/orbeon \
     && microdnf clean all
 
 # Use jboss user at runtime
-RUN chown -R jboss:root $WILDFLY_HOME
+RUN chown -R jboss:jboss $WILDFLY_HOME \
+    && chown -R jboss:jboss /tmp
 USER jboss
 
 EXPOSE 8080

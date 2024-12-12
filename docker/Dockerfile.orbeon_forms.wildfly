@@ -27,6 +27,8 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
 # Allow auto-deployment of exploded WAR files (disabled by default)
 RUN sed -i 's|<deployment-scanner|<deployment-scanner auto-deploy-exploded="true"|g' $CONFIG_DIR/standalone.xml
 
+# We might want to use WildFly's deployment overlays to customize the Orbeon Forms WAR instead of exploding it
+
 # Cleanup
 RUN rm -rf /tmp/orbeon \
     && microdnf remove -y unzip \

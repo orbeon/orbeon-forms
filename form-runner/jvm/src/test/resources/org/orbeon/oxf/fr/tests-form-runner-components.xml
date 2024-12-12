@@ -781,7 +781,7 @@
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
                         <xxf:control id="my-date≡xf-12" relevant="false"/>
                         <xxf:init id="my-date">
-                            <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[],"weekStart":null}</xxf:value>
+                            <xxf:value>{"isoOrUnrecognizedValue":{"Left":{"value":{"year":2010,"month":1,"day":13}}},"format":{"firstComponent":{"Month":{}},"separator":"/","isPadDayDigits":false,"isPadMonthDigits":false},"excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>
                     </xxf:control-values>
                     <xxf:focus control-id="my-date"/>

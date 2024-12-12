@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.saxon.om
 
 import scala.collection.mutable
-import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
 
 
 trait PartControlsAnalysis extends TransientState {
@@ -31,10 +30,13 @@ trait PartControlsAnalysis extends TransientState {
   def wrapElement(elem: dom.Element): om.NodeInfo
 
   def getControlAnalysis(prefixedId: String): ElementAnalysis =
-    controlAnalysisMap.get(prefixedId) orNull
+    controlAnalysisMap.get(prefixedId).orNull
 
-  val controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis] = LinkedHashMap[String, ElementAnalysis]()
-  val controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]] = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
+  val controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis] =
+    mutable.LinkedHashMap[String, ElementAnalysis]()
+
+  val controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]] =
+    mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]]() // `type` -> `Map` of `prefixedId` -> `ElementAnalysis`
 
   def iterateControlsNoModels: Iterator[ElementAnalysis] =
     for (control <- controlAnalysisMap.valuesIterator if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
@@ -53,9 +55,12 @@ trait PartControlsAnalysis extends TransientState {
           yield AttributeDetails(attributeControl.forPrefixedId, attributeControl.attributeName, attributeControl)
 
       // Nicely group the results in a two-level map
-      // NOTE: We assume only one control per forPrefixedId/attributeName combination, hence the assert
+      // NOTE: We assume only one control per forPrefixedId/attributeName combination, hence the `assert`
       val newAttributes =
-        triples.groupBy(_.forPrefixedId).view.mapValues(_.groupBy(_.attributeName).view.mapValues(_.ensuring(_.size == 1).head.attributeControl))
+        triples
+          .groupBy(_.forPrefixedId)
+          .view
+          .mapValues(_.groupBy(_.attributeName).view.mapValues(_.ensuring(_.size == 1).head.attributeControl))
 
       // Accumulate new attributes into existing map by combining values for a given "for id"
       // NOTE: mapValues above ok, since we accumulate the values below into new immutable Maps.
@@ -75,30 +80,33 @@ trait PartControlsAnalysis extends TransientState {
     _attributeControls.contains(prefixedForAttribute)
 
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl =
-    _attributeControls.get(prefixedForAttribute) flatMap (_.get(attributeName)) orNull
+    _attributeControls.get(prefixedForAttribute).flatMap(_.get(attributeName)).orNull // TODO: `null`
 
   def controlsByName(controlName: String): Iterable[ElementAnalysis] =
-    controlTypes.get(controlName).toList flatMap (_.values)
+    controlTypes.get(controlName).toList.flatMap(_.values)
 
   // Repeats
   def repeats: Iterable[RepeatControl] =
-    controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Nil
+    controlTypes.get("repeat").map(_.values.map(_.asInstanceOf[RepeatControl])).getOrElse(Nil)
 
   def getRepeatHierarchyString(ns: String): String =
-    controlTypes.get("repeat") map { repeats =>
-      val repeatsWithAncestors =
-        for {
-          repeat               <- repeats.values
-          namespacedPrefixedId = ns + repeat.prefixedId
-          ancestorRepeat       = repeat.ancestorRepeatsAcrossParts.headOption
-        } yield
-          ancestorRepeat match {
-            case Some(ancestorRepeat) => namespacedPrefixedId + " " + ns + ancestorRepeat.prefixedId
-            case None                 => namespacedPrefixedId
-          }
+    controlTypes
+      .get("repeat")
+      .map { repeats =>
+        val repeatsWithAncestors =
+          for {
+            repeat               <- repeats.values
+            namespacedPrefixedId = s"$ns${repeat.prefixedId}"
+            ancestorRepeat       = repeat.ancestorRepeatsAcrossParts.headOption
+          } yield
+            ancestorRepeat match {
+              case Some(ancestorRepeat) => s"$namespacedPrefixedId $ns${ancestorRepeat.prefixedId}"
+              case None                 => namespacedPrefixedId
+            }
 
-      repeatsWithAncestors mkString ","
-    } getOrElse ""
+        repeatsWithAncestors mkString ","
+      }
+      .getOrElse("")
 
   def getTopLevelControls: List[ElementAnalysis] = List(controlTypes("root").values.head)
 

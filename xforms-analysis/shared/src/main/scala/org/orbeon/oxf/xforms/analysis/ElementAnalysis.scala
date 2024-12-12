@@ -17,14 +17,14 @@ import cats.syntax.option.*
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, RootControl, VariableAnalysisTrait, VariableTrait}
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
+import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.Phase
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
@@ -72,7 +72,7 @@ abstract class ElementAnalysis(
 
   selfElement =>
 
-  import ElementAnalysis._
+  import ElementAnalysis.*
 
   require(element ne null)
 
@@ -81,7 +81,7 @@ abstract class ElementAnalysis(
 
   def getLangUpdateIfUndefined: LangRef = lang match {
     case LangRef.Undefined =>
-      val updated = parent map (_.getLangUpdateIfUndefined) getOrElse LangRef.None
+      val updated = parent.map(_.getLangUpdateIfUndefined).getOrElse(LangRef.None)
       lang = updated
       updated
     case existing =>

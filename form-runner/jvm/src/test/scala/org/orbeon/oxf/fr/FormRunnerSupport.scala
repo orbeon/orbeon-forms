@@ -74,11 +74,11 @@ trait FormRunnerSupport extends DocumentTestBase {
 
     val (processorService, response, _, events) =
       TestHttpClient.connect(
-        url         = PathUtils.recombineQuery(s"/fr/$app/$form/$mode", query),
-        method      = if (content.isDefined) POST else GET,
-        headers     = Map.empty,
-        content     = content,
-        attributes  = attributes
+        url        = PathUtils.recombineQuery(s"/fr/$app/$form/$mode", query),
+        method     = if (content.isDefined) POST else GET,
+        headers    = Map.empty,
+        content    = content,
+        attributes = attributes
       )
 
     val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)

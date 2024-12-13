@@ -176,7 +176,7 @@
 
             <!-- Workaround for #6443 until we have a fix for #6456 -->
             <xf:select1 ref="xf:element('_')" appearance="xxf:internal" id="internal-select1">
-                <xf:choices context="$itemset">
+                <xf:choices context="$itemset" xxbl:scope="outer">
                     <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
                 </xf:choices>
             </xf:select1>

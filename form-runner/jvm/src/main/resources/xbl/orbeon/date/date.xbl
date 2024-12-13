@@ -412,27 +412,16 @@
             <xf:group class="{$class-field-width} {$class-native-picker}">
 
                 <xf:group ref="$binding[not($view)]" class="input-append date">
-                    <!-- Create placeholder from Orbeon Forms input format
-                         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->
-                    <xf:var
-                        name="placeholder"
-                        value="
-                            (: Reminder: empty string property returns the empty sequence :)
-                            let $format      := (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1],
-                                $cleaned     := translate($format, '[01]', ''),
-                                $duplicate   := replace(replace(replace($cleaned,
-                                                'M', 'MM'),
-                                                'D', 'DD'),
-                                                'Y', 'YYYY'),
-                                $format-en   := instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                                $format-lang := xxf:r('format'),
-                                $translated  := translate($duplicate, $format-en, $format-lang)
-                            return
-                                $translated
-                        "/>
                     <xh:input
                         xh:type="text"
-                        placeholder="{$placeholder}"
+                        placeholder="{
+                            DateSupport:generatePlaceholder(
+                                (: Reminder: empty string property returns the empty sequence :)
+                                (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1],
+                                instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                                xxf:r('format')
+                            )
+                        }"
                         id="input"
                         xxf:control="true"
                         xbl:attr="autocomplete"/>
@@ -441,8 +430,16 @@
                     </xh:span>
                 </xf:group>
 
-                <!-- Static readonly mode -->
-                <xf:input ref="$binding[$view]"/>
+                <xf:input
+                    ref="$binding[$view]"
+                    class="{$class-field-width}"
+                    xbl:attr="xxf:readonly-appearance"
+                    xxf:format="
+                        DateSupport:formatReadonlyModeDate(
+                            xxf:binding('fr-date'),
+                            (: Reminder: empty string property returns the empty sequence :)
+                            (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1]
+                        )"/>
 
             </xf:group>
 

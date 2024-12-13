@@ -56,6 +56,19 @@ object DateSupportJava {
       .fold(Failure.apply, Success.apply)
       .map(_.isoOrUnrecognizedValue.fold(_.toIsoString, identity))
       .getOrElse("")
+
+  //@XPathFunction
+  def formatReadonlyModeDate(
+    binding : om.Item,
+    format  : String
+  ): String =
+    IsoDate.parseIsoDate(binding.getStringValue)
+      .map(IsoDate.formatDate(_, IsoDate.parseFormat(format)))
+      .getOrElse(binding.getStringValue)
+
+  //@XPathFunction
+  def generatePlaceholder(formatString: String, hmsEn: String, hms: String): String =
+    IsoDate.parseFormat(formatString).generatePlaceholderString(hmsEn, hms)
 }
 
 object TimeSupportJava {

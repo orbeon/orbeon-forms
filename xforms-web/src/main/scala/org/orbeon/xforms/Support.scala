@@ -149,4 +149,21 @@ object Support {
         case _ =>
       }
     }
+
+  // Handle progress as ‰ (per mille) but represent it as a percent with one decimal
+  // https://github.com/orbeon/orbeon-forms/issues/6666
+  // Use `Long`s as file sizes can go over 2^31 - 1!
+  def computePercentStringToOneDecimal(received: Long, expected: Long): String = {
+    require(received >= 0 && expected >= 0)
+    require(received <= expected)
+
+    val perMille =
+      if (expected == 0)
+        1000L
+      else
+        1000L * received / expected
+
+    val perMilleString = perMille.toString
+    s"${perMilleString.init}.${perMilleString.last}"
+  }
 }

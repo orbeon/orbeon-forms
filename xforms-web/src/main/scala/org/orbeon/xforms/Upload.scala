@@ -119,27 +119,18 @@ class Upload {
   // server.
   // This is called from JavaScript directly in AjaxServer.js.
   @JSExport
-  def progress(state: String, received: Int, expected: Int): Unit =
+  def progress(state: String, received: Long, expected: Long): Unit =
     state match {
       case "interrupted"                     =>
         XFormsApp.clientServerChannel.cancel(doAbort = true, XXFormsUploadError)
         logger.debug("cancel")
       case _ =>
         findProgressBar foreach { bar =>
-          val pctString = computePercentStringToOneDecimal(received, expected)
+          val pctString = Support.computePercentStringToOneDecimal(received, expected)
           logger.debug(s"update progress $pctString%")
           bar.style.width = s"$pctString%"
         }
     }
-
-  // Handle progress as ‰ (per mille) but represent it as a percent with one decimal
-  // https://github.com/orbeon/orbeon-forms/issues/6666
-  private def computePercentStringToOneDecimal(received: Int, expected: Int): String = {
-    // Value between 1 and 1000
-    val perMille = (1000L * received / expected) max 1 // use `Long` as file sizes can go over 2^31
-    val perMilleString = perMille.toString
-    s"${perMilleString.init}.${perMilleString.last}"
-  }
 
   // Called by UploadServer when the upload for this control is finished.
   def uploadDone(): Unit = {
@@ -173,7 +164,7 @@ class Upload {
 
     if (state == "progress")
       findProgressBar foreach {
-        val pctString = computePercentStringToOneDecimal(1, 1000)
+        val pctString = Support.computePercentStringToOneDecimal(1, 1000)
         _.style.width = s"$pctString%" // https://github.com/orbeon/orbeon-forms/issues/6666
       }
   }

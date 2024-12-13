@@ -91,6 +91,53 @@ case class DateFormat(
           .withResolverStyle(ResolverStyle.STRICT)
           .withChronology(IsoChronology.INSTANCE)
     }
+
+  def generateFormatString: String =
+    generateFormat(
+      dayComponent =
+        if (isPadDayMonthDigits)
+          "[D01]"
+        else
+          "[D]",
+      monthComponent =
+        if (isPadDayMonthDigits)
+          "[M01]"
+        else
+          "[M]",
+      yearComponent = "[Y]"
+    )
+
+  def generatePlaceholderString(ymdEn: String, ymd: String): String =
+    generateFormat(
+      dayComponent   = "DD",
+      monthComponent = "MM",
+      yearComponent  = "YYYY"
+    ).translate(ymdEn, ymd)
+
+  // Orbeon Forms format:         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input
+  // bootstrap-datepicker format: https://bootstrap-datepicker.readthedocs.io/en/latest/options.html#format
+  def generateBootstrapFormatString: String =
+    generateFormat(
+      dayComponent =
+        if (isPadDayMonthDigits)
+          "dd"
+        else
+          "d",
+      monthComponent =
+        if (isPadDayMonthDigits)
+          "mm"
+        else
+          "m",
+      yearComponent = "yyyy"
+    )
+
+  private def generateFormat(dayComponent: String, monthComponent: String, yearComponent: String): String = {
+    firstComponent match {
+      case DateFormatComponent.Day   => s"$dayComponent$separator$monthComponent$separator$yearComponent"
+      case DateFormatComponent.Month => s"$monthComponent$separator$dayComponent$separator$yearComponent"
+      case DateFormatComponent.Year  => s"$yearComponent$separator$monthComponent$separator$dayComponent"
+    }
+  }
 }
 
 object IsoDate {
@@ -131,88 +178,20 @@ object IsoDate {
     }
   }
 
-  def parseFormat(formatInputDate: String): DateFormat = {
-
-    val firstComponent =
-      if (formatInputDate.startsWith("[D"))
-        DateFormatComponent.Day
-      else if (formatInputDate.startsWith("[M"))
-        DateFormatComponent.Month
-      else if (formatInputDate.startsWith("[Y"))
-        DateFormatComponent.Year
-      else
-        throw new IllegalArgumentException(s"Invalid format: `$formatInputDate`")
-
+  def parseFormat(formatInputDate: String): DateFormat =
     DateFormat(
-      firstComponent      = firstComponent,
+      firstComponent      =
+        if (formatInputDate.startsWith("[D"))
+          DateFormatComponent.Day
+        else if (formatInputDate.startsWith("[M"))
+          DateFormatComponent.Month
+        else if (formatInputDate.startsWith("[Y"))
+          DateFormatComponent.Year
+        else
+          throw new IllegalArgumentException(s"Invalid format: `$formatInputDate`"),
       separator           = formatInputDate.dropWhile(_ != ']').drop(1).head, // first character after the first `]`
       isPadDayMonthDigits = formatInputDate.contains("[D01]") || formatInputDate.contains("[M01]")
     )
-  }
-
-  def generateFormat(dateFormat: DateFormat): String = {
-
-    val dayComponent =
-      if (dateFormat.isPadDayMonthDigits)
-        "[D01]"
-      else
-        "[D]"
-
-    val monthComponent =
-      if (dateFormat.isPadDayMonthDigits)
-        "[M01]"
-      else
-        "[M]"
-
-    val yearComponent = "[Y]"
-
-    dateFormat.firstComponent match {
-      case DateFormatComponent.Day   => s"$dayComponent${dateFormat.separator}$monthComponent${dateFormat.separator}$yearComponent"
-      case DateFormatComponent.Month => s"$monthComponent${dateFormat.separator}$dayComponent${dateFormat.separator}$yearComponent"
-      case DateFormatComponent.Year  => s"$yearComponent${dateFormat.separator}$monthComponent${dateFormat.separator}$dayComponent"
-    }
-  }
-
-  def generatePlaceholder(dateFormat: DateFormat, ymdEn: String, ymd: String): String = {
-
-    val dayComponent   = "DD"
-    val monthComponent = "MM"
-    val yearComponent  = "YYYY"
-
-    val enPlaceholder =
-      dateFormat.firstComponent match {
-        case DateFormatComponent.Day   => s"$dayComponent${dateFormat.separator}$monthComponent${dateFormat.separator}$yearComponent"
-        case DateFormatComponent.Month => s"$monthComponent${dateFormat.separator}$dayComponent${dateFormat.separator}$yearComponent"
-        case DateFormatComponent.Year  => s"$yearComponent${dateFormat.separator}$monthComponent${dateFormat.separator}$dayComponent"
-      }
-
-    enPlaceholder.translate(ymdEn, ymd)
-  }
-
-  // Orbeon Forms format:         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input
-  // bootstrap-datepicker format: https://bootstrap-datepicker.readthedocs.io/en/latest/options.html#format
-  def generateBootstrapFormat(dateFormat: DateFormat): String = {
-
-    val dayComponent =
-      if (dateFormat.isPadDayMonthDigits)
-        "dd"
-      else
-        "d"
-
-    val monthComponent =
-      if (dateFormat.isPadDayMonthDigits)
-        "mm"
-      else
-        "m"
-
-    val yearComponent = "yyyy"
-
-    dateFormat.firstComponent match {
-      case DateFormatComponent.Day   => s"$dayComponent${dateFormat.separator}$monthComponent${dateFormat.separator}$yearComponent"
-      case DateFormatComponent.Month => s"$monthComponent${dateFormat.separator}$dayComponent${dateFormat.separator}$yearComponent"
-      case DateFormatComponent.Year  => s"$yearComponent${dateFormat.separator}$monthComponent${dateFormat.separator}$dayComponent"
-    }
-  }
 
   def findMagicDateAsIsoDateWithNow(dateFormat: DateFormat, magicDate: String, currentDate: => IsoDate): Option[IsoDate] =
     magicDate.some.map(_.trimAllToEmpty)

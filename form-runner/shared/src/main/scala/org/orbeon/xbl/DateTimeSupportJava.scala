@@ -92,5 +92,5 @@ object TimeSupportJava {
 
   //@XPathFunction
   def generatePlaceholder(formatString: String, hmsEn: String, hms: String): String =
-    IsoTime.generatePlaceholder(IsoTime.parseFormat(formatString), hmsEn, hms)
+    IsoTime.parseFormat(formatString).generatePlaceholder(hmsEn, hms)
 }

@@ -21,7 +21,7 @@ object DateFormatUi extends ScalaToXml {
 
   //@XPathFunction
   def xmlFormatToFormatString(dateFormatRootElem: NodeInfo): String =
-    simplifiedXmlToState(dateFormatRootElem).map(IsoDate.generateFormat).toOption.orNull
+    simplifiedXmlToState(dateFormatRootElem).map(_.generateFormatString).toOption.orNull
 
   //@XPathFunction
   def formatDateWithFormat(dateFormatRootElem: NodeInfo, isoDate: String): String =

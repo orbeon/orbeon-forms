@@ -252,7 +252,7 @@ object Date {
           opts.container        = containerElem.closest("dialog, .orbeon")
 
           dateExternalValue.foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>
-            opts.format = IsoDate.generateBootstrapFormat(format)
+            opts.format = format.generateBootstrapFormatString
             weekStart.foreach(opts.weekStart = _)
             if (excludedDates.nonEmpty)
               opts.datesDisabled = excludedDates.flatMap(JSDateUtils.parseIsoDateUsingLocalTimezone).toJSArray

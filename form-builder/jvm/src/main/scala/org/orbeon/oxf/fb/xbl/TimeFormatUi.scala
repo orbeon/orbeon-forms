@@ -10,7 +10,7 @@ object TimeFormatUi extends ScalaToXml {
 
   type MyState = TimeFormat
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   val encoder: Encoder[TimeFormat] = implicitly
   val decoder: Decoder[TimeFormat] = implicitly
@@ -21,5 +21,5 @@ object TimeFormatUi extends ScalaToXml {
 
   //@XPathFunction
   def xmlFormatToFormatString(timeFormatRootElem: NodeInfo): String =
-    simplifiedXmlToState(timeFormatRootElem).map(IsoTime.generateFormat).toOption.orNull
+    simplifiedXmlToState(timeFormatRootElem).map(_.generateFormatString).toOption.orNull
 }

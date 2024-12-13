@@ -141,7 +141,7 @@ class IsoTimeTest extends AnyFunSpec {
 
     for ((timeFormat, timeFormatString) <- Formats)
       it(s"must pass for `$timeFormat`") {
-        assert(generateFormat(timeFormat) == timeFormatString)
+        assert(timeFormat.generateFormatString == timeFormatString)
       }
   }
 }

@@ -39,7 +39,41 @@ case class TimeFormat(
   isPadHourDigits: Boolean,
   hasSeconds     : Boolean,
   amPmFormat     : AmPmFormat,
-)
+) {
+
+  def generateFormatString: String = {
+
+    val hours = s"[${if (is24Hour) "H" else "h"}${if (isPadHourDigits) "01" else ""}]"
+
+    val secondsSuffix = if (hasSeconds) ":[s]" else ""
+
+    val amPmSuffix = amPmFormat match {
+      case AmPmFormat.None       => ""
+      case AmPmFormat.Lower      => " [P,2-2]"  // could also produce `*-2`
+      case AmPmFormat.Upper      => " [PN,2-2]" // could also produce `*-2`
+      case AmPmFormat.LowerDots  => " [P]"
+      case AmPmFormat.LowerShort => " [P,1-1]"  // could also produce `*-1`
+      case AmPmFormat.UpperDots  => " [PN]"
+      case AmPmFormat.UpperShort => " [PN,1-1]" // could also produce `*-1`
+    }
+
+    s"$hours:[m]$secondsSuffix$amPmSuffix"
+  }
+
+  def generatePlaceholder(hmsEn: String, hms: String): String = {
+
+    val secondsSuffix = if (hasSeconds) ":ss" else ""
+
+    val amPmSuffix = amPmFormat match {
+      case AmPmFormat.None  => ""
+      case _                => " am"
+    }
+
+    val translatedHms = s"hh:mm$secondsSuffix".translate(hmsEn, hms)
+
+    s"$translatedHms$amPmSuffix"
+  }
+}
 
 object IsoTime {
 
@@ -132,39 +166,6 @@ object IsoTime {
         AmPmFormat.None
 
     TimeFormat(is24Hour = is24Hour, isPadHourDigits = isPadHourDigits, hasSeconds = hasSeconds, amPmFormat = amPmFormat)
-  }
-
-  def generateFormat(timeFormat: TimeFormat): String = {
-
-    val hours = s"[${if (timeFormat.is24Hour) "H" else "h"}${if (timeFormat.isPadHourDigits) "01" else ""}]"
-
-    val secondsSuffix = if (timeFormat.hasSeconds) ":[s]" else ""
-
-    val amPmSuffix = timeFormat.amPmFormat match {
-      case AmPmFormat.None       => ""
-      case AmPmFormat.Lower      => " [P,2-2]"  // could also produce `*-2`
-      case AmPmFormat.Upper      => " [PN,2-2]" // could also produce `*-2`
-      case AmPmFormat.LowerDots  => " [P]"
-      case AmPmFormat.LowerShort => " [P,1-1]"  // could also produce `*-1`
-      case AmPmFormat.UpperDots  => " [PN]"
-      case AmPmFormat.UpperShort => " [PN,1-1]" // could also produce `*-1`
-    }
-
-    s"$hours:[m]$secondsSuffix$amPmSuffix"
-  }
-
-  def generatePlaceholder(timeFormat: TimeFormat, hmsEn: String, hms: String): String = {
-
-    val secondsSuffix = if (timeFormat.hasSeconds) ":ss" else ""
-
-    val amPmSuffix = timeFormat.amPmFormat match {
-      case AmPmFormat.None  => ""
-      case _                => " am"
-    }
-
-    val translatedHms = s"hh:mm$secondsSuffix".translate(hmsEn, hms)
-
-    s"$translatedHms$amPmSuffix"
   }
 
   def findMagicTimeAsIsoTimeWithNow(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =

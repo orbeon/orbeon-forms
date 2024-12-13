@@ -16,7 +16,7 @@
             }
             // By default, don't show labels, but don't hide to screen readers
             // Particularly strong rule for Form Builder, to override its `display: table`
-            &.xforms-control .xforms-label,
+            .fr-view &.xforms-control .xforms-label, // add `.fr-view` because `.fr-density-*` on that same element has a `display` property and we need to override it
             .fb-main .fb &.xforms-control .xforms-label {
                 overflow : hidden;
                 display  : block;

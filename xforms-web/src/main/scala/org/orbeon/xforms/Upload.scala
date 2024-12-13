@@ -126,11 +126,20 @@ class Upload {
         logger.debug("cancel")
       case _ =>
         findProgressBar foreach { bar =>
-          val pct = 100 * received / expected max 10
-          logger.debug(s"update progress $pct%")
-          bar.style.width = s"$pct%"
+          val pctString = computePercentStringToOneDecimal(received, expected)
+          logger.debug(s"update progress $pctString%")
+          bar.style.width = s"$pctString%"
         }
     }
+
+  // Handle progress as ‰ (per mille) but represent it as a percent with one decimal
+  // https://github.com/orbeon/orbeon-forms/issues/6666
+  private def computePercentStringToOneDecimal(received: Int, expected: Int): String = {
+    // Value between 1 and 1000
+    val perMille = (1000L * received / expected) max 1 // use `Long` as file sizes can go over 2^31
+    val perMilleString = perMille.toString
+    s"${perMilleString.init}.${perMilleString.last}"
+  }
 
   // Called by UploadServer when the upload for this control is finished.
   def uploadDone(): Unit = {
@@ -164,7 +173,8 @@ class Upload {
 
     if (state == "progress")
       findProgressBar foreach {
-        _.style.width = s"10%"
+        val pctString = computePercentStringToOneDecimal(1, 1000)
+        _.style.width = s"$pctString%" // https://github.com/orbeon/orbeon-forms/issues/6666
       }
   }
 

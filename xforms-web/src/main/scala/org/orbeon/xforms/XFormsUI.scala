@@ -902,10 +902,10 @@ object XFormsUI {
     (progressStateOpt, progressExpectedOpt) match {
       case (Some(progressState), Some(progressExpected)) if progressState.nonAllBlank && progressExpected.nonAllBlank =>
         Page.getUploadControl(documentElement).progress(
-        progressState,
-        progressReceivedOpt.getOrElse(throw new IllegalArgumentException).toInt,
-        progressExpected.toInt
-      )
+          progressState,
+          progressReceivedOpt.getOrElse(throw new IllegalArgumentException).toInt,
+          progressExpected.toInt
+        )
       case _ =>
     }
 

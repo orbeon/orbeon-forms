@@ -105,7 +105,7 @@
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
                         <_>
                             <resource xml:lang="en">
-                                <output-format>Output format</output-format>
+                                <output-format>Time format</output-format>
                                 <default-custom>
                                     <item id="0">Use default</item>
                                     <item id="1">Custom format</item>
@@ -118,7 +118,7 @@
                                 <pad-hour>
                                     <label>Hour format</label>
                                     <item id="0">No Leading zero (1)</item>
-                                    <item id="1">leading zero (01)</item>
+                                    <item id="1">Leading zero (01)</item>
                                 </pad-hour>
                                 <seconds>
                                     <label>Include seconds</label>
@@ -137,7 +137,7 @@
                                 </am-pm>
                             </resource>
                             <resource xml:lang="fr">
-                                <output-format>Format de sortie</output-format>
+                                <output-format>Format de l'heure</output-format>
                                 <default-custom>
                                     <item id="0">Utiliser le défaut</item>
                                     <item id="1">Format sur mesure</item>

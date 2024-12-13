@@ -41,7 +41,7 @@ object DateSupportJava {
     DateExternalValue(
       isoOrUnrecognizedValue =
         DateUtils
-          .tryParseISODate(binding.getStringValue)
+          .tryParseISOLocalDateComponents(binding.getStringValue)
           .map((IsoDate.apply _).tupled)
           .toOption
           .toLeft(binding.getStringValue),

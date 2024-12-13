@@ -4,7 +4,12 @@
             width: auto;
         }
         .fr-component-group {
-            display: inline-block;
+            span:first-of-type {
+                display: inline-flex;
+                flex-wrap: wrap;   // it *seems* that this will let things wrap if the cell is too narrow
+                column-gap: .25em;
+                row-gap: .25em;
+            }
         }
     }
 }

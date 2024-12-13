@@ -406,10 +406,11 @@
                     ) or
                     fr:mode() = 'pdf'
                 "/>
-            <xf:var name="class-field-width"   value="concat('fr-field-width-'  , fr:component-param-value('field-width'))"/>
-            <xf:var name="class-native-picker" value="concat('fr-native-picker-', fr:component-param-value('native-picker'))"/>
+            <xf:var name="class-field-width"     value="concat('fr-field-width-'  ,   fr:component-param-value('field-width'))"/>
+            <xf:var name="class-native-picker"   value="concat('fr-native-picker-',   fr:component-param-value('native-picker'))"/>
+            <xf:var name="class-today-highlight" value="concat('fr-today-highlight-', fr:component-param-value('today-highlight'))"/>
 
-            <xf:group class="{$class-field-width} {$class-native-picker}">
+            <xf:group class="{$class-field-width} {$class-native-picker} {$class-today-highlight}">
 
                 <xf:group ref="$binding[not($view)]" class="input-append date">
                     <xh:input

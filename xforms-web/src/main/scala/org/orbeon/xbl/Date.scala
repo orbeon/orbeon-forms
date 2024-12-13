@@ -250,6 +250,7 @@ object Date {
           opts.forceParse       = false
           opts.language         = Language.getLang()
           opts.container        = containerElem.closest("dialog, .orbeon")
+          opts.todayHighlight   = containerElem.querySelector(":scope > .fr-today-highlight-true") != null
 
           dateExternalValue.foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>
             opts.format = format.generateBootstrapFormatString

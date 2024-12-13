@@ -28,6 +28,7 @@ object DatePicker {
     var assumeNearbyYear : Boolean                  = false
     var showOnFocus      : Boolean                  = true
     var forceParse       : Boolean                  = true
+    var todayHighlight   : Boolean                  = false
     var datesDisabled    : js.Array[js.Date]        = _
     var language         : String                   = "en"
     var container        : js.UndefOr[Element]      = js.undefined

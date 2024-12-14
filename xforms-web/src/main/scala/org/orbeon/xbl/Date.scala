@@ -18,7 +18,7 @@ import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.date.JSDateUtils.todayAsIsoDate
 import org.orbeon.date.{IsoDate, JSDateUtils}
-import org.orbeon.facades.DatePicker.*
+import org.orbeon.facades.BoostrapDatepicker.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames

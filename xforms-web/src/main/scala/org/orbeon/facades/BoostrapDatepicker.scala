@@ -5,7 +5,7 @@ import io.udash.wrappers.jquery.JQuery
 
 import scala.scalajs.js
 
-object DatePicker {
+object BoostrapDatepicker {
 
   implicit def jQuery2DatePicker(jQuery: JQuery): JQueryDatePicker =
     jQuery.asInstanceOf[JQueryDatePicker]

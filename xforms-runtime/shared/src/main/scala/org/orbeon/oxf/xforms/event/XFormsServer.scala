@@ -457,8 +457,16 @@ object XFormsServer {
                       // See https://github.com/orbeon/orbeon-forms/issues/4113
                       if (containingDocument.controls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => c.isRelevant && ! Focus.isHidden(c)))
                         outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
-                    case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt =>
+                      outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
+                    case (_, Some(afterFocusEffectiveId))
+                      if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt &&
+                        containingDocument.controls.getCurrentControlTree.findControl(afterFocusEffectiveId)
+                          .exists(c => c.isRelevant && ! Focus.isHidden(c)) =>
                       // There is a focused control and it is different from the focus as known by the client
+                      // Also check that the new control exists and is relevant:
+                      // https://github.com/orbeon/orbeon-forms/issues/6679
+                      // TODO: This is a symptom that `XFormsControls.setFocusedControl()` is not set to the right
+                      //  control. We should investigate why this is the case.
                       outputFocusInfo(containingDocument, focus = true, afterFocusEffectiveId)
                     case _ =>
                       // Nothing to notify

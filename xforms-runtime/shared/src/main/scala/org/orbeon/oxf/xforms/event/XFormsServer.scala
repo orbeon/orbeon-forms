@@ -452,11 +452,11 @@ object XFormsServer {
                     afterFocusedControlOpt map (_.effectiveId)
 
                   (beforeFocusEffectiveIdOpt, afterFocusEffectiveIdOpt) match {
-                    case (Some(beforeFocusEffectiveId), None) =>
+                    case (Some(beforeFocusEffectiveId), None)
+                      if containingDocument.controls.getCurrentControlTree.findControl(beforeFocusEffectiveId)
+                        .exists(c => c.isRelevant && ! Focus.isHidden(c)) =>
                       // Focus removed: notify the client only if the control still exists AND is relevant AND is visible
                       // See https://github.com/orbeon/orbeon-forms/issues/4113
-                      if (containingDocument.controls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => c.isRelevant && ! Focus.isHidden(c)))
-                        outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
                       outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
                     case (_, Some(afterFocusEffectiveId))
                       if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt &&

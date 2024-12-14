@@ -223,10 +223,13 @@ object Date {
         companion.visibleInputElemOpt.foreach { visibleInputElem =>
             writeValue(
               visibleInputElem,
-              if (isNativePicker)
+              if (isNativePicker) {
+                // The native date picker will clear the field if the date is not an HTML "date string" (ISO-like), but
+                // we still set it to whatever string value we have if it's not an ISO date. Alternatively, we could set
+                // it to a blank string directly.
                 state.isoOrUnrecognizedValue.fold(_.toIsoString, identity)
-              else
-                state.stringValue // date picker will clear field if the date is not an HTML "date string" (ISO-like)
+              } else
+                state.stringValue
             )
         }
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import java.time.chrono.IsoChronology
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle}
 import java.time.temporal.ChronoField
-import java.time.{Instant, LocalDate, OffsetDateTime, ZoneOffset}
+import java.time.{Instant, OffsetDateTime, ZoneOffset}
 import java.util.Locale
 import scala.util.Try
 
@@ -31,18 +31,6 @@ object DateUtils {
 
   def formatRfc1123DateTimeGmt(instant: Instant): String =
     RFC1123Date.format(instant)
-
-  // Date can be local or with a timezone offset, which is ignored
-  def tryParseISOLocalDateComponents(date: String): Try[(Int, Int, Int)] =
-    Try {
-      // Parse with a non-local date, but only extract the local components
-      val accessor = DateTimeFormatter.ISO_DATE.parse(date)
-      (
-        accessor.get(ChronoField.YEAR),
-        accessor.get(ChronoField.MONTH_OF_YEAR),
-        accessor.get(ChronoField.DAY_OF_MONTH)
-      )
-    }
 
   // Parse an RFC 1123 dateTime
   // NOTE: See https://tools.ietf.org/html/rfc2616#page-20

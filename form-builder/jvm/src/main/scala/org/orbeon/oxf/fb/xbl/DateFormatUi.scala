@@ -26,7 +26,7 @@ object DateFormatUi extends ScalaToXml {
   //@XPathFunction
   def formatDateWithFormat(dateFormatRootElem: NodeInfo, isoDate: String): String =
     simplifiedXmlToState(dateFormatRootElem)
+      .flatMap(f => IsoDate.tryParseLocalIsoDate(isoDate).map(IsoDate.formatDate(_, f)))
       .toOption
-      .flatMap(f => IsoDate.parseIsoDate(isoDate).map(IsoDate.formatDate(_, f)))
       .orNull
 }

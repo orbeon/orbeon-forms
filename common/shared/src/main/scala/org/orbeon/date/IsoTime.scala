@@ -5,6 +5,10 @@ import org.orbeon.date.IsoTime.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoField
+import scala.util.Try
+
 
 case class IsoTime(
   hour  : Int,
@@ -171,12 +175,11 @@ object IsoTime {
   def findMagicTimeAsIsoTimeWithNow(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =
     magicTime.some.map(_.trimAllToEmpty).collect {
       case "now" => currentTime
-    } orElse
-      findMagicTimeAsIsoTime(magicTime)
+    }
+    .orElse(findMagicTimeAsIsoTime(magicTime))
 
-  // TODO: Should we really do any "magic" here?
   // TODO: Should we use `java.time` for parsing?
-  def findMagicTimeAsIsoTime(magicTime: String): Option[IsoTime] =
+  private def findMagicTimeAsIsoTime(magicTime: String): Option[IsoTime] =
     magicTime.some.map(_.trimAllToEmpty).collect {
       case MagicTimeRe(h, m, s, amPm)
         if h.toInt >=0 && h.toInt < 24  &&
@@ -206,6 +209,17 @@ object IsoTime {
       "0" + n
     else
       n.toString
+
+  def tryParseLocalIsoTime(value: String): Try[IsoTime] =
+    Try {
+      // Parse with a non-local time, but only extract the local components
+      val accessor = DateTimeFormatter.ISO_TIME.parse(value)
+      IsoTime(
+        hour   = accessor.get(ChronoField.HOUR_OF_DAY),
+        minute = accessor.get(ChronoField.MINUTE_OF_HOUR),
+        second = accessor.get(ChronoField.SECOND_OF_MINUTE).some,
+      )
+    }
 
   private val MagicTimeRe = """(\d{1,2})(?::(\d{1,2})(?::(\d{1,2}))?)?(?:\s*(p|pm|p\.m\.|a|am|a\.m\.))?""".r
 }

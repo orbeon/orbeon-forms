@@ -203,25 +203,26 @@ object IsoDate {
 
   // The `java.time` format that we create validates dates against a chronology. So for example `2023-02-29` is not
   // valid.
-  def parseUserDateValue(dateFormat: DateFormat, dateValue: String): Option[IsoDate] =
+  private def parseUserDateValue(dateFormat: DateFormat, dateValue: String): Option[IsoDate] =
     Try(dateFormat.ParseFormat.parse(dateValue))
       .toOption
       .map { accessor =>
         IsoDate(
-          accessor.get(ChronoField.YEAR),
-          accessor.get(ChronoField.MONTH_OF_YEAR),
-          accessor.get(ChronoField.DAY_OF_MONTH)
+          year  = accessor.get(ChronoField.YEAR),
+          month = accessor.get(ChronoField.MONTH_OF_YEAR),
+          day   = accessor.get(ChronoField.DAY_OF_MONTH)
         )
       }
 
-  def parseIsoDate(isoDate: String): Option[IsoDate] =
-    Try(LocalDate.parse(isoDate))
-      .toOption
-      .map { accessor =>
-        IsoDate(
-          accessor.get(ChronoField.YEAR),
-          accessor.get(ChronoField.MONTH_OF_YEAR),
-          accessor.get(ChronoField.DAY_OF_MONTH)
-        )
-      }
+  // Date can be local or with a timezone offset, which is ignored
+  def tryParseLocalIsoDate(value: String): Try[IsoDate] =
+    Try {
+      // Parse with a non-local date, but only extract the local components
+      val accessor = DateTimeFormatter.ISO_DATE.parse(value)
+      IsoDate(
+        year  = accessor.get(ChronoField.YEAR),
+        month = accessor.get(ChronoField.MONTH_OF_YEAR),
+        day   = accessor.get(ChronoField.DAY_OF_MONTH)
+      )
+    }
 }

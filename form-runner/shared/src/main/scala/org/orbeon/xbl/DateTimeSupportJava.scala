@@ -16,7 +16,6 @@ package org.orbeon.xbl
 import cats.syntax.option.*
 import org.orbeon.date.{IsoDate, IsoTime}
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om
@@ -40,9 +39,7 @@ object DateSupportJava {
   ): String =
     DateExternalValue(
       isoOrUnrecognizedValue =
-        DateUtils
-          .tryParseISOLocalDateComponents(binding.getStringValue)
-          .map((IsoDate.apply _).tupled)
+        IsoDate.tryParseLocalIsoDate(binding.getStringValue)
           .toOption
           .toLeft(binding.getStringValue),
       format                 = IsoDate.parseFormat(format),
@@ -62,7 +59,7 @@ object DateSupportJava {
     binding : om.Item,
     format  : String
   ): String =
-    IsoDate.parseIsoDate(binding.getStringValue)
+    IsoDate.tryParseLocalIsoDate(binding.getStringValue)
       .map(IsoDate.formatDate(_, IsoDate.parseFormat(format)))
       .getOrElse(binding.getStringValue)
 
@@ -83,7 +80,10 @@ object TimeSupportJava {
     format  : String
   ): String =
     TimeExternalValue(
-      isoOrUnrecognizedValue = IsoTime.findMagicTimeAsIsoTime(binding.getStringValue).toLeft(binding.getStringValue),
+      isoOrUnrecognizedValue =
+        IsoTime.tryParseLocalIsoTime(binding.getStringValue)
+          .toOption
+          .toLeft(binding.getStringValue),
       format                 = IsoTime.parseFormat(format) // Q: could parse earlier/cache?
     ).asJson.noSpaces
 
@@ -99,7 +99,7 @@ object TimeSupportJava {
     binding : om.Item,
     format  : String
   ): String =
-    IsoTime.findMagicTimeAsIsoTime(binding.getStringValue)
+    IsoTime.tryParseLocalIsoTime(binding.getStringValue)
       .map(IsoTime.formatTime(_, IsoTime.parseFormat(format)))
       .getOrElse(binding.getStringValue)
 

@@ -1,22 +1,10 @@
-/**
- * Copyright (C) 2012 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
 package org.orbeon.oxf.util
 
-import java.time.Instant
+import cats.syntax.option.*
+import org.orbeon.date.{IsoDate, IsoTime}
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.util.Success
+import java.time.Instant
 
 
 class DateUtilsTest extends AnyFunSpec {
@@ -46,11 +34,11 @@ class DateUtilsTest extends AnyFunSpec {
   describe("ISO local date parsing") {
 
     val data = List(
-      "1970-01-01"       -> (Some(1970, 1, 1)),
-      "2012-05-29"       -> Some((2012, 5, 29)),
-      "2012-05-29+01:00" -> Some((2012, 5, 29)),
-      "2012-05-29+23:00" -> Some((2012, 5, 29)),
-      "2012-05-29-23:00" -> Some((2012, 5, 29)),
+      "1970-01-01"       -> Some(IsoDate(1970, 1, 1)),
+      "2012-05-29"       -> Some(IsoDate(2012, 5, 29)),
+      "2012-05-29+01:00" -> Some(IsoDate(2012, 5, 29)),
+      "2012-05-29+23:00" -> Some(IsoDate(2012, 5, 29)),
+      "2012-05-29-23:00" -> Some(IsoDate(2012, 5, 29)),
       "2023-02-29"       -> None,
       "2023-13-01"       -> None,
       // This has different behavior on the JVM and JS. Bug in the JS version of `java.time`? But this is an unlikely
@@ -60,7 +48,32 @@ class DateUtilsTest extends AnyFunSpec {
 
     for ((value, expected) <- data)
       it(s"must parse `$value` with no explicit timezone") {
-        assert(DateUtils.tryParseISOLocalDateComponents(value).toOption == expected)
+        assert(IsoDate.tryParseLocalIsoDate(value).toOption == expected)
+      }
+  }
+
+  describe("ISO local time parsing") {
+
+    val data = List(
+      "17:44:34"           -> Some(IsoTime(17, 44, 34.some)),
+      "17:44"              -> Some(IsoTime(17, 44, 0.some)),
+      "17:"                -> None,
+      "17"                 -> None,
+      "17:44:34+01:00"     -> Some(IsoTime(17, 44, 34.some)),
+      "17:44+01:00"        -> Some(IsoTime(17, 44, 0.some)),
+      "17:44:34+23:00"     -> Some(IsoTime(17, 44, 34.some)),
+      "17:44+23:00"        -> Some(IsoTime(17, 44, 0.some)),
+      "17:44:34-23:00"     -> Some(IsoTime(17, 44, 34.some)),
+      "17:44-23:00"        -> Some(IsoTime(17, 44, 0.some)),
+      "17:44:34.123"       -> Some(IsoTime(17, 44, 34.some)),
+      "17:44:34.123+01:00" -> Some(IsoTime(17, 44, 34.some)),
+      "17:44:abc"          -> None,
+      "17:44:34.abc"       -> None,
+    )
+
+    for ((value, expected) <- data)
+      it(s"must parse `$value` with no explicit timezone") {
+        assert(IsoTime.tryParseLocalIsoTime(value).toOption == expected)
       }
   }
 }

@@ -19,7 +19,11 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding id="fr-process-button" element="fr|process-button" xxbl:container="span" xxbl:mode="binding">
+    <xbl:binding
+        id="fr-process-button"
+        element="fr|process-button"
+        xxbl:container="span"
+        xxbl:mode="binding">
 
         <xbl:template>
 

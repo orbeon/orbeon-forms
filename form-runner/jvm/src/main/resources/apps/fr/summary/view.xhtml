@@ -1180,7 +1180,7 @@
                                     <xf:trigger
                                         id="fr-bulk-edit-toggle"
                                         appearance="full"
-                                        ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit = 'true']) then $enabled else $disabled"
+                                        ref="if (instance('fr-bulk-edit-instance')/query[exists(@path) and @summary-edit = 'true']) then $enabled else $disabled"
                                         class="fr-summary-bulk-show-button">
 
                                         <xf:label

@@ -162,7 +162,7 @@ class Upload {
 
     if (state == "progress")
       findProgressBar foreach {
-        val pctString = Support.computePercentStringToOneDecimal(1, 1000)
+        val pctString = Support.computePercentStringToOneDecimal(0, 1000)
         _.style.width = s"$pctString%" // https://github.com/orbeon/orbeon-forms/issues/6666
       }
   }

@@ -174,6 +174,8 @@ object IsoTime {
     } orElse
       findMagicTimeAsIsoTime(magicTime)
 
+  // TODO: Should we really do any "magic" here?
+  // TODO: Should we use `java.time` for parsing?
   def findMagicTimeAsIsoTime(magicTime: String): Option[IsoTime] =
     magicTime.some.map(_.trimAllToEmpty).collect {
       case MagicTimeRe(h, m, s, amPm)

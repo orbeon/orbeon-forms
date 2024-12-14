@@ -187,17 +187,19 @@
             // =============================================================================================================
             .fr-grid.fr-repeat {
 
-                // We never have a header row in narrow layout
                 @media (max-width: 640px) {
-                    &.fr-repeat-single-row, &.fr-repeat-multiple-rows:has(.fr-grid-repeat-iteration) { // to make rule stronger
-                        &.fr-grid-table > .fr-grid-head { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
-                            display: none;
-                        }
 
-                        &.fr-grid-css > .fr-grid-repeat-top-row {
-                            display: none;
-                        }
+                    // We don't show the header row
+                    .fr-grid-head:is(.xforms-grid-appearance-minimal *) {
+                        display: none;
                     }
+
+                    // We never show the content of the header row
+                    .fr-grid-repeat-top-row .fr-grid-head, .fr-grid-th,   // CSS
+                    .fr-grid-head .fr-grid-master-row      .fr-grid-th {  // Table
+                        display: none;
+                    }
+
                 }
             }
 
@@ -294,7 +296,8 @@
 
                             // In narrow layout, we must never show the top border for the first
                             // `.fr-grid-repeat-iteration`.
-                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                            .fr-grid-repeat-top-row:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
+                            .fr-grid-repeat-iteration                                                ~ .fr-grid-repeat-iteration {
                                 border-top: 1px solid #ddd;
                             }
                         }
@@ -321,7 +324,8 @@
                             margin-left: 4px;
                             margin-right: 4px;
 
-                            .fr-grid-repeat-iteration ~ .fr-grid-repeat-iteration {
+                            .fr-grid-head:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
+                            .fr-grid-repeat-iteration                                      ~ .fr-grid-repeat-iteration {
                                 & > tr > td { border-top: 1px solid #ddd; }
                             }
                         }

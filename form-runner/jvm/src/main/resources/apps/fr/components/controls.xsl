@@ -262,7 +262,7 @@
             fr:short-label        [exists(fr:param)] |
             fr:iteration-label    [exists(fr:param)] |
             fr:add-iteration-label[exists(fr:param)]"
-        mode="within-controls">
+        mode="within-controls within-grid">
 
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
 

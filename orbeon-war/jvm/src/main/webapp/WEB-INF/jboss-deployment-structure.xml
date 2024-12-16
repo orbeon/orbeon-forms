@@ -5,6 +5,7 @@
             <module name="org.apache.logging.log4j.api" />
         </exclusions>
         <dependencies>
+            <module name="jdk.unsupported"/>
             <system export="true">
                 <paths>
                     <path name="org/w3c/dom/css"/>

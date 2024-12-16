@@ -1557,30 +1557,30 @@ object XFormsUI {
     }
 
     private val dialogKeydownListener: js.Function1[dom.KeyboardEvent, Unit] = (event: dom.KeyboardEvent) => {
-      val targetElem    = event.target.asInstanceOf[html.Element]
-      val dialogElem    = targetElem.closest("dialog")
+      event.targetT.closestOpt("dialog").foreach { dialogElem =>
 
-      // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
-      val supportsClose = dialogElem.classList.contains("xforms-dialog-close-true")
-      if (event.key == "Escape" && ! supportsClose) {
-        event.preventDefault()
-        event.stopPropagation()
-      }
+        // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
+        val supportsClose = dialogElem.classList.contains("xforms-dialog-close-true")
+        if (event.key == "Escape" && ! supportsClose) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
 
-      // Cmd-Enter or Ctrl-Enter is equivalent to clicking the primary button
-      if (event.key == "Enter" && (event.metaKey || event.ctrlKey)) {
-        val allButtons            = dialogElem.querySelectorAll("button.btn-primary")
-        val firstVisibleButtonOpt = allButtons.toList
-          .map(_.asInstanceOf[html.Button])
-          .find { button =>
-            val computedStyle = dom.window.getComputedStyle(button)
-            computedStyle.visibility != "hidden" &&
-            computedStyle.display    != "none"
+        // Cmd-Enter or Ctrl-Enter is equivalent to clicking the primary button
+        if (event.key == "Enter" && (event.metaKey || event.ctrlKey)) {
+          val allButtons            = dialogElem.querySelectorAll("button.btn-primary")
+          val firstVisibleButtonOpt = allButtons.toList
+            .map(_.asInstanceOf[html.Button])
+            .find { button =>
+              val computedStyle = dom.window.getComputedStyle(button)
+              computedStyle.visibility != "hidden" &&
+              computedStyle.display    != "none"
+            }
+          firstVisibleButtonOpt.foreach { button =>
+            // Blur active element so to send a possible value change before closing the dialog
+            Option(dom.document.activeElement).foreach(_.asInstanceOf[html.Element].blur())
+            button.click()
           }
-        firstVisibleButtonOpt.foreach { button =>
-          // Blur active element so to send a possible value change before closing the dialog
-          Option(dom.document.activeElement).foreach(_.asInstanceOf[html.Element].blur())
-          button.click()
         }
       }
     }

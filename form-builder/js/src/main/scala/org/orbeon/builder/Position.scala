@@ -42,8 +42,8 @@ object Position {
   })
 
   // How much we need to add to offset to account for the form having been scrolled
-  def scrollTop() : Double  = $(".fb-main").scrollTop ()
-  def scrollLeft(): Double  = $(".fb-main").scrollLeft()
+  def scrollTop() : Double  = document.querySelector(".fb-main").scrollTop
+  def scrollLeft(): Double  = document.querySelector(".fb-main").scrollLeft
 
   // Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
   def adjustedOffset(el: JQuery): Offset = {

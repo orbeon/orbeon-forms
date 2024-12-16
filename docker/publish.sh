@@ -3,7 +3,7 @@
 publish=true
 
 VERSION=${1:-'2023.1.6-pe'}
-TAG=${2:-'tag-release-2023.6-pe-pseudo'}
+TAG=${2:-'tag-release-2023.1.6-pe-pseudo'}
 FILE=${3:-'orbeon-2023.1.6.202412160253-PE.zip'}
 SQL_FILE=${4:-'2023.1/postgresql-2023_1.sql'}
 PLATFORMS=${5:-'linux/amd64,linux/arm64'}

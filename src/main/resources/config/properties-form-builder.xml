@@ -180,58 +180,22 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
-        if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
-            return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
-        ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test") then
-            suspend then
-            xf:dispatch(name = "fb-test-form")
-        ) else
-            xf:dispatch(name = "fb-test-form")
+        xf:dispatch(name = "fb-test-form")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test-formulas.orbeon.builder">
-        if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
-            return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
-        ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test-formulas") then
-            suspend then
-            xf:dispatch(name = "fb-test-formulas")
-        ) else
-            xf:dispatch(name = "fb-test-formulas")
+        xf:dispatch(name = "fb-test-formulas")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test-offline.orbeon.builder">
-        if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
-            return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
-        ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test-offline") then
-            suspend then
-            xf:dispatch(name = "fb-test-offline")
-        ) else
-            xf:dispatch(name = "fb-test-offline")
+        xf:dispatch(name = "fb-test-offline")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test-pdf.orbeon.builder">
-        if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
-            return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
-        ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test-pdf") then
-            suspend then
-            xf:dispatch(name = "fb-test-pdf-show-dialog")
-        ) else
-            xf:dispatch(name = "fb-test-pdf-show-dialog")
+        xf:dispatch(name = "fb-test-pdf-show-dialog")
     </property>
 
-<property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
+    <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
         if ("
             let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
             return

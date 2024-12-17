@@ -677,7 +677,14 @@
             )"
         method="post"
         replace="all"
-        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test?fr-language={$fb-lang}"
+        resource="
+            /fr/{
+                (bind('application-name-bind')[xxf:non-blank()], '_')[1]
+            }/{
+                (bind('form-name-bind')[xxf:non-blank()], '_')[1]
+            }/test?fr-language={
+                $fb-lang
+            }"
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />
@@ -711,7 +718,14 @@
             )"
         method="post"
         replace="all"
-        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test"
+        resource="
+            /fr/{
+                (bind('application-name-bind')[xxf:non-blank()], '_')[1]
+            }/{
+                (bind('form-name-bind')[xxf:non-blank()], '_')[1]
+            }/test?fr-language={
+                $fb-lang
+            }"
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />
@@ -751,7 +765,12 @@
             )"
         method="post"
         replace="all"
-        resource="/fr/service/{bind('application-name-bind')}/{bind('form-name-bind')}/compile?format=zip"
+        resource="
+            /fr/service/{
+                (bind('application-name-bind')[xxf:non-blank()], '_')[1]
+            }/{
+                (bind('form-name-bind')[xxf:non-blank()], '_')[1]
+            }/compile?format=zip"
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />
@@ -781,14 +800,19 @@
             )"
         method="post"
         replace="all"
-        resource="/fr/service/{bind('application-name-bind')}/{bind('form-name-bind')}/test-pdf?{
+        resource="
+            /fr/service/{
+                (bind('application-name-bind')[xxf:non-blank()], '_')[1]
+            }/{
+                (bind('form-name-bind')[xxf:non-blank()], '_')[1]
+            }/test-pdf?{
             string-join(
                 for $p in instance('fb-test-pdf-submission-params')/@*[xxf:non-blank(.)]
                 return
                     concat(name($p), '=', encode-for-uri(string($p))),
                 '&amp;'
             )
-        }&amp;fr-remember-language=false"
+            }&amp;fr-remember-language=false"
         xxf:target="_blank"
         xxf:show-progress="false"
     />

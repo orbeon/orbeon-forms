@@ -236,7 +236,7 @@ object XPathFunctionAnnotationMacro {
           if (regularArgs.isEmpty) { // no parameter list!
             q"""
               encodeSaxonArg[$returnType](
-                fn[..$tpes]
+                fn[..$tpes]()
               )
              """
           } else {

@@ -776,12 +776,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date≡xf-9" class="fr-field-width-natural fr-native-picker-ios"/>
-                        <xxf:control id="my-date≡xf-10" class="input-append date"/>
+                        <xxf:control id="my-date≡xf-10" class="fr-field-width-natural fr-native-picker-ios fr-today-highlight-true"/>
+                        <xxf:control id="my-date≡xf-11" class="input-append date"/>
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
                         <xxf:control id="my-date≡xf-12" relevant="false"/>
                         <xxf:init id="my-date">
-                            <xxf:value>{"isoOrUnrecognizedValue":{"Left":{"value":{"year":2010,"month":1,"day":13}}},"format":{"firstComponent":{"Month":{}},"separator":"/","isPadDayDigits":false,"isPadMonthDigits":false},"excludedDates":[],"weekStart":null}</xxf:value>
+                            <xxf:value>{"isoOrUnrecognizedValue":{"Left":{"value":{"year":2010,"month":1,"day":13}}},"format":{"firstComponent":{"Month":{}},"separator":"/","isPadDayMonthDigits":false},"excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>
                     </xxf:control-values>
                     <xxf:focus control-id="my-date"/>

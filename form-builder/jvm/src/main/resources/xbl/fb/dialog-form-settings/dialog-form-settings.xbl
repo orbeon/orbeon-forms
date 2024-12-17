@@ -714,7 +714,7 @@
                             <url>oxf:/forms/orbeon/builder/form/template-wizard.xml</url>
                             <title>Wizard Form</title>
                             <description>This template is configured to use the Wizard view.</description>
-                            <thumbnail>oxf:/forms/orbeon/builder/form/template-wizard.webp</thumbnail>
+                            <thumbnail>oxf:/forms/orbeon/builder/form/template-wizard.jpg</thumbnail>
                         </_>
                     </_>
                     <_/>
@@ -1053,7 +1053,7 @@
                                 <xf:group xxf:element="div" class="fb-template-cards-container" id="fb-template-cards-container">
                                     <xh:div class="fb-template-cards">
                                         <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
-                                            <xh:div class="fb-template-card" title="{{title}}">
+                                            <xh:div class="fb-template-card {if (position() le 2) then 'fb-builtin-template' else ()}" title="{{title}}">
                                                 <xf:output class="fb-template-title" value="title"/>
                                                 <xf:output class="fb-template-thumbnail" mediatype="image/*" ref="thumbnail[xxf:non-blank()]"/>
                                             </xh:div>

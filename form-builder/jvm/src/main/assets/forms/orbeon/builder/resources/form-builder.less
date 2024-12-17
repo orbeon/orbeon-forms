@@ -803,6 +803,14 @@ body.orbeon {
                     overflow: hidden;
                     box-sizing: border-box;
 
+                    &.fb-builtin-template {
+                        img {
+                            opacity: 0.8;
+                            box-sizing: border-box;
+                            padding: 5%;
+                        }
+                    }
+
                     &.xforms-repeat-selected-item-1 {
                         border-color: @focusBorderColor;
                         .focusDecorations();

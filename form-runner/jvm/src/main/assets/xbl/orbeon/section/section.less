@@ -10,6 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+@import (reference) "../../../../../../../../bootstrap-src/less/variables";
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
@@ -25,24 +26,55 @@
         &:last-of-type { padding-bottom: 0; }
 
         h2, h3, h4, h5, h6 {
-            &.fr-section-title {
-                #gradient > .vertical(@grayLighter, @grayLighter);
-                margin: 0;
+            &.fr-section-title, &.fr-section-iteration-title {
+                display: flex;
+                background-color: @grayLighter;
                 font-weight: normal;
-                padding: 0;
                 color: @frHeaderColor;
-                font-size: @frSectionTitleHeight;
-                line-height: @frSectionTitleLineHeight;
+            }
+
+            &.fr-section-title {
+                margin: 0;
+                padding: 0;
             }
 
             &.fr-section-iteration-title {
-                #gradient > .vertical(@grayLighter, @grayLighter);
                 margin: 5px 0 0 0;
-                font-weight: normal;
                 padding: 0 0 0 10px;
-                color: @frHeaderColor;
+            }
+        }
+
+        h3, h4, h5, h6 {
+            &.fr-section-title, &.fr-section-iteration-title {
+                border-radius: @baseBorderRadius;
+            }
+        }
+
+        h2 {
+            &.fr-section-title {
+                font-size: @frSectionTitleHeight;
+                line-height: @frSectionTitleLineHeight;
+                min-height: @frSectionTitleLineHeight;
+            }
+
+            &.fr-section-iteration-title {
                 font-size: @frSectionTitleHeight * 0.8;
                 line-height: @frSectionTitleLineHeight * 0.8;
+                min-height: @frSectionTitleLineHeight * 0.8;
+            }
+        }
+
+        h3, h4, h5, h6 {
+            &.fr-section-title {
+                font-size: @frSectionTitleHeight * 0.8;
+                line-height: @frSectionTitleLineHeight * 0.8;
+                min-height: @frSectionTitleLineHeight * 0.8;
+            }
+
+            &.fr-section-iteration-title {
+                font-size: @frSectionTitleHeight * 0.8 * 0.8;
+                line-height: @frSectionTitleLineHeight * 0.8 * 0.8;
+                min-height: @frSectionTitleLineHeight * 0.8 * 0.8;
             }
         }
 
@@ -72,7 +104,6 @@
 
                 padding-left: 10px;
                 padding-right: 10px;
-                font-size: @frSectionTitleHeight;
 
                 .xforms-help {
                     .help-icon();
@@ -85,7 +116,7 @@
 
                 // `<button>` for collapsible section, `<output>` for non-collapsible
                 .btn-link, .xforms-output-output {
-                    min-height: @frSectionTitleLineHeight;
+                    //min-height: @frSectionTitleLineHeight;
                     white-space: normal;   // so long titles don't get truncated (we could also go with `.text-overflow()`)
                 }
                 .btn-link {
@@ -104,11 +135,9 @@
                     padding-left  : @frSectionTitleLeftPadding;
                     padding-right : @frSectionTitleLeftPadding; // Same logic, for RTL
                     background-repeat: no-repeat;
-                    background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
-                                                                                                             // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
-                                                                                                             // to be aligned on the first line, not the middle of the section area
-                    cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
-                    border-collapse: separate;  // For Liferay, see https://github.com/orbeon/orbeon-forms/issues/2716
+                    background-position: 5px 50%; // used to try to align on center of first line for multiline titles, but I don't think it's worth the trouble
+                    cursor: pointer;              // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
+                    border-collapse: separate;    // For Liferay, see https://github.com/orbeon/orbeon-forms/issues/2716
                 }
                 &.fr-section-open {
                     background-image: url(arrow-down.png);

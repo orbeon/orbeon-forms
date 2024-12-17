@@ -137,10 +137,13 @@
                     <created-with-version>2023.1 PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
 
 
+
+                    <thumbnail filename="copy-action" mediatype="image/png" size="44789">/fr/service/persistence/crud/orbeon/builder/data/4da83f8626b0e8f3f29ae554780c060312e04d02/2c828cbbd83a866832a0a4d8e374bcddabb52fd2.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>
                             <template name="default">
@@ -150,8 +153,6 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <thumbnail filename="copy-action" mediatype="image/png" size="44789">/fr/service/persistence/crud/orbeon/builder/data/4da83f8626b0e8f3f29ae554780c060312e04d02/2c828cbbd83a866832a0a4d8e374bcddabb52fd2.bin</thumbnail>
-                    <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>
 

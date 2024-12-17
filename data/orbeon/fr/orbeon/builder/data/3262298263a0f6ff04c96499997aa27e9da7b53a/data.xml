@@ -78,10 +78,13 @@
 
 
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
 
 
+
+                    <thumbnail filename="nobel-prizes.png" mediatype="image.png" size="301601">/fr/service/persistence/crud/orbeon/builder/data/3262298263a0f6ff04c96499997aa27e9da7b53a/fc4088d80515f2169bff927e96c21f10b0f33ed0.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>
                             <template name="default">
@@ -91,8 +94,6 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <thumbnail filename="nobel-prizes.png" mediatype="image.png" size="301601">/fr/service/persistence/crud/orbeon/builder/data/3262298263a0f6ff04c96499997aa27e9da7b53a/fc4088d80515f2169bff927e96c21f10b0f33ed0.bin</thumbnail>
-                    <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>
 
@@ -186,7 +187,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section readonly="true" id="prizes-section" bind="prizes-bind" repeat="content" min="1"
                             template="instance('prizes-template')"

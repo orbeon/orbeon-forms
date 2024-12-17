@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xh:title>Orbeon Demo: Document Request</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
@@ -7,20 +22,31 @@
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <requester-section>
-                        <contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5>
+                        <contact-information>
+                            <grid-5>
+                                <contact-information-first-name/>
+                                <contact-information-last-name/>
+                                <contact-information-phone/>
+                                <contact-information-email/>
+                                <control-4/>
+                            </grid-5>
 
 
                         </contact-information>
-                        <address-us><grid-3>
-                            <us-address-street-1/><us-address-city/>
+                        <address-us>
+                            <grid-3>
+                                <us-address-street-1/>
+                                <us-address-city/>
 
 
-                            <us-address-street-2/><us-address-state/><us-address-zip/>
+                                <us-address-street-2/>
+                                <us-address-state/>
+                                <us-address-zip/>
 
 
-                            <us-address-urbanization/>
+                                <us-address-urbanization/>
 
-                        </grid-3>
+                            </grid-3>
 
 
                         </address-us>
@@ -38,14 +64,17 @@
             <!-- Bindings -->
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="requester-section-bind" name="requester-section" ref="requester-section">
-                    <xf:bind id="contact-information-bind" ref="contact-information" name="contact-information"/>
+                    <xf:bind id="contact-information-bind" ref="contact-information"
+                             name="contact-information"/>
                     <xf:bind id="address-us-bind" ref="address-us" name="address-us"/>
 
                 </xf:bind>
-                <xf:bind id="requested-documents-bind" ref="requested-documents" name="requested-documents">
+                <xf:bind id="requested-documents-bind" ref="requested-documents"
+                         name="requested-documents">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
                         <xf:bind id="quantity-bind" ref="quantity" name="quantity" required="true()"/>
-                        <xf:bind id="document-type-bind" ref="document-type" name="document-type" required="true()"/>
+                        <xf:bind id="document-type-bind" ref="document-type" name="document-type"
+                                 required="true()"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -59,13 +88,24 @@
                     <description xml:lang="en">This form allows you to request documents from an organization.</description>
 
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
 
-                <thumbnail filename="document-request.png" mediatype="image/png" size="41736">/fr/service/persistence/crud/orbeon/builder/data/e4853204ebf880792029db4f9139a556787389b3/af03cda4bc3749f5b545d9b23ea715ae53d3a383.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
+                    <thumbnail filename="document-request.png" mediatype="image/png" size="41736">/fr/service/persistence/crud/orbeon/builder/data/e4853204ebf880792029db4f9139a556787389b3/af03cda4bc3749f5b545d9b23ea715ae53d3a383.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
             </xf:instance>
 
             <!-- Attachments -->
@@ -77,7 +117,9 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
-                        <document-type><label>Document Type</label><hint/>
+                        <document-type>
+                            <label>Document Type</label>
+                            <hint/>
 
 
                             <item>
@@ -96,7 +138,9 @@
                                 <value>privacy-policies</value>
                             </item>
                         </document-type>
-                        <quantity><label>Number of documents</label><hint/>
+                        <quantity>
+                            <label>Number of documents</label>
+                            <hint/>
 
 
                             <item>
@@ -147,14 +191,25 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="requester-section-section" bind="requester-section-bind">
                     <xf:label ref="$form-resources/requester-section/label"/>
                     <fr:section id="contact-information-section" bind="contact-information-bind">
-                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" id="contact-information-content-control"/>
+                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                                       xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                                       id="contact-information-content-control"/>
                     </fr:section>
                     <fr:section id="address-us-section" bind="address-us-bind">
-                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" id="address-us-content-control"/>
+                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                              xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                              xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                              id="address-us-content-control"/>
                     </fr:section>
                 </fr:section>
                 <fr:section id="requested-documents-section" bind="requested-documents-bind">
@@ -166,7 +221,8 @@
                                     <fr:summary-show/>
                                 </fr:index>
                                 <xf:label ref="$form-resources/document-type/label"/>
-                                <xf:hint ref="$form-resources/document-type/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/document-type/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                                 <xf:itemset ref="$form-resources/document-type/item">
@@ -182,7 +238,8 @@
                                     <fr:summary-show/>
                                 </fr:index>
                                 <xf:label ref="$form-resources/quantity/label"/>
-                                <xf:hint ref="$form-resources/quantity/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/quantity/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                                 <xf:itemset ref="$form-resources/quantity/item">
@@ -191,7 +248,8 @@
                                     <xf:hint ref="hint"/>
                                 </xf:itemset>
                             </xf:select1>
-                        </fr:c><fr:c x="10" y="1" w="3" h="1"/>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="3" h="1"/>
                     </fr:grid>
                 </fr:section>
             </fr:body>

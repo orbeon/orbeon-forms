@@ -99,11 +99,17 @@
                     <title xml:lang="en">Orbeon Demo: Travel Form with Master-Detail</title>
                     <description xml:lang="en">This form showcases Orbeon Forms's support for synchronized master-detail views, with paging and custom repetition labels in the wizard.</description>
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
 
 
 
+
+                    <thumbnail filename="travel.png" mediatype="image/png" size="52985">/fr/service/persistence/crud/orbeon/builder/data/cfe461c3f4daac89f9fac29fb9ea48f5fa5221f9/36eb291fbd28434c99e3c01c831b7f7276248862.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <wizard>true</wizard>
+                    <wizard-mode>strict</wizard-mode>
+                    <data-migration>enabled</data-migration>
                     <email>
                         <templates>
                             <template name="default">
@@ -113,11 +119,6 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <thumbnail filename="travel.png" mediatype="image/png" size="52985">/fr/service/persistence/crud/orbeon/builder/data/cfe461c3f4daac89f9fac29fb9ea48f5fa5221f9/36eb291fbd28434c99e3c01c831b7f7276248862.bin</thumbnail>
-                    <allow-template-use>true</allow-template-use>
-                    <wizard>true</wizard>
-                    <wizard-mode>strict</wizard-mode>
-                    <data-migration>enabled</data-migration>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">

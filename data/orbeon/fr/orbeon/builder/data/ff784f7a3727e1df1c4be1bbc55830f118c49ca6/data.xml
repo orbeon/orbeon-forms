@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xh:title>Orbeon Demo: Consent for emergency medical treatment</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
@@ -7,27 +22,69 @@
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <consent-section>
-                        <consent-grid><control-1/><organization-name/><minor-name/><allergies/></consent-grid>
+                        <consent-grid>
+                            <control-1/>
+                            <organization-name/>
+                            <minor-name/>
+                            <allergies/>
+                        </consent-grid>
 
-                    </consent-section><contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5></contact-information><contact-address><grid-3>
-                            <us-address-street-1/><us-address-city/>
+                    </consent-section>
+                    <contact-information>
+                        <grid-5>
+                            <contact-information-first-name/>
+                            <contact-information-last-name/>
+                            <contact-information-phone/>
+                            <contact-information-email/>
+                            <control-4/>
+                        </grid-5>
+                    </contact-information>
+                    <contact-address>
+                        <grid-3>
+                            <us-address-street-1/>
+                            <us-address-city/>
 
 
-                            <us-address-street-2/><us-address-state/><us-address-zip/>
+                            <us-address-street-2/>
+                            <us-address-state/>
+                            <us-address-zip/>
 
 
                             <us-address-urbanization/>
 
-                        </grid-3></contact-address><signature-section><grid-2><signature-date/><signature/></grid-2></signature-section>
+                        </grid-3>
+                    </contact-address>
+                    <signature-section>
+                        <grid-2>
+                            <signature-date/>
+                            <signature/>
+                        </grid-2>
+                    </signature-section>
                 </form>
             </xf:instance>
 
             <!-- Bindings -->
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="consent-section-bind" name="consent-section" ref="consent-section">
-                    <xf:bind id="consent-grid-bind" ref="consent-grid" name="consent-grid"><xf:bind id="control-1-bind" ref="control-1" name="control-1"/><xf:bind id="organization-name-bind" ref="organization-name" name="organization-name" xxf:whitespace="trim"/><xf:bind id="allergies-bind" ref="allergies" name="allergies"/><xf:bind id="minor-name-bind" ref="minor-name" name="minor-name" xxf:whitespace="trim"/></xf:bind>
+                    <xf:bind id="consent-grid-bind" ref="consent-grid" name="consent-grid">
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1"/>
+                        <xf:bind id="organization-name-bind" ref="organization-name" name="organization-name"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="allergies-bind" ref="allergies" name="allergies"/>
+                        <xf:bind id="minor-name-bind" ref="minor-name" name="minor-name" xxf:whitespace="trim"/>
+                    </xf:bind>
 
-                </xf:bind><xf:bind id="contact-address-bind" ref="contact-address" name="contact-address"/><xf:bind id="signature-section-bind" ref="signature-section" name="signature-section"><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="signature-bind" ref="signature" name="signature" type="xf:anyURI"/><xf:bind id="signature-date-bind" ref="signature-date" name="signature-date" type="xf:date"/></xf:bind></xf:bind><xf:bind id="contact-information-bind" ref="contact-information" name="contact-information"/>
+                </xf:bind>
+                <xf:bind id="contact-address-bind" ref="contact-address" name="contact-address"/>
+                <xf:bind id="signature-section-bind" ref="signature-section" name="signature-section">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="signature-bind" ref="signature" name="signature" type="xf:anyURI"/>
+                        <xf:bind id="signature-date-bind" ref="signature-date" name="signature-date"
+                                 type="xf:date"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="contact-information-bind" ref="contact-information"
+                         name="contact-information"/>
             </xf:bind>
 
             <!-- Metadata -->
@@ -39,10 +96,22 @@
                     <description xml:lang="en" mediatype="text/html">&lt;div style="display: flex; align-items: center; column-gap: 1em;"&gt;&lt;img style="width: 50px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Star_of_life2.svg/2560px-Star_of_life2.svg.png"&gt;This is a simple form to give consent for emergency medical treatment to a minor. It also makes use of section template fro the global library.&lt;/div&gt;</description>
 
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
-                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
-                <thumbnail filename="emergency-medical-consent.png" mediatype="image/png" size="160175">/fr/service/persistence/crud/orbeon/builder/data/ff784f7a3727e1df1c4be1bbc55830f118c49ca6/fee5a9ed8f5ebedf7b6f72b169e0c716f9133c81.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <thumbnail filename="emergency-medical-consent.png" mediatype="image/png" size="160175">/fr/service/persistence/crud/orbeon/builder/data/ff784f7a3727e1df1c4be1bbc55830f118c49ca6/fee5a9ed8f5ebedf7b6f72b169e0c716f9133c81.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
             </xf:instance>
 
             <!-- Attachments -->
@@ -53,10 +122,41 @@
             <!-- All form resources -->
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
-                    <resource xml:lang="en"><signature-date><label>Date</label><hint/></signature-date><signature><label>Signature</label><hint/></signature><control-1><text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;I hereby give consent to the following organization to obtain emergency care prescribed by a licensed physician.&lt;/div&gt;</text></control-1><organization-name><label>Organization name</label><hint/></organization-name><minor-name><label>Minor full name</label><hint/></minor-name><allergies><label>Allergies or other concerns</label><hint/></allergies>
+                    <resource xml:lang="en">
+                        <signature-date>
+                            <label>Date</label>
+                            <hint/>
+                        </signature-date>
+                        <signature>
+                            <label>Signature</label>
+                            <hint/>
+                        </signature>
+                        <control-1>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;I hereby give consent to the following organization to obtain emergency care prescribed by a licensed physician.&lt;/div&gt;</text>
+                        </control-1>
+                        <organization-name>
+                            <label>Organization name</label>
+                            <hint/>
+                        </organization-name>
+                        <minor-name>
+                            <label>Minor full name</label>
+                            <hint/>
+                        </minor-name>
+                        <allergies>
+                            <label>Allergies or other concerns</label>
+                            <hint/>
+                        </allergies>
                         <consent-section>
 
-                        </consent-section><signature-section/><contact-information><help/></contact-information><contact-address/><consent-grid/>
+                        </consent-section>
+                        <signature-section/>
+                        <contact-information>
+                            <help/>
+                        </contact-information>
+                        <contact-address/>
+                        <consent-grid/>
 
                     </resource>
                 </resources>
@@ -66,44 +166,102 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="consent-section-section" bind="consent-section-bind">
                     <fr:grid id="consent-grid-grid" bind="consent-grid-bind">
-                        <fr:c y="1" x="1" w="12"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control" bind="control-1-bind">
-                        <fr:text ref="$form-resources/control-1/text" mediatype="text/html"/>
-                    </fr:explanation>
+                        <fr:c y="1" x="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control"
+                                            bind="control-1-bind">
+                                <fr:text ref="$form-resources/control-1/text" mediatype="text/html"/>
+                            </fr:explanation>
 
                             </fr:c>
-                        <fr:c x="1" y="2" w="6"><xf:input id="organization-name-control" bind="organization-name-bind"><fr:index><fr:summary-show/></fr:index>
-                        <xf:label ref="$form-resources/organization-name/label"/>
-                        <xf:hint ref="$form-resources/organization-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input id="organization-name-control" bind="organization-name-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/organization-name/label"/>
+                                <xf:hint ref="$form-resources/organization-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </xf:input></fr:c><fr:c x="7" y="2" w="6"><xf:input id="minor-name-control" bind="minor-name-bind"><fr:index><fr:summary-show/></fr:index>
-                        <xf:label ref="$form-resources/minor-name/label"/>
-                        <xf:hint ref="$form-resources/minor-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="minor-name-control" bind="minor-name-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/minor-name/label"/>
+                                <xf:hint ref="$form-resources/minor-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </xf:input></fr:c><fr:c x="1" y="3" w="12"><xf:textarea id="allergies-control" bind="allergies-bind">
-                        <xf:label ref="$form-resources/allergies/label"/>
-                        <xf:hint ref="$form-resources/allergies/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="12">
+                            <xf:textarea id="allergies-control" bind="allergies-bind">
+                                <xf:label ref="$form-resources/allergies/label"/>
+                                <xf:hint ref="$form-resources/allergies/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </xf:textarea></fr:c>
+                            </xf:textarea>
+                        </fr:c>
                     </fr:grid>
-                </fr:section><fr:section id="contact-information-section" bind="contact-information-bind"><component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-information-content-control"/></fr:section><fr:section id="contact-address-section" bind="contact-address-bind"><component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-address-content-control" bind="contact-address-content-bind"/></fr:section><fr:section id="signature-section-section" bind="signature-section-bind"><fr:grid id="grid-2-grid" bind="grid-2-bind">
-              <fr:c x="1" y="1" w="3"/><fr:c x="4" y="1" w="3" h="1"/><fr:c x="7" y="1" w="2"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="signature-date-control" bind="signature-date-bind"><fr:index><fr:summary-show/></fr:index>
-                        <xf:label ref="$form-resources/signature-date/label"/>
-                        <xf:hint ref="$form-resources/signature-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </fr:section>
+                <fr:section id="contact-information-section" bind="contact-information-bind">
+                    <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                                   xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                   xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                   xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                   id="contact-information-content-control"/>
+                </fr:section>
+                <fr:section id="contact-address-section" bind="contact-address-bind">
+                    <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                          xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                          id="contact-address-content-control"
+                                          bind="contact-address-content-bind"/>
+                </fr:section>
+                <fr:section id="signature-section-section" bind="signature-section-bind">
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="3"/>
+                        <fr:c x="4" y="1" w="3" h="1"/>
+                        <fr:c x="7" y="1" w="2">
+                            <fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="signature-date-control"
+                                     bind="signature-date-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/signature-date/label"/>
+                                <xf:hint ref="$form-resources/signature-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:date></fr:c><fr:c x="9" y="1" w="4" h="1"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="signature-control" bind="signature-bind">
-                        <xf:label ref="$form-resources/signature/label"/>
-                        <xf:hint ref="$form-resources/signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4" h="1">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="signature-control"
+                                                      bind="signature-bind">
+                                <xf:label ref="$form-resources/signature/label"/>
+                                <xf:hint ref="$form-resources/signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:handwritten-signature></fr:c>
-            </fr:grid></fr:section>
+                            </fr:handwritten-signature>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
             </fr:body>
         </fr:view>
     </xh:body>

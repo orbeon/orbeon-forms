@@ -154,7 +154,7 @@
                     <xf:bind id="details-grid-bind" ref="details-grid" name="details-grid">
                         <xf:bind id="title-bind" name="title" ref="title" required="true()" xxf:whitespace="trim"/>
                         <xf:bind id="author-bind" name="author" ref="author" required="true()" xxf:whitespace="trim"/>
-                        <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
+                        <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI" required="true()"/>
                         <xf:bind id="language-bind" name="language" ref="language"/>
                         <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
                         <xf:bind id="rating-bind" name="rating" ref="rating"/>
@@ -181,7 +181,7 @@
                     <title xml:lang="fr">Orbeon Demo: Bookshelf</title>
                     <description xml:lang="fr">Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
                     <library-versions>
-
+                        <_>1</_>
                     </library-versions>
 
                     <thumbnail filename="bookshelf.png" mediatype="image/png" size="524952">/fr/service/persistence/crud/orbeon/bookshelf/form/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</thumbnail>
@@ -211,23 +211,23 @@
                             <label>Notes</label>
                             <help>This section contains one or more notes about the book.</help>
                         </notes>
-                        <title>
-                            <label>Title</label>
-                            <hint>Book title</hint>
-                            <help>This input contains the book title. For example...</help>
-                            <alert>The book title is missing</alert>
+                        <title><label>Title</label><help>This input field contains the book title, for example "On the Road".</help>
+
+
+                            <hint>Book title</hint><alert>The book title is missing</alert>
+
                         </title>
-                        <author>
-                            <label>Author</label>
-                            <help>This input contains the book's author name.</help>
+                        <author><label>Author</label><help>This input contains the book's author name, for example "Jack Kerouak".</help>
+
                             <hint>Book author</hint>
                             <alert>The author name is missing</alert>
+
                         </author>
-                        <language>
-                            <label>Language</label>
-                            <hint>Book language</hint>
-                            <help>This contains the book language. For example...</help>
-                            <alert>The language selected is invalid</alert>
+                        <language><label>Language</label><help/>
+
+
+                            <hint>Book language</hint><alert>The language selected is invalid</alert>
+
                             <item>
                                 <label>Chinese</label>
                                 <value>zh</value>
@@ -257,17 +257,17 @@
                                 <value>es</value>
                             </item>
                         </language>
-                        <link>
-                            <label>Link</label>
-                            <hint>Optional link to external resource</hint>
-                            <help>This input contains a link to an external resource. For example...</help>
-                            <alert>The link must be a valid HTTP or HTTPS URL</alert>
+                        <link><label>Link</label><help>This input contains a link to an external resource. For example "https://en.wikipedia.org/wiki/On_the_Road".</help>
+
+
+                            <hint>Optional link to external resource</hint><alert>The link must be a valid HTTP or HTTPS URL</alert>
+
                         </link>
-                        <rating>
-                            <label>Rating</label>
-                            <hint>Your rating</hint>
-                            <help>This contains your rating about the book. For example...</help>
-                            <alert>The rating selected is invalid</alert>
+                        <rating><label>Rating</label><help/>
+
+
+                            <hint>Your rating</hint><alert>The rating selected is invalid</alert>
+
 
                             <item>
                                 <label>None</label>
@@ -294,27 +294,29 @@
                                 <value>5</value>
                             </item>
                         </rating>
-                        <publication-year>
-                            <label>Publication Year</label>
-                            <hint>Year the book was published</hint>
-                            <help>This is the year the book was published. For example: "2009".</help>
+                        <publication-year><label>Publication Year</label><help>This is the year the book was published. For example: "1957".</help><hint>Year the book was published</hint>
+
+
                             <alert>The year selected is invalid</alert>
+
                         </publication-year>
-                        <review>
-                            <label>Review</label>
-                            <help>Your review for this book</help>
+                        <review><label>Review</label><help>This is your review for this book. You can use rich text.</help><hint/>
+
+                            <alert/>
                         </review>
-                        <image>
-                            <label>Book Cover</label>
-                            <hint>Upload a book cover image</hint>
-                            <help>This is an optional book cover image.</help>
-                            <alert>The book cover image is invalid</alert>
+                        <image><label>Book Cover</label><help>&lt;div&gt;This is an optional book cover image. You can upload any image format supported by web browsers, including:&lt;/div&gt;&lt;div&gt;
+&lt;ul&gt;&lt;li&gt;JPG&lt;/li&gt;&lt;li&gt;PNG&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</help>
+
+
+                            <hint>Upload a book cover image</hint><alert>The book cover image is invalid</alert>
+
                         </image>
-                        <note-text>
-                            <label>Note</label>
-                            <hint>Notes about this book</hint>
-                            <help>These notes contain your own comments about the book. For example...</help>
-                            <alert>The notes are invalid</alert>
+                        <note-text><label>Note</label><help>These notes contain your own comments about the book. For example, a paragraph excerpt, or personal notes.</help>
+
+
+                            <hint>Notes about this book</hint><alert>The notes are invalid</alert>
+
                         </note-text>
                     </resource>
                     <resource xml:lang="fr">
@@ -326,23 +328,23 @@
                             <label>Notes</label>
                             <help>Cette section contient une ou plusieurs notes à propos du livre.</help>
                         </notes>
-                        <title>
-                            <label>Titre</label>
-                            <hint>Titre du livre</hint>
-                            <help>Ce champ contient le titre du livre, par exemple...</help>
-                            <alert>Le titre du livre manque</alert>
+                        <title><label>Titre</label><help>Ce champ contient le titre du livre, par exemple...</help>
+
+
+                            <hint>Titre du livre</hint><alert>Le titre du livre manque</alert>
+
                         </title>
-                        <author>
-                            <label>Auteur</label>
-                            <help>Ce champ contient le nom de l'auteur du livre.</help>
+                        <author><label>Auteur</label><help>Ce champ contient le nom de l'auteur du livre.</help>
+
                             <hint>Auteur du livre</hint>
                             <alert>L'auteur du livre manque</alert>
+
                         </author>
-                        <language>
-                            <label>Langue</label>
-                            <hint>Langue du livre</hint>
-                            <help>Ce champ contient la langue du livre, par exemple...</help>
-                            <alert>La langue sélectionnée est invalide</alert>
+                        <language><label>Langue</label><help>Ce champ contient la langue du livre, par exemple...</help>
+
+
+                            <hint>Langue du livre</hint><alert>La langue sélectionnée est invalide</alert>
+
                             <item>
                                 <label>Allemand</label>
                                 <value>de</value>
@@ -372,17 +374,17 @@
                                 <value>ru</value>
                             </item>
                         </language>
-                        <link>
-                            <label>Lien</label>
-                            <hint>Lien optionnel vers une ressource externe</hint>
-                            <help>Ce champ contient un lien vers une ressource externe, par exemple...</help>
-                            <alert>Le lien doit être un URL HTTP ou HTTPS valide</alert>
+                        <link><label>Lien</label><help>Ce champ contient un lien vers une ressource externe, par exemple...</help>
+
+
+                            <hint>Lien optionnel vers une ressource externe</hint><alert>Le lien doit être un URL HTTP ou HTTPS valide</alert>
+
                         </link>
-                        <rating>
-                            <label>Evaluation</label>
-                            <hint>Votre évaluation</hint>
-                            <help>Ce champ contient votre évaluation du livre, par exemple...</help>
-                            <alert>L'évaluation sélectionnée est invalide</alert>
+                        <rating><label>Evaluation</label><help>Ce champ contient votre évaluation du livre, par exemple...</help>
+
+
+                            <hint>Votre évaluation</hint><alert>L'évaluation sélectionnée est invalide</alert>
+
 
                             <item>
                                 <label>Aucune</label>
@@ -409,27 +411,27 @@
                                 <value>5</value>
                             </item>
                         </rating>
-                        <publication-year>
-                            <label>Année de publication</label>
-                            <hint>Année durant laquelle le livre a été publié</hint>
-                            <help>Ceci est l'année durant laquelle le livre a été publié. Par exemple: "2009".</help>
+                        <publication-year><label>Année de publication</label><help>Ceci est l'année durant laquelle le livre a été publié. Par exemple: "2009".</help><hint>Année durant laquelle le livre a été publié</hint>
+
+
                             <alert>L'année sélectionnée est invalide</alert>
+
                         </publication-year>
-                        <review>
-                            <label>Critique</label>
-                            <help>Votre critique pour ce livre</help>
+                        <review><label>Critique</label><help>Votre critique pour ce livre</help><hint/>
+
+                            <alert/>
                         </review>
-                        <image>
-                            <label>Couverture</label>
-                            <hint>Insérer une image de couverture</hint>
-                            <help>Ce champ contient une image de couverture optionnelle.</help>
-                            <alert>L'image de couverture est invalide</alert>
+                        <image><label>Couverture</label><help>Ce champ contient une image de couverture optionnelle.</help>
+
+
+                            <hint>Insérer une image de couverture</hint><alert>L'image de couverture est invalide</alert>
+
                         </image>
-                        <note-text>
-                            <label>Note</label>
-                            <hint>Notes au sujet de ce livre</hint>
-                            <help>Ce champ de texte contient vos propres commentaires au sujet du livre, par exemple...</help>
-                            <alert>Cette note n'est pas valide</alert>
+                        <note-text><label>Note</label><help>Ce champ de texte contient vos propres commentaires au sujet du livre, par exemple...</help>
+
+
+                            <hint>Notes au sujet de ce livre</hint><alert>Cette note n'est pas valide</alert>
+
                         </note-text>
                     </resource>
                 </resources>
@@ -441,47 +443,43 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+            <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="details-section" bind="details-bind">
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
                     <fr:grid columns="3" id="details-grid-grid" bind="details-grid-bind">
                         <fr:c y="1" x="1" w="4">
-                                <xf:input id="title-control" bind="title-bind">
-                                    <xf:label ref="$form-resources/title/label"/>
+                                <xf:input id="title-control" bind="title-bind"><fr:index><fr:summary-show/></fr:index>
+                                    <xf:label ref="$form-resources/title/label"/><xf:help ref="$form-resources/title/help"/>
                                     <xf:hint ref="$form-resources/title/hint"/>
-                                    <xf:help ref="$form-resources/title/help"/>
                                     <xf:alert ref="$form-resources/title/alert"/>
-                                    <fr:index>
-                                        <fr:summary-show/>
-                                    </fr:index>
+
+
                                 </xf:input>
                             </fr:c>
                         <fr:c y="1" x="5" w="4">
-                                <xf:input id="author-control" bind="author-bind">
-                                    <xf:label ref="$form-resources/author/label"/>
+                                <xf:input id="author-control" bind="author-bind"><fr:index><fr:summary-show/></fr:index>
+                                    <xf:label ref="$form-resources/author/label"/><xf:help ref="$form-resources/author/help"/>
                                     <xf:hint ref="$form-resources/author/hint"/>
-                                    <xf:help ref="$form-resources/author/help"/>
                                     <xf:alert ref="$form-resources/author/alert"/>
-                                    <fr:index>
-                                        <fr:summary-show/>
-                                    </fr:index>
+
+
                                 </xf:input>
                             </fr:c>
                         <fr:c y="1" x="9" h="3" w="4">
                                 <fr:image-attachment id="image-control" bind="image-bind" class="fr-attachment">
-                                    <xf:label ref="$form-resources/image/label"/>
+                                    <xf:label ref="$form-resources/image/label"/><xf:help ref="$form-resources/image/help" mediatype="text/html"/>
                                     <xf:hint ref="$form-resources/image/hint"/>
-                                    <xf:help ref="$form-resources/image/help"/>
                                     <xf:alert ref="$form-resources/image/alert"/>
+
                                 </fr:image-attachment>
                             </fr:c>
                         <fr:c y="2" x="1" w="4">
-                                <xf:select1 id="language-control" bind="language-bind">
-                                    <xf:label ref="$form-resources/language/label"/>
+                                <xf:select1 id="language-control" bind="language-bind" appearance="dropdown"><fr:index><fr:summary-show/></fr:index>
+                                    <xf:label ref="$form-resources/language/label"/><xf:help ref="$form-resources/language/help"/>
                                     <xf:hint ref="$form-resources/language/hint"/>
-                                    <xf:help ref="$form-resources/language/help"/>
                                     <xf:alert ref="$form-resources/language/alert"/>
+
                                     <xf:item>
                                         <xf:label>Choose One...</xf:label>
                                         <xf:value/>
@@ -490,25 +488,23 @@
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                    <fr:index>
-                                        <fr:summary-show/>
-                                    </fr:index>
+
                                 </xf:select1>
                             </fr:c>
                         <fr:c y="2" x="5" w="4">
                                 <xf:input id="link-control" bind="link-bind">
-                                    <xf:label ref="$form-resources/link/label"/>
+                                    <xf:label ref="$form-resources/link/label"/><xf:help ref="$form-resources/link/help"/>
                                     <xf:hint ref="$form-resources/link/hint"/>
-                                    <xf:help ref="$form-resources/link/help"/>
                                     <xf:alert ref="$form-resources/link/alert"/>
+
                                 </xf:input>
                             </fr:c>
                         <fr:c y="3" x="1" w="4">
                             <xf:select1 id="rating-control" bind="rating-bind" appearance="full xxf:horizontal">
-                                    <xf:label ref="$form-resources/rating/label"/>
+                                    <xf:label ref="$form-resources/rating/label"/><xf:help ref="$form-resources/rating/help"/>
                                     <xf:hint ref="$form-resources/rating/hint"/>
-                                <xf:help ref="$form-resources/rating/help"/>
-                                    <xf:alert ref="$form-resources/rating/alert"/>
+                                <xf:alert ref="$form-resources/rating/alert"/>
+
                                     <xf:itemset ref="$form-resources/rating/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
@@ -517,20 +513,20 @@
                             </fr:c>
                         <fr:c y="3" x="5" w="4">
                                 <xf:input id="publication-year-control" bind="publication-year-bind">
-                                    <xf:label ref="$form-resources/publication-year/label"/>
-                                    <xf:hint ref="$form-resources/publication-year/hint"/>
-                                    <xf:help ref="$form-resources/publication-year/help"/>
-                                    <xf:alert ref="$form-resources/publication-year/alert"/>
+                                    <xf:label ref="$form-resources/publication-year/label"/><xf:help ref="$form-resources/publication-year/help"/>
+                                    <xf:hint ref="$form-resources/publication-year/hint"/><xf:alert ref="$form-resources/publication-year/alert"/>
+
+
                                 </xf:input>
                             </fr:c>
                     </fr:grid>
                     <fr:grid columns="1" id="review-grid-grid" bind="review-grid-bind">
                         <fr:c y="1" x="1" w="12">
                                 <fr:tinymce id="review-control" bind="review-bind">
-                                    <xf:label ref="$form-resources/review/label"/>
-                                    <xf:hint ref="$form-resources/review/hint"/>
-                                    <xf:help ref="$form-resources/review/help"/>
-                                    <xf:alert ref="$form-resources/review/alert"/>
+                                    <xf:label ref="$form-resources/review/label"/><xf:help ref="$form-resources/review/help"/>
+                                    <xf:hint ref="$form-resources/review/hint"/><xf:alert ref="$form-resources/review/alert"/>
+
+
                                 </fr:tinymce>
                             </fr:c>
                     </fr:grid>
@@ -541,10 +537,10 @@
                     <fr:grid repeat="content" bind="note-bind" id="note-grid" template="instance('note-template')" min="0">
                         <fr:c y="1" x="1" w="12">
                                 <xf:textarea id="note-text-control" bind="note-text-bind" appearance="xxf:autosize">
-                                    <xf:label ref="$form-resources/note-text/label"/>
+                                    <xf:label ref="$form-resources/note-text/label"/><xf:help ref="$form-resources/note-text/help"/>
                                     <xf:hint ref="$form-resources/note-text/hint"/>
-                                    <xf:help ref="$form-resources/note-text/help"/>
                                     <xf:alert ref="$form-resources/note-text/alert"/>
+
                                 </xf:textarea>
                             </fr:c>
                     </fr:grid>

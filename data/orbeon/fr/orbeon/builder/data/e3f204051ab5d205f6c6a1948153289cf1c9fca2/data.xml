@@ -1,14 +1,14 @@
-    <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-             xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
-             xmlns:xf="http://www.w3.org/2002/xforms"
-             xmlns:xs="http://www.w3.org/2001/XMLSchema"
-             xmlns:math="http://www.w3.org/2005/xpath-functions/math">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math">
         <xh:head>
             <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
-                      xxf:xpath-analysis="true"
-                      xxf:expose-xpath-types="true">
+                  xxf:xpath-analysis="true"
+                  xxf:expose-xpath-types="true">
                 <xf:instance id="fr-form-instance" xxf:index="id">
                     <form>
                         <personal-information>
@@ -114,28 +114,28 @@
                 </xf:instance>
                 <xf:bind id="fr-form-binds" ref=".">
                     <xf:bind id="personal-information-bind" ref="personal-information"
-                             name="personal-information">
+                         name="personal-information">
                         <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
                             <xf:bind id="last-name-bind" ref="last-name" name="last-name" required="true()"
-                                     xxf:whitespace="trim"
-                                     type="dmv:last-name"/>
+                                 xxf:whitespace="trim"
+                                 type="dmv:last-name"/>
                             <xf:bind id="first-name-bind" ref="first-name" name="first-name" required="true()"
-                                     xxf:whitespace="trim"
-                                     type="dmv:first-name"/>
+                                 xxf:whitespace="trim"
+                                 type="dmv:first-name"/>
                             <xf:bind id="initial-bind" ref="initial" name="initial" type="dmv:initial"
-                                     xxf:whitespace="trim"/>
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="driver-license-number-bind" ref="driver-license-number"
-                                     name="driver-license-number"
-                                     required="true()"
-                                     xxf:whitespace="trim"
-                                     type="dmv:driver-license-number"/>
+                                 name="driver-license-number"
+                                 required="true()"
+                                 xxf:whitespace="trim"
+                                 type="dmv:driver-license-number"/>
                             <xf:bind id="birth-date-bind" ref="birth-date" name="birth-date" type="xs:date"
-                                     required="true()">
+                                 required="true()">
                                 <xf:constraint id="validation-6-validation" value=". lt current-date()"/>
                             </xf:bind>
                             <xf:bind id="voter-address-change-bind" ref="voter-address-change"
-                                     name="voter-address-change"
-                                     type="xf:boolean"/>
+                                 name="voter-address-change"
+                                 type="xf:boolean"/>
                         </xf:bind>
 
 
@@ -147,30 +147,30 @@
                     <xf:bind id="residence-address-bind" ref="residence-address" name="residence-address">
                         <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
                             <xf:bind id="residence-street-number-bind" ref="residence-street-number"
-                                     name="residence-street-number"
-                                     type="dmv:street-number"
-                                     xxf:whitespace="trim"/>
+                                 name="residence-street-number"
+                                 type="dmv:street-number"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="residence-street-name-1-bind" ref="residence-street-name-1"
-                                     name="residence-street-name-1"
-                                     type="dmv:street-name-1"
-                                     required="true()"
-                                     xxf:whitespace="trim"/>
+                                 name="residence-street-name-1"
+                                 type="dmv:street-name-1"
+                                 required="true()"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="residence-street-name-2-bind" ref="residence-street-name-2"
-                                     name="residence-street-name-2"
-                                     type="dmv:street-name-2"
-                                     xxf:whitespace="trim"/>
+                                 name="residence-street-name-2"
+                                 type="dmv:street-name-2"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="residence-apt-bind" ref="residence-apt" name="residence-apt" type="dmv:apt"
-                                     xxf:whitespace="trim"/>
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="residence-city-bind" ref="residence-city" name="residence-city"
-                                     type="dmv:city"
-                                     required="true()"
-                                     xxf:whitespace="trim"/>
+                                 type="dmv:city"
+                                 required="true()"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="residence-state-bind" ref="residence-state" name="residence-state"
-                                     type="dmv:state"
-                                     required="true()"/>
+                                 type="dmv:state"
+                                 required="true()"/>
                             <xf:bind id="residence-zip-bind" ref="residence-zip" name="residence-zip" type="dmv:zip"
-                                     required="true()"
-                                     xxf:whitespace="trim"/>
+                                 required="true()"
+                                 xxf:whitespace="trim"/>
                         </xf:bind>
 
 
@@ -183,41 +183,41 @@
                     <xf:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
                         <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                             <xf:bind id="mailing-address-different-bind" ref="mailing-address-different"
-                                     name="mailing-address-different"
-                                     type="xf:boolean"/>
+                                 name="mailing-address-different"
+                                 type="xf:boolean"/>
                         </xf:bind>
                         <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
                             <xf:bind id="mailing-street-number-bind" ref="mailing-street-number"
-                                     name="mailing-street-number"
-                                     type="dmv:street-number"
-                                     readonly="not($mailing-address-different = true())"
-                                     xxf:whitespace="trim"/>
+                                 name="mailing-street-number"
+                                 type="dmv:street-number"
+                                 readonly="not($mailing-address-different = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="mailing-street-name-1-bind" ref="mailing-street-name-1"
-                                     name="mailing-street-name-1"
-                                     type="dmv:street-name-1"
-                                     required="$mailing-address-different = true()"
-                                     readonly="not($mailing-address-different = true())"
-                                     xxf:whitespace="trim"/>
+                                 name="mailing-street-name-1"
+                                 type="dmv:street-name-1"
+                                 required="$mailing-address-different = true()"
+                                 readonly="not($mailing-address-different = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="mailing-street-name-2-bind" ref="mailing-street-name-2"
-                                     name="mailing-street-name-2"
-                                     type="dmv:street-name-2"
-                                     readonly="not($mailing-address-different = true())"
-                                     xxf:whitespace="trim"/>
+                                 name="mailing-street-name-2"
+                                 type="dmv:street-name-2"
+                                 readonly="not($mailing-address-different = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="mailing-apt-bind" ref="mailing-apt" name="mailing-apt" type="dmv:apt"
-                                     readonly="not($mailing-address-different = true())"
-                                     xxf:whitespace="trim"/>
+                                 readonly="not($mailing-address-different = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="mailing-city-bind" ref="mailing-city" name="mailing-city" type="dmv:city"
-                                     required="$mailing-address-different = true()"
-                                     readonly="not($mailing-address-different = true())"
-                                     xxf:whitespace="trim"/>
+                                 required="$mailing-address-different = true()"
+                                 readonly="not($mailing-address-different = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="mailing-state-bind" ref="mailing-state" name="mailing-state"
-                                     type="dmv:state"
-                                     required="$mailing-address-different = true()"
-                                     readonly="not($mailing-address-different = true())"/>
+                                 type="dmv:state"
+                                 required="$mailing-address-different = true()"
+                                 readonly="not($mailing-address-different = true())"/>
                             <xf:bind id="mailing-zip-bind" ref="mailing-zip" name="mailing-zip" type="dmv:zip"
-                                     required="$mailing-address-different = true()"
-                                     readonly="not($mailing-address-different = true())"
-                                     xxf:whitespace="trim"/>
+                                 required="$mailing-address-different = true()"
+                                 readonly="not($mailing-address-different = true())"
+                                 xxf:whitespace="trim"/>
                         </xf:bind>
 
 
@@ -232,59 +232,59 @@
                         <xf:bind id="vehicle-bind" ref="vehicle" name="vehicle">
                             <xf:bind ref="vehicle-iteration" name="vehicle-iteration">
                                 <xf:bind id="plate-number-bind" ref="plate-number" name="plate-number"
-                                         type="dmv:plate-number"
-                                         required="true()"
-                                         xxf:whitespace="trim"
-                                         readonly="false()"
-                                         calculate="upper-case(.)"/>
+                                     type="dmv:plate-number"
+                                     required="true()"
+                                     xxf:whitespace="trim"
+                                     readonly="false()"
+                                     calculate="upper-case(.)"/>
                                 <xf:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
-                                         xxf:whitespace="trim"
-                                         readonly="false()"
-                                         calculate="upper-case(.)"/>
+                                     xxf:whitespace="trim"
+                                     readonly="false()"
+                                     calculate="upper-case(.)"/>
                                 <xf:bind id="leased-bind" ref="leased" name="leased" type="xf:boolean"/>
                             </xf:bind>
                         </xf:bind>
                         <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
                             <xf:bind id="leasing-company-name-bind" ref="leasing-company-name"
-                                     name="leasing-company-name"
-                                     type="dmv:company-name"
-                                     xxf:whitespace="trim"/>
+                                 name="leasing-company-name"
+                                 type="dmv:company-name"
+                                 xxf:whitespace="trim"/>
                         </xf:bind>
 
                     </xf:bind>
                     <xf:bind id="trailer-coach-vessel-bind" ref="trailer-coach-vessel"
-                             name="trailer-coach-vessel">
+                         name="trailer-coach-vessel">
                         <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
                             <xf:bind id="has-trailer-coach-vessel-bind" name="has-trailer-coach-vessel"
-                                     ref="has-trailer-coach-vessel"
-                                     type="xf:boolean"/>
+                                 ref="has-trailer-coach-vessel"
+                                 type="xf:boolean"/>
                         </xf:bind>
                         <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
                             <xf:bind id="vehicle-street-number-bind" ref="vehicle-street-number"
-                                     name="vehicle-street-number"
-                                     type="dmv:street-number"
-                                     readonly="not($has-trailer-coach-vessel = true())"
-                                     xxf:whitespace="trim"/>
+                                 name="vehicle-street-number"
+                                 type="dmv:street-number"
+                                 readonly="not($has-trailer-coach-vessel = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="vehicle-street-name-1-bind" ref="vehicle-street-name-1"
-                                     name="vehicle-street-name-1"
-                                     type="dmv:street-name-1"
-                                     required="$has-trailer-coach-vessel = true()"
-                                     readonly="not($has-trailer-coach-vessel = true())"
-                                     xxf:whitespace="trim"/>
+                                 name="vehicle-street-name-1"
+                                 type="dmv:street-name-1"
+                                 required="$has-trailer-coach-vessel = true()"
+                                 readonly="not($has-trailer-coach-vessel = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="vehicle-street-name-2-bind" ref="vehicle-street-name-2"
-                                     name="vehicle-street-name-2"
-                                     type="dmv:street-name-2"
-                                     readonly="not($has-trailer-coach-vessel = true())"
-                                     xxf:whitespace="trim"/>
+                                 name="vehicle-street-name-2"
+                                 type="dmv:street-name-2"
+                                 readonly="not($has-trailer-coach-vessel = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="vehicle-city-bind" ref="vehicle-city" name="vehicle-city" type="dmv:city"
-                                     required="$has-trailer-coach-vessel = true()"
-                                     readonly="not($has-trailer-coach-vessel = true())"
-                                     xxf:whitespace="trim"/>
+                                 required="$has-trailer-coach-vessel = true()"
+                                 readonly="not($has-trailer-coach-vessel = true())"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="vehicle-county-bind" ref="vehicle-county" name="vehicle-county"
-                                     type="dmv:county"
-                                     required="$has-trailer-coach-vessel = true()"
-                                     readonly="not($has-trailer-coach-vessel = true())"
-                                     xxf:whitespace="trim"/>
+                                 type="dmv:county"
+                                 required="$has-trailer-coach-vessel = true()"
+                                 readonly="not($has-trailer-coach-vessel = true())"
+                                 xxf:whitespace="trim"/>
                         </xf:bind>
 
 
@@ -296,17 +296,17 @@
                     <xf:bind id="old-address-bind" ref="old-address" name="old-address">
                         <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
                             <xf:bind id="old-street-number-name-bind" ref="old-street-number-name"
-                                     name="old-street-number-name"
-                                     type="xs:string"
-                                     required="true()"
-                                     xxf:whitespace="trim"/>
+                                 name="old-street-number-name"
+                                 type="xs:string"
+                                 required="true()"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="old-city-bind" ref="old-city" name="old-city" type="dmv:city"
-                                     required="true()"
-                                     xxf:whitespace="trim"/>
+                                 required="true()"
+                                 xxf:whitespace="trim"/>
                             <xf:bind id="old-state-bind" ref="old-state" name="old-state" type="dmv:state"
-                                     required="true()"/>
+                                 required="true()"/>
                             <xf:bind id="old-zip-bind" ref="old-zip" name="old-zip" type="dmv:zip" required="true()"
-                                     xxf:whitespace="trim"/>
+                                 xxf:whitespace="trim"/>
                         </xf:bind>
 
 
@@ -325,22 +325,23 @@
 
 
                         <library-versions>
-                            <orbeon>1</orbeon>
+                            <_>1</_>
                         </library-versions>
-                        <email>
-                            <templates>
-                                <template name="default">
-                                    <headers/>
-                                    <exclude-from-all-control-values/>
-                                </template>
-                            </templates>
-                            <parameters/>
-                        </email>
+
                         <thumbnail filename="dmv-14.png" mediatype="image/png" size="86742">/fr/service/persistence/crud/orbeon/builder/data/e3f204051ab5d205f6c6a1948153289cf1c9fca2/b1e787f94b9e91fd7b959ed5dad0c94abb856bf7.bin</thumbnail>
                         <allow-template-use>true</allow-template-use>
                         <wizard>true</wizard>
                         <wizard-mode>free</wizard-mode>
-                    </metadata>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
                 </xf:instance>
                 <xf:instance id="fr-form-attachments">
                     <attachments>
@@ -522,15 +523,15 @@
                     </resources>
                 </xf:instance>
                 <xf:instance xxf:exclude-result-prefixes="#all" id="vehicle-template">
-                    <vehicle-iteration>
-                        <plate-number/>
-                        <vin/>
-                        <leased>false</leased>
-                    </vehicle-iteration>
-                </xf:instance>
+                <vehicle-iteration>
+                    <plate-number/>
+                    <vin/>
+                    <leased>false</leased>
+                </vehicle-iteration>
+            </xf:instance>
                 <xs:schema targetNamespace="http://orbeon.org/oxf/examples/dmv"
-                           elementFormDefault="qualified"
-                           attributeFormDefault="unqualified">
+                       elementFormDefault="qualified"
+                       attributeFormDefault="unqualified">
                     <xs:simpleType name="first-name">
                         <xs:restriction base="xs:string">
                             <xs:maxLength value="9"/>
@@ -665,10 +666,11 @@
         </xh:head>
         <xh:body>
             <fr:view>
-                <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                         xmlns:ev="http://www.w3.org/2001/xml-events">
+                <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:ev="http://www.w3.org/2001/xml-events">
                     <fr:section id="personal-information-section" bind="personal-information-bind">
                         <xf:label ref="$form-resources/personal-information/label"/>
                         <fr:grid id="grid-1-grid" bind="grid-1-bind">
@@ -866,7 +868,7 @@
                     <fr:section id="vehicles-section" bind="vehicles-bind">
                         <xf:label ref="$form-resources/vehicles/label"/>
                         <fr:grid bind="vehicle-bind" id="vehicle-repeat" repeat="content" min="1" max="3"
-                                 template="instance('vehicle-template')">
+                             template="instance('vehicle-template')">
                             <fr:c y="1" x="1" w="4">
                                 <xf:input id="plate-number-control" bind="plate-number-bind">
                                     <xf:label ref="$form-resources/plate-number/label"/>

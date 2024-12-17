@@ -3,7 +3,7 @@
         <xh:title>Orbeon Demo: Appearance of Repeated Grids</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
-            
+
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <section>
@@ -256,7 +256,7 @@
                 </form>
             </xf:instance>
 
-            
+
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-bind" ref="section" name="section" relevant="false()">
                     <xf:bind id="single-grid-bind" ref="single-grid" name="single-grid">
@@ -287,7 +287,7 @@
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="repeated-minimal-number-readwrite-table-section-bind" ref="repeated-minimal-number-readwrite-table-section" name="repeated-minimal-number-readwrite-table-section" relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'no'">
-                    <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-bind" ref="repeated-minimal-number-readwrite-table-single-grid" name="repeated-minimal-number-readwrite-table-single-grid">
+                    <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-bind" ref="repeated-minimal-number-readwrite-table-single-grid" name="repeated-minimal-number-readwrite-table-single-grid" readonly="$readonly = true()">
                         <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-iteration-bind" ref="repeated-minimal-number-readwrite-table-single-grid-iteration" name="repeated-minimal-number-readwrite-table-single-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readwrite-table-f1-bind" ref="repeated-minimal-number-readwrite-table-f1" name="repeated-minimal-number-readwrite-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
@@ -301,7 +301,7 @@
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="repeated-full-nonumber-readwrite-table-section-bind" ref="repeated-full-nonumber-readwrite-table-section" name="repeated-full-nonumber-readwrite-table-section" relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'full' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'no'">
-                    <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-bind" ref="repeated-full-nonumber-readwrite-table-single-grid" name="repeated-full-nonumber-readwrite-table-single-grid">
+                    <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-bind" ref="repeated-full-nonumber-readwrite-table-single-grid" name="repeated-full-nonumber-readwrite-table-single-grid" readonly="$readonly = true()">
                         <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-table-single-grid-iteration" name="repeated-full-nonumber-readwrite-table-single-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readwrite-table-f1-bind" ref="repeated-full-nonumber-readwrite-table-f1" name="repeated-full-nonumber-readwrite-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
@@ -511,7 +511,7 @@
                 </xf:bind>
             </xf:bind>
 
-            
+
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
@@ -519,27 +519,25 @@
                     <title xml:lang="en">Orbeon Demo: Appearance of Repeated Grids</title>
                     <description xml:lang="en" mediatype="text/html">&lt;div&gt;This form illustrates the different appearances of repeated grids depending on the following parameters:&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;/div&gt;&lt;ol&gt;&lt;li&gt;Repetition over one vs. more rows&lt;/li&gt;&lt;li&gt;Full appearance vs. minimal appearance&lt;/li&gt;&lt;li&gt;Whether to show the repetition number or not&lt;/li&gt;&lt;li&gt;Modifiable vs. readonly grid&lt;/li&gt;&lt;li&gt;Use of HTML tables vs. CSS grids for rendering&lt;/li&gt;&lt;/ol&gt;&lt;div&gt;With Form Builder, you can control the appearance, numbering, and readonly parameters in the Container Settings dialog. With Orbeon Forms 2022.1, Orbeon Forms uses CSS grids by default. This default can be changed using configuration properties.&lt;/div&gt;</description>
                     <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
-                    
-                    
-                    <library-versions>
-                        <orbeon>2</orbeon>
-                    </library-versions>
+
+
+                    <library-versions/>
                     <grid-markup>html-table</grid-markup>
 
 
 
-                    
+
                     <thumbnail>/fr/service/persistence/crud/orbeon/repeated-grids/form/486c430112867e07d1db916eef15ac0fd9bde296.bin</thumbnail>
                     <grid-tab-order>default</grid-tab-order>
                 <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "section/single-grid", "iteration-name": "single-grid-iteration" },{ "path": "section/multiple-grid", "iteration-name": "multiple-grid-iteration" },{ "path": "repeated-full-number-readwrite-table-section/repeated-full-number-readwrite-table-single-grid", "iteration-name": "repeated-full-number-readwrite-table-single-grid-iteration" },{ "path": "repeated-full-number-readwrite-table-section/repeated-full-number-readwrite-table-multiple-grid", "iteration-name": "repeated-full-number-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-table-section/repeated-minimal-number-readwrite-table-single-grid", "iteration-name": "repeated-minimal-number-readwrite-table-single-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-table-section/repeated-minimal-number-readwrite-table-multiple-grid", "iteration-name": "repeated-minimal-number-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-table-section/repeated-full-nonumber-readwrite-table-single-grid", "iteration-name": "repeated-full-nonumber-readwrite-table-single-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-table-section/repeated-full-nonumber-readwrite-table-multiple-grid", "iteration-name": "repeated-full-nonumber-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-table-section/repeated-minimal-nonumber-readwrite-table-single-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-table-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-table-section/repeated-minimal-nonumber-readwrite-table-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-full-number-readonly-table-section/repeated-full-number-readonly-table-single-grid", "iteration-name": "repeated-full-number-readonly-table-single-grid-iteration" },{ "path": "repeated-full-number-readonly-table-section/repeated-full-number-readonly-table-multiple-grid", "iteration-name": "repeated-full-number-readonly-table-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readonly-table-section/repeated-minimal-number-readonly-table-single-grid", "iteration-name": "repeated-minimal-number-readonly-table-single-grid-iteration" },{ "path": "repeated-minimal-number-readonly-table-section/repeated-minimal-number-readonly-table-multiple-grid", "iteration-name": "repeated-minimal-number-readonly-table-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-table-section/repeated-full-nonumber-readonly-table-single-grid", "iteration-name": "repeated-full-nonumber-readonly-table-single-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-table-section/repeated-full-nonumber-readonly-table-multiple-grid", "iteration-name": "repeated-full-nonumber-readonly-table-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-table-section/repeated-minimal-nonumber-readonly-table-single-grid", "iteration-name": "repeated-minimal-nonumber-readonly-table-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-table-section/repeated-minimal-nonumber-readonly-table-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readonly-table-multiple-grid-iteration" },{ "path": "repeated-full-number-readwrite-css-section/repeated-full-number-readwrite-css-single-grid", "iteration-name": "repeated-full-number-readwrite-css-single-grid-iteration" },{ "path": "repeated-full-number-readwrite-css-section/repeated-full-number-readwrite-css-multiple-grid", "iteration-name": "repeated-full-number-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-css-section/repeated-minimal-number-readwrite-css-single-grid", "iteration-name": "repeated-minimal-number-readwrite-css-single-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-css-section/repeated-minimal-number-readwrite-css-multiple-grid", "iteration-name": "repeated-minimal-number-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-css-section/repeated-full-nonumber-readwrite-css-single-grid", "iteration-name": "repeated-full-nonumber-readwrite-css-single-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-css-section/repeated-full-nonumber-readwrite-css-multiple-grid", "iteration-name": "repeated-full-nonumber-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-css-section/repeated-minimal-nonumber-readwrite-css-single-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-css-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-css-section/repeated-minimal-nonumber-readwrite-css-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-full-number-readonly-css-section/repeated-full-number-readonly-css-single-grid", "iteration-name": "repeated-full-number-readonly-css-single-grid-iteration" },{ "path": "repeated-full-number-readonly-css-section/repeated-full-number-readonly-css-multiple-grid", "iteration-name": "repeated-full-number-readonly-css-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readonly-css-section/repeated-minimal-number-readonly-css-single-grid", "iteration-name": "repeated-minimal-number-readonly-css-single-grid-iteration" },{ "path": "repeated-minimal-number-readonly-css-section/repeated-minimal-number-readonly-css-multiple-grid", "iteration-name": "repeated-minimal-number-readonly-css-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-css-section/repeated-full-nonumber-readonly-css-single-grid", "iteration-name": "repeated-full-nonumber-readonly-css-single-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-css-section/repeated-full-nonumber-readonly-css-multiple-grid", "iteration-name": "repeated-full-nonumber-readonly-css-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-css-section/repeated-minimal-nonumber-readonly-css-single-grid", "iteration-name": "repeated-minimal-nonumber-readonly-css-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-css-section/repeated-minimal-nonumber-readonly-css-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readonly-css-multiple-grid-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"control-section"}],"newGridElem":{"value":"control-grid"},"afterElem":null,"content":[{"value":"table-or-css"},{"value":"appearance"},{"value":"number"},{"value":"readonly-static"},{"value":"readonly"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
-            
+
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments/>
             </xf:instance>
 
-            
+
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">

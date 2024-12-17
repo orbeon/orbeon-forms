@@ -16,6 +16,91 @@
 
 body.orbeon { background-color: @frBackground }
 
+.fr-body-decorations() {
+    border: 1px solid darken(@wellBackground, 7%);
+    border-radius: @baseBorderRadius;
+    background-color: white;
+}
+
+// This only for the top-level TOC
+.fr-toc-body-container-top() {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    .fr-toc {
+    }
+}
+
+// Used by the wizard and the top-level TOC
+.fr-toc-body-container-left() {
+    display: grid;
+
+    &:not(:has(> .fr-wizard-separate-toc)) {
+        grid-template-columns: 20% 1fr;
+    }
+    &:has(> .fr-wizard-separate-toc) {
+        grid-template-columns: 1fr;
+    }
+
+    column-gap: 10px;
+    row-gap: 10px;
+
+    .fr-toc, .fr-wizard-toc {
+        grid-row: 1;
+        grid-column: 1;
+        height: fit-content;
+
+        position: sticky;
+
+        top: 60px;
+    }
+    .fr-body, .fr-wizard-body {
+        grid-row: 1;
+        grid-column: 2;
+    }
+    .wizard-toc.fr-wizard-separate-toc, .wizard-body.fr-wizard-separate-toc {
+        grid-row: 1 / 2;
+    }
+
+    .fr-wizard-other {
+        grid-row: 2;
+        grid-column: 2;
+    }
+}
+
+.fr-toc-styling() {
+    margin-bottom: 0;
+    a {
+        text-decoration: none;
+    }
+    .nav-header {
+        color: @frHeaderColor;
+        display: none; // 2024-12-16: I don't think we need this header, do we? We don't have it in wizard mode.
+    }
+    .nav > li > span > .btn-link {
+        display: flex; // for wizard, will hold section state
+        align-items: center;
+        line-height: 30px; // line-height: @wizardLineHeight; // to align with section title
+        padding: 3px 1em;
+        margin: 0;
+        border: none;
+        text-shadow: none;
+        & > .fr-toc-title {
+            order: 1;
+            flex-grow: 1;
+            .text-overflow();
+        }
+    }
+    .fr-toc-body-styling();
+    height: fit-content;
+}
+
+.fr-toc-body-styling {
+    min-height: 20px;
+    border: 1px solid darken(@wellBackground, 7%);
+    border-radius: @baseBorderRadius;
+}
+
 // Reset Liferay styles which impact ours
 // See https://github.com/orbeon/orbeon-forms/issues/2728
 // 2017-06-09: We had `.aui .orbeon` but it seems like with Liferay 7/DXP at least, the `.aui` class is not present.
@@ -148,7 +233,15 @@ body.orbeon { background-color: @frBackground }
 
 .orbeon {
 
-    // ***** Controls***************************************************************************************************
+    // ***** Main decorations ******************************************************************************************
+
+    .fr-mode-new, .fr-mode-edit, .fr-mode-view, .fr-mode-test {
+        .fr-view-appearance-full {
+            .fr-body-decorations();
+        }
+    }
+
+    // ***** Controls **************************************************************************************************
 
     // Copied over Bootstrap styles as we can't reuse them simply as mixins
     // Ideally this would be in box-select.less
@@ -168,7 +261,7 @@ body.orbeon { background-color: @frBackground }
         border-radius: @inputBorderRadius; // for focus highlight
     }
 
-    .nav-list .xforms-trigger-appearance-minimal .btn-link {
+    .nav .xforms-trigger-appearance-minimal .btn-link {
         border-radius: 0; // restore for nav list
     }
 
@@ -375,21 +468,8 @@ body.orbeon { background-color: @frBackground }
 
     // Table of contents
     .fr-toc {
-        margin-bottom: 0;
-        padding: 10px;
-        a {
-            text-decoration: none;
-        }
-        .nav-header {
-            color: @frHeaderColor;
-        }
-        .nav-list > li > span > .btn-link {
-            margin-bottom: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 3px 0;
-            white-space: nowrap;
-        }
+        .fr-toc-styling();
+        background-color: @wellBackground;
     }
 
     .fr-mode-pdf {
@@ -412,30 +492,13 @@ body.orbeon { background-color: @frBackground }
     .fr-toc-with-body {
         &.fr-toc-position-top {
             & > * { // .span12
-                display: flex;
-                flex-direction: column;
-                row-gap: 10px;
-                .fr-toc {
-                }
+                .fr-toc-body-container-top();
             }
         }
 
         &.fr-toc-position-left {
             & > * { // .span12
-                display: flex;
-                flex-direction: row;
-                column-gap: 10px;
-                .fr-toc {
-                    max-width: 20%;
-                    flex-grow: 1;
-                    height: fit-content;
-
-                    position: sticky;
-                    top: 60px;
-                }
-                .fr-body {
-                    flex-grow: 1;
-                }
+                .fr-toc-body-container-left();
             }
         }
     }
@@ -516,6 +579,10 @@ body.orbeon { background-color: @frBackground }
     }
 
     .orbeon {
+
+        .fr-view-appearance-full {
+            border: none;
+        }
 
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
             .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {

@@ -65,7 +65,7 @@
         <fr:row>
             <fr:top-messages/>
         </fr:row>
-        <fr:row class="fr-toc-with-body fr-toc-position-{$toc-position-opt}">
+        <fr:row class="{if ($has-toc) then concat('fr-toc-with-body fr-toc-position-', $toc-position-opt) else ()}">
             <fr:toc/>
             <fr:body/>
         </fr:row>
@@ -1477,7 +1477,7 @@
 
     <xsl:template match="fr:toc[$has-toc]" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
-        <xh:div class="fr-toc well sidebar-nav">
+        <xh:div class="fr-toc sidebar-nav">
             <xh:ul class="nav nav-list">
                 <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
                 <xsl:apply-templates select="$body" mode="fr-toc-sections">

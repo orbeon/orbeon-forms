@@ -25,29 +25,11 @@
     width: 100%; // comment about #1741 here might be out of date, had explicit width
     box-sizing: border-box;
 
-    border: 1px solid darken(@wellBackground, 7%);
-    border-radius: @baseBorderRadius;
-
-    // Following #4211, we don't need to use the `rtl` trick to reverse columns
-    display: table;
-    table-layout: fixed;
-
-    .fr-wizard-body, .fr-wizard-toc {
-        display: table-cell;
-    }
-
-    // https://github.com/orbeon/orbeon-forms/issues/4450
-    .fr-wizard-cell-placeholder {
-        display: table-cell;
-    }
-
-    .fr-wizard-toc, .fr-wizard-body {
-        vertical-align: top;
-    }
+    .fr-toc-body-container-left();
 
     .fr-wizard-toc {
-        width: @frWizardTocWidth;
-        margin-bottom: 0;
+
+        .fr-toc-styling();
 
         &.fr-wizard-separate-toc {
             .nav {
@@ -63,6 +45,7 @@
 
             & > li:first-of-type + li .btn-link {
                 border-top-left-radius: @baseBorderRadius;
+                border-top-right-radius: @baseBorderRadius;
             }
 
             ul, li {
@@ -75,24 +58,9 @@
 
             .btn-link {
                 text-decoration: none;
-                text-shadow: none;
-                border: none;
-                line-height: @wizardLineHeight; // to align with section title
-                .text-overflow();
                 color: @linkColor;
 
-                display: flex;
-                align-items: center;
-
-                padding-left: 10px;  // narrower than default
-                padding-right: 10px; // narrower than default
-
                 .fr-toc-title {
-                    order: 1;
-                    flex-grow: 1;
-
-                    overflow: hidden;
-                    text-overflow: ellipsis;
                 }
 
                 .fr-toc-edit {
@@ -132,30 +100,21 @@
                 background-color: @error;
             }
 
-            .nav-list {
+            .nav {
                 list-style-type: none;
-                padding-right: 0;
+                padding-right: 1em;
+                padding-left: 1em; // nested list for subsection navigation
             }
         }
     }
 
-    .fr-wizard-toc-inner {
-        position: sticky;
-        top: 60px;
-    }
-
     .fr-wizard-body {
-        border-left: 1px solid darken(@wellBackground, 7%);
+        .fr-body-decorations();
     }
 
     .fr-wizard-other {
-        display: table-row;
-        // Tricky to get the border to show correctly without `border-collapse: collapse` (which causes corners not to
-        // be rounded)
-        .fr-wizard-cell-placeholder, .fr-buttons {
-            border-top: 1px solid darken(@wellBackground, 7%);
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
+        .fr-buttons {
+            display: block;
         }
     }
 
@@ -229,19 +188,9 @@
 
         width: 100%;
 
-        .fr-wizard-body, .fr-wizard-toc, .fr-wizard-other {
-            display: block;
-            position: static;
-            width: 100%;
-        }
-
-        .fr-wizard-cell-placeholder {
-            display: none;
-        }
-
         .fr-wizard-toc {
             order: 1;
-            border: none;
+            position: static;
 
             .nav {
                 & > li:first-of-type + li .btn-link {

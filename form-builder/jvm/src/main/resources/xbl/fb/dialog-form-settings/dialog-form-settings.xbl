@@ -1072,10 +1072,16 @@
                                              and then a template without an app, we don't want the new app to be
                                              sticky. So we restore it to the original app. This makes sense because
                                              the user cannot directly change the app name in `new` mode.
+
+                                             UPDATE: We only set the app name if the user only has access to a limited
+                                             number of apps using `form-builder-permissions.xml`. We think that it might
+                                             be too confusing to automatically set an app name in the general case.
                                         -->
                                         <xf:setvalue
                                             event="xxforms-index-changed"
                                             observer="form-template-repeat"
+                                            if="$app-chooser = ('select1', 'output')"
+
                                             ref="$i/app"
                                             value="
                                                 (

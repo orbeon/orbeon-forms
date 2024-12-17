@@ -109,7 +109,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assertSameTable(provider, "2017_2" , "2018_2")
         assertSameTable(provider, "2018_2" , "2019_1")
         assertSameTable(provider, "2019_1" , "2023_1")
-        assertSameTable(provider, "2023_2" , "2024_1")
+        assertSameTable(provider, "2023_1" , "2024_1")
       case provider @ SQLite =>
     }
   }

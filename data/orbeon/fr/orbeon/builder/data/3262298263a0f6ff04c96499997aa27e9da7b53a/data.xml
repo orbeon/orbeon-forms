@@ -65,7 +65,7 @@
             <!-- Metadata -->
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
-                    <application-name>orbeon</application-name>
+                    <application-name>orbeon-features</application-name>
                     <form-name>nobel-prizes</form-name>
                     <title xml:lang="en">Orbeon Demo: List of Nobel prizes</title>
                     <description xml:lang="en" mediatype="text/html">&lt;div&gt;This form demonstrates:&lt;/div&gt;&lt;div&gt;

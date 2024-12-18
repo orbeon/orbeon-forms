@@ -419,6 +419,7 @@
             <published-forms>訪問您已發布的表單</published-forms>
             <form-builder-forms>查看和編輯您使用 Form Builder 創建的進行中表單</form-builder-forms>
             <demo-forms>試用隨 Orbeon Forms 一起提供的演示表單</demo-forms>
+            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
         </descriptions>
         <show-more>顯示更多…</show-more>
     </landing>

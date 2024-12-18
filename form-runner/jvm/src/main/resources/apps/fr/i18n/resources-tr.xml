@@ -419,6 +419,7 @@
             <published-forms>Yayınlanan formlarınıza erişin</published-forms>
             <form-builder-forms>Form Oluşturucu ile oluşturulan devam eden formlarınızı görüntüleyin ve düzenleyin</form-builder-forms>
             <demo-forms>Orbeon Forms ile birlikte gelen demo formlarını deneyin</demo-forms>
+            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
         </descriptions>
         <show-more>Daha fazla göster…</show-more>
     </landing>

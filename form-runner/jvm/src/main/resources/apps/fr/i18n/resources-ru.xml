@@ -408,7 +408,8 @@
         <descriptions>
             <published-forms todo="true">Access your published forms</published-forms>
             <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
+            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
         </descriptions>
         <show-more todo="true">Show more…</show-more>
     </landing>

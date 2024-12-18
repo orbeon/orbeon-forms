@@ -423,7 +423,8 @@
         <descriptions>
             <published-forms>Accédez vos formulaires publiés</published-forms>
             <form-builder-forms>Visualisez et éditez vos formulaires en cours créés avec Form Builder</form-builder-forms>
-            <demo-forms>Essayez les formulaires de démonstration</demo-forms>
+            <demo-forms>Essayez les formulaires de démonstration d'Orbeon Forms</demo-forms>
+            <demo-features>Essayez les exemples de fonctions spécifiques d'Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Voir plus…</show-more>
     </landing>

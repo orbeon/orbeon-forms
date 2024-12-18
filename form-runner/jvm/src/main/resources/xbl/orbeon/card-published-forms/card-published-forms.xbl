@@ -109,8 +109,11 @@
                     <xf:value ref="concat('/fr/forms?fr-search-app=exact:', fr:component-param-value('app'))"/>
                 </xf:itemset>
                 <fr:card-body>
-                    <xh:p class="card-text lead"><xf:output ref="xxf:r('landing.descriptions.demo-forms', '|fr-fr-resources|')"/></xh:p>
+                    <xh:p class="card-text lead"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>
                 </fr:card-body>
+                <fr:card-thumbnail>
+                    <xh:img src="/apps/fr/style/images/orbeon/sports-car.svg" class="img-thumbnail"/>
+                </fr:card-thumbnail>
                 <fr:card-footer>
                     <xh:span>
                         <xf:output value="

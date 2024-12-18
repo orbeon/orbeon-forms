@@ -419,6 +419,7 @@
             <published-forms>Hozzáférés a közzétett űrlapjaihoz</published-forms>
             <form-builder-forms>A Form Builder segítségével létrehozott, folyamatban lévő űrlapok megtekintése és szerkesztése</form-builder-forms>
             <demo-forms>Próbálja ki az Orbeon Forms-szal szállított demó űrlapokat</demo-forms>
+            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
         </descriptions>
         <show-more>Több megjelenítése…</show-more>
     </landing>

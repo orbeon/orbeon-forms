@@ -90,7 +90,7 @@
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
                 <metadata>
-                    <application-name>orbeon</application-name>
+                    <application-name>orbeon-features</application-name>
                     <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
                     <updated-with-version>2017.2-SNAPSHOT PE</updated-with-version>
                     <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version>

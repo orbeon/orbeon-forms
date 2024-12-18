@@ -130,7 +130,7 @@
             <!-- Metadata -->
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
-                    <application-name>orbeon</application-name>
+                    <application-name>orbeon-features</application-name>
                     <form-name>copy-action</form-name>
                     <title xml:lang="en">Orbeon Demo: Action to copy complex content</title>
                     <description xml:lang="en">This form illustrates the use of the `&lt;fr:copy-content&gt;` action.</description>

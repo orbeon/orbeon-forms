@@ -321,7 +321,7 @@
             <xf:var
                 name="view"
                 value="
-                    property('xxf:readonly-appearance') = 'static' or
+                    xxf:is-control-static-readonly('fr-time') or
                     fr:mode() = 'pdf'
                 "/>
             <xf:var
@@ -355,6 +355,7 @@
             <xf:input
                 ref="$binding[$view]"
                 class="{$class-field-width}"
+                xbl:attr="xxf:readonly-appearance"
                 xxf:format="
                     TimeSupport:formatReadonlyModeTime(
                         xxf:binding('fr-time'),

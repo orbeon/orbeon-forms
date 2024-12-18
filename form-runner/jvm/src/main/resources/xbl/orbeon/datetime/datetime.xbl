@@ -156,7 +156,7 @@
             <xf:var name="binding"    value="xxf:binding('fr-datetime')"/>
             <xf:var name="local-date" value="instance('i')/date"/>
             <xf:var name="local-time" value="instance('i')/time"/>
-            <xf:var name="view"       value="xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+            <xf:var name="view"       value="xxf:readonly($binding) and xxf:is-control-static-readonly('fr-datetime')"/>
 
             <!-- Update local date and time from bound node -->
             <xf:var name="value" as="xs:string" value="xxf:value('fr-datetime')">
@@ -214,7 +214,7 @@
                     <xf:label ref="xxf:r('time')"/>
                 </fr:time>
             </xh:div>
-            <xf:input ref="$binding[$view]"/>
+            <xf:input ref="$binding[$view]" xbl:attr="xxf:readonly-appearance"/>
         </xbl:template>
 
     </xbl:binding>

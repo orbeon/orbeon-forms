@@ -54,3 +54,7 @@ class XXFormsIsControlRequired extends SingleNodeControlMipFunction {
 class XXFormsIsControlValid extends SingleNodeControlMipFunction {
   protected def getMip(c: XFormsSingleNodeControl): Boolean = c.isValid
 }
+
+class XXFormsIsControlStaticReadonly extends SingleNodeControlMipFunction {
+  protected def getMip(c: XFormsSingleNodeControl): Boolean = c.isStaticReadonly
+}

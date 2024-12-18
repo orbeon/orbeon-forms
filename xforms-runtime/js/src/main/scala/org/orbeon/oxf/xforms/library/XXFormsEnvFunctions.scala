@@ -193,6 +193,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isValid } contains true
 
   @XPathFunction()
+  def isControlStaticReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
+    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isStaticReadonly } contains true
+
+  @XPathFunction()
   def value(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     XFormsFunction.findRelevantControls(staticOrAbsoluteId, followIndexes) flatMap
       (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt(EventCollector.Throw))

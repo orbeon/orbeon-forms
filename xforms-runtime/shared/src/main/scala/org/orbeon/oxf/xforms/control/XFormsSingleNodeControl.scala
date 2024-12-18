@@ -325,7 +325,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // Static read-only if we are read-only and static (global or local setting)
   override def isStaticReadonly = isReadonly && hasStaticReadonlyAppearance
 
-  def hasStaticReadonlyAppearance =
+  private def hasStaticReadonlyAppearance: Boolean =
     containingDocument.staticReadonly ||
       XFormsProperties.ReadonlyAppearanceStaticValue == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 

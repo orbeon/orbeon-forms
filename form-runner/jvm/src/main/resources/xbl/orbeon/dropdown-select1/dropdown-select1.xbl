@@ -134,7 +134,7 @@
                 appearance="minimal"
                 ref="xxf:binding('fr-dropdown-select1')"
                 id="select1"
-                xbl:attr="xxf:encrypt-item-values autocomplete">
+                xbl:attr="xxf:encrypt-item-values autocomplete xxf:readonly-appearance">
                 <!-- Title item -->
                 <!-- Always present, but blank if the control is readonly OR if a value is already selected -->
                 <!-- Alternate behavior: remove title item if a value is selected -->

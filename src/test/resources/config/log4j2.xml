@@ -7,7 +7,6 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="org.orbeon.oxf.xforms.processor.XFormsServer" level="debug"/>
         <Logger name="org.orbeon.oxf.fr.persistence.test.DDLTest"   level="debug"/>
 
         <Root level="info">

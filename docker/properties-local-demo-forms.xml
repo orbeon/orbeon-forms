@@ -4,15 +4,11 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
 >
-    <property as="xs:string"  name="oxf.crypto.password"                               value=""/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                 value="postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form" value="postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"   value="postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"  value="postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"    value="postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"        value="postgresql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"    value="postgresql"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.active"                  value="false"/>
+    <property as="xs:string"  name="oxf.crypto.password"                                value=""/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                  value="postgresql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.*.form"          value="postgresql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon-features.*.form" value="postgresql"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.active"                   value="false"/>
 
     <property
         as="xs:string"

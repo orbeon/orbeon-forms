@@ -376,13 +376,8 @@
     <property as="xs:string"  name="oxf.fr.email.attach-files.*.*"                                 value="all"/>
 
     <!-- Configuration of built-in forms -->
-    <!-- Be specific, as user might change the default persistence layer -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"             value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"               value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"                value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                    value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"                value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon-features.controls.form"     value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.*.form"                     value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon-features.*.form"            value="sqlite"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
         home summary clear pdf wizard-toc wizard-prev wizard-next save-final review

@@ -331,7 +331,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <xf:bind id="items-total-grid-bind" ref="items-total-grid" name="items-total-grid">
                         <xf:bind id="items-total-bind" ref="items-total" name="items-total" type="xf:decimal"
                                  constraint="xxf:fraction-digits(2)"
-                                 calculate="sum($item-price[. castable as xs:decimal], 0.0)"
+                                 calculate="sum($item-price[. castable as xs:decimal]/xs:decimal(.), 0.0)"
                                  readonly="false()"/>
                     </xf:bind>
                 </xf:bind>

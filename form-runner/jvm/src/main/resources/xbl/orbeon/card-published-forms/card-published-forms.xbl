@@ -112,7 +112,7 @@
                     <xh:p class="card-text lead"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>
                 </fr:card-body>
                 <fr:card-thumbnail>
-                    <xh:img src="/apps/fr/style/images/orbeon/sports-car.svg" class="img-thumbnail"/>
+                    <xh:img src="{fr:component-param-value('thumbnail')}" class="img-thumbnail"/>
                 </fr:card-thumbnail>
                 <fr:card-footer>
                     <xh:span>

@@ -8,7 +8,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.*
@@ -182,19 +182,30 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction()
   def isControlReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
-    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isReadonly } contains true
+    relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isReadonly)
 
   @XPathFunction()
   def isControlRequired(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
-    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isRequired } contains true
+    relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isRequired)
 
   @XPathFunction()
   def isControlValid(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
-    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isValid } contains true
+    relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isValid)
 
   @XPathFunction()
   def isControlStaticReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
-    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isStaticReadonly } contains true
+    relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isStaticReadonly)
+
+  private def relevantWithPredicate[T <: XFormsSingleNodeControl](
+    staticOrAbsoluteId: String,
+    predicate         : T => Boolean
+  )(implicit
+    xpc               : XPathContext,
+    xfc               : XFormsFunction.Context
+  ): Boolean =
+    relevantControl(staticOrAbsoluteId)
+      .flatMap(_.narrowTo[T])
+      .exists(predicate)
 
   @XPathFunction()
   def value(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =

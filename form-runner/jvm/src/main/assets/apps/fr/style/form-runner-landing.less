@@ -71,6 +71,23 @@ html {
         }
     }
 
+    .xbl-component {
+        .card {
+            .card-body {
+                .card-text {
+                    margin-bottom: 0;
+                }
+                .img-thumbnail {
+                    padding: 0;
+                    border: none;
+                }
+                img.img-thumbnail, .img-thumbnail img {
+                    max-width: 7em;
+                }
+            }
+        }
+    }
+
     a figure, .card .list-group-item {
         &:hover {
             background-color: @frRowHoverBackground;
@@ -109,14 +126,16 @@ html {
         }
     }
 
-    .img-thumbnail {
-        padding: 15%;
-        border: none;
-        background-color: transparent;
-        border-top-left-radius: 10px; // avoid stepping over enclosing border
-        border-top-right-radius: 10px;
-        opacity: .8;
-        transition: all ease 100ms;
+    .fr-landing-quick-links-card {
+        .img-thumbnail {
+            padding: 15%;
+            border: none;
+            background-color: transparent;
+            border-top-left-radius: 10px; // avoid stepping over enclosing border
+            border-top-right-radius: 10px;
+            opacity: .8;
+            transition: all ease 100ms;
+        }
     }
 
     figure:hover .img-thumbnail {
@@ -126,6 +145,7 @@ html {
     .card-body {
         display: flex;
         align-items: center;
+        column-gap: .5em;
         p {
             width: 100%;
         }

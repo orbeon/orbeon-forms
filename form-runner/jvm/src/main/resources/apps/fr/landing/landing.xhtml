@@ -211,6 +211,14 @@
                     </xh:div>
                 </xh:div>
 
+                <fr:card-published-forms ref=".[$cards-tokens = 'demo-forms']" app="orbeon">
+                    <xf:label ref="xxf:r('landing.titles.demo-forms', '|fr-fr-resources|')"/>
+                </fr:card-published-forms>
+
+                <fr:card-published-forms ref=".[$cards-tokens = 'demo-forms']" app="orbeon-features">
+                    <xf:label ref="xxf:r('landing.titles.demo-features', '|fr-fr-resources|')"/>
+                </fr:card-published-forms>
+
                 <fr:card
                     class="{'xforms-hidden'[not($cards-tokens = 'published-forms')]}"
                     status="{(instance('fr-landing-form-metadata-instance')/@state, 'done')[1]}"
@@ -338,12 +346,6 @@
                         </xh:span>
                     </fr:card-footer>
                 </fr:card>
-                <fr:card-published-forms ref=".[$cards-tokens = 'demo-forms']" app="orbeon">
-                    <xf:label ref="xxf:r('landing.titles.demo-forms', '|fr-fr-resources|')"/>
-                </fr:card-published-forms>
-                <fr:card-published-forms ref=".[$cards-tokens = 'demo-forms']" app="orbeon-features">
-                    <xf:label ref="xxf:r('landing.titles.demo-features', '|fr-fr-resources|')"/>
-                </fr:card-published-forms>
 <!--                <fr:link-card img-src="/apps/fr/style/images/orbeon/crane.jpg" href="/fr/orbeon/builder/new">-->
 <!--                    <xf:label ref="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/>-->
 <!--                </fr:link-card>-->

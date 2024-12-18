@@ -63,16 +63,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </typed-controls>
                     <date-time-controls>
                         <grid-4>
-                            <date/>
+                            <date-us/>
+                            <date-eu/>
+                            <date-iso/>
                             <dropdown-date/>
                             <fields-date/>
+                            <native-date/>
+
+
+
                             <time/>
                             <time-24hour/>
-                            <native-date/>
+
 
                             <time-12hour-noseconds/>
                             <time-24hour-noseconds/>
                             <datetime/>
+
                         </grid-4>
                     </date-time-controls>
                     <selection-controls>
@@ -207,27 +214,35 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
-                        <xf:bind id="date-bind" ref="date" type="xf:date" name="date"
+
+
+
+                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"
+                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+
+
+                        <xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time"
+                                 name="time-12hour-noseconds"
+                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time"
+                                 name="time-24hour-noseconds"
+                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour"
+                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date"
+                                 xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date"
+                                 xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="date-iso-bind" ref="date-iso" name="date-iso" type="xf:date"
                                  xxf:default="adjust-date-to-timezone(current-date(), ())"/>
                         <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"
                                  xxf:default="adjust-date-to-timezone(current-date(), ())"/>
                         <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"
                                  xxf:default="adjust-date-to-timezone(current-date(), ())"/>
-                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"
-                                 xxf:default="substring(string(adjust-time-to-timezone(current-time(), ())), 1, 8)"/>
-
-                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"
-                                 xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/>
-                        <xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time"
-                                 name="time-12hour-noseconds"
-                                 xxf:default="substring(string(adjust-time-to-timezone(current-time(), ())), 1, 8)"/>
-                        <xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time"
-                                 name="time-24hour-noseconds"
-                                 xxf:default="substring(string(adjust-time-to-timezone(current-time(), ())), 1, 8)"/>
-                        <xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour"
-                                 xxf:default="substring(string(adjust-time-to-timezone(current-time(), ())), 1, 8)"/>
                         <xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date"
                                  xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"
+                                 xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
@@ -352,12 +367,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                    <thumbnail filename="" mediatype="" size="">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</thumbnail>
-                    <singleton>true</singleton>
-                    <data-migration>enabled</data-migration>
-                    <xbl>
-                        <fr:date output-format="[D01]/[M01]/[Y]"/>
-                    </xbl>
+
+
+
+
 
 
                     <email>
@@ -369,6 +382,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </templates>
                         <parameters/>
                     </email>
+                    <thumbnail filename="" mediatype="" size="">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</thumbnail>
+                    <singleton>true</singleton>
+                    <data-migration>enabled</data-migration>
+                    <density>comfortable</density>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
@@ -380,6 +397,52 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
+                        <date-us>
+                            <label>Date with US format</label>
+                            <hint/>
+
+
+                        </date-us>
+                        <date-eu>
+                            <label>Date with European format</label>
+                            <hint/>
+
+
+                        </date-eu>
+                        <date-iso>
+                            <label>Date in ISO format</label>
+                            <hint/>
+
+
+                        </date-iso>
+                        <dropdown-date>
+                            <label>Dropdown Date</label>
+                            <hint>Date selector with dropdown menus</hint>
+
+
+
+
+                        </dropdown-date>
+                        <fields-date>
+                            <label>Fields Date</label>
+                            <hint>Date selector with separate fields</hint>
+
+
+
+
+                        </fields-date>
+                        <native-date>
+                            <label>Browser Date</label>
+                            <hint>Standard date field</hint>
+
+
+
+
+
+
+
+
+                        </native-date>
 
 
 
@@ -727,27 +790,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Signature</label>
                             <help/>
                         </signature-controls>
-                        <date>
-                            <label>Date</label>
-                            <hint>Standard date field</hint>
 
 
-                        </date>
-                        <dropdown-date>
-                            <label>Dropdown Date</label>
-                            <hint>Date selector with dropdown menus</hint>
 
-
-                        </dropdown-date>
-                        <fields-date>
-                            <label>Fields Date</label>
-                            <hint>Date selector with separate fields</hint>
-
-
-                        </fields-date>
                         <time>
                             <label>12-Hour Time</label>
                             <hint>Standard time field</hint>
+
+
 
 
                         </time>
@@ -756,21 +806,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint>Standard time field</hint>
 
 
+
+
                         </time-24hour>
-                        <native-date>
-                            <label>Date</label>
-                            <hint>Standard date field</hint>
 
-
-
-
-
-
-                        </native-date>
 
                         <time-12hour-noseconds>
                             <label>12-Hour Time (No Seconds)</label>
                             <hint>Standard time field</hint>
+
+
 
 
                         </time-12hour-noseconds>
@@ -779,13 +824,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint>Standard time field</hint>
 
 
+
+
                         </time-24hour-noseconds>
                         <datetime>
                             <label>Date and Time</label>
                             <hint>Standard date and time field</hint>
 
 
+
+
                         </datetime>
+
                         <htmlarea>
                             <label>Formatted Text Area</label>
                             <hint>Rich text editor</hint>
@@ -844,6 +894,52 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </attachment-controls>
                     </resource>
                     <resource xml:lang="fr">
+                        <date-us>
+                            <label>Date au format É.-U.</label>
+                            <hint/>
+
+
+                        </date-us>
+                        <date-eu>
+                            <label>Date au format Européen</label>
+                            <hint/>
+
+
+                        </date-eu>
+                        <date-iso>
+                            <label>Date au format ISO</label>
+                            <hint/>
+
+
+                        </date-iso>
+                        <dropdown-date>
+                            <label>Date avec menus</label>
+                            <hint>Sélecteur de date avec menus</hint>
+
+
+
+
+                        </dropdown-date>
+                        <fields-date>
+                            <label>Date avec champs</label>
+                            <hint>Sélecteur de date avec champs séparés</hint>
+
+
+
+
+                        </fields-date>
+                        <native-date>
+                            <label>Date du navigateur</label>
+                            <hint>Champ date standard</hint>
+
+
+
+
+
+
+
+
+                        </native-date>
 
 
 
@@ -1193,27 +1289,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Signature</label>
                             <help/>
                         </signature-controls>
-                        <date>
-                            <label>Date</label>
-                            <hint>Champ date standard</hint>
 
 
-                        </date>
-                        <dropdown-date>
-                            <label>Date avec menus</label>
-                            <hint>Sélecteur de date avec menus</hint>
 
-
-                        </dropdown-date>
-                        <fields-date>
-                            <label>Date avec champs</label>
-                            <hint>Sélecteur de date avec champs séparés</hint>
-
-
-                        </fields-date>
                         <time>
                             <label>Heure sur 12 heures</label>
                             <hint>Champ heure standard</hint>
+
+
 
 
                         </time>
@@ -1222,21 +1305,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint>Champ heure standard</hint>
 
 
+
+
                         </time-24hour>
-                        <native-date>
-                            <label>Date</label>
-                            <hint>Champ date standard</hint>
 
-
-
-
-
-
-                        </native-date>
 
                         <time-12hour-noseconds>
                             <label>Heure sur 12 heures (sans secondes)</label>
                             <hint>Champ heure sans secondes</hint>
+
+
 
 
                         </time-12hour-noseconds>
@@ -1245,13 +1323,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint>Champ heure sans secondes</hint>
 
 
+
+
                         </time-24hour-noseconds>
                         <datetime>
                             <label>Date et heure</label>
                             <hint>Champ date et heure standard</hint>
 
 
+
+
                         </datetime>
+
                         <htmlarea>
                             <label>Texte formatté</label>
                             <hint>Editeur de texte enrichi</hint>
@@ -1525,59 +1608,107 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <xf:label ref="$form-resources/date-time-controls/label"/>
                     <fr:grid columns="3" id="grid-4-grid" bind="grid-4-bind">
                         <fr:c y="1" x="1" w="4">
-                            <fr:date bind="date-bind" id="date-control" field-width="natural">
-                                <xf:label ref="$form-resources/date/label"/>
-                                <xf:hint ref="$form-resources/date/hint"/>
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="date-us-control"
+                                     bind="date-us-bind"
+                                     output-format="[M]/[D]/[Y]"
+                                     field-width="natural">
+                                <xf:label ref="$form-resources/date-us/label"/>
+                                <xf:hint ref="$form-resources/date-us/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
                             </fr:date>
+
                         </fr:c>
 
                         <fr:c x="5" y="1" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="date-eu-control"
+                                     bind="date-eu-bind"
+                                     field-width="natural"
+                                     output-format="[D]/[M]/[Y]">
+                                <xf:label ref="$form-resources/date-eu/label"/>
+                                <xf:hint ref="$form-resources/date-eu/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:date>
+
+                        </fr:c>
+                        <fr:c y="1" x="9" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="date-iso-control"
+                                     bind="date-iso-bind"
+                                     field-width="natural"
+                                     output-format="[Y]-[M01]-[D01]">
+                                <xf:label ref="$form-resources/date-iso/label"/>
+                                <xf:hint ref="$form-resources/date-iso/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:date>
+
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
                             <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
                                 <xf:label ref="$form-resources/dropdown-date/label"/>
                                 <xf:hint ref="$form-resources/dropdown-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:dropdown-date>
                         </fr:c>
-                        <fr:c y="1" x="9" w="4">
+                        <fr:c x="5" y="2" w="4">
                             <fr:fields-date bind="fields-date-bind" id="fields-date-control">
                                 <xf:label ref="$form-resources/fields-date/label"/>
                                 <xf:hint ref="$form-resources/fields-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:fields-date>
                         </fr:c>
-                        <fr:c y="2" x="1" w="4">
+                        <fr:c x="9" y="2" w="4">
+                            <fr:date bind="native-date-bind" id="native-date-control" ref="">
+                                <xf:label ref="$form-resources/native-date/label"/>
+                                <xf:hint ref="$form-resources/native-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c y="3" x="1" w="4">
                             <fr:time bind="time-bind" id="time-control" field-width="natural"
                                      output-format="[h]:[m]:[s] [P,2-2]">
                                 <xf:label ref="$form-resources/time/label"/>
                                 <xf:hint ref="$form-resources/time/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:time>
                         </fr:c>
-                        <fr:c y="2" x="5" w="4">
+                        <fr:c y="3" x="5" w="4">
                             <fr:time bind="time-24hour-bind" id="time-24hour-control" field-width="natural"
                                      output-format="[H]:[m]:[s]">
                                 <xf:label ref="$form-resources/time-24hour/label"/>
                                 <xf:hint ref="$form-resources/time-24hour/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:time>
 
                         </fr:c>
-                        <fr:c y="2" x="9" w="4">
-                            <fr:date bind="native-date-bind" id="native-date-control" field-width="natural"
-                                     native-picker="always">
-                                <xf:label ref="$form-resources/native-date/label"/>
-                                <xf:hint ref="$form-resources/native-date/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:c y="3" x="9" w="4">
 
-
-                            </fr:date>
                         </fr:c>
-                        <fr:c x="1" y="3" w="4">
+                        <fr:c x="1" y="4" w="4">
                             <fr:time bind="time-12hour-noseconds-bind" id="time-12hour-noseconds-control"
                                      field-width="natural"
                                      output-format="[h]:[m] [P,2-2]">
@@ -1585,9 +1716,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:hint ref="$form-resources/time-12hour-noseconds/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:time>
                         </fr:c>
-                        <fr:c x="5" y="3" w="4">
+                        <fr:c x="5" y="4" w="4">
                             <fr:time bind="time-24hour-noseconds-bind" id="time-24hour-noseconds-control"
                                      field-width="natural"
                                      output-format="[H]:[m]">
@@ -1595,16 +1727,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:hint ref="$form-resources/time-24hour-noseconds/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:time>
                         </fr:c>
-                        <fr:c x="9" y="3" w="4">
+                        <fr:c x="9" y="4" w="4">
+
+                        </fr:c>
+                        <fr:c x="1" y="5" w="7">
                             <fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
                                 <xf:label ref="$form-resources/datetime/label"/>
                                 <xf:hint ref="$form-resources/datetime/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                             </fr:datetime>
                         </fr:c>
+                        <fr:c x="8" y="5" w="1"/>
+                        <fr:c x="9" y="5" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">

@@ -379,26 +379,25 @@
     <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"             value="sqlite"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"               value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"              value="sqlite"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"                value="sqlite"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                    value="sqlite"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"                value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon-features.controls.form"     value="sqlite"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
         home summary clear pdf wizard-toc wizard-prev wizard-next save-final review
     </property>
-
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon-features.controls">
         home pdf wizard-prev wizard-next review
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.button.review.enabled.orbeon.controls">
+    <property as="xs:string"  name="oxf.fr.detail.button.review.enabled.orbeon-features.controls">
         fr:is-wizard-last-page()
     </property>
 
-    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"                 value="wizard"/>
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon-features.controls"        value="wizard"/>
 
     <!-- Disable autosave for forms that only support the `new` mode -->
-    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.controls"                  value="0"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon-features.controls"         value="0"/>
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.repeated-grids"            value="0"/>
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.nobel-prizes"              value="0"/>
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.placeholders"              value="0"/>
@@ -456,7 +455,7 @@
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.*"                           value="none"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon.*"                              value="new edit view"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.controls"                    value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon-features.controls"           value="left"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.dmv-14"                      value="left"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.w9"                          value="left"/>
 

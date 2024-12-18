@@ -411,6 +411,7 @@
             <form-builder-new>Új Form Builder űrlap</form-builder-new>
             <form-builder-summary>Form Builder űrlapok</form-builder-summary>
             <demo-forms>Demó űrlapok</demo-forms>
+            <demo-features todo="true">Demo Features</demo-features>
             <quick-links>Gyors linkek</quick-links>
             <form-runner-admin>Űrlapok adminisztrációja</form-runner-admin>
         </titles>

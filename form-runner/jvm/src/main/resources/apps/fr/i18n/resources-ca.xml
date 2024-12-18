@@ -425,6 +425,7 @@
             <form-builder-new todo="true">New Form Builder Form</form-builder-new>
             <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
             <demo-forms todo="true">Demo Forms</demo-forms>
+            <demo-features todo="true">Demo Features</demo-features>
             <quick-links todo="true">Quick Links</quick-links>
             <form-runner-admin todo="true">Forms Admin</form-runner-admin>
         </titles>

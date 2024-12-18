@@ -405,6 +405,7 @@
             <form-builder-new>新建Form Builder表单</form-builder-new>
             <form-builder-summary>Form Builder表单</form-builder-summary>
             <demo-forms>演示表单</demo-forms>
+            <demo-features todo="true">Demo Features</demo-features>
             <quick-links>快速链接</quick-links>
             <form-runner-admin>表单管理</form-runner-admin>
         </titles>

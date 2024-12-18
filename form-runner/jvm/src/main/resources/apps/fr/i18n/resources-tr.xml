@@ -411,6 +411,7 @@
             <form-builder-new>Yeni Form Oluşturucu Formu</form-builder-new>
             <form-builder-summary>Form Oluşturucu Formları</form-builder-summary>
             <demo-forms>Demo Formları</demo-forms>
+            <demo-features todo="true">Demo Features</demo-features>
             <quick-links>Hızlı Bağlantılar</quick-links>
             <form-runner-admin>Form Yönetimi</form-runner-admin>
         </titles>

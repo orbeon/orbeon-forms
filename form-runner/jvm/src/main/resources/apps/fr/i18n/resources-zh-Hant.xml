@@ -411,6 +411,7 @@
             <form-builder-new>新建 Form Builder 表單</form-builder-new>
             <form-builder-summary>Form Builder 表單</form-builder-summary>
             <demo-forms>演示表單</demo-forms>
+            <demo-features todo="true">Demo Features</demo-features>
             <quick-links>快速鏈接</quick-links>
             <form-runner-admin>表單管理</form-runner-admin>
         </titles>

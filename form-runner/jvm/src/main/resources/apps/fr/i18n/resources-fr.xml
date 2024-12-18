@@ -416,6 +416,7 @@
             <form-builder-new>Nouveau formulaire Form Builder</form-builder-new>
             <form-builder-summary>Formulaires Form Builder</form-builder-summary>
             <demo-forms>Formulaires de démonstration</demo-forms>
+            <demo-features>Fonctions de démonstration</demo-features>
             <quick-links>Raccourcis</quick-links>
             <form-runner-admin>Admin formulaires</form-runner-admin>
         </titles>

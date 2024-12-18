@@ -412,6 +412,7 @@
             <form-builder-new>New Form Builder Form</form-builder-new>
             <form-builder-summary>Form Builder Forms</form-builder-summary>
             <demo-forms>Demo Forms</demo-forms>
+            <demo-features>Demo Features</demo-features>
             <quick-links>Quick Links</quick-links>
             <form-runner-admin>Forms Admin</form-runner-admin>
         </titles>

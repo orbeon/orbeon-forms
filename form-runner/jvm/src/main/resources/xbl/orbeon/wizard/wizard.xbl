@@ -1620,7 +1620,6 @@
                             <!-- Only place content if at least one element is present, so we avoid issues with table borders -->
                             <xsl:if test="exists($fr-wizard-other-content/self::*)">
                                 <xh:div class="fr-wizard-other">
-                                    <xh:div class="fr-wizard-cell-placeholder"/>
                                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                         <xsl:copy-of select="$fr-wizard-other-content"/>
                                     </xf:group>

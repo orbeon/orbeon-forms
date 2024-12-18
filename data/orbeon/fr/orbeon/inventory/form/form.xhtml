@@ -25,8 +25,17 @@
                     <application-name>orbeon</application-name>
                     <form-name>inventory</form-name>
                     <title xml:lang="en">Orbeon Demo: Inventory Form</title>
-                    <description xml:lang="en">This form allows you to catalog the inventory of a collection.</description><created-with-version>2021.1-SNAPSHOT PE</created-with-version><library-versions><_>1</_></library-versions>
-                <thumbnail filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/inventory/form/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2021.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"accquisition-details"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"acquisition-date"},{"value":"acquisition-id"},{"value":"acquisition-location"},{"value":"acquisition-price-base"},{"value":"acquisition-price-additional"},{"value":"acquisition-price-total"},{"value":"acquisition-comment"}],"topLevel":true},{"containerPath":[{"value":"object-details"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"object-description"},{"value":"object-type"},{"value":"object-subtype"},{"value":"object-brand"},{"value":"object-model"},{"value":"object-serial-number"},{"value":"object-manufacturing-year"},{"value":"object-manufacturing-decade"},{"value":"object-base-weight-lbs"},{"value":"object-total-weight-lbs"},{"value":"object-color"},{"value":"object-link"},{"value":"object-image"},{"value":"object-attachments"},{"value":"object-comment"}],"topLevel":true},{"containerPath":[{"value":"appraisal"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"appraisal-condition"},{"value":"appraisal-score"},{"value":"appraisal-current-value"},{"value":"appraisal-comment"}],"topLevel":true}]}</migration></metadata>
+                    <description xml:lang="en">This form allows you to catalog the inventory of a collection.</description>
+                    <created-with-version>2021.1-SNAPSHOT PE</created-with-version>
+
+
+                    <library-versions>
+                        <_>1</_>
+                    </library-versions>
+
+
+
+                <thumbnail filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/inventory/form/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</thumbnail><allow-template-use>true</allow-template-use><wizard>false</wizard><density>comfortable</density><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2021.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"accquisition-details"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"acquisition-date"},{"value":"acquisition-id"},{"value":"acquisition-location"},{"value":"acquisition-price-base"},{"value":"acquisition-price-additional"},{"value":"acquisition-price-total"},{"value":"acquisition-comment"}],"topLevel":true},{"containerPath":[{"value":"object-details"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"object-description"},{"value":"object-type"},{"value":"object-subtype"},{"value":"object-brand"},{"value":"object-model"},{"value":"object-serial-number"},{"value":"object-manufacturing-year"},{"value":"object-manufacturing-decade"},{"value":"object-base-weight-lbs"},{"value":"object-total-weight-lbs"},{"value":"object-color"},{"value":"object-link"},{"value":"object-image"},{"value":"object-attachments"},{"value":"object-comment"}],"topLevel":true},{"containerPath":[{"value":"appraisal"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"appraisal-condition"},{"value":"appraisal-score"},{"value":"appraisal-current-value"},{"value":"appraisal-comment"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
 
@@ -105,7 +114,60 @@
             <label>Model Car</label>
             <hint/>
             <value>model-car</value>
-          </item></object-type><object-subtype><label>Object subtype</label><hint/></object-subtype><object-brand><label>Object brand</label><hint/></object-brand><object-model><label>Model</label><hint/></object-model><object-serial-number><label>Serial number</label><hint/></object-serial-number><object-manufacturing-year><label>Manufacturing year</label><hint/></object-manufacturing-year><object-manufacturing-decade><label>Manufacturing decade</label><hint/></object-manufacturing-decade><object-base-weight-lbs><label>Base weight</label><hint/></object-base-weight-lbs><object-total-weight-lbs><label>Total weight</label><hint/></object-total-weight-lbs><object-color><label>Color</label><hint/></object-color><object-link><label>Link</label><hint/></object-link><object-image><label>Image</label><hint/></object-image><object-attachments><label>Attachments</label><hint/></object-attachments><object-comment><label>Comment</label><hint/></object-comment>
+                            </item>
+                        </object-type>
+                        <object-subtype>
+                            <label>Object subtype</label>
+                            <hint/>
+                        </object-subtype>
+                        <object-brand>
+                            <label>Object brand</label>
+                            <hint/>
+                        </object-brand>
+                        <object-model>
+                            <label>Model</label>
+                            <hint/>
+                        </object-model>
+                        <object-serial-number>
+                            <label>Serial number</label>
+                            <hint/>
+                        </object-serial-number>
+                        <object-manufacturing-year>
+                            <label>Manufacturing year</label>
+                            <hint/>
+                        </object-manufacturing-year>
+                        <object-manufacturing-decade>
+                            <label>Decade</label>
+                            <hint/>
+                        </object-manufacturing-decade>
+                        <object-base-weight-lbs>
+                            <label>Base weight</label>
+                            <hint/>
+                        </object-base-weight-lbs>
+                        <object-total-weight-lbs>
+                            <label>Total weight</label>
+                            <hint/>
+                        </object-total-weight-lbs>
+                        <object-color>
+                            <label>Color</label>
+                            <hint/>
+                        </object-color>
+                        <object-link>
+                            <label>Link</label>
+                            <hint/>
+                        </object-link>
+                        <object-image>
+                            <label>Image</label>
+                            <hint/>
+                        </object-image>
+                        <object-attachments>
+                            <label>Attachments</label>
+                            <hint/>
+                        </object-attachments>
+                        <object-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </object-comment>
                         <accquisition-details>
                             <label>Acquisition</label>
                         </accquisition-details><object-details><label>Description</label></object-details><appraisal><label>Appraisal</label></appraisal>

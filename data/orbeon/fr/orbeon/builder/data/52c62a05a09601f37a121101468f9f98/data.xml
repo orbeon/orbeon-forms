@@ -194,8 +194,9 @@
                         <_>1</_>
                     </library-versions>
 
-                    <thumbnail filename="bookshelf.png" mediatype="image/png" size="524952">/fr/service/persistence/crud/orbeon/builder/data/52c62a05a09601f37a121101468f9f98/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</thumbnail>
-                    <allow-template-use>true</allow-template-use>
+
+
+
                     <email>
                         <templates>
                             <template name="default" xml:lang="en">
@@ -220,6 +221,10 @@
                             </param>
                         </parameters>
                     </email>
+                    <thumbnail filename="bookshelf.png" mediatype="image/png" size="524952">/fr/service/persistence/crud/orbeon/builder/data/52c62a05a09601f37a121101468f9f98/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <wizard>false</wizard>
+                    <density>comfortable</density>
                 </metadata>
             </xf:instance>
 

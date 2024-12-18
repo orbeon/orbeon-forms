@@ -384,6 +384,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </email>
                     <thumbnail filename="" mediatype="" size="">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</thumbnail>
                     <singleton>true</singleton>
+                    <wizard>true</wizard>
+                    <wizard-subsections-nav>true</wizard-subsections-nav>
+                    <wizard-separate-toc>false</wizard-separate-toc>
+                    <wizard-section-status>false</wizard-section-status>
+                    <wizard-mode>free</wizard-mode>
+                    <wizard-subsections-toc>all</wizard-subsections-toc>
                     <data-migration>enabled</data-migration>
                     <density>comfortable</density>
                 </metadata>

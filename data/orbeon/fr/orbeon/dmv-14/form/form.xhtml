@@ -221,11 +221,12 @@
                             <_>1</_>
                         </library-versions>
 
-                        <thumbnail filename="dmv-14.png" mediatype="image/png" size="86742">/fr/service/persistence/crud/orbeon/dmv-14/form/b1e787f94b9e91fd7b959ed5dad0c94abb856bf7.bin</thumbnail>
-                        <allow-template-use>true</allow-template-use>
-                        <wizard>true</wizard>
-                        <wizard-mode>free</wizard-mode>
-                    <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "vehicles/vehicle", "iteration-name": "vehicle-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"personal-information"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"last-name"},{"value":"first-name"},{"value":"initial"},{"value":"driver-license-number"},{"value":"birth-date"},{"value":"voter-address-change"}],"topLevel":true},{"containerPath":[{"value":"residence-address"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"residence-street-number"},{"value":"residence-street-name-1"},{"value":"residence-street-name-2"},{"value":"residence-apt"},{"value":"residence-city"},{"value":"residence-state"},{"value":"residence-zip"}],"topLevel":true},{"containerPath":[{"value":"mailing-address"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"mailing-address-different"}],"topLevel":true},{"containerPath":[{"value":"mailing-address"}],"newGridElem":{"value":"grid-4"},"afterElem":{"value":"grid-3"},"content":[{"value":"mailing-street-number"},{"value":"mailing-street-name-1"},{"value":"mailing-street-name-2"},{"value":"mailing-apt"},{"value":"mailing-city"},{"value":"mailing-state"},{"value":"mailing-zip"}],"topLevel":true},{"containerPath":[{"value":"vehicles"}],"newGridElem":{"value":"grid-5"},"afterElem":{"value":"vehicle"},"content":[{"value":"leasing-company-name"}],"topLevel":true},{"containerPath":[{"value":"trailer-coach-vessel"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"has-trailer-coach-vessel"}],"topLevel":true},{"containerPath":[{"value":"trailer-coach-vessel"}],"newGridElem":{"value":"grid-7"},"afterElem":{"value":"grid-6"},"content":[{"value":"vehicle-street-number"},{"value":"vehicle-street-name-1"},{"value":"vehicle-street-name-2"},{"value":"vehicle-city"},{"value":"vehicle-county"}],"topLevel":true},{"containerPath":[{"value":"old-address"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"old-street-number-name"},{"value":"old-city"},{"value":"old-state"},{"value":"old-zip"}],"topLevel":true}]}</migration></metadata>
+
+
+
+
+
+                <thumbnail filename="dmv-14.png" mediatype="image/png" size="86742">/fr/service/persistence/crud/orbeon/dmv-14/form/b1e787f94b9e91fd7b959ed5dad0c94abb856bf7.bin</thumbnail><allow-template-use>true</allow-template-use><wizard>true</wizard><wizard-subsections-nav>false</wizard-subsections-nav><wizard-separate-toc>false</wizard-separate-toc><wizard-section-status>false</wizard-section-status><wizard-mode>free</wizard-mode><density>comfortable</density><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "vehicles/vehicle", "iteration-name": "vehicle-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"personal-information"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"last-name"},{"value":"first-name"},{"value":"initial"},{"value":"driver-license-number"},{"value":"birth-date"},{"value":"voter-address-change"}],"topLevel":true},{"containerPath":[{"value":"residence-address"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"residence-street-number"},{"value":"residence-street-name-1"},{"value":"residence-street-name-2"},{"value":"residence-apt"},{"value":"residence-city"},{"value":"residence-state"},{"value":"residence-zip"}],"topLevel":true},{"containerPath":[{"value":"mailing-address"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"mailing-address-different"}],"topLevel":true},{"containerPath":[{"value":"mailing-address"}],"newGridElem":{"value":"grid-4"},"afterElem":{"value":"grid-3"},"content":[{"value":"mailing-street-number"},{"value":"mailing-street-name-1"},{"value":"mailing-street-name-2"},{"value":"mailing-apt"},{"value":"mailing-city"},{"value":"mailing-state"},{"value":"mailing-zip"}],"topLevel":true},{"containerPath":[{"value":"vehicles"}],"newGridElem":{"value":"grid-5"},"afterElem":{"value":"vehicle"},"content":[{"value":"leasing-company-name"}],"topLevel":true},{"containerPath":[{"value":"trailer-coach-vessel"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"has-trailer-coach-vessel"}],"topLevel":true},{"containerPath":[{"value":"trailer-coach-vessel"}],"newGridElem":{"value":"grid-7"},"afterElem":{"value":"grid-6"},"content":[{"value":"vehicle-street-number"},{"value":"vehicle-street-name-1"},{"value":"vehicle-street-name-2"},{"value":"vehicle-city"},{"value":"vehicle-county"}],"topLevel":true},{"containerPath":[{"value":"old-address"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"old-street-number-name"},{"value":"old-city"},{"value":"old-state"},{"value":"old-zip"}],"topLevel":true}]}</migration></metadata>
                 </xf:instance>
                 <xf:instance id="fr-form-attachments">
                     <attachments>
@@ -585,8 +586,8 @@
                                     </fr:index>
                                 </xf:input>
                             </fr:c>
-                            <fr:c y="2" x="5" w="2">
-                                <fr:date id="birth-date-control" bind="birth-date-bind">
+                            <fr:c y="2" x="5" w="4">
+                                <fr:date id="birth-date-control" bind="birth-date-bind" field-width="natural">
                                     <xf:label ref="$form-resources/birth-date/label"/>
                                     <xf:hint ref="$form-resources/birth-date/hint"/>
                                     <xf:alert ref="$form-resources/birth-date/alert" validation="validation-6-validation"/>
@@ -596,7 +597,7 @@
                                     </fr:index>
                                 </fr:date>
                             </fr:c>
-                            <fr:c x="7" y="2" w="2" h="1"/>
+
                             <fr:c y="2" x="9" w="4">
                                 <fr:checkbox-input id="voter-address-change-control" bind="voter-address-change-bind">
                                     <xf:label ref="$form-resources/voter-address-change/label"/>
@@ -609,14 +610,14 @@
                     <fr:section id="residence-address-section" bind="residence-address-bind">
                         <xf:label ref="$form-resources/residence-address/label"/>
                         <fr:grid id="grid-2-grid" bind="grid-2-bind">
-                            <fr:c y="1" x="1" w="2">
+                            <fr:c y="1" x="1" w="3">
                                 <xf:input id="residence-street-number-control" bind="residence-street-number-bind">
                                     <xf:label ref="$form-resources/residence-street-number/label"/>
                                     <xf:hint ref="$form-resources/residence-street-number/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </fr:c>
-                            <fr:c x="3" y="1" w="1" h="1"/>
+
                             <fr:c y="1" x="4" w="3">
                                 <xf:input id="residence-street-name-1-control" bind="residence-street-name-1-bind">
                                     <xf:label ref="$form-resources/residence-street-name-1/label"/>
@@ -678,14 +679,14 @@
                             </fr:c>
                         </fr:grid>
                         <fr:grid id="grid-4-grid" bind="grid-4-bind">
-                            <fr:c y="1" x="1" w="2">
+                            <fr:c y="1" x="1" w="3">
                                 <xf:input id="mailing-street-number-control" bind="mailing-street-number-bind">
                                     <xf:label ref="$form-resources/mailing-street-number/label"/>
                                     <xf:hint ref="$form-resources/mailing-street-number/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </fr:c>
-                            <fr:c x="3" y="1" w="1" h="1"/>
+
                             <fr:c y="1" x="4" w="3">
                                 <xf:input id="mailing-street-name-1-control" bind="mailing-street-name-1-bind">
                                     <xf:label ref="$form-resources/mailing-street-name-1/label"/>
@@ -789,14 +790,14 @@
                             </fr:c>
                         </fr:grid>
                         <fr:grid id="grid-7-grid" bind="grid-7-bind">
-                            <fr:c y="1" x="1" w="2">
+                            <fr:c y="1" x="1" w="3">
                                 <xf:input id="vehicle-street-number-control" bind="vehicle-street-number-bind">
                                     <xf:label ref="$form-resources/vehicle-street-number/label"/>
                                     <xf:hint ref="$form-resources/vehicle-street-number/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </fr:c>
-                            <fr:c x="3" y="1" w="1" h="1"/>
+
                             <fr:c y="1" x="4" w="3">
                                 <xf:input id="vehicle-street-name-1-control" bind="vehicle-street-name-1-bind">
                                     <xf:label ref="$form-resources/vehicle-street-name-1/label"/>

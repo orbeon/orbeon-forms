@@ -131,11 +131,10 @@ trait HttpServletRequest extends ServletRequest {
   def isFont: Boolean      = hasFileExtension(Set("otf", "ttf", "woff", "woff2"))
   def isSourceMap: Boolean = hasFileExtension(Set("map"))
 
-  private def hasFileExtension(extensions: Set[String]): Boolean =
-    (for {
-      url  <- Option(getRequestURL)
-      path <- Option(URI.create(url.toString).getPath)
-    } yield extensions.exists(ext => path.endsWith(s".$ext"))).getOrElse(false)
+  private def hasFileExtension(extensions: Set[String]): Boolean = {
+    val requestPathInfo = getRequestPathInfo
+    extensions.exists(ext => requestPathInfo.endsWith(s".$ext"))
+  }
 }
 
 class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServletRequest) extends JavaxServletRequest(httpServletRequest) with HttpServletRequest {

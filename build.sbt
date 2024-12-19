@@ -713,9 +713,10 @@ lazy val formRunnerJVM = formRunner.jvm
     DebugDatabaseTest / sourceDirectory := (DatabaseTest / sourceDirectory).value,
     DebugDatabaseTest / javaOptions     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
-    libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
-    libraryDependencies += "javax.portlet"   % "portlet-api"         % PortletApiVersion        % Provided,
+    libraryDependencies += "javax.servlet"        % "javax.servlet-api"         % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet"      % "jakarta.servlet-api"       % JakartaServletApiVersion % Provided,
+    libraryDependencies += "javax.portlet"        % "portlet-api"               % PortletApiVersion        % Provided,
+    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % "2.6.0.Final"            % Provided,
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 

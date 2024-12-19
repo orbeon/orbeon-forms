@@ -39,14 +39,23 @@ object FormRunnerAuth {
     Headers.OrbeonCredentials
   )
 
-  import Private._
+  import Private.*
 
   def getCredentialsAsHeadersUseSession(
-    userRoles  : UserRolesFacade,
-    session    : ExternalContext.Session,
-    getHeader  : String => List[String]
+    userRoles: UserRolesFacade,
+    session  : ExternalContext.Session,
+    getHeader: String => List[String]
   ): List[(String, NonEmptyList[String])] =
-    getCredentialsUseSession(userRoles, session, getHeader) match {
+    getCredentialsAsHeadersUseSession(
+      findCredentialsFromContainerOrHeaders(userRoles, getHeader),
+      session
+    )
+
+  def getCredentialsAsHeadersUseSession(
+    credentialsOpt: => Option[Credentials],
+    session       : ExternalContext.Session
+  ): List[(String, NonEmptyList[String])] =
+    getCredentialsUseSession(credentialsOpt, session) match {
       case Some(credentials) =>
         val result = CredentialsSerializer.toHeaders[List](credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
@@ -109,9 +118,8 @@ object FormRunnerAuth {
     // - https://github.com/orbeon/orbeon-forms/issues/4436
     //
     def getCredentialsUseSession(
-      userRoles : UserRolesFacade,
-      session   : ExternalContext.Session,
-      getHeader : String => List[String]
+      credentialsOpt: => Option[Credentials],
+      session       : ExternalContext.Session
     ): Option[Credentials] = {
 
       val sessionCredentialsOpt = ServletPortletRequest.findCredentialsInSession(session)
@@ -119,7 +127,7 @@ object FormRunnerAuth {
       lazy val stickyHeadersConfigured =
         Properties.instance.getPropertySet.getBoolean(HeaderStickyPropertyName, default = false)
 
-      lazy val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
+      lazy val newCredentialsOpt = credentialsOpt
 
       def storeAndReturnNewCredentials(): Option[Credentials] = {
         ServletPortletRequest.storeCredentialsInSession(session, newCredentialsOpt)

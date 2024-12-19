@@ -217,14 +217,20 @@ object LabelEditor {
         // Position interceptor for each section
         for ((section, interceptor) <- sections.iterator.zip(labelClickInterceptors.iterator)) {
 
-          val sectionTitle = $(section).find(SectionTitleSelector)
-          val sectionLabel = $(section).find(SectionLabelSelector)
+          val sectionTitle = section.find(SectionTitleSelector)
+          val sectionLabel = section.find(SectionLabelSelector)
 
           // Show, as this might be an interceptor that was previously hidden, and is now reused
           interceptor.show()
 
           // Start at the label, but extend all the way to the right to the end of the title
-          interceptor.offset(sectionLabel.offset())
+          val labelOffset = sectionLabel.offset()
+          val titleOffset = sectionTitle.offset()
+          val interceptorOffset = io.udash.wrappers.jquery.Offset(
+            top  = titleOffset.top,
+            left = labelOffset.left
+          )
+          interceptor.offset(interceptorOffset)
           interceptor.height(sectionTitle.height())
           interceptor.width(sectionTitle.width() - (Offset(sectionLabel).left - Offset(sectionTitle).left))
         }

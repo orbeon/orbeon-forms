@@ -146,4 +146,13 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template
+        match="fr:databound-select1[@selection] | fr:databound-select1-search[@selection]"
+        mode="within-body">
+        <xsl:copy>
+            <xsl:attribute name="fb:selection" select="@selection"/>
+            <xsl:apply-templates select="@* except (@selection) | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
 </xsl:stylesheet>

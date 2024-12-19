@@ -149,6 +149,15 @@
                     </fr:buttons>
                 </xsl:template>
 
+                <!-- Restore selection -->
+                <xsl:template
+                    match="fr:databound-select1[@fb:selection] | fr:databound-select1-search[@fb:selection]">
+                    <xsl:copy>
+                        <xsl:attribute name="selection" select="@fb:selection"/>
+                        <xsl:apply-templates select="@* except (@fb:selection) | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" ref="data"/>

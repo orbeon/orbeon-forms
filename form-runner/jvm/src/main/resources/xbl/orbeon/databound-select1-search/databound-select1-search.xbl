@@ -146,7 +146,7 @@
                                             context="$control"
                                             origin="
                                                 xf:attribute(
-                                                    'selection',
+                                                    'fb:selection',
                                                     if (event('xxf:value') = 'true()')
                                                     then 'open'
                                                     else concat(
@@ -323,7 +323,7 @@
 
                             <xf:var name="binding"                   value="xxf:binding('fr-databound-select1-search')"/>
                             <xf:var name="auto-select-unique-choice" value="xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
-                            <xf:var name="open-selection"            value="fr:component-param-value('selection')"/>
+                            <xf:var name="open-selection"            value="fr:component-param-value('fb:selection')"/>
                             <xf:var name="is-open-selection"         value="$open-selection = 'open'"/>
 
                             <xf:submission

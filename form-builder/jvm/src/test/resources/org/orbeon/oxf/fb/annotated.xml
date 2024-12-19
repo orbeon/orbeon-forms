@@ -62,6 +62,7 @@
                             <control-30/>
                             <control-31/>
                             <control-32/>
+                            <control-33/>
                         </grid-26>
                     </section-25>
                 </form>
@@ -136,6 +137,7 @@
                         <xf:bind id="control-30-bind" ref="control-30" name="control-30" type="xf:time"/>
                         <xf:bind id="control-31-bind" ref="control-31" name="control-31" type="xf:date"/>
                         <xf:bind id="control-32-bind" ref="control-32" name="control-32"/>
+                        <xf:bind id="control-33-bind" ref="control-33" name="control-33"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -488,6 +490,23 @@
                                     <fr:summary-show column="false"/>
                                 </fr:index>
                             </fr:dropdown-select1>
+                            <fr:databound-select1 id="control-33-control"
+                                                  bind="control-33-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  fb:selection="{if ($is-open) then 'open' else ''}">
+                                <xf:label ref="$form-resources/control-33/label"/>
+                                <xf:hint ref="$form-resources/control-33/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="us-code"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
                         </fr:c>
                         <fr:c y="1" x="7" w="6"/>
                     </fr:grid>

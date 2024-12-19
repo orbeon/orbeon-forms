@@ -29,7 +29,7 @@ object FormRunnerPrivateAPI extends js.Object {
   private val ErrorScrollOffset = -100
 
   // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
-  private val ReturnMessage: (dom.Event) => String = (_) => "You may lose some unsaved changes."
+  private val ReturnMessage: js.Function1[dom.Event, Boolean] = { event => event.preventDefault(); true }
   private val NewEditViewPathRe = """(.*/fr/)([^/]+)/([^/]+)/(new|edit|view)(?:/([^/]+))?$""".r
 
   def setDataStatus(uuid: String, safe: Boolean): Unit = {

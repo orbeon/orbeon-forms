@@ -8,8 +8,8 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:binding
-        id="fr-form-card"
-        element="fr|form-card"
+        id="fr-card-form-data"
+        element="fr|card-form-data"
         xxbl:mode="lhha custom-lhha binding"
         class=""
     >

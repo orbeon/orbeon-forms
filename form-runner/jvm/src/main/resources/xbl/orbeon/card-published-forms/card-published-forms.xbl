@@ -16,6 +16,7 @@
         <xbl:implementation>
             <xf:model>
 
+                <!-- FIXME: Read from property. Tried to pass it from parent but it doesn't work. -->
                 <xf:var
                     name="page-size"
                     value="8"/>
@@ -70,10 +71,7 @@
                 </xf:action>
             </xf:model>
         </xbl:implementation>
-        <xbl:template
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        >
+        <xbl:template>
             <fr:card
                     status="{(instance('fr-landing-demo-forms-instance')/@state, 'done')[1]}"
                 >

@@ -51,9 +51,10 @@ object FormRunnerAuthFilter {
   def wrapWithOrbeonAuthHeaders[T <: PortletRequest](req: T): T = {
 
     val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
-      userRoles  = req,
-      session    = new PortletSessionImpl(req.getPortletSession),
-      getHeader  = req.getProperties(_).asScala.to(List)
+      userRoles    = req,
+      getAttribute = req.getAttribute,
+      session      = new PortletSessionImpl(req.getPortletSession),
+      getHeader    = req.getProperties(_).asScala.to(List)
     ).toMap
 
     AddLiferayUserHeadersFilter.wrap(req, FormRunnerAuth.AllAuthHeaderNames, authHeaders)

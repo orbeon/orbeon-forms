@@ -13,9 +13,8 @@
  */
 package org.orbeon.oxf.servlet
 
-import cats.data.NonEmptyList
 import org.apache.logging.log4j.ThreadContext
-import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest}
+import org.orbeon.oxf.externalcontext.ServletPortletRequest
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
@@ -84,90 +83,49 @@ object FormRunnerAuthFilterImpl {
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
     // directly with `Orbeon-*` headers. See https://github.com/orbeon/orbeon-forms/issues/2275
-    val ServicePath = "/fr/service/"
-
     val requestWithAmendedHeaders =
-      if (WildflyOidcAuth.hasWildflyOidcAuth(servletRequest)) {
-        credentialsFromSessionOrParameter(httpSession, servletRequest, WildflyOidcAuth.credentialsOpt(servletRequest))
-      } else if (servletRequest.getRequestPathInfo.startsWith(ServicePath)) {
-        credentialsFromSessionOrHeaders(httpSession, servletRequest, getHttpHeaders)
-      } else if (servletRequest.isSourceMap) {
+      if (servletRequest.getRequestPathInfo.startsWith("/fr/service/")) {
+
+        // `ServletPortletRequest` gets credentials from the session, which means we need to store the credentials into
+        // the session. This is done by `getCredentialsAsHeadersUseSession()` if we are not a service, but here we
+        // don't use that function so we need to do make sure they are stored.
+
+        ServletPortletRequest.findCredentialsInSession(httpSession) match {
+          case None =>
+            ServletPortletRequest.storeCredentialsInSession(
+              httpSession,
+              FormRunnerAuth.fromHeaderValues(
+                credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),
+                usernameOpt    = servletRequest.headerFirstValueOpt(Headers.OrbeonUsername),
+                rolesList      = getHttpHeaders(Headers.OrbeonRoles),
+                groupOpt       = servletRequest.headerFirstValueOpt(Headers.OrbeonGroup),
+              )
+            )
+          case Some(_) =>
+        }
+
+        servletRequest
+      } else if (servletRequest.getRequestPathInfo.endsWith(".map")) {
         // Don't amend headers for `.map` as this would cause the credentials code to clear the credentials
         // unnecessarily. https://github.com/orbeon/orbeon-forms/issues/6080
         servletRequest
       } else {
-        credentialsFromSessionHeadersOrContainer(httpSession, servletRequest, getHttpHeaders)
+
+        trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
+          override def headersToRemoveAsSet: Set[String] = FormRunnerAuth.AllAuthHeaderNames
+          val headersToPrependAsMap = FormRunnerAuth.getCredentialsAsHeadersUseSession(
+            userRoles    = servletRequest,
+            getAttribute = servletRequest.getAttribute,
+            session      = httpSession,
+            getHeader    = getHttpHeaders
+          ).toMap
+        }
+
+        new HttpServletRequestWrapper(servletRequest) with CustomHeaders
       }
 
     logger.debug(s"amended headers:\n${requestWithAmendedHeaders.headersAsString}")
 
     requestWithAmendedHeaders
-  }
-
-  private def credentialsFromSessionOrHeaders(
-    httpSession   : ServletSessionImpl,
-    servletRequest: HttpServletRequest,
-    getHttpHeaders: String => List[String]
-  ): HttpServletRequest = {
-
-    // `ServletPortletRequest` gets credentials from the session, which means we need to store the credentials into
-    // the session. This is done by `getCredentialsAsHeadersUseSession()` if we are not a service, but here we
-    // don't use that function so we need to do make sure they are stored.
-
-    ServletPortletRequest.findCredentialsInSession(httpSession) match {
-      case None =>
-        ServletPortletRequest.storeCredentialsInSession(
-          httpSession,
-          FormRunnerAuth.fromHeaderValues(
-            credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),
-            usernameOpt    = servletRequest.headerFirstValueOpt(Headers.OrbeonUsername),
-            rolesList      = getHttpHeaders(Headers.OrbeonRoles),
-            groupOpt       = servletRequest.headerFirstValueOpt(Headers.OrbeonGroup),
-          )
-        )
-      case Some(_) =>
-    }
-
-    servletRequest
-  }
-
-  private def credentialsFromSessionOrParameter(
-    httpSession   : ServletSessionImpl,
-    servletRequest: HttpServletRequest,
-    credentialsOpt: => Option[Credentials]
-  ): HttpServletRequest =
-    requestWithCredentialsHeaders(
-      servletRequest    = servletRequest,
-      credentialHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
-        credentialsOpt = credentialsOpt,
-        session        = httpSession
-      ).toMap
-    )
-
-  private def credentialsFromSessionHeadersOrContainer(
-    httpSession   : ServletSessionImpl,
-    servletRequest: HttpServletRequest,
-    getHttpHeaders: String => List[String]
-  ): HttpServletRequest =
-    requestWithCredentialsHeaders(
-      servletRequest    = servletRequest,
-      credentialHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
-        userRoles = servletRequest,
-        session   = httpSession,
-        getHeader = getHttpHeaders
-      ).toMap
-    )
-
-  private def requestWithCredentialsHeaders(
-    servletRequest   : HttpServletRequest,
-    credentialHeaders: Map[String, NonEmptyList[String]]
-  ): HttpServletRequest = {
-
-    trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-      override def headersToRemoveAsSet: Set[String] = FormRunnerAuth.AllAuthHeaderNames
-      val headersToPrependAsMap: Map[String, NonEmptyList[String]] = credentialHeaders
-    }
-
-    new HttpServletRequestWrapper(servletRequest) with CustomHeaders
   }
 }

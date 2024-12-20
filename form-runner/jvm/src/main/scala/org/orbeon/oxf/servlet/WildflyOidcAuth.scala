@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import org.orbeon.oxf.externalcontext.{Credentials, SimpleRole, UserAndGroup}
-import org.wildfly.security.http.oidc.OidcSecurityContext
+import org.wildfly.security.http.oidc.{JsonWebToken, OidcSecurityContext}
 
 import scala.jdk.CollectionConverters.*
 
@@ -22,17 +22,36 @@ object WildflyOidcAuth {
 
   private val OidcSecurityContextClassName = "org.wildfly.security.http.oidc.OidcSecurityContext"
   private val ObjectIDClaimName            = "oid"
+  private val RolesClaimName               = "roles"
 
-  def hasWildflyOidcAuth(servletRequest: HttpServletRequest): Boolean =
-    Option(servletRequest.getAttribute(OidcSecurityContextClassName)).isDefined
+  def hasWildflyOidcAuth(getAttribute: String => AnyRef): Boolean =
+    Option(getAttribute(OidcSecurityContextClassName)).isDefined
 
-  def credentialsOpt(servletRequest: HttpServletRequest): Option[Credentials] =
-    Option(servletRequest.getAttribute(OidcSecurityContextClassName)) collect {
+  def credentialsOpt(getAttribute: String => AnyRef): Option[Credentials] = {
+
+    // Try retrieving claims from both the access and ID tokens. We're using functions instead of methods here to
+    // prevent NoClassDefFoundError runtime errors when we're not in a WildFly environment.
+
+    val getClaimValueFromToken = (token: JsonWebToken, claimName: String) =>
+      Option(token.getClaimValue(claimName)).map(_.toString)
+
+    val getClaimValue = (oidcSecurityContext: OidcSecurityContext, claimName: String) =>
+      Option(oidcSecurityContext.getToken  ).flatMap(getClaimValueFromToken(_, claimName)) orElse
+      Option(oidcSecurityContext.getIDToken).flatMap(getClaimValueFromToken(_, claimName))
+
+    val getStringListClaimValueFromToken = (token: JsonWebToken, claimName: String) =>
+      Option(token.getStringListClaimValue(claimName)).map(_.asScala.toList)
+
+    val getStringListClaimValue = (oidcSecurityContext: OidcSecurityContext, claimName: String) =>
+      Option(oidcSecurityContext.getToken  ).flatMap(getStringListClaimValueFromToken(_, claimName)) orElse
+      Option(oidcSecurityContext.getIDToken).flatMap(getStringListClaimValueFromToken(_, claimName))
+
+    Option(getAttribute(OidcSecurityContextClassName)) collect {
       case oidcSecurityContext: OidcSecurityContext =>
 
-        val objectIdOpt = Option(oidcSecurityContext.getToken.getClaimValue(ObjectIDClaimName)).map(_.toString)
+        val objectIdOpt = getClaimValue(oidcSecurityContext, ObjectIDClaimName)
         val objectId    = objectIdOpt.getOrElse(throw new RuntimeException(s"Claim '$ObjectIDClaimName' not found in OIDC token"))
-        val roleIds     = oidcSecurityContext.getToken.getRolesClaim.asScala.toList
+        val roleIds     = getStringListClaimValue(oidcSecurityContext, RolesClaimName).getOrElse(Nil)
 
         Credentials(
           userAndGroup  = UserAndGroup(username = objectId, groupname = None),
@@ -40,4 +59,5 @@ object WildflyOidcAuth {
           organizations = Nil
         )
     }
+  }
 }

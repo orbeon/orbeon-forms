@@ -18,7 +18,8 @@ import enumeratum.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.servlet.WildflyOidcAuth
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -39,23 +40,19 @@ object FormRunnerAuth {
     Headers.OrbeonCredentials
   )
 
-  import Private.*
+  import Private._
+
+  // We're using a distinct getAttribute parameter instead of adding getAttribute to the UserRolesFacade structural
+  // type as doing so leads to weird runtime errors (NoClassDefFoundError related to javax vs jakarta packages). This
+  // is not the first time it happened and a hint that we should probably avoid structural types altogether.
 
   def getCredentialsAsHeadersUseSession(
-    userRoles: UserRolesFacade,
-    session  : ExternalContext.Session,
-    getHeader: String => List[String]
+    userRoles   : UserRolesFacade,
+    getAttribute: String => AnyRef,
+    session     : ExternalContext.Session,
+    getHeader   : String => List[String]
   ): List[(String, NonEmptyList[String])] =
-    getCredentialsAsHeadersUseSession(
-      findCredentialsFromContainerOrHeaders(userRoles, getHeader),
-      session
-    )
-
-  def getCredentialsAsHeadersUseSession(
-    credentialsOpt: => Option[Credentials],
-    session       : ExternalContext.Session
-  ): List[(String, NonEmptyList[String])] =
-    getCredentialsUseSession(credentialsOpt, session) match {
+    getCredentialsUseSession(userRoles, getAttribute, session, getHeader) match {
       case Some(credentials) =>
         val result = CredentialsSerializer.toHeaders[List](credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
@@ -118,8 +115,10 @@ object FormRunnerAuth {
     // - https://github.com/orbeon/orbeon-forms/issues/4436
     //
     def getCredentialsUseSession(
-      credentialsOpt: => Option[Credentials],
-      session       : ExternalContext.Session
+      userRoles   : UserRolesFacade,
+      getAttribute: String => AnyRef,
+      session     : ExternalContext.Session,
+      getHeader   : String => List[String]
     ): Option[Credentials] = {
 
       val sessionCredentialsOpt = ServletPortletRequest.findCredentialsInSession(session)
@@ -127,7 +126,7 @@ object FormRunnerAuth {
       lazy val stickyHeadersConfigured =
         Properties.instance.getPropertySet.getBoolean(HeaderStickyPropertyName, default = false)
 
-      lazy val newCredentialsOpt = credentialsOpt
+      lazy val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getAttribute, getHeader)
 
       def storeAndReturnNewCredentials(): Option[Credentials] = {
         ServletPortletRequest.storeCredentialsInSession(session, newCredentialsOpt)
@@ -181,8 +180,9 @@ object FormRunnerAuth {
     }
 
     def findCredentialsFromContainerOrHeaders(
-      userRoles : UserRolesFacade,
-      getHeader : String => List[String]
+      userRoles   : UserRolesFacade,
+      getAttribute: String => AnyRef,
+      getHeader   : String => List[String]
     ): Option[Credentials] = {
 
       val propertySet = Properties.instance.getPropertySet
@@ -195,34 +195,12 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          val usernameOpt    = Option(userRoles.getRemoteUser()).flatMap(_.trimAllToOpt)
-          val rolesStringOpt = propertySet.getNonBlankString(ContainerRolesPropertyName)
-
-          Logger.debug(s"usernameOpt: `$usernameOpt`, roles property: `$rolesStringOpt`")
-
-          usernameOpt map { username =>
-
-              // Wrap exceptions as Liferay throws if the role is not available instead of returning false
-              def isUserInRole(role: String) =
-                try userRoles.isUserInRole(role)
-                catch { case NonFatal(_) => false}
-
-              val rolesSplitRegex =
-                propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
-
-              val rolesList =
-                for {
-                  rolesString <- rolesStringOpt.toList
-                  roleName    <- rolesString split rolesSplitRegex
-                  if isUserInRole(roleName)
-                } yield
-                  SimpleRole(roleName)
-
-              Credentials(
-                userAndGroup  = UserAndGroup.fromStringsOrThrow(username, rolesList.headOption.map(_.roleName).getOrElse("")),
-                roles         = rolesList,
-                organizations = Nil
-              )
+          if (WildflyOidcAuth.hasWildflyOidcAuth(getAttribute)) {
+            Logger.debug(s"using Wildfly OIDC credentials")
+            WildflyOidcAuth.credentialsOpt(getAttribute)
+          } else {
+            Logger.debug(s"using regular container credentials")
+            containerCredentialsOpt(userRoles, propertySet)
           }
 
         case Some(authMethod @ AuthMethod.Header) =>
@@ -241,6 +219,38 @@ object FormRunnerAuth {
 
         case None =>
           throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$requestedAuthMethod`")
+      }
+    }
+
+    private def containerCredentialsOpt(userRoles : UserRolesFacade, propertySet: PropertySet): Option[Credentials] = {
+      val usernameOpt    = Option(userRoles.getRemoteUser()).flatMap(_.trimAllToOpt)
+      val rolesStringOpt = propertySet.getNonBlankString(ContainerRolesPropertyName)
+
+      Logger.debug(s"usernameOpt: `$usernameOpt`, roles property: `$rolesStringOpt`")
+
+      usernameOpt map { username =>
+
+        // Wrap exceptions as Liferay throws if the role is not available instead of returning false
+        def isUserInRole(role: String) =
+          try userRoles.isUserInRole(role)
+          catch { case NonFatal(_) => false }
+
+        val rolesSplitRegex =
+          propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
+
+        val rolesList =
+          for {
+            rolesString <- rolesStringOpt.toList
+            roleName    <- rolesString split rolesSplitRegex
+            if isUserInRole(roleName)
+          } yield
+            SimpleRole(roleName)
+
+        Credentials(
+          userAndGroup  = UserAndGroup.fromStringsOrThrow(username, rolesList.headOption.map(_.roleName).getOrElse("")),
+          roles         = rolesList,
+          organizations = Nil
+        )
       }
     }
 

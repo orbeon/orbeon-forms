@@ -405,7 +405,7 @@
         <title>Forms Admin</title>
     </admin>
     <landing>
-        <title>Orbeon Form Runner</title>
+        <title>Landing</title>
         <titles>
             <published-forms>Published Forms</published-forms>
             <form-builder-forms>Form Builder Forms</form-builder-forms>

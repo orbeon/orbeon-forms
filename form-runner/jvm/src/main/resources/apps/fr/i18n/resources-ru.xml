@@ -394,7 +394,7 @@
         <title todo="true">[Forms Admin]</title>
     </admin>
     <landing>
-        <title>Orbeon Form Runner</title>
+        <title>Landing</title>
         <titles>
             <published-forms todo="true">Published Forms</published-forms>
             <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>

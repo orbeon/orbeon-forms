@@ -404,7 +404,7 @@
         <title>Űrlapok adminisztrációja</title>
     </admin>
     <landing>
-        <title>Orbeon Form Runner</title>
+        <title>Landing</title>
         <titles>
             <published-forms>Közzétett űrlapok</published-forms>
             <form-builder-forms>Form Builder űrlapok</form-builder-forms>

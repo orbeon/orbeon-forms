@@ -398,7 +398,7 @@
         <title>表单管理</title>
     </admin>
     <landing>
-        <title>Orbeon Form Runner</title>
+        <title>Landing</title>
         <titles>
             <published-forms>已发布的表单</published-forms>
             <form-builder-forms>Form Builder表单</form-builder-forms>

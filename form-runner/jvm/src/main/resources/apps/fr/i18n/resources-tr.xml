@@ -404,7 +404,7 @@
         <title>Form Yönetimi</title>
     </admin>
     <landing>
-        <title>Orbeon Form Runner</title>
+        <title>Landing</title>
         <titles>
             <published-forms>Yayınlanan Formlar</published-forms>
             <form-builder-forms>Form Oluşturucu Formları</form-builder-forms>

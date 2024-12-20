@@ -404,7 +404,7 @@
         <title>表單管理</title>
     </admin>
     <landing>
-        <title>Orbeon Form Runner</title>
+        <title>Landing</title>
         <titles>
             <published-forms>已發布的表單</published-forms>
             <form-builder-forms>Form Builder 表單</form-builder-forms>

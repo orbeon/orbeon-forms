@@ -27,6 +27,11 @@
                     <p:output name="data"   id="xhtml"/>
                 </p:processor>
 
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="oxf:/apps/fr/i18n/resources.xml"/>
+                    <p:output name="data" id="xincluded-resources"/>
+                </p:processor>
+
                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="config" href="oxf:/apps/fr/email/email-form.xsl"/>
                     <p:input name="parameters">
@@ -81,7 +86,7 @@
                             </parameters>
                         </request>
                     </p:input>
-                    <p:input name="fr-resources" href="oxf:/apps/fr/i18n/resources.xml"/>
+                    <p:input name="fr-resources" href="#xincluded-resources"/>
                     <p:output name="data" ref="message"/>
                 </p:processor>
             </p:config>

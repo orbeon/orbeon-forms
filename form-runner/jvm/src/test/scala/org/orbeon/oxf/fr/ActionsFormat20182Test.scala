@@ -42,7 +42,7 @@ class ActionsFormat20182Test
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
             for {
-              (expectedSizeOpt, i) <- List(Some(1426), None, Some(1162), None).zipWithIndex
+              (expectedSizeOpt, i) <- List(Some(386), None, Some(400), None).zipWithIndex
               control              = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
               value                = control.getValue(EventCollector.Throw)
             } locally {

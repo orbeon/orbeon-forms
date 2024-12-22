@@ -35,9 +35,9 @@ object Connect {
   def createTables(provider: Provider, connection: java.sql.Connection)(implicit logger: IndentedLogger): Unit = {
     val statement = connection.createStatement
     val sql = provider match {
-      case MySQL      => "2019.1/mysql-2019_1.sql"
-      case PostgreSQL => "2019.1/postgresql-2019_1.sql"
-      case SQLite     => "2023.1/sqlite-2023_1.sql"
+      case MySQL      => "2024.1/mysql-2024_1.sql"
+      case PostgreSQL => "2024.1/postgresql-2024_1.sql"
+      case SQLite     => "2024.1/sqlite-2024_1.sql"
     }
     val createDDL = SQL.read(sql)
     Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }

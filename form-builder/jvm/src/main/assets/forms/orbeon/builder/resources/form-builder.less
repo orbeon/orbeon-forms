@@ -1550,12 +1550,12 @@ body.orbeon {
 
         .xxforms-dialog-body {
             padding: 0;
+            flex-grow: 1;                           // Body to take all the space available, see `height` for dialog above
             display: flex;
             flex-direction: column;
 
             .fb-test-dialog-form {
                 flex-grow: 1;
-                overflow: scroll;
             }
 
             .fb-test-iframe {

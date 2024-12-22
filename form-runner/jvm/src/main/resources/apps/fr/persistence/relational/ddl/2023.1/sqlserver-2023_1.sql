@@ -96,7 +96,7 @@ CREATE TABLE orbeon_i_control_text (
     data_id             INT                            NOT NULL,
     control             VARCHAR(255)                   NOT NULL,
     pos                 INT                            NOT NULL,
-    val                 NTEXT                          NOT NULL,
+    val                 NVARCHAR(MAX)                  NOT NULL,
     FOREIGN KEY         (data_id)                      REFERENCES orbeon_form_data(id)
 );
 

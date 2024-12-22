@@ -104,7 +104,7 @@ CREATE FULLTEXT CATALOG orbeon_fulltext_catalog AS DEFAULT;
 CREATE UNIQUE INDEX orbeon_form_data_pk ON orbeon_form_data (id);
 CREATE FULLTEXT INDEX ON orbeon_form_data (xml) KEY INDEX orbeon_form_data_pk;
 
-CREATE        INDEX orbeon_form_definition_i1     ON orbeon_form_definition        (app, form, form_version, last_modified_time));
+CREATE        INDEX orbeon_form_definition_i1     ON orbeon_form_definition        (app, form, form_version, last_modified_time);
 CREATE        INDEX orbeon_form_definition_att_i1 ON orbeon_form_definition_attach (app, form, file_name);
 CREATE        INDEX orbeon_form_data_i1           ON orbeon_form_data              (app, form, document_id, draft);
 CREATE        INDEX orbeon_form_data_i2           ON orbeon_form_data              (document_id);

@@ -706,14 +706,18 @@
                     <_>
                         <_>
                             <url>oxf:/forms/orbeon/builder/form/template.xml</url>
-                            <title>Blank Form</title>
-                            <description>Use this template to start from scratch.</description>
+                            <title xml:lang="en">Blank Form</title>
+                            <title xml:lang="fr">Formulaire vide</title>
+                            <description xml:lang="en">Use this template to start from scratch.</description>
+                            <description xml:lang="fr">Utilisez ce modèle pour commencer à partir de zéro.</description>
                             <thumbnail></thumbnail>
                         </_>
                         <_>
                             <url>oxf:/forms/orbeon/builder/form/template-wizard.xml</url>
-                            <title>Wizard Form</title>
-                            <description>This template is configured to use the Wizard view.</description>
+                            <title xml:lang="en">Wizard Form</title>
+                            <title xml:lang="fr">Formulaire "Wizard"</title>
+                            <description xml:lang="en">Use this template to automatically use the Wizard view, which presents the form as a series of steps.</description>
+                            <description xml:lang="fr">Utilisez ce modèle pour automatiquement utiliser la vue "Wizard", qui présente le formulaire comme une série d'étapes.</description>
                             <thumbnail>oxf:/forms/orbeon/builder/form/template-wizard.jpg</thumbnail>
                         </_>
                     </_>
@@ -1049,12 +1053,17 @@
                                     <xf:output value="$resources/messages/select-template-output"/>
                                 </xh:p>
 
+                                <xf:var
+                                    name="lang"
+                                    value="fr:lang()"/>
+
                                 <!-- Make this an `xf:group` so we can focus on it -->
                                 <xf:group xxf:element="div" class="fb-template-cards-container" id="fb-template-cards-container">
                                     <xh:div class="fb-template-cards">
+
                                         <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
                                             <xh:div class="fb-template-card {if (position() le 2) then 'fb-builtin-template' else ()}" title="{{title}}">
-                                                <xf:output class="fb-template-title" value="title"/>
+                                                <xf:output class="fb-template-title" value="(title[@xml:lang = $lang], title)[1]"/>
                                                 <xf:output class="fb-template-thumbnail" mediatype="image/*" ref="thumbnail[xxf:non-blank()]"/>
                                             </xh:div>
                                         </xf:repeat>
@@ -1096,7 +1105,10 @@
                                 <!-- Languages are not separated, so we cannot see the description in the current language :( -->
                                 <xf:var
                                     name="description-opt"
-                                    value="instance('template-forms')/*[index('form-template-repeat')]/description[xxf:non-blank()]/xxf:trim()"/>
+                                    value="
+                                        let $descriptions := instance('template-forms')/*[index('form-template-repeat')]/description[xxf:non-blank()]
+                                        return
+                                            ($descriptions[@xml:lang = $lang], $descriptions)[1]/xxf:trim()"/>
 
                                 <!-- Same heuristic as in the Form Builder Summary page -->
                                 <xf:group

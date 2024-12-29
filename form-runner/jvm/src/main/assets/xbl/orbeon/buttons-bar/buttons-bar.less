@@ -30,8 +30,8 @@
     .fr-buttons, .fr-dialog-buttons {
         &:hover kbd {
             & { display: inline-block; }                                    // Show `kbd` on hover
-            // REVIEW: doesn't look like this is needed, as we seem to be careful to not have empty `kbd` elements
-            //&:empty, &:has(.xforms-output-output:empty) { display: none; }  // But hide `kbd` is empty
+            // See https://github.com/orbeon/orbeon-forms/issues/6693
+            &:empty, &:has(.xforms-output-output:empty) { display: none; }  // But hide `kbd` is empty
         }
     }
 

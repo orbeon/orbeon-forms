@@ -125,35 +125,46 @@ extends DocumentTestBase
       }
 
       val processes = Map(
-        "p1" -> """a1 then a2 then suspend then a3""",
-        "p2" -> """a1 then (a2 then (a3 then if (". = true()") then (a4 then suspend then (a5 then a6)) else (a7 then suspend then (a8 then a9)) then a10) then a11) then a12""",
-        "p3" -> """a13 then if ("true()") then p2 else p1 then a14""",
-        "p4" -> """a1 then suspend""",
-        "p5" -> """a2 then p4 then a3"""
+        "p1"  -> """a1 then a2 then suspend then a3""",
+        "p2"  -> """a1 then (a2 then (a3 then if (". = true()") then (a4 then suspend then (a5 then a6)) else (a7 then suspend then (a8 then a9)) then a10) then a11) then a12""",
+        "p3"  -> """a13 then if ("true()") then p2 else p1 then a14""",
+        "p4"  -> """a1 then suspend""",
+        "p5"  -> """a2 then p4 then a3""",
+        "p6"  -> """a1 then a2 then suspend then a3 recover a4""",
+        "p7"  -> """p2 recover a15""",
       )
 
       override def findProcessByName(scope: String, name: String) = processes.get(name)
     }
 
     val expected = Seq(
-      ("p1", null,               """nop then a3""",                                               "a1 a2"),
-      ("p2", BooleanValue.TRUE,  """nop then (a5 then a6) then a10 then a11 then a12""",          "a1 a2 a3 a4"),
-      ("p2", BooleanValue.FALSE, """nop then (a8 then a9) then a10 then a11 then a12""",          "a1 a2 a3 a7"),
-      ("p3", BooleanValue.TRUE,  """nop then (a5 then a6) then a10 then a11 then a12 then a14""", "a13 a1 a2 a3 a4"),
-      ("p3", BooleanValue.FALSE, """nop then (a8 then a9) then a10 then a11 then a12 then a14""", "a13 a1 a2 a3 a7"),
-      ("p5", null,               """nop then a3""",                                               "a2 a1")
+      ("p1", null,               """nop then a3""",                                                  "a1 a2",           "a3",                    ""),
+      ("p2", BooleanValue.TRUE,  """nop then (a5 then a6) then a10 then a11 then a12""",             "a1 a2 a3 a4",     "a5 a6 a10 a11 a12",     ""),
+      ("p2", BooleanValue.FALSE, """nop then (a8 then a9) then a10 then a11 then a12""",             "a1 a2 a3 a7",     "a8 a9 a10 a11 a12",     ""),
+      ("p3", BooleanValue.TRUE,  """nop then (a5 then a6) then a10 then a11 then a12 then a14""",    "a13 a1 a2 a3 a4", "a5 a6 a10 a11 a12 a14", ""),
+      ("p3", BooleanValue.FALSE, """nop then (a8 then a9) then a10 then a11 then a12 then a14""",    "a13 a1 a2 a3 a7", "a8 a9 a10 a11 a12 a14", ""),
+      ("p5", null,               """nop then a3""",                                                  "a2 a1",           "a3",                    ""),
+      ("p6", null,               """nop then a3 recover a4""",                                       "a1 a2",           "a3",                    "a4"),
+      ("p7", BooleanValue.TRUE,  """nop then (a5 then a6) then a10 then a11 then a12 recover a15""", "a1 a2 a3 a4",     "a5 a6 a10 a11 a12",     "a15"),
+      ("p7", BooleanValue.FALSE, """nop then (a8 then a9) then a10 then a11 then a12 recover a15""", "a1 a2 a3 a7",     "a8 a9 a10 a11 a12",     "a15"),
     )
 
-    for ((process, context, continuation, trace) <- expected) {
-      it(s"must pass with `$process/$context`") {
+    for {
+      (process, context, continuation, trace1, trace2, trace3) <- expected
+      (resumeActions, trace) <- Seq(Seq("resume", "resume-with-success") -> trace2, Seq("resume-with-failure") -> trace3)
+      resumeAction <- resumeActions
+    } locally {
+      it(s"must pass with `$process/$context/$resumeAction`") {
         interpreter.xpathContext = context
         interpreter.runProcessByName("", process)
         assert(interpreter.savedProcess.contains((ConstantProcessId, continuation)))
-        assert(trace == interpreter.trace)
-        interpreter.runProcess("", "resume") match {
-          case Left(t)  => t.get
-          case Right(_) => throw new IllegalStateException
+        assert(trace1 == interpreter.trace)
+        interpreter.runProcess("", resumeAction) match {
+          case Left(_) if resumeAction == "resume-with-failure"  => assertThrows[Throwable]
+          case Left(t)                                           => t.get
+          case Right(_)                                          => throw new IllegalStateException
         }
+        assert(trace == interpreter.trace)
       }
     }
   }

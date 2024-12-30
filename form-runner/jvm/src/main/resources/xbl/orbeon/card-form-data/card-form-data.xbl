@@ -251,7 +251,8 @@
 <!--                        value="."/>-->
                 </fr:card-body>
                 <fr:card-thumbnail>
-                    <xh:img src="{instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]}" class="img-thumbnail"/>
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/6696 -->
+                    <xf:output mediatype="image/*" value="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]" class="img-thumbnail"/>
                 </fr:card-thumbnail>
 
                     <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">

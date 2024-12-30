@@ -295,12 +295,6 @@ trait FormRunnerActions
         case _ => None
       }
 
-    // Set `data-safe-override` as we know we are not losing data upon navigation. This happens:
-    // - with changing mode (`tryChangeMode()`)
-    // - when navigating away using the `send` action
-    if (replace == XFORMS_SUBMIT_REPLACE_ALL)
-      setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
-
     // If submitting binary (from the `xf:submission`'s point of view) find the URL
     // For rendered formats, if there are multiple of them, we fall under the multipart case
     def binaryContentUrlOpt =
@@ -336,12 +330,20 @@ trait FormRunnerActions
   }
 
   def trySendImpl(params: SendActionParams): Option[XFormsSubmitDoneEvent] = {
-      ensureDataCalculationsAreUpToDate()
-      sendThrowOnError(
-        s"fr-send-submission",
-        params.toPropertyValues
-      )
-    }
+
+    ensureDataCalculationsAreUpToDate()
+
+    // Set `data-safe-override` as we know we are not losing data upon navigation. This happens:
+    // - with changing mode (`tryChangeMode()`)
+    // - when navigating away using the `send` action
+    if (params.replace == ReplaceType.All)
+      setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
+
+    sendThrowOnError(
+      s"fr-send-submission",
+      params.toPropertyValues
+    )
+  }
 
   private def tryChangeMode(
     replace            : ReplaceType,

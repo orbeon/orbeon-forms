@@ -352,15 +352,15 @@
     <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-section"
-        value="ISS"/>
+        value="IFS"/>
     <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-grid"
-        value="ISG"/>
+        value="IFG"/>
     <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-repeated-grid"
-        value="ISR"/>
+        value="IFR"/>
     <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-xf-input"

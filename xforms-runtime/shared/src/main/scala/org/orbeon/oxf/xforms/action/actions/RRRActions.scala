@@ -30,7 +30,7 @@ trait RRRFunctions {
 
 trait XFormsRebuildFunctions extends RRRFunctions {
   def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit = model.deferredActionContext.markStructuralChange(DefaultsStrategy.None, None)
-  def createEvent(model: XFormsModel) = new XFormsRebuildEvent(model)
+  def createEvent(model: XFormsModel): XFormsEvent = new XFormsRebuildEvent(model)
 }
 
 // Make `<xf:recalculate>` do the same thing as `<xf:revalidate>`

@@ -1,8 +1,8 @@
 Orbeon Forms
 ============
 
-Web Forms for the Enterprise and the Government
------------------------------------------------
+Manage your web forms' entire lifecycle
+---------------------------------------
 
 Last updated for Orbeon Forms 2024.1 (December 2024)
 
@@ -12,7 +12,13 @@ Last updated for Orbeon Forms 2024.1 (December 2024)
 What is Orbeon Forms?
 ---------------------
 
-Orbeon Forms is a Web forms solution which includes:
+Orbeon Forms allows you to create, publish, version, and run your forms on-premises or in the cloud.
+
+With Orbeon Forms, you can manage large numbers of complex forms, grant access rights to users, produce PDF and Excel files, collect and submit completed file data with attachments, and more.
+
+Orbeon Forms is used in government, banking, healthcare, telecommunications, education, and other industries.
+
+Orbeon Forms includes:
 
 - __Form Builder:__ a browser-based visual form authoring tool
 - __Form Runner:__ a runtime environment which facilitates the deployment and integration of large and complex forms
@@ -163,21 +169,13 @@ Compiling Orbeon Forms
 
 You usually don't have to compile Orbeon Forms yourself. But if you want to, see [Building Orbeon Forms](https://doc.orbeon.com/contributors/building-orbeon-forms).
 
-The source code of Orbeon Forms CE is available on [github](https://github.com/orbeon/orbeon-forms/).
-
-Orbeon Forms is written mainly using the following languages and technologies:
-
-- Scala
-- Java
-- JavaScript
-- XForms, XSLT, and other XML technologies
+The source code of Orbeon Forms CE is available on [GitHub](https://github.com/orbeon/orbeon-forms/).
 
 
-Known bugs and requests for enhancements (RFEs)
------------------------------------------------
+Issue tracker
+-------------
 
 For a list of known issues and RFEs, check the [issue tracking system](https://github.com/orbeon/orbeon-forms/issues).
-
 
 
 Third-party software
@@ -197,7 +195,7 @@ Credits
 -------
 
 We would like to thank [YourKit, LLC](https://www.yourkit.com/) for kindly supporting open source projects like Orbeon
-Forms with the full-featured [YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp).
+Forms CE with the full-featured [YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp).
 
 ---
 

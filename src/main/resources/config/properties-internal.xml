@@ -203,7 +203,6 @@
         +fr:databound-select1
         +fr:explanation
         +fr:open-select1
-        +fr:handwritten-signature
         +fr:us-phone
         +fr:us-state
         +fr:yesno-input
@@ -278,7 +277,6 @@
         +fr:databound-select1
         +fr:explanation
         +fr:open-select1
-        +fr:handwritten-signature
         +fr:us-phone
         +fr:us-state
         +fr:yesno-input

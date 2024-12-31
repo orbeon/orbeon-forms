@@ -473,21 +473,21 @@
                 <item id="1">Rows</item>
                 <item id="2">Columns</item>
             </grid-tab-order>
-            <availability>
-                <label>Availability</label>
+            <time-window>
+                <label>Time Window</label>
                 <available>
                     <available-from>
-                        <label>Only available from</label>
+                        <label>Creating only available from specific date</label>
                         <date>Start date and time</date>
                         <message>Pending message</message>
                     </available-from>
                     <available-to>
-                        <label>Only available until</label>
+                        <label>Creating only available until specific date</label>
                         <date>End date and time</date>
                         <message>Expired message</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label>PDF page orientation</label>
                 <hint/>
@@ -1387,13 +1387,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>Email Settings</label>
+            <templates>Email templates</templates>
+            <template-name>
+                <label>Email template name</label>
+                <hint>This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")</hint>
+            </template-name>
+            <language>
+                <label>Language</label>
+                <any-language>Any language</any-language>
+            </language>
+            <headers>
+                <from>Sender</from>
+                <to>Recipient</to>
+                <cc>CC</cc>
+                <bcc>BCC</bcc>
+                <reply-to>Reply To</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value>Control Value</control-value>
+                <expression>Formula</expression>
+                <text>Text</text>
+            </header-value-types>
             <enable-if-true>Enable this template only if the following formula evaluates to true</enable-if-true>
             <subject>Email Subject</subject>
             <body>Email Body</body>
-            <from-properties>Template from Properties</from-properties>
-            <template>
-                <label>Template</label>
-            </template>
+            <use-html>Use HTML</use-html>
+            <attach-form-as>Attach form as</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label>Attach files users uploaded to the form</label>
+                <choices>
+                    <all>All</all>
+                    <none>None</none>
+                    <selected>Selected attachments</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values>Exclude from All Control Values</exclude-from-all-control-values>
+            <use-default>Use default</use-default>
+            <delete-template>Delete template</delete-template>
+            <template-parameters>Template parameters</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
@@ -1991,21 +2024,21 @@
                 <item id="1">Rangées</item>
                 <item id="2">Colonnes</item>
             </grid-tab-order>
-            <availability>
-                <label>Disponibilité</label>
+            <time-window>
+                <label>Fenêtre temporelle</label>
                 <available>
                     <available-from>
-                    <label>Disponible uniquement à partir de</label>
-                    <date>Date et heure de début</date>
-                    <message>Message en attente</message>
+                        <label>Création disponible à partir d'une date spécifique</label>
+                        <date>Date et heure de début</date>
+                        <message>Message en attente</message>
                     </available-from>
                     <available-to>
-                    <label>Disponible uniquement jusqu'à</label>
-                    <date>Date et heure de fin</date>
-                    <message>Message expiré</message>
+                        <label>Création disponible jusqu'à une date spécifique</label>
+                        <date>Date et heure de fin</date>
+                        <message>Message expiré</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label>Orientation de page PDF</label>
                 <hint/>
@@ -2908,13 +2941,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>Paramètres Email</label>
+            <templates>Modèles</templates>
+            <template-name>
+                <label>Nom du modèle</label>
+                <hint>Ce nom n'est pas visible pour les utilisateurs remplissant des formulaire ; il est utilisé dans les processus, par exemple : email(template = "notify-user")</hint>
+            </template-name>
+            <language>
+                <label>Langue</label>
+                <any-language>Toutes les langues</any-language>
+            </language>
+            <headers>
+                <from>Expéditeur</from>
+                <to>Destinataire</to>
+                <cc>CC</cc>
+                <bcc>BCC</bcc>
+                <reply-to>Répondre à</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value>Valeur du contrôle</control-value>
+                <expression>Formule</expression>
+                <text>Texte</text>
+            </header-value-types>
             <enable-if-true>Activer ce modèle uniquement si la formule suivante est évaluée comme vraie</enable-if-true>
-            <subject>Sujet email</subject>
-            <body>Corps email</body>
-            <from-properties>Le modèle vient des propriétés</from-properties>
-            <template>
-                <label>Modèle</label>
-            </template>
+            <subject>Sujet</subject>
+            <body>Corps</body>
+            <use-html>Format HTML</use-html>
+            <attach-form-as>Joindre le formulaire au format</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label>Joindre à l'email les fichiers téléchargés par les utilisateurs dans le formulaire</label>
+                <choices>
+                    <all>Tous</all>
+                    <none>Aucun</none>
+                    <selected>Pièces jointes sélectionnées</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values>Exclure de Toutes les valeurs</exclude-from-all-control-values>
+            <use-default>Utiliser le défaut</use-default>
+            <delete-template>Supprimer le modèle</delete-template>
+            <template-parameters>Paramètres des modèles</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
@@ -3412,6 +3478,7 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -3493,21 +3560,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -4436,13 +4503,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
@@ -4940,6 +5040,7 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -5021,21 +5122,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -5963,13 +6064,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Настройка прав</label>
@@ -6550,21 +6684,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -7456,13 +7590,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Autorizzazioni</label>
@@ -8043,21 +8210,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -8949,14 +9116,47 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label>E-Mail-Einstellungen</label>
+            <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
-            <subject>E-Mail Betreff</subject>
-            <body>E-Mail Text</body>
-            <from-properties>Vorlage aus Eigenschaften</from-properties>
-            <template>
-                <label>Vorlage</label>
-            </template>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Berechtigungen</label>
@@ -9539,21 +9739,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -10474,13 +10674,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Käyttöoikeudet</label>
@@ -11060,21 +11293,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -11995,13 +12228,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permisos</label>
@@ -12582,21 +12848,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -13495,14 +13761,47 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label>E-mail instellingen</label>
+            <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
-            <subject>E-mail onderwerp</subject>
-            <body>Email inhoud</body>
-            <from-properties>Template van properties</from-properties>
-            <template>
-                <label>Template</label>
-            </template>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Bevoegdheden</label>
@@ -14083,21 +14382,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -15024,13 +15323,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissões</label>
@@ -15611,21 +15943,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
-            <availability>
-                <label todo="true">[Availability]</label>
+            <time-window>
+                <label todo="true">[Time Window]</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Only available from]</label>
+                        <label todo="true">[Creating only available from specific date]</label>
                         <date todo="true">[Start date and time]</date>
                         <message todo="true">[Pending message]</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Only available until]</label>
+                        <label todo="true">[Creating only available until specific date]</label>
                         <date todo="true">[End date and time]</date>
                         <message todo="true">[Expired message]</message>
                     </available-to>
                 </available>
-            </availability>
+            </time-window>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -16553,13 +16885,46 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <templates todo="true">[Email templates]</templates>
+            <template-name>
+                <label todo="true">[Email template name]</label>
+                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+            </template-name>
+            <language>
+                <label todo="true">[Language]</label>
+                <any-language todo="true">[Any language]</any-language>
+            </language>
+            <headers>
+                <from todo="true">[Sender]</from>
+                <to todo="true">[Recipient]</to>
+                <cc todo="true">[CC]</cc>
+                <bcc todo="true">[BCC]</bcc>
+                <reply-to todo="true">[Reply To]</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value todo="true">[Control Value]</control-value>
+                <expression todo="true">[Formula]</expression>
+                <text todo="true">[Text]</text>
+            </header-value-types>
             <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
-            <template>
-                <label todo="true">[Template]</label>
-            </template>
+            <use-html todo="true">[Use HTML]</use-html>
+            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label todo="true">[Attach files users uploaded to the form]</label>
+                <choices>
+                    <all todo="true">[All]</all>
+                    <none todo="true">[None]</none>
+                    <selected todo="true">[Selected attachments]</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
+            <use-default todo="true">[Use default]</use-default>
+            <delete-template todo="true">Delete template</delete-template>
+            <template-parameters todo="true">[Template parameters]</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Rättigheter</label>

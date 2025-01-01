@@ -721,7 +721,6 @@
                             <thumbnail>oxf:/forms/orbeon/builder/form/template-wizard.jpg</thumbnail>
                         </_>
                     </_>
-                    <_/>
                 </xf:instance>
 
                 <xf:instance id="fr-search-instance">

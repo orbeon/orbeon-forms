@@ -2,10 +2,10 @@
 
 publish=true
 
-VERSION=${1:-'2023.1.6-pe'}
-TAG=${2:-'tag-release-2023.1.6-pe-pseudo'}
-FILE=${3:-'orbeon-2023.1.6.202412160253-PE.zip'}
-SQL_FILE=${4:-'2023.1/postgresql-2023_1.sql'}
+VERSION=${1:-'2024.1-pe'}
+TAG=${2:-'tag-release-2024.1-ce'}
+FILE=${3:-'orbeon-2024.1.202412312252-PE.zip'}
+SQL_FILE=${4:-'2024.1/postgresql-2024_1.sql'}
 PLATFORMS=${5:-'linux/amd64,linux/arm64'}
 DEMO_FORMS_LICENSE_FILE=${6:-"$HOME/.orbeon/license.xml"}
 DEMO_FORMS_POSTGRES_NETWORK=${7:-'demo_forms_network'}

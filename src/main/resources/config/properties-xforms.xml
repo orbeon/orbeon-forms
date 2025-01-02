@@ -229,6 +229,8 @@
 
     <property as="xs:string" name="oxf.xforms.xbl.fr.friendly-captcha.script-url"                value="https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.16/widget.min.js"/>
     <property as="xs:string" name="oxf.xforms.xbl.fr.friendly-captcha.start-mode"                value="auto"/>
+    <property as="xs:string" name="oxf.xforms.xbl.fr.friendly-captcha.server-endpoint"           value=""/>
+    <property as="xs:string" name="oxf.xforms.xbl.fr.friendly-captcha.client-endpoint"           value=""/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single

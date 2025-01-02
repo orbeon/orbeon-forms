@@ -5,12 +5,14 @@ import enumeratum.*
 import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.scalajs.dom
 import org.scalajs.dom.{html, window}
 
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
@@ -29,7 +31,7 @@ object FriendlyCaptcha {
     private var widget: Option[FriendlyCaptchaWidget] = None
 
     //@JSExport
-    def render(publicKey: String, scriptUrl: String, startMode: String): Unit = {
+    def render(publicKey: String, scriptUrl: String, startMode: String, clientEndpoint: String): Unit = {
 
       logger.debug("render")
 
@@ -42,7 +44,7 @@ object FriendlyCaptcha {
 
       if (! renderingStarted) {
         renderingStarted = true
-        renderFriendlyCaptcha(publicKey, StartMode.withNameInsensitiveOption(startMode).getOrElse(StartMode.Auto))
+        renderFriendlyCaptcha(publicKey, StartMode.withNameInsensitiveOption(startMode).getOrElse(StartMode.Auto), clientEndpoint.trimAllToOpt)
       }
     }
 
@@ -66,7 +68,7 @@ object FriendlyCaptcha {
       DocumentAPI.setValue(responseControlEffectiveId, response)
     }
 
-    private def renderFriendlyCaptcha(publicKey: String, mode: StartMode): Unit = {
+    private def renderFriendlyCaptcha(publicKey: String, mode: StartMode, clientEndpoint: Option[String]): Unit = {
 
       val reCaptchaNotFullyLoaded = {
         val topLevelObject = window.asInstanceOf[js.Dynamic].friendlyChallenge
@@ -77,7 +79,7 @@ object FriendlyCaptcha {
       if (reCaptchaNotFullyLoaded) {
         logger.debug("FriendlyCaptcha not fully loaded, trying again in a moment")
         val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-        js.timers.setTimeout(shortDelay)(renderFriendlyCaptcha(publicKey, mode))
+        js.timers.setTimeout(shortDelay)(renderFriendlyCaptcha(publicKey, mode, clientEndpoint))
       } else {
         widget = Some(
           new FriendlyCaptchaWidget(
@@ -91,6 +93,7 @@ object FriendlyCaptcha {
               startedCallback   = js.defined((() => logger.debug("started callback")): js.Function0[Unit])
               doneCallback      = js.defined(successfulResponse)
               errorCallback     = js.defined((e => logger.error(s"error callback: `$e`")): js.Function1[String, Unit])
+              puzzleEndpoint    = clientEndpoint.getOrElse("https://api.friendlycaptcha.com/api/v1/puzzle"): String // unclear why `js.orUndefined` fails at runtime here
             }
           )
         )

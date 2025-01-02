@@ -55,7 +55,12 @@
                 <xf:var name="conf" value="instance('conf')"/>
                 <xf:submission
                     id="verify-submission"
-                    resource="https://api.friendlycaptcha.com/api/v1/siteverify"
+                    resource="{
+                        (
+                            fr:component-param-value('server-endpoint')[xxf:non-blank()],
+                            'https://api.friendlycaptcha.com/api/v1/siteverify'
+                        )[1]
+                    }"
                     ref="instance('verify-request')"
                     method="post"
                     serialization="application/x-www-form-urlencoded"
@@ -81,11 +86,12 @@
 
                     <!-- Script loading and initialization -->
                     <xf:action type="javascript">
-                        <xf:param name="publicKey" value="$conf/public-key"/>
-                        <xf:param name="scriptUrl" value="fr:component-param-value('script-url')"/>
-                        <xf:param name="startMode" value="fr:component-param-value('start-mode')"/>
+                        <xf:param name="publicKey"      value="$conf/public-key"/>
+                        <xf:param name="scriptUrl"      value="fr:component-param-value('script-url')"/>
+                        <xf:param name="startMode"      value="fr:component-param-value('start-mode')"/>
+                        <xf:param name="clientEndpoint" value="fr:component-param-value('client-endpoint')"/>
                         <xf:body>
-                            ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, scriptUrl, startMode);
+                            ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, scriptUrl, startMode, clientEndpoint);
                         </xf:body>
                     </xf:action>
                 </xf:action>

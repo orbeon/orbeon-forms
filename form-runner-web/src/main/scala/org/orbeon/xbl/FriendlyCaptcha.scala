@@ -3,7 +3,7 @@ package org.orbeon.xbl
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
 import org.log4s.Logger
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
@@ -39,7 +39,7 @@ object FriendlyCaptcha {
         containerElem.appendChild(
           dom.document
             .createElement("script").asInstanceOf[html.Script]
-            |!> (_.src = scriptUrl)
+            .kestrel(_.src = scriptUrl)
         )
 
       if (! renderingStarted) {

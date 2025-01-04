@@ -131,18 +131,21 @@
                     cursor: pointer;              // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
                     border-collapse: separate;    // For Liferay, see https://github.com/orbeon/orbeon-forms/issues/2716
                 }
-                &.fr-section-open::before,
-                &.fr-section-closed::before {
-                    width: 1em;                   // So the section open/close icon doesn't make the title jump
-                    font-family: "Font Awesome 6 Free";
-                    font-weight: 900;
-                    font-size: 75%;
-                }
-                &.fr-section-open::before {
-                    content: "\f0d7"; // Unicode for 'caret-down' icon
-                }
-                &.fr-section-closed::before {
-                    content: "\f0da"; // Unicode for 'caret-right' icon
+
+                &:is(*) {                         // Hide the caret in PDF, as Open HTML to PDF doesn't understand `:is()`
+                    &.fr-section-open::before,
+                    &.fr-section-closed::before {
+                        width: 1em;               // So the section open/close icon doesn't make the title jump
+                        font-family: "Font Awesome 6 Free";
+                        font-weight: 900;
+                        font-size: 75%;
+                    }
+                    &.fr-section-open::before {
+                        content: "\f0d7";         // Unicode for 'caret-down' icon
+                    }
+                    &.fr-section-closed::before {
+                        content: "\f0da";         // Unicode for 'caret-right' icon
+                    }
                 }
             }
         }

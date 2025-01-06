@@ -183,7 +183,7 @@ val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition fr
 val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-specific optimizations (for development).")
 
 lazy val scala213 = "2.13.15"
-lazy val scala3   = "3.5.2"
+lazy val scala3   = "3.6.2"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala213)
 

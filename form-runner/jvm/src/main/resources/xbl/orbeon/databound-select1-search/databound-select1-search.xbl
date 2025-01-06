@@ -116,8 +116,8 @@
                             required="true()"/>
                         <xf:bind
                             ref="xf:label/@ref"
-                            readonly="$control/@selection != ''"
-                            calculate="if ($control/@selection != '') then ../../xf:value/@ref else ."/>
+                            readonly="$control/@fb:selection != ''"
+                            calculate="if ($control/@fb:selection != '') then ../../xf:value/@ref else ."/>
                     </xf:bind>
                     <xf:bind
                         ref="@store-label"
@@ -140,9 +140,9 @@
                             <xf:var name="formula-suffix">) then 'open' else ''}</xf:var>
                             <fb:boolean-or-formula
                                 ref="xf:element('_',
-                                    if      (empty($control/@selection))   then 'false()'
-                                    else if ($control/@selection = 'open') then 'true()'
-                                    else substring-before(substring-after($control/@selection, $formula-prefix), $formula-suffix)
+                                    if      (empty($control/@fb:selection))   then 'false()'
+                                    else if ($control/@fb:selection = 'open') then 'true()'
+                                    else substring-before(substring-after($control/@fb:selection, $formula-prefix), $formula-suffix)
                                 )"
                                 resources-ref="frf:currentFormResources()"
                                 id="fb-open-selection">
@@ -150,7 +150,7 @@
                                 <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-control-settings.open-selection.hint',  '|fr-form-resources|')"/>
                                 <xf:action event="xforms-value-changed">
-                                    <xf:delete ref="$control/@selection"/>
+                                    <xf:delete ref="$control/@fb:selection"/>
                                     <xf:action if="event('xxf:value') != 'false()'">
                                         <xf:insert
                                             context="$control"

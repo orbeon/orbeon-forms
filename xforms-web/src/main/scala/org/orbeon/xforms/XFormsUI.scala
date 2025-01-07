@@ -507,9 +507,7 @@ object XFormsUI {
     val showProgressOpt = booleanAttValueOpt(submissionElement, "show-progress")
     val targetOpt       = attValueOpt(submissionElement, "target")
 
-
-    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
-    val formElem = form.elem
+    val form  = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
 
     // When the target is an iframe, we add a `?t=id` to work around a Chrome bug happening  when doing a POST to the
     // same page that was just loaded, gut that the POST returns a PDF. See:
@@ -555,66 +553,55 @@ object XFormsUI {
             None
       }
 
-    // Set or reset `target` attribute
-    newTargetOpt match {
-      case None            => formElem.removeAttribute("target")
-      case Some(newTarget) => formElem.target = newTarget
-    }
-
-    formElem.action = updatedPath(
-      (
-        if (urlType == "action")
-          form.xformsServerSubmitActionPath
-        else
-          form.xformsServerSubmitResourcePath
-      ).getOrElse(dom.window.location.toString)
-    )
+    val effectiveAction =
+      updatedPath(
+        (
+          if (urlType == "action")
+            form.xformsServerSubmitActionPath
+          else
+            form.xformsServerSubmitResourcePath
+        ).getOrElse(dom.window.location.toString)
+      )
 
     // Notify the caller (to handle the loading indicator)
     if (! showProgressOpt.contains(false))
       notifyReplace()
 
-    // Remove possibly existing hidden fields just in case. In particular, the server should no longer include `$uuid`.
-    Iterator(Constants.UuidFieldName, Constants.SubmissionIdFieldName) foreach { name =>
-      formElem.querySelectorAll(s":scope > input[type = 'hidden'][name = '$name']")
+    // Remove any pre-existing `<form>` so we don't keep accumulating elements
+    dom.document.body
+      .querySelectorAll("form[id ^= 'xforms-form-submit-']")
       .toJSArray
-      .foreach(e => e.parentNode.removeChild(e))
-    }
+      .foreach(_.remove())
 
-    val inputElemsToAddAndRemove = {
-
-      def createHiddenInput(name: String, value: String) =
-        dom.document
-          .createElement("input")
-          .asInstanceOf[html.Input] |!>
-          (_.`type` = "hidden")     |!>
-          (_.name   = name)         |!>
-          (_.value  = value)
-
-      List(
-        createHiddenInput(Constants.UuidFieldName,         form.uuid),
-        createHiddenInput(Constants.SubmissionIdFieldName, submissionId)
+    // Create and submit a new `<form>` element created on the fly
+    // https://github.com/orbeon/orbeon-forms/issues/6682
+    dom.document.body
+      .appendChild(
+        dom.document.createElement("form")
+          .asInstanceOf[html.Form]
+          .kestrel(_.id      = "xforms-form-submit-" + java.util.UUID.randomUUID().toString)
+          .kestrel(_.method  = "post")
+          .kestrel(_.target  = newTargetOpt.orNull)
+          .kestrel(_.enctype = "multipart/form-data")
+          .kestrel(_.action  = effectiveAction)
+          .kestrel(_.appendChild(
+            dom.document.createElement("input")
+              .asInstanceOf[html.Input]
+              .kestrel(_.`type` = "hidden")
+              .kestrel(_.name   = Constants.UuidFieldName)
+              .kestrel(_.value  = form.uuid)
+          ))
+          .kestrel(_.appendChild(
+            dom.document.createElement("input")
+              .asInstanceOf[html.Input]
+              .kestrel(_.`type` = "hidden")
+              .kestrel(_.name   = Constants.SubmissionIdFieldName)
+              .kestrel(_.value  = submissionId)
+          ))
       )
-    }
-
-    formElem.asInstanceOf[ElementExt].prepend(inputElemsToAddAndRemove*)
-
-    try {
-      formElem.submit()
-    } catch {
-      case NonFatal(t) =>
-        // NOP: This is to prevent the error "Unspecified error" in IE. This can
-        // happen when navigating away is cancelled by the user pressing cancel
-        // on a dialog displayed on unload.
-        // 2022-08-01: We no longer support IE, so if indeed this only happened with
-        // IE we could remove this code. Adding logging to see if this ever happens.
-        logger.warn(s"`requestForm.submit()` caused an error: ${t.getMessage}")
-    }
-
-    inputElemsToAddAndRemove foreach { inputElem =>
-      inputElem.parentElement.removeChild(inputElem)
-    }
-  }
+      .asInstanceOf[html.Form]
+      .submit()
+  } // end handleSubmission
 
   @JSExport // 2020-04-27: 1 JavaScript usage
   def displayModalProgressPanel(): Unit =

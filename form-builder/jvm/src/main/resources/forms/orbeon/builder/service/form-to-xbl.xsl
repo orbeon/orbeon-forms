@@ -697,7 +697,8 @@
                     </xh:div>
 
                     <!-- Copy section content -->
-                    <xsl:copy-of select="$fr-section/*"/>
+                    <!-- Dont' copy label, see https://github.com/orbeon/orbeon-forms/issues/3243 -->
+                    <xsl:copy-of select="$fr-section/(* except xf:label)"/>
                 </xf:group>
             </xbl:template>
         </xbl:binding>

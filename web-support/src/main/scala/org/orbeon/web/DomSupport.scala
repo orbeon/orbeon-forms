@@ -37,9 +37,15 @@ object DomSupport {
 
     def ancestorOrSelfElem: Iterator[T] =
       Iterator.iterate(elem)(_.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T]).takeWhile(_ ne null)
+
+    def appendChildT[U <: dom.Node](newChild: U): U =
+      elem.appendChild(newChild).asInstanceOf[U]
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {
+
+    def documentElementT: html.Element =
+      doc.documentElement.asInstanceOf[html.Element]
 
     def getElementByIdT(elementId: String): html.Element =
       doc.getElementById(elementId).asInstanceOf[html.Element]
@@ -58,6 +64,24 @@ object DomSupport {
 
     def querySelectorOpt(selectors: String): Option[html.Element] =
       Option(querySelectorT(selectors))
+
+    def createScriptElement: html.Script =
+      doc.createElement("script").asInstanceOf[html.Script]
+
+    def createLinkElement: html.Link =
+      doc.createElement("link").asInstanceOf[html.Link]
+
+    def createFormElement: html.Form =
+      doc.createElement("form").asInstanceOf[html.Form]
+
+    def createInputElement: html.Input =
+      doc.createElement("input").asInstanceOf[html.Input]
+
+    def createOptionElement: html.Option =
+      doc.createElement("option").asInstanceOf[html.Option]
+
+    def createOptGroupElement: html.OptGroup =
+      doc.createElement("optgroup").asInstanceOf[html.OptGroup]
   }
 
   implicit class DomEventOps(private val event: dom.Event) extends AnyVal {

@@ -24,9 +24,7 @@ object DropTrigger {
 
     private val onActivate: dom.Event => Unit = (e: dom.Event) =>
       e.target.asInstanceOf[html.Element]
-        .closest(ListenerSelector)
-        .asInstanceOf[html.Element]
-        .pipe(Option(_))
+        .closestOpt(ListenerSelector)
         .foreach { buttonOrA =>
           AjaxClient.fireEvent(
             AjaxEvent(

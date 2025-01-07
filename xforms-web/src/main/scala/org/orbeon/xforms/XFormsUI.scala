@@ -576,30 +576,26 @@ object XFormsUI {
     // Create and submit a new `<form>` element created on the fly
     // https://github.com/orbeon/orbeon-forms/issues/6682
     dom.document.body
-      .appendChild(
-        dom.document.createElement("form")
-          .asInstanceOf[html.Form]
+      .appendChildT(
+        dom.document.createFormElement
           .kestrel(_.id      = "xforms-form-submit-" + java.util.UUID.randomUUID().toString)
           .kestrel(_.method  = "post")
           .kestrel(_.target  = newTargetOpt.orNull)
           .kestrel(_.enctype = "multipart/form-data")
           .kestrel(_.action  = effectiveAction)
-          .kestrel(_.appendChild(
-            dom.document.createElement("input")
-              .asInstanceOf[html.Input]
+          .kestrel(_.appendChildT(
+            dom.document.createInputElement
               .kestrel(_.`type` = "hidden")
               .kestrel(_.name   = Constants.UuidFieldName)
               .kestrel(_.value  = form.uuid)
           ))
-          .kestrel(_.appendChild(
-            dom.document.createElement("input")
-              .asInstanceOf[html.Input]
+          .kestrel(_.appendChildT(
+            dom.document.createInputElement
               .kestrel(_.`type` = "hidden")
               .kestrel(_.name   = Constants.SubmissionIdFieldName)
               .kestrel(_.value  = submissionId)
           ))
       )
-      .asInstanceOf[html.Form]
       .submit()
   } // end handleSubmission
 
@@ -1298,14 +1294,14 @@ object XFormsUI {
 
             itemElement.children.toOption match {
               case None =>
-                dom.document.createElement("option").asInstanceOf[html.Option].kestrel { option =>
+                dom.document.createOptionElement.kestrel { option =>
                   option.value     = itemElement.value
                   option.selected  = selectedValues.contains(itemElement.value)
                   option.innerHTML = itemElement.label.getOrElse("")
                   classOpt.foreach(option.className = _)
                 }
               case Some(children) =>
-                dom.document.createElement("optgroup").asInstanceOf[html.OptGroup].kestrel { optgroup =>
+                dom.document.createOptGroupElement.kestrel { optgroup =>
                   optgroup.label = itemElement.label.getOrElse("")
                   classOpt.foreach(optgroup.className = _)
                   optgroup.replaceChildren(children.map(generateItem).toList*)

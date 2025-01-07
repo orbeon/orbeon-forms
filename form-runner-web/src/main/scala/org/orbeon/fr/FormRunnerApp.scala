@@ -80,12 +80,11 @@ object FormRunnerApp extends App {
     Events.orbeonLoadedEvent.subscribe(() => {
 
       // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
-      def addScrollPadding(rawElement: dom.Element, cssClass: String): Unit = {
-        val htmlElement = rawElement.asInstanceOf[html.Element]
+      def addScrollPadding(htmlElement: html.Element, cssClass: String): Unit = {
         val position    = window.getComputedStyle(htmlElement).position
         if (position == "fixed" || position == "sticky") {
           val resizeObserver = new ResizeObserver(() => {
-            val documentElement = document.documentElement.asInstanceOf[HTMLElement]
+            val documentElement = document.documentElementT
             val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
             documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
           })
@@ -93,15 +92,15 @@ object FormRunnerApp extends App {
         }
       }
 
-      Option(document.querySelector(".orbeon .navbar-fixed-top")).foreach(addScrollPadding(_, "scroll-padding-top"))
-      Option(document.querySelector(".orbeon .fr-buttons"      )).foreach(addScrollPadding(_, "scroll-padding-bottom"))
+      document.querySelectorOpt(".orbeon .navbar-fixed-top").foreach(addScrollPadding(_, "scroll-padding-top"))
+      document.querySelectorOpt(".orbeon .fr-buttons"      ).foreach(addScrollPadding(_, "scroll-padding-bottom"))
 
       initSessionExpirationDialog()
     })
   }
 
   private def initSessionExpirationDialog(): Unit =
-    Option(document.querySelectorT(".fr-session-expiration-dialog")) foreach { dialog =>
+    document.querySelectorOpt(".fr-session-expiration-dialog").foreach { dialog =>
 
       val modal = Bootstrap.newModal(dialog, new js.Object {
         val backdrop = "static" // Click on the background doesn't hide dialog

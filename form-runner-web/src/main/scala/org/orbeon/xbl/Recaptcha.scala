@@ -5,6 +5,7 @@ import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.{html, window}
 
@@ -39,8 +40,8 @@ object Recaptcha {
 
         containerElem.appendChild(
           dom.document
-            .createElement("script").asInstanceOf[html.Script]
-            |!> (_.src = PathUtils.recombineQuery(ReCaptchaScript, langParameterSeq ++ v3SiteKeySeq))
+            .createScriptElement
+            .kestrel(_.src = PathUtils.recombineQuery(ReCaptchaScript, langParameterSeq ++ v3SiteKeySeq))
         )
       }
 

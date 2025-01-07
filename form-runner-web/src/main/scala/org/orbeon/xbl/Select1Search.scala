@@ -16,9 +16,11 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 
@@ -210,10 +212,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       select.removeChild(select.firstChild)
     val value = queryElementWithData.getAttribute(DataValue)
     if (value.nonEmpty) {
-      val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
-      initialOption.value    = value
-      initialOption.text     = queryElementWithData.getAttribute(DataLabel)
-      initialOption.selected = true
+      val initialOption =
+        dom.document
+          .createOptionElement
+          .kestrel(_.value    = value)
+          .kestrel(_.text     = queryElementWithData.getAttribute(DataLabel))
+          .kestrel(_.selected = true)
       select.appendChild(initialOption)
     }
   }

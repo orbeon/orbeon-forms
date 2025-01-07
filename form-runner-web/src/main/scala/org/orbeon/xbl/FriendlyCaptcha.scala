@@ -8,6 +8,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.{html, window}
 
@@ -38,7 +39,7 @@ object FriendlyCaptcha {
       if (! WebSupport.isScriptPresent(scriptUrl))
         containerElem.appendChild(
           dom.document
-            .createElement("script").asInstanceOf[html.Script]
+            .createScriptElement
             .kestrel(_.src = scriptUrl)
         )
 

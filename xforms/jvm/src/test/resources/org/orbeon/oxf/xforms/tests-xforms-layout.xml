@@ -2659,6 +2659,45 @@
         </output>
     </test>
 
+    <test description="#6543: inner and outer hints with XBL control with `xxf:label-for`" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model"/>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo" xxbl:mode="lhha" xxbl:label-for="my-div" xxbl:container="span">
+                            <xbl:template>
+                                <xf:input id="my-div" ref="xf:element('_')">
+                                    <xf:hint appearance="minimal">Inner hint</xf:hint>
+                                </xf:input>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <fr:foo id="foo">
+                            <xf:hint>Outer hint</xf:hint>
+                        </fr:foo>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="my-group" class="xforms-group">
+                    <xh:span id="foo" class="xbl-component xbl-fr-foo">
+                        <xh:span id="foo≡my-div" class="xforms-control xforms-input">
+                            <xh:input id="foo≡my-div≡xforms-input-1" type="text" name="foo≡my-div≡xforms-input-1" value="" placeholder="Inner hint" class="xforms-input-input" aria-describedby="foo≡≡t"/>
+                        </xh:span>
+                        <xh:span class="xforms-hint" id="foo≡≡t">Outer hint</xh:span>
+                    </xh:span>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
+
     <test description="#6279: output `aria-required` and `aria-invalid` via `xxf:label-for`" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">

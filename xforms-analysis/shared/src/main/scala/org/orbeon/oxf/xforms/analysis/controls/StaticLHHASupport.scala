@@ -40,6 +40,9 @@ trait StaticLHHASupport extends ElementAnalysis {
   def firstByOrDirectLhhaOpt(lhhaType: LHHA): Option[LHHAAnalysis] =
     byLhh(lhhaType).headOption orElse directLhh(lhhaType).headOption
 
+  def allByOrDirectLhha(lhhaType: LHHA): List[LHHAAnalysis] =
+    byLhh(lhhaType) ++ directLhh(lhhaType)
+
   def firstDirectLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
     directLhh(lhhaType).headOption
 
@@ -61,11 +64,10 @@ trait StaticLHHASupport extends ElementAnalysis {
   def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
     directLhh(lhhaType).flatMap(_.valueAnalysis)
 
-  def hasLhhaPlaceholder(lhhaType: LHHA): Boolean =
-    firstByOrDirectLhhaOpt(lhhaType) match {
-      case Some(lhh) => lhh.isPlaceholder && allowMinimalLabelHint
-      case None      => false
-    }
+  def hasLhhaPlaceholder(lhhaType: LHHA): Boolean = {
+    val lhhas = allByOrDirectLhha(lhhaType)
+    lhhas.exists(_.isPlaceholder) && allowMinimalLabelHint
+  }
 
   // Make `var` for `fullOpt` error "Assignment to immutable field beforeAfterTokensOpt"
   var beforeAfterTokensOpt: Option[(List[String], List[String])] =

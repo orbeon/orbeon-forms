@@ -58,7 +58,7 @@ object TinyMCE {
 
     observer.observe(
       target  = document.body,
-      options = MutationObserverInit(childList = true, subtree = false)
+      options = new MutationObserverInit { childList = true; subtree = false }
     )
   })
 

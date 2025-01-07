@@ -44,10 +44,10 @@ object Language {
       val mutationObserver = new MutationObserver(callback)
       mutationObserver.observe(
         target  = elem,
-        options = dom.MutationObserverInit(
-          attributes      = true,
+        options = new dom.MutationObserverInit {
+          attributes      = true
           attributeFilter = js.Array(HtmlLangAttr)
-        )
+        }
       )
       langListeners.put(listenerId, mutationObserver)
     }

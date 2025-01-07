@@ -32,20 +32,20 @@ trait LiferayAPI {
   protected val LiferayPackages: List[String]
 
   // These are the standard organization roles in Liferay (also in Liferay `RoleConstants.java`)
-  sealed trait LiferayOrganizationRoles                           { def name: String                           }
-  case  object LiferayOrganizationOwnerRoleName           extends { val name = "Organization Owner"            } with LiferayOrganizationRoles
-  case  object LiferayOrganizationAdministratorRoleName   extends { val name = "Organization Administrator"    } with LiferayOrganizationRoles
-  case  object LiferayOrganizationContentReviewerRoleName extends { val name = "Organization Content Reviewer" } with LiferayOrganizationRoles
+  sealed trait LiferayOrganizationRoles                                                    {          def name: String                           }
+  case  object LiferayOrganizationOwnerRoleName           extends LiferayOrganizationRoles { override val name = "Organization Owner"            }
+  case  object LiferayOrganizationAdministratorRoleName   extends LiferayOrganizationRoles { override val name = "Organization Administrator"    }
+  case  object LiferayOrganizationContentReviewerRoleName extends LiferayOrganizationRoles { override val name = "Organization Content Reviewer" }
 
-  sealed trait LiferayRoleType                     { def value: Int }
-  case  object LiferayRegularRoleType      extends { val value = 1  } with LiferayRoleType
-  case  object LiferaySiteRoleType         extends { val value = 2  } with LiferayRoleType
-  case  object LiferayOrganizationRoleType extends { val value = 3  } with LiferayRoleType
+  sealed trait LiferayRoleType                                     {          def value: Int }
+  case  object LiferayRegularRoleType      extends LiferayRoleType { override val value = 1  }
+  case  object LiferaySiteRoleType         extends LiferayRoleType { override val value = 2  }
+  case  object LiferayOrganizationRoleType extends LiferayRoleType { override val value = 3  }
 
-  sealed trait LiferayAuthType                     { def name: String          }
-  case  object LiferayEmailAddressAuthType extends { val name = "emailAddress" } with LiferayAuthType
-  case  object LiferayUserIdAuthType       extends { val name = "userId"       } with LiferayAuthType
-  case  object LiferayScreenNameAuthType   extends { val name = "screenName"   } with LiferayAuthType
+  sealed trait LiferayAuthType                                     {          def name: String          }
+  case  object LiferayEmailAddressAuthType extends LiferayAuthType { override val name = "emailAddress" }
+  case  object LiferayUserIdAuthType       extends LiferayAuthType { override val name = "userId"       }
+  case  object LiferayScreenNameAuthType   extends LiferayAuthType { override val name = "screenName"   }
 
   private def liferayClass(suffix: String) =
     LiferayPackages.iterator                      map

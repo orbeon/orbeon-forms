@@ -164,6 +164,7 @@
         home review pdf delete duplicate new
     </property>
     <property as="xs:string"  name="oxf.fr.summary.bulk-processes.*.*"                             value=""/>
+    <property as="xs:string"  name="oxf.fr.summary.search-options-opened-on-load.*.*"              value="false"/>
 
     <!-- Whether simple data migration takes place by default -->
     <property as="xs:string"  name="oxf.fr.detail.data-migration.*.*"                              value="{if (fr:created-with-or-newer('2024.1')) then 'enabled' else 'disabled'}"/>

@@ -609,6 +609,17 @@
                 if="exists($fr-search-app-param-opt) or exists($fr-search-form-param-opt)">
                 <xf:toggle case="fr-search-options-case"/>
             </xf:action>
+            <xf:action event="xforms-ready">
+                <xf:var
+                    name="show-search-options-because-property"
+                    value="xxf:property(string-join(('oxf.fr.summary.search-options-opened-on-load', $app, $form), '.')) = 'true'"/>
+                <xf:var
+                    name="show-search-options-because-app-form-provided"
+                    value="exists($fr-search-app-param-opt) or exists($fr-search-form-param-opt)"/>
+                <xf:toggle
+                    if="$show-search-options-because-property or $show-search-options-because-app-form-provided"
+                    case="fr-search-options-case"/>
+            </xf:action>
 
             <!-- Date range search logic -->
             <xi:include href="../home-view/date-range-search.xhtml"/>

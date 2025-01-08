@@ -124,8 +124,15 @@ class SecureUtilsTest
 
     // Check that for a given algorithm/encoding, the digest has the same size for any size of input data
     def assertSameSize(algorithm: String, encoding: ByteEncoding): Unit =
-      Sizes map randomBytes map (SecureUtils.digestBytes(_, algorithm, encoding)) map (_.size) sliding 2 foreach
-        { case Seq(s1, s2) => assert(s1 == s2) }
+      Sizes
+        .map(randomBytes)
+        .map(SecureUtils.digestBytes(_, algorithm, encoding))
+        .map(_.size)
+        .sliding(2)
+        .foreach {
+          case Seq(s1, s2) => assert(s1 == s2)
+          case _           => throw new IllegalStateException
+        }
 
     it(s"must have the same size in parallel for all") {
       for {

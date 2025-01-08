@@ -191,7 +191,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
                 js.Dynamic.global.window.URL.createObjectURL(
                   new Blob(
                     js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
-                    BlobPropertyBag(`type` = cxr.mediatype.orUndefined)
+                    new BlobPropertyBag { `type` = cxr.mediatype.orUndefined }
                   )
                 ).asInstanceOf[String]
               )

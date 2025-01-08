@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.library
 
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.scalajs.dom.crypto.GlobalCrypto
+import org.scalajs.dom
 
 import scala.scalajs.js.typedarray.{DataView, Int8Array}
 
@@ -18,7 +18,7 @@ object CryptoFunctions {
   def random(): Double = {
 
     val ints = new Int8Array(8)
-    GlobalCrypto.crypto.getRandomValues(ints)
+    dom.crypto.getRandomValues(ints)
 
     // https://stackoverflow.com/questions/34575635/cryptographically-secure-float
     ints(7) = 63

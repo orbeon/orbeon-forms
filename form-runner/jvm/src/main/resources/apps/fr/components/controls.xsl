@@ -124,10 +124,14 @@
         The combination of those is included in `$choice-validation-selection-control-names`.
 
         See https://github.com/orbeon/orbeon-forms/issues/6008
+
+        Set priority a little higher, see https://github.com/orbeon/orbeon-forms/issues/6709.
      -->
     <xsl:template
         mode="within-grid"
-        match="*[$validate-selection-controls-choices and frf:isMaybeSelectionControl(.)]">
+        match="*[$validate-selection-controls-choices and frf:isMaybeSelectionControl(.)]"
+        priority="10"
+    >
         <xsl:param name="choice-validation-selection-control-names" tunnel="yes"/>
         <xsl:variable name="is-multiple" select="frf:isMultipleSelectionControl(local-name(.))"/>
         <xsl:choose>

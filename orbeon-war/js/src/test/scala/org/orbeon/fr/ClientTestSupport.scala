@@ -149,8 +149,8 @@ trait ClientTestSupport {
   ): Future[Try[List[String]]] =
     runContainer(
       TomcatImageName,
+      containerName,
       s"""
-        |--name $containerName
         |${network.map(n => s"--network=$n ").getOrElse("")}-it
         |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/jvm/target/webapp,dst=$ImageTomcatDir/webapps/orbeon
         |--mount type=bind,src=$$HOME/.orbeon/license.xml,dst=/root/.orbeon/license.xml,ro
@@ -171,8 +171,8 @@ trait ClientTestSupport {
     result
   }
 
-  def withRunContainer[T](image: String, params: String, checkImageRunning: Boolean)(block: => Future[T]): Future[T] = async {
-    await(runContainer(image, params, checkImageRunning))
+  def withRunContainer[T](image: String, containerName: String, params: String, checkImageRunning: Boolean)(block: => Future[T]): Future[T] = async {
+    await(runContainer(image, containerName, params, checkImageRunning))
     val result = await(block)
     await(removeContainerByImage(image))
     result

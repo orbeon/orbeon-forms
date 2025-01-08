@@ -13,6 +13,7 @@
   */
 package org.orbeon.fr
 
+import cats.implicits.toFunctorOps
 import org.orbeon.node
 import org.orbeon.node.OS
 import org.orbeon.oxf.util.FutureUtils.eventually
@@ -40,29 +41,28 @@ object DockerSupport {
   def replacePaths(s: String): String =
     s.replace("$BASE_DIRECTORY", BaseDirectory).replace("$HOME", OS.homedir())
 
-  def withInfo[T](message: => String)(body: => T): T =
-    try {
-      println(s"start $message")
-      body
-    } finally {
-      println(s"end $message")
+  private def withInfo[T](message: => String)(body: => Future[T]): Future[T] = {
+    def timestamp: String = new scala.scalajs.js.Date().toLocaleString()
+    println(s"$timestamp - Start $message")
+    body.transform { result =>
+      println(s"$timestamp - End $message")
+      result
     }
+  }
 
-  def runProcessSync(cmd: String, params: String): String = {
+  private def runProcessSync(cmd: String, params: String): String = {
 
     val replacedCmd    = replacePaths(cmd)
     val replacedParams = replacePaths(params).trim.replace("\n", " ")
 
-    withInfo(s"trying to run execFileSync: $replacedCmd $replacedParams") {
-      (node.ChildProcess.execFileSync(replacedCmd, replacedParams.jsSplit(" ")): Any) match {
-        case v: String      => v
-        case v: node.Buffer => v.toString()
-        case _              => throw new IllegalStateException
-      }
+    (node.ChildProcess.execFileSync(replacedCmd, replacedParams.jsSplit(" ")): Any) match {
+      case v: String      => v
+      case v: node.Buffer => v.toString()
+      case _              => throw new IllegalStateException
     }
   }
 
-  def runProcessSyncF(cmd: String, params: String): Future[String] = {
+  private def runProcessSyncF(cmd: String, params: String): Future[String] = {
     try {
       Future.successful(runProcessSync(cmd, params))
     } catch {
@@ -72,8 +72,8 @@ object DockerSupport {
     }
   }
 
-  def waitUntilImageAvailable(image: String): Future[String] = {
-    withInfo(s"wait for image `$image` to be available") {
+  private def waitUntilImageAvailable(image: String): Future[String] = {
+    withInfo(s"waiting for image `$image` to be available") {
       eventually(interval = ImageWaitDelay, timeout = ImageWaitTimeout) {
         runProcessSyncF("docker", s"images -q $image") map (_.trim) filter (_.nonEmpty)
       }
@@ -81,48 +81,57 @@ object DockerSupport {
   }
 
   // Return existing container ids or new container id
-  def runContainer(image: String, params: String, checkImageRunning: Boolean): Future[Success[List[String]]] = async {
+  def runContainer(image: String, containerName: String, params: String, checkImageRunning: Boolean): Future[Success[List[String]]] = {
+    def getContainerIds: Future[Option[String]] = runProcessSyncF("docker", s"ps -q --filter ancestor=$image").map(_.trimAllToOpt)
+    def runNewContainer: Future[List[String]]   = runProcessSyncF("docker", s"run -d --name $containerName ${params.trim} $image").map(_.trim).map(List(_))
 
-    await(waitUntilImageAvailable(image))
-    val existingContainerIdsOpt =
-      if (! checkImageRunning)
-        None
-      else
-        await(runProcessSyncF("docker", s"ps -q --filter ancestor=$image")).trimAllToOpt
-
-    Success(
-      existingContainerIdsOpt match {
-        case Some(containerIds) => containerIds.splitTo[List]()
-        case None               => List(await(runProcessSyncF("docker", s"run -d ${params.trim} $image")))
-      }
-    )
-  }
-
-  def removeContainerByImage(image: String): Future[Unit] = async {
-    await(runProcessSyncF("docker", s"ps -q --filter ancestor=$image")).trimAllToOpt match {
-      case Some(containerIds) => await(runProcessSyncF("docker", s"rm -f $containerIds"))
-      case None               => None
+    withInfo(s"running container image `$image` name `$containerName`") {
+      for {
+        _                       <- waitUntilImageAvailable(image)
+        existingContainerIdsOpt <- if (!checkImageRunning) Future.successful(None) else getContainerIds
+        containerIds            <- existingContainerIdsOpt
+                                     .map(ids => Future.successful(ids.splitTo[List]()))
+                                     .getOrElse(runNewContainer)
+      } yield Success(containerIds)
     }
   }
 
-  def waitForContainerStopById(containerId: String) =
+  def removeContainerByImage(image: String): Future[Unit] = {
+    def removeContainers(containerIds: String): Future[Unit] =
+      runProcessSyncF("docker", s"rm -f $containerIds").void
+
+    withInfo(s"removing container by image name `$image`") {
+      for {
+        containerIdsOpt <- runProcessSyncF("docker", s"ps -q --filter ancestor=$image").map(_.trimAllToOpt)
+        _               <- containerIdsOpt.fold(Future.successful(()))(removeContainers)
+      } yield ()
+    }
+  }
+
+  private def waitForContainerStopById(containerId: String): Future[String] =
     eventually(interval = ImageWaitDelay, timeout = ImageWaitTimeout) {
       runProcessSyncF("docker", s"ps -q --filter id=$containerId") filter (_.trimAllToOpt.isEmpty)
     }
 
-  def removeContainerById(containerId: String): Future[Unit] = async {
-    await(runProcessSyncF("docker", s"ps -q --filter id=$containerId")).trimAllToOpt match {
-      case Some(containerIds) => await(runProcessSyncF("docker", s"rm -f $containerId"))
-      case None               => None
+  private def removeContainerById(containerId: String): Future[Unit] = {
+    for {
+      containerIdsOpt <- runProcessSyncF("docker", s"ps -q --filter id=$containerId").map(_.trimAllToOpt)
+      _               <- containerIdsOpt.fold(Future.successful(()))(
+                           ids => runProcessSyncF("docker", s"rm -f $containerId").void
+                         )
+    } yield ()
+  }
+
+  def removeContainerByIdAndWait(containerId: String): Future[Unit] = {
+    withInfo(s"removing container by id `$containerId`") {
+      for {
+        _ <- removeContainerById(containerId)
+        _ <- waitForContainerStopById(containerId)
+      } yield ()
     }
   }
 
-  def removeContainerByIdAndWait(containerId: String): Future[Unit] = async {
-    await(removeContainerById(containerId))
-    await(waitForContainerStopById(containerId))
-  }
-
-  def findNetworkIdF: Future[Option[String]] =
+  private def findNetworkIdF: Future[Option[String]] =
     runProcessSyncF("docker", s"network ls -q --filter name=$OrbeonDockerNetwork") map (_.trimAllToOpt)
 
   def createNetworkIfNeeded(): Future[Any] = async {

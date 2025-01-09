@@ -28,7 +28,6 @@ class ItemsetDependenciesTest
   // See: [ #315557 ] XPath analysis: Checkbox with both itemset and value changing ends up in incorrect state
   //      http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=315557&group_id=168
   describe("select value depending on itemset") {
-    assume(Version.isPE)
 
     val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -70,6 +69,7 @@ class ItemsetDependenciesTest
       </xh:html>.toDocument
 
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(TestDoc)) {
 

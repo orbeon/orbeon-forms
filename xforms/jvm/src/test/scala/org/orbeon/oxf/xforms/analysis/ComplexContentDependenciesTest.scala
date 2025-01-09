@@ -27,7 +27,6 @@ class ComplexContentDependenciesTest
   // See: [ #315535 ] XPath analysis: xxf:serialize() support: detect changes to nested elements
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315535&group_id=168&atid=350207
   describe("`serialize()` functions") {
-    assume(Version.isPE)
 
     val TestDoc =
       <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
@@ -54,6 +53,7 @@ class ComplexContentDependenciesTest
       </xh:html>.toDocument
 
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(TestDoc)) {
           assert(getControlValue("input") == "complex")
@@ -73,7 +73,6 @@ class ComplexContentDependenciesTest
   // See: [ #315525 ] XPath analysis: bug with xf:output pointing to complex content
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315525&group_id=168&atid=350207
   describe("output complex content") {
-    assume(Version.isPE)
 
     val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -93,6 +92,7 @@ class ComplexContentDependenciesTest
       </xh:html>.toDocument
 
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(TestDoc)) {
           assert(getControlValue("input") === "Teddy")

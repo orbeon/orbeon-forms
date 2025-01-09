@@ -26,7 +26,6 @@ class VariableDependenciesTest
      with AnyFunSpecLike {
 
   describe("variable with intermediate control") {
-    assume(Version.isPE)
 
     val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -57,6 +56,7 @@ class VariableDependenciesTest
       </xh:html>.toDocument
 
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(TestDoc)) {
 

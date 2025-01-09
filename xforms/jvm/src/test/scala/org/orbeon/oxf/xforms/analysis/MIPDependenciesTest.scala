@@ -27,8 +27,8 @@ class MIPDependenciesTest
  val AnalysisMipsFormUrl = "oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml"
 
   describe("validity based on `type` MIP") {
-    assume(Version.isPE)
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
@@ -57,8 +57,8 @@ class MIPDependenciesTest
   }
 
   describe("`relevant` MIP") {
-    assume(Version.isPE)
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
           val units = getControlValue("units⊙1")
@@ -84,8 +84,8 @@ class MIPDependenciesTest
   }
 
   describe("validity based on `constraint` MIP") {
-    assume(Version.isPE)
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
@@ -119,8 +119,8 @@ class MIPDependenciesTest
   }
 
   describe("`required` MIP") {
-    assume(Version.isPE)
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
@@ -142,8 +142,8 @@ class MIPDependenciesTest
   }
 
   describe("`normalize-space()` constraint") {
-    assume(Version.isPE)
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
@@ -162,7 +162,6 @@ class MIPDependenciesTest
   // See: [ #315733 ] Incorrect MIPs when more than two binds point to the same node
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315733&group_id=168&atid=350207
   describe("multiple `xf:bind`s on same node") {
-    assume(Version.isPE)
 
     val MultipleBindsDoc =
       <xh:html
@@ -185,6 +184,7 @@ class MIPDependenciesTest
       </xh:html>.toDocument
 
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(MultipleBindsDoc)) {
 
@@ -210,7 +210,6 @@ class MIPDependenciesTest
 
   // https://github.com/orbeon/orbeon-forms/issues/6370
   describe("`calculate` MIP recalculates upon destination node change") {
-    assume(Version.isPE)
 
     val Issue6370TestDoc =
       <xh:html
@@ -250,6 +249,7 @@ class MIPDependenciesTest
       </xh:html>.toDocument
 
     it("must pass all checks") {
+      assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(Issue6370TestDoc)) {
 

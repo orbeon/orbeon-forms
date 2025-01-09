@@ -136,7 +136,7 @@ trait Reindex extends FormDefinition {
           |        SELECT
           |          document_id,
           |          draft,
-          |          max(last_modified_time) last_modified_time
+          |          max(id) id
           |        FROM
           |          orbeon_form_data
           |        ${whereConditions.nonEmpty.string("WHERE")}
@@ -146,9 +146,8 @@ trait Reindex extends FormDefinition {
           |          draft
           |      ) l
           |   WHERE
-          |     d.document_id          = l.document_id        AND
-          |     d.last_modified_time   = l.last_modified_time AND
-          |     d.deleted              = 'N'
+          |     d.id      = l.id AND
+          |     d.deleted = 'N'
           |""".stripMargin
 
     // Count how many documents we'll reindex, and tell progress code

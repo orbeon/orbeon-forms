@@ -203,6 +203,7 @@ trait Read {
     val sql = {
       val table  = SqlSupport.tableName(req)
       val idCols = SqlSupport.idColumns(req)
+      val maxColumn = if (req.forData && ! req.forAttachment) "id" else "last_modified_time"
 
       val body = bodyContentOpt match {
         case None =>
@@ -264,7 +265,7 @@ trait Read {
               |        , t.form_version, t.deleted
               |FROM    $table t,
               |        (
-              |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+              |            SELECT   max($maxColumn) $maxColumn, ${idCols.mkString(", ")}
               |              FROM   $table
               |             WHERE   app  = ?
               |                     and form = ?
@@ -273,7 +274,7 @@ trait Read {
               |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
               |            GROUP BY ${idCols.mkString(", ")}
               |        ) m
-              |WHERE   ${SqlSupport.joinColumns("last_modified_time" +: idCols, "t", "m")}
+              |WHERE   ${SqlSupport.joinColumns(maxColumn +: idCols, "t", "m")}
               |""".stripMargin
       }
     }

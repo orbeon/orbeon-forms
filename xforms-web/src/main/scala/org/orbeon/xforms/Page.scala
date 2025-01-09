@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom.html
@@ -100,7 +101,7 @@ object Page {
               //  But is that warning correct? Do we ever take this branch?
               Some(formElem)
             case _ =>
-              Option(elem.asInstanceOf[js.Dynamic].closest(s"form.$FormClass[id]").asInstanceOf[html.Form])
+              elem.closestOpt(s"form.$FormClass[id]").map(_.asInstanceOf[html.Form])
           }
       }
 

@@ -3,6 +3,7 @@ package org.orbeon.xforms
 import org.orbeon.jquery.*
 import org.scalajs.dom
 import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -19,9 +20,11 @@ object ItemHint {
    *     since the tooltip is shown all the way to the right of the cell. To avoid this, if we detect that situation,
    *     we set the container to be the parent of the div.fb-hover (which is the td).
    */
-  dom.document.addEventListener("mouseover", (ev: dom.Event) => {
-    val hintRegionEl = ev.target.asInstanceOf[dom.Element].closest(".xforms-form .xforms-items .xforms-hint-region")
-    if (hintRegionEl != null) {
+  dom.document.addEventListener("mouseover", (event: dom.Event) =>
+    event.targetT
+      .closestOpt(".xforms-form .xforms-items .xforms-hint-region")
+      .foreach { hintRegionEl =>
+
       val jHintRegionEl    = $(hintRegionEl)
       val jHintRegionElDyn = jHintRegionEl.asInstanceOf[js.Dynamic]
 
@@ -53,10 +56,11 @@ object ItemHint {
           jHintRegionElDyn.tooltip("show")
         case (true, false) =>
           // Avoid super-narrow tooltip in Form Builder [1]
-          val containerEl = {
-            val parentFbHover = jHintRegionEl.closest(".fb-hover");
-            if (parentFbHover.is("*")) parentFbHover.parent() else jHintRegionEl
-          }
+          val containerEl =
+            hintRegionEl.closestOpt(".fb-hover") match {
+              case Some(parentFbHover) => parentFbHover.parentElement
+              case None                => hintRegionEl
+            }
 
           // Create tooltip and show right away
           jHintRegionElDyn.tooltip(js.Dynamic.literal(
@@ -64,7 +68,7 @@ object ItemHint {
             html      = true,
             animation = false,
             placement = placement,
-            container = containerEl
+            container = $(containerEl)
           ))
           jHintRegionElDyn.on("shown", (_ => shiftTooltipLeft(containerEl, jHintRegionEl)): js.Function1[JQueryEvent, Unit])
           jHintRegionElDyn.tooltip("show")
@@ -75,18 +79,18 @@ object ItemHint {
         // NOP if not initialized and we don't have a tooltip
       }
     }
-  })
+  )
 
   /**
    * Fixup position of tooltip element to be to the left of the checkbox/radio. Without this fixup, the tooltip is
    * shown to the left of the hint region, so it shows over the checkbox/radio.
    */
-  private def shiftTooltipLeft(containerEl: JQuery, hintRegionEl: JQuery): Unit = {
-    val tooltipEl = containerEl.children(".tooltip")
-    if (tooltipEl.is(".left")) {
-      val offset = Offset(tooltipEl)
+  private def shiftTooltipLeft(containerEl: html.Element, hintRegionEl: JQuery): Unit = {
+    containerEl.children.find(_.matches(".tooltip.left")).foreach { tooltipEl =>
+      val jTooltipEl = $(tooltipEl)
+      val offset = Offset(jTooltipEl)
       // Add 5px spacing between arrow and checkbox/radio
-      Offset.offset(tooltipEl, offset.copy(left = Offset(hintRegionEl.parent()).left - tooltipEl.outerWidth().getOrElse(0d) - 5))
+      Offset.offset(jTooltipEl, offset.copy(left = Offset(hintRegionEl.parent()).left - jTooltipEl.outerWidth().getOrElse(0d) - 5))
     }
   }
 }

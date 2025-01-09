@@ -18,18 +18,19 @@ import autowire.*
 import cats.Eval
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
-import org.orbeon.builder.facade.JQueryTooltip.*
+import io.udash.wrappers.jquery.{JQuery, JQueryCallbacks}
 import org.orbeon.builder.facade.*
+import org.orbeon.builder.facade.JQueryTooltip.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
-import io.udash.wrappers.jquery.{JQuery, JQueryCallback, JQueryCallbacks, JQueryEvent, jQ}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -54,21 +55,21 @@ object ControlLabelHintTextEditor {
     val ExplanationSelector   = ".xbl-component.xbl-fr-explanation"
 
     var resourceEditorCurrentControlOpt: Option[JQuery] = None
-    var resourceEditorCurrentLabelHint: JQuery = null
+    var jResourceEditorCurrentLabelHint: JQuery = null
 
     // Heuristic to close the editor based on click and focus events
     def clickOrFocus(event: dom.Event): Unit = {
-      val target = $(event.target)
-      val eventOnEditor        = target.closest(".fb-label-editor").is("*")
-      val eventOnMceDialog     = target.closest(".tox-dialog").is("*")
-      val eventOnMceToolbar    = target.closest(".tox-tinymce").is("*")
-      val eventOnMceToolbarOvf = target.closest(".tox-toolbar__overflow").is("*") // https://github.com/orbeon/orbeon-forms/issues/6315
-      val eventOnMceMenu       = target.closest(".tox-menu").is("*")
+      val target = event.targetT
+      val eventOnEditor        = target.closestOpt(".fb-label-editor").isDefined
+      val eventOnMceDialog     = target.closestOpt(".tox-dialog").isDefined
+      val eventOnMceToolbar    = target.closestOpt(".tox-tinymce").isDefined
+      val eventOnMceToolbarOvf = target.closestOpt(".tox-toolbar__overflow").isDefined // https://github.com/orbeon/orbeon-forms/issues/6315
+      val eventOnMceMenu       = target.closestOpt(".tox-menu").isDefined
       val eventOnControlLabel  =
           // Click on label or element inside label
-          (target.is(LabelHintSelector) || target.parents(LabelHintSelector).is("*")) &&
+          target.ancestorOrSelfElem(LabelHintSelector).nonEmpty &&
           // Only interested in labels in the "editor" portion of FB
-          target.parents(".fb-main").is("*")
+          target.ancestorOrSelfElem(".fb-main").nonEmpty
       if (! (eventOnEditor || eventOnMceDialog || eventOnMceToolbar || eventOnMceToolbarOvf || eventOnMceMenu || eventOnControlLabel))
         resourceEditorEndEdit()
     }
@@ -80,24 +81,24 @@ object ControlLabelHintTextEditor {
 
       // Click on label/hint
       document.addEventListener(DomEventNames.Click, (event: dom.Event) => {
-        val labelHint = event.target.asInstanceOf[dom.Element].closest(LabelHintSelector)
-        if (labelHint != null) {
+        event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
           // Close current editor, if there is one open
           resourceEditorEndEdit()
-          resourceEditorCurrentLabelHint = $(labelHint)
+          jResourceEditorCurrentLabelHint = $(labelHint)
           // Find control for this label
-          val th = resourceEditorCurrentLabelHint.parents(".fr-grid-th")
           resourceEditorCurrentControlOpt =
             Some(
-              if (th.is("*"))
-                // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
-                resourceEditorCurrentLabelHint
-              else
-                Option(labelHint.closest(ExplanationSelector))
-                  .getOrElse(labelHint.closest(ControlSelector))
-                  .pipe($(_))
+              labelHint.ancestorOrSelfElem(".fr-grid-th").nextOption() match {
+                case Some(_) =>
+                  // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
+                  jResourceEditorCurrentLabelHint
+                case None =>
+                  labelHint.closestOpt(ExplanationSelector)
+                    .getOrElse(labelHint.closest(ControlSelector))
+                    .pipe($(_))
+              }
             )
-          resourceEditorStartEdit(resourceEditorCurrentLabelHint)
+          resourceEditorStartEdit(jResourceEditorCurrentLabelHint)
         }
       })
 
@@ -106,14 +107,14 @@ object ControlLabelHintTextEditor {
         val container = $(document.getElementById(containerId))
         resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
         val repeat = container.parents(".fr-repeat-single-row").first()
-        resourceEditorCurrentLabelHint =
+        jResourceEditorCurrentLabelHint =
             if (repeat.is("*")) {
               val column = container.index() + 1
               repeat.find(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
             } else
               container.find(".xforms-label, .xforms-text .xforms-output-output").first()
-        if (resourceEditorCurrentLabelHint.is("*"))
-            resourceEditorStartEdit(resourceEditorCurrentLabelHint)
+        if (jResourceEditorCurrentLabelHint.is("*"))
+            resourceEditorStartEdit(jResourceEditorCurrentLabelHint)
       })
 
     }
@@ -168,13 +169,13 @@ object ControlLabelHintTextEditor {
           Private.containerDiv.hide()
           Private.endEdit()
           Private.annotateWithLhhaClass(false)
-          resourceEditorCurrentLabelHint.css("visibility", "")
+          jResourceEditorCurrentLabelHint.css("visibility", "")
           // Update values in the DOM, without waiting for the server to send us the value
           Private.setLabelHintHtml(isHTML)
-          Private.labelHintValue(resourceEditorCurrentLabelHint, newValue)
+          Private.labelHintValue(jResourceEditorCurrentLabelHint, newValue)
           // Clean state
           resourceEditorCurrentControlOpt = None
-          resourceEditorCurrentLabelHint = null
+          jResourceEditorCurrentLabelHint = null
         }
       }
     }
@@ -221,8 +222,8 @@ object ControlLabelHintTextEditor {
 
       // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
       def getEditorType: EditorType =
-        if      (resourceEditorCurrentLabelHint.is(".xforms-label"))             EditorType.Label
-        else if (resourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) EditorType.Text
+        if      (jResourceEditorCurrentLabelHint.is(".xforms-label"))             EditorType.Label
+        else if (jResourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) EditorType.Text
         else                                                                     EditorType.Hint
 
       def htmlClass: String = s"fb-${getEditorType.entryName}-is-html"
@@ -251,7 +252,7 @@ object ControlLabelHintTextEditor {
 
       // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
       def makeSpaceForTinyMce(): Unit =
-        Option(resourceEditorCurrentLabelHint).foreach(_.height(tinyMceContainerDiv.height()))
+        Option(jResourceEditorCurrentLabelHint).foreach(_.height(tinyMceContainerDiv.height()))
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
       val initTinyMce: Eval[TinyMceEditor] = Eval.later {
@@ -354,7 +355,7 @@ object ControlLabelHintTextEditor {
       def endEdit(): Unit =
         if (getEditorType == EditorType.Text)
           // Reset height we might have placed on the explanation element inside the cell
-          resourceEditorCurrentLabelHint.css("height", "")
+          jResourceEditorCurrentLabelHint.css("height", "")
     }
   }
 }

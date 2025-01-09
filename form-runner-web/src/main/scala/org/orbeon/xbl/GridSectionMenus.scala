@@ -16,7 +16,6 @@ package org.orbeon.xbl
 import enumeratum.*
 import enumeratum.EnumEntry.Hyphencase
 import io.udash.wrappers.jquery.JQueryEvent
-import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
@@ -60,31 +59,32 @@ trait GridSectionMenus {
         delegateKeyEventToBootstrapButtonHandler(e)
     )
 
-    document.addEventListener("click", (e: dom.Event) => {
+    document.addEventListener("click", (event: dom.Event) => {
 
-      val target  = e.targetT
-      if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(e)
-      if (target.matches   (s".fr-$componentName-remove-button")           ) removeIterationHandler(e)
+      val target  = event.targetT
+      if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(event)
+      if (target.matches   (s".fr-$componentName-remove-button")           ) removeIterationHandler(event)
 
       // Menu actions
-      Operation.values foreach { op =>
-        val liOpOpt = Option(target.closest(s".fr-$componentName-dropdown-menu .fr-${op.entryName}"))
-        liOpOpt.foreach(_ => actionHandler(op, e))
+      Operation.values.foreach { op =>
+        target
+          .closestOpt(s".fr-$componentName-dropdown-menu .fr-${op.entryName}")
+          .foreach(_ => actionHandler(op, event))
       }
     })
   }
 
-  private def removeIterationHandler(e: dom.Event): Unit = {
+  private def removeIterationHandler(event: dom.Event): Unit = {
 
-    val jTarget = $(e.target)
+    val buttonOpt =
+      event.targetT.closestOpt(s".fr-$componentName-remove-button")
 
-    val jButton = jTarget.closest(s".fr-$componentName-remove-button")
-    val button  = jButton.get(0).get.asInstanceOf[html.Element]
-
-    componentId(e).zip(findIterationForElemWithId(button)) foreach {
-      case (currentComponentId, currentIteration) =>
-        dispatchActionEvent(Operation.Remove, currentComponentId, currentIteration)
-    }
+    componentId(event)
+      .zip(buttonOpt.flatMap(findIterationForElemWithId))
+      .foreach {
+        case (currentComponentId, currentIteration) =>
+          dispatchActionEvent(Operation.Remove, currentComponentId, currentIteration)
+      }
   }
 
   private def moveAndShowMenuHandler(e: dom.Event): Unit = {
@@ -179,16 +179,16 @@ trait GridSectionMenus {
 
   private object Util {
 
-    def iteration(e: dom.Event): html.Element =
-      $(e.target).closest(s".fr-$componentName-repeat-iteration").get(0).get.asInstanceOf[html.Element]
+    def iteration(event: dom.Event): html.Element =
+      event.targetT.closestT(s".fr-$componentName-repeat-iteration")
 
     def findIterationForElemWithId(elemWithId: html.Element): Option[Int] =
       $(elemWithId).attr("id") map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
 
-    def componentElem(e: dom.Event): js.UndefOr[html.Element] =
-      $(e.target).closest(s".xbl-fr-$componentName").get(0).get.asInstanceOf[js.UndefOr[html.Element]]
+    private def componentElem(event: dom.Event): Option[html.Element] =
+      event.targetT.closestOpt(s".xbl-fr-$componentName")
 
-    def componentId(e: dom.Event): Option[String] =
-      $(componentElem(e)).attr("id")
+    def componentId(event: dom.Event): Option[String] =
+      componentElem(event).flatMap(e => Option(e.id))
   }
 }

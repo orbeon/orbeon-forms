@@ -22,6 +22,7 @@ import org.orbeon.facades.BoostrapDatepicker.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
@@ -252,7 +253,7 @@ object Date {
           opts.showOnFocus      = false
           opts.forceParse       = false
           opts.language         = Language.getLang()
-          opts.container        = containerElem.closest("dialog, .orbeon")
+          opts.container        = containerElem.closestT("dialog, .orbeon")
           opts.todayHighlight   = containerElem.querySelector(":scope > .fr-today-highlight-true") != null
 
           dateExternalValue.foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>

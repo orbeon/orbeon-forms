@@ -23,6 +23,12 @@ object DomSupport {
     def querySelectorOpt(selectors: String): Option[T] =
       Option(elem.querySelector(selectors).asInstanceOf[T])
 
+    def previousElementSiblings: Iterator[T] =
+      Iterator.iterate(elem.previousElementSibling.asInstanceOf[T])(_.previousSibling.asInstanceOf[T]).takeWhile(_ ne null)
+
+    def previousElementSiblings(selector: String): Iterator[T] =
+      elem.previousElementSiblings.filter(_.matches(selector))
+
     def closestT(selector: String): T =
       elem.closest(selector).asInstanceOf[T]
 
@@ -37,6 +43,9 @@ object DomSupport {
 
     def ancestorOrSelfElem: Iterator[T] =
       Iterator.iterate(elem)(_.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T]).takeWhile(_ ne null)
+
+    def ancestorOrSelfElem(selector: String): Iterator[T] =
+      ancestorOrSelfElem.filter(_.matches(selector))
 
     def appendChildT[U <: dom.Node](newChild: U): U =
       elem.appendChild(newChild).asInstanceOf[U]

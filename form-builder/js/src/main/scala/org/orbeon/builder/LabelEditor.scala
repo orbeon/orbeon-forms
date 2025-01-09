@@ -47,8 +47,8 @@ object LabelEditor {
         event.targetIdOpt foreach { eventTargetId =>
 
           val eventName        = event.eventName
-          val targetEl         = $(dom.document.getElementById(eventTargetId))
-          val inSectionEditor  = targetEl.closest(".fb-section-grid-editor").is("*")
+          val targetEl         = dom.document.getElementById(eventTargetId)
+          val inSectionEditor  = targetEl.closestOpt(".fb-section-grid-editor").isDefined
 
           if (eventName == DomEventNames.DOMActivate && inSectionEditor)
             addProperties(js.Dictionary(

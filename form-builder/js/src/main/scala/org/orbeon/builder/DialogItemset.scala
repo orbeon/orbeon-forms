@@ -14,9 +14,9 @@
 package org.orbeon.builder
 
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.scalajs.dom
-import org.scalajs.dom.html
 
 
 object DialogItemset {
@@ -28,18 +28,22 @@ object DialogItemset {
       label.trimAllToOpt map (_.replaceAll("""\s+""", "-").toLowerCase)
 
     // Automatically set a corresponding value when the user changes a label
-    dom.document.addEventListener("change", (event: dom.Event) => {
-      val labelInput =
-        event.target                .asInstanceOf[html.Element]
-        .closest(LabelInputSelector).asInstanceOf[html.Element]
-      if (labelInput != null) {
-        val valueXFormsInput = $(labelInput).closest(".fr-grid-tr").find(".fb-itemset-value-input").get(0).get.asInstanceOf[html.Element]
-        if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isAllBlank)) {
-          DocumentAPI.getValue(labelInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue =>
-            DocumentAPI.setValue(valueXFormsInput, suggestedValue)
-          }
+    dom.document.addEventListener("change", (event: dom.Event) =>
+      event.targetT.closestOpt(LabelInputSelector).foreach { labelInput =>
+
+        val valueXFormsInput =
+          labelInput.closestT(".fr-grid-tr").querySelectorT(".fb-itemset-value-input")
+
+        if (DocumentAPI.getValue(valueXFormsInput).toOption.exists(_.isAllBlank)) {
+          DocumentAPI
+            .getValue(labelInput)
+            .toOption
+            .flatMap(suggestValueFromLabel)
+            .foreach { suggestedValue =>
+              DocumentAPI.setValue(valueXFormsInput, suggestedValue)
+            }
         }
       }
-    })
+    )
   }
 }

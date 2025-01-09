@@ -147,7 +147,7 @@ object TinyMCE {
     private def clientToServer(): Unit =
       tinyMceObjectOpt foreach { tinyMceObject =>
         // https://github.com/orbeon/orbeon-forms/issues/5963
-        if (containerElem.closest("form") != null) {
+        if (containerElem.closestOpt("form").isDefined) {
           val rawContent = tinyMceObject.getContent()
           // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
           val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent

@@ -51,7 +51,7 @@ object LaddaButton {
       val button = findButton
       button.setAttribute("data-style", "slide-left")
 
-      val isPrimary = button.closest(".xforms-trigger-appearance-xxforms-primary") != null
+      val isPrimary = button.closestOpt(".xforms-trigger-appearance-xxforms-primary").isDefined
       button.setAttribute("data-spinner-color", if (isPrimary) "white" else "black")
       button.classList.add("ladda-button")
 
@@ -63,7 +63,7 @@ object LaddaButton {
         fn     = (_: dom.Event) => {
           if (state == State.Begin)
             js.timers.setTimeout(0) { // defer so we don't prevent other `click` listeners from being called
-              ladda.foreach (_.start())
+              ladda.foreach(_.start())
               state = State.Clicked
             }
         }

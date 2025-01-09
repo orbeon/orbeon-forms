@@ -76,7 +76,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           optionsOpt = Some(
             new Select2.Options {
               val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
-              val dropdownParent     = containerElem.closestOpt("dialog").map($(_)).orUndefined // For dropdown not to show under dialog
+              val dropdownParent     = containerElem // For dropdown not to show under dialog
               val ajax               = if (isDatabound) Select2Ajax else null
               val width              = "100%" // For Select2 width to update as the viewport width changes
               val tags               = false

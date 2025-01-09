@@ -14,6 +14,7 @@
 package org.orbeon.facades
 
 import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -31,7 +32,7 @@ object Select2 {
     val placeholder        : js.UndefOr[Option]
     val ajax               : Ajax
     val allowClear         : Boolean
-    val dropdownParent     : js.UndefOr[JQuery]
+    val dropdownParent     : js.UndefOr[html.Element]
     val width              : String
     val tags               : Boolean
     val minimumInputLength : Int
@@ -42,7 +43,7 @@ object Select2 {
       newPlaceholder: js.UndefOr[Option] = o.placeholder,
       newAjax: Ajax = o.ajax,
       newAllowClear: Boolean = o.allowClear,
-      newDropdownParent: js.UndefOr[JQuery] = o.dropdownParent,
+      newDropdownParent: js.UndefOr[html.Element] = o.dropdownParent,
       newWidth: String = o.width,
       newTags: Boolean = o.tags,
       newMinimumInputLength: Int = o.minimumInputLength

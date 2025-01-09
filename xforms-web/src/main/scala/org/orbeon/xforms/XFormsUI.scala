@@ -1517,6 +1517,7 @@ object XFormsUI {
       dialogElem.showModal()
       dialogElem.addEventListener("cancel" , dialogCancelListener )
       dialogElem.addEventListener("keydown", dialogKeydownListener)
+      dom.document.getElementByIdOpt("orbeon-inspector").foreach(dialogElem.appendChild)
     }
 
     // Server telling us to hide the dialog
@@ -1525,6 +1526,10 @@ object XFormsUI {
       dialogElem.removeEventListener("cancel" , dialogCancelListener )
       dialogElem.removeEventListener("keydown", dialogKeydownListener)
       dialogElem.close()
+
+      val inspectorElemOpt = dialogElem.querySelectorOpt("#orbeon-inspector")
+      val formElemOpt      = dom.document.getElementByIdOpt(formID)
+      inspectorElemOpt.foreach(inspectorElem => formElemOpt.foreach(_.appendChild(inspectorElem)))
     }
 
     // Users closed the dialog (Esc): the browser dispatches the `cancel` event, we inform the server

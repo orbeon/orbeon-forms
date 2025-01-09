@@ -16,14 +16,13 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.dom.*
 import org.orbeon.xforms.XFormsNames.*
 
-
-sealed trait MipName { def name: String; val aName: QName; val eName: QName }
+sealed trait MipName { def name: String; def aName: QName; def eName: QName }
 
 object MipName {
 
   // MIP enumeration
-  sealed trait Std extends MipName { val name: String; val aName = QName(name);    val eName = xfQName(name) }
-  sealed trait Ext extends MipName { val name: String; val aName = xxfQName(name); val eName = xxfQName(name) }
+  sealed trait Std extends MipName { val name: String; lazy val aName = QName(name);    lazy val eName = xfQName(name) }
+  sealed trait Ext extends MipName { val name: String; lazy val aName = xxfQName(name); lazy val eName = xxfQName(name) }
 
   sealed trait Computed      extends MipName
   sealed trait Validate      extends MipName
@@ -32,22 +31,21 @@ object MipName {
   sealed trait StringXPath   extends XPath
 
   // NOTE: `required` is special: it is evaluated during recalculate, but used during revalidate. In effect both
-  // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
+  // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the *value* of the
   // `required` MIP, not on the XPath of it. See also what we would need for `valid()`, etc. functions.
-  case object Relevant     extends { val name = "relevant"   } with Std with BooleanXPath with Computed
-  case object Readonly     extends { val name = "readonly"   } with Std with BooleanXPath with Computed
-  case object Required     extends { val name = "required"   } with Std with BooleanXPath with Computed with Validate
-  case object Constraint   extends { val name = "constraint" } with Std with BooleanXPath with Validate
-
-  case object Calculate    extends { val name = "calculate"  } with Std with StringXPath  with Computed
-  case object Default      extends { val name = "default"    } with Ext with StringXPath  with Computed
-  case object Type         extends { val name = "type"       } with Std with Validate
-  case object Whitespace   extends { val name = "whitespace" } with Ext with Computed
+  case object Relevant   extends Std with BooleanXPath with Computed               { val name = "relevant"   }
+  case object Readonly   extends Std with BooleanXPath with Computed               { val name = "readonly"   }
+  case object Required   extends Std with BooleanXPath with Computed with Validate { val name = "required"   }
+  case object Constraint extends Std with BooleanXPath with Validate               { val name = "constraint" }
+  case object Calculate  extends Std with StringXPath  with Computed               { val name = "calculate"  }
+  case object Default    extends Ext with StringXPath  with Computed               { val name = "default"    }
+  case object Type       extends Std with Validate                                 { val name = "type"       }
+  case object Whitespace extends Ext with Computed                                 { val name = "whitespace" }
 
   case class Custom(qName: QName) extends StringXPath { // with `ComputedMIP`?
     def name = buildInternalCustomMIPName(qName)
-    val aName: QName = qName
-    val eName: QName = qName
+    def aName: QName = qName
+    def eName: QName = qName
   }
 
   val AllMipNames            : Set[MipName]          = Set(Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)

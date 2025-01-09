@@ -13,7 +13,7 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.xforms.$
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -33,10 +33,10 @@ object HrefButton {
     def enabled() = ()
 
     private def onClick(): Unit = {
-      val a = $(containerElem).find(".fr-href-button-anchor")
-      org.scalajs.dom.window.open(
-        url      = a.attr("href"  ).toString,
-        target   = a.attr("target").toString,
+      val a = containerElem.querySelectorT(".fr-href-button-anchor").asInstanceOf[html.Anchor]
+      dom.window.open(
+        url      = a.href,
+        target   = a.target,
         features = "noopener"
       )
     }

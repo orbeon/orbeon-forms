@@ -5,6 +5,7 @@ import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQueryPromise
+import org.orbeon.web.DomSupport.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.{Future, Promise}
@@ -59,7 +60,7 @@ object CodeMirror {
       this.handlers.foreach { case (key, value) => this.editor.off(key, value) }
       this.handlers.clear()
       this.editor = null
-      $(containerElem).find(".xbl-fr-code-mirror-editor").empty()
+      containerElem.querySelectorT(".xbl-fr-code-mirror-editor").replaceChildren()
     }
 
     override def xformsFocus(): Unit = this.editor.focus()

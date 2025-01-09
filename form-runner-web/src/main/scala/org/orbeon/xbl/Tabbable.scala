@@ -13,12 +13,11 @@
   */
 package org.orbeon.xbl
 
-import io.udash.wrappers.jquery.JQuery
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.DndRepeat.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.*
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -65,47 +64,45 @@ object Tabbable {
               override val mirrorContainer: UndefOr[Element] = firstRepeatContainer
 
               // Only elements in drake.containers will be taken into account
-              override def isContainer(el: Element) = false
+              override def isContainer(el: html.Element) = false
 
-              override def moves(el: Element, source: Element, handle: Element, sibling: Element) = {
-                val jEl = $(el)
+              override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) = {
                 (
-                    jEl.prev().is(IsRepeatDelimiterSelector) ||
-                    jEl.prev().prev().is(IsRepeatDelimiterSelector)
+                    el.previousElementOpt.exists(_.matches(IsRepeatDelimiterSelector)) ||
+                    el.previousElementOpt.flatMap(_.previousElementOpt).exists(_.matches(IsRepeatDelimiterSelector))
                 ) &&
-                    jEl.is(IsDndMovesSelector)
+                    el.matches(IsDndMovesSelector)
               }
 
-              override def accepts(el: Element, target: Element, source: Element, sibling: Element) =
-                sibling != null && $(sibling).is(IsNotGuSelector)
+              override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
+                sibling != null && sibling.matches(IsNotGuSelector)
             }
           )
 
-        newDrake.onDrag((el: Element, source: Element) => {
-
-          val jEl = $(el)
-
+        newDrake.onDrag((el: html.Element, source: html.Element) =>
           dragState = Some(
             DragState(
-              currentDragStartPrev     = jEl.prev().get(0).get.asInstanceOf[html.Element],
-              currentDragStartPosition = jEl.prevAll(IsDndMovesSelector + ExcludeRepeatClassesSelector).length
+              currentDragStartPrev     = el.previousElementOpt.orNull,
+              currentDragStartPosition = el.previousElementSiblings(IsDndMovesSelector + ExcludeRepeatClassesSelector).size
             )
           )
-        })
+        )
 
-        newDrake.onDragend((el: Element) => {
+        newDrake.onDragend((el: html.Element) =>
           dragState = None
-        })
+        )
 
         // This is almost identical in `DndRepeat`. Should remove code duplication.
-        newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) => {
+        newDrake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
           dragState foreach { dragState =>
 
-            val jEl = $(el)
+            val dndEnd = el.previousElementSiblings(IsDndMovesSelector + ExcludeRepeatClassesSelector).size
 
-            val dndEnd = jEl.prevAll(IsDndMovesSelector + ExcludeRepeatClassesSelector).length
-
-            val repeatId = jEl.prevAll(IsRepeatBeginEndSelector).attr("id").get.substring("repeat-begin-".length)
+            val repeatId =
+              el.previousElementSiblings(IsRepeatBeginEndSelector)
+                .nextOption()
+                .map(_.id.substring("repeat-begin-".length))
+                .getOrElse(throw new IllegalStateException)
 
             val beforeEl = dragState.currentDragStartPrev
             val dndStart = dragState.currentDragStartPosition
@@ -118,7 +115,7 @@ object Tabbable {
               // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
               // doing this is probably the right thing to do.
               AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("tabbable") foreach { _ =>
-                $(beforeEl).after(el)
+                beforeEl.after(el)
               }
 
               // Thinking this should instead block input, but only after a while show a modal screen.
@@ -172,21 +169,22 @@ object Tabbable {
       drake = None
     }
 
-    def findAllTabPanes: JQuery =
-      $(containerElem).children().children(TabContentSelector).children(TabPaneSelector + ExcludeRepeatClassesSelector)
+    def findAllTabPanes: collection.Seq[html.Element] =
+      containerElem
+        .childrenT
+        .flatMap(_.childrenT(TabContentSelector))
+        .flatMap(_.childrenT(TabPaneSelector + ExcludeRepeatClassesSelector))
 
     // Called from XBL component
     def selectTabForPane(targetElem: html.Element): Unit = {
 
       val allTabPanes            = findAllTabPanes
-      val ancestorOrSelfTabPanes = $(targetElem).parents(TabPaneSelector).add(targetElem) // exact order doesn't matter
-      val intersectionPane       = allTabPanes.filter(ancestorOrSelfTabPanes)
+      val ancestorOrSelfTabPanes = targetElem :: targetElem.parentElementOpt.filter(_.matches(TabPaneSelector)).toList // exact order doesn't matter
 
-      val index = allTabPanes.index(intersectionPane)
-      if (index < 0)
-          return
-
-      selectTab(index)
+      allTabPanes.indexWhere(ancestorOrSelfTabPanes.contains) match {
+        case -1    =>
+        case index => selectTab(index)
+      }
     }
 
     // Called from XBL component
@@ -195,22 +193,23 @@ object Tabbable {
       if (tabPosition < 0)
           return
 
-      val allLis = $(containerElem).find("> div > .nav-tabs").children(ExcludeRepeatClassesSelector)
-      if (tabPosition > allLis.length - 1)
+      val allLis = containerElem.querySelectorAllT(":scope > div > .nav-tabs").flatMap(_.childrenT(ExcludeRepeatClassesSelector))
+
+      if (tabPosition > allLis.size - 1)
           return
 
-      val newLi = allLis.at(tabPosition)
-      if (newLi.is(ActiveSelector))
+      val newLi = allLis(tabPosition)
+      if (newLi.matches(ActiveSelector))
           return
 
-      val allTabPanes = newLi.closest(NavTabsSelector).nextAll().children(TabPaneSelector).filter(ExcludeRepeatClassesSelector)
-      val newTabPane  = allTabPanes.at(tabPosition)
+      val allTabPanes = newLi.closestT(NavTabsSelector).nextElementSiblings.flatMap(_.childrenT(TabPaneSelector)).filter(_.matches(ExcludeRepeatClassesSelector)).toList
+      val newTabPane  = allTabPanes(tabPosition)
 
-      allLis.removeClass(ActiveClass)
-      allTabPanes.removeClass(ActiveClass)
+      allLis.foreach(_.classList.remove(ActiveClass))
+      allTabPanes.foreach(_.classList.remove(ActiveClass))
 
-      newLi.addClass(ActiveClass)
-      $(newTabPane).addClass(ActiveClass)
+      newLi.classList.add(ActiveClass)
+      newTabPane.classList.add(ActiveClass)
     }
   }
 }

@@ -24,10 +24,22 @@ object DomSupport {
       Option(elem.querySelector(selectors).asInstanceOf[T])
 
     def previousElementSiblings: Iterator[T] =
-      Iterator.iterate(elem.previousElementSibling.asInstanceOf[T])(_.previousSibling.asInstanceOf[T]).takeWhile(_ ne null)
+      Iterator.iterate(elem.previousElementSibling.asInstanceOf[T])(_.previousElementSibling.asInstanceOf[T]).takeWhile(_ ne null)
 
     def previousElementSiblings(selector: String): Iterator[T] =
       elem.previousElementSiblings.filter(_.matches(selector))
+
+    def previousElementOpt: Option[T] =
+      elem.previousElementSiblings.nextOption()
+
+    def nextElementSiblings: Iterator[T] =
+      Iterator.iterate(elem.nextElementSibling.asInstanceOf[T])(_.nextElementSibling.asInstanceOf[T]).takeWhile(_ ne null)
+
+    def nextElementSiblings(selector: String): Iterator[T] =
+      elem.nextElementSiblings.filter(_.matches(selector))
+
+    def nextElementOpt: Option[T] =
+      elem.nextElementSiblings.nextOption()
 
     def closestT(selector: String): T =
       elem.closest(selector).asInstanceOf[T]
@@ -37,6 +49,9 @@ object DomSupport {
 
     def childrenT: collection.Seq[T] =
       elem.children.asInstanceOf[HTMLCollection[T]]
+
+    def childrenT(selector: String): collection.Seq[T] =
+      elem.childrenT.filter(_.matches(selector))
 
     def parentElementOpt: Option[T] =
       Option(elem.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T])

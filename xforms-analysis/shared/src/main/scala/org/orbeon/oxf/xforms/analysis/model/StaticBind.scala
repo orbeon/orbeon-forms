@@ -173,29 +173,28 @@ object StaticBind {
 
   // Represent an individual MIP on an <xf:bind> element
   sealed trait MIP {
-    val id    : String
-    val name  : MipName
-    val level : ValidationLevel
+    def id    : String
+    def name  : MipName
+    def level : ValidationLevel
 
-    // WARNING: The following requires early initialization of `name`.
-    val isCalculateComputedMIP = MipName.CalculateMipNames(name)
-    val isValidateMIP          = MipName.ValidateMipNames(name)
+    // Make these lazy vals to avoid early initialization issues
+    lazy val isCalculateComputedMIP : Boolean = MipName.CalculateMipNames(name)
+    lazy val isValidateMIP          : Boolean = MipName.ValidateMipNames(name)
   }
 
   // Represent an XPath MIP
   class XPathMIP(
-    val id           : String,
-    val name         : MipName.XPath,
-    val level        : ValidationLevel,
-    val expression   : String, // public for serialization and debugging
-    namespaceMapping : NamespaceMapping,
-    locationData     : ExtendedLocationData,
-    functionLibrary  : FunctionLibrary
+    override val id     : String,
+    override val name   : MipName.XPath,
+    override val level  : ValidationLevel,
+    val expression      : String, // public for serialization and debugging
+    namespaceMapping    : NamespaceMapping,
+    locationData        : ExtendedLocationData,
+    functionLibrary     : FunctionLibrary
   ) extends MIP {
 
     // Compile the expression right away
-    val compiledExpression: StaticXPath.CompiledExpression = {
-
+    lazy val compiledExpression: StaticXPath.CompiledExpression = {
       val booleanOrStringExpression =
         if (MipName.BooleanXPathMipNames(name))
           StaticXPath.makeBooleanExpression(expression)
@@ -216,13 +215,19 @@ object StaticBind {
   }
 
   // The type MIP is not an XPath expression
-  class TypeMIP(val id: String, val datatype: String) extends {
-    val name  = MipName.Type
-    val level = ValidationLevel.ErrorLevel
-  } with MIP
+  class TypeMIP(
+    override val id       : String,
+             val datatype : String
+  ) extends MIP {
+    override val name     : MipName         = MipName.Type
+    override val level    : ValidationLevel = ValidationLevel.ErrorLevel
+  }
 
-  class WhitespaceMIP(val id: String, val policy: Policy) extends {
-    val name  = MipName.Whitespace
-    val level = ValidationLevel.ErrorLevel
-  } with MIP
+  class WhitespaceMIP(
+    override val id       : String,
+    val policy            : Policy
+  ) extends MIP {
+    override val name     : MipName         = MipName.Whitespace
+    override val level    : ValidationLevel = ValidationLevel.ErrorLevel
+  }
 }

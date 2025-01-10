@@ -28,6 +28,7 @@
 
         background-color: white;
         box-sizing: border-box;
+        box-shadow: -2px -2px 8px rgba(0, 0, 0, 0.2);
         padding: 1em;
         z-index: 10000;
 
@@ -50,6 +51,7 @@
             button {
                 border-top-left-radius: 0;
                 border-bottom-right-radius: 0;
+                &:focus { box-shadow: none }
             }
         }
 
@@ -132,7 +134,7 @@
             height: auto;
             width: auto;
             font-size: 50%;
-            border-top-left-radius: 5px;
+            border-top-left-radius: 8px;
             padding: 4px;
 
             .fr-xforms-inspector-title {
@@ -153,5 +155,11 @@
                 display: none;
             }
         }
+
+        &.fr-xforms-inspector-open {
+            border-top-left-radius    : 8px;
+            border-bottom-left-radius : 8px;
+        }
+
     }
 }

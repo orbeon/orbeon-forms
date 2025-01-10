@@ -233,26 +233,19 @@ class PropertySet private (
 
     val result = mutable.Buffer[String]()
 
-    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): Unit = {
-      def processChildren(): Unit =
-        for ((key, value) <- propertyNode.children)
-          processNode(value, key :: foundTokens, incomingTokens.drop(1))
-
-      incomingTokens.headOption match {
-        case None =>
-          if (propertyNode.children.isEmpty)
-            result += foundTokens.reverse.mkString(".")
-          else
-            processChildren()
-        case Some(StarToken) =>
-          processChildren()
-        case Some(currentToken) =>
+    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): Unit =
+      (incomingTokens.headOption, propertyNode.children.isEmpty) match {
+        case (None, true) =>
+          result += foundTokens.reverse.mkString(".")
+        case (None, false) | (Some(StarToken), _) =>
+          for ((key, value) <- propertyNode.children)
+            processNode(value, key :: foundTokens, incomingTokens.drop(1))
+        case (Some(currentToken), _) =>
           def findChild(t: String): List[(String, PropertyNode)] =
             propertyNode.children.get(t).map(t -> _).toList
           for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild(StarToken)))
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
       }
-    }
     processNode(propertiesTree, Nil, incomingPropertyName.splitTo[List]("."))
 
     result.toList

@@ -604,11 +604,6 @@
                 frf:sendError(403)
             </xf:action>
 
-            <xf:action
-                event="xforms-ready"
-                if="exists($fr-search-app-param-opt) or exists($fr-search-form-param-opt)">
-                <xf:toggle case="fr-search-options-case"/>
-            </xf:action>
             <xf:action event="xforms-ready">
                 <xf:var
                     name="show-search-options-because-property"

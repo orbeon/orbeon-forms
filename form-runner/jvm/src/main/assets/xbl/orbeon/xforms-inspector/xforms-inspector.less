@@ -51,13 +51,13 @@
             button {
                 border-top-left-radius: 0;
                 border-bottom-right-radius: 0;
-                &:focus { box-shadow: none }
+                &:focus { box-shadow: none }            // Remove focus outline, which is distracting
             }
         }
 
         .fr-xforms-inspector-disabled-function {
-            color: #ccc;                                                                                // Grey out part of the UI that are disabled
-            .xforms-label { color: #ccc }                                                               // Label is light gray when disabled
+            color: #ccc;                                // Grey out part of the UI that are disabled
+            .xforms-label { color: #ccc }               // Label is light gray when disabled
         }
 
         .xforms-label {

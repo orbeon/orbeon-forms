@@ -49,10 +49,13 @@ object StringUtils {
     }
 
   // For Java callers
-  def trimAllToEmpty(s: String): String         = s.trimAllToEmpty
-  def trimAllToNull (s: String): String         = s.trimAllToNull
-  def trimAllToOpt  (s: String): Option[String] = s.trimAllToOpt
-  def isAllBlank    (s: String): Boolean        = s.isAllBlank
+  def trimAllToEmpty(s: String): String                   = s.trimAllToEmpty
+  def trimAllToNull (s: String): String                   = s.trimAllToNull
+  def trimAllToOpt  (s: String): Option[String]           = s.trimAllToOpt
+  def isAllBlank    (s: String): Boolean                  = s.isAllBlank
+  def splitToArray  (s: String): Array[String]            = s.splitTo[Array]()
+  def repeat        (s: String, n: Int): String           = s * n
+  def join          (a: Array[String], s: String): String = a.mkString(s)
 
   implicit class OrbeonStringOps(private val s: String) extends AnyVal {
 

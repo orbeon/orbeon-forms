@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 
 import java.util.Date;
@@ -30,18 +29,18 @@ public class CacheUtils {
 
     private static String validityToString(Object validity, int level) {
         if (validity instanceof Long) {
-            return StringUtils.repeat(" ", INDENTATION * level) +
+            return org.orbeon.oxf.util.StringUtils.repeat(" ", INDENTATION * level) +
                     new Date((Long) validity).toString();
         } else if (validity instanceof List) {
             StringBuilder result = new StringBuilder();
-            result.append(StringUtils.repeat(" ", INDENTATION * level));
+            result.append(org.orbeon.oxf.util.StringUtils.repeat(" ", INDENTATION * level));
             result.append("[\n");
             for (Iterator i = ((List) validity).iterator(); i.hasNext();) {
                 Object childValidity = i.next();
                 result.append(validityToString(childValidity, level + 1));
                 result.append("\n");
             }
-            result.append(StringUtils.repeat(" ", INDENTATION * level));
+            result.append(org.orbeon.oxf.util.StringUtils.repeat(" ", INDENTATION * level));
             result.append("]");
             return result.toString();
         } else {

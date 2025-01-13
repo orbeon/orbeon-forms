@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
@@ -233,7 +232,7 @@ public class LDAPProcessor extends ProcessorImpl {
                     for (int i = 0; i < levels.length; i++) {
                         String[] currentLevels = new String[levels.length - i];
                         System.arraycopy(levels, i, currentLevels, 0, levels.length - i);
-                        String levelRootDN = StringUtils.join(currentLevels, ",");
+                        String levelRootDN = org.orbeon.oxf.util.StringUtils.join(currentLevels, ",");
                         if (logger.isDebugEnabled())
                             logger.debug("LDAP Search on level " + levelRootDN);
                         NamingEnumeration results = ctx.search(levelRootDN, filter, constraints);

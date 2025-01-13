@@ -100,7 +100,7 @@ public class XFormsModelSchemaValidator {
         // Check for external schemas
         final String schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME());
         if (schemaAttribute != null)
-            this.schemaURIs = org.apache.commons.lang3.StringUtils.split(MarkupUtils.encodeHRRI(schemaAttribute, false));
+            this.schemaURIs = org.orbeon.oxf.util.StringUtils.splitToArray(MarkupUtils.encodeHRRI(schemaAttribute, false));
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."

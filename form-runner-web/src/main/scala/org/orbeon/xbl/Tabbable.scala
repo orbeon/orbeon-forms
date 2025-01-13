@@ -51,8 +51,8 @@ object Tabbable {
     private val eventListenerSupport = new EventListenerSupport {}
 
     override def init(): Unit = {
-      eventListenerSupport.addListener(dom.document, "keydown", handleKeyboardNavigation)
-      eventListenerSupport.addListener(containerElem, "focus", onDOMFocus, useCapture = true)
+      eventListenerSupport.addListener(dom.document , "keydown", onDOMKeydown)
+      eventListenerSupport.addListener(containerElem, "focus"  , onDOMFocus, useCapture = true)
 
       if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
@@ -216,7 +216,7 @@ object Tabbable {
     private def getAllLis: collection.Seq[Element] =
       containerElem.querySelectorAllT(s":scope > div > .nav-tabs > $ExcludeRepeatClassesSelector")
 
-    private def handleKeyboardNavigation(event: dom.KeyboardEvent): Unit = {
+    private def onDOMKeydown(event: dom.KeyboardEvent): Unit = {
       if (containerElem.matches("dialog :scope")) {
         // macOS-like
         if (event.ctrlKey && !event.altKey) {

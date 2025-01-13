@@ -12,6 +12,7 @@ import java.util as ju
 object URLRewriterUtils {
 
   private val FormBuilderEditPath = "/fr/orbeon/builder/edit/"
+  private val FormBuilderNewPath = "/fr/orbeon/builder/new"
 
   // TODO: placeholder, does it matter for Scala.js?
   def isResourcesVersioned = false
@@ -40,9 +41,13 @@ object URLRewriterUtils {
 
           val basePath = base.resolve(".").getPath
 
+          // Special case for Form Builder
+          // https://github.com/orbeon/orbeon-forms/issues/6722
           val newBasePath =
             if (basePath.endsWith(FormBuilderEditPath))
               basePath.substring(0, basePath.length - FormBuilderEditPath.length + 1)
+            else if (basePath.endsWith(FormBuilderNewPath))
+              basePath.substring(0, basePath.length - FormBuilderNewPath.length + 1)
             else
               basePath
 

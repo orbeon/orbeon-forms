@@ -333,7 +333,7 @@ object FormBuilderXPathApi {
 
     // Make sure an optional element is present while we set content or attributes
     if (isOptionalLHHAT)
-      FormBuilder.ensureCleanLHHAElements(controlName, lhht, count = 1, replace = true)
+      FormBuilder.ensureCleanLHHAElements(controlName, lhht, count = 1, replace = true, keepParams = true)
 
     val t = controlSetter(ctx)
 
@@ -568,7 +568,7 @@ object FormBuilderXPathApi {
 
     AlertDetails.fromForm(controlName)(FormBuilderDocContext())              find
       (_.default)                                                            getOrElse
-      AlertDetails(None, Nil, global = true) toXML
+      AlertDetails(None, Nil, global = true, params = Nil) toXML
   }
 
   // Return all validations as XML for the given control

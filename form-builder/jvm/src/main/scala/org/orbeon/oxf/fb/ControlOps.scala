@@ -575,14 +575,14 @@ trait ControlOps extends ResourcesOps {
     controlName : String,
     lhhaName    : String,
     count       : Int,
-    replace     : Boolean)(implicit
+    replace     : Boolean,
+    keepParams  : Boolean)(implicit
     ctx         : FormBuilderDocContext
   ): collection.Seq[NodeInfo] = {
 
-    val control  = findControlByName(controlName).get
-    val existing = getControlLhhat(controlName, lhhaName)
-    val params   = lhhatChildrenParams(existing)
-
+    val control   = findControlByName(controlName).get
+    val existing  = getControlLhhat(controlName, lhhaName)
+    val params    = if (keepParams) lhhatChildrenParams(existing) else LazyList.empty
     val lhhaQName = controlLHHATQName(lhhaName)
 
     if (replace)

@@ -1730,6 +1730,29 @@
                                                 <xf:label ref="$resources/dialog-control-settings/use-default-alert/label"/>
                                             </xf:input>
                                         </xh:span>
+                                        <xf:group ref=".[@default-alert = false()]">
+                                            <xf:trigger appearance="minimal">
+                                                <xf:label ref="$resources/dialog-control-settings/alert-template-parameters/edit-label"/>
+                                                <xf:label>Edit alert template parameters</xf:label>
+                                                <xxf:show event="DOMActivate" dialog="fb-alert-template-parameters-dialog"/>
+                                            </xf:trigger>
+                                        </xf:group>
+                                        <xxf:dialog id="fb-alert-template-parameters-dialog" class="fb-alert-template-parameters-dialog">
+                                            <xf:label ref="$resources/dialog-control-settings/alert-template-parameters/dialog-label"/>
+                                            <fb:parameters-editor
+                                                ref="alert"
+                                                resources-ref="$resources"
+                                                form-runner-namespace="true"
+                                                xpath-completion-updates="{{$xpath-completion-updates}}">
+                                                <xf:label ref="$resources/dialog-control-settings/parameters"/>
+                                            </fb:parameters-editor>
+                                            <xh:div class="fr-dialog-buttons" xml:space="preserve">
+                                                <xf:trigger appearance="xxf:primary">
+                                                    <xf:label ref="$resources/apply/label"/>
+                                                    <xxf:hide event="DOMActivate" dialog="fb-alert-template-parameters-dialog"/>
+                                                </xf:trigger>
+                                            </xh:div>
+                                        </xxf:dialog>
                                     </xf:group>
                                 </fr:c>
                             </fr:grid>

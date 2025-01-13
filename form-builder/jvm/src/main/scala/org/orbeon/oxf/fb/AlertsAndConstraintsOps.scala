@@ -235,19 +235,23 @@ trait AlertsAndConstraintsOps extends ControlOps {
         controlName = controlName,
         lhhaName    = LHHA.Alert.entryName,
         count       = alertsWithResources.size,
-        replace     = true
+        replace     = true,
+        keepParams  = false
       )
 
     // Insert validation attribute as needed
     newAlertElements zip alertsWithResources foreach {
-      case (e, AlertDetails(Some(forValidationId), _, _)) =>
-        insert(into = e, origin = NodeInfoFactory.attributeInfo(VALIDATION_QNAME, forValidationId))
+      case (alertElem, AlertDetails(Some(forValidationId), _, _, params)) =>
+        insert(into = alertElem, origin = NodeInfoFactory.attributeInfo(VALIDATION_QNAME, forValidationId))
+        params foreach { param =>
+          insert(into = alertElem, origin = param)
+        }
       case _ => // no attributes to insert if this is not an alert linked to a validation
     }
 
     // Write global default alert if needed
     if (defaultAlert.global) {
-      val newGlobalAlert = ensureCleanLHHAElements(controlName, LHHA.Alert.entryName, count = 1, replace = false).head
+      val newGlobalAlert = ensureCleanLHHAElements(controlName, LHHA.Alert.entryName, count = 1, replace = false, keepParams = false).head
       setvalue(newGlobalAlert /@ "ref", OldStandardAlertRef)
     }
   }
@@ -549,7 +553,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
   }
 
-  case class AlertDetails(forValidationId: Option[String], messages: List[(String, String)], global: Boolean) {
+  case class AlertDetails(forValidationId: Option[String], messages: List[(String, String)], global: Boolean, params: List[NodeInfo]) {
 
     require(! (global && forValidationId.isDefined))
 
@@ -558,10 +562,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // XML representation used by Form Builder
     def toXML: sx.Elem = {
       <alert global={global.toString}>{
-        messages collect {
+        val messageElem = messages.collect {
           case (lang, message) =>
             <message lang={lang} value={message}/>
         }
+        val paramsElems = params map nodeInfoToElem
+        messageElem ++ paramsElems
       }</alert>
     }
   }
@@ -570,7 +576,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     refAtt == OldStandardAlertRef
 
   // - If the attribute matches a non-global alert path, return `Some`, otherwise `None`.
-  // - If there is an explicit index such as as `[1]`, then return a nested `Some` index, otherwise `None.
+  // - If there is an explicit index such as `[1]`, then return a nested `Some` index, otherwise `None.
   // - The index, if any, is 0-based.
   private def findZeroBasedIndexFromAlertRef(refAtt: String, resourceName: String): Option[Option[Int]] = {
 
@@ -629,8 +635,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
         def isDefault           = forValidations.isEmpty && forLevels.isEmpty
         def hasSingleValidation = forValidations.size == 1 && forLevels.isEmpty
         def canHandle           = (isDefault || hasSingleValidation) && alertsByLang.nonEmpty
+        def params              = e.child("*:param").toList
 
-        canHandle option AlertDetails(forValidations.headOption, alertsByLang, refAttOpt exists isGlobalAlertRef)
+        canHandle option AlertDetails(forValidations.headOption, alertsByLang, refAttOpt exists isGlobalAlertRef, params)
       }
 
       controlElem child "alert" flatMap alertFromElement toList
@@ -643,8 +650,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
       }
 
       val isGlobal = (alertElem attValue "global") == "true"
-
-      AlertDetails(forValidationId, messagesElems, isGlobal)
+      val params   = alertElem.child("*:param").toList
+      AlertDetails(forValidationId, messagesElems, isGlobal, params)
     }
 
     def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext): Option[AlertDetails] = {
@@ -700,5 +707,5 @@ trait AlertsAndConstraintsOps extends ControlOps {
   private def mipElems(bind: NodeInfo, mip: MipName) = bind /  mipToFBMIPQNames(mip)._2
 
   private def alertOrPlaceholder(alert: Option[AlertDetails])(implicit ctx: FormBuilderDocContext) =
-    alert orElse Some(AlertDetails(None, Nil, global = false)) map (_.toXML) get
+    alert orElse Some(AlertDetails(None, Nil, global = false, params = Nil)) map (_.toXML) get
 }

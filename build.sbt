@@ -1295,10 +1295,11 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .settings(commonScalaJsSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.xml"    %%% "sax"       % SaxVersion,
-      "org.orbeon" %%% "saxon"     % SaxonJsVersion,
-      "org.orbeon" %%% "xerces"    % XercesVersion,
-      "com.chuusai" %% "shapeless" % ShapelessVersion,
+      "org.xml"      %%% "sax"         % SaxVersion,
+      "org.orbeon"   %%% "saxon"       % SaxonJsVersion,
+      "org.orbeon"   %%% "xerces"      % XercesVersion,
+      "com.chuusai"   %% "shapeless"   % ShapelessVersion,
+      "org.scala-js" %%% "scalajs-dom" % ScalaJsDomVersion,
     ),
     Compile / unmanagedJars      := Nil,
     Compile / unmanagedClasspath := Nil

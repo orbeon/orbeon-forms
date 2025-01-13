@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, runtime}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
+import org.orbeon.oxf.xml.ElemFilter
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath.*
 
@@ -70,14 +71,16 @@ trait FormRunnerSummary {
       .map(offsetToDuration)
       .orNull
 
-  private val ElemNamesToFilterOut = Set("a")
+  // Filter `<a>` in addition to unsafe elements as we don't want links in the summary table
+  private val FilterOut: String => ElemFilter =
+    s => if (s == "a") ElemFilter.Remove else ElemFilter.Keep
 
   //@XPathFunction
   def maybeFilterHtml(htmlString: String): String =
     htmlString
       .trimAllToOpt
       .filter(_.startsWith("<div")) // heuristic; don't close `<div>` so that it works if there are attributes
-      .map(HtmlParsing.sanitizeHtmlString(_, ElemNamesToFilterOut))
+      .map(HtmlParsing.sanitizeHtmlString(_, FilterOut))
       .getOrElse(htmlString)
 
   //@XPathFunction

@@ -31,7 +31,7 @@ object Tabbable {
 
   val ActiveClass                  = "active"
 
-  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end):not(.fr-tabbable-add)"
+  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end):not(.fr-tabbable-add)"
   val NavTabsSelector              = ".nav-tabs"
   val TabPaneSelector              = ".tab-pane"
   val TabContentSelector           = ".tab-content"
@@ -51,6 +51,7 @@ object Tabbable {
     private val eventListenerSupport = new EventListenerSupport {}
 
     override def init(): Unit = {
+      eventListenerSupport.addListener(dom.document, "keydown", handleKeyboardNavigation)
 
       if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
@@ -193,7 +194,7 @@ object Tabbable {
       if (tabPosition < 0)
           return
 
-      val allLis = containerElem.querySelectorAllT(":scope > div > .nav-tabs").flatMap(_.childrenT(ExcludeRepeatClassesSelector))
+      val allLis = getAllLis
 
       if (tabPosition > allLis.size - 1)
           return
@@ -210,6 +211,54 @@ object Tabbable {
 
       newLi.classList.add(ActiveClass)
       newTabPane.classList.add(ActiveClass)
+    }
+
+    private def getAllLis: collection.Seq[Element] =
+      containerElem.querySelectorAllT(s":scope > div > .nav-tabs > $ExcludeRepeatClassesSelector")
+
+    private def handleKeyboardNavigation(event: dom.KeyboardEvent): Unit = {
+      if (containerElem.matches("dialog :scope")) {
+        // macOS-like
+        if (event.ctrlKey && !event.altKey) {
+            event.key match {
+              case "}" =>
+                event.preventDefault()
+                moveToNextTab()
+              case "{" =>
+                event.preventDefault()
+                moveToPreviousTab()
+              case _ =>
+            }
+          }
+        // Windows-like
+        else if (event.ctrlKey && event.altKey) {
+          event.key match {
+            case "Tab" =>
+              event.preventDefault()
+              if (event.shiftKey) {
+                moveToPreviousTab()
+              } else {
+                moveToNextTab()
+              }
+            case _ =>
+          }
+        }
+      }
+    }
+
+    private def getCurrentTabIndex: Int =
+      getAllLis.indexWhere(_.matches(ActiveSelector))
+
+    private def moveToNextTab(): Unit = {
+      val currentIndex = getCurrentTabIndex
+      if (currentIndex < getAllLis.size - 1)
+        selectTab(currentIndex + 1)
+    }
+
+    private def moveToPreviousTab(): Unit = {
+      val currentIndex = getCurrentTabIndex
+      if (currentIndex > 0)
+        selectTab(currentIndex - 1)
     }
   }
 }

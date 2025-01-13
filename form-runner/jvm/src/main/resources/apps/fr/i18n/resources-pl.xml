@@ -12,8 +12,8 @@
     <buttons>
         <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Utwórz</create>
         <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Podgląd</view>
-        <approve>&lt;i class="icon-ok-circle"&gt;&lt;/i&gt; Akceptuj</approve>
-        <reject>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Odrzuć</reject>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Akceptuj</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Odrzuć</reject>
 
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</home>
         <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</landing>
@@ -29,19 +29,19 @@
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Zapisz</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Złóż</save-final>
-        <save-draft todo="true">&lt;i class="icon-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-draft>
-        <save-progress todo="true">&lt;i class="icon-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-progress>
+        <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-draft>
+        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</edit>
-        <send>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Wyślij</send>
+        <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Wyślij</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Zweryfikuj</validate>
         <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
 
         <!-- Legacy buttons -->
-        <submit>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Złóż</submit>
-        <workflow-review>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Przeglądaj</workflow-review>
+        <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Złóż</submit>
+        <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Przeglądaj</workflow-review>
         <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</workflow-edit>
-        <workflow-send>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Wyślij</workflow-send>
+        <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Wyślij</workflow-send>
 
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Podsumowanie</summary>
@@ -49,8 +49,8 @@
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wyczyść</clear>
         <cancel>Anuluj</cancel>
         <save-locally>Zapisz lokalnie</save-locally>
-        <collapse-all>&lt;i class="icon-resize-small"/></collapse-all>
-        <expand-all>&lt;i class="icon-resize-full"/></expand-all>
+        <collapse-all>&lt;i class="fa fa-fw fa-compress"/></collapse-all>
+        <expand-all>&lt;i class="fa fa-fw fa-expand"/></expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
         <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
         <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
@@ -426,7 +426,7 @@
     <home>
         <title todo="true">[Published Forms]</title>
         <buttons>
-            <unpublish>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Cofnij publikację</unpublish>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Cofnij publikację</unpublish>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>
             <cancel>Anuluj</cancel>
             <connect>Połącz</connect>

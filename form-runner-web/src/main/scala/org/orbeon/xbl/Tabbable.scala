@@ -189,8 +189,6 @@ object Tabbable {
 
     // Called from XBL component
     def selectTab(tabPosition: Int): Unit = {
-      org.scalajs.dom.console.log("selectTab", tabPosition)
-
       if (tabPosition < 0)
           return
 

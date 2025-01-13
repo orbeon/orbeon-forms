@@ -52,6 +52,7 @@ object Tabbable {
 
     override def init(): Unit = {
       eventListenerSupport.addListener(dom.document, "keydown", handleKeyboardNavigation)
+      eventListenerSupport.addListener(containerElem, "focus", onDOMFocus, useCapture = true)
 
       if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
@@ -176,13 +177,11 @@ object Tabbable {
         .flatMap(_.childrenT(TabContentSelector))
         .flatMap(_.childrenT(TabPaneSelector + ExcludeRepeatClassesSelector))
 
-    // Called from XBL component
-    def selectTabForPane(targetElem: html.Element): Unit = {
+    private def onDOMFocus(event: dom.FocusEvent): Unit = {
+      val targetElem  = event.targetT
+      val allTabPanes = findAllTabPanes
 
-      val allTabPanes            = findAllTabPanes
-      val ancestorOrSelfTabPanes = targetElem :: targetElem.parentElementOpt.filter(_.matches(TabPaneSelector)).toList // exact order doesn't matter
-
-      allTabPanes.indexWhere(ancestorOrSelfTabPanes.contains) match {
+      allTabPanes.indexWhere(_.contains(targetElem)) match {
         case -1    =>
         case index => selectTab(index)
       }
@@ -190,6 +189,7 @@ object Tabbable {
 
     // Called from XBL component
     def selectTab(tabPosition: Int): Unit = {
+      org.scalajs.dom.console.log("selectTab", tabPosition)
 
       if (tabPosition < 0)
           return

@@ -174,12 +174,6 @@
                         <!-- Tab content -->
                         <xf:group xxf:element="div" class="tab-content">
 
-                            <!-- Focus on tab when `xforms-focus` is dispatched. Use `capture` phase as that event
-                                 doesn't bubble! -->
-                            <xf:action event="xforms-focus" type="javascript" phase="capture" xxf:phantom="true">
-                                ORBEON.xforms.XBL.instanceForControl(this).selectTabForPane(event.target);
-                            </xf:action>
-
                             <xsl:for-each select="fr:tab">
                                 <xsl:variable name="tab"    select="."/>
                                 <xsl:variable name="pos"    select="position()"/>

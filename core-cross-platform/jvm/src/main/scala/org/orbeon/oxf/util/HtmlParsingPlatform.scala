@@ -2,14 +2,14 @@ package org.orbeon.oxf.util
 
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xml.{HTMLBodyXMLReceiver, SimpleHtmlSerializer, XMLReceiver}
+import org.orbeon.oxf.xml.XMLReceiver
 import org.xml.sax.InputSource
 
 import java.io.StringReader
 import scala.util.control.NonFatal
 
 
-object HtmlParsing {
+trait HtmlParsingPlatform {
 
   private val TagSoupHtmlSchema = new HTMLSchema
 
@@ -26,21 +26,4 @@ object HtmlParsing {
       case NonFatal(_) =>
         throw new OXFException(s"Cannot parse value as text/html for value: `$value`")
     }
-
-  def sanitizeHtmlString(value: String, filterOutElemByName: String => Boolean = _  => false): String = {
-    val sb = new java.lang.StringBuilder
-    parseHtmlString(
-      value,
-      new HTMLBodyXMLReceiver(
-        // This does the same as `clean-html.xsl`
-        new SimpleHtmlSerializer(
-          sb,
-          n      => filterOutElemByName(n) || ! MarkupUtils.SafeElements(n),
-          (n, v) => n.startsWith("on") || v.contains("javascript:")
-        ),
-        ""
-      )
-    )
-    sb.toString
-  }
 }

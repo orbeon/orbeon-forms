@@ -19,7 +19,8 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting">
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:TinyMceSupport="java:org.orbeon.xbl.TinyMceSupport">
 
     <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/tinymce.min.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/icons/default/icons.min.js"/>
@@ -31,13 +32,7 @@
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
         xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
         xxbl:label-for="tinymce-div"
-        xxbl:deserialize-external-value="
-                    xxf:call-xpl(
-                        'oxf:/ops/xforms/clean-html.xpl',
-                        'dirty-html',
-                        xf:element('value', .),
-                        'clean-html'
-                    )">
+        xxbl:deserialize-external-value="TinyMceSupport:deserializeExternalValue(.)">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Formatted Text Area</display-name>

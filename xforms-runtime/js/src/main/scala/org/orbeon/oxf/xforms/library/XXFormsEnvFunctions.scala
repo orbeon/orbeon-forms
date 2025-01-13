@@ -30,6 +30,7 @@ import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable.*
 
 import scala.jdk.CollectionConverters.*
+import scala.reflect.ClassTag
 
 
 trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
@@ -196,7 +197,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def isControlStaticReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
     relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isStaticReadonly)
 
-  private def relevantWithPredicate[T <: XFormsSingleNodeControl](
+  private def relevantWithPredicate[T <: XFormsSingleNodeControl : ClassTag](
     staticOrAbsoluteId: String,
     predicate         : T => Boolean
   )(implicit

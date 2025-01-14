@@ -145,8 +145,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
         delete(existingElementValidations)
       case _ =>
         val nestedValidations =
-          validations flatMap { case Validation(idOpt, level, value, _) =>
-
+          validations flatMap { validation =>
+            val Validation(idOpt, level, value, _) = validation
             value.trimAllToOpt match {
               case Some(nonEmptyValue) =>
 

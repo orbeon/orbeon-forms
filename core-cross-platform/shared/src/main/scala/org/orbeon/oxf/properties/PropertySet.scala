@@ -256,12 +256,12 @@ class PropertySet private (
     val allIncomingTokens = incomingPropertyName.splitTo[List](".")
 
     def processNode(
-      children      : collection.Map[String, PropertyNode],
+      incomingTokens: List[String],
       property      : Option[Property],
-      incomingTokens: List[String]
+      children      : collection.Map[String, PropertyNode],
     ): LazyList[(Property, Boolean)] =
-      (incomingTokens.headOption, property) match {
-        case (None, Some(property)) =>
+      (incomingTokens.headOption, property, children.isEmpty) match {
+        case (None, Some(property), _) =>
           // Found
 
           val incomingAlwaysMatches =
@@ -271,27 +271,30 @@ class PropertySet private (
               }
 
           LazyList(property -> incomingAlwaysMatches)
-        case (Some(_), _) if children.isEmpty =>
+        case (Some(_), _, true) =>
           // Not found because requested property is longer
           LazyList.empty
-        case (None, _) if children.nonEmpty =>
+        case (None, _, false) =>
           // Not found because requested property is shorter
           LazyList.empty
-        case (Some(StarToken), _) =>
+        case (Some(StarToken), _, _) =>
           // Return all branches, but first the ones that are not wildcard if any, so that the resulting list is sorted
           (children.view.filter(_._1 != StarToken) ++ children.view.filter(_._1 == StarToken))
             .map(_._2)
-            .flatMap(value => processNode(value.children, value.property, incomingTokens.drop(1)))
+            .flatMap(value => processNode(incomingTokens.drop(1), value.property, value.children))
             .to(LazyList)
-        case (Some(currentToken), _) =>
+        case (Some(currentToken), _, _) =>
           // Return an exact branch if any and a wildcard branch if any
           (children.get(currentToken) #:: children.get(StarToken) #:: LazyList.empty)
             .flatten
-            .flatMap(value => processNode(value.children, value.property, incomingTokens.drop(1)))
+            .flatMap(value => processNode(incomingTokens.drop(1), value.property, value.children))
+        case (None, None, true) =>
+          // Can this happen?
+          LazyList.empty
       }
 
     val allMatchingProperties =
-      processNode(propertiesTree.children, propertiesTree.property, allIncomingTokens)
+      processNode(allIncomingTokens, propertiesTree.property, propertiesTree.children)
 
     // Take the shortest prefix ending with a property that swallows the input
     (allMatchingProperties.takeWhile(! _._2) ++ allMatchingProperties.dropWhile(! _._2).take(1))

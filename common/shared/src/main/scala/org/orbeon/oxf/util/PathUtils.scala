@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.StringUtils.*
 
-import java.{util, lang as jl}
+import java.lang as jl
 
 
 object PathUtils {
@@ -199,7 +199,7 @@ object PathUtils {
     combineValues[String, String, Array](
       PathUtils.decodeSimpleQuery(queryString.toString.replace("&amp;", "&")) map { case (k, v) =>
         (
-          // Source can contains `&amp;amp;` because of double escaping in full Ajax updates.
+          // Source can contain `&amp;amp;` because of double escaping in full Ajax updates.
           // 2022-08-31: Keeping this logic, but it's unclear why this is done or whether it's safe.
           if (k.startsWith("amp;")) k.substring("amp;".length) else k,
           // Replace spaces with '+' due to `URLEncoder`/`URLDecoder` not bing fully reversible.
@@ -208,7 +208,4 @@ object PathUtils {
         )
       }
     ).toMap
-
-  def addValueToStringArrayMap(map: util.Map[String, Array[String]], name: String, value: String): Unit =
-    map.put(name, map.get(name) :+ value)
 }

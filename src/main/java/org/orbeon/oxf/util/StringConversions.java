@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.util;
 
-import java.util.*;
-
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 public class StringConversions {
 
@@ -55,21 +55,5 @@ public class StringConversions {
             System.arraycopy(result, 0, newResult, 0, size);
             return newResult;
         }
-    }
-
-    public static String getFirstValueFromStringArray(String[] values) {
-        return (values != null && values.length > 0) ? values[0] : null;
-    }
-
-    public static void addValueToObjectArrayMap(Map<String, Object[]> map, String name, Object value) {
-        map.put(name, ArrayUtils.add(map.get(name), value));
-    }
-
-    public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
-        map.put(name, ArrayUtils.add(map.get(name), value));
-    }
-
-    public static void addValuesToStringArrayMap(Map<String, String[]> map, String name, String[] values) {
-        map.put(name, ArrayUtils.addAll(map.get(name), values));
     }
 }

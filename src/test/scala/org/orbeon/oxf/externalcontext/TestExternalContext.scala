@@ -20,8 +20,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext.*
 import org.orbeon.oxf.http.{Headers, HttpMethod, PathType, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xml.{PartUtils, XPathUtils}
 
 import java.io.*
@@ -194,7 +194,7 @@ class TestExternalContext(
         valueElem  = valueNode.asInstanceOf[Element]
         value      = XPathUtils.selectStringValueNormalize(valueElem, ".")
       } locally {
-        StringConversions.addValueToStringArrayMap(result, name, value)
+        result.put(name, result.get(name) :+ value)
       }
 
       ju.Collections.unmodifiableMap(result)
@@ -218,7 +218,7 @@ class TestExternalContext(
         valueElem  = valueNode.asInstanceOf[Element]
         value      = XPathUtils.selectStringValueNormalize(valueElem, ".")
       } locally {
-        StringConversions.addValueToObjectArrayMap(result, name, value)
+        result.put(name, result.get(name) :+ value)
       }
 
       ju.Collections.unmodifiableMap(result)

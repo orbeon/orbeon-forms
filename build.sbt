@@ -96,7 +96,6 @@ val CoreLibraryDependencies = Seq(
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
-  "org.apache.commons"          % "commons-lang3"                   % "3.12.0",
   "javax.cache"                 % "cache-api"                       % "1.1.1",
   "net.sf.ehcache"              % "ehcache"                         % "2.10.9.2",
   "org.ehcache"                 % "ehcache"                         % "3.10.8",

@@ -48,34 +48,6 @@ public class NetUtils {
         return new File(System.getProperty("java.io.tmpdir")).getAbsoluteFile();
     }
 
-    /**
-     * Return true if the document was modified since the given date, based on the If-Modified-Since
-     * header. If the request method was not "GET", or if no valid lastModified value was provided,
-     * consider the document modified.
-     */
-    public static boolean checkIfModifiedSince(ExternalContext.Request request, long lastModified, Logger logger) {
-        // Do the check only for the GET method
-        if (!"GET".equals(request.getMethod().entryName().toUpperCase()) || lastModified <= 0)
-            return true;
-        // Check dates
-        final String ifModifiedHeader = StringConversions.getFirstValueFromStringArray(request.getHeaderValuesMap().get("if-modified-since"));
-        if (logger.isDebugEnabled())
-            logger.debug("Found If-Modified-Since header");
-        if (ifModifiedHeader != null) {
-            try {
-                long dateTime = DateUtils.parseRFC1123(ifModifiedHeader);
-                if (lastModified <= (dateTime + 1000)) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Sending SC_NOT_MODIFIED response");
-                    return false;
-                }
-            } catch (Exception e) {// used to be ParseException, but NumberFormatException may be thrown as well
-                // Ignore
-            }
-        }
-        return true;
-    }
-
 
     /**
      * Return the last modification date of the given absolute URL if it is "fast" to do so, i.e. if it is an "oxf:" or

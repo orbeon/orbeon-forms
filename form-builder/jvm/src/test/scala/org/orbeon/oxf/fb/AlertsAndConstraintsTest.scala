@@ -46,7 +46,7 @@ class AlertsAndConstraintsTest
       withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val alertDetails = AlertDetails.fromForm(Control1)
-        assert(List(AlertDetails(None, List("en" -> "Alert for en", "fr" -> "Alert for fr"), global = false)) === alertDetails)
+        assert(List(AlertDetails(None, List("en" -> "Alert for en", "fr" -> "Alert for fr"), global = false, params = Nil)) === alertDetails)
 
         val expected =
           <alert global="false">
@@ -461,7 +461,8 @@ class AlertsAndConstraintsTest
                 AlertDetails(
                   Some("validation-1-validation"),
                   List("en" -> "This is required!", "fr" -> "Ce champ est requis !"),
-                  global = false
+                  global = false,
+                  params = Nil
                 )
               )
             )
@@ -476,7 +477,8 @@ class AlertsAndConstraintsTest
                 AlertDetails(
                   Some("validation-4-validation"),
                   List("en" -> "This must be a decimal!", "fr" -> "Ce champ doit être une valeur décimale !"),
-                  global = false
+                  global = false,
+                  params = Nil
                 )
               )
             )
@@ -592,7 +594,7 @@ class AlertsAndConstraintsTest
             DatatypeValidation(
               Some("validation-2-validation"),
               Left((XMLConstants.XS_STRING_QNAME, false)), // always `false` even for `xs:string`
-              Some(AlertDetails(Some("validation-2-validation"), List(("en", "Incorrect datatype"), ("fr", "")), global = false))
+              Some(AlertDetails(Some("validation-2-validation"), List(("en", "Incorrect datatype"), ("fr", "")), global = false, params = Nil))
             )
 
           assert(expected == DatatypeValidation.fromForm(Control1))
@@ -600,7 +602,7 @@ class AlertsAndConstraintsTest
       }
   }
 
-  private def globalAlert                                           = AlertDetails(None, Nil, global = true)
+  private def globalAlert                                           = AlertDetails(None, Nil, global = true, params = Nil)
   private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =

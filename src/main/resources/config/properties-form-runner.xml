@@ -118,7 +118,7 @@
     <property as="xs:string"  name="oxf.fr.default-timezone"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                   value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
-        /apps/fr/style/orbeon-navbar-logo.png
+        /apps/fr/style/orbeon-logo.svg
     </property>
     <property as="xs:string"  name="oxf.fr.css.custom.uri.*.*"                                     value=""/>
     <property as="xs:string"  name="oxf.fr.js.custom.uri.*.*"                                      value=""/>

@@ -46,11 +46,11 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   import XFormsEnvFunctions._
 
-  @XPathFunction()
+  @XPathFunction
   def index(repeatStaticId: String)(implicit xfc: XFormsFunction.Context): Int =
     findIndexForRepeatId(repeatStaticId)
 
-  @XPathFunction()
+  @XPathFunction
   def property(propertyName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.Item] = {
 
     import Property._
@@ -94,7 +94,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   }
 
   // XXX TODO: must extend `InstanceTrait`
-  @XPathFunction()
+  @XPathFunction
   def instance(
     instanceId : String = "")(implicit
     xpc        : XPathContext,
@@ -160,7 +160,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
   }
 
-  @XPathFunction()
+  @XPathFunction
   def current()(implicit xpc: XPathContext): Option[om.Item] = {
     // Go up the stack to find the top-level context
     var currentContext = xpc
@@ -169,11 +169,11 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     Option(currentContext.getContextItem)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def context()(implicit xfc: XFormsFunction.Context): Option[om.Item] =
     Option(xfc.bindingContext.contextItem)
 
-  @XPathFunction()
+  @XPathFunction
   def event(name: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterator[om.Item] = {
 
     // XXX FIXME hardcoding `xxf` prefix for now. Extract namespaces from the static state or `xfc`.
@@ -189,7 +189,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
       item
   }
 
-  @XPathFunction()
+  @XPathFunction
   def valid(
     items           : Option[Iterable[om.Item]] = None,
     pruneNonRelevant: Boolean                   = true,
@@ -228,12 +228,12 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   }
 
   // XForms 2.0
-  @XPathFunction()
+  @XPathFunction
   def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
     bindImpl(bindId, searchAncestors = false)
 
   // XForms 2.0
-  @XPathFunction()
+  @XPathFunction
   def `case`(caseId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     for {
       control      <- relevantControl(caseId)

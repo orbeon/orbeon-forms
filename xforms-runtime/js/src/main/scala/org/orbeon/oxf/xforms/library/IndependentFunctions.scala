@@ -38,7 +38,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //    Fun("get-window-state", classOf[GetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
 //
 
-  @XPathFunction()
+  @XPathFunction
   def getSessionAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {
 
     // TODO: Handle XML tree
@@ -49,7 +49,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     } flatten
   }
 
-  @XPathFunction()
+  @XPathFunction
   def setSessionAttribute(attributeName: String, items: Iterable[om.Item]): Unit = {
 
     // NOTE: We take only the first item, even though the parameter is declared as supporting
@@ -65,7 +65,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     CoreCrossPlatformSupport.externalContext.getSession(true).setAttribute(attributeName, value)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def getRequestAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {
     // TODO: Handle XML tree
     Option(CoreCrossPlatformSupport.externalContext.getRequest.getAttributesMap.get(attributeName)).toList collect {
@@ -73,7 +73,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     } flatten
   }
 
-  @XPathFunction()
+  @XPathFunction
   def setRequestAttribute(attributeName: String, items: Iterable[om.Item]): Unit = {
 
     val request = CoreCrossPlatformSupport.externalContext.getRequest
@@ -87,23 +87,23 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     }
   }
 
-  @XPathFunction()
+  @XPathFunction
   def username: Option[String] =
     CoreCrossPlatformSupport.externalContext.getRequest.credentials map (_.userAndGroup.username)
 
-  @XPathFunction()
+  @XPathFunction
   def getRemoteUser: Option[String] = // `= username`
     CoreCrossPlatformSupport.externalContext.getRequest.credentials map (_.userAndGroup.username)
 
-  @XPathFunction()
+  @XPathFunction
   def userGroup: Option[String] =
     CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)
 
-  @XPathFunction()
+  @XPathFunction
   def userRoles: Iterable[String] =
     CoreCrossPlatformSupport.externalContext.getRequest.credentials.toList flatMap (_.roles map (_.roleName))
 
-  @XPathFunction()
+  @XPathFunction
   def userOrganizations: Iterable[String] =
     for {
       credentials <- CoreCrossPlatformSupport.externalContext.getRequest.credentials.toList
@@ -112,7 +112,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     } yield
       leafOrg
 
-  @XPathFunction()
+  @XPathFunction
   def userAncestorOrganizations(leafOrgParam: String): List[String] = {
 
     // There should be only one match if the organizations are well-formed
@@ -131,7 +131,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
   }
 
   // TODO: Split this out into separate trait
-  @XPathFunction()
+  @XPathFunction
   def isUserInRole(username: String): Boolean =
     CoreCrossPlatformSupport.externalContext.getRequest.isUserInRole(username)
 
@@ -147,7 +147,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //    )
 
   // TODO: Handle `params`.
-  @XPathFunction()
+  @XPathFunction
   def serialize(node: Option[om.NodeInfo], params: om.Item): String =
     node map StaticXPath.tinyTreeToString getOrElse ""
 
@@ -186,41 +186,41 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //      Arg(BOOLEAN, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def hasClass(className: String, elem: Option[om.NodeInfo] = null)(implicit xpc: XPathContext): Boolean =
     classesFromAttribute(elem).contains(className)
 
-  @XPathFunction()
+  @XPathFunction
   def classes(elem: Option[om.NodeInfo] = null)(implicit xpc: XPathContext): Iterable[String] =
     classesFromAttribute(elem)
 
-  @XPathFunction()
+  @XPathFunction
   def split(s: Option[String] = null, separator: Option[String] = None)(implicit xpc: XPathContext): Iterable[String] =
     stringArgumentOrContextOpt(s).toList flatMap (_.splitTo[List](separator.orNull))
 
-  @XPathFunction()
+  @XPathFunction
   def trim(s: Option[String] = null)(implicit xpc: XPathContext): Option[String] =
     stringArgumentOrContextOpt(s) map (_.trimAllToEmpty)
 
-  @XPathFunction()
+  @XPathFunction
   def isBlank(s: Option[String] = null)(implicit xpc: XPathContext): Boolean =
     ! (stringArgumentOrContextOpt(s) exists (_.trimAllToEmpty.nonEmpty))
 
-  @XPathFunction()
+  @XPathFunction
   def nonBlank(s: Option[String] = null)(implicit xpc: XPathContext): Boolean =
     stringArgumentOrContextOpt(s) exists (_.trimAllToEmpty.nonEmpty)
 
-  @XPathFunction()
+  @XPathFunction
   def escapeXmlMinimal(s: Option[String] = null)(implicit xpc: XPathContext): Option[String] =
     stringArgumentOrContextOpt(s) map (_.escapeXmlMinimal)
 
-  @XPathFunction()
+  @XPathFunction
   def jsonToXml(s: Option[String] = null)(implicit xpc: XPathContext): Option[om.NodeInfo] =
     stringArgumentOrContextOpt(s).flatMap(jsonString =>
       Try(Converter.jsonStringToXmlDoc(jsonString)).toOption
     )
 
-  @XPathFunction()
+  @XPathFunction
   def xmlToJson(root: Option[om.NodeInfo])(implicit xpc: XPathContext): String =
     Converter.xmlToJsonString(root.getOrElse(xpc.getContextItem.asInstanceOf[om.NodeInfo]), strict = false)
 

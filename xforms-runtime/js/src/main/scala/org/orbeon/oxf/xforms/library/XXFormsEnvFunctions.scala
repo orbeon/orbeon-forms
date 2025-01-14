@@ -48,11 +48,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def repeatPosition(repeatId: String = null)(implicit xfc: XFormsFunction.Context): Int =
     xfc.bindingContext.enclosingRepeatIterationBindingContext(Option(repeatId)).position
 
-  @XPathFunction()
+  @XPathFunction
   def repeatPositions()(implicit xfc: XFormsFunction.Context): Iterator[Int] =
     xfc.bindingContext.repeatPositions
 
@@ -60,7 +60,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def repeatItems(contextIdOpt: Option[String] = None)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = {
 
     val repeatId =
@@ -89,7 +89,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(BOOLEAN, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def `type`(item: Option[om.Item] = None)(implicit xpc: XPathContext): Option[om.Item] = // TODO: should be `QNameValue`
     item getOrElse xpc.getContextItem match {
       case atomicValue: AtomicValue =>
@@ -122,7 +122,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
   // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
   // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
-  @XPathFunction()
+  @XPathFunction
   def customMip(
     binding : Iterable[om.Item],
     qName   : om.Item)(implicit
@@ -134,7 +134,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       qName   = XFormsFunction.getQNameFromItem(qName)
     )
 
-  @XPathFunction()
+  @XPathFunction
   def invalidBinds(
     binding : Option[Iterable[om.Item]]
   )(implicit
@@ -147,7 +147,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       .map(InstanceData.getInvalidBindIds)
       .getOrElse(Nil)
 
-  @XPathFunction()
+  @XPathFunction
   def failedValidations(
     binding : Option[Iterable[om.Item]]
   )(implicit
@@ -168,32 +168,32 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def binding(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
     findControlsByStaticOrAbsoluteId(staticOrAbsoluteId, followIndexes = true)
       .headOption.toList.flatMap(_.bindingEvenIfNonRelevant)
 
-  @XPathFunction()
+  @XPathFunction
   def bindingContext(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.Item] =
     relevantControl(staticOrAbsoluteId) flatMap (_.contextForBinding)
 
-  @XPathFunction()
+  @XPathFunction
   def isControlRelevant(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
     relevantControl(staticOrAbsoluteId).nonEmpty
 
-  @XPathFunction()
+  @XPathFunction
   def isControlReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
     relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isReadonly)
 
-  @XPathFunction()
+  @XPathFunction
   def isControlRequired(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
     relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isRequired)
 
-  @XPathFunction()
+  @XPathFunction
   def isControlValid(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
     relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isValid)
 
-  @XPathFunction()
+  @XPathFunction
   def isControlStaticReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean =
     relevantWithPredicate[XFormsSingleNodeControl](staticOrAbsoluteId, _.isStaticReadonly)
 
@@ -208,17 +208,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       .flatMap(_.narrowTo[T])
       .exists(predicate)
 
-  @XPathFunction()
+  @XPathFunction
   def value(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     XFormsFunction.findRelevantControls(staticOrAbsoluteId, followIndexes) flatMap
       (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt(EventCollector.Throw))
 
-  @XPathFunction()
+  @XPathFunction
   def formattedValue(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     XFormsFunction.findRelevantControls(staticOrAbsoluteId, followIndexes) flatMap
       (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue(EventCollector.Throw))
 
-  @XPathFunction()
+  @XPathFunction
   def avtValue(forId: String, attName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     for {
       forPrefixedId      <- sourceScope.prefixedIdForStaticIdOpt(forId)
@@ -229,7 +229,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     } yield
       value
 
-  @XPathFunction()
+  @XPathFunction
   def componentContext()(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =
     for {
       componentControl <- xfc.container.associatedControlOpt.toList
@@ -238,14 +238,14 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     } yield
       item
 
-  @XPathFunction()
+  @XPathFunction
   def componentParamValue(paramNameString: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[AtomicValue] =
     ComponentParamSupport.componentParamValue(
       paramName = QName(paramNameString),
       property  = CoreSupport.property
     )
 
-  @XPathFunction()
+  @XPathFunction
   def instance(
     instanceId : String)(implicit
     xpc        : XPathContext,
@@ -253,14 +253,14 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   ): Option[om.NodeInfo] =
     instanceId.trimAllToOpt flatMap (XFormsInstance.findInAncestorScopes(xfc.container, _))
 
-  @XPathFunction()
+  @XPathFunction
   def index(repeatStaticId: Option[String] = None)(implicit xfc: XFormsFunction.Context): Int =
     repeatStaticId match {
       case Some(repeatId: String) => findIndexForRepeatId(repeatId)
       case None                   => findIndexForRepeatId(xfc.bindingContext.enclosingRepeatId)
     }
 
-  @XPathFunction()
+  @XPathFunction
   def listModels()(implicit xfc: XFormsFunction.Context): Iterator[String] =
     for {
       model       <- xfc.containingDocument.allModels
@@ -269,7 +269,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     } yield
       absoluteId
 
-  @XPathFunction()
+  @XPathFunction
   def listInstances(modelId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterator[String] = {
 
     val modelOpt =
@@ -289,7 +289,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def getVariable(modelEffectiveId: String, variableName: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] = {
     xfc.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
       case model: XFormsModel => model.getTopLevelVariables(variableName).asIterable().asScala
@@ -297,7 +297,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
   }
 
-  @XPathFunction()
+  @XPathFunction
   def itemset(controlId: String, format: String, selected: Boolean = false)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.Item] =
     for {
       control        <- relevantControl(controlId)
@@ -337,16 +337,16 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       }
     }
 
-  @XPathFunction()
+  @XPathFunction
   def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String =
     MessageFormatter.format(MessageFormatCache(template), args map SequenceTool.convertToJava toVector)
 
-  @XPathFunction()
+  @XPathFunction
   def lang()(implicit xfc: XFormsFunction.Context): Option[String] =
     elementAnalysisForSource flatMap (resolveXMLangHandleAVTs(xfc.containingDocument, _))
 
   // TODO: last arg is`map(*)`
-  @XPathFunction()
+  @XPathFunction
   def r(
     resourceKey         : String,
     instanceArgumentOpt : Option[String]  = None,
@@ -389,7 +389,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         processResourceString(leaf.getStringValue)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def resourceElements(
     resourceKeyArgument : String,
     instanceArgument    : String = "fr-form-resources")(implicit
@@ -411,62 +411,62 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       leaf
   }
 
-  @XPathFunction()
+  @XPathFunction
   def pendingUploads(): Int =
     XFormsFunction.context.containingDocument.countPendingUploads
 
-  @XPathFunction()
+  @XPathFunction
   def documentId()(implicit xfc: XFormsFunction.Context): String =
     xfc.containingDocument.uuid
 
-  @XPathFunction()
+  @XPathFunction
   def setDocumentAttribute(ns: String, key: String, value: Iterable[om.Item])(implicit xfc: XFormsFunction.Context): Unit =
     xfc.containingDocument.setAttribute(ns, key, SequenceExtent.makeSequenceExtent(value.toSeq.asJava): om.GroundedValue)
 
-  @XPathFunction()
+  @XPathFunction
   def getDocumentAttribute(ns: String, key: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =
     xfc.containingDocument.getAttribute(ns, key) match {
       case Some(value: om.GroundedValue) => value.asIterable.asScala
       case _                             => Nil
     }
 
-  @XPathFunction()
+  @XPathFunction
   def removeDocumentAttribute(ns: String, key: String)(implicit xfc: XFormsFunction.Context): Unit =
     xfc.containingDocument.removeAttribute(ns, key)
 
-  @XPathFunction()
+  @XPathFunction
   def removeDocumentAttributes(ns: String)(implicit xfc: XFormsFunction.Context): Unit =
     xfc.containingDocument.removeAttributes(ns)
 
-  @XPathFunction()
+  @XPathFunction
   def label(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     LHHAFunctionSupport.directOrByLocalLhhaValue(controlId, LHHA.Label)
 
-  @XPathFunction()
+  @XPathFunction
   def help(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     LHHAFunctionSupport.directOrByLocalLhhaValue(controlId, LHHA.Help)
 
-  @XPathFunction()
+  @XPathFunction
   def hint(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     LHHAFunctionSupport.directOrByLocalLhhaValue(controlId, LHHA.Hint)
 
-  @XPathFunction()
+  @XPathFunction
   def alert(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     LHHAFunctionSupport.directOrByLocalLhhaValue(controlId, LHHA.Alert)
 
-  @XPathFunction()
+  @XPathFunction
   def labelAppearance(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     LHHAFunctionSupport.labelHintAppearance(controlId, LHHA.Label)
 
-  @XPathFunction()
+  @XPathFunction
   def hintAppearance(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     LHHAFunctionSupport.labelHintAppearance(controlId, LHHA.Hint)
 
-  @XPathFunction()
+  @XPathFunction
   def visited(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[Boolean] =
     relevantControl(controlId) map (_.visited)
 
-  @XPathFunction()
+  @XPathFunction
   def focusable(controlId: String, toggle: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean = {
 
     val it =
@@ -478,15 +478,15 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     it.nonEmpty
   }
 
-  @XPathFunction()
+  @XPathFunction
   def absoluteId(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.effectiveId) map XFormsId.effectiveIdToAbsoluteId
 
-  @XPathFunction()
+  @XPathFunction
   def clientId(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.effectiveId)
 
-  @XPathFunction()
+  @XPathFunction
   def controlElement(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.NodeInfo] =
     relevantControl(controlId) flatMap
       (control => control.container.partAnalysis.controlElement(control.prefixedId))
@@ -539,20 +539,20 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     itemOption exists (item => get(item))
   }
 
-  @XPathFunction()
+  @XPathFunction
   def relevant(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     exformsMipFunction(items, 0)
 
-  @XPathFunction()
+  @XPathFunction
   def readonly(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     exformsMipFunction(items, 1)
 
-  @XPathFunction()
+  @XPathFunction
   def required(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     exformsMipFunction(items, 2)
 
   // Now available in XForms 2.0
-  @XPathFunction()
+  @XPathFunction
   def bind(bindId: String, searchAncestors: Boolean = false)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
     XFormsFunctionLibrary.bindImpl(bindId, searchAncestors)
 
@@ -575,7 +575,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
   }
 
-  @XPathFunction()
+  @XPathFunction
   def maxLength(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
 
     def evaluate(itemValue: String) =
@@ -587,7 +587,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("max-length", constraintOpt, evaluate)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def minLength(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
 
     def evaluate(itemValue: String) =
@@ -599,7 +599,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("min-length", constraintOpt, evaluate)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def nonNegative()(implicit xpc: XPathContext): Boolean = {
 
     def evaluate(value: String) =
@@ -608,7 +608,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("non-negative", None, evaluate)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def negative()(implicit xpc: XPathContext): Boolean = {
 
     def evaluate(value: String) =
@@ -617,7 +617,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("negative", None, evaluate)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def nonPositive()(implicit xpc: XPathContext): Boolean = {
 
     def evaluate(value: String) =
@@ -626,7 +626,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("non-positive", None, evaluate)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def positive()(implicit xpc: XPathContext): Boolean = {
 
     def evaluate(value: String) =
@@ -635,7 +635,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("positive", None, evaluate)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def fractionDigits(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
 
     // Operate at the lexical level
@@ -672,25 +672,25 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   }
 
   // Backward compatibility
-  @XPathFunction()
+  @XPathFunction
   def uploadMaxSize(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate, see #2956
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSize, constraintOpt, _ => true)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def uploadMaxSizePerFile(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate, see #2956
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSizePerFile, constraintOpt, _ => true)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def uploadMaxSizeAggregatePerControl(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate, see #6064
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSizeAggregatePerControl, constraintOpt, _ => true)
   }
 
-  @XPathFunction()
+  @XPathFunction
   def uploadMediatypes(constraintOpt: Option[String])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate, see #2956
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMediatypes, constraintOpt, _ => true)
@@ -720,11 +720,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     )
   }
 
-  @XPathFunction()
+  @XPathFunction
   def evaluate(expr: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
     evaluateImpl(expr)
 
-  @XPathFunction()
+  @XPathFunction
   def evaluateAvt(avt: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String = {
 
     val xfcd = xfc.containingDocument
@@ -748,19 +748,19 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(NODE_TYPE, EXACTLY_ONE)
 //    )
 
-  @XPathFunction()
+  @XPathFunction
   def getRequestMethod()(implicit xfc: XFormsFunction.Context): String =
     xfc.containingDocument.getRequestMethod.entryName
 
-  @XPathFunction()
+  @XPathFunction
   def getRequestContextPath()(implicit xfc: XFormsFunction.Context): String =
     xfc.containingDocument.getRequestContextPath
 
-  @XPathFunction()
+  @XPathFunction
   def getRequestPath()(implicit xfc: XFormsFunction.Context): String =
     xfc.containingDocument.getRequestPath
 
-  @XPathFunction()
+  @XPathFunction
   def getRequestHeader(name: String, encoding: String = Iso88591)(implicit xfc: XFormsFunction.Context): Iterable[String] =
     GetRequestHeaderSupport.getAndDecodeHeader(
       name     = name,
@@ -768,11 +768,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       getter   = xfc.containingDocument.getRequestHeaders.get
     ).toList.flatten
 
-  @XPathFunction()
+  @XPathFunction
   def getRequestParameter(name: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     xfc.containingDocument.getRequestParameters.getOrElse(name, Nil)
 
-  @XPathFunction()
+  @XPathFunction
   def evaluateInContext(
     expr       : String,
     effectiveId: String

@@ -56,14 +56,29 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
             |     FROM information_schema.columns
             |    WHERE table_name = ?
             | ORDER BY ordinal_position"""
+        case SQLite =>
+          """   SELECT *
+            |     FROM pragma_table_info(?)
+            | ORDER BY cid"""
       }
       Connect.getTableNames(provider, connection).map { tableName =>
         useAndClose(connection.prepareStatement(query.stripMargin)) { ps =>
           ps.setString(1, tableName)
           useAndClose(ps.executeQuery()) { tableInfoResultSet =>
             def tableInfo(): ColMeta = {
-              val colName = tableInfoResultSet.getString("column_name")
-              val interestingKeys = Set("is_nullable", "data_type")
+              val colName = tableInfoResultSet.getString(
+                provider match {
+                  case SQLite => "name"
+                  case _      => "column_name"
+                }
+              )
+              val interestingKeys = Set(
+                provider match {
+                  case SQLite => "notnull"
+                  case _      => "is_nullable"
+                },
+                "data_type"
+              )
               val colKeyVals = for (metaKey <- interestingKeys) yield
                 ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
               ColMeta(colName, colKeyVals)

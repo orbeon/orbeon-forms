@@ -117,9 +117,8 @@ trait StaticLHHASupport extends ElementAnalysis {
   private object Private {
 
     // All LHHA, local or external
-    // There can only be multiple alerts for now, not multiple LHH, so store alerts separately
-    var _directLhh      = Map.empty[LHHA, List[LHHAAnalysis]] // at most 4 entries
-    var _byLhh    = Map.empty[LHHA, List[LHHAAnalysis]] // at most 4 entries
+    var _directLhh = Map.empty[LHHA, List[LHHAAnalysis]] // at most 4 entries
+    var _byLhh     = Map.empty[LHHA, List[LHHAAnalysis]] // at most 4 entries
 
     def allLhha: Iterable[LHHAAnalysis] = _directLhh.values.flatten
 

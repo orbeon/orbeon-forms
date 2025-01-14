@@ -17,7 +17,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.http.{Headers, HttpMethod, PathType}
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.DateUtils
-import org.slf4j.Logger
+
 
 trait CachingResponseSupport {
 
@@ -75,7 +75,7 @@ trait CachingResponseSupport {
     }
 
   def checkIfModifiedSince(request: Request, lastModified: Long): Boolean =
-    responseCachingDisabled || CachingResponseSupport.checkIfModifiedSince(request, lastModified)(ServletExternalContext.Logger.logger)
+    responseCachingDisabled || CachingResponseSupport.checkIfModifiedSince(request, lastModified)
 }
 
 object CachingResponseSupport {
@@ -85,11 +85,11 @@ object CachingResponseSupport {
    * header. If the request method was not `GET`, or if no valid `lastModified` value was provided,
    * consider the document modified.
    */
-  def checkIfModifiedSince(request: ExternalContext.Request, lastModified: Long)(logger: Logger): Boolean =
+  def checkIfModifiedSince(request: ExternalContext.Request, lastModified: Long): Boolean =
     if (request.getMethod != HttpMethod.GET || lastModified <= 0) {
       true
     } else {
-      ! request.getFirstHeaderIgnoreCase("if-modified-since")
+      ! request.getFirstHeaderIgnoreCase(Headers.IfModifiedSince)
         .exists { ifModifiedHeader =>
           DateUtils.tryParseRFC1123(ifModifiedHeader)
             .exists(ifModifiedTime => lastModified <= (ifModifiedTime + 1000))

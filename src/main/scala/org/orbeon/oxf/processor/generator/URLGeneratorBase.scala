@@ -14,9 +14,10 @@
 package org.orbeon.oxf.processor.generator
 
 import org.orbeon.connection.ConnectionResult
-import java.{lang as jl, util as ju}
 
+import java.{lang as jl, util as ju}
 import org.orbeon.dom.Element
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.{CollectionUtils, DateUtils, NetUtils}
 
 import scala.jdk.CollectionConverters.*
@@ -49,7 +50,7 @@ object URLGeneratorBase {
   ): ju.Map[String, Array[String]] = {
 
     val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) => (k, v.to(Array)) }} getOrElse Map.empty[String, Array[String]]
-    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified => "If-Modified-Since" -> Array(DateUtils.formatRfc1123DateTimeGmt(lastModified))).to(List)
+    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified => Headers.IfModifiedSince -> Array(DateUtils.formatRfc1123DateTimeGmt(lastModified))).to(List)
 
     headersOrEmpty ++ newHeaderAsList
   }.asJava

@@ -53,6 +53,8 @@ object Headers {
   val Timeout                      = "Timeout"
   val TimeoutValuePrefix           = "Second-"
 
+  val IfModifiedSince              = "If-Modified-Since"
+
   val Range                        = "Range"
   val IfRange                      = "If-Range"
   val AcceptRanges                 = "Accept-Ranges"

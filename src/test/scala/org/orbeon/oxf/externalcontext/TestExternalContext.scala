@@ -194,7 +194,7 @@ class TestExternalContext(
         valueElem  = valueNode.asInstanceOf[Element]
         value      = XPathUtils.selectStringValueNormalize(valueElem, ".")
       } locally {
-        result.put(name, result.get(name) :+ value)
+        result.put(name, Option(result.get(name)).getOrElse(Array.empty[String]) :+ value)
       }
 
       ju.Collections.unmodifiableMap(result)
@@ -218,7 +218,7 @@ class TestExternalContext(
         valueElem  = valueNode.asInstanceOf[Element]
         value      = XPathUtils.selectStringValueNormalize(valueElem, ".")
       } locally {
-        result.put(name, result.get(name) :+ value)
+        result.put(name, Option(result.get(name)).getOrElse(Array.empty[AnyRef]) :+ value)
       }
 
       ju.Collections.unmodifiableMap(result)

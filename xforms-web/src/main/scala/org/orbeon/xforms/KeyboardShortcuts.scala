@@ -11,9 +11,9 @@ import scala.scalajs.js
 
 object KeyboardShortcuts {
 
-  private val KeyBoardIconCharacter = "⌨\uFE0F"
+  val KeyBoardIconCharacter = "⌨\uFE0F"
 
-  private lazy val isAppleOs: Boolean =
+  lazy val isAppleOs: Boolean =
     Bowser.osname.exists(Set("macOS", "iOS"))
 
   private val ModifiersMap = Map(

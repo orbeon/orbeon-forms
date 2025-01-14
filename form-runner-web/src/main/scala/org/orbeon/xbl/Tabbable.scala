@@ -13,10 +13,11 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
+import org.orbeon.facades.{Bowser, Dragula, DragulaOptions, Drake}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.*
+import org.orbeon.xforms.KeyboardShortcuts.KeyBoardIconCharacter
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -189,26 +190,37 @@ object Tabbable {
 
     // Called from XBL component
     def selectTab(tabPosition: Int): Unit = {
-      if (tabPosition < 0)
-          return
 
+      // Ignore out of bound tab positions
       val allLis = getAllLis
+      if (tabPosition < 0              ) return
+      if (tabPosition > allLis.size - 1) return
 
-      if (tabPosition > allLis.size - 1)
-          return
+      // Update keyboard shortcuts
+      val isAppleOs            = KeyboardShortcuts.isAppleOs
+      def addIcon(kbd: String) = s"$KeyBoardIconCharacter $kbd"
+      val nextTabShortcut      = addIcon(if (isAppleOs) "Ctrl + }" else "Ctrl + Tab")
+      val previousTabShortcut  = addIcon(if (isAppleOs) "Ctrl + {" else "Ctrl + Shift + Tab")
+      def setTooltip(position: Int, title: String): Unit =
+        allLis.lift(position).foreach(_.querySelectorOpt("a").foreach { aElem =>
+          aElem.setAttribute("title", title)
+          $(aElem).asInstanceOf[js.Dynamic].tooltip()
+        })
 
+      allLis.foreach(_.querySelectorAllT("a").foreach($(_).asInstanceOf[js.Dynamic].tooltip("destroy")))
+      setTooltip(tabPosition + 1, nextTabShortcut)
+      setTooltip(tabPosition - 1, previousTabShortcut)
+
+      // Switch tab
       val newLi = allLis(tabPosition)
-      if (newLi.matches(ActiveSelector))
-          return
-
-      val allTabPanes = newLi.closestT(NavTabsSelector).nextElementSiblings.flatMap(_.childrenT(TabPaneSelector)).filter(_.matches(ExcludeRepeatClassesSelector)).toList
-      val newTabPane  = allTabPanes(tabPosition)
-
-      allLis.foreach(_.classList.remove(ActiveClass))
-      allTabPanes.foreach(_.classList.remove(ActiveClass))
-
-      newLi.classList.add(ActiveClass)
-      newTabPane.classList.add(ActiveClass)
+      if (! newLi.matches(ActiveSelector)) {
+        val allTabPanes = newLi.closestT(NavTabsSelector).nextElementSiblings.flatMap(_.childrenT(TabPaneSelector)).filter(_.matches(ExcludeRepeatClassesSelector)).toList
+        val newTabPane  = allTabPanes(tabPosition)
+        allLis.foreach(_.classList.remove(ActiveClass))
+        allTabPanes.foreach(_.classList.remove(ActiveClass))
+        newLi.classList.add(ActiveClass)
+        newTabPane.classList.add(ActiveClass)
+      }
     }
 
     private def getAllLis: collection.Seq[Element] =

@@ -12,6 +12,11 @@ ThisBuild / githubOwner := "orbeon"
 
 ThisBuild / evictionErrorLevel := Level.Info
 
+lazy val scala213 = "2.13.15"
+lazy val scala3   = "3.5.2"
+lazy val mainScalaVersion       = scala213
+lazy val supportedScalaVersions = List(scala213)
+
 // For now, keep ad-hoc list for offline client
 val TimezonesToInclude = Set(
   "America/Los_Angeles",
@@ -180,11 +185,6 @@ val fastOrFullOptJS                = taskKey[Attributed[File]]("Performs either 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-specific optimizations (for development).")
-
-lazy val scala213 = "2.13.15"
-lazy val scala3   = "3.5.2"
-lazy val mainScalaVersion       = scala213
-lazy val supportedScalaVersions = List(scala213)
 
 // "ThisBuild is a Scope encompassing all projects"
 ThisBuild / scalaVersion                := mainScalaVersion

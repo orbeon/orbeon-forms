@@ -428,23 +428,23 @@ object ItemsetSupport {
   }
 
   // xxx ItemsetSupport, XFS1Handler
-  def streamAsHTML(lhhaValue: LHHAValue, locationData: LocationData)(implicit xmlReceiver: XMLReceiver): Unit =
+  def streamAsHTML(lhhaValue: LHHAValue)(implicit xmlReceiver: XMLReceiver): Unit =
     if (lhhaValue.label.nonAllBlank) {
       if (lhhaValue.isHTML)
-        XFormsCrossPlatformSupport.streamHTMLFragment(lhhaValue.label, locationData, "")
+        XFormsCrossPlatformSupport.streamHTMLFragment(lhhaValue.label, "")
       else
         text(lhhaValue.label)
     }
 
   // xxx XFS1Control
-  def htmlValue(lhhaValue: LHHAValue, locationData: LocationData): String =
+  def htmlValue(lhhaValue: LHHAValue): String =
     if (lhhaValue.isHTML)
-      getEscapedHTMLValue(locationData, lhhaValue.label)
+      getEscapedHTMLValue(lhhaValue.label)
     else
       lhhaValue.label.escapeXmlMinimal
 
-  private def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
-    htmlValue(lhhaValue, locationData).escapeJavaScript
+  private def javaScriptValue(lhhaValue: LHHAValue): String =
+    htmlValue(lhhaValue).escapeJavaScript
 
   private def javaScriptValue(item: Item.ValueNode, encode: Boolean): String =
     item.externalValue(encode).escapeJavaScript
@@ -473,17 +473,17 @@ object ItemsetSupport {
 
           // Item LHH and value
           sb.append(""""label":"""")
-          sb.append(javaScriptValue(itemNode.label, locationData))
+          sb.append(javaScriptValue(itemNode.label))
           sb.append('"')
 
           itemNode match {
             case item: Item.ValueNode =>
-              item.help map (javaScriptValue(_, locationData)) foreach { h =>
+              item.help map javaScriptValue foreach { h =>
                 sb.append(""","help":"""")
                 sb.append(h)
                 sb.append('"')
               }
-              item.hint map (javaScriptValue(_, locationData)) foreach { h =>
+              item.hint map javaScriptValue foreach { h =>
                 sb.append(""","hint":"""")
                 sb.append(h)
                 sb.append('"')
@@ -550,8 +550,7 @@ object ItemsetSupport {
   def asXML(
     itemset                    : Itemset,
     controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
-    excludeWhitespaceTextNodes : Boolean,
-    locationData               : LocationData
+    excludeWhitespaceTextNodes : Boolean
   ): DocumentNodeInfoType = {
 
     val (identity, result) = StaticXPath.newTinyTreeReceiver
@@ -586,20 +585,20 @@ object ItemsetSupport {
               openElement("item", atts = itemAttributes)
 
               withElement("label") {
-                streamAsHTML(itemNode.label, locationData)
+                streamAsHTML(itemNode.label)
               }
 
               itemNode match {
                 case item: Item.ValueNode =>
                   item.help foreach { h =>
                     withElement("help") {
-                      streamAsHTML(h, locationData)
+                      streamAsHTML(h)
                     }
                   }
 
                   item.hint foreach { h =>
                     withElement("hint") {
-                      streamAsHTML(h, locationData)
+                      streamAsHTML(h)
                     }
                   }
 

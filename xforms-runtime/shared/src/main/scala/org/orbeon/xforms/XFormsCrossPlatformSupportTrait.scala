@@ -25,10 +25,11 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, IndentedLogger, ResourceResolver, UploadProgress}
+import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, HtmlParsing, IndentedLogger, ResourceResolver, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, HTMLBodyXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
 
 import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
 import java.net.URI
@@ -65,11 +66,20 @@ trait XFormsCrossPlatformSupportTrait {
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String
 
   def streamHTMLFragment(
-    value        : String,
-    locationData : LocationData,
-    xhtmlPrefix  : String)(implicit
-    xmlReceiver  : XMLReceiver
-  ): Unit
+    value       : String,
+    xhtmlPrefix : String
+  )(implicit
+    xmlReceiver : XMLReceiver
+  ): Unit =
+    if (value.nonAllBlank)
+      HtmlParsing.sanitizeHtmlStringToReceiver(
+        value,
+        xhtmlPrefix
+      )(
+        // Also filter out icons for ARIA support
+        // https://github.com/orbeon/orbeon-forms/issues/6624
+        new IconAriaXMLReceiver(xmlReceiver)
+      )
 
   private val DEFAULT_METHOD_PROPERTY_NAME = "default-method"
   private val DEFAULT_METHOD               = QName("html")

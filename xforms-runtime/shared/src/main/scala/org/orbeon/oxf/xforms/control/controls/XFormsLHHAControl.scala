@@ -163,7 +163,7 @@ class XFormsLHHAControl(
 
   protected override def getRelevantEscapedExternalValue(collector: ErrorEventCollector): String =
     if (mediatype contains "text/html")
-      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue(collector))
+      XFormsControl.getEscapedHTMLValue(getExternalValue(collector))
     else
       getExternalValue(collector)
 

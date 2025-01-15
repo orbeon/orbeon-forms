@@ -16,21 +16,17 @@ package org.orbeon.xforms
 import org.orbeon.apache.xerces.parsers.{NonValidatingConfiguration, SAXParser}
 import org.orbeon.apache.xerces.util.SymbolTable
 import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XMLParseException}
-import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StaticXPath.*
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
-import org.scalajs.dom.{Blob, BlobPropertyBag, DOMParser, HTMLDocument}
+import org.scalajs.dom.{Blob, BlobPropertyBag}
 
 import java.io.*
 import java.net.URI
@@ -87,44 +83,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String =
     throw new NotImplementedError("resolveActionURL")
-
-  def streamHTMLFragment(
-    value        : String,
-    locationData : LocationData,
-    xhtmlPrefix  : String
-  )(implicit
-    xmlReceiver  : XMLReceiver
-  ): Unit =
-    if (value.nonAllBlank) {
-
-    // The Scala.js implementation uses the HTML environment's `DOMParser`, unlike on the JVM where
-    // we have to use a library like `TagSoup`.
-    val parser = new DOMParser()
-    val doc    = parser.parseFromString(value, org.scalajs.dom.MIMEType.`text/html`).asInstanceOf[HTMLDocument]
-
-    // Also filter out icons for ARIA support
-    // https://github.com/orbeon/orbeon-forms/issues/6624
-    outputFragment(doc.body.childNodes)(new IconAriaXMLReceiver(xmlReceiver))
-  }
-
-  private def outputFragment(
-    nodes      : org.scalajs.dom.NodeList[org.scalajs.dom.Node]
-  )(implicit
-    xmlReceiver: XMLReceiver
-  ): Unit =
-    nodes.toList.foreach {
-      case v: org.scalajs.dom.Element =>
-        withElement(
-          v.tagName,
-          atts = v.attributes.toList map { case (name, att) => name -> att.value }
-        ) {
-          outputFragment(v.childNodes)
-        }
-      case v: org.scalajs.dom.Text    =>
-        val s = v.nodeValue
-        xmlReceiver.characters(s.toCharArray, 0, s.length)
-      case _ =>
-    }
 
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
   // proxy resources as `data:` or `blob:` URLs.

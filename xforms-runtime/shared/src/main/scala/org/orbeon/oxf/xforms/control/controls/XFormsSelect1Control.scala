@@ -124,7 +124,7 @@ class XFormsSelect1Control(
       if (! isStaticReadonly)
         findSelectedItem(collector).map(_.externalValue(mustEncodeValues)).orNull
       else
-        findSelectedItem(collector).map(i => ItemsetSupport.htmlValue(i.label, getLocationData)).orNull // external value is the label
+        findSelectedItem(collector).map(i => ItemsetSupport.htmlValue(i.label)).orNull // external value is the label
     )
   }
 

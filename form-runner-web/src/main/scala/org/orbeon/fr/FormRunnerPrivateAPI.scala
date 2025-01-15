@@ -17,7 +17,7 @@ import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.Page
 import org.scalajs.dom
-import org.scalajs.dom.{DOMParser, HTMLFormElement, URLSearchParams}
+import org.scalajs.dom.{HTMLFormElement, URLSearchParams}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -53,7 +53,7 @@ object FormRunnerPrivateAPI extends js.Object {
         <input type="hidden" name="j_password" value={password}/>
       </form>
 
-    val domParser    = new DOMParser
+    val domParser    = new dom.DOMParser
     val formDocument = domParser.parseFromString(formElem.toString, dom.MIMEType.`text/html`)
     val formElement  = formDocument.querySelector("form").asInstanceOf[HTMLFormElement]
     dom.document.body.appendChild(formElement)

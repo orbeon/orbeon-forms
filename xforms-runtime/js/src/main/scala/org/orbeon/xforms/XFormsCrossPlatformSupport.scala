@@ -13,11 +13,11 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon
 import org.orbeon.apache.xerces.parsers.{NonValidatingConfiguration, SAXParser}
 import org.orbeon.apache.xerces.util.SymbolTable
 import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XMLParseException}
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod
@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAr
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
-import org.scalajs.dom.{Blob, BlobPropertyBag, DOMParser, HTMLDocument}
+import org.scalajs.dom
 
 import java.io.*
 import java.net.URI
@@ -62,13 +62,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     throw new NotImplementedError("attachmentFileExists")
 
   // Form Runner: called with `input:instance`
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: orbeon.dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
     url match {
       case "input:instance" => url
       case _                => url
     }
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: orbeon.dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
     if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("javascript:"))
       url
     else
@@ -76,7 +76,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
-    currentElement     : dom.Element,
+    currentElement     : orbeon.dom.Element,
     url                : String,
     skipRewrite        : Boolean
   ): String =
@@ -85,7 +85,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =
     URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
-  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String =
+  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: orbeon.dom.Element, url: String): String =
     throw new NotImplementedError("resolveActionURL")
 
   def streamHTMLFragment(
@@ -99,8 +99,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
     // The Scala.js implementation uses the HTML environment's `DOMParser`, unlike on the JVM where
     // we have to use a library like `TagSoup`.
-    val parser = new DOMParser()
-    val doc    = parser.parseFromString(value, org.scalajs.dom.MIMEType.`text/html`).asInstanceOf[HTMLDocument]
+    val parser = new dom.DOMParser
+    val doc    = parser.parseFromString(value, dom.MIMEType.`text/html`).asInstanceOf[dom.HTMLDocument]
 
     // Also filter out icons for ARIA support
     // https://github.com/orbeon/orbeon-forms/issues/6624
@@ -108,19 +108,19 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   }
 
   private def outputFragment(
-    nodes      : org.scalajs.dom.NodeList[org.scalajs.dom.Node]
+    nodes      : dom.NodeList[dom.Node]
   )(implicit
     xmlReceiver: XMLReceiver
   ): Unit =
     nodes.toList.foreach {
-      case v: org.scalajs.dom.Element =>
+      case v: dom.Element =>
         withElement(
           v.tagName,
           atts = v.attributes.toList map { case (name, att) => name -> att.value }
         ) {
           outputFragment(v.childNodes)
         }
-      case v: org.scalajs.dom.Text    =>
+      case v: dom.Text    =>
         val s = v.nodeValue
         xmlReceiver.characters(s.toCharArray, 0, s.length)
       case _ =>
@@ -189,9 +189,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
             def createBlobUrl(): URI =
               URI.create(
                 js.Dynamic.global.window.URL.createObjectURL(
-                  new Blob(
+                  new dom.Blob(
                     js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
-                    new BlobPropertyBag { `type` = cxr.mediatype.orUndefined }
+                    new dom.BlobPropertyBag { `type` = cxr.mediatype.orUndefined }
                   )
                 ).asInstanceOf[String]
               )
@@ -308,7 +308,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     result()
   }
 
-  def readOrbeonDom(xmlString: String): dom.Document = {
+  def readOrbeonDom(xmlString: String): orbeon.dom.Document = {
 
     val (receiver, result) = newDomReceiver
 
@@ -328,7 +328,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     systemId       : String,
     handleXInclude : Boolean,
     handleLexical  : Boolean
-  ): dom.Document = {
+  ): orbeon.dom.Document = {
 
     val (receiver, result) = newDomReceiver
 
@@ -354,7 +354,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def openUrlStream(url: URI): InputStream = throw new NotImplementedError("openUrlStream")
 
-  def writeMultipartFormData(document: dom.Document, os: OutputStream): String = throw new NotImplementedError("writeMultipartFormData")
+  def writeMultipartFormData(document: orbeon.dom.Document, os: OutputStream): String = throw new NotImplementedError("writeMultipartFormData")
 
   def getRootThrowable(t : Throwable): Throwable = Exceptions.getRootThrowable(t).orNull
   def causesIterator(t : Throwable): Iterator[Throwable] = Exceptions.causesIterator(t)
@@ -371,7 +371,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   protected def getIdentityTransformerHandler: TransformerHandler =
     new SaxonTransformerFactory(GlobalConfiguration).newTransformerHandler
 
-  private def newDomReceiver: (XMLReceiver, () => dom.Document) = {
+  private def newDomReceiver: (XMLReceiver, () => orbeon.dom.Document) = {
     val receiver =
       new SAXContentHandler(
         systemIdOpt         = None,

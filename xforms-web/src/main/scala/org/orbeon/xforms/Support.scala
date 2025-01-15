@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
-import org.scalajs.dom.*
+import org.scalajs.dom.html
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
@@ -49,7 +49,7 @@ object Support {
 
   private def parseStringAsXml(xmlString: String): Option[dom.Document] =
     try {
-      Option((new DOMParser).parseFromString(xmlString, dom.MIMEType.`application/xml`)) filter
+      Option((new dom.DOMParser).parseFromString(xmlString, dom.MIMEType.`application/xml`)) filter
         (_.documentElement.getElementsByTagName("parsererror").length == 0)
     } catch {
       case NonFatal(_) =>
@@ -67,11 +67,11 @@ object Support {
   // TODO: Rename as we are returning a `dom.Document`?
   def fetchText(
     url         : String,
-    requestBody : String | FormData,
+    requestBody : String | dom.FormData,
     contentType : Option[String],
     acceptLang  : Option[String],
     transform   : (String, String) => String,
-    abortSignal : Option[AbortSignal])(implicit
+    abortSignal : Option[dom.AbortSignal])(implicit
     executor    : ExecutionContext
   ): Future[(Int, String, Option[dom.Document])] = {
 
@@ -80,18 +80,18 @@ object Support {
     acceptLang .foreach(customHeaders(Headers.AcceptLanguage) = _)
 
     val fetchPromise =
-      Fetch.fetch(
+      dom.Fetch.fetch(
         url,
-        new RequestInit {
-          method         = HttpMethod.POST
+        new dom.RequestInit {
+          method         = dom.HttpMethod.POST
           body           = requestBody
           headers        = if (customHeaders.nonEmpty) customHeaders else js.undefined
           referrer       = js.undefined
           referrerPolicy = js.undefined
           mode           = js.undefined
-          credentials    = RequestCredentials.include
+          credentials    = dom.RequestCredentials.include
           cache          = js.undefined
-          redirect       = RequestRedirect.follow // only one supported with the polyfill
+          redirect       = dom.RequestRedirect.follow // only one supported with the polyfill
           integrity      = js.undefined
           keepalive      = js.undefined
           signal         = abortSignal map js.defined.apply getOrElse js.undefined
@@ -112,8 +112,8 @@ object Support {
   }
 
   def stopFocusOutPropagation(
-    element       : Element,
-    eventToTarget : FocusEvent => EventTarget,
+    element       : dom.Element,
+    eventToTarget : dom.FocusEvent => dom.EventTarget,
     targetClass   : String
   ): Unit =
     element.addEventListener(
@@ -123,8 +123,8 @@ object Support {
     )
 
   def stopFocusOutPropagationUseEventListenerSupport(
-    element     : Element,
-    eventTarget : FocusEvent => EventTarget,
+    element     : dom.Element,
+    eventTarget : dom.FocusEvent => dom.EventTarget,
     targetClass : String,
     support     : EventListenerSupport
   ): Unit =
@@ -136,10 +136,10 @@ object Support {
     )
 
   private def focusFunction(
-    eventToTarget : FocusEvent => EventTarget,
+    eventToTarget : dom.FocusEvent => dom.EventTarget,
     targetClass   : String
-  ): FocusEvent => Unit =
-    (event: FocusEvent) => {
+  ): dom.FocusEvent => Unit =
+    (event: dom.FocusEvent) => {
       // 2020-12-22: Noted that `relatedTarget` can be `null` in plain XForms.
       // Not sure why, but protecting against crash here with pattern match.
       eventToTarget(event) match {

@@ -147,7 +147,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     xhtmlPrefix : String)(implicit
     xmlReceiver : XMLReceiver
   ): Unit =
-    if (value.nonAllBlank) {
+    if (value.nonAllBlank)
       htmlStringToResult(
         value,
         locationData,
@@ -160,7 +160,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
           )
         )
       )
-    }
 
   def proxyURI(
     urlString      : String,

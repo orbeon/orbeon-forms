@@ -19,6 +19,7 @@ import org.log4s.Logger
 import org.orbeon.date.JSDateUtils.todayAsIsoDate
 import org.orbeon.date.{IsoDate, JSDateUtils}
 import org.orbeon.facades.BoostrapDatepicker.*
+import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
@@ -189,6 +190,12 @@ object Date {
 
     private object Private {
 
+      val isNativePicker: Boolean = {
+        val always = containerElem.querySelectorOpt(":scope > .fr-native-picker-always").isDefined
+        val iOS    = Bowser.ios.contains(true)
+        always || iOS
+      }
+
       def updateReadonly(readonly: Boolean): Unit =
         visibleInputElemOpt.foreach { visibleInputElem =>
           visibleInputElem.readOnly = readonly
@@ -307,12 +314,6 @@ object Date {
               enableDatePickerChangeListener(datePicker)
           }
         }
-      }
-
-      def isNativePicker: Boolean = {
-        val always  = containerElem.querySelector(":scope > .fr-native-picker-always") != null
-        val iOS     = dom.document.body.classList.contains(XFormsIosClass)
-        always || iOS
       }
 
       def enableDatePickerChangeListener(datePicker: DatePicker): Unit =

@@ -30,19 +30,19 @@ import scala.scalajs.js.UndefOr
 
 object Tabbable {
 
-  val ActiveClass                  = "active"
+  private val ActiveClass         = "active"
 
-  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end):not(.fr-tabbable-add)"
-  val NavTabsSelector              = ".nav-tabs"
-  val TabPaneSelector              = ".tab-pane"
-  val TabContentSelector           = ".tab-content"
-  val ActiveSelector               = s".$ActiveClass"
+  private val ExcludeNotVisible   = ":not(.xforms-repeat-delimiter, .xforms-repeat-begin-end, .xforms-group-begin-end, .fr-tabbable-add, .xforms-hidden)"
+  private val NavTabsSelector     = ".nav-tabs"
+  private val TabPaneSelector     = ".tab-pane:not(.xforms-disabled)"
+  private val TabContentSelector  = ".tab-content"
+  private val ActiveSelector      = s".$ActiveClass"
 
   XBL.declareCompanion("fr|tabbable", js.constructorOf[TabbableCompanion])
 
   private class TabbableCompanion(containerElem: html.Element) extends XBLCompanion {
 
-    case class DragState(
+    private case class DragState(
       currentDragStartPrev     : Element,
       currentDragStartPosition : Int
     )
@@ -86,7 +86,7 @@ object Tabbable {
           dragState = Some(
             DragState(
               currentDragStartPrev     = el.previousElementOpt.orNull,
-              currentDragStartPosition = el.previousElementSiblings(IsDndMovesSelector + ExcludeRepeatClassesSelector).size
+              currentDragStartPosition = el.previousElementSiblings(IsDndMovesSelector + ExcludeNotVisible).size
             )
           )
         )
@@ -99,7 +99,7 @@ object Tabbable {
         newDrake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
           dragState foreach { dragState =>
 
-            val dndEnd = el.previousElementSiblings(IsDndMovesSelector + ExcludeRepeatClassesSelector).size
+            val dndEnd = el.previousElementSiblings(IsDndMovesSelector + ExcludeNotVisible).size
 
             val repeatId =
               el.previousElementSiblings(IsRepeatBeginEndSelector)
@@ -140,7 +140,7 @@ object Tabbable {
         })
       }
 
-      // Select first tab
+      // Select first visible tab
       // https://github.com/orbeon/orbeon-forms/issues/3458
       selectTab(0)
 
@@ -158,8 +158,8 @@ object Tabbable {
 
             val newLi = matchedElem.parentElement
 
-            if (newLi.matches(ExcludeRepeatClassesSelector) && ! newLi.matches(ActiveSelector)) {
-              val tabPosition = newLi.previousElementSiblings(ExcludeRepeatClassesSelector).size
+            if (newLi.matches(ExcludeNotVisible) && ! newLi.matches(ActiveSelector)) {
+              val tabPosition = newLi.previousElementSiblings(ExcludeNotVisible).size
               selectTab(tabPosition)
             }
           }
@@ -176,20 +176,25 @@ object Tabbable {
       containerElem
         .childrenT
         .flatMap(_.childrenT(TabContentSelector))
-        .flatMap(_.childrenT(TabPaneSelector + ExcludeRepeatClassesSelector))
+        .flatMap(_.childrenT(TabPaneSelector + ExcludeNotVisible))
 
-    private def onDOMFocus(event: dom.FocusEvent): Unit = {
-      val targetElem  = event.targetT
+    private def onDOMFocus(event: dom.FocusEvent): Unit =
+      onFocus(event.targetT)
+
+    // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)
+    def onFocus(targetElem: Element): Unit = {
       val allTabPanes = findAllTabPanes
-
       allTabPanes.indexWhere(_.contains(targetElem)) match {
         case -1    =>
         case index => selectTab(index)
       }
     }
 
-    // Called from XBL component
+    // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)
     def selectTab(tabPosition: Int): Unit = {
+
+      // Ignore if we get this after the dialog closed
+      if (containerElem.matches(".xforms-disabled")) return
 
       // Ignore out of bound tab positions
       val allLis = getAllLis
@@ -214,7 +219,7 @@ object Tabbable {
       // Switch tab
       val newLi = allLis(tabPosition)
       if (! newLi.matches(ActiveSelector)) {
-        val allTabPanes = newLi.closestT(NavTabsSelector).nextElementSiblings.flatMap(_.childrenT(TabPaneSelector)).filter(_.matches(ExcludeRepeatClassesSelector)).toList
+        val allTabPanes = newLi.closestT(NavTabsSelector).nextElementSiblings.flatMap(_.childrenT(TabPaneSelector)).filter(_.matches(ExcludeNotVisible)).toList
         val newTabPane  = allTabPanes(tabPosition)
         allLis.foreach(_.classList.remove(ActiveClass))
         allTabPanes.foreach(_.classList.remove(ActiveClass))
@@ -224,7 +229,7 @@ object Tabbable {
     }
 
     private def getAllLis: collection.Seq[Element] =
-      containerElem.querySelectorAllT(s":scope > div > .nav-tabs > $ExcludeRepeatClassesSelector")
+      containerElem.querySelectorAllT(s":scope > div > .nav-tabs > $ExcludeNotVisible")
 
     private def onDOMKeydown(event: dom.KeyboardEvent): Unit = {
       if (containerElem.matches("dialog :scope")) {

@@ -167,13 +167,15 @@ trait FormRunnerComponentsCompileTime {
           hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$displaySize'")
         }
 
-      case (constraintName @ ValidationFunctionNames.UploadMediatypes,Some(mediatype)) =>
-        val slashPosition     = mediatype.indexOf('/')
-        val isProperMediatype = slashPosition > 1 && slashPosition < mediatype.length - 1
-        isProperMediatype.flatOption {
-          val mediatypeLeft   = mediatype.substring(0, slashPosition)
-          val mediatypeRight  = mediatype.substring(slashPosition + 1)
-          val displayMediatypeOpt =
+      case (constraintName @ ValidationFunctionNames.UploadMediatypes, Some(mediatypesStr)) =>
+        val mediatypes        = mediatypesStr.splitTo[List]()
+        val displayMediatypes = mediatypes.flatMap { mediatype =>
+
+          val slashPosition     = mediatype.indexOf('/')
+          val isProperMediatype = slashPosition > 1 && slashPosition < mediatype.length - 1
+          isProperMediatype.flatOption {
+            val mediatypeLeft   = mediatype.substring(0, slashPosition)
+            val mediatypeRight  = mediatype.substring(slashPosition + 1)
             if (mediatypeRight == "*") {
               // Localized name for common wildcard media types
               Set("image", "video", "audio")(mediatypeLeft).option(hintResourceXPath(s"upload-$mediatypeLeft"))
@@ -190,8 +192,16 @@ trait FormRunnerComponentsCompileTime {
               val toXPath    = s"'$toUpper'"
               Some(toXPath)
             }
-          displayMediatypeOpt.map(hintMessageXPath(constraintName, _))
+          }
         }
+
+        displayMediatypes match {
+          case Nil => None
+          case _   =>
+            val combined = displayMediatypes.mkString(", ")
+            Some(hintMessageXPath(constraintName, s"string-join(($combined), ', ')"))
+        }
+
       case _ => None
     }
 

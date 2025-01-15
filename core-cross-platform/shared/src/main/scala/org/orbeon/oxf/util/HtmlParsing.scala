@@ -1,6 +1,6 @@
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.xml.{ElemFilter, HTMLBodyXMLReceiver, SimpleHtmlSerializer}
+import org.orbeon.oxf.xml.*
 
 
 object HtmlParsing extends HtmlParsingPlatform {
@@ -13,17 +13,33 @@ object HtmlParsing extends HtmlParsingPlatform {
     extraElemFilter: String => ElemFilter = _  => ElemFilter.Keep
   ): String = {
     val sb = new java.lang.StringBuilder
-    parseHtmlString(
+    sanitizeHtmlStringToReceiver(
       value,
-      new HTMLBodyXMLReceiver(
-        new SimpleHtmlSerializer(
-          sb,
-          n => safeElementsElemFilter(n).combine(extraElemFilter(n)),
-          (n, v) => n.startsWith("on") || v.contains("javascript:")
-        ),
-        ""
-      )
+      "",
+      extraElemFilter
+    )(
+      new SimpleHtmlSerializer(sb)
     )
     sb.toString
   }
+
+  def sanitizeHtmlStringToReceiver(
+    value          : String,
+    xhtmlPrefix    : String,
+    extraElemFilter: String => ElemFilter = _  => ElemFilter.Keep
+  )(
+    receiver       : XMLReceiver
+  ): Unit =
+    parseHtmlString(
+      value,
+      new HTMLBodyXMLReceiver(
+        new SimpleHtmlFilter(
+          n => safeElementsElemFilter(n).combine(extraElemFilter(n)),
+          (n, v) => n.startsWith("on") || v.contains("javascript:")
+        )(
+          receiver
+        ),
+        xhtmlPrefix
+      )
+    )
 }

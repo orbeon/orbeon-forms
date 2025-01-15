@@ -492,7 +492,6 @@ object XFormsBaseHandlerXHTML {
       if (mustOutputHTMLFragment)
         XFormsCrossPlatformSupport.streamHTMLFragment(
           value,
-          locationDataOpt.orNull,
           xhtmlPrefix
         )
       else

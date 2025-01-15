@@ -180,7 +180,7 @@ class XFormsOutputHTMLHandler(
     withElement("div", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
       val htmlValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
-      XFormsCrossPlatformSupport.streamHTMLFragment(htmlValue, outputControl.getLocationData, xhtmlPrefix)
+      XFormsCrossPlatformSupport.streamHTMLFragment(htmlValue, xhtmlPrefix)
     }
   }
 

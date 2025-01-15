@@ -242,7 +242,7 @@ object LHHASupport {
     def escapedValue(collector: ErrorEventCollector): String = {
       val rawValue = value(collector)
       if (isHTML)
-        XFormsControl.getEscapedHTMLValue(locationData, rawValue)
+        XFormsControl.getEscapedHTMLValue(rawValue)
       else
         rawValue.escapeXmlMinimal
     }

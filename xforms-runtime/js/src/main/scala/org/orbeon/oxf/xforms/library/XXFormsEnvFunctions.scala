@@ -331,8 +331,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         ItemsetSupport.asXML(
           itemset                    = itemset,
           controlValue               = controlValueForSelection,
-          excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
-          locationData               = control.getLocationData
+          excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy
         )
       }
     }

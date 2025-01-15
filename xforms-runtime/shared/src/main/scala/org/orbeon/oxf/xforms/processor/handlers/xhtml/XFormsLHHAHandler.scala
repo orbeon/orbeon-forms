@@ -114,7 +114,7 @@ class XFormsLHHAHandler(
             // 2024-11-25: The external value is the same as the value.
             currentLHHAControl.externalValueOpt(handlerContext.collector).filter(_.nonEmpty).foreach { externalValue =>
               if (elementAnalysis.containsHTML)
-                XFormsCrossPlatformSupport.streamHTMLFragment(externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
+                XFormsCrossPlatformSupport.streamHTMLFragment(externalValue, handlerContext.findXHTMLPrefix)
               else
                 xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
             }

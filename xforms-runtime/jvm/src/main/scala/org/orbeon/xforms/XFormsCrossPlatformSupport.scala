@@ -16,14 +16,11 @@ package org.orbeon.xforms
 import cats.syntax.option.*
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
-import org.ccil.cowan.tagsoup.HTMLSchema
-import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
-import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.resources.URLFactory
@@ -35,18 +32,15 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.xml.sax.InputSource
 
 import java.io.*
 import java.net.URI
 import java.nio.charset.Charset
-import javax.xml.transform.sax.{SAXResult, TransformerHandler}
-import javax.xml.transform.{Result, Transformer}
-import scala.util.control.NonFatal
+import javax.xml.transform.Transformer
+import javax.xml.transform.sax.TransformerHandler
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
@@ -102,35 +96,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     else
       resolvedURI.toString
 
-  private val TagSoupHtmlSchema = new HTMLSchema
-
-  private def htmlStringToResult(value: String, locationData: LocationData, result: Result): Unit = {
-    try {
-      val xmlReader = new org.ccil.cowan.tagsoup.Parser
-      xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TagSoupHtmlSchema)
-      xmlReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true)
-      val identity = getIdentityTransformerHandler
-      identity.setResult(result)
-      xmlReader.setContentHandler(identity)
-      val inputSource = new InputSource
-      inputSource.setCharacterStream(new StringReader(value))
-      xmlReader.parse(inputSource)
-    } catch {
-      case NonFatal(_) =>
-        throw new ValidationException(s"Cannot parse value as text/html for value: `$value`", locationData)
-    }
-    //			r.setFeature(Parser.CDATAElementsFeature, false);
-    //			r.setFeature(Parser.namespacesFeature, false);
-    //			r.setFeature(Parser.ignoreBogonsFeature, true);
-    //			r.setFeature(Parser.bogonsEmptyFeature, false);
-    //			r.setFeature(Parser.defaultAttributesFeature, false);
-    //			r.setFeature(Parser.translateColonsFeature, true);
-    //			r.setFeature(Parser.restartElementsFeature, false);
-    //			r.setFeature(Parser.ignorableWhitespaceFeature, true);
-    //			r.setProperty(Parser.scannerProperty, new PYXScanner());
-    //          r.setProperty(Parser.lexicalHandlerProperty, h);
-  }
-
   // TODO: implement server-side plain text output with <br> insertion
   //    public static void streamPlainText(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
   //        // 1: Split string along 0x0a and remove 0x0d (?)
@@ -141,25 +106,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   //            throw new OXFException(e);
   //        }
   //    }
-  def streamHTMLFragment(
-    value       : String,
-    locationData: LocationData,
-    xhtmlPrefix : String)(implicit
-    xmlReceiver : XMLReceiver
-  ): Unit =
-    if (value.nonAllBlank)
-      htmlStringToResult(
-        value,
-        locationData,
-        new SAXResult(
-          new HTMLBodyXMLReceiver(
-            // Also filter out icons for ARIA support
-            // https://github.com/orbeon/orbeon-forms/issues/6624
-            new IconAriaXMLReceiver(xmlReceiver),
-            ""
-          )
-        )
-      )
 
   def proxyURI(
     urlString      : String,

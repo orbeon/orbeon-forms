@@ -446,7 +446,7 @@ class XFormsSelect1Handler(
           } locally {
             if (selectedFound)
               ch.text(" - ")
-            ItemsetSupport.streamAsHTML(currentItem.label, control.getLocationData)
+            ItemsetSupport.streamAsHTML(currentItem.label)
             selectedFound = true
           }
         }

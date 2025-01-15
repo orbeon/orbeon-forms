@@ -268,7 +268,7 @@ class XFormsOutputControl(
         externalValue
     } else if (staticControlOpt exists (_.isHtmlMediatype))
       // Rewrite the HTML value with resolved @href and @src attributes
-      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue(collector))
+      XFormsControl.getEscapedHTMLValue(getExternalValue(collector))
     else
       // Return external value as is
       getExternalValue(collector)

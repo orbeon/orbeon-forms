@@ -275,7 +275,7 @@ object XFormsControl {
   }
 
   // Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.
-  def getEscapedHTMLValue(locationData: LocationData, rawValue: String): String = {
+  def getEscapedHTMLValue(rawValue: String): String = {
 
     if (rawValue eq null)
       return null
@@ -285,7 +285,6 @@ object XFormsControl {
     val rewriter = XFormsCrossPlatformSupport.externalContext.getResponse
     XFormsCrossPlatformSupport.streamHTMLFragment(
       rawValue,
-      locationData,
       "xhtml"
     )(
       Rewrite.getRewriteXMLReceiver(

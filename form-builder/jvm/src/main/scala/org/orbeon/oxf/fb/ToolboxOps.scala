@@ -47,7 +47,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{Namespaces, XFormsNames}
-import org.orbeon.xforms.XFormsNames.ID_QNAME
+import org.orbeon.xforms.XFormsNames.{CLASS_QNAME, ID_QNAME}
 
 import java.net.URI
 import scala.collection.mutable
@@ -77,6 +77,13 @@ object ToolboxOps {
                 val controlElem = insert(into = gridTd, origin = viewTemplate).head
                 // xf:help might be in the template, but we don't need it as it is created on demand
                 delete(controlElem / "help")
+
+                // https://github.com/orbeon/orbeon-forms/issues/6725
+                controlElem.attOpt(CLASS_QNAME).foreach { classAtt =>
+                  insert(into = controlElem, origin = attributeInfo(FBClass, classAtt.stringValue))
+                  delete(classAtt)
+                }
+
                 controlElem
               case _ =>
                 // No specific, create simple element with LHHA
@@ -811,7 +818,7 @@ object ToolboxOps {
         containerId,
         force = true // https://github.com/orbeon/orbeon-forms/issues/6541
       )
-      
+
       // Also copy attachments when merging https://github.com/orbeon/orbeon-forms/issues/
       pasteSectionGridFromXcv(
         xcvElem,

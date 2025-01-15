@@ -54,6 +54,7 @@ object XMLNames {
   val FBReadonly                  : QName = QName("readonly",           FBPrefix, FB)
   val FBPageSize                  : QName = QName("page-size",          FBPrefix, FB)
   val FBInitialIterations         : QName = QName("initial-iterations", FBPrefix, FB)
+  val FBClass                     : QName = QName("class",              FBPrefix, FB)
 
   val XFConstraintTest            : Test = XF -> "constraint"
   val XFTypeTest                  : Test = XF -> "type"

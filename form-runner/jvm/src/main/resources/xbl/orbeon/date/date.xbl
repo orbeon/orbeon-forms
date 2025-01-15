@@ -135,8 +135,9 @@
                                 <output-format>Date format</output-format>
                                 <native-picker>
                                     <label>Use browser date picker</label>
-                                    <item id="0">Automatically</item>
-                                    <item id="1">Always</item>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Automatically</item>
+                                    <item id="2">Always</item>
                                 </native-picker>
                                 <default-custom>
                                     <item id="0">Use default</item>
@@ -174,8 +175,9 @@
                                 <output-format>Format de la date</output-format>
                                 <native-picker>
                                     <label>Utiliser le sélecteur du navigateur</label>
-                                    <item id="0">Automatiquement</item>
-                                    <item id="1">Toujours</item>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Automatiquement</item>
+                                    <item id="2">Toujours</item>
                                 </native-picker>
                                 <default-custom>
                                     <item id="0">Utiliser le défaut</item>
@@ -241,6 +243,8 @@
                                         if (@id = 0) then
                                             ''
                                         else if (@id = 1) then
+                                            'ios'
+                                        else if (@id = 2) then
                                             'always'
                                         else
                                             error()"/>

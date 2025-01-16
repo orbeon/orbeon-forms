@@ -41,7 +41,6 @@ import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{Dictionary, JSON, UndefOr, timers, |}
-import scala.util.control.NonFatal
 
 
 // Progressively migrate contents of xforms.js/AjaxServer.js here
@@ -577,24 +576,16 @@ object XFormsUI {
     // https://github.com/orbeon/orbeon-forms/issues/6682
     dom.document.body
       .appendChildT(
-        dom.document.createFormElement
-          .kestrel(_.id      = "xforms-form-submit-" + java.util.UUID.randomUUID().toString)
-          .kestrel(_.method  = "post")
-          .kestrel(_.target  = newTargetOpt.orNull)
-          .kestrel(_.enctype = "multipart/form-data")
-          .kestrel(_.action  = effectiveAction)
-          .kestrel(_.appendChildT(
-            dom.document.createInputElement
-              .kestrel(_.`type` = "hidden")
-              .kestrel(_.name   = Constants.UuidFieldName)
-              .kestrel(_.value  = form.uuid)
-          ))
-          .kestrel(_.appendChildT(
-            dom.document.createInputElement
-              .kestrel(_.`type` = "hidden")
-              .kestrel(_.name   = Constants.SubmissionIdFieldName)
-              .kestrel(_.value  = submissionId)
-          ))
+        JsDom.all.form(
+          id      := "xforms-form-submit-" + java.util.UUID.randomUUID().toString,
+          method  := "post",
+          target  := newTargetOpt.getOrElse(""),
+          enctype := "multipart/form-data",
+          action  := effectiveAction
+        )(
+          input(`type` := "hidden", name := Constants.UuidFieldName,         value := form.uuid),
+          input(`type` := "hidden", name := Constants.SubmissionIdFieldName, value := submissionId)
+        ).render
       )
       .submit()
   } // end handleSubmission

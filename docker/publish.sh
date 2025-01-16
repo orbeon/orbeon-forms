@@ -3,7 +3,7 @@
 publish=true
 
 VERSION=${1:-'2024.1-pe'}
-TAG=${2:-'tag-release-2024.1-ce'}
+RELEASE_TAG=${2:-'tag-release-2024.1-ce'}
 FILE=${3:-'orbeon-2024.1.202412312252-PE.zip'}
 SQL_FILE=${4:-'2024.1/postgresql-2024_1.sql'}
 PLATFORMS=${5:-'linux/amd64,linux/arm64'}
@@ -12,7 +12,7 @@ DEMO_FORMS_POSTGRES_NETWORK=${7:-'demo_forms_network'}
 DEMO_FORMS_ORBEON_FORMS_PORT=${8:-'18080'}
 
 echo "Version: $VERSION"
-echo "Tag: $TAG"
+echo "Release tag: $RELEASE_TAG"
 echo "File: $FILE"
 echo "SQL file: $SQL_FILE"
 echo "Platforms: $PLATFORMS"
@@ -25,13 +25,20 @@ echo
 SQL_SCHEMA_FILE='01-orbeon-postgresql-schema.sql'
 SQL_DATA_FILE='02-orbeon-postgresql-data.sql'
 
+# Docker registry tags
+DOCKER_TAG_BASE="$VERSION"
+DOCKER_TAG_TOMCAT="$DOCKER_TAG_BASE"
+#DOCKER_TAG_WILDFLY="$DOCKER_TAG_BASE-wildfly"
+
 # Image names
-POSTGRES_IMAGE="orbeon/postgres:$VERSION"
-ORBEON_FORMS_BASE_IMAGE="orbeon/orbeon-forms-base:$VERSION"
-ORBEON_FORMS_IMAGE="orbeon/orbeon-forms:$VERSION"
+POSTGRES_IMAGE="orbeon/postgres:$DOCKER_TAG_BASE"
+ORBEON_FORMS_TOMCAT_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_TOMCAT"
+ORBEON_FORMS_TOMCAT_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_TOMCAT"
+#ORBEON_FORMS_WILDFLY_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_WILDFLY"
+#ORBEON_FORMS_WILDDLY_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_WILDFLY"
 
 # Image/container names for demo forms import/export
-DEMO_FORMS_POSTGRES_IMAGE="orbeon/postgres-demo-forms:$VERSION"
+DEMO_FORMS_POSTGRES_IMAGE="orbeon/postgres-demo-forms:$DOCKER_TAG_BASE"
 DEMO_FORMS_POSTGRES_CONTAINER='orbeon-postgres-demo-forms'
 DEMO_FORMS_ORBEON_FORMS_CONTAINER='orbeon-orbeon-forms-demo-forms'
 
@@ -52,11 +59,17 @@ main() {
     docker login -u orbeon
   fi
 
-  # Build Orbeon Forms image (base image)
-  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms --build-arg tag="$TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_BASE_IMAGE" .
+  # Build Orbeon Forms image (Tomcat, base image)
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_TOMCAT_BASE_IMAGE" .
 
-  # Build Orbeon Forms image (including PostgreSQL JDBC driver)
-  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.postgres --build-arg base_image="$ORBEON_FORMS_BASE_IMAGE" -t "$ORBEON_FORMS_IMAGE" .
+  # Build Orbeon Forms image (Tomcat, including PostgreSQL JDBC driver)
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat.postgres_driver --build-arg base_image="$ORBEON_FORMS_TOMCAT_BASE_IMAGE" -t "$ORBEON_FORMS_TOMCAT_IMAGE" .
+
+  # Build Orbeon Forms image (Wildfly, base image)
+  #docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
+
+  # Build Orbeon Forms image (Wildfly, including PostgreSQL JDBC driver)
+  #docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .
 
   # Do not import demo forms into PostgreSQL, just use SQLite
   ## Import demo forms into PostgreSQL database and export them to SQL script
@@ -66,7 +79,7 @@ main() {
   docker build --platform="$PLATFORMS" -f Dockerfile.postgres -t "$POSTGRES_IMAGE" .
 
   if $publish; then
-    docker push "$ORBEON_FORMS_IMAGE"
+    docker push "$ORBEON_FORMS_TOMCAT_IMAGE"
     docker push "$POSTGRES_IMAGE"
   fi
 }

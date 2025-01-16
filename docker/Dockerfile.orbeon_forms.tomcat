@@ -4,7 +4,8 @@ ARG tag
 ARG file
 
 ENV TOMCAT_HOME=/usr/local/tomcat
-ENV CONFIG_DIR=$TOMCAT_HOME/conf/Catalina/localhost
+ENV CONFIG_DIR=$TOMCAT_HOME/conf
+ENV CONTEXT_DIR=$CONFIG_DIR/Catalina/localhost
 ENV DEPLOYMENT_DIR=$TOMCAT_HOME/webapps
 
 RUN mkdir -p /tmp/orbeon
@@ -22,8 +23,11 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && mkdir -p $DEPLOYMENT_DIR/orbeon \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon/
 
+# Enable compression
+COPY server.compression_on.xml $CONFIG_DIR/server.xml
+
 # Create directory for Tomcat context configuration
-RUN mkdir -p $CONFIG_DIR
+RUN mkdir -p $CONTEXT_DIR
 
 # Cleanup
 RUN rm -rf /tmp/orbeon \

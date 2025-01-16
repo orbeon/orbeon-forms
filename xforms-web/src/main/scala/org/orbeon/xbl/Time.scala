@@ -17,8 +17,10 @@ import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.date.IsoTime
 import org.orbeon.date.JSDateUtils.nowAsIsoTime
+import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.DomElemOps
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
@@ -59,75 +61,85 @@ object Time {
       val visibleInputElem = containerElem.querySelector("input").asInstanceOf[html.Input]
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
-      EventSupport.addListeners(visibleInputElem, List(DomEventNames.TouchStart, DomEventNames.FocusIn),
-        (e: dom.Event) => {
-          if (! isMarkedReadonly) {
+      // Add `readonly` attribute on the input if the control is readonly
+      val isReadonly = containerElem.classList.contains("xforms-readonly")
+      updateReadonly(isReadonly)
 
-            logger.debug(s"reacting to event ${e.`type`}")
+      if (isNativePicker) {
+        visibleInputElem.`type` = "time"
+        EventSupport.addListener(visibleInputElem, DomEventNames.Change, (_: dom.Event) => updateStateAndSendValueToServer(readValue))
+      } else {
 
-            stateOpt.foreach { state =>
-              // Upon `focusin`, if the format omits seconds, but the value has non-zero seconds, then we want to show
-              // the value with seconds, so that the value is not lost.
-              if (! state.format.hasSeconds)
-                state.isoOrUnrecognizedValue match {
-                  case Left(t @ IsoTime(_, _, Some(s))) if s != 0 =>
-                    writeValue(visibleInputElem, IsoTime.formatTime(t, state.format.copy(hasSeconds = true)))
-                  case _ =>
-                }
+        EventSupport.addListeners(visibleInputElem, List(DomEventNames.TouchStart, DomEventNames.FocusIn),
+          (e: dom.Event) => {
+            if (! isMarkedReadonly) {
+
+              logger.debug(s"reacting to event ${e.`type`}")
+
+              stateOpt.foreach { state =>
+                // Upon `focusin`, if the format omits seconds, but the value has non-zero seconds, then we want to show
+                // the value with seconds, so that the value is not lost.
+                if (! state.format.hasSeconds)
+                  state.isoOrUnrecognizedValue match {
+                    case Left(t @ IsoTime(_, _, Some(s))) if s != 0 =>
+                      writeValue(visibleInputElem, IsoTime.formatTime(t, state.format.copy(hasSeconds = true)))
+                    case _ =>
+                  }
+              }
             }
           }
-        }
-      )
+        )
 
-      EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
-        (e: dom.Event) => {
-          if (! isMarkedReadonly) {
-            logger.debug(s"reacting to event ${e.`type`}")
+        EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
+          (e: dom.Event) => {
+            if (! isMarkedReadonly) {
+              logger.debug(s"reacting to event ${e.`type`}")
 
-            updateStateAndSendValueToServer(readValue)
-
-            // Always update visible value with XForms value:
-            //
-            // - relying on just value change event from server is not enough
-            // - value change is not dispatched if the server value hasn't changed
-            // - if the visible changed, but XForms hasn't, we still need to show XForms value
-            // - see: https://github.com/orbeon/orbeon-forms/issues/1026
-            //
-            // So either:
-            //
-            // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
-            // - or it didn't, and we force `updateVisibleValue()` after the response is processed
-            //
-            // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
-            // edit value hasn't changed.
-            //
-//            val formId = $(containerElem).parents("form").attr("id").get
-            AjaxClient.allEventsProcessedF("time") foreach { _ =>
-              stateOpt.foreach(updateVisibleValue)
-            }
-          }
-        }
-      )
-
-      EventSupport.addListener(visibleInputElem, DomEventNames.KeyPress,
-        (e: dom.KeyboardEvent) => {
-          if (! isMarkedReadonly) {
-
-            logger.debug(s"reacting to event ${e.`type`}")
-
-            if (Set(10, 13)(e.keyCode)) {
-              e.preventDefault()
               updateStateAndSendValueToServer(readValue)
-              AjaxClient.fireEvent(
-                AjaxEvent(
-                  eventName = DomEventNames.DOMActivate,
-                  targetId  = containerElem.id
-                )
-              )
+
+              // Always update visible value with XForms value:
+              //
+              // - relying on just value change event from server is not enough
+              // - value change is not dispatched if the server value hasn't changed
+              // - if the visible changed, but XForms hasn't, we still need to show XForms value
+              // - see: https://github.com/orbeon/orbeon-forms/issues/1026
+              //
+              // So either:
+              //
+              // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
+              // - or it didn't, and we force `updateVisibleValue()` after the response is processed
+              //
+              // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
+              // edit value hasn't changed.
+              //
+  //            val formId = $(containerElem).parents("form").attr("id").get
+              AjaxClient.allEventsProcessedF("time") foreach { _ =>
+                stateOpt.foreach(updateVisibleValue)
+              }
             }
           }
-        }
-      )
+        )
+
+        EventSupport.addListener(visibleInputElem, DomEventNames.KeyPress,
+          (e: dom.KeyboardEvent) => {
+            if (! isMarkedReadonly) {
+
+              logger.debug(s"reacting to event ${e.`type`}")
+
+              if (Set(10, 13)(e.keyCode)) {
+                e.preventDefault()
+                updateStateAndSendValueToServer(readValue)
+                AjaxClient.fireEvent(
+                  AjaxEvent(
+                    eventName = DomEventNames.DOMActivate,
+                    targetId  = containerElem.id
+                  )
+                )
+              }
+            }
+          }
+        )
+      }
     }
 
     override def destroy(): Unit = {
@@ -147,10 +159,14 @@ object Time {
 
       logger.debug(s"updateWithServerValues: `$isoValue`, `$format`")
 
-      updateVisibleValue(newState)
+      if (isNativePicker) {
+        if (! previousStateOpt.map(_.stringValue).contains(newState.stringValue)) // test probably not needed as we just set the input value? might avoid focus issues?
+          updateVisibleValue(newState)
+      } else {
 
-      // Also update disabled because this might be called upon an iteration being moved, in which
-      // case all the control properties must be updated.
+        updateVisibleValue(newState)
+      }
+
       updateReadonly(companion.isMarkedReadonly)
     }
 
@@ -164,9 +180,18 @@ object Time {
 
     private object Private {
 
+      val isNativePicker: Boolean = {
+        val always = containerElem.querySelectorOpt(":scope > .fr-native-picker-always").isDefined
+        val iOS    = Bowser.ios.contains(true)
+        always || iOS
+      }
+
       def updateReadonly(readonly: Boolean): Unit =
         visibleInputElemOpt.foreach { visibleInputElem =>
           visibleInputElem.readOnly = readonly
+          if (isNativePicker)
+            // Also set `disabled` on iOS (see #5376)
+            visibleInputElem.disabled = readonly
         }
 
       def updateStateAndSendValueToServer(read: html.Input => String): Unit =
@@ -201,7 +226,16 @@ object Time {
 //              if (hasFocus) state.editValue
 //              else          state.displayValue
 
-          writeValue(visibleInputElem, state.stringValue)
+          writeValue(
+            visibleInputElem,
+            if (isNativePicker) {
+              // The native time picker will clear the field if the date is not an HTML "time string" (ISO-like), but
+              // we still set it to whatever string value we have if it's not an ISO date. Alternatively, we could set
+              // it to a blank string directly.
+              state.isoOrUnrecognizedValue.fold(_.toIsoString, identity)
+            } else
+              state.stringValue
+          )
         }
 
       def readValue(input: html.Input): String =

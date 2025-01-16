@@ -321,47 +321,51 @@
             <xf:var
                 name="view"
                 value="
-                    xxf:is-control-static-readonly('fr-time') or
+                    (
+                        xxf:is-control-static-readonly('fr-time') and
+                        (: Still use the native picker if static readonly, to have consistent output format :)
+                        not(fr:component-param-value('native-picker') = 'always')
+                    ) or
                     fr:mode() = 'pdf'
                 "/>
-            <xf:var
-                name="class-field-width"
-                value="concat('fr-field-width-', fr:component-param-value('field-width'))"/>
+            <xf:var name="class-field-width"     value="concat('fr-field-width-'  ,   fr:component-param-value('field-width'))"/>
+            <xf:var name="class-native-picker"   value="concat('fr-native-picker-',   fr:component-param-value('native-picker'))"/>
 
-            <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append {$class-field-width}">
-                    <xh:input
-                        xh:type="text"
-                        placeholder="{
-                            TimeSupport:generatePlaceholder(
-                                (: Reminder: empty string property returns the empty sequence :)
-                                (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
-                                instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                                xxf:r('format')
-                            )}"
-                        id="fr-time-input"
-                        xxf:control="true"
-                        xbl:attr="autocomplete"/>
-                    <xh:span class="add-on">
-                        <xh:i class="fa fa-fw fa-clock-o"/>
-                    </xh:span>
-                </xh:div>
+            <xf:group class="{$class-field-width} {$class-native-picker}">
+                <xf:group ref="$binding[not($view)]" class="input-append">
+
+                        <xh:input
+                            xh:type="text"
+                            placeholder="{
+                                TimeSupport:generatePlaceholder(
+                                    (: Reminder: empty string property returns the empty sequence :)
+                                    (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
+                                    instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                                    xxf:r('format')
+                                )}"
+                            id="fr-time-input"
+                            xxf:control="true"
+                            xbl:attr="autocomplete"/>
+                        <xh:span class="add-on">
+                            <xh:i class="fa fa-fw fa-clock-o"/>
+                        </xh:span>
+                </xf:group>
+
+                <!--
+                    - https://github.com/orbeon/orbeon-forms/issues/5490
+                    - https://github.com/orbeon/orbeon-forms/issues/2991
+                -->
+                <xf:input
+                    ref="$binding[$view]"
+                    class="{$class-field-width}"
+                    xbl:attr="xxf:readonly-appearance"
+                    xxf:format="
+                        TimeSupport:formatReadonlyModeTime(
+                            xxf:binding('fr-time'),
+                            (: Reminder: empty string property returns the empty sequence :)
+                            (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1]
+                        )"/>
             </xf:group>
-
-            <!--
-                - https://github.com/orbeon/orbeon-forms/issues/5490
-                - https://github.com/orbeon/orbeon-forms/issues/2991
-            -->
-            <xf:input
-                ref="$binding[$view]"
-                class="{$class-field-width}"
-                xbl:attr="xxf:readonly-appearance"
-                xxf:format="
-                    TimeSupport:formatReadonlyModeTime(
-                        xxf:binding('fr-time'),
-                        (: Reminder: empty string property returns the empty sequence :)
-                        (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1]
-                    )"/>
 
         </xbl:template>
     </xbl:binding>

@@ -193,7 +193,6 @@ ThisBuild / version                     := orbeonVersionFromProperties.value
 ThisBuild / orbeonVersionFromProperties := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
 ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
-ThisBuild / traceLevel                  := 0
 ThisBuild / preferFastOptJS             := sys.props.get("orbeon.prefer-fast-opt-js").isDefined
 
 // Restrict the number of concurrent linker processes so we don't run out of memory

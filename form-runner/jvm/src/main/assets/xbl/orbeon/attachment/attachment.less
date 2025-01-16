@@ -52,13 +52,12 @@
         .fr-attachment-drop, .fr-attachment-empty {
             display: block;
             border-width: 2px;
-            border-color: @minGrayOnWhiteFallback;
-            border-color: @minGrayOnWhiteVariable;
+            border-color: @minGrayDecorationFallback;
+            border-color: @minGrayDecorationVariable;
             border-radius: @inputBorderRadius;
             margin: 3px 0;
             padding: 1em;
-            color: @minGrayOnWhiteFallback;
-            color: @minGrayOnWhiteVariable;
+            color: @minGrayText;
             text-align: center;
         }
 
@@ -67,8 +66,8 @@
             border-style: dashed;
 
             &.fr-attachment-dragover {
-                background-color: @minGrayOnWhiteFallback;
-                background-color: @minGrayOnWhiteVariable;
+                background-color: @minGrayDecorationFallback;
+                background-color: @minGrayDecorationVariable;
                 color: white;
             }
         }

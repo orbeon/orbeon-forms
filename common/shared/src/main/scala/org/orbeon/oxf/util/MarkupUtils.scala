@@ -156,9 +156,10 @@ object MarkupUtils {
   )
 
   val SafeElements: Set[String] = Set(
-    "a",  "b",      "i",     "ul",    "li",  "ol", "p",  "span",       "u",   "div",
-    "br", "strong", "em",    "pre",   "img", "h1", "h2", "h3",         "h4",  "h5",
-    "h6", "font",   "table", "tbody", "tr",  "td", "th", "blockquote", "sub", "sup",
+    "a",   "b",      "i",     "ul",    "li",  "ol", "p",  "span",       "u",   "div",
+    "br",  "strong", "em",    "pre",   "img", "h1", "h2", "h3",         "h4",  "h5",
+    "h6",  "font",   "table", "tbody", "tr",  "td", "th", "blockquote", "sub", "sup",
+    "kbd",
   )
 
   private val CrRegex = """\r""".r

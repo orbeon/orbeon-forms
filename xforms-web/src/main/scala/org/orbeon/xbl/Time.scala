@@ -220,11 +220,13 @@ object Time {
       def updateVisibleValue(state: State): Unit =
         companion.visibleInputElemOpt.foreach { visibleInputElem =>
 
-//          val hasFocus = visibleInputElem eq dom.document.activeElement
-
-//            val newValue =
-//              if (hasFocus) state.editValue
-//              else          state.displayValue
+          // Update `step` to show seconds or not
+          if (isNativePicker) {
+            if (state.format.hasSeconds)
+              visibleInputElem.step = "1"
+            else
+              visibleInputElem.step = "60"
+          }
 
           writeValue(
             visibleInputElem,
@@ -243,11 +245,6 @@ object Time {
 
       def writeValue(input: html.Input, value: String): Unit =
         input.value = value
-
-//      // On mobile, we set the field to `type="number"`, so the format of `value` always uses a `.`
-//      // as decimal separator
-//      def mobileConversionNeeded(input: html.Input): Boolean =
-//        input.`type` == "time"
     }
   }
 }

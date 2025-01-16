@@ -82,12 +82,19 @@
                         <xf:insert
                             xmlns:tfui="java:org.orbeon.oxf.fb.xbl.TimeFormatUi"
                             context="instance('local')/output-format-details"
-                            origin="tfui:timeFormatToXml(if (not($use-default)) then instance()/@output-format else property('xxf:format.input.time'))/*/*"/>
+                            origin="
+                                tfui:timeFormatToXml(
+                                    if (not($use-default)) then
+                                        instance()/@output-format
+                                    else
+                                        property('xxf:format.input.time')
+                                )/*/*"/>
                     </xf:action>
 
                     <xf:instance id="local" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <field-width/>
+                            <native-picker/>
                             <output-format-details default="true">
                                 <is24Hour        type="boolean"/>
                                 <isPadHourDigits type="boolean"/>
@@ -106,6 +113,12 @@
                         <_>
                             <resource xml:lang="en">
                                 <output-format>Time format</output-format>
+                                <native-picker>
+                                    <label>Use browser date picker</label>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Automatically</item>
+                                    <item id="2">Always</item>
+                                </native-picker>
                                 <default-custom>
                                     <item id="0">Use default</item>
                                     <item id="1">Custom format</item>
@@ -138,6 +151,12 @@
                             </resource>
                             <resource xml:lang="fr">
                                 <output-format>Format de l'heure</output-format>
+                                <native-picker>
+                                    <label>Utiliser le sélecteur du navigateur</label>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Automatiquement</item>
+                                    <item id="2">Toujours</item>
+                                </native-picker>
                                 <default-custom>
                                     <item id="0">Utiliser le défaut</item>
                                     <item id="1">Format sur mesure</item>
@@ -190,7 +209,25 @@
                             </xf:item>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="1" y="2" w="12">
+                    <fr:c x="1" y="2" w="6">
+                        <xf:select1 ref="instance('local')/native-picker" appearance="full" id="native-picker-control">
+                            <xf:label ref="xxf:r('native-picker.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('native-picker.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 0) then
+                                            ''
+                                        else if (@id = 1) then
+                                            'ios'
+                                        else if (@id = 2) then
+                                            'always'
+                                        else
+                                            error()"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="3" w="12">
                         <xf:select1 ref="instance('local')/output-format-details/@default" appearance="full xxf:horizontal" id="output-format-control">
                             <xf:label ref="xxf:r('output-format')"/>
                             <xf:itemset ref="xxf:resource-elements('default-custom.item')">
@@ -199,7 +236,7 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="1" y="3" w="6">
+                    <fr:c x="1" y="4" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/is24Hour" appearance="full xxf:horizontal" id="is-24-hour-control">
                             <xf:label ref="xxf:r('hour-system.label')"/>
                             <xf:itemset ref="xxf:resource-elements('hour-system.item')">
@@ -208,7 +245,7 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="7" y="3" w="6">
+                    <fr:c x="7" y="4" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/hasSeconds" appearance="full xxf:horizontal" id="has-seconds-control">
                             <xf:label ref="xxf:r('seconds.label')"/>
                             <xf:itemset ref="xxf:resource-elements('seconds.item')">
@@ -217,7 +254,7 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="1" y="4" w="6">
+                    <fr:c x="1" y="5" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/isPadHourDigits" appearance="full" id="is-pad-hour-digits-control">
                             <xf:label ref="xxf:r('pad-hour.label')"/>
                             <xf:itemset ref="xxf:resource-elements('pad-hour.item')">
@@ -226,7 +263,7 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="7" y="4" w="6">
+                    <fr:c x="7" y="5" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/amPmFormat/@type" appearance="minimal" id="am-pm-format-control">
                             <xf:label ref="xxf:r('am-pm.label')"/>
                             <xf:itemset ref="xxf:resource-elements('am-pm.item')[xs:integer(@id) le 4 (: don't support a/p for now :)]">
@@ -256,7 +293,9 @@
                 <xf:action
                     id="fb-editor-time-action"
                     event="xforms-value-changed"
-                    observer="field-width-control">
+                    observer="
+                        field-width-control
+                        native-picker-control">
 
                     <xf:var name="name"      value="name(event('xxf:binding'))"/>
                     <xf:var name="new-value" value="string(event('xxf:binding'))"/>

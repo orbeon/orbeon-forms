@@ -10,7 +10,7 @@ object HtmlParsing extends HtmlParsingPlatform {
 
   def sanitizeHtmlString(
     value          : String,
-    extraElemFilter: String => ElemFilter = _  => ElemFilter.Keep
+    extraElemFilter: String => ElemFilter = _ => ElemFilter.Keep
   ): String = {
     val sb = new java.lang.StringBuilder
     sanitizeHtmlStringToReceiver(
@@ -26,7 +26,7 @@ object HtmlParsing extends HtmlParsingPlatform {
   def sanitizeHtmlStringToReceiver(
     value          : String,
     xhtmlPrefix    : String,
-    extraElemFilter: String => ElemFilter = _  => ElemFilter.Keep
+    extraElemFilter: String => ElemFilter = _ => ElemFilter.Keep
   )(
     receiver       : XMLReceiver
   ): Unit =

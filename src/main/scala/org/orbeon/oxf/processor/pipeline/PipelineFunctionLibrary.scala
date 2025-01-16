@@ -33,16 +33,16 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
  * - then remove them from below
  * - then update XSLT stylesheets to use the p:* functions instead of direct Java calls
  */
-class PipelineFunctionLibrary extends {
-  // Namespace the functions. We wish we had trait parameters, see:
-  // http://docs.scala-lang.org/sips/pending/trait-parameters.html
-  val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
-  val CryptoFunctionsNS             = Seq(PIPELINE_NAMESPACE_URI)
-  val PureUriFunctionsNS            = Seq(PIPELINE_NAMESPACE_URI)
-  val IndependentFunctionsNS        = Seq(PIPELINE_NAMESPACE_URI)
-  val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
+trait PipelineNamespaces {
+  val XFormsIndependentFunctionsNS : Seq[String] = Seq(PIPELINE_NAMESPACE_URI)
+  val CryptoFunctionsNS            : Seq[String] = Seq(PIPELINE_NAMESPACE_URI)
+  val PureUriFunctionsNS           : Seq[String] = Seq(PIPELINE_NAMESPACE_URI)
+  val IndependentFunctionsNS       : Seq[String] = Seq(PIPELINE_NAMESPACE_URI)
+  val XSLTFunctionsNS              : Seq[String] = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
 }
-  with OrbeonFunctionLibrary
+
+class PipelineFunctionLibrary extends OrbeonFunctionLibrary
+  with PipelineNamespaces
   with CryptoFunctions
   with PureUriFunctions
   with IndependentFunctions
@@ -55,9 +55,8 @@ class PipelineFunctionLibrary extends {
 
   def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
 
-  def isPE = Version.isPE
-
-  def isPortlet = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType
+  def isPE: Boolean = Version.isPE
+  def isPortlet: Boolean = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType
 
   def setTitle(title: String): String = {
     NetUtils.getExternalContext.getResponse.setTitle(title)

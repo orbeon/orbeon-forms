@@ -24,6 +24,7 @@ import org.orbeon.builder.facade.JQueryTooltip.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.HtmlParsing
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
@@ -154,13 +155,14 @@ object ControlLabelHintTextEditor {
         resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
           // Send value to server, handled in Form Builder's `model.xml`
           val controlId   = resourceEditorCurrentControl.attr("id").get
-          val newValue    = Private.getValue
+          val newRawValue = Private.getValue
           val isHTML      = Private.isHTML
+          val sanitized   = if (isHTML) HtmlParsing.sanitizeHtmlString(newRawValue) else newRawValue
 
           RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
             controlId = controlId,
             lhha      = Private.getEditorType.entryName,
-            value     = newValue,
+            value     = sanitized,
             isHTML    = isHTML
           ).call() // ignoring the `Future` completion
 
@@ -171,8 +173,9 @@ object ControlLabelHintTextEditor {
           Private.annotateWithLhhaClass(false)
           jResourceEditorCurrentLabelHint.css("visibility", "")
           // Update values in the DOM, without waiting for the server to send us the value
+
           Private.setLabelHintHtml(isHTML)
-          Private.labelHintValue(jResourceEditorCurrentLabelHint, newValue)
+          Private.labelHintValue(jResourceEditorCurrentLabelHint, sanitized)
           // Clean state
           resourceEditorCurrentControlOpt = None
           jResourceEditorCurrentLabelHint = null

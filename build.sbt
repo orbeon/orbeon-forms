@@ -908,7 +908,8 @@ lazy val formBuilderJS = formBuilder.js
   .dependsOn(
     commonJS,
     xformsWeb % "test->test;compile->compile",
-    formRunnerWeb
+    formRunnerWeb,
+    coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)

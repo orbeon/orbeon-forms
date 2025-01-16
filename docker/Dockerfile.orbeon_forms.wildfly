@@ -1,4 +1,4 @@
-FROM quay.io/wildfly/wildfly:latest
+FROM quay.io/wildfly/wildfly:35.0.0.Final-jdk21
 
 ARG tag
 ARG file
@@ -24,8 +24,8 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && mkdir -p $DEPLOYMENT_DIR/orbeon.war \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon.war/
 
-# Allow auto-deployment of exploded WAR files (disabled by default)
-RUN sed -i 's|<deployment-scanner|<deployment-scanner auto-deploy-exploded="true"|g' $CONFIG_DIR/standalone.xml
+# Enable compression and auto-deployment of exploded WAR files
+COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
 
 # We might want to use WildFly's deployment overlays to customize the Orbeon Forms WAR instead of exploding it
 

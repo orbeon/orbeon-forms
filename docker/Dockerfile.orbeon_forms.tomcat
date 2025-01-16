@@ -24,7 +24,7 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon/
 
 # Enable compression
-COPY server.compression_on.xml $CONFIG_DIR/server.xml
+COPY server.gzip.xml $CONFIG_DIR/server.xml
 
 # Create directory for Tomcat context configuration
 RUN mkdir -p $CONTEXT_DIR

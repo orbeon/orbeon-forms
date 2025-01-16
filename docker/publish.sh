@@ -28,14 +28,14 @@ SQL_DATA_FILE='02-orbeon-postgresql-data.sql'
 # Docker registry tags
 DOCKER_TAG_BASE="$VERSION"
 DOCKER_TAG_TOMCAT="$DOCKER_TAG_BASE"
-#DOCKER_TAG_WILDFLY="$DOCKER_TAG_BASE-wildfly"
+DOCKER_TAG_WILDFLY="$DOCKER_TAG_BASE-wildfly"
 
 # Image names
 POSTGRES_IMAGE="orbeon/postgres:$DOCKER_TAG_BASE"
 ORBEON_FORMS_TOMCAT_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_TOMCAT"
 ORBEON_FORMS_TOMCAT_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_TOMCAT"
-#ORBEON_FORMS_WILDFLY_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_WILDFLY"
-#ORBEON_FORMS_WILDDLY_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_WILDFLY"
+ORBEON_FORMS_WILDFLY_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_WILDFLY"
+ORBEON_FORMS_WILDFLY_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_WILDFLY"
 
 # Image/container names for demo forms import/export
 DEMO_FORMS_POSTGRES_IMAGE="orbeon/postgres-demo-forms:$DOCKER_TAG_BASE"
@@ -66,10 +66,10 @@ main() {
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat.postgres_driver --build-arg base_image="$ORBEON_FORMS_TOMCAT_BASE_IMAGE" -t "$ORBEON_FORMS_TOMCAT_IMAGE" .
 
   # Build Orbeon Forms image (Wildfly, base image)
-  #docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
 
   # Build Orbeon Forms image (Wildfly, including PostgreSQL JDBC driver)
-  #docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .
 
   # Do not import demo forms into PostgreSQL, just use SQLite
   ## Import demo forms into PostgreSQL database and export them to SQL script
@@ -80,6 +80,7 @@ main() {
 
   if $publish; then
     docker push "$ORBEON_FORMS_TOMCAT_IMAGE"
+    docker push "$ORBEON_FORMS_WILDFLY_IMAGE"
     docker push "$POSTGRES_IMAGE"
   fi
 }

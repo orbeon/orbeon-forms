@@ -76,11 +76,6 @@ object Date {
       if (isNativePicker) {
         visibleInputElem.`type` = "date"
         EventSupport.addListener(visibleInputElem, DomEventNames.Change, (_: dom.Event) => onDateSelectedUpdateStateAndSendValueToServer())
-
-        // Also set `disabled` on iOS (see #5376)
-        if (visibleInputElem.readOnly)
-          visibleInputElem.disabled = true
-
       } else {
 
         // 2024-12-06: Use `focusout` like for `fr:time`
@@ -175,8 +170,6 @@ object Date {
         }
       }
 
-      // Also update disabled because this might be called upon an iteration being moved, in which
-      // case all the control properties must be updated.
       updateReadonly(companion.isMarkedReadonly)
     }
 

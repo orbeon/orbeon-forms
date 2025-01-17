@@ -183,14 +183,16 @@ class EmailProcessor extends ProcessorImpl {
       }
     }
 
-    // Set To
-    propertySet.getNonBlankString(TestTo) match {
-      case Some(testTo) => message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(testTo, false).map(ia => ia: Address))
-      case None         => addRecipients("to", Message.RecipientType.TO)
+    // Set To, Cc, Bcc, taking `set-to` into account
+    val testToOption = propertySet.getNonBlankString(TestTo)
+    testToOption match {
+      case Some(testTo) =>
+        message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(testTo, false).map(ia => ia: Address))
+      case None =>
+        addRecipients("to", Message.RecipientType.TO)
+        addRecipients("cc", Message.RecipientType.CC)
+        addRecipients("bcc", Message.RecipientType.BCC)
     }
-
-    addRecipients("cc", Message.RecipientType.CC)
-    addRecipients("bcc", Message.RecipientType.BCC)
 
     // Set headers if any
     for (headerElement <- messageElement.elements("header")) {

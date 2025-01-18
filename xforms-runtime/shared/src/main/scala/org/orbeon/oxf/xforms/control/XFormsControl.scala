@@ -177,15 +177,15 @@ class XFormsControl(
   def hasJavaScriptInitialization = false
 
   def compareExternalMaybeClientValue(
-    previousValueOpt   : Option[String],
-    previousControlOpt : Option[XFormsControl],
-    collector          : ErrorEventCollector
+    clientValueOpt    : Option[String],
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
   ): Boolean =
     // NOTE: See https://github.com/orbeon/orbeon-forms/issues/2857. We might consider removing this
     // optimization as it is dangerous. `XFormsValueControl` works around it by calling
     // `compareExternalUseExternalValue` directly.
     (previousControlOpt exists (_ eq self)) && (getInitialLocal eq getCurrentLocal) ||
-    compareExternalUseExternalValue(previousValueOpt, previousControlOpt, collector)
+    compareExternalUseExternalValue(clientValueOpt, previousControlOpt, collector)
 
   // Compare this control with another control, as far as the comparison is relevant for the external world.
   def compareExternalUseExternalValue(

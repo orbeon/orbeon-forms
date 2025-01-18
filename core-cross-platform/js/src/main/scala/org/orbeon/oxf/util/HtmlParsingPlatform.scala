@@ -11,7 +11,6 @@ import scala.util.control.NonFatal
 
 trait HtmlParsingPlatform {
 
-
   def parseHtmlString(value: String, xmlReceiver: XMLReceiver): Unit =
     try {
       // Use the browser's HTML parser to parse the HTML string

@@ -17,10 +17,8 @@ import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.date.IsoTime
 import org.orbeon.date.JSDateUtils.nowAsIsoTime
-import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
-import org.orbeon.web.DomSupport.DomElemOps
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
@@ -37,7 +35,8 @@ object Time {
 
   XBL.declareCompanion("fr|time", js.constructorOf[TimeCompanion])
 
-  private class TimeCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
+  private class TimeCompanion(containerElem: html.Element)
+    extends XblDateTimeCompanionSupport(containerElem) {
 
     companion =>
 
@@ -180,12 +179,6 @@ object Time {
 
     private object Private {
 
-      val isNativePicker: Boolean = {
-        val always = containerElem.querySelectorOpt(":scope > .fr-native-picker-always").isDefined
-        val iOS    = Bowser.ios.contains(true)
-        always || iOS
-      }
-
       def updateReadonly(readonly: Boolean): Unit =
         visibleInputElemOpt.foreach { visibleInputElem =>
           visibleInputElem.readOnly = readonly
@@ -239,12 +232,6 @@ object Time {
               state.stringValue
           )
         }
-
-      def readValue(input: html.Input): String =
-        input.value
-
-      def writeValue(input: html.Input, value: String): Unit =
-        input.value = value
     }
   }
 }

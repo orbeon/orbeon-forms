@@ -19,13 +19,11 @@ import org.log4s.Logger
 import org.orbeon.date.JSDateUtils.todayAsIsoDate
 import org.orbeon.date.{IsoDate, JSDateUtils}
 import org.orbeon.facades.BoostrapDatepicker.*
-import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
-import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -42,8 +40,10 @@ object Date {
 
   XBL.declareCompanion("fr|date", js.constructorOf[DateCompanion])
 
-  // TODO: Can we reduce duplication with `TimeCompanion`?
-  private class DateCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
+  // TODO: Can we reduce duplication with `TimeCompanion`
+  //  See `XblTDateTimeCompanionSupport` for WIP.
+  private class DateCompanion(containerElem: html.Element)
+    extends XblDateTimeCompanionSupport(containerElem) {
 
     companion =>
 
@@ -190,12 +190,6 @@ object Date {
 
     private object Private {
 
-      val isNativePicker: Boolean = {
-        val always = containerElem.querySelectorOpt(":scope > .fr-native-picker-always").isDefined
-        val iOS    = Bowser.ios.contains(true)
-        always || iOS
-      }
-
       def updateReadonly(readonly: Boolean): Unit =
         visibleInputElemOpt.foreach { visibleInputElem =>
           visibleInputElem.readOnly = readonly
@@ -240,12 +234,6 @@ object Date {
                 state.stringValue
             )
         }
-
-      def readValue(input: html.Input): String =
-        input.value
-
-      def writeValue(input: html.Input, value: String): Unit =
-        input.value = value
 
       def createDatePicker(visibleInputElem: html.Input, dateExternalValue: Option[DateExternalValue]): Unit = {
 

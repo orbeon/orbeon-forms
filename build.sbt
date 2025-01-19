@@ -88,7 +88,7 @@ val JavaxServletApiVersion           = "4.0.1"
 val JakartaServletApiVersion         = "6.1.0"
 val PortletApiVersion                = "3.0.1"
 val LiferayPortalServiceVersion      = "6.2.5"
-val LiferayPortalKernelVersion       = "154.0.0"
+val LiferayPortalKernelVersion       = "156.0.0"
 
 
 val CoreLibraryDependencies = Seq(

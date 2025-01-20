@@ -29,3 +29,6 @@ docker run \
   -v ./web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/web.xml \
   -v ./application.keystore:/opt/jboss/wildfly/standalone/configuration/application.keystore \
   orbeon/orbeon-forms:2024.1-pe-wildfly
+
+# Just use SQLite locally
+#  -v ./jboss-web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/jboss-web.xml \

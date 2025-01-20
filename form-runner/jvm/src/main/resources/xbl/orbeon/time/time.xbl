@@ -104,9 +104,14 @@
                         </_>
                     </xf:instance>
 
-                    <xf:bind ref="instance('local')/output-format-details">
-                        <xf:bind ref="@default | is24Hour | isPadHourDigits | hasSeconds" type="xs:boolean"/>
-                        <xf:bind ref="*" readonly="instance('local')/output-format-details/@default/data(.)"/>
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="native-picker" name="native-picker"/>
+                        <xf:bind ref="output-format-details">
+                            <xf:bind ref="*[@type = 'boolean']"    type="xs:boolean"/>
+                            <xf:bind ref="@default" name="default" type="xs:boolean"/>
+                            <xf:bind ref="*" readonly="$default/data(.)"/>
+                            <xf:bind ref="* except hasSeconds" readonly="$native-picker = 'always'"/><!-- these settings don't make sense when the native field is used -->
+                        </xf:bind>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">

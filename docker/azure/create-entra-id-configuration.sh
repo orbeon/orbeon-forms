@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script uses: az (Azure CLI), jq (JSON manipulation), and grep
+# This script uses: az (Azure CLI), jq (JSON manipulation), grep, and sed
 
 # Azure account email
 ACCOUNT_EMAIL="..." # TODO: add your Azure account email here
@@ -32,7 +32,7 @@ check_azure_login() {
   # Check if we're logged in as the correct user
   local account_output
   account_output=$(az account show --query user.name -o tsv 2>&1)
-  if [ $? -ne 0 ] || [ "$account_output" != "$EXPECTED_USER" ]; then
+  if [[ $? -ne 0 || "$account_output" != "$EXPECTED_USER" ]]; then
     echo "Need to login as $EXPECTED_USER..."
     if !  az login --scope "$GRAPH_SCOPE"; then
       return 1
@@ -291,7 +291,7 @@ check_and_add_permission() {
     --query "[?resourceAppId=='$api_id'].resourceAccess | [] | [?id=='$permission_id' && type=='$permission_type'].id" \
     --output tsv)
 
-  if [ -z "$existing_permission" ]; then
+  if [[ -z "$existing_permission" ]]; then
     az ad app permission add \
       --id "$app_id" \
       --api "$api_id" \
@@ -343,12 +343,30 @@ cat << EOF > form-builder-permissions.xml
 </roles>
 EOF
 
-# TODO: remove (debugging)
-echo "APP_ID: $APP_ID"
-echo "SCOPE_ID: $SCOPE_ID"
-echo "PROVIDER_URL: $PROVIDER_URL"
-echo "API_SCOPE_URL: $API_SCOPE_URL"
-echo "USER_GROUP_ID: $USER_GROUP_ID"
-echo "ADMIN_GROUP_ID: $ADMIN_GROUP_ID"
+# Generate the web.xml configuration file
+cp web.template.xml web.xml
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' \
+        -e "s/USER_GROUP_ID/${USER_GROUP_ID}/g" \
+        -e "s/ADMIN_GROUP_ID/${ADMIN_GROUP_ID}/g" \
+        web.xml
+else
+    # Linux and other Unix-like systems
+    sed -i \
+        -e "s/USER_GROUP_ID/${USER_GROUP_ID}/g" \
+        -e "s/ADMIN_GROUP_ID/${ADMIN_GROUP_ID}/g" \
+        web.xml
+fi
+
+# Print all IDs/URLs
+echo "User group ID: $USER_GROUP_ID"
+echo "Admin group ID: $ADMIN_GROUP_ID"
+echo "App ID: $APP_ID"
+echo "App object ID: $APP_OBJECT_ID"
+echo "Scope ID: $SCOPE_ID"
+echo "Tenant ID: $TENANT_ID"
+echo "Provider URL: $PROVIDER_URL"
+echo "API scope URL: $API_SCOPE_URL"
 
 # TODO: disable MFA (can't seem to be able to do it via the CLI => Entra ID > Properties > Security defaults > disable, all from the UI)

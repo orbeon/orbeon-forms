@@ -1,2 +1,5 @@
+application.keystore
 form-builder-permissions.xml
 oidc.json
+web.xml
+webapp

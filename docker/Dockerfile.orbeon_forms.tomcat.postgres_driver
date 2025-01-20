@@ -2,12 +2,12 @@ ARG base_image
 
 FROM $base_image
 
-RUN mkdir -p /tmp/orbeon
-WORKDIR /tmp/orbeon
+RUN mkdir -p /tmp/orbeon_forms
+WORKDIR /tmp/orbeon_forms
 
 # JDBC driver for PostgreSQL
 RUN wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
 RUN mv postgresql-42.7.3.jar /usr/local/tomcat/lib/
 
 # Cleanup
-RUN rm -rf /tmp/orbeon
+RUN rm -rf /tmp/orbeon_forms

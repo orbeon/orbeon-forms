@@ -8,8 +8,8 @@ ENV CONFIG_DIR=$TOMCAT_HOME/conf
 ENV CONTEXT_DIR=$CONFIG_DIR/Catalina/localhost
 ENV DEPLOYMENT_DIR=$TOMCAT_HOME/webapps
 
-RUN mkdir -p /tmp/orbeon
-WORKDIR /tmp/orbeon
+RUN mkdir -p /tmp/orbeon_forms
+WORKDIR /tmp/orbeon_forms
 
 RUN apt-get update -y && apt-get install -y unzip
 
@@ -30,7 +30,7 @@ COPY server.gzip.xml $CONFIG_DIR/server.xml
 RUN mkdir -p $CONTEXT_DIR
 
 # Cleanup
-RUN rm -rf /tmp/orbeon \
+RUN rm -rf /tmp/orbeon_forms \
     && apt-get remove -y unzip \
     && apt-get autoremove -y \
     && apt-get clean

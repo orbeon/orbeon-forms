@@ -2,8 +2,8 @@ ARG base_image=default
 
 FROM ${base_image}
 
-RUN mkdir -p /tmp/orbeon
-WORKDIR /tmp/orbeon
+RUN mkdir -p /tmp/orbeon_forms
+WORKDIR /tmp/orbeon_forms
 
 # JDBC driver for MySQL
 RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-9.0.0.tar.gz \
@@ -27,4 +27,4 @@ RUN rm -f /usr/local/tomcat/webapps/orbeon/WEB-INF/orbeon-demo.sqlite \
 RUN rm -f /usr/local/tomcat/lib/postgresql-*.jar
 
 # Cleanup
-RUN rm -rf /tmp/orbeon
+RUN rm -rf /tmp/orbeon_forms

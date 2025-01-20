@@ -9,8 +9,8 @@ ENV DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
 
 USER root
 
-RUN mkdir -p /tmp/orbeon
-WORKDIR /tmp/orbeon
+RUN mkdir -p /tmp/orbeon_forms
+WORKDIR /tmp/orbeon_forms
 
 RUN microdnf update -y && microdnf install -y unzip
 
@@ -30,9 +30,12 @@ COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
 # We might want to use WildFly's deployment overlays to customize the Orbeon Forms WAR instead of exploding it
 
 # Cleanup
-RUN rm -rf /tmp/orbeon \
+RUN rm -rf /tmp/orbeon_forms \
     && microdnf remove -y unzip \
     && microdnf clean all
+
+# Prevent permission errors at runtime (Ehcache, etc.)
+RUN mkdir -p /tmp/orbeon
 
 # Use jboss user at runtime
 RUN chown -R jboss:jboss $WILDFLY_HOME \

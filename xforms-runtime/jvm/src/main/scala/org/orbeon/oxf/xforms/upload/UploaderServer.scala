@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.upload
 
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
+import org.apache.commons.fileupload.{FileItemHeaders, UploadContext}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.exception.OrbeonFormatter
@@ -26,8 +26,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.*
-import org.orbeon.oxf.util.CoreUtils.OptionOps
-import org.orbeon.oxf.util.Multipart.UploadItem
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.FileItemSupport.*
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
@@ -50,10 +50,10 @@ object UploaderServer {
 
   import Private.*
 
-  def processUpload(request: Request): (List[(String, UploadItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
+  def processUpload(request: Request): (List[(String, DiskFileItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
 
     // Session is required to communicate with the XForms document
-    val session = request.sessionOpt getOrElse (throw new IllegalStateException("upload requires a session"))
+    val session = request.sessionOpt.getOrElse(throw new IllegalStateException("upload requires a session"))
 
     val trustedUploadContext = new UploadContext {
 
@@ -67,34 +67,43 @@ object UploaderServer {
       val getCharacterEncoding = request.getCharacterEncoding
       val getInputStream       = outerLimiterInputStream
 
+      def getMaxBytes                              = outerLimiterInputStream.maxBytes
+      def setMaxBytes(maxBytes: MaximumSize): Unit = outerLimiterInputStream.maxBytes = maxBytes
+
+//      println(new String(NetUtils.inputStreamToByteArray(outerLimiterInputStream)))
+
       // Set to -1 because we want to be able to read at least `$uuid`
       val contentLength        = -1L
       def getContentLength     = -1 // this won't be used anyway
     }
 
-    Multipart.parseMultipartRequest(
-      uploadContext  = trustedUploadContext,
-      lifecycleOpt   = Some(
-        new UploadProgressMultipartLifecycle(
-          requestContentLengthOpt  = request.contentLengthOpt,
-          requestAcceptLanguageOpt = request.getFirstHeaderIgnoreCase(Headers.AcceptLanguage),
-          outerLimiterInputStream  = trustedUploadContext.getInputStream,
-          session                  = session
-        ) {
-          def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
-            withDocumentAcquireLock(
-              uuid    = uuid,
-              timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)
-            { doc =>
-              doc.getUploadConstraintsForControl(controlEffectiveId) -> doc.getRequestUri
-            }
-        }
-      ),
-      maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
-      maxFiles       = Some(RequestGenerator.getMaxFilesProperty.toLong).filter(_ >= 0), // probably not really needed
-      headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
-      maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
-    )
+    val (files, throwableOpt) =
+      Multipart.parseMultipartRequest(
+        uploadContext  = trustedUploadContext,
+        lifecycleOpt   = Some(
+          new UploadProgressMultipartLifecycle(
+            requestContentLengthOpt  = request.contentLengthOpt,
+            requestAcceptLanguageOpt = request.getFirstHeaderIgnoreCase(Headers.AcceptLanguage),
+            getMaxBytes              = trustedUploadContext.getMaxBytes,
+            setMaxBytes              = trustedUploadContext.setMaxBytes,
+            session                  = session
+          ) {
+            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
+              withDocumentAcquireLock(
+                uuid    = uuid,
+                timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)
+              { doc =>
+                doc.getUploadConstraintsForControl(controlEffectiveId) -> doc.getRequestUri
+              }
+          }
+        ),
+        maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
+        maxFiles       = Some(RequestGenerator.getMaxFilesProperty.toLong).filter(_ >= 0), // probably not really needed
+        headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
+        maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
+      )
+
+    (files.collect { case (fieldName, Right(diskFileItem: DiskFileItem), fileScanAcceptResultOpt) => (fieldName, diskFileItem, fileScanAcceptResultOpt) }, throwableOpt)
   }
 
   def getUploadProgressForTests(
@@ -139,10 +148,11 @@ object UploaderServer {
 
   // Public for tests
   abstract class UploadProgressMultipartLifecycle(
-    requestContentLengthOpt  : Option[Long],
-    requestAcceptLanguageOpt : Option[String],
-    outerLimiterInputStream  : LimiterInputStream,
-    session                  : Session
+    requestContentLengthOpt : Option[Long],
+    requestAcceptLanguageOpt: Option[String],
+    getMaxBytes             : MaximumSize,
+    setMaxBytes             : MaximumSize => Unit,
+    session                 : Session
   ) extends MultipartLifecycle {
 
     import Private.*
@@ -166,7 +176,7 @@ object UploaderServer {
     def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
 
     // Can throw
-    def fileItemStarting(fieldName: String, fileItem: FileItem): Option[MaximumSize] = {
+    def fileItemStarting(fieldName: String, fileItem: DiskFileItem): Option[MaximumSize] = {
 
       val uuid =
         uuidOpt getOrElse (throw new IllegalStateException("missing document UUID"))
@@ -177,16 +187,11 @@ object UploaderServer {
       val ((maxUploadSizeForControl, allowedMediatypeRangesForControl), requestUri) =
         getUploadConstraintsForControl(uuid, fieldName).get // TODO: will throw if this is a `Failure`
 
-      val headersOpt =
-        for {
-          support <- fileItem.cast[FileItemHeadersSupport]
-          headers <- Option(support.getHeaders)
-        } yield
-          headers
+      val fileItemHeadersOpt = Option(fileItem.getHeaders)
 
-      def findHeaderValue(name: String) =
+      def findHeaderValue(name: String): Option[String] =
         for {
-          headers <- headersOpt
+          headers <- fileItemHeadersOpt
           value   <- Option(headers.getHeader(name))
         } yield
           value
@@ -202,7 +207,7 @@ object UploaderServer {
         // So that the XFCD is aware of progress information
         // Do this before checking size so that we can report the interrupted upload
         locally {
-          val (newSessionKey, progress) = UploaderServer.setUploadProgress(session, uuid, fieldName, untrustedExpectedSizeOpt, fileItem.getName.trimAllToOpt)
+          val (newSessionKey, progress) = UploaderServer.setUploadProgress(session, uuid, fieldName, untrustedExpectedSizeOpt, fileItem.nonBlankClientFilenameOpt)
           sessionKeys += newSessionKey
           progressOpt = Some(progress)
         }
@@ -210,7 +215,7 @@ object UploaderServer {
         // As of 2017-03-22: part `Content-Length` takes precedence if provided (but browsers don't set it).
         // Browsers do set the outer `Content-Length` though. Again we assume that the overhead of the
         // entire request vs. the part is small so it's ok, for progress purposes, to use the outer size.
-        untrustedExpectedSizeOpt foreach { untrustedExpectedSize =>
+        untrustedExpectedSizeOpt.foreach { untrustedExpectedSize =>
           UploadCheckerLogic.checkSizeLimitExceeded(
             maxSize     = maxUploadSizeForControl,
             currentSize = untrustedExpectedSize
@@ -221,10 +226,10 @@ object UploaderServer {
         // This is an approximation as there is overhead for `$uuid` and the part's headers.
         // The assumption is that the content of the upload is typically much larger than
         // the overhead.
-        (outerLimiterInputStream.maxBytes, maxUploadSizeForControl) match {
-          case (_,                    UnlimitedSize)        => outerLimiterInputStream.maxBytes = UnlimitedSize
+        (getMaxBytes, maxUploadSizeForControl) match {
+          case (_,                    UnlimitedSize)        => setMaxBytes(UnlimitedSize)
           case (UnlimitedSize,        LimitedSize(_))       => throw new IllegalStateException
-          case (LimitedSize(current), LimitedSize(control)) => outerLimiterInputStream.maxBytes = LimitedSize(current + control)
+          case (LimitedSize(current), LimitedSize(control)) => setMaxBytes(LimitedSize(current + control))
         }
       }
 
@@ -235,10 +240,10 @@ object UploaderServer {
           case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
             Mediatypes.fromHeadersOrFilename(findHeaderValue, fileItem.getName.trimAllToOpt) match {
               case None =>
-                throw DisallowedMediatypeException(fileItem.getName, allowedMediatypeRanges, None)
+                throw DisallowedMediatypeException(fileItem.nonBlankClientFilenameOpt, allowedMediatypeRanges, None)
               case Some(untrustedPartMediatype) =>
                 if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
-                  throw DisallowedMediatypeException(fileItem.getName, allowedMediatypeRanges, Some(untrustedPartMediatype))
+                  throw DisallowedMediatypeException(fileItem.nonBlankClientFilenameOpt, allowedMediatypeRanges, Some(untrustedPartMediatype))
             }
         }
       }
@@ -251,7 +256,7 @@ object UploaderServer {
               Try(
                 fileScanProviderV2.startStream(
                   filename  = fileItem.getName,
-                  headers   = FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil),
+                  headers   = FileScanProvider.convertHeadersToJava(fileItemHeadersOpt map convertFileItemHeaders getOrElse Nil),
                   language  = requestAcceptLanguageOpt.getOrElse("en"),
                   extension = Map[String, Any]("request.uri" -> requestUri).asJava
                 )
@@ -260,7 +265,7 @@ object UploaderServer {
                 case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
               }
           case Right(fileScanProvider) =>
-            fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
+            fileScanOpt = fileScanProvider.startStream(fileItem.getName, fileItemHeadersOpt map convertFileItemHeaders getOrElse Nil) match {
               case Success(fs) => Some(Right(fs))
               case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
             }
@@ -279,6 +284,7 @@ object UploaderServer {
       }
     }
 
+    // May return `Some[FileScanResult]` only if passed `UploadState.Completed`, `None` otherwise.
     def fileItemState(state: UploadState[DiskFileItem]): Option[FileScanResult] = {
 
       progressOpt foreach (_.state = state)

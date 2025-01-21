@@ -38,9 +38,9 @@ import scala.util.control.NonFatal
 
 
 case class DisallowedMediatypeException(
-  filename  : String,
-  permitted : Set[MediatypeRange],
-  actual    : Option[Mediatype]
+  clientFilenameOpt: Option[String],
+  permitted        : Set[MediatypeRange],
+  actual           : Option[Mediatype]
 ) extends FileUploadException
 
 case class EmptyFileException() extends FileUploadException
@@ -72,11 +72,11 @@ case class FileScanErrorResult(
 ) extends FileScanResult
 
 trait MultipartLifecycle {
-  def fieldReceived(fieldName: String, value: String)         : Unit
-  def fileItemStarting(fieldName: String, fileItem: FileItem) : Option[MaximumSize]
-  def updateProgress(b: Array[Byte], off: Int, len: Int)      : Option[FileScanResult]
-  def fileItemState(state: UploadState[DiskFileItem])         : Option[FileScanResult]
-  def interrupted()                                           : Unit
+  def fieldReceived(fieldName: String, value: String)             : Unit
+  def fileItemStarting(fieldName: String, fileItem: DiskFileItem) : Option[MaximumSize]
+  def updateProgress(b: Array[Byte], off: Int, len: Int)          : Option[FileScanResult]
+  def fileItemState(state: UploadState[DiskFileItem])             : Option[FileScanResult]
+  def interrupted()                                               : Unit
 }
 
 object Multipart {
@@ -114,14 +114,14 @@ object Multipart {
       case (nameValuesFileScan, None) =>
 
         // Add a listener to destroy file items when the pipeline context is destroyed
-        pipelineContext.addContextListener((_: Boolean) => quietlyDeleteFileItems(nameValuesFileScan))
+        pipelineContext.addContextListener((_: Boolean) => quietlyDeleteItems(nameValuesFileScan))
 
         val foldedValues =
           nameValuesFileScan map { case (k, v, _) => (k,  v.fold(identity, identity)) }
 
         combineValues[String, AnyRef, Array](foldedValues).toMap.asJava
       case (nameValuesFileScan, Some(t)) =>
-        quietlyDeleteFileItems(nameValuesFileScan)
+        quietlyDeleteItems(nameValuesFileScan)
         throw t
     }
   }
@@ -165,13 +165,14 @@ object Multipart {
       try {
         // `getItemIterator` can throw a `SizeLimitExceededException` in particular
         val itemIterator = FileItemSupport.asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
-        for (fis <- itemIterator)
+        for (fis <- itemIterator) {
           result += processSingleStreamItem(servletFileUpload, fis, lifecycleOpt)
+        }
 
         (result.toList, None)
       } catch {
         case NonFatal(t) =>
-          lifecycleOpt foreach (_.interrupted())
+          lifecycleOpt.foreach(_.interrupted())
           // Return all completed values up to the point of failure alongside the `Throwable`
           (result.toList, Some(t))
       }
@@ -186,12 +187,18 @@ object Multipart {
     )
 
   // Delete all items which are of type `FileItem`
-  def quietlyDeleteFileItems[T, U](nameValues: List[(T, UploadItem, U)]): Unit =
-    nameValues collect {
-      case (_, Right(fileItem), _) => fileItem
-    } foreach {
-      fileItem =>
-        FileItemSupport.deleteFileItem(fileItem, None)
+  private def quietlyDeleteItems[T, U](nameValues: List[(T, UploadItem, U)]): Unit =
+    nameValues
+      .collect {
+        case (_, Right(fileItem), _) => fileItem
+      }
+      .foreach {
+        fileItem => FileItemSupport.deleteFileItem(fileItem, None)
+      }
+
+  def quietlyDeleteFileItems[T, U](nameValues: List[(T, FileItem, U)]): Unit =
+    nameValues.foreach {
+      case (_, fileItem, _) => FileItemSupport.deleteFileItem(fileItem, None)
     }
 
   def rejectEmptyFiles: Boolean =
@@ -219,7 +226,7 @@ object Multipart {
         // A value could be very large, especially if there is a malicious request. However, this will be caught
         // by the limiter on the incoming outer input stream.
         val value = Streams.asString(fis.openStream, StandardParameterEncoding)
-        lifecycleOpt foreach (_.fieldReceived(fieldName, value))
+        lifecycleOpt.foreach(_.fieldReceived(fieldName, value))
         (fieldName, Left(value), None)
       } else {
 
@@ -280,11 +287,10 @@ object Multipart {
               throw t
           }
 
-          if (lifecycleOpt.isDefined && fileItemSize == 0L && rejectEmptyFiles) {
+          if (lifecycleOpt.isDefined && fileItemSize == 0L && rejectEmptyFiles)
             throw EmptyFileException()
-          }
 
-          lifecycleOpt flatMap (_.fileItemState(UploadState.Completed(fileItem))) match {
+          lifecycleOpt.flatMap(_.fileItemState(UploadState.Completed(fileItem))) match {
             case None                          =>
               // Means there was no file scan
               (fieldName, Right(fileItem), None)
@@ -300,15 +306,15 @@ object Multipart {
           case NonFatal(t) =>
             // Make sure we call `abort()` on the file scan provider but not if we have already called `complete()`
             if (! fileScanCompleteCalled)
-              lifecycleOpt foreach (_.fileItemState( // returns `None` anyway for `Interrupted` so we ignore the result
+              lifecycleOpt.foreach(_.fileItemState( // returns `None` anyway for `Interrupted` so we ignore the result
                 UploadState.Interrupted(
-                 Option(Exceptions.getRootThrowable(t))
-                 collect {
-                   case _: EmptyFileException                                     => FileRejectionReason.EmptyFile
-                   case root: SizeLimitExceededException                          => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
-                   case DisallowedMediatypeException(filename, permitted, actual) => FileRejectionReason.DisallowedMediatype(filename, permitted, actual)
-                   case FileScanException(fieldName, fileScanResult)              => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
-                 }
+                  Option(Exceptions.getRootThrowable(t))
+                    .collect {
+                      case _: EmptyFileException => FileRejectionReason.EmptyFile
+                      case root: SizeLimitExceededException => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
+                      case DisallowedMediatypeException(clientFilenameOpt, permitted, actual) => FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)
+                      case FileScanException(fieldName, fileScanResult) => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
+                    }
                 )
               ))
             throw t

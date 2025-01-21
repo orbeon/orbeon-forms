@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.FileItemSupport.FileItemOps
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.EncodeDecode
@@ -65,31 +64,30 @@ object XFormsUploadRoute extends XmlNativeRoute {
         )
     }
 
-    //          implicit def logger: Logger = Loggers.logger.logger
-
     UploaderServer.processUpload(ec.getRequest) match {
       case (nameValuesFileScan, None) =>
 
         // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
         // handle more than one here.
         val files =
-          nameValuesFileScan collect { // Q: Why do we test on fileItem.getName? We call the file scan API even is not blank, by the way!
-            case (name, Right(fileItem: DiskFileItem), fileScanAcceptResultOpt) if fileItem.getName.nonAllBlank => // XXX TODO use fileScanAcceptResultOpt
+          nameValuesFileScan.collect {
+            case (fieldName, fileItem, fileScanAcceptResultOpt)
+              if fileItem.hasNonBlankClientFilename => // Q: Why do we test on fileItem.getName? We call the file scan API even is not blank, by the way!
 
               FileItemSupport.Logger.debug(
                 s"UploaderServer got `FileItem` (disk location: `${fileItem.debugFileLocation}`)"
               )
 
               // Get size before renaming below
-              val message   = fileScanAcceptResultOpt.flatMap(_.message)
-              val mediatype = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse fileItem.contentTypeOpt
-              val filename  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse fileItem.nameOpt
+              val messageOpt   = fileScanAcceptResultOpt.flatMap(_.message)
+              val mediatypeOpt = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse fileItem.nonBlankContentTypeOpt
+              val filenameOpt  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse fileItem.nonBlankClientFilenameOpt
 
               // Not used yet
               //val extension = fileScanAcceptResultOpt.flatMap(_.extension)
 
               def sessionUrlAndSizeFromFileScan =
-                fileScanAcceptResultOpt.flatMap(_.content) map { is =>
+                fileScanAcceptResultOpt.flatMap(_.content).map { is =>
                   useAndClose(is) { _ =>
                     FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
                   }
@@ -109,23 +107,22 @@ object XFormsUploadRoute extends XmlNativeRoute {
                 (newFile.toURI, newFile.length())
               }
 
-              (name, filename, mediatype, sessionUrlAndSizeFromFileScan getOrElse sessionUrlAndSizeFromFileItem)
+              (fieldName, filenameOpt, mediatypeOpt, sessionUrlAndSizeFromFileScan getOrElse sessionUrlAndSizeFromFileItem)
           }
 
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
             for {
-              (fieldName, filename, mediatype, (sessionUrl, size)) <- files
-              headers      = Map(Headers.ContentType -> mediatype)
-              mediatypeOpt = Mediatypes.fromHeadersOrFilename(n => headers.get(n).flatten, filename)
+              (fieldName, filenameOpt, mediatypeOpt, (sessionUrl, size)) <- files
+              effectiveMediatypeOpt = Mediatypes.fromHeadersOrFilename(_ => mediatypeOpt, filenameOpt)
             } yield
               <xxf:event
-                name={EventNames.XXFormsUploadStore}
-                source-control-id={fieldName}
-                file={sessionUrl.toString}
-                filename={filename.getOrElse("")}
-                content-type={mediatypeOpt map (_.toString) getOrElse ""}
-                content-length={size.toString}/>
+                name              = {EventNames.XXFormsUploadStore}
+                source-control-id = {fieldName}
+                file              = {sessionUrl.toString}
+                filename          = {filenameOpt.getOrElse("")}
+                content-type      = {effectiveMediatypeOpt.map(_.toString).getOrElse("")}
+                content-length    = {size.toString}/>
           }</xxf:events>
         )
 

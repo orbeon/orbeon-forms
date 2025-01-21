@@ -36,10 +36,13 @@ object FileItemSupport {
 
   implicit class FileItemOps(private val fileItem: FileItem) extends AnyVal {
 
-    def nameOpt: Option[String] =
+    def nonBlankClientFilenameOpt: Option[String] =
       fileItem.getName.trimAllToOpt
 
-    def contentTypeOpt: Option[String] =
+    def hasNonBlankClientFilename: Boolean =
+      nonBlankClientFilenameOpt.isDefined
+
+    def nonBlankContentTypeOpt: Option[String] =
       fileItem.getContentType.trimAllToOpt
 
     def fileLocationOpt: Option[File] =

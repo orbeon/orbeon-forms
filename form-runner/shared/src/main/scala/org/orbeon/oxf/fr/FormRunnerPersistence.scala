@@ -53,6 +53,7 @@ import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 import java.net.URI
 import java.util as ju
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase
@@ -1007,10 +1008,15 @@ trait FormRunnerPersistence {
         origin = AttachmentEncryptedAttribute
       )
     if (setTmpFileAtt) {
-      XFormsAPI.insert(
-        into   = holder,
-        origin = NodeInfoFactory.attributeInfo(TmpFileAttributeName, attachment.fromPath)
-      )
+      // Only store a temporary file URI in `fr:tmp-file`, not other URIs pointing to the persistence layer, which
+      // might be outdated (e.g. draft), or that `email` might not be able to access.
+      val fromPathURIOpt = Try(URI.create(attachment.fromPath)).toOption
+      val isTemporaryURI = fromPathURIOpt.exists(org.orbeon.io.FileUtils.isTemporaryFileUri)
+      if (isTemporaryURI)
+        XFormsAPI.insert(
+          into   = holder,
+          origin = NodeInfoFactory.attributeInfo(TmpFileAttributeName, attachment.fromPath)
+        )
     }
   }
 

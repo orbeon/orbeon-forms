@@ -27,8 +27,8 @@ import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, SearchVersion, Version}
-import org.orbeon.oxf.http.HttpMethod.*
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.http.HttpMethod.*
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
@@ -178,7 +178,7 @@ private[persistence] object HttpCall {
 
     val headersCapitalized = {
 
-      import Version._
+      import Version.*
 
       val timeoutHeader  = timeout.map(t => Headers.Timeout -> List(Headers.TimeoutValuePrefix + t.toString))
       val versionHeaders = version match {
@@ -204,7 +204,7 @@ private[persistence] object HttpCall {
 
     val contentType = body.map {
       case XML   (_) => ContentTypes.XmlContentType
-      case Binary(_) => "application/octet-stream"
+      case Binary(_) => ContentTypes.OctetStreamContentType
     }
 
     val messageBody = body map {

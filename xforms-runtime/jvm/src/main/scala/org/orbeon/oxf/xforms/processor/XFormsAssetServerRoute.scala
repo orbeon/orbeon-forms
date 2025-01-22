@@ -507,7 +507,7 @@ object XFormsAssetServerRoute extends NativeRoute {
       val incompleteMediatype = mediatypeOpt exists (_.endsWith("/*"))
 
       val contentType =
-        contentTypeOpt filterNot (_ => incompleteMediatype) getOrElse "application/octet-stream"
+        contentTypeOpt filterNot (_ => incompleteMediatype) getOrElse ContentTypes.OctetStreamContentType
 
       DynamicResource(
         digest       = digest,

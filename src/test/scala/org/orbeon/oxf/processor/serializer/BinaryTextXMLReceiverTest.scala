@@ -18,6 +18,7 @@ import org.junit.Test
 import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.http.{PathType, StatusCode}
 import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -38,7 +39,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
 
     TransformerUtils.writeOrbeonDom(document, receiver)
 
-    assert("application/octet-stream" === response.contentType)
+    assert(ContentTypes.OctetStreamContentType == response.contentType)
   }
 
   @Test def forwardAsIs(): Unit =
@@ -54,7 +55,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
 
       TransformerUtils.writeOrbeonDom(document, receiver)
 
-      assert(contentType === response.contentType)
+      assert(contentType == response.contentType)
     }
 
   def responseWithReceiver: (TestResponse, BinaryTextXMLReceiver) = {

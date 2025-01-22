@@ -185,7 +185,7 @@ object Headers {
 
     // All browsers since IE7, Safari 5 support the `filename*=UTF-8''` syntax to indicate that the filename is
     // UTF-8 percent encoded. Also see https://stackoverflow.com/a/6745788/5295.
-    "Content-Disposition" -> ("attachment; filename*=UTF-8''" + filenameEncodedForHeader)
+    ContentDisposition -> ("attachment; filename*=UTF-8''" + filenameEncodedForHeader)
   }
 
   def embeddedClientValueFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Option[String] =

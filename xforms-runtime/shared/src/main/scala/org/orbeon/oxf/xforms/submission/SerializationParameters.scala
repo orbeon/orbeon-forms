@@ -56,7 +56,7 @@ object SerializationParameters {
     documentToSubmitOpt match {
       case Some(Left(uri)) =>
         requestedSerialization match {
-          case serialization @ "application/octet-stream" =>
+          case serialization @ ContentTypes.OctetStreamContentType =>
             InstanceData.getType(refContext.refNodeInfo) match {
               case XMLConstants.XS_BASE64BINARY_QNAME =>
                 // TODO
@@ -198,7 +198,7 @@ object SerializationParameters {
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(multipartContentType)
             )
-          case serialization @ "application/octet-stream" =>
+          case serialization @ ContentTypes.OctetStreamContentType =>
             throw new XFormsSubmissionException(
               submission  = submission,
               message     = s"xf:submission: illegal state: invalid submission serialization requested: $serialization",

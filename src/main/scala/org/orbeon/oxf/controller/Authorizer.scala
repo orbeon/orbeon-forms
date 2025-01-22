@@ -14,26 +14,25 @@
 package org.orbeon.oxf.controller
 
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
-
-import java.lang.Boolean as JBoolean
-import java.net.URI
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException}
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.*
 
+import java.lang.Boolean as JBoolean
+import java.net.URI
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 
 object Authorizer extends Logging {
 
-  import org.orbeon.oxf.controller.PageFlowControllerProcessor._
+  import org.orbeon.oxf.controller.PageFlowControllerProcessor.*
 
   // For now don't remember authorization, because simply remembering in the session is not enough if the authorization
   // depends on the request method, path, or headers.
@@ -154,7 +153,7 @@ object Authorizer extends Logging {
           HttpMethodsWithRequestBody(method) option
             StreamedContent(
               EmptyInputStream,
-              Some("application/octet-stream"),
+              Some(ContentTypes.OctetStreamContentType),
               Some(0L),
               None
             )

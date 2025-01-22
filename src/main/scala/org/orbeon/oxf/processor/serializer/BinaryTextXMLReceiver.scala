@@ -237,8 +237,8 @@ class BinaryTextXMLReceiver(
 
 object BinaryTextXMLReceiver {
 
-  val DefaultBinaryContentType = "application/octet-stream"
-  val DefaultTextContentType   = "text/plain"
+  val DefaultBinaryContentType = ContentTypes.OctetStreamContentType
+  val DefaultTextContentType   = ContentTypes.PlainTextContentType
 
   val PITargets = Set("orbeon-serializer", "oxf-serializer")
 

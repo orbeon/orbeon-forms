@@ -89,8 +89,8 @@ object DemoSqliteDatabase {
 
     val mediaType = FilenameUtils.getExtension(fileToImport.toString) match {
       case "jpg"           => "image/jpeg"
-      case "xml" | "xhtml" => "application/xml"
-      case _               => "application/octet-stream"
+      case "xml" | "xhtml" => ContentTypes.XmlContentType
+      case _               => ContentTypes.OctetStreamContentType
     }
 
     // Version 2 temporarily as on demo we have this and have a /new bug

@@ -1,0 +1,14 @@
+<properties
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+>
+    <!-- Change the following values for production use -->
+    <property as="xs:string" name="oxf.crypto.password"              value="J$WYh!Ltgg4Q^jnR"/>
+    <property as="xs:string" name="oxf.fr.field-encryption.password" value=""/>
+    <property as="xs:string" name="oxf.fr.access-token.password"     value=""/>
+
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*" value="postgresql"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.active"  value="false"/>
+</properties>

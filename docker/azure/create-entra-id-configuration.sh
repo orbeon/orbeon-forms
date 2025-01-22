@@ -2,58 +2,6 @@
 
 # This script uses: az (Azure CLI), jq (JSON manipulation), grep, and sed
 
-# Azure account email
-ACCOUNT_EMAIL="..." # TODO: add your Azure account email here
-
-# 1st Entra ID test user
-TEST_USER_EMAIL1="..." # TODO: add a test email here
-TEST_USER_PASSWORD1="CHANGEME!"
-TEST_USER_DISPLAY_NAME1="Test User 1"
-
-# 2nd Entra ID test user
-TEST_USER_EMAIL2="..." # TODO: add a test email here
-TEST_USER_PASSWORD2="CHANGEME!"
-TEST_USER_DISPLAY_NAME2="Test User 2"
-
-# Orbeon user and admin group names
-USER_GROUP="orbeon-user"
-ADMIN_GROUP="orbeon-admin"
-
-# Application name and URL
-APP_NAME="Orbeon Forms"
-APP_URL="https://localhost:8443/orbeon"
-
-SCOPE_VALUE="groups.access"
-
-check_azure_login() {
-  local GRAPH_SCOPE="https://graph.microsoft.com//.default"
-  local EXPECTED_USER="$1"  # Pass the expected user as first argument
-
-  # Check if we're logged in as the correct user
-  local account_output
-  account_output=$(az account show --query user.name -o tsv 2>&1)
-  if [[ $? -ne 0 || "$account_output" != "$EXPECTED_USER" ]]; then
-    echo "Need to login as $EXPECTED_USER..."
-    if !  az login --scope "$GRAPH_SCOPE"; then
-      return 1
-    fi
-  fi
-
-  # Verify Graph API access by making a test call
-  if ! az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' >/dev/null 2>&1; then
-    echo "Need to refresh token with Graph API permissions..."
-    if ! az login --scope "$GRAPH_SCOPE"; then
-      return 1
-    fi
-  fi
-
-  return 0
-}
-
-if ! check_azure_login "$ACCOUNT_EMAIL"; then
-  echo "Login failed"
-fi
-
 DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv 2>&1)
 echo "First domain: $DOMAIN"
 

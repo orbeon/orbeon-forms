@@ -71,12 +71,12 @@ case class FileScanErrorResult(
   throwable : Option[Throwable]
 ) extends FileScanResult
 
-trait MultipartLifecycle {
-  def fieldReceived(fieldName: String, value: String)             : Unit
-  def fileItemStarting(fieldName: String, fileItem: DiskFileItem) : Option[MaximumSize]
-  def updateProgress(b: Array[Byte], off: Int, len: Int)          : Option[FileScanResult]
-  def fileItemState(state: UploadState[DiskFileItem])             : Option[FileScanResult]
-  def interrupted()                                               : Unit
+trait MultipartLifecycle[Constraints] {
+  def fieldReceived(fieldName: String, value: String)            : Unit
+  def fileItemStarting(fieldName: String, fileItem: DiskFileItem): (Option[MaximumSize], Constraints)
+  def updateProgress(b: Array[Byte], off: Int, len: Int)         : Option[FileScanResult]
+  def fileItemState(state: UploadState[DiskFileItem])            : Option[FileScanResult]
+  def interrupted()                                              : Unit
 }
 
 object Multipart {
@@ -132,14 +132,14 @@ object Multipart {
   // occurred by looking at the Throwable returned. If the caller wants to discard the partial request, it is the
   // responsibility of the caller to discard returned FileItem if the caller doesn't want to process the partial
   // results further.
-  def parseMultipartRequest(
+  def parseMultipartRequest[Constraints](
     uploadContext  : UploadContext,
-    lifecycleOpt   : Option[MultipartLifecycle],
+    lifecycleOpt   : Option[MultipartLifecycle[Constraints]],
     maxSize        : MaximumSize,
     maxFiles       : Option[Long],
     headerEncoding : String,
     maxMemorySize  : Int
-  ): (List[(String, UploadItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
+  ): (List[(String, UploadItem, Option[(FileScanAcceptResult, Constraints)])], Option[Throwable]) = {
 
     require(uploadContext ne null)
     require(headerEncoding ne null)
@@ -161,7 +161,7 @@ object Multipart {
     // Parse the request and add file information
     useAndClose(uploadContext.getInputStream) { _ =>
       // This contains all completed values up to the point of failure if any
-      val result = m.ListBuffer[(String, UploadItem, Option[FileScanAcceptResult])]()
+      val result = m.ListBuffer[(String, UploadItem, Option[(FileScanAcceptResult, Constraints)])]()
       try {
         // `getItemIterator` can throw a `SizeLimitExceededException` in particular
         val itemIterator = FileItemSupport.asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
@@ -211,11 +211,11 @@ object Multipart {
     def adjustMaxSize(maxSize: Long): Long =
       if (maxSize < 0L) -1L else maxSize max DefaultBufferSize
 
-    def processSingleStreamItem(
+    def processSingleStreamItem[Constraints](
       servletFileUpload : ServletFileUpload,
       fis               : FileItemStream,
-      lifecycleOpt      : Option[MultipartLifecycle]
-    ): (String, UploadItem, Option[FileScanAcceptResult]) = {
+      lifecycleOpt      : Option[MultipartLifecycle[Constraints]]
+    ): (String, UploadItem, Option[(FileScanAcceptResult, Constraints)]) = {
 
       val fieldName = fis.getFieldName
 
@@ -238,54 +238,56 @@ object Multipart {
 
           var fileItemSize = 0L
 
-          try {
+          val constraintsOpt =
+            try {
 
-            // Browsers (at least Chrome and Firefox) don't seem to want to put a `Content-Length` per part :(
-            for {
-              fisHeaders     <- Option(fis.getHeaders) // `getHeaders` can be null
-              headersSupport <- fileItem.cast[FileItemHeadersSupport]
-            } locally {
-              headersSupport.setHeaders(fisHeaders)
-            }
+              // Browsers (at least Chrome and Firefox) don't seem to want to put a `Content-Length` per part :(
+              for {
+                fisHeaders     <- Option(fis.getHeaders) // `getHeaders` can be null
+                headersSupport <- fileItem.cast[FileItemHeadersSupport]
+              } locally {
+                headersSupport.setHeaders(fisHeaders)
+              }
 
-            val maxSizeForSpecificFileItemOpt =
-              lifecycleOpt flatMap
-                (_.fileItemStarting(fieldName, fileItem)) // can throw `FileScanException`, `IllegalStateException`, `DisallowedMediatypeException`
+              val fileItemStartingResult =
+                lifecycleOpt
+                  .map(_.fileItemStarting(fieldName, fileItem)) // can throw `FileScanException`, `IllegalStateException`, `DisallowedMediatypeException`
 
-            copyStreamAndClose(
-              in  = maxSizeForSpecificFileItemOpt map (
-                new LimiterInputStream(
+              copyStreamAndClose(
+                in  = fileItemStartingResult.flatMap(_._1) map (
+                  new LimiterInputStream(
+                    fis.openStream,
+                    _,
+                    throwSizeLimitExceeded
+                  )
+                ) getOrElse
                   fis.openStream,
-                  _,
-                  throwSizeLimitExceeded
-                )
-              ) getOrElse
-                fis.openStream,
-              out = new OutputStream {
+                out = new OutputStream {
 
-                private val fios = fileItem.getOutputStream
+                  private val fios = fileItem.getOutputStream
 
-                // We know that this is not called by `copyStream`
-                def write(b: Int): Unit = throw new IllegalStateException
+                  // We know that this is not called by `copyStream`
+                  def write(b: Int): Unit = throw new IllegalStateException
 
-                // We know that this is the only `write` method called by `copyStream`
-                override def write(b: Array[Byte], off: Int, len: Int): Unit =
-                  lifecycleOpt flatMap (_.updateProgress(b, off, len)) match {
-                    case None | Some(_: FileScanAcceptResult) => fios.write(b, off, len)
-                    case Some(r)                              => throw FileScanException(fieldName, r) // to the `catch` at the bottom
-                  }
+                  // We know that this is the only `write` method called by `copyStream`
+                  override def write(b: Array[Byte], off: Int, len: Int): Unit =
+                    lifecycleOpt.flatMap(_.updateProgress(b, off, len)) match {
+                      case None | Some(_: FileScanAcceptResult) => fios.write(b, off, len)
+                      case Some(r)                              => throw FileScanException(fieldName, r) // to the `catch` at the bottom
+                    }
 
-                override def flush(): Unit = fios.flush()
-                override def close(): Unit = fios.close()
-              },
-              progress = fileItemSize += _
-            )
-          } catch {
-            // Clean-up `FileItem` right away in case of failure
-            case NonFatal(t) =>
-              FileItemSupport.deleteFileItem(fileItem, None)
-              throw t
-          }
+                  override def flush(): Unit = fios.flush()
+                  override def close(): Unit = fios.close()
+                },
+                progress = fileItemSize += _
+              )
+              fileItemStartingResult.map(_._2)
+            } catch {
+              // Clean-up `FileItem` right away in case of failure
+              case NonFatal(t) =>
+                FileItemSupport.deleteFileItem(fileItem, None)
+                throw t
+            }
 
           if (lifecycleOpt.isDefined && fileItemSize == 0L && rejectEmptyFiles)
             throw EmptyFileException()
@@ -296,7 +298,7 @@ object Multipart {
               (fieldName, Right(fileItem), None)
             case Some(r: FileScanAcceptResult) =>
               fileScanCompleteCalled = true
-              (fieldName, Right(fileItem), Some(r))
+              (fieldName, Right(fileItem), Some(r -> constraintsOpt.getOrElse(throw new IllegalStateException)))
             case Some(r)                       =>
               // File scan with `FileScanErrorResult` or `FileScanRejectResult`
               fileScanCompleteCalled = true

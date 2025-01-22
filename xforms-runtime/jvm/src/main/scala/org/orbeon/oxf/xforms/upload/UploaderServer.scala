@@ -47,9 +47,34 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 
-object UploaderServer {
+object UploaderServer extends UploaderServer {
+
+  protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
+    withDocumentAcquireLock(
+      uuid    = uuid,
+      timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout
+    ) { doc =>
+      doc.getUploadConstraintsForControl(controlEffectiveId) -> doc.getRequestUri
+    }
+
+  private def checkVersion(): Unit =
+    Version.instance.requirePEFeature("File scan API")
+
+  protected lazy val fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
+      ServiceProviderSupport.loadProvider[FileScanProvider2]("file scan", checkVersion).kestrel(_.init()).map(Left.apply)
+        .orElse(ServiceProviderSupport.loadProvider[FileScanProvider]("file scan", checkVersion).kestrel(_.init()).map(Right.apply))
+}
+
+trait UploaderServer {
+
+  selfUploaderServer =>
 
   import Private.*
+
+  protected implicit val logger: slf4j.Logger = LoggerFactory.createLogger("org.orbeon.xforms.upload").logger
+
+  protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
+  protected def fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]]
 
   def processUpload(request: Request): (List[(String, DiskFileItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
 
@@ -88,12 +113,7 @@ object UploaderServer {
             session                  = session
           ) {
             def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
-              withDocumentAcquireLock(
-                uuid    = uuid,
-                timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)
-              { doc =>
-                doc.getUploadConstraintsForControl(controlEffectiveId) -> doc.getRequestUri
-              }
+              selfUploaderServer.getUploadConstraintsForControl(uuid, controlEffectiveId)
           }
         ),
         maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
@@ -283,7 +303,7 @@ object UploaderServer {
         // So that the XFCD is aware of progress information
         // Do this before checking size so that we can report the interrupted upload
         locally {
-          val (newSessionKey, progress) = UploaderServer.setUploadProgress(session, uuid, fieldName, untrustedExpectedSizeOpt, fileItem.nonBlankClientFilenameOpt)
+          val (newSessionKey, progress) = selfUploaderServer.setUploadProgress(session, uuid, fieldName, untrustedExpectedSizeOpt, fileItem.nonBlankClientFilenameOpt)
           sessionKeys += newSessionKey
           progressOpt = Some(progress)
         }
@@ -387,15 +407,13 @@ object UploaderServer {
       // - instead mark all entries added so far as being in state `Interrupted` if not already the case
       for (sessionKey <- sessionKeys)
         runQuietly {
-          UploaderServer.getUploadProgress(session, sessionKey)
+          selfUploaderServer.getUploadProgress(session, sessionKey)
           .collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) => p }
           .foreach (_.state = UploadState.Interrupted(None))
         }
   }
 
   private object Private {
-
-    implicit val logger: slf4j.Logger = LoggerFactory.createLogger("org.orbeon.xforms.upload").logger
 
     private val UploadProgressSessionKey = "orbeon.upload.progress."
 
@@ -419,13 +437,6 @@ object UploaderServer {
         case Success(fileScanResponse) => fileScanResultFromJavaApi(fileScanResponse)
         case Failure(t)                => FileScanErrorResult(message = Option(t.getMessage), throwable = Option(t))
       }
-
-    lazy val fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
-      ServiceProviderSupport.loadProvider[FileScanProvider2]("file scan", checkVersion).kestrel(_.init()).map(Left.apply)
-        .orElse(ServiceProviderSupport.loadProvider[FileScanProvider]("file scan", checkVersion).kestrel(_.init()).map(Right.apply))
-
-    private def checkVersion(): Unit =
-      Version.instance.requirePEFeature("File scan API")
 
     // The Java API uses its own ADT. Here we convert from that to our native Scala ADT.
     private def fileScanResultFromJavaApi(jfsr: JFileScanResult): FileScanResult =

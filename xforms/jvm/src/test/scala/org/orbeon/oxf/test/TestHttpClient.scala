@@ -106,51 +106,9 @@ object TestHttpClient {
         val (externalContext, response) = {
 
           val webAppContext         = new TestWebAppContext(Logger, ServerState.serverAttributes)
-          val connectionCredentials = credentials
-
-          // Create a request with only the methods used by `LocalRequest.incomingRequest` parameter
-          val baseRequest = new RequestAdapter {
-
-            override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
-            override val getAttributesMap                        = ju.Collections.synchronizedMap(attributes.asJava)
-            override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
-
-            override val getContainerType                        = "servlet"
-            override val getContainerNamespace                   = ""
-            override val getPortletMode  : String                = null
-            override val getWindowState  : String                = null
-            override val getNativeRequest: AnyRef                = null
-            override val getPathTranslated                       = ""
-            override val getProtocol                             = "HTTP/1.1"
-            override val getServerPort                           = ServerState.Port
-            override val getScheme                               = Scheme
-            override val getRemoteHost                           = RemoteHost
-            override val getRemoteAddr                           = RemoteAddr
-            override val isSecure                                = Scheme == "https"
-            override val getLocale : Locale                      = null
-            override val getLocales: util.Enumeration[_]         = null
-            override val getServerName                           = ServerState.Host
-            override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
-            override def sessionInvalidate()                     = session.invalidate()
-            override val getRequestedSessionId: String           = null
-
-            override val credentials                             = connectionCredentials
-
-            // The following are never used by our code
-            override val isRequestedSessionIdValid               = false   // only delegated
-            override def isUserInRole(role: String)              = false   // called by `xxf:is-user-in-role()`
-            override val getAuthType                             = "BASIC" // some processors read it but result is unused
-
-            // Session handling
-            private val session: Session =
-              new SimpleSession(SecureUtils.randomHexId) |!>
-                XFormsStateManager.sessionCreated
-
-            override def getSession(create: Boolean): Session = session
-          }
 
           val request = LocalRequest(
-            incomingRequest         = baseRequest,
+            incomingRequest         = makeBaseRequest(attributes, credentials),
             contextPath             = ServerState.ContextPath,
             pathQuery               = url,
             method                  = method,
@@ -196,5 +154,49 @@ object TestHttpClient {
     debug(s"response status code: ${httpResponse.statusCode}, headers: ${httpResponse.headers}, last modified: ${httpResponse.lastModified}")
 
     (processorService, httpResponse, sessionOpt, events.toList)
+  }
+
+  // Create a request with only the methods used by `LocalRequest.incomingRequest` parameter
+  def makeBaseRequest(
+    attributes           : Map[String, AnyRef] = Map.empty,
+    connectionCredentials: Option[Credentials] = None
+  ): RequestAdapter = new RequestAdapter {
+
+    override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
+    override val getAttributesMap                        = ju.Collections.synchronizedMap(attributes.asJava)
+    override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
+
+    override val getContainerType                        = "servlet"
+    override val getContainerNamespace                   = ""
+    override val getPortletMode  : String                = null
+    override val getWindowState  : String                = null
+    override val getNativeRequest: AnyRef                = null
+    override val getPathTranslated                       = ""
+    override val getProtocol                             = "HTTP/1.1"
+    override val getServerPort                           = ServerState.Port
+    override val getScheme                               = Scheme
+    override val getRemoteHost                           = RemoteHost
+    override val getRemoteAddr                           = RemoteAddr
+    override val isSecure                                = Scheme == "https"
+    override val getLocale : Locale                      = null
+    override val getLocales: util.Enumeration[_]         = null
+    override val getServerName                           = ServerState.Host
+    override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
+    override def sessionInvalidate()                     = session.invalidate()
+    override val getRequestedSessionId: String           = null
+
+    override val credentials                             = connectionCredentials
+
+    // The following are never used by our code
+    override val isRequestedSessionIdValid               = false   // only delegated
+    override def isUserInRole(role: String)              = false   // called by `xxf:is-user-in-role()`
+    override val getAuthType                             = "BASIC" // some processors read it but result is unused
+
+    // Session handling
+    private val session: Session =
+      new SimpleSession(SecureUtils.randomHexId) |!>
+        XFormsStateManager.sessionCreated
+
+    override def getSession(create: Boolean): Session = session
   }
 }

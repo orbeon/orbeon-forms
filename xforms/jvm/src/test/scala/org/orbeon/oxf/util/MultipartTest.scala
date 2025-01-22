@@ -71,6 +71,9 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val getCharacterEncoding = null
     val getInputStream       = outerLimiterInputStream
 
+    def getMaxBytes                              = outerLimiterInputStream.maxBytes
+    def setMaxBytes(maxBytes: MaximumSize): Unit = outerLimiterInputStream.maxBytes = maxBytes
+
     // Set to -1 because we want to be able to read at least `$uuid`
     val contentLength        = -1L
     def getContentLength     = -1 // this won't be used anyway
@@ -82,17 +85,17 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     val (triplets, throwableOpt) =
       parseMultipartRequest(
-        uploadContext,
-        Some(
-          new UploadProgressMultipartLifecycle(Some(body.length.toLong), None, uploadContext.getInputStream, session) {
+        uploadContext  = uploadContext,
+        lifecycleOpt   = Some(
+          new UploadProgressMultipartLifecycle(Some(body.length.toLong), None, uploadContext.getMaxBytes, uploadContext.setMaxBytes, session) {
             def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
               Success(MaximumSize.unapply(maxSize.toString).get -> AllowedAnyMediatype -> URI.create("/acme/sales/new"))
           }
         ),
-        MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),
-        None,
-        ExternalContext.StandardHeaderCharacterEncoding,
-        0
+        maxSize        = MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),
+        maxFiles       = None,
+        headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
+        maxMemorySize  = 0
       )
 
     (triplets map { case (a, b, _) => a -> convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))

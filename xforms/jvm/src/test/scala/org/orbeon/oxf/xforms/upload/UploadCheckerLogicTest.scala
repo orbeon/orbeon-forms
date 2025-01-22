@@ -44,7 +44,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
   describe("With `upload.max-size-per-file` property only") {
     for (limit <- List(LimitedSize(0L), LimitedSize(1000L), UnlimitedSize))
       it(s"limit = `$limit`") {
-        assert(limit === TestUploadCheckerLogic(
+        assert(limit == TestUploadCheckerLogic(
           controlIdToMaxSizePerFile                       = Map(),
           controlIdToMaxSizeAggregatePerControl           = Map(),
           controlIdToCurrentUploadSizeAggregateForControl = Map(),
@@ -83,7 +83,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
       (controlId, expectedLimit)  <- controlAndExpected
     } locally {
       it(s"limit = `$limit`, controlId = `$controlId`") {
-        assert(expectedLimit === TestUploadCheckerLogic(
+        assert(expectedLimit == TestUploadCheckerLogic(
           controlIdToMaxSizePerFile                       = Map("control1" -> 1000L, "control2" -> 2000L),
           controlIdToMaxSizeAggregatePerControl           = Map(),
           controlIdToCurrentUploadSizeAggregateForControl = Map(),
@@ -136,7 +136,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
       (controlId, expectedLimit)                                               <- controlAndExpected
     } locally {
       it(s"currentUploadSizeFormAggregate = `$currentUploadSizeFormAggregate`, formAggregateLimit = `$formAggregateLimit`, controlId = `$controlId`") {
-        assert(expectedLimit === TestUploadCheckerLogic(
+        assert(expectedLimit == TestUploadCheckerLogic(
           controlIdToMaxSizePerFile                       = Map("control1" -> 1000L, "control2" -> 2000L),
           controlIdToMaxSizeAggregatePerControl           = Map(),
           controlIdToCurrentUploadSizeAggregateForControl = Map(),
@@ -210,7 +210,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
       it(s"controlIdToCurrentUploadSizeControlAggregate = `$controlIdToCurrentUploadSizeControlAggregate`, controlId = `$controlId`") {
         val currentUploadSizeFormAggregate = controlIdToCurrentUploadSizeControlAggregate.values.sum
 
-        assert(expectedLimit === TestUploadCheckerLogic(
+        assert(expectedLimit == TestUploadCheckerLogic(
           controlIdToMaxSizePerFile                       = Map(),
           controlIdToMaxSizeAggregatePerControl           = Map("control1" -> 1000L, "control2" -> 1000L, "control3" -> 3000L),
           controlIdToCurrentUploadSizeAggregateForControl = controlIdToCurrentUploadSizeControlAggregate,

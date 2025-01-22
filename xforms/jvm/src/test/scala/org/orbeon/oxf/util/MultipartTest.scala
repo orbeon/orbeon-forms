@@ -35,6 +35,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import java.io.ByteArrayInputStream
 import java.net.URI
 import scala.collection.mutable as m
+import scala.util.chaining.*
 import scala.util.{Success, Try}
 
 
@@ -112,28 +113,26 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         val session = new SimpleSession(SecureUtils.randomHexId)
 
         it("must return UUID and file result") {
-          assert((expectedPairs, None) === newRead(session, limit))
+          assert((expectedPairs, None) == newRead(session, limit))
         }
 
-        implicit val uploadProgressEq =
-          new Equality[UploadProgress[DiskFileItem]] {
-            def areEqual(a: UploadProgress[DiskFileItem], b: Any) =
-              b match {
-                case b: UploadProgress[_] =>
-                  a.fieldName    == b.fieldName    &&
-                  a.expectedSize == b.expectedSize &&
-                  a.receivedSize == b.receivedSize &&
-                  a.state.name   == b.state.name // only check on the state name for now as we can't compare the nested `DiskFileItem`
-                case _ => false
-              }
+        implicit val uploadProgressEq: Equality[UploadProgress[DiskFileItem]] =
+          (a: UploadProgress[DiskFileItem], b: Any) => b match {
+            case b: UploadProgress[_] =>
+              a.fieldName    == b.fieldName &&
+              a.expectedSize == b.expectedSize &&
+              a.receivedSize == b.receivedSize &&
+              a.state.name   == b.state.name // only check on the state name for now as we can't compare the nested `DiskFileItem`
+            case _ => false
           }
 
-        val DummyFileItem = new DiskFileItem("foo", "image/jpeg", false, "bar.jpg", 10000, null)
-        DummyFileItem.getOutputStream // otherwise `toString` can fail with an NPE
+        val DummyFileItem =
+          new DiskFileItem("foo", "image/jpeg", false, "bar.jpg", 10000, null)
+            .tap(_.getOutputStream) // otherwise `toString` can fail with an NPE
 
         it("must set completed `UploadProgress` into session") {
           assert(
-            UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed(DummyFileItem)) ===
+            UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed(DummyFileItem)) === // keep `==`, see `uploadProgressEq`
               UploaderServer.getUploadProgressForTests(session, UUID, FieldName).get
           )
         }
@@ -156,14 +155,14 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
         it("must return just the UUID") {
           assert(
-            (expectedPairs, Some("org.apache.commons.fileupload.FileUploadBase$SizeLimitExceededException")) ===
+            (expectedPairs, Some("org.apache.commons.fileupload.FileUploadBase$SizeLimitExceededException")) ==
               newRead(session, limit)
           )
         }
 
         it("must set `Interrupted` `UploadProgress` into session") {
           assert(
-            Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeTooLarge(limit, 8326))))) ===
+            Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeTooLarge(limit, 8326))))) ==
               UploaderServer.getUploadProgressForTests(session, UUID, FieldName)
           )
         }

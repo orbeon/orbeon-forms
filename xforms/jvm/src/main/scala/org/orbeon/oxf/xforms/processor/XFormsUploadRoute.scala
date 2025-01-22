@@ -15,11 +15,10 @@ package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileCountLimitExceededException
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
-import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.controller.XmlNativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*

@@ -28,6 +28,7 @@ import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.FileItemSupport.*
+import org.orbeon.oxf.util.Multipart.UploadItem
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
@@ -70,14 +71,12 @@ object UploaderServer {
       def getMaxBytes                              = outerLimiterInputStream.maxBytes
       def setMaxBytes(maxBytes: MaximumSize): Unit = outerLimiterInputStream.maxBytes = maxBytes
 
-//      println(new String(NetUtils.inputStreamToByteArray(outerLimiterInputStream)))
-
       // Set to -1 because we want to be able to read at least `$uuid`
       val contentLength        = -1L
       def getContentLength     = -1 // this won't be used anyway
     }
 
-    val (files, throwableOpt) =
+    val result: (List[(String, UploadItem, Option[(FileScanAcceptResult, AllowedMediatypes)])], Option[Throwable]) =
       Multipart.parseMultipartRequest(
         uploadContext  = trustedUploadContext,
         lifecycleOpt   = Some(
@@ -103,7 +102,67 @@ object UploaderServer {
         maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
       )
 
-    (files.collect { case (fieldName, Right(diskFileItem: DiskFileItem), fileScanAcceptResultOpt) => (fieldName, diskFileItem, fileScanAcceptResultOpt) }, throwableOpt)
+    result match {
+      case (items, t @ Some(_)) =>
+        // If there was already an error, don't bother checking for further errors
+        items.collect { case (fieldName, Right(diskFileItem: DiskFileItem), tuple) =>
+          (fieldName, diskFileItem, tuple.map(_._1))
+        } -> t
+      case (items, None) =>
+        // No error so far, check mediatypes possibly updated by the file scan provider
+        // https://github.com/orbeon/orbeon-forms/issues/6738
+        val itemsWithThrowableOpt =
+          items.collect { case (fieldName, Right(diskFileItem: DiskFileItem), tuple) =>
+            (fieldName, diskFileItem, tuple.map(_._1)) ->
+              Try(checkFileScanResultMediatypeThrowIfDisallowed(diskFileItem, tuple)).toEither.left.toOption
+          }
+
+        itemsWithThrowableOpt.takeWhile(_._2.isEmpty).collect { case (files, _) => files } ->
+          itemsWithThrowableOpt.collectFirst { case (_, Some(t)) => t }
+    }
+  }
+
+  // https://github.com/orbeon/orbeon-forms/issues/6738
+  private def checkFileScanResultMediatypeThrowIfDisallowed(
+    fileItem        : DiskFileItem,
+    fileScanResulOpt: Option[(FileScanAcceptResult, AllowedMediatypes)]
+  ): Unit = fileScanResulOpt match {
+    // If the file scan provider returned a new and different mediatype, it will be used, so we need to revalidate
+    // it.
+    case
+      Some(
+        (
+          FileScanAcceptResult(_, someMediatypeFromFileScan @ Some(mediatypeFromFileScan), filenameFromFileScanOpt, _, _),
+          allowedMediatypes: AllowedMediatypes
+        )
+      )
+      if ! fileItem.nonBlankContentTypeOpt.contains(mediatypeFromFileScan) => // small optimization: do only if file scan mediatype is different, as if same it has already been checked
+
+      UploaderServer.checkMediatypesThrowIfDisallowed(
+        allowedMediatypeRanges    = allowedMediatypes,
+        nonBlankClientFilenameOpt = filenameFromFileScanOpt.flatMap(_.trimAllToOpt),
+        header                    = _ => someMediatypeFromFileScan
+      )
+    // If the file scan provider:
+    // - did not return a new mediatype
+    // - but returned a new filename
+    // - and there is no mediatype associated with the `FileItem`
+    // Then the mediatype associated with the filename returned by the provider will be used. So check it here.
+    case
+      Some(
+        (
+          FileScanAcceptResult(_, None, someFilenameFromFileScan @ Some(filenameFromFileScan), _, _),
+          allowedMediatypes: AllowedMediatypes
+        )
+      )
+      if fileItem.nonBlankContentTypeOpt.isEmpty => // only if there is no mediatype, as the one from the
+
+      UploaderServer.checkMediatypesThrowIfDisallowed(
+        allowedMediatypeRanges    = allowedMediatypes,
+        nonBlankClientFilenameOpt = someFilenameFromFileScan.flatMap(_.trimAllToOpt),
+        header                    = _ => None
+      )
+    case _ =>
   }
 
   def getUploadProgressForTests(
@@ -146,6 +205,23 @@ object UploaderServer {
       .foreach(_.removeAttribute(getProgressSessionKey(control.containingDocument.uuid, control.effectiveId)))
   }
 
+  def checkMediatypesThrowIfDisallowed(
+    allowedMediatypeRanges   : AllowedMediatypes,
+    nonBlankClientFilenameOpt: Option[String],
+    header                   : String => Option[String],
+  ): Unit =
+    allowedMediatypeRanges match {
+      case AllowedMediatypes.AllowedAnyMediatype =>
+      case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
+        Mediatypes.fromHeadersOrFilename(header, nonBlankClientFilenameOpt) match {
+          case None =>
+            throw DisallowedMediatypeException(nonBlankClientFilenameOpt, allowedMediatypeRanges, None)
+          case Some(untrustedPartMediatype) =>
+            if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
+              throw DisallowedMediatypeException(nonBlankClientFilenameOpt, allowedMediatypeRanges, Some(untrustedPartMediatype))
+        }
+    }
+
   // Public for tests
   abstract class UploadProgressMultipartLifecycle(
     requestContentLengthOpt : Option[Long],
@@ -153,7 +229,7 @@ object UploaderServer {
     getMaxBytes             : MaximumSize,
     setMaxBytes             : MaximumSize => Unit,
     session                 : Session
-  ) extends MultipartLifecycle {
+  ) extends MultipartLifecycle[AllowedMediatypes] {
 
     import Private.*
 
@@ -176,7 +252,7 @@ object UploaderServer {
     def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
 
     // Can throw
-    def fileItemStarting(fieldName: String, fileItem: DiskFileItem): Option[MaximumSize] = {
+    def fileItemStarting(fieldName: String, fileItem: DiskFileItem): (Option[MaximumSize], AllowedMediatypes) = {
 
       val uuid =
         uuidOpt getOrElse (throw new IllegalStateException("missing document UUID"))
@@ -234,25 +310,17 @@ object UploaderServer {
       }
 
       // Handle mediatypes
-      locally {
-        allowedMediatypeRangesForControl match {
-          case AllowedMediatypes.AllowedAnyMediatype =>
-          case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
-            Mediatypes.fromHeadersOrFilename(findHeaderValue, fileItem.getName.trimAllToOpt) match {
-              case None =>
-                throw DisallowedMediatypeException(fileItem.nonBlankClientFilenameOpt, allowedMediatypeRanges, None)
-              case Some(untrustedPartMediatype) =>
-                if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
-                  throw DisallowedMediatypeException(fileItem.nonBlankClientFilenameOpt, allowedMediatypeRanges, Some(untrustedPartMediatype))
-            }
-        }
-      }
+      checkMediatypesThrowIfDisallowed(
+        allowedMediatypeRanges    = allowedMediatypeRangesForControl,
+        nonBlankClientFilenameOpt = fileItem.nonBlankClientFilenameOpt,
+        header                    = findHeaderValue
+      )
 
       // https://github.com/orbeon/orbeon-forms/issues/5516
       if (Version.isPE)
-        fileScanProviderOpt foreach {
-          case Left(fileScanProviderV2) =>
-            fileScanOpt =
+        fileScanOpt =
+          fileScanProviderOpt.flatMap {
+            case Left(fileScanProviderV2) =>
               Try(
                 fileScanProviderV2.startStream(
                   filename  = fileItem.getName,
@@ -264,14 +332,14 @@ object UploaderServer {
                 case Success(fs) => Some(Left(fs))
                 case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
               }
-          case Right(fileScanProvider) =>
-            fileScanOpt = fileScanProvider.startStream(fileItem.getName, fileItemHeadersOpt map convertFileItemHeaders getOrElse Nil) match {
-              case Success(fs) => Some(Right(fs))
-              case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
-            }
-        }
+            case Right(fileScanProvider) =>
+              fileScanProvider.startStream(fileItem.getName, fileItemHeadersOpt map convertFileItemHeaders getOrElse Nil) match {
+                case Success(fs) => Some(Right(fs))
+                case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
+              }
+          }
 
-      Some(maxUploadSizeForControl)
+      (Some(maxUploadSizeForControl), allowedMediatypeRangesForControl)
     }
 
     def updateProgress(b: Array[Byte], off: Int, len: Int): Option[FileScanResult] = {

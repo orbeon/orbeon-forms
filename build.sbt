@@ -1518,17 +1518,6 @@ lazy val orbeonWarJS = orbeonWar.js
     }
   )
 
-
-// Only for IntelliJ to provide syntax highlighting/completion for `.sc` files in `ammonite`.
-// Ideally, I'd also like to be able to run those directly from sbt.
-lazy val ammonite = project
-  .in(file("ammonite"))
-  .settings(
-    name := "ammonite",
-    scalaVersion := scala213,
-    libraryDependencies += "com.lihaoyi" %% "ammonite" % "3.0.0" cross CrossVersion.full
-  )
-
 lazy val root = (project in file("."))
   .aggregate(
     commonJVM,

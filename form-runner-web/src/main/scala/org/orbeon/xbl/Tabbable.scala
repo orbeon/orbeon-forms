@@ -201,20 +201,22 @@ object Tabbable {
       if (tabPosition < 0              ) return
       if (tabPosition > allLis.size - 1) return
 
-      // Update keyboard shortcuts
-      val isAppleOs            = KeyboardShortcuts.isAppleOs
-      def addIcon(kbd: String) = s"$KeyBoardIconCharacter $kbd"
-      val nextTabShortcut      = addIcon(if (isAppleOs) "Ctrl + }" else "Ctrl + Tab")
-      val previousTabShortcut  = addIcon(if (isAppleOs) "Ctrl + {" else "Ctrl + Shift + Tab")
-      def setTooltip(position: Int, title: String): Unit =
-        allLis.lift(position).foreach(_.querySelectorOpt("a").foreach { aElem =>
-          aElem.setAttribute("title", title)
-          $(aElem).asInstanceOf[js.Dynamic].tooltip()
-        })
+      // Update keyboard shortcuts tooltips
+      if (isOutermostTabbableInDialog) {
+        val isAppleOs            = KeyboardShortcuts.isAppleOs
+        def addIcon(kbd: String) = s"$KeyBoardIconCharacter $kbd"
+        val nextTabShortcut      = addIcon(if (isAppleOs) "Ctrl + }" else "Ctrl + Tab")
+        val previousTabShortcut  = addIcon(if (isAppleOs) "Ctrl + {" else "Ctrl + Shift + Tab")
+        def setTooltip(position: Int, title: String): Unit =
+          allLis.lift(position).foreach(_.querySelectorOpt("a").foreach { aElem =>
+            aElem.setAttribute("title", title)
+            $(aElem).asInstanceOf[js.Dynamic].tooltip()
+          })
 
-      allLis.foreach(_.querySelectorAllT("a").foreach($(_).asInstanceOf[js.Dynamic].tooltip("destroy")))
-      setTooltip(tabPosition + 1, nextTabShortcut)
-      setTooltip(tabPosition - 1, previousTabShortcut)
+        allLis.foreach(_.querySelectorAllT("a").foreach($(_).asInstanceOf[js.Dynamic].tooltip("destroy")))
+        setTooltip(tabPosition + 1, nextTabShortcut)
+        setTooltip(tabPosition - 1, previousTabShortcut)
+      }
 
       // Switch tab
       val newLi = allLis(tabPosition)
@@ -232,7 +234,8 @@ object Tabbable {
       containerElem.querySelectorAllT(s":scope > div > .nav-tabs > $ExcludeNotVisible")
 
     private def onDOMKeydown(event: dom.KeyboardEvent): Unit = {
-      if (containerElem.matches("dialog :scope")) {
+      // Only handle keyboard shortcuts on the outermost tabbable
+      if (isOutermostTabbableInDialog) {
         // macOS-like
         if (event.ctrlKey && !event.altKey) {
             event.key match {
@@ -260,6 +263,9 @@ object Tabbable {
         }
       }
     }
+
+    private def isOutermostTabbableInDialog: Boolean =
+      containerElem.matches("dialog .xbl-fr-tabbable:not(.xbl-fr-tabbable .xbl-fr-tabbable)")
 
     private def getCurrentTabIndex: Int =
       getAllLis.indexWhere(_.matches(ActiveSelector))

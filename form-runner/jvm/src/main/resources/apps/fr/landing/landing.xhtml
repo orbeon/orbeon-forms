@@ -47,12 +47,18 @@
                 name="has-any-matching-roles"
                 value="not($fb-permissions/@has-roles = 'false')"/>
 
+            <xf:var
+                name="is-form-builder-available"
+                value="doc-available('oxf:/forms/orbeon/builder/form/form.xhtml')"/>
+
             <!-- Similar logic in Form Builder model.xml -->
             <xf:var
                 name="is-allow-new-form-builder"
                 value="
-                    not($has-any-matching-roles) or
-                    $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
+                    $is-form-builder-available and (
+                        not($has-any-matching-roles) or
+                        $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])
+                    )"/>
 
             <xf:var
                 name="is-allow-admin"
@@ -167,8 +173,8 @@
             </xf:submission>
 
             <xf:action event="xforms-model-construct-done">
-                <xf:send if="$cards-tokens = 'published-forms'"    submission="fr-landing-read-form-metadata-submission"/>
-                <xf:send if="$cards-tokens = 'form-builder-forms'" submission="fr-landing-read-form-builder-submission"/>
+                <xf:send if="$cards-tokens = 'published-forms'"                                   submission="fr-landing-read-form-metadata-submission"/>
+                <xf:send if="$is-form-builder-available and $cards-tokens = 'form-builder-forms'" submission="fr-landing-read-form-builder-submission"/>
             </xf:action>
 
         </xf:model>
@@ -189,7 +195,7 @@
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/></xh:figcaption>
                                 </xh:figure>
                             </xh:a>
-                            <xh:a href="/fr/orbeon/builder/summary" class="text-center">
+                            <xh:a href="/fr/orbeon/builder/summary" class="text-center {'xforms-hidden'[not($is-form-builder-available)]}">
                                 <xh:figure>
                                     <xh:img src="/apps/fr/style/images/orbeon/library.svg" class="img-thumbnail w-100"/>
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-summary', '|fr-fr-resources|')"/></xh:figcaption>
@@ -297,7 +303,7 @@
                     </fr:card-footer>
                 </fr:card>
                 <fr:card
-                    class="{'xforms-hidden'[not($cards-tokens = 'form-builder-forms')]}"
+                    class="{'xforms-hidden'[not($is-form-builder-available) or not($cards-tokens = 'form-builder-forms')]}"
                     status="{(instance('fr-landing-form-builder-instance')/@state, 'done')[1]}"
                 >
                     <xf:label ref="xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|')"/>

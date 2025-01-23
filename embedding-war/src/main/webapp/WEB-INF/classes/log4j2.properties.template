@@ -5,13 +5,13 @@ name = OrbeonEmbeddingConfig
 appender.CONSOLE.type=Console
 appender.CONSOLE.name=CONSOLE
 appender.CONSOLE.layout.type = PatternLayout
-appender.CONSOLE.layout.pattern = %date{ISO8601} %-5level %logger{1} - %message%n
+appender.CONSOLE.layout.pattern = %date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n
 
 appender.FILE.type = File
 appender.FILE.name = FILE
 appender.FILE.fileName = /var/log/orbeon-embedding.log
 appender.FILE.layout.type = PatternLayout
-appender.FILE.layout.pattern = %date{ISO8601} %-5level %logger{1} - %message%n
+appender.FILE.layout.pattern = %date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n
 
 logger.apache-http.name = org.orbeon.private.apache.http
 logger.apache-http.level = error

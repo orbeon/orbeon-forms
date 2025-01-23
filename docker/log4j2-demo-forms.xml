@@ -2,14 +2,14 @@
 
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
-            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+            <PatternLayout pattern="%date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n"/>
         </Console>
 
         <File
             name="SingleFileAppender"
             fileName="/logs/orbeon.log"
             append="true">
-            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+            <PatternLayout pattern="%date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n"/>
         </File>
 
         <RollingFile
@@ -17,7 +17,7 @@
             fileName="/logs/orbeon-rolling.log"
             filePattern="/logs/orbeon-rolling-%date{yyyy-dd-MM}.log.gz"
             ignoreExceptions="false">
-            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+            <PatternLayout pattern="%date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="5 MB"/>

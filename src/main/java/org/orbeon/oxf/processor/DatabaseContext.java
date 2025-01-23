@@ -91,9 +91,9 @@ public class DatabaseContext {
                 // Create connection from datasource
                 javax.naming.Context initialContext = new InitialContext();
 
-                // Workaround for WildFly (TODO: do we really need it?)
+                // Workaround for WildFly (TODO: investigate why we still need this with 2024.1+ and WildFly 35+)
                 DataSource ds = null;
-                List<String> prefixesToTry = Arrays.asList("java:comp/env/", "java:/");
+                List<String> prefixesToTry = Arrays.asList("java:comp/env/", "java:/", "java:jboss/datasources/");
                 for (String prefix : prefixesToTry) {
                     try {
                         ds = (DataSource) initialContext.lookup(prefix + jndiName);

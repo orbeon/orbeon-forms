@@ -132,9 +132,9 @@ object RelationalUtils extends Logging {
       (throw new OXFException("Missing `orbeon-datasource` header"))
 
   private def getDataSourceNoFallback(name: String): Option[DataSource] = {
-    val prefixesToTry = Seq("java:comp/env/jdbc/", "java:/jdbc/")
+    val prefixesToTry = Seq("java:comp/env/jdbc/", "java:/jdbc/", "java:jboss/datasources/")
 
-    // Workaround for WildFly (TODO: do we really need it?)
+    // Workaround for WildFly (TODO: investigate why we still need this with 2024.1+ and WildFly 35+)
     prefixesToTry
       .to(LazyList)
       .map(prefix => Try(InitialContext.doLookup(prefix + name).asInstanceOf[DataSource]))

@@ -119,7 +119,7 @@
                             <resource xml:lang="en">
                                 <output-format>Time format</output-format>
                                 <native-picker>
-                                    <label>Use browser date picker</label>
+                                    <label>Use browser time picker</label>
                                     <item id="0">Use default</item>
                                     <item id="1">Automatically</item>
                                     <item id="2">Always</item>

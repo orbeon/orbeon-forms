@@ -15,16 +15,15 @@ package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileCountLimitExceededException
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
-import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.controller.XmlNativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*
-import org.orbeon.oxf.util.FileItemSupport.FileItemOps
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.upload.UploaderServer
+import org.orbeon.oxf.xforms.upload.UploaderServer.UploadResponse
 import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.xforms.EventNames
@@ -47,72 +46,31 @@ object XFormsUploadRoute extends XmlNativeRoute {
       response.setContentType(ContentTypes.XmlContentType)
 
       NodeConversions.elemToSAX(
-          <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-            <xxf:action>
-              <xxf:server-events>{
-                EncodeDecode.encodeXML(
-                  NodeConversions.elemToOrbeonDom(serverEvents),
-                  XFormsGlobalProperties.isGZIPState,
-                  encrypt = true,
-                  location = false
-                )
-              }</xxf:server-events>
-            </xxf:action>
-          </xxf:event-response>,
-          getResponseXmlReceiver(ec)
-        )
+        <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          <xxf:action>
+            <xxf:server-events>{
+              EncodeDecode.encodeXML(
+                NodeConversions.elemToOrbeonDom(serverEvents),
+                XFormsGlobalProperties.isGZIPState,
+                encrypt = true,
+                location = false
+              )
+            }</xxf:server-events>
+          </xxf:action>
+        </xxf:event-response>,
+        getResponseXmlReceiver(ec)
+      )
     }
 
+    // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
+    // handle more than one here.
     UploaderServer.processUpload(ec.getRequest) match {
-      case (nameValuesFileScan, None) =>
-
-        // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
-        // handle more than one here.
-        val files =
-          nameValuesFileScan.collect {
-            case (fieldName, fileItem, fileScanAcceptResultOpt)
-              if fileItem.hasNonBlankClientFilename => // Q: Why do we test on fileItem.getName? We call the file scan API even is not blank, by the way!
-
-              FileItemSupport.Logger.debug(
-                s"UploaderServer got `FileItem` (disk location: `${fileItem.debugFileLocation}`)"
-              )
-
-              // Get size before renaming below
-              val messageOpt   = fileScanAcceptResultOpt.flatMap(_.message)
-              val mediatypeOpt = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse fileItem.nonBlankContentTypeOpt
-              val filenameOpt  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse fileItem.nonBlankClientFilenameOpt
-
-              // Not used yet
-              //val extension = fileScanAcceptResultOpt.flatMap(_.extension)
-
-              def sessionUrlAndSizeFromFileScan =
-                fileScanAcceptResultOpt.flatMap(_.content).map { is =>
-                  useAndClose(is) { _ =>
-                    FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
-                  }
-                }
-
-              // If there is a `FileScanProvider`, a `File` is obtained from the `DiskFileItem` separately. If by
-              // any chance a new file is created on disk at that time, it will be deleted separately as the request
-              // completes. Here again we would create a new request-expired file, before renaming it and making
-              // sure it expires with the session only.
-              def sessionUrlAndSizeFromFileItem = {
-
-                val newFile =
-                  FileItemSupport.renameAndExpireWithSession(
-                    FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)
-                  )
-
-                (newFile.toURI, newFile.length())
-              }
-
-              (fieldName, filenameOpt, mediatypeOpt, sessionUrlAndSizeFromFileScan getOrElse sessionUrlAndSizeFromFileItem)
-          }
+      case (uploadResponses, None) =>
 
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
             for {
-              (fieldName, filenameOpt, mediatypeOpt, (sessionUrl, size)) <- files
+              UploadResponse(fieldName, messageOpt, mediatypeOpt, filenameOpt, sessionUrl, actualSize) <- uploadResponses
               effectiveMediatypeOpt = Mediatypes.fromHeadersOrFilename(_ => mediatypeOpt, filenameOpt)
             } yield
               <xxf:event
@@ -121,32 +79,27 @@ object XFormsUploadRoute extends XmlNativeRoute {
                 file              = {sessionUrl.toString}
                 filename          = {filenameOpt.getOrElse("")}
                 content-type      = {effectiveMediatypeOpt.map(_.toString).getOrElse("")}
-                content-length    = {size.toString}/>
+                content-length    = {actualSize.toString}
+                messsage          = {messageOpt.getOrElse("")}/>
           }</xxf:events>
         )
 
-      case (nameValues, someThrowable @ Some(t)) =>
-        // NOTE: There is no point sending a response, see:
-        //   https://github.com/orbeon/orbeon-forms/issues/985
-        // 2022-02-18: However we do send a response for a `FileScanException` so we can pass a custom error
-        // message.
-        Multipart.quietlyDeleteFileItems(nameValues)
-
-        t match {
-          case FileScanException(fieldName, fileScanResult) =>
-            outputResponse(
-              <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:event name={EventNames.XXFormsUploadError} source-control-id={fieldName}>
-                  <xxf:property name="error-type">file-scan-error</xxf:property>
-                  <xxf:property name="message">{fileScanResult.message.getOrElse("")}</xxf:property>
-                </xxf:event>
-              </xxf:events>
-            )
-          case _: SizeLimitExceededException | _: FileSizeLimitExceededException | _: FileCountLimitExceededException =>
-            throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
-          case _ =>
-            throw HttpStatusCodeException(StatusCode.InternalServerError, throwable = someThrowable)
-        }
+      case (_, Some(FileScanException(fieldName, fileScanResult))) =>
+        // 2022-02-18: We do send a response for a `FileScanException` so we can pass a custom error message.
+        outputResponse(
+          <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event name={EventNames.XXFormsUploadError} source-control-id={fieldName}>
+              <xxf:property name="error-type">file-scan-error</xxf:property>
+              <xxf:property name="message">{fileScanResult.message.getOrElse("")}</xxf:property>
+            </xxf:event>
+          </xxf:events>
+        )
+      case (_, someThrowable @ Some(_: SizeLimitExceededException | _: FileSizeLimitExceededException | _: FileCountLimitExceededException)) =>
+        // No point sending a response body: https://github.com/orbeon/orbeon-forms/issues/985
+        throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
+      case (_, someThrowable) =>
+        // No point sending a response body: https://github.com/orbeon/orbeon-forms/issues/985
+        throw HttpStatusCodeException(StatusCode.InternalServerError, throwable = someThrowable)
     }
   }
 }

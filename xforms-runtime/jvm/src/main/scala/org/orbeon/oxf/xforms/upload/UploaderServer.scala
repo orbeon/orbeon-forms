@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.upload
 
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.apache.commons.fileupload.{FileItemHeaders, UploadContext}
+import org.apache.commons.fileupload.{FileItem, FileItemHeaders, UploadContext}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.IOUtils.runQuietly
+import org.orbeon.io.IOUtils.{runQuietly, useAndClose}
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -49,6 +49,15 @@ import scala.util.{Failure, Success, Try}
 
 object UploaderServer extends UploaderServer {
 
+  case class UploadResponse(
+    fieldName   : String,
+    messageOpt  : Option[String],
+    mediatypeOpt: Option[String],
+    filenameOpt : Option[String],
+    tmpFileUri  : URI,
+    actualSize  : Long
+  )
+
   protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
     withDocumentAcquireLock(
       uuid    = uuid,
@@ -70,13 +79,14 @@ trait UploaderServer {
   selfUploaderServer =>
 
   import Private.*
+  import UploaderServer.*
 
   protected implicit val logger: slf4j.Logger = LoggerFactory.createLogger("org.orbeon.xforms.upload").logger
 
   protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
   protected def fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]]
 
-  def processUpload(request: Request): (List[(String, DiskFileItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
+  def processUpload(request: Request): (List[UploadResponse], Option[Throwable]) = {
 
     // Session is required to communicate with the XForms document
     val session = request.sessionOpt.getOrElse(throw new IllegalStateException("upload requires a session"))
@@ -122,68 +132,140 @@ trait UploaderServer {
         maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
       )
 
+    def quietlyDeleteFileItems(itemsToDelete: List[(String, UploadItem, Option[(FileScanAcceptResult, AllowedMediatypes)])]): Unit =
+      itemsToDelete
+        .collect { case (_, Right(fileItem: FileItem), _) => fileItem }
+        .foreach(FileItemSupport.deleteFileItem(_, None))
+
+    // Check post-file scan provider constraints
     result match {
       case (items, t @ Some(_)) =>
         // If there was already an error, don't bother checking for further errors
-        items.collect { case (fieldName, Right(diskFileItem: DiskFileItem), tuple) =>
-          (fieldName, diskFileItem, tuple.map(_._1))
-        } -> t
+        quietlyDeleteFileItems(items)
+        Nil -> t // currently, the caller does not need the failed uploads
       case (items, None) =>
         // No error so far, check mediatypes possibly updated by the file scan provider
         // https://github.com/orbeon/orbeon-forms/issues/6738
         val itemsWithThrowableOpt =
-          items.collect { case (fieldName, Right(diskFileItem: DiskFileItem), tuple) =>
-            (fieldName, diskFileItem, tuple.map(_._1)) ->
-              Try(checkFileScanResultMediatypeThrowIfDisallowed(diskFileItem, tuple)).toEither.left.toOption
+          items.collect { case (fieldName, Right(diskFileItem: DiskFileItem), fileScanAcceptResultTupleOpt) =>
+            (fieldName, diskFileItem, fileScanAcceptResultTupleOpt.map(_._1)) ->
+              Try(checkFileScanResultMediatypeThrowIfDisallowed(diskFileItem, fileScanAcceptResultTupleOpt)).toEither.left.toOption
           }
 
-        itemsWithThrowableOpt.takeWhile(_._2.isEmpty).collect { case (files, _) => files } ->
-          itemsWithThrowableOpt.collectFirst { case (_, Some(t)) => t }
+        itemsWithThrowableOpt
+          .collectFirst { case (_, Some(t)) => t }
+          match {
+            case t @ Some(_) =>
+              quietlyDeleteFileItems(items)
+              Nil -> t // currently, the caller does not need the failed uploads
+            case None =>
+              itemsWithThrowableOpt.takeWhile(_._2.isEmpty).collect { case ((fieldName, diskFileItem, fileScanAcceptResultTupleOpt), _) =>
+                uploadResponseFromFileScanResultOrDiskItem(fieldName, fileScanAcceptResultTupleOpt, diskFileItem)
+              } -> None
+          }
     }
+  }
+
+  private def uploadResponseFromFileScanResultOrDiskItem(
+    fieldName              : String,
+    fileScanAcceptResultOpt: Option[FileScanAcceptResult],
+    diskFileItem           : DiskFileItem
+  ): UploadResponse = {
+
+    val messageOpt   = fileScanAcceptResultOpt.flatMap(_.message)
+    val mediatypeOpt = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse diskFileItem.nonBlankContentTypeOpt
+    val filenameOpt  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse diskFileItem.nonBlankClientFilenameOpt
+
+    val (tmpFileUri, actualSize) = contentFromFileScanResultOrDiskItem(fileScanAcceptResultOpt, diskFileItem)
+
+    UploadResponse(
+      fieldName    = fieldName,
+      messageOpt   = messageOpt,
+      mediatypeOpt = mediatypeOpt,
+      filenameOpt  = filenameOpt,
+      tmpFileUri   = tmpFileUri,
+      actualSize   = actualSize
+    )
+  }
+
+  private def contentFromFileScanResultOrDiskItem(
+    fileScanAcceptResultOpt: Option[FileScanAcceptResult],
+    diskFileItem           : DiskFileItem
+  ): (URI, Long) = {
+
+    def sessionUrlAndSizeFromFileScan: Option[(URI, Long)] =
+      fileScanAcceptResultOpt.flatMap(_.content).map { is =>
+        useAndClose(is) { _ =>
+          FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
+        }
+      }
+
+    // If there is a `FileScanProvider`, a `File` is obtained from the `DiskFileItem` separately. If by
+    // any chance a new file is created on disk at that time, it will be deleted separately as the request
+    // completes. Here again we would create a new request-expired file, before renaming it and making
+    // sure it expires with the session only.
+    def sessionUrlAndSizeFromFileItem: (URI, Long) = {
+
+      val newFile =
+        FileItemSupport.renameAndExpireWithSession(
+          FileItemSupport.urlForFileItemCreateIfNeeded(diskFileItem, ExpirationScope.Request)
+        )
+
+      (newFile.toURI, newFile.length())
+    }
+
+//    FileItemSupport.Logger.debug(
+//      s"UploaderServer got `FileItem` (disk location: `${fileItem.debugFileLocation}`)"
+//    )
+
+    sessionUrlAndSizeFromFileScan getOrElse sessionUrlAndSizeFromFileItem
   }
 
   // https://github.com/orbeon/orbeon-forms/issues/6738
   private def checkFileScanResultMediatypeThrowIfDisallowed(
     fileItem        : DiskFileItem,
     fileScanResulOpt: Option[(FileScanAcceptResult, AllowedMediatypes)]
-  ): Unit = fileScanResulOpt match {
-    // If the file scan provider returned a new and different mediatype, it will be used, so we need to revalidate
-    // it.
-    case
-      Some(
-        (
-          FileScanAcceptResult(_, someMediatypeFromFileScan @ Some(mediatypeFromFileScan), filenameFromFileScanOpt, _, _),
-          allowedMediatypes: AllowedMediatypes
+  ): Unit =
+    fileScanResulOpt match {
+      // If the file scan provider returned a new and different mediatype, it will be used, so we need to revalidate
+      // it.
+      case
+        Some(
+          (
+            FileScanAcceptResult(_, someMediatypeFromFileScan @ Some(mediatypeFromFileScan), filenameFromFileScanOpt, _, _),
+            allowedMediatypes: AllowedMediatypes
+          )
         )
-      )
-      if ! fileItem.nonBlankContentTypeOpt.contains(mediatypeFromFileScan) => // small optimization: do only if file scan mediatype is different, as if same it has already been checked
+        if ! fileItem.nonBlankContentTypeOpt.contains(mediatypeFromFileScan) => // small optimization: do only if file scan mediatype is different, as if same it has already been checked
 
-      UploaderServer.checkMediatypesThrowIfDisallowed(
-        allowedMediatypeRanges    = allowedMediatypes,
-        nonBlankClientFilenameOpt = filenameFromFileScanOpt.flatMap(_.trimAllToOpt),
-        header                    = _ => someMediatypeFromFileScan
-      )
-    // If the file scan provider:
-    // - did not return a new mediatype
-    // - but returned a new filename
-    // - and there is no mediatype associated with the `FileItem`
-    // Then the mediatype associated with the filename returned by the provider will be used. So check it here.
-    case
-      Some(
-        (
-          FileScanAcceptResult(_, None, someFilenameFromFileScan @ Some(filenameFromFileScan), _, _),
-          allowedMediatypes: AllowedMediatypes
+        UploaderServer.checkMediatypesThrowIfDisallowed(
+          allowedMediatypeRanges    = allowedMediatypes,
+          nonBlankClientFilenameOpt = filenameFromFileScanOpt.flatMap(_.trimAllToOpt),
+          header                    = _ => someMediatypeFromFileScan
         )
-      )
-      if fileItem.nonBlankContentTypeOpt.isEmpty => // only if there is no mediatype, as the one from the
+      // If the file scan provider:
+      // - did not return a new mediatype
+      // - but returned a new filename
+      // - and there is no mediatype associated with the `FileItem`
+      // Then the mediatype associated with the filename returned by the provider will be used. So check it here.
+      // However, note that this probably will not happen, as there is always a mediatype sent with the multipart
+      // request's file part
+      case
+        Some(
+          (
+            FileScanAcceptResult(_, None, someFilenameFromFileScan @ Some(_), _, _),
+            allowedMediatypes: AllowedMediatypes
+          )
+        )
+        if fileItem.nonBlankContentTypeOpt.isEmpty =>
 
-      UploaderServer.checkMediatypesThrowIfDisallowed(
-        allowedMediatypeRanges    = allowedMediatypes,
-        nonBlankClientFilenameOpt = someFilenameFromFileScan.flatMap(_.trimAllToOpt),
-        header                    = _ => None
-      )
-    case _ =>
-  }
+        UploaderServer.checkMediatypesThrowIfDisallowed(
+          allowedMediatypeRanges    = allowedMediatypes,
+          nonBlankClientFilenameOpt = someFilenameFromFileScan.flatMap(_.trimAllToOpt),
+          header                    = _ => None
+        )
+      case _ =>
+    }
 
   def getUploadProgressForTests(
     session  : Session,

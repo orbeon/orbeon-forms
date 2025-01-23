@@ -196,11 +196,6 @@ object Multipart {
         fileItem => FileItemSupport.deleteFileItem(fileItem, None)
       }
 
-  def quietlyDeleteFileItems[T, U](nameValues: List[(T, FileItem, U)]): Unit =
-    nameValues.foreach {
-      case (_, fileItem, _) => FileItemSupport.deleteFileItem(fileItem, None)
-    }
-
   def rejectEmptyFiles: Boolean =
     properties.getBoolean("oxf.fr.upload.reject-empty-files", default = true)
 

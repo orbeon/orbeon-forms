@@ -4,12 +4,14 @@ import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.{HttpMultipartMode, MultipartEntityBuilder}
 import org.orbeon.connection.StreamedContent
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.oxf.externalcontext.LocalRequest
+import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.test.{ResourceManagerSupport, TestHttpClient}
+import org.orbeon.oxf.test.{PipelineSupport, ResourceManagerSupport, TestHttpClient}
 import org.orbeon.oxf.util.ContentTypes
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
+import org.orbeon.oxf.xforms.upload.UploaderServer.UploadResponse
 import org.orbeon.oxf.xforms.upload.api.FileScanProvider
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult}
 import org.orbeon.xforms.Constants
@@ -23,10 +25,13 @@ import scala.util.{Success, Try}
 
 class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
+  def new8000BytesContentInputStream: InputStream =
+    ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/util/miserables-8000.txt")
+
   def makeContentRequest: LocalRequest = {
     val content =
       buildMultipartContent(
-        is           = ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/util/miserables-8000.txt"),
+        is           = new8000BytesContentInputStream,
         fieldName    = "xf-5",
         mediatypeOpt = Some("text/plain"),
         filenameOpt  = Some("miserables-8000.txt")
@@ -47,6 +52,52 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
     )
   }
 
+  def withTestExternalContext[T](body: ExternalContext => T): T =
+    PipelineSupport.withTestExternalContext(
+      XFormsStateManager.sessionCreated,
+      XFormsStateManager.sessionDestroyed)(
+      body
+    )
+
+  describe("Test size constraints") {
+
+    it(s"must upload when size constraints are satisfied") {
+      withTestExternalContext { _ =>
+
+        val (uploadResponses, None) =
+          new TestUploaderServer(
+            maximumSize       = MaximumSize.UnlimitedSize,
+            allowedMediatypes = AllowedMediatypes.AllowedAnyMediatype,
+            fileScanProvider  = None
+          )
+          .processUpload(makeContentRequest)
+
+        uploadResponses
+          .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize)  =>
+            assert(filenameOpt.contains("miserables-8000.txt"))
+            assert(actualSize == 8000)
+            assert(mediatypeOpt.contains("text/plain"))
+        }
+      }
+    }
+
+    it(s"must not upload when size constraints are not satisfied") {
+      withTestExternalContext { _ =>
+
+        val (items, throwableOpt) =
+          new TestUploaderServer(
+            maximumSize       = MaximumSize.LimitedSize(4000),
+            allowedMediatypes = AllowedMediatypes.AllowedAnyMediatype,
+            fileScanProvider  = None
+          )
+          .processUpload(makeContentRequest)
+
+        assert(throwableOpt.isDefined)
+        assert(items.isEmpty)
+      }
+    }
+  }
+
   describe("Test mediatype constraints") {
 
     val AllowTextPlainMediatypeVariations = List(
@@ -58,22 +109,23 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     for (mediatype <- AllowTextPlainMediatypeVariations)
       it(s"must upload when mediatype constraints are satisfied: `$mediatype`") {
+        withTestExternalContext { _ =>
 
-        val (items, None) =
-          new TestUploaderServer(
-            maximumSize       = MaximumSize.UnlimitedSize,
-            allowedMediatypes = mediatype,
-            fileScanProvider  = None
-          )
-          .processUpload(makeContentRequest)
+          val (uploadResponses, None) =
+            new TestUploaderServer(
+              maximumSize       = MaximumSize.UnlimitedSize,
+              allowedMediatypes = mediatype,
+              fileScanProvider  = None
+            )
+            .processUpload(makeContentRequest)
 
-        items
-          .foreach { case (_, fileItem, fileScanAcceptResultOpt) =>
-            assert(fileItem.getName == "miserables-8000.txt")
-            assert(fileItem.getSize == 8000)
-            assert(fileItem.getContentType == "text/plain")
-            assert(fileScanAcceptResultOpt.isEmpty)
-          }
+          uploadResponses
+            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize) =>
+              assert(filenameOpt.contains("miserables-8000.txt"))
+              assert(actualSize == 8000)
+              assert(mediatypeOpt.contains("text/plain"))
+            }
+        }
       }
 
     val DisallowTextPlainMediatypeVariations = List(
@@ -83,17 +135,19 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     for (mediatype <- DisallowTextPlainMediatypeVariations)
       it(s"must not upload when mediatype constraints are not satisfied: `$mediatype`") {
+        withTestExternalContext { _ =>
 
-        val (items, throwableOpt) =
-          new TestUploaderServer(
-            maximumSize       = MaximumSize.UnlimitedSize,
-            allowedMediatypes = mediatype,
-            fileScanProvider  = None
-          )
-          .processUpload(makeContentRequest)
+          val (items, throwableOpt) =
+            new TestUploaderServer(
+              maximumSize       = MaximumSize.UnlimitedSize,
+              allowedMediatypes = mediatype,
+              fileScanProvider  = None
+            )
+            .processUpload(makeContentRequest)
 
-        assert(throwableOpt.isDefined)
-        assert(items.isEmpty)
+          assert(throwableOpt.isDefined)
+          assert(items.isEmpty)
+        }
       }
 
     val AllowTextMediatypes = List(
@@ -103,37 +157,40 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     for (mediatype <- AllowTextMediatypes)
       it(s"must upload when mediatype constraints are satisfied after file scan updates them: `$mediatype`") {
+        withTestExternalContext { _ =>
 
-        val (items, None) =
-          new TestUploaderServer(
-            maximumSize       = MaximumSize.UnlimitedSize,
-            allowedMediatypes = mediatype,
-            fileScanProvider  = Some(new TestFileScanProvider(newMediatypeOpt = Some("text/html"), newFilenameOpt = None))
-          )
-          .processUpload(makeContentRequest)
+          val (items, None) =
+            new TestUploaderServer(
+              maximumSize       = MaximumSize.UnlimitedSize,
+              allowedMediatypes = mediatype,
+              fileScanProvider  = Some(new TestFileScanProvider(newMediatypeOpt = Some("text/html")))
+            )
+            .processUpload(makeContentRequest)
 
-        items
-          .foreach { case (_, fileItem, fileScanAcceptResultOpt) =>
-            assert(fileItem.getName == "miserables-8000.txt")
-            assert(fileItem.getSize == 8000)
-            assert(fileItem.getContentType == "text/plain")
-            assert(fileScanAcceptResultOpt.isDefined)
-          }
+          items
+            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize) =>
+              assert(filenameOpt.contains("miserables-8000.txt"))
+              assert(actualSize == 8000)
+              assert(mediatypeOpt.contains("text/html"))
+            }
+        }
       }
 
     for (mediatype <- AllowTextMediatypes)
       it(s"must not upload when mediatype constraints are not satisfied after file scan updates them: `$mediatype`") {
+        withTestExternalContext { _ =>
 
-        val (items, throwableOpt) =
-          new TestUploaderServer(
-            maximumSize       = MaximumSize.UnlimitedSize,
-            allowedMediatypes = mediatype,
-            fileScanProvider  = Some(new TestFileScanProvider(newMediatypeOpt = Some("image/png"), newFilenameOpt = None))
-          )
-          .processUpload(makeContentRequest)
+          val (items, throwableOpt) =
+            new TestUploaderServer(
+              maximumSize       = MaximumSize.UnlimitedSize,
+              allowedMediatypes = mediatype,
+              fileScanProvider  = Some(new TestFileScanProvider(newMediatypeOpt = Some("image/png")))
+            )
+            .processUpload(makeContentRequest)
 
-        assert(throwableOpt.isDefined)
-        assert(items.isEmpty)
+          assert(throwableOpt.isDefined)
+          assert(items.isEmpty)
+        }
       }
   }
 
@@ -171,7 +228,11 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
     )
   }
 
-  class TestFileScanProvider(newMediatypeOpt: Option[String], newFilenameOpt: Option[String]) extends FileScanProvider2 {
+  class TestFileScanProvider(
+    newMediatypeOpt: Option[String]      = None,
+    newFilenameOpt : Option[String]      = None,
+    newContent     : Option[InputStream] = None
+  ) extends FileScanProvider2 {
     def init(): Unit = ()
     def destroy(): Unit = ()
     def startStream(filename: String, headers: util.Map[String, Array[String]], language: String, extension: util.Map[String, Any]): FileScan2 = {
@@ -183,7 +244,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
             null,
             newMediatypeOpt.orNull,
             newFilenameOpt.orNull,
-            null,
+            newContent.orNull,
             null
           )
         def abort(): Unit = ()

@@ -5,38 +5,45 @@
 @import (reference) "../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-bootstrap-override";
 
 .orbeon {
-  text-expander {
+  .xbl-fb-xpath-completion {
+    text-expander {
 
-    & > .dropdown-menu {
-      display: block;
-    }
+      textarea {
+        font-family: monospace;
+        font-size: small;
+      }
 
-    ul {
-      position: absolute;
+      & > .dropdown-menu {
+        display: block;
+      }
 
-      background-color: white;
-      border-color: #ddd;
-      border-style: solid;
-      border-radius: 5px;
-      padding: 5px;
+      ul {
+        position: absolute;
 
-      li {
-        list-style: none;
-        white-space: nowrap;
-        padding: 3px 20px;
-        line-height: @baseLineHeight;
+        background-color: white;
+        border-color: #ddd;
+        border-style: solid;
+        border-radius: 5px;
+        padding: 5px;
 
-        &:hover {
+        li {
+          list-style: none;
+          white-space: nowrap;
+          padding: 3px 20px;
+          line-height: @baseLineHeight;
 
-          color: @dropdownLinkColorHover;
-          background-color: @dropdownLinkBackgroundHover;
+          &:hover {
 
-          cursor: pointer;
-        }
+            color: @dropdownLinkColorHover;
+            background-color: @dropdownLinkBackgroundHover;
 
-        &[aria-selected = true] {
-          color: @dropdownLinkColorHover;
-          background-color: @dropdownLinkBackgroundActive;
+            cursor: pointer;
+          }
+
+          &[aria-selected = true] {
+            color: @dropdownLinkColorHover;
+            background-color: @dropdownLinkBackgroundActive;
+          }
         }
       }
     }

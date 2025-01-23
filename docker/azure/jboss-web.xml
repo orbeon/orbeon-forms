@@ -2,6 +2,6 @@
 <jboss-web>
     <resource-ref>
         <res-ref-name>jdbc/postgresql</res-ref-name>
-        <jndi-name>java:jboss/datasources/postgresql</jndi-name>
+        <jndi-name>java:/jdbc/postgresql</jndi-name>
     </resource-ref>
 </jboss-web>

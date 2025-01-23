@@ -228,15 +228,13 @@
     </context-param>-->
     <!-- End session listener processors -->
 
-    <!-- Uncomment this for the relational persistence, and change oracle if necessary -->
-    <!--
     <resource-ref>
         <description>DataSource</description>
-        <res-ref-name>jdbc/oracle</res-ref-name>
+        <res-ref-name>jdbc/postgresql</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
-    </resource-ref>-->
-    <!-- End relational persistence, and change oracle if necessary -->
+    </resource-ref>
+
     <!-- Form Runner authentication -->
     <!-- Require the security role on /fr/auth by default. To protect everything this must be changed. -->
     <security-constraint>

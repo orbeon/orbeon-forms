@@ -1,5 +1,10 @@
 #!/bin/bash
 
+source variables.sh
+
+# Login if needed
+source login.sh
+
 # Create Entra ID configuration (test users, groups, permissions, etc.)
 source create-entra-id-configuration.sh
 
@@ -25,10 +30,10 @@ docker run \
   -p 8443:8443 \
   -v ~/.orbeon/license.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/license.xml \
   -v ./form-builder-permissions.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/form-builder-permissions.xml \
+  -v ./properties-local.postgresql.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/properties-local.xml \
+  -v ./jboss-web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/jboss-web.xml \
   -v ./oidc.json:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/oidc.json \
   -v ./web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/web.xml \
   -v ./application.keystore:/opt/jboss/wildfly/standalone/configuration/application.keystore \
+  -v ./standalone.postgresql.local.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
   orbeon/orbeon-forms:2024.1-pe-wildfly
-
-# Just use SQLite locally
-#  -v ./jboss-web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/jboss-web.xml \

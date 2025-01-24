@@ -233,7 +233,7 @@
                     'new edit'
                 )[1]
             )[
-                . = ('new', 'edit', 'view', 'pdf', 'tiff')
+                . = ('new', 'edit', 'view', 'pdf', 'tiff', 'test', 'test-pdf')
             ]"/>
 
     <xsl:variable

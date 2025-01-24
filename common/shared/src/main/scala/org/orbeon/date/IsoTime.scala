@@ -202,6 +202,11 @@ object IsoTime {
             hInt
 
         IsoTime(hh, mInt, Option(s).map(_.toInt))
+      case MagicTimeNoSeparatorRe(h, m)
+        if h.toInt >=0 && h.toInt < 24  &&
+          (m.toInt >= 0 && m.toInt <= 59) =>
+
+        IsoTime( h.toInt, m.toInt, None)
     }
 
   def pad2(n: Int): String =
@@ -221,5 +226,6 @@ object IsoTime {
       )
     }
 
-  private val MagicTimeRe = """(\d{1,2})(?::(\d{1,2})(?::(\d{1,2}))?)?(?:\s*(p|pm|p\.m\.|a|am|a\.m\.))?""".r
+  private val MagicTimeRe            = """(\d{1,2})(?::(\d{1,2})(?::(\d{1,2}))?)?(?:\s*(p|pm|p\.m\.|a|am|a\.m\.))?""".r
+  private val MagicTimeNoSeparatorRe = """(\d{1,2})(\d{2})""".r
 }

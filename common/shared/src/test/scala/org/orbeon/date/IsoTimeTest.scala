@@ -33,12 +33,23 @@ class IsoTimeTest extends AnyFunSpec {
       "12:34am"       -> IsoTime(0,  34, None).some,
       "12am"          -> IsoTime(0,  0,  None).some,
       "0"             -> IsoTime(0,  0,  None).some,
+      "00"            -> IsoTime(0,  0,  None).some,
+      "000"           -> IsoTime(0,  0,  None).some,
+      "12"            -> IsoTime(12, 0,  None).some,
+      "23"            -> IsoTime(23, 0,  None).some,
+      "100"           -> IsoTime(1,  0,  None).some,
+      "2300"          -> IsoTime(23, 0,  None).some,
+      "2359"          -> IsoTime(23, 59, None).some,
 //      "24"            -> IsoTime(0,  0,  None).some,
       // Reject invalid strings, including out of range to avoid silent autocorrection
       "foo"           -> None,
       "25:22:23"      -> None,
       "21:60:23"      -> None,
       "21:22:60"      -> None,
+      "60"            -> None,
+      "99"            -> None,
+      "160"           -> None,
+      "2400"          -> None,
     )
 
     for ((s, expected) <- StringsToIsoDates)

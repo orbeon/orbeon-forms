@@ -15,7 +15,7 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xh:title>Orbeon Demo: Consent for emergency medical treatment</xh:title>
+        <xh:title>Orbeon Demo: Consent for Emergency Medical Treatment</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
             <!-- Main instance -->
@@ -92,7 +92,7 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>emergency-medical-consent</form-name>
-                    <title xml:lang="en">Orbeon Demo: Consent for emergency medical treatment</title>
+                    <title xml:lang="en">Orbeon Demo: Consent for Emergency Medical Treatment</title>
                     <description xml:lang="en" mediatype="text/html">&lt;div style="display: flex; align-items: center; column-gap: 1em;"&gt;&lt;img style="width: 50px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Star_of_life2.svg/2560px-Star_of_life2.svg.png"&gt;This is a simple form to give consent for emergency medical treatment to a minor. It also makes use of section template fro the global library.&lt;/div&gt;</description>
 
                     <library-versions>

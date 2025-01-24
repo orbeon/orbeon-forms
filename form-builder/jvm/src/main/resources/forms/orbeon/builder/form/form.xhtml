@@ -920,16 +920,23 @@
                         context="bind('fb-form-model-bind')"
                         origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
 
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/6101 -->
+                    <xf:var
+                        name="control-settings-elems-to-preserve"
+                        value="bind('xbl-bind')/fr:toc[exists(@*)]"/>
                     <xf:delete
                         bind="xbl-bind"/>
                     <xf:insert
-                        if="exists(event('control-settings-elems')/@*)"
+                        if="exists((event('control-settings-elems')/@*, $control-settings-elems-to-preserve))"
                         context="bind('metadata-bind')"
                         ref="*"
                         origin="
                             xf:element(
                                 'xbl',
-                                event('control-settings-elems')[exists(@*)]
+                                (
+                                    event('control-settings-elems')[exists(@*)],
+                                    $control-settings-elems-to-preserve
+                                )
                             )"/>
 
                     <!-- Load a specific form template to get started -->

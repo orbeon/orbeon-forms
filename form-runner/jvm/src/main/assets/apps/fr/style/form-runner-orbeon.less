@@ -70,6 +70,8 @@ body.orbeon { background-color: @frBackground }
 
 .fr-toc-styling() {
     margin-bottom: 0;
+    height: fit-content;
+    background-color: white;
     a {
         text-decoration: none;
     }
@@ -91,14 +93,16 @@ body.orbeon { background-color: @frBackground }
             .text-overflow();
         }
     }
+    .nav > li .btn-link {
+        color: @linkColor;
+    }
     .fr-toc-body-styling();
-    height: fit-content;
     .nav .nav {
         margin-left: 1em; // nested list for subsection navigation
     }
 }
 
-.fr-toc-body-styling {
+.fr-toc-body-styling() {
     min-height: 20px;
     border: 1px solid darken(@wellBackground, 7%);
     border-radius: @baseBorderRadius;
@@ -471,7 +475,6 @@ body.orbeon { background-color: @frBackground }
     // Table of contents
     .fr-toc {
         .fr-toc-styling();
-        background-color: @wellBackground;
     }
 
     .fr-mode-pdf {

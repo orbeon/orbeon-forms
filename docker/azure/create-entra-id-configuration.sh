@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv 2>&1)
-echo "First domain: $DOMAIN"
+ENTRA_ID_DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv 2>&1)
+echo "Entra ID domain: $ENTRA_ID_DOMAIN"
 
 user_id_from_display_name() {
   local display_name="$1"
@@ -13,7 +13,7 @@ user_upn_from_email() {
   local email="$1"
 
   # Build principal name from email and domain (external users)
-  local upn="${email//[@+]/_}#EXT#@${DOMAIN}"
+  local upn="${email//[@+]/_}#EXT#@${ENTRA_ID_DOMAIN}"
 
   echo "$upn"
 }
@@ -57,8 +57,8 @@ create_user() {
 }
 
 # Create a couple of test users
-create_user "$TEST_USER_EMAIL1" "$TEST_USER_PASSWORD1" "$TEST_USER_DISPLAY_NAME1"
-create_user "$TEST_USER_EMAIL2" "$TEST_USER_PASSWORD2" "$TEST_USER_DISPLAY_NAME2"
+create_user "$ENTRA_ID_TEST_USER_EMAIL1" "$ENTRA_ID_TEST_USER_PASSWORD1" "$ENTRA_ID_TEST_USER_DISPLAY_NAME1"
+create_user "$ENTRA_ID_TEST_USER_EMAIL2" "$ENTRA_ID_TEST_USER_PASSWORD2" "$ENTRA_ID_TEST_USER_DISPLAY_NAME2"
 
 group_exists() {
   local display_name="$1"
@@ -76,8 +76,8 @@ create_group() {
 	az ad group create --display-name "$display_name" --mail-nickname "$display_name"
 }
 
-create_group "$USER_GROUP"
-create_group "$ADMIN_GROUP"
+create_group "$ENTRA_ID_USER_GROUP"
+create_group "$ENTRA_ID_ADMIN_GROUP"
 
 user_in_group() {
   local user_display_name="$1"
@@ -108,9 +108,9 @@ add_user_to_group() {
 }
 
 # Assign groups to users
-add_user_to_group "$TEST_USER_DISPLAY_NAME1" "$USER_GROUP"
-add_user_to_group "$TEST_USER_DISPLAY_NAME2" "$USER_GROUP"
-add_user_to_group "$TEST_USER_DISPLAY_NAME2" "$ADMIN_GROUP"
+add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME1" "$ENTRA_ID_USER_GROUP"
+add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_USER_GROUP"
+add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_ADMIN_GROUP"
 
 app_exists() {
 	local app_name=$1
@@ -118,22 +118,22 @@ app_exists() {
 	az ad app list --filter "displayName eq '$app_name'" --query "[].displayName" -o tsv | grep -q "^$app_name$"
 }
 
-if app_exists "$APP_NAME"; then
-	echo "App $APP_NAME already exists"
+if app_exists "$ENTRA_ID_APP_NAME"; then
+	echo "App $ENTRA_ID_APP_NAME already exists"
 else
 	# Create application
 	az ad app create \
-    --display-name "$APP_NAME" \
-    --web-redirect-uris "$APP_URL/*" \
+    --display-name "$ENTRA_ID_APP_NAME" \
+    --web-redirect-uris "$LOCAL_APP_URL/*" \
     --sign-in-audience "AzureADMyOrg"
 fi
 
-APP_ID=$(az ad app list --query "[?displayName=='$APP_NAME'].appId" -o tsv)
+ENTRA_ID_APP_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP_NAME'].appId" -o tsv)
 
 # Add identifier URI
-az ad app update --id "$APP_ID" --identifier-uris "api://$APP_ID"
+az ad app update --id "$ENTRA_ID_APP_ID" --identifier-uris "api://$ENTRA_ID_APP_ID"
 
-APP_OBJECT_ID=$(az ad app list --query "[?displayName=='$APP_NAME'].id" -o tsv)
+ENTRA_ID_APP_OBJECT_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP_NAME'].id" -o tsv)
 
 scope_exists() {
   local app_id="$1"
@@ -145,16 +145,16 @@ scope_exists() {
   [ -n "$scope_exists" ]
 }
 
-if scope_exists "$APP_ID" "$SCOPE_VALUE"; then
-  echo "Scope $SCOPE_VALUE already exists"
+if scope_exists "$ENTRA_ID_APP_ID" "$ENTRA_ID_SCOPE_VALUE"; then
+  echo "Scope $ENTRA_ID_SCOPE_VALUE already exists"
 else
 	# Add scope (az ad app update doesn't seem to work)
 	az rest --method PATCH \
-    --uri "https://graph.microsoft.com/v1.0/applications/$APP_OBJECT_ID" \
+    --uri "https://graph.microsoft.com/v1.0/applications/$ENTRA_ID_APP_OBJECT_ID" \
     --headers "Content-Type=application/json" \
     --body "$(jq -n \
       --arg scope_id "$(uuidgen)" \
-      --arg scope_value "$SCOPE_VALUE" \
+      --arg scope_value "$ENTRA_ID_SCOPE_VALUE" \
       '{
         api: {
           oauth2PermissionScopes: [{
@@ -172,33 +172,33 @@ else
 fi
 
 # Retrieve the scope ID given its name/value
-SCOPE_ID=$(az ad app show --id "$APP_ID" \
-           --query "api.oauth2PermissionScopes[?value=='$SCOPE_VALUE'].id" \
-           -o tsv)
+ENTRA_ID_SCOPE_ID=$(az ad app show --id "$ENTRA_ID_APP_ID" \
+                    --query "api.oauth2PermissionScopes[?value=='$ENTRA_ID_SCOPE_VALUE'].id" \
+                    -o tsv)
 
 # Pre-authorize the application (this is needed to include the groups in the correct OIDC token)
-az ad app show --id "$APP_ID" | \
-  jq --arg app_id "$APP_ID" \
-     --arg scope_id "$SCOPE_ID" \
+az ad app show --id "$ENTRA_ID_APP_ID" | \
+  jq --arg app_id "$ENTRA_ID_APP_ID" \
+     --arg scope_id "$ENTRA_ID_SCOPE_ID" \
      '.api.preAuthorizedApplications = [{
        "appId": $app_id,
        "delegatedPermissionIds": [$scope_id]
      }]' | \
-  az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$APP_OBJECT_ID" --body @-
+  az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$ENTRA_ID_APP_OBJECT_ID" --body @-
 
 # Add client secret (beware: this will update any existing secret with the same name)
-CREDENTIAL_SECRET=$(az ad app credential reset \
-                    --id "$APP_ID" \
-                    --display-name "Orbeon Forms Credential" \
-                    --years 2 | jq -r '.password')
+ENTRA_ID_CREDENTIAL_SECRET=$(az ad app credential reset \
+                             --id "$ENTRA_ID_APP_ID" \
+                             --display-name "Orbeon Forms Credential" \
+                             --years 2 | jq -r '.password')
 
 # Only security group membership claims will be included as group IDs
-az ad app show --id "$APP_ID" | \
+az ad app show --id "$ENTRA_ID_APP_ID" | \
   jq '.groupMembershipClaims = "SecurityGroup"' | \
-  az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$APP_OBJECT_ID" --body @-
+  az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$ENTRA_ID_APP_OBJECT_ID" --body @-
 
 # Add optional OIDC claims (groups included as roles, email)
-az ad app show --id "$APP_ID" | \
+az ad app show --id "$ENTRA_ID_APP_ID" | \
   jq '.optionalClaims = {
     "accessToken": [{
       "additionalProperties": ["emit_as_roles"],
@@ -219,7 +219,7 @@ az ad app show --id "$APP_ID" | \
       "source": null
     }]
   }' | \
-  az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$APP_OBJECT_ID" --body @-
+  az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$ENTRA_ID_APP_OBJECT_ID" --body @-
 
 API_MICROSOFT_GRAPH="00000003-0000-0000-c000-000000000000"
 API_PERMISSION_OPENID="37f7f235-527c-4136-accd-4a02d197296e"
@@ -233,9 +233,9 @@ check_and_add_permission() {
 
   # Check if permission exists (note: [] in JMESPath flattens the arrays)
   existing_permission=$(az ad app permission list \
-    --id "$app_id" \
-    --query "[?resourceAppId=='$api_id'].resourceAccess | [] | [?id=='$permission_id' && type=='$permission_type'].id" \
-    --output tsv)
+                        --id "$app_id" \
+                        --query "[?resourceAppId=='$api_id'].resourceAccess | [] | [?id=='$permission_id' && type=='$permission_type'].id" \
+                        --output tsv)
 
   if [[ -z "$existing_permission" ]]; then
     az ad app permission add \
@@ -248,44 +248,44 @@ check_and_add_permission() {
 }
 
 # Microsoft Graph permissions
-check_and_add_permission "$APP_ID" "$API_MICROSOFT_GRAPH" "$API_PERMISSION_OPENID" "Scope"
-check_and_add_permission "$APP_ID" "$API_MICROSOFT_GRAPH" "$API_PERMISSION_EMAIL" "Scope"
+check_and_add_permission "$ENTRA_ID_APP_ID" "$API_MICROSOFT_GRAPH" "$API_PERMISSION_OPENID" "Scope"
+check_and_add_permission "$ENTRA_ID_APP_ID" "$API_MICROSOFT_GRAPH" "$API_PERMISSION_EMAIL" "Scope"
 
 # App's own permissions
-check_and_add_permission "$APP_ID" "$APP_ID" "$SCOPE_ID" "Scope"
+check_and_add_permission "$ENTRA_ID_APP_ID" "$ENTRA_ID_APP_ID" "$ENTRA_ID_SCOPE_ID" "Scope"
 
 # Grant admin consent (for permissions above)
-az ad app permission admin-consent --id "$APP_ID"
+az ad app permission admin-consent --id "$ENTRA_ID_APP_ID"
 
 # Get the tenant ID
-TENANT_ID=$(az account show --query tenantId -o tsv)
+ENTRA_ID_TENANT_ID=$(az account show --query tenantId -o tsv)
 
 # Build the OIDC provider URL
-PROVIDER_URL="https://login.microsoftonline.com/$TENANT_ID/v2.0"
+ENTRA_ID_PROVIDER_URL="https://login.microsoftonline.com/$ENTRA_ID_TENANT_ID/v2.0"
 
 # Build the API scope URL
-API_SCOPE_URL="api://$APP_ID/$SCOPE_VALUE"
+ENTRA_ID_API_SCOPE_URL="api://$ENTRA_ID_APP_ID/$ENTRA_ID_SCOPE_VALUE"
 
 # Generate the OIDC configuration file
 cat << EOF > oidc.json
 {
-  "client-id": "$APP_ID",
-  "provider-url": "$PROVIDER_URL",
+  "client-id": "$ENTRA_ID_APP_ID",
+  "provider-url": "$ENTRA_ID_PROVIDER_URL",
   "credentials": {
-    "secret": "$CREDENTIAL_SECRET"
+    "secret": "$ENTRA_ID_CREDENTIAL_SECRET"
   },
   "principal-attribute": "oid",
-  "scope": "profile $API_SCOPE_URL"
+  "scope": "profile $ENTRA_ID_API_SCOPE_URL"
 }
 EOF
 
-USER_GROUP_ID=$(az ad group show --group "$USER_GROUP" --query id -o tsv)
-ADMIN_GROUP_ID=$(az ad group show --group "$ADMIN_GROUP" --query id -o tsv)
+ENTRA_ID_USER_GROUP_ID=$(az ad group show --group "$ENTRA_ID_USER_GROUP" --query id -o tsv)
+ENTRA_ID_ADMIN_GROUP_ID=$(az ad group show --group "$ENTRA_ID_ADMIN_GROUP" --query id -o tsv)
 
 # Generate the Form Builder permissions file
 cat << EOF > form-builder-permissions.xml
 <roles>
-  <role name="$ADMIN_GROUP_ID" app="*" form="*"/>
+  <role name="$ENTRA_ID_ADMIN_GROUP_ID" app="*" form="*"/>
 </roles>
 EOF
 
@@ -294,25 +294,25 @@ cp web.template.xml web.xml
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     sed -i '' \
-        -e "s/USER_GROUP_ID/${USER_GROUP_ID}/g" \
-        -e "s/ADMIN_GROUP_ID/${ADMIN_GROUP_ID}/g" \
+        -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
+        -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
         web.xml
 else
     # Linux and other Unix-like systems
     sed -i \
-        -e "s/USER_GROUP_ID/${USER_GROUP_ID}/g" \
-        -e "s/ADMIN_GROUP_ID/${ADMIN_GROUP_ID}/g" \
+        -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
+        -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
         web.xml
 fi
 
 # Print all IDs/URLs
-echo "User group ID: $USER_GROUP_ID"
-echo "Admin group ID: $ADMIN_GROUP_ID"
-echo "App ID: $APP_ID"
-echo "App object ID: $APP_OBJECT_ID"
-echo "Scope ID: $SCOPE_ID"
-echo "Tenant ID: $TENANT_ID"
-echo "Provider URL: $PROVIDER_URL"
-echo "API scope URL: $API_SCOPE_URL"
+echo "User group ID: $ENTRA_ID_USER_GROUP_ID"
+echo "Admin group ID: $ENTRA_ID_ADMIN_GROUP_ID"
+echo "App ID: $ENTRA_ID_APP_ID"
+echo "App object ID: $ENTRA_ID_APP_OBJECT_ID"
+echo "Scope ID: $ENTRA_ID_SCOPE_ID"
+echo "Tenant ID: $ENTRA_ID_TENANT_ID"
+echo "Provider URL: $ENTRA_ID_PROVIDER_URL"
+echo "API scope URL: $ENTRA_ID_API_SCOPE_URL"
 
 # TODO: disable MFA (can't seem to be able to do it via the CLI => Entra ID > Properties > Security defaults > disable, all from the UI)

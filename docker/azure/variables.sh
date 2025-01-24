@@ -1,20 +1,22 @@
 #!/bin/bash
 
+ORBEON_FORMS_DOCKER_TAG="2024.1-pe-wildfly"
+
 #####################################
 # Azure account
 #####################################
 
-ACCOUNT_EMAIL='...' # TODO: add your Azure account email here
+AZURE_ACCOUNT_EMAIL='...' # TODO: add your Azure account email here
+AZURE_LOCATION='westus'
 
 #####################################
 # Resource group
 #####################################
 
 RESOURCE_GROUP='orbeon-forms-resource-group'
-AZURE_LOCATION='westus'
 
 #####################################
-# Storage / configuration files
+# Storage
 #####################################
 
 STORAGE_ACCOUNT_PREFIX='orbeonformsstorage'
@@ -60,26 +62,43 @@ DATABASE_USER='orbeon'
 DATABASE_PASSWORD='orbeon'
 
 #####################################
+# Kubernetes
+#####################################
+
+K8S_CLUSTER_NAME="orbeon-forms-cluster"
+K8S_STORAGE_SECRET="storage-secret"
+K8S_PERSISTENCE_VOLUME="orbeon-forms-pv"
+K8S_PERSISTENCE_VOLUME_CLAIM="orbeon-forms-pvc"
+K8S_APP="orbeon-forms"
+K8S_DEPLOYMENT="orbeon-forms-deployment"
+K8S_SERVICE="orbeon-forms-service"
+
+#####################################
 # Entra ID
 #####################################
 
 # 1st Entra ID test user
-TEST_USER_EMAIL1='...' # TODO: add a test email here
-TEST_USER_PASSWORD1='CHANGEME!'
-TEST_USER_DISPLAY_NAME1='Test User 1'
+ENTRA_ID_TEST_USER_EMAIL1='...' # TODO: add a test email here
+ENTRA_ID_TEST_USER_PASSWORD1='CHANGEME!'
+ENTRA_ID_TEST_USER_DISPLAY_NAME1='Test User 1'
 
 # 2nd Entra ID test user
-TEST_USER_EMAIL2='...' # TODO: add a test email here
-TEST_USER_PASSWORD2='CHANGEME!'
-TEST_USER_DISPLAY_NAME2='Test User 2'
+ENTRA_ID_TEST_USER_EMAIL2='...' # TODO: add a test email here
+ENTRA_ID_TEST_USER_PASSWORD2='CHANGEME!'
+ENTRA_ID_TEST_USER_DISPLAY_NAME2='Test User 2'
 
 # Orbeon user and admin group names
-USER_GROUP='orbeon-user'
-ADMIN_GROUP='orbeon-admin'
+ENTRA_ID_USER_GROUP='orbeon-user'
+ENTRA_ID_ADMIN_GROUP='orbeon-admin'
 
 # Application name and URL
-APP_NAME='Orbeon Forms'
-APP_URL='https://localhost:8443/orbeon'
+ENTRA_ID_APP_NAME='Orbeon Forms'
 
 # Scope name/value
-SCOPE_VALUE='groups.access'
+ENTRA_ID_SCOPE_VALUE='groups.access'
+
+#####################################
+# Local deployment
+#####################################
+
+LOCAL_APP_URL='https://localhost:8443/orbeon'

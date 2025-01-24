@@ -45,6 +45,7 @@ upload_to_share() {
 # Upload all configuration files to the file share (license, properties, Form Builder permissions, OIDC, etc.)
 upload_to_share "./application.keystore" "application.keystore"
 upload_to_share "./form-builder-permissions.xml" "form-builder-permissions.xml"
+upload_to_share "./jboss-web.xml" "jboss-web.xml"
 upload_to_share "$HOME/.orbeon/license.xml" "license.xml"
 upload_to_share "./oidc.json" "oidc.json"
 upload_to_share "./properties-local.postgresql.xml" "properties-local.xml"

@@ -32,8 +32,8 @@ create_firewall_rule() {
       --name "$DATABASE_SERVER" 2>/dev/null) ]]; then
     if ! az postgres flexible-server firewall-rule create \
         --rule-name "$rule_name" \
-        --resource-group "$RESOURCE_GROUP" \
         --name "$DATABASE_SERVER" \
+        --resource-group "$RESOURCE_GROUP" \
         --start-ip-address "$start_ip" \
         --end-ip-address "$end_ip"; then
       echo "Failed to create firewall rule $rule_name (range: $start_ip-$end_ip)"
@@ -47,13 +47,13 @@ create_firewall_rule() {
   return 0
 }
 
-PUBLIC_IP=$(curl -s 'https://api.ipify.org')
-echo "Local IP: $PUBLIC_IP"
+DATABASE_PUBLIC_IP=$(curl -s 'https://api.ipify.org')
+echo "Local IP: $DATABASE_PUBLIC_IP"
 
 # Explicitly create a firewall rule to allow access from the local machine, so that we can easily disable it later
 # (calling 'az postgres flexible-server create' without --public-access None but with --yes will also create that rule
 # automatically)
-create_firewall_rule "$DATABASE_FIREWALL_RULE_LOCAL" "$PUBLIC_IP" "$PUBLIC_IP"
+create_firewall_rule "$DATABASE_FIREWALL_RULE_LOCAL" "$DATABASE_PUBLIC_IP" "$DATABASE_PUBLIC_IP"
 
 if ! az postgres flexible-server db show \
     --resource-group "$RESOURCE_GROUP" \

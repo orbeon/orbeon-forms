@@ -3,5 +3,9 @@
 application.keystore
 form-builder-permissions.xml
 oidc.json
+orbeon-forms-deployment.yaml
+orbeon-forms-pv.yaml
+orbeon-forms-pvc.yaml
+storage-secret.yaml
 web.xml
 webapp

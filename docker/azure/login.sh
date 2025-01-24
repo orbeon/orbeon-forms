@@ -69,7 +69,7 @@ register_provider() {
   return 0
 }
 
-if ! check_azure_login "$ACCOUNT_EMAIL"; then
+if ! check_azure_login "$AZURE_ACCOUNT_EMAIL"; then
   echo "Login failed"
   return
 fi

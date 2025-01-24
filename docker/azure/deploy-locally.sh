@@ -36,4 +36,4 @@ docker run \
   -v ./web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/web.xml \
   -v ./application.keystore:/opt/jboss/wildfly/standalone/configuration/application.keystore \
   -v ./standalone.postgresql.local.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
-  orbeon/orbeon-forms:2024.1-pe-wildfly
+  "orbeon/orbeon-forms:$ORBEON_FORMS_DOCKER_TAG"

@@ -3,10 +3,10 @@
 # Commands used by the sub-scripts:
 #  - az (Azure CLI)
 #  - psql (PostgreSQL)
+#  - kubectl (Kubernetes)
 #  - jq (JSON manipulation)
-#  - grep (for Entra ID app existence test)
-#  - sed (for web.xml generation from template)
-#  - curl (for client public IP retrieval)
+#  - base64 (K8S passwords encoding)
+#  - cat, curl, cut, echo, grep, sed
 
 source variables.sh
 
@@ -25,5 +25,5 @@ source create-storage.sh
 # Create PostgreSQL database with Orbeon Forms model
 source create-postgresql-database.sh
 
-# TODO
-#source create-kubernetes-cluster.sh
+# Deploy Orbeon Forms as a simple Kubernetes cluster
+source create-kubernetes-cluster.sh

@@ -44,7 +44,12 @@ object DateSupportJava {
           .toLeft(binding.getStringValue),
       format                 = IsoDate.parseFormat(format),
       excludedDates          = InstanceData.findCustomMip(binding, ExcludedDatesQName).map(_.splitTo[List]()).getOrElse(Nil),
-      weekStart              = weekStart.trimAllToOpt.flatMap(v => if (v == "sunday") 0.some else if (v == "monday") 1.some else None)
+      weekStart              = weekStart.trimAllToOpt.flatMap {
+          case "saturday" => 6.some
+          case "sunday"   => 0.some
+          case "monday"   => 1.some
+          case _          => None
+        }
     ).asJson.noSpaces
 
   //@XPathFunction

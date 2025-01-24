@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# This script uses: az (Azure CLI), jq (JSON manipulation), grep, and sed
-
 DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv 2>&1)
 echo "First domain: $DOMAIN"
 

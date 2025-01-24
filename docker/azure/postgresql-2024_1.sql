@@ -1,0 +1,1 @@
+../../form-runner/jvm/src/main/resources/apps/fr/persistence/relational/ddl/2024.1/postgresql-2024_1.sql

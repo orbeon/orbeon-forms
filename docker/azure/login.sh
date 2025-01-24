@@ -74,9 +74,8 @@ if ! check_azure_login "$ACCOUNT_EMAIL"; then
   return
 fi
 
-# Register providers to be able to use storages and AKS clusters
+# Register providers to be able to use storages, PostgreSQL, and AKS clusters
 register_provider "Microsoft.Compute"
 register_provider "Microsoft.ContainerService"
+register_provider "Microsoft.DBforPostgreSQL"
 register_provider "Microsoft.Storage"
-
-# TODO: register_provider "Microsoft.DBforPostgreSQL" needed?

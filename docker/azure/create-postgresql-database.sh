@@ -1,75 +1,169 @@
 #!/bin/bash
 
-# TODO: cleanup code below
+if ! az postgres flexible-server show \
+    --name "$DATABASE_SERVER" \
+    --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
+  if ! az postgres flexible-server create \
+      --name "$DATABASE_SERVER" \
+      --resource-group "$RESOURCE_GROUP" \
+      --location "$AZURE_LOCATION" \
+      --admin-user "$DATABASE_ADMIN_USERNAME" \
+      --admin-password "$DATABASE_ADMIN_PASSWORD" \
+      --sku-name standard_d2ds_v4 \
+      --version 16 \
+      --public-access None; then
+    echo "Failed to create database server $DATABASE_SERVER"
+    exit 1
+  fi
 
-exit 1
+  echo "Database server $DATABASE_SERVER created"
+else
+  echo "Database server $DATABASE_SERVER already exists"
+fi
 
-# Create PostgreSQL server
-az postgres flexible-server create \
-  --name mypostgresqlserver \
-  --resource-group myResourceGroup \
-  --location westus \
-  --admin-user myuser \
-  --admin-password mypassword \
-  --sku-name standard_d2ds_v4 \
-  --version 16
+create_firewall_rule() {
+  local rule_name="$1"
+  local start_ip="$2"
+  local end_ip="$3"
 
-# TODO: try with 15???
+  if ! [[ $(az postgres flexible-server firewall-rule show \
+      --rule-name "$rule_name" \
+      --resource-group "$RESOURCE_GROUP" \
+      --name "$DATABASE_SERVER" 2>/dev/null) ]]; then
+    if ! az postgres flexible-server firewall-rule create \
+        --rule-name "$rule_name" \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$DATABASE_SERVER" \
+        --start-ip-address "$start_ip" \
+        --end-ip-address "$end_ip"; then
+      echo "Failed to create firewall rule $rule_name (range: $start_ip-$end_ip)"
+      return 1
+    fi
+    echo "Firewall rule $rule_name created successfully (range: $start_ip-$end_ip)"
+  else
+    echo "Firewall rule $rule_name already exists (range: $start_ip-$end_ip)"
+  fi
 
-# Do you want to enable access to client x.x.x.x (y/n): y
+  return 0
+}
 
-## What's my IP?
-#wget -qO- http://ifconfig.me
-#
-## Allow access from my IP
-#az postgres flexible-server firewall-rule create \
-#  --name allow-azure \
-#  --resource-group myResourceGroup \
-#  --name mypostgresqlserver \
-#  --start-ip-address 144.2.89.194 \
-#  --end-ip-address 144.2.89.194
+PUBLIC_IP=$(curl -s 'https://api.ipify.org')
+echo "Local IP: $PUBLIC_IP"
 
-# Create database
-az postgres flexible-server db create \
-  --resource-group myResourceGroup \
-  --server-name mypostgresqlserver \
-  --database-name orbeon
+# Explicitly create a firewall rule to allow access from the local machine, so that we can easily disable it later
+# (calling 'az postgres flexible-server create' without --public-access None but with --yes will also create that rule
+# automatically)
+create_firewall_rule "$DATABASE_FIREWALL_RULE_LOCAL" "$PUBLIC_IP" "$PUBLIC_IP"
 
-# Add user
-PGPASSWORD=mypassword psql \
-  --host mypostgresqlserver.postgres.database.azure.com \
-  --username myuser \
-  --dbname orbeon \
-  --command "CREATE USER orbeon WITH PASSWORD 'orbeon';" \
-  --command "CREATE USER \"orbeon@mypostgresqlserver\" WITH PASSWORD 'orbeon';"
+if ! az postgres flexible-server db show \
+    --resource-group "$RESOURCE_GROUP" \
+    --server-name "$DATABASE_SERVER" \
+    --database-name "$DATABASE_NAME" >/dev/null 2>&1; then
+  if ! az postgres flexible-server db create \
+     --resource-group "$RESOURCE_GROUP" \
+     --server-name "$DATABASE_SERVER" \
+     --database-name "$DATABASE_NAME"; then
+     echo "Failed to create database $DATABASE_NAME"
+     return 1
+  fi
+  echo "Database $DATABASE_NAME created successfully"
+else
+  echo "Database $DATABASE_NAME already exists"
+fi
 
-# Grant privileges
-PGPASSWORD=mypassword psql \
-  --host mypostgresqlserver.postgres.database.azure.com \
-  --username myuser \
-  --dbname orbeon \
-  --command "GRANT ALL PRIVILEGES ON DATABASE orbeon TO orbeon;" \
-  --command "GRANT ALL PRIVILEGES ON SCHEMA public TO orbeon;" \
-  --command "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO orbeon;" \
-  --command "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO orbeon;"
+export PGPASSWORD="$DATABASE_ADMIN_PASSWORD"
 
-# Grant privileges (@mypostgresqlserver)
-PGPASSWORD=mypassword psql \
-  --host mypostgresqlserver.postgres.database.azure.com \
-  --username myuser \
-  --dbname orbeon \
-  --command "GRANT ALL PRIVILEGES ON DATABASE orbeon TO \"orbeon@mypostgresqlserver\";" \
-  --command "GRANT ALL PRIVILEGES ON SCHEMA public TO \"orbeon@mypostgresqlserver\";" \
-  --command "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"orbeon@mypostgresqlserver\";" \
-  --command "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"orbeon@mypostgresqlserver\";"
+create_db_user() {
+  local username="$1"
+  local password="$2"
 
-# Import SQL file (replace with your file path)
-PGPASSWORD=mypassword psql \
-  --host mypostgresqlserver.postgres.database.azure.com \
-  --username myuser \
-  --dbname orbeon \
-  --file ./postgresql-2023_1.sql
+  if ! [[ $(psql \
+      --host "$DATABASE_SERVER.postgres.database.azure.com" \
+      --username "$DATABASE_ADMIN_USERNAME" \
+      --dbname "$DATABASE_NAME" \
+      --tuples-only \
+      --command "SELECT 1 FROM pg_user WHERE usename = '$username';") ]]; then
+    if ! psql \
+        --host "$DATABASE_SERVER.postgres.database.azure.com" \
+        --username "$DATABASE_ADMIN_USERNAME" \
+        --dbname "$DATABASE_NAME" \
+        --command "CREATE USER $username WITH PASSWORD '$password';"; then
+      echo "Failed to create user $username"
+      return 1
+    fi
+    echo "User $username created successfully"
+  else
+    echo "User $username already exists"
+  fi
 
-# Add 0.0.0.0 - 255.255.255.255 to firewall rules
-# => how to do this with Azure CLI?
-# => how to do this in a secure way?
+  return 0
+}
+
+# TODO: which user do we actually need (the qualified one or both?)
+create_db_user "$DATABASE_USER" "$DATABASE_PASSWORD"
+#create_db_user "$DATABASE_USER@$DATABASE_SERVER" "$DATABASE_PASSWORD"
+
+grant_privileges() {
+ local username="$1"
+
+  # GRANT is idempotent, so we don't need to check if the privileges were already granted
+  if ! psql \
+      --host "$DATABASE_SERVER.postgres.database.azure.com" \
+      --username "$DATABASE_ADMIN_USERNAME" \
+      --dbname "$DATABASE_NAME" \
+      --command "GRANT ALL PRIVILEGES ON DATABASE $DATABASE_NAME TO $username;" \
+      --command "GRANT ALL PRIVILEGES ON SCHEMA public TO $username;" \
+      --command "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $username;" \
+      --command "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $username;"; then
+    echo "Failed to grant privileges to user $username"
+    return 1
+  fi
+
+  echo "Privileges granted successfully to user $username"
+  return 0
+}
+
+grant_privileges "$DATABASE_USER"
+#grant_privileges "$DATABASE_USER@$DATABASE_SERVER"
+
+if ! [[ $(psql \
+    --host "$DATABASE_SERVER.postgres.database.azure.com" \
+    --username "$DATABASE_ADMIN_USERNAME" \
+    --dbname "$DATABASE_NAME" \
+    --tuples-only \
+    --command "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' LIMIT 1;") ]]; then
+  if ! psql \
+      --host "$DATABASE_SERVER.postgres.database.azure.com" \
+      --username "$DATABASE_ADMIN_USERNAME" \
+      --dbname "$DATABASE_NAME" \
+      --file ./postgresql-2024_1.sql; then
+    echo "Failed to create Orbeon Forms tables"
+    return 1
+  fi
+  echo "Orbeon Forms tables created successfully"
+else
+  echo "Database already contains Orbeon Forms tables"
+fi
+
+# TODO: do this in a secure way (using private endpoints?)
+create_firewall_rule "$DATABASE_FIREWALL_RULE_ALL" "0.0.0.0" "255.255.255.255"
+
+unset PGPASSWORD
+
+delete_firewall_rule() {
+  local rule_name="$1"
+
+  if ! az postgres flexible-server firewall-rule delete \
+      --rule-name "$rule_name" \
+      --resource-group "$RESOURCE_GROUP" \
+      --name "$DATABASE_SERVER" \
+      --yes; then
+    echo "Failed to delete firewall rule $rule_name"
+    return 1
+  fi
+
+  echo "Firewall rule $rule_name deleted successfully"
+  return 0
+}
+
+delete_firewall_rule "$DATABASE_FIREWALL_RULE_LOCAL"

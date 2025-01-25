@@ -1661,7 +1661,7 @@
 
                                         <!-- Formula or common constraint argument -->
                                         <xf:group ref=".[not($validation-type = ('required', 'datatype'))]">
-                                            <xf:textarea ref="constraint/@argument[$validation-type = 'excluded-dates'], constraint/@expression">
+                                            <xf:textarea ref="constraint/@argument[$validation-type = 'excluded-dates'], constraint/@expression" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
                                                 <xf:label
                                                     class="xforms-hidden"
                                                     appearance="minimal"

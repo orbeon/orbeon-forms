@@ -7,11 +7,12 @@ def main(username: String, password: String): Unit = {
   val root         = os.pwd / os.RelPath("data/orbeon/fr")
   val crudEndPoint = "https://demo.orbeon.com/demo/fr/service/persistence/crud/"
 
-  os.walk(root)                   filter
-    os.isFile                     filterNot
-    (_.ext == "DS_Store")         filterNot
-    (_.baseName.contains("copy")) filterNot
-    (_.ext.endsWith("~"))         foreach { p =>
+  os.walk(root)
+    .filter(os.isFile
+    .filterNot(_.ext == "DS_Store")
+    .filterNot(_.baseName.contains("copy"))
+    .filterNot(_.ext.endsWith("~"))
+    .foreach { p =>
 
     println(s"processing file: ${p.relativeTo(root)}")
 

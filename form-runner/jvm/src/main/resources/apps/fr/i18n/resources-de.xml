@@ -295,10 +295,10 @@
             <upload-cancel>Das Hochladen der Datei wurde vom Benutzer abgebrochen.</upload-cancel>
             <upload-done>Datei fertig hochgeladen</upload-done>
             <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</upload-error>
-            <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
+            <upload-error-empty-file>Die hochgeladene Datei darf nicht leer sein.</upload-error-empty-file>
             <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximal zulässige Größe ist {0,number,integer} Bytes und die tatsächlich empfangene Größe ist {1,number,integer} Bytes.</upload-error-size>
-            <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
-            <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
+            <upload-error-mediatype>Die hochgeladene Datei hat einen falschen Dateityp: {0}</upload-error-mediatype>
+            <upload-error-file-scan>Die hochgeladene Datei wurde mit folgender Meldung abgelehnt: "{0}". Bitte überprüfen Sie auch, ob die Datei infiziert ist.</upload-error-file-scan>
             <lost-attachments>Einige Beilagen sind aufgrund eines Serverproblems verloren gegangen. Bitte prüfen Sie alle Beilagen und laden Sie diese gegebenenfalls erneut hoch.</lost-attachments>
         </messages>
         <draft-singleton>
@@ -329,12 +329,12 @@
             <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
+            <upload-max-size-per-file>Die maximale Dateigröße ist {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Es sind nur {0}-Dateien zulässig.</upload-mediatypes>
+            <upload-image>Bild</upload-image>
+            <upload-video>Video</upload-video>
+            <upload-audio>Audio</upload-audio>
         </hints>
         <view>
             <explanation>

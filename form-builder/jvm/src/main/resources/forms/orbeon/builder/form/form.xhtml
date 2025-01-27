@@ -951,9 +951,9 @@
                 </xf:action>
                 <!-- Continuation of `fr-get-document-submission` after success loading the form template -->
                 <xf:action
-                    observer="fr-get-document-submission"
-                    event="xforms-submit-done"
-                    if="event('for') = 'load-template'">
+                        observer="fr-get-document-submission"
+                        event="xforms-submit-done"
+                        if="event('for') = 'load-template'">
                     <!-- Continue data setup -->
                     <xf:dispatch name="fb-data-ready" targetid="fr-form-model">
                         <!-- Don't enable the new form to be a template! -->

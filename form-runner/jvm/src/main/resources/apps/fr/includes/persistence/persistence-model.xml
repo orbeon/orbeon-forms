@@ -174,7 +174,8 @@
         event="xforms-model-construct-done"
         if="not($mode = ('summary', 'home', 'landing')) and $app != '*' and $form != '*'">
 
-        <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
+        <!-- Handle loading of initial data for detail modes only -->
+        <!-- Q: Is this test needed, given that we filter out non-detail modes above? -->
         <xf:action if="$mode = ('new', 'test', 'edit') or fr:is-readonly-mode()">
 
             <xf:var name="is-new-id" value="xxf:is-blank($document)"/>
@@ -213,6 +214,7 @@
             <!-- NOTE: We used to do a sort of permission check here for submits. Since #75 is implemented and there is
                  a proper authorization mechanism, this check is no longer required. -->
 
+            <!-- Q: What if we load data from a service above? This will override the data? -->
             <xf:action if="$is-submit">
 
                 <xf:var
@@ -306,7 +308,7 @@
                 <xf:recalculate xxf:defaults="true" model="fr-form-model"/>
             </xf:action>
 
-            <!-- Case of modes other than new where the data to be edited or viewed is loaded from the persistence layer -->
+            <!-- Case of modes other than `new` where the data to be edited or viewed is loaded from the persistence layer -->
             <xf:action if="not($mode = ('new', 'test')) and not($is-new-id) and not($is-submit)">
 
                 <xf:var
@@ -894,7 +896,7 @@
 
             </xf:action>
 
-            <!-- Save value of the Orbeon-Workflow-Stage header -->
+            <!-- Save value of the `Orbeon-Workflow-Stage` header -->
             <xf:setvalue
                 ref="instance('fr-document-metadata')/@workflow-stage"
                 value="
@@ -1228,7 +1230,7 @@
             value="
                 $autosave-elem/status                             = 'dirty' and
                 $persistence-instance/lease-owned-by-current-user = 'true'  and
-                $persistence-instance/found-document-message-to-show      = ''
+                xxf:is-blank($persistence-instance/found-document-message-to-show)
             "/>
         <xf:action if="$do-autosave">
             <xf:var

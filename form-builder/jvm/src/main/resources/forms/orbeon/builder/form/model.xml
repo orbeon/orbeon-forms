@@ -262,7 +262,9 @@
         </xf:dispatch>
 
         <!-- Free fr-form-instance -->
-        <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
+        <xf:insert
+            ref="instance('fr-form-instance')"
+            origin="xf:element('_')"/>
 
         <!-- Mark data as safe. Once user sets metadata from dialog, data will be marked dirty automatically.  -->
         <xf:action type="xpath">
@@ -272,7 +274,7 @@
     </xf:action>
 
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
-    <xf:action ev:event="fb-data-ready">
+    <xf:action event="fb-data-ready">
 
         <!-- NOTE: $fb-lang has already been set by fr-annotate-data above -->
 
@@ -356,15 +358,19 @@
 
         <!-- This is done here as Form Runner only updates `fr-form-instance` and not `fb-form-instance` -->
         <xf:action iterate="event('before-urls')">
-            <xf:var name="p" value="position()"/>
+            <xf:var name="p"      value="position()"/>
             <xf:var name="before" value="."/>
-            <xf:var name="after" value="event('after-urls')[$p]"/>
+            <xf:var name="after"  value="event('after-urls')[$p]"/>
 
-            <xf:setvalue ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[xxf:trim() = $before]" value="$after"/>
+            <xf:setvalue
+                ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[xxf:trim() = $before]"
+                value="$after"/>
         </xf:action>
 
         <!-- Free fr-form-instance and re-mark data as safe -->
-        <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
+        <xf:insert
+            ref="instance('fr-form-instance')"
+            origin="xf:element('_')"/>
         <xf:action type="xpath">
             fr:run-process('oxf.fr.detail.process', 'set-data-status(status = "safe")')
         </xf:action>
@@ -1144,6 +1150,7 @@
                 name="fr-expand"
                 targetid="{.}"/>
             <xf:recalculate/>
+            <!-- Q: Explicit refresh needed? -->
             <xf:refresh/>
         </xf:action>
 

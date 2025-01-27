@@ -277,7 +277,7 @@ trait ExternalContext {
         getRequest.queryStringOpt.getOrElse("")
       )
 
-    s"End request:   ${getRequest.getMethod} $pathQuery"
+    s"End request:   ${getRequest.getMethod} $pathQuery ${getResponse.getStatus}"
   }
 }
 

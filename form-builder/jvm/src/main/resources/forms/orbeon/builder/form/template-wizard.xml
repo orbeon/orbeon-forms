@@ -15,7 +15,7 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xh:title>Untitled Form</xh:title>
+        <xh:title/>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
             <!-- Main instance -->
@@ -49,7 +49,7 @@
                 <metadata>
                     <application-name/>
                     <form-name/>
-                    <title xml:lang="en">Untitled Form</title>
+                    <title xml:lang="en"/>
                     <description xml:lang="en"/>
 
                     <library-versions>

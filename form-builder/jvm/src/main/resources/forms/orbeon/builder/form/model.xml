@@ -241,19 +241,16 @@
                 ref="$metadata/thumbnail"/>
         </xf:action>
 
-        <!-- Set initial form and first section titles on template -->
-        <xf:var
-            name="form-resources"
-            model="fr-resources-model"
-            value="
-                (
-                    $fr-form-resources/../resource[@xml:lang = $fb-lang],
-                    $fr-form-resources
-                )[1]"/>
 
         <xf:setvalue
+            if="exists(event('title'))"
             ref="$metadata/title"
-            value="$form-resources/template/untitled-form"/>
+            value="event('title')"/>
+
+        <xf:setvalue
+            if="exists(event('description'))"
+            ref="$metadata/description"
+            value="event('description')"/>
 
         <!-- Annotate data -->
         <!-- NOTE: RRR done by fr-annotate-data -->
@@ -418,6 +415,22 @@
                     not($has-roles and not($allowed-apps-if-has-roles = ('*', $requested-app)))
             "/>
 
+            <xf:var
+                name="fb-lang"
+                value="
+                    let $requested-fb-lang := xxf:trim(xxf:get-request-parameter('fb-language'))[xxf:non-blank()]
+                    return
+                        if ($requested-fb-lang = xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code) then
+                            $requested-fb-lang
+                        else
+                            xxf:instance('fr-language-instance')"/>
+
+            <xf:message value="concat('fb-lang: ', $fb-lang)"/>
+
+            <xf:var
+                name="fb-resources"
+                value="instance('fr-form-resources')/(resource[@xml:lang = $fb-lang], resource)[1]"/>
+
             <!-- If valid app/form were passed, skip showing the dialog -->
             <!-- Reuse existing logic of event handlers on dialog-form-settings -->
             <xf:dispatch
@@ -429,7 +442,7 @@
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="$requested-app"/>
                 <xf:property name="form"                                      value="$requested-form"/>
-                <xf:property name="title"                                     value="($requested-title,       bind('title-bind'))[1]"/>
+                <xf:property name="title"                                     value="($requested-title,       $fb-resources/template/untitled-form)[1]"/>
                 <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>
@@ -475,7 +488,7 @@
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="($requested-app,         bind('application-name-bind'))[1]"/>
                 <xf:property name="form"                                      value="($requested-form,        bind('form-name-bind'))[1]"/>
-                <xf:property name="title"                                     value="($requested-title,       bind('title-bind'))[1]"/>
+                <xf:property name="title"                                     value="($requested-title,       $fb-resources/template/untitled-form)[1]"/>
                 <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>

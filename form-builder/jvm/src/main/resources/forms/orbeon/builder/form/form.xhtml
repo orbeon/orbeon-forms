@@ -741,6 +741,7 @@
 
                 <!-- Update title/description -->
                 <xf:action event="fb-update-metadata">
+
                     <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                     <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
 
@@ -946,6 +947,10 @@
                         <xf:property name="data-or-draft" value="'data'"/>
                         <xf:property name="document-url"  value="event('template-url')"/>
                         <xf:property name="for"           value="'load-template'" xxf:tunnel="true"/>
+                        <!-- Make `title` and `description` available downstream
+                             https://github.com/orbeon/orbeon-forms/issues/6745 -->
+                        <xf:property name="title"         value="event('title')" xxf:tunnel="true"/>
+                        <xf:property name="description"   value="event('title')" xxf:tunnel="true"/>
                     </xf:send>
 
                 </xf:action>
@@ -958,6 +963,8 @@
                     <xf:dispatch name="fb-data-ready" targetid="fr-form-model">
                         <!-- Don't enable the new form to be a template! -->
                         <xf:property name="allow-template-use" value="false()"/>
+                        <xf:property name="title"              value="event('title')"/>
+                        <xf:property name="description"        value="event('description')"/>
                     </xf:dispatch>
                 </xf:action>
                 <!-- Update app/form name if changed -->

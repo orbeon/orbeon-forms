@@ -2,7 +2,7 @@
 
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
-            <PatternLayout pattern="%date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n"/>
+            <PatternLayout pattern="%date{ISO8601} - %tid - %-5level %logger{1} - %message%n"/>
         </Console>
     </Appenders>
 

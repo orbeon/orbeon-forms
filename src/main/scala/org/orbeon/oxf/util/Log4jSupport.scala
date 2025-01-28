@@ -160,7 +160,7 @@ object Log4jSupport {
 
     val DefaultConfigurationName = "OrbeonDefault"
     val DefaultLevel             = Level.INFO
-    val DefaultPattern           = "%date{ISO8601} - %tid - %-5level %logger{1} %X{orbeon-incoming-http-header-host} - %message%n"
+    val DefaultPattern           = "%date{ISO8601} - %tid - %-5level %logger{1} - %message%n"
 
     val Log4j1ConfigPropName     = "oxf.log4j-config"
     val Log4j2ConfigPropName     = "oxf.log4j2-config"

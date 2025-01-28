@@ -14,8 +14,7 @@
             maxElementsOnDisk="10000000"
             diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
-            statistics="false"/>
+            memoryStoreEvictionPolicy="LRU"/>
 
     <!-- XForms state store configuration. Only modify if you know what you are doing! -->
     <!-- NOTE: We set this as a disk cache, but follow the Ehcache doc and set maxElementsInMemory to 1 instead of 0. -->

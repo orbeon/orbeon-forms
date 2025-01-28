@@ -282,7 +282,9 @@
                 <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
 
                 <!-- Tell custom settings to initialize -->
-                <xf:dispatch name="fb-initialize" targetid="fb-custom-form-settings">
+                <xf:dispatch
+                    if="xxf:non-blank(xxf:property('oxf.fb.extension.form-settings'))"
+                    name="fb-initialize" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
                     <xf:property name="form-instance"     value="frf:formInstanceRoot($form)"/>
                     <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>

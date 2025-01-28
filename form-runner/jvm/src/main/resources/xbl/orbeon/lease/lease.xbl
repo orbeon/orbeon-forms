@@ -91,8 +91,11 @@
             </xbl:handler>
 
             <xbl:handler event="fr-acquire-lease">
-                <!-- Sending the submission directly from fr:alert-dialog doesn't seem to work -->
-                <xf:send submission="fr-acquire-lease-submission" xxbl:scope="outer"/>
+                <!-- Sending the submission directly from `fr:alert-dialog` doesn't seem to work -->
+                <xf:send submission="fr-acquire-lease-submission" xxbl:scope="outer">
+                    <xf:property name="load-document"  value="event('load-document')"  xxf:tunnel="true"/>
+                    <xf:property name="refresh-needed" value="event('refresh-needed')" xxf:tunnel="true"/>
+                </xf:send>
             </xbl:handler>
 
             <xbl:handler event="fr-relinquish-lease">
@@ -148,7 +151,9 @@
                             <fr:negative-choice/>
                             <fr:positive-choice>
                                 <xf:action event="DOMActivate">
-                                    <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
+                                    <xf:dispatch name="fr-acquire-lease" targetid="fr-lease">
+                                        <xf:property name="load-document" value="false()"/>
+                                    </xf:dispatch>
                                 </xf:action>
                             </fr:positive-choice>
                         </fr:alert-dialog>
@@ -220,7 +225,9 @@
                                 <xf:trigger class="xforms-trigger-appearance-modal">
                                     <xf:label ref="$fr-resources/detail/lease/renew"/>
                                     <xf:action event="DOMActivate">
-                                        <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
+                                        <xf:dispatch name="fr-acquire-lease" targetid="fr-lease">
+                                            <xf:property name="load-document" value="false()"/>
+                                        </xf:dispatch>
                                     </xf:action>
                                 </xf:trigger>
 
@@ -256,9 +263,10 @@
                     <xf:trigger class="xforms-trigger-appearance-modal">
                         <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
                         <xf:action event="DOMActivate">
-                            <xf:setvalue ref="$fr-persistence-instance/lease-load-document">true</xf:setvalue>
-                            <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$is-fb"/>
-                            <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
+                            <xf:dispatch name="fr-acquire-lease" targetid="fr-lease">
+                                <xf:property name="load-document" value="true()"/>
+                                <xf:property name="refresh-needed" value="$is-fb"/>
+                            </xf:dispatch>
                         </xf:action>
                     </xf:trigger>
 

@@ -349,12 +349,13 @@
                     <xf:setvalue
                         ref="$persistence-instance/lease-alert-threshold"
                         value="xxf:property(string-join(('oxf.fr.detail.lease.alert-threshold', $app, $form), '.'))"/>
-                    <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
-                    <xf:send submission="fr-acquire-lease-submission"/>
+                    <xf:send submission="fr-acquire-lease-submission">
+                        <xf:property name="load-document" value="true()" xxf:tunnel="true"/>
+                    </xf:send>
                 </xf:action>
 
                 <xf:action if="not($lease-enabled)">
-                    <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
+                    <xf:dispatch name="fr-load-document-handle-drafts" target="fr-persistence-model"/>
                 </xf:action>
             </xf:action>
 
@@ -368,21 +369,40 @@
                 type="xpath">
                 frf:sendError(403)
             </xf:action>
-        </xf:action>
 
-        <!-- Notify that the data is ready -->
-        <!-- 2024-09-24: No users of this event. -->
-        <xf:dispatch targetid="fr-form-model" name="fr-data-ready"/>
+            <!-- Notify that the data is ready (or not quite) -->
+            <xf:dispatch targetid="fr-form-model" name="fr-data-ready">
+                <!-- For sanity, include how we got the data -->
+                <xf:property
+                    name="data-source"
+                    value="
+                        if ($is-submit) then
+                            'submit'
+                        else if ($new-from-service) then
+                            'service'
+                        else if (instance('fr-persistence-instance')/found-document-message-to-show = 'found-multiple-docs-for-singleton') then
+                            'none-singleton'
+                        else if (instance('fr-persistence-instance')/found-document-message-to-show = ('found-draft-for-never-saved', 'found-drafts-for-never-saved')) then
+                            'none-drafts'
+                        else if ($lease-state-elem = 'other-user') then
+                            'none-lease'
+                        else if ($mode = ('new', 'test')) then
+                            'template'
+                        else
+                            'persistence'"/>
+            </xf:dispatch>
+        </xf:action>
 
     </xf:action>
 
-    <xf:action event="fr-load-document">
+    <xf:action event="fr-load-document-handle-drafts">
         <!-- Load document with the provided id from persistence layer -->
         <xf:message level="xxf:log-debug">Loading data by id from persistence layer: <xf:output value="$document"/></xf:message>
         <xf:var name="draft-requested" value="xxf:get-request-parameter('draft') = 'true'"/>
         <xf:action if="$draft-requested">
             <xf:send submission="fr-get-document-submission">
-                <xf:property name="data-or-draft" value="'draft'"/>
+                <xf:property name="data-or-draft"  value="'draft'"/>
+                <xf:property name="refresh-needed" value="event('refresh-needed')" xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
         <xf:action if="not($draft-requested)">
@@ -403,7 +423,8 @@
 
             <!-- Otherwise just load the data -->
             <xf:send if="not($draft-found)" submission="fr-get-document-submission">
-                <xf:property name="data-or-draft" value="'data'"/>
+                <xf:property name="data-or-draft"  value="'data'"/>
+                <xf:property name="refresh-needed" value="event('refresh-needed')" xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
     </xf:action>
@@ -813,10 +834,12 @@
                     current-dateTime() +
                     xs:dayTimeDuration(concat('PT', $persistence-instance/lease-duration, 'M'))
                 "/>
-            <xf:action if="$persistence-instance/lease-load-document = 'true'">
-                <xf:setvalue ref="$persistence-instance/lease-load-document"/>
-                <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
-            </xf:action>
+            <xf:dispatch
+                if="event('load-document') = true()"
+                name="fr-load-document-handle-drafts"
+                target="fr-persistence-model">
+                <xf:property name="refresh-needed" value="event('refresh-needed')"/>
+            </xf:dispatch>
         </xf:action>
         <xf:action event="xforms-submit-error">
             <!-- We failed to acquire a lease -->
@@ -961,9 +984,15 @@
         <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
         <xf:recalculate model="fr-form-model"/>
 
-        <!-- In some cases (Form Builder, lease not acquired when page loaded), we need to refresh the model as well -->
-        <xf:action if="instance('fr-persistence-instance')/lease-refresh-needed = 'true'">
-            <xf:setvalue ref="instance('fr-persistence-instance')/lease-refresh-needed"/>
+        <!-- This will be the case if the user uses the `try-acquire` button -->
+        <xf:action if="event('refresh-needed') = true()">
+            <!-- Notify that the data is ready -->
+            <xf:dispatch targetid="fr-form-model" name="fr-data-ready">
+                <xf:property
+                    name="data-source"
+                    value="'persistence'"/>
+            </xf:dispatch>
+            <!-- Unclear if this is needed here -->
             <xf:refresh model="fr-form-model"/>
         </xf:action>
     </xf:action>
@@ -1060,8 +1089,6 @@
             <lease-enabled/>
             <!-- When lease-enabled = 'true': other-user | current-user | relinquished -->
             <lease-state/>
-            <lease-load-document/>
-            <lease-refresh-needed/>
             <lease-duration/>
             <lease-renew-threshold/>
             <lease-alert-threshold/>
@@ -1220,7 +1247,9 @@
                     xs:dateTime($persistence-instance/lease-start-time) +
                     xs:dayTimeDuration(concat('PT', $persistence-instance/lease-renew-threshold, 'M'))">
 
-            <xf:send submission="fr-acquire-lease-submission"/>
+            <xf:send submission="fr-acquire-lease-submission">
+                <xf:property name="load-document" value="false()" xxf:tunnel="true"/>
+            </xf:send>
         </xf:action>
     </xf:action>
 

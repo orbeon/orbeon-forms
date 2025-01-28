@@ -169,8 +169,9 @@
                                 <week-start-day>
                                     <label>First day of the week</label>
                                     <item id="0">Use default</item>
-                                    <item id="1">Sunday</item>
-                                    <item id="2">Monday</item>
+                                    <item id="1">Saturday</item>
+                                    <item id="2">Sunday</item>
+                                    <item id="3">Monday</item>
                                 </week-start-day>
                                 <examples>
                                     <label>Examples</label>
@@ -209,8 +210,9 @@
                                 <week-start-day>
                                     <label>Premier jour de la semaine</label>
                                     <item id="0">Utiliser le défaut</item>
-                                    <item id="1">Dimanche</item>
-                                    <item id="2">Lundi</item>
+                                    <item id="1">Samedi</item>
+                                    <item id="2">Dimanche</item>
+                                    <item id="3">Lundi</item>
                                 </week-start-day>
                                 <examples>
                                     <label>Exemples</label>
@@ -266,8 +268,10 @@
                                         if (@id = 0) then
                                             ''
                                         else if (@id = 1) then
-                                            'sunday'
+                                            'saturday'
                                         else if (@id = 2) then
+                                            'sunday'
+                                        else if (@id = 3) then
                                             'monday'
                                         else
                                             error()"/>

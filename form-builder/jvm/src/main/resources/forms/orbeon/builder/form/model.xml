@@ -148,19 +148,13 @@
             value="$resources/resource[1]/@xml:lang"/>
     </xf:action>
 
-    <xf:action ev:event="xforms-model-construct-done">
-        <!-- Regular case: lease acquired or no lease needed -->
-        <xf:dispatch name="fb-construct-done-or-refresh" targetid="fr-form-model"/>
-    </xf:action>
-
-    <xf:action ev:event="xforms-refresh" >
-        <!-- Special case: lease acquired in Form Builder (see xf:refresh in persistence-model.xml, xforms-submit-done action) -->
-        <xf:dispatch name="fb-construct-done-or-refresh" targetid="fr-form-model"/>
-    </xf:action>
-
-    <!-- Initialization entry point. Form data must be ready and the Form Runner language must have been set. -->
-    <xf:action ev:event="fb-construct-done-or-refresh" if="not($mode = ('summary', 'home', 'landing')) and $app != '*' and $form != '*'">
-        <xf:dispatch name="fb-data-ready" targetid="fr-form-model"/>
+    <xf:action event="fr-data-ready">
+        <xf:dispatch
+                if="not(event('data-source') = 'template' or starts-with(event('data-source'), 'none-'))"
+                name="fb-data-ready"
+                targetid="fr-form-model">
+            <xf:property name="data-source" value="event('data-source')"/>
+        </xf:dispatch>
     </xf:action>
 
     <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->

@@ -8,7 +8,7 @@ def main(username: String, password: String): Unit = {
   val crudEndPoint = "https://demo.orbeon.com/demo/fr/service/persistence/crud/"
 
   os.walk(root)
-    .filter(os.isFile
+    .filter(os.isFile)
     .filterNot(_.ext == "DS_Store")
     .filterNot(_.baseName.contains("copy"))
     .filterNot(_.ext.endsWith("~"))

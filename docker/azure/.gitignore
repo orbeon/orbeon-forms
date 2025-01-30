@@ -6,6 +6,7 @@ oidc.json
 orbeon-forms-deployment.yaml
 orbeon-forms-pv.yaml
 orbeon-forms-pvc.yaml
+standalone.xml
 storage-secret.yaml
 web.xml
 webapp

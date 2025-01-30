@@ -87,7 +87,7 @@ create_db_user() {
         --host "$DATABASE_SERVER.postgres.database.azure.com" \
         --username "$DATABASE_ADMIN_USERNAME" \
         --dbname "$DATABASE_NAME" \
-        --command "CREATE USER $username WITH PASSWORD '$password';"; then
+        --command "CREATE USER \"$username\" WITH PASSWORD '$password';"; then
       echo "Failed to create user $username"
       return 1
     fi
@@ -100,8 +100,8 @@ create_db_user() {
 }
 
 # TODO: which user do we actually need (the qualified one or both?)
-create_db_user "$DATABASE_USER" "$DATABASE_PASSWORD"
-#create_db_user "$DATABASE_USER@$DATABASE_SERVER" "$DATABASE_PASSWORD"
+#create_db_user "$DATABASE_USER" "$DATABASE_PASSWORD"
+create_db_user "$DATABASE_USER@$DATABASE_SERVER" "$DATABASE_PASSWORD"
 
 grant_privileges() {
  local username="$1"
@@ -111,10 +111,12 @@ grant_privileges() {
       --host "$DATABASE_SERVER.postgres.database.azure.com" \
       --username "$DATABASE_ADMIN_USERNAME" \
       --dbname "$DATABASE_NAME" \
-      --command "GRANT ALL PRIVILEGES ON DATABASE $DATABASE_NAME TO $username;" \
-      --command "GRANT ALL PRIVILEGES ON SCHEMA public TO $username;" \
-      --command "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $username;" \
-      --command "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $username;"; then
+      --command "GRANT ALL PRIVILEGES ON DATABASE $DATABASE_NAME TO \"$username\";" \
+      --command "GRANT ALL PRIVILEGES ON SCHEMA public TO \"$username\";" \
+      --command "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"$username\";" \
+      --command "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"$username\";" \
+      --command "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO \"$username\";" \
+      --command "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO \"$username\";"; then
     echo "Failed to grant privileges to user $username"
     return 1
   fi
@@ -123,8 +125,8 @@ grant_privileges() {
   return 0
 }
 
-grant_privileges "$DATABASE_USER"
-#grant_privileges "$DATABASE_USER@$DATABASE_SERVER"
+#grant_privileges "$DATABASE_USER"
+grant_privileges "$DATABASE_USER@$DATABASE_SERVER"
 
 if ! [[ $(psql \
     --host "$DATABASE_SERVER.postgres.database.azure.com" \

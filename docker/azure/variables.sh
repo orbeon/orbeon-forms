@@ -65,13 +65,13 @@ DATABASE_PASSWORD='orbeon'
 # Kubernetes
 #####################################
 
-K8S_CLUSTER_NAME="orbeon-forms-cluster"
-K8S_STORAGE_SECRET="storage-secret"
-K8S_PERSISTENCE_VOLUME="orbeon-forms-pv"
-K8S_PERSISTENCE_VOLUME_CLAIM="orbeon-forms-pvc"
-K8S_APP="orbeon-forms"
-K8S_DEPLOYMENT="orbeon-forms-deployment"
-K8S_SERVICE="orbeon-forms-service"
+K8S_CLUSTER_NAME='orbeon-forms-cluster'
+K8S_STORAGE_SECRET='storage-secret'
+K8S_PERSISTENCE_VOLUME='orbeon-forms-pv'
+K8S_PERSISTENCE_VOLUME_CLAIM='orbeon-forms-pvc'
+K8S_APP='orbeon-forms'
+K8S_DEPLOYMENT='orbeon-forms-deployment'
+K8S_SERVICE='orbeon-forms-service'
 
 #####################################
 # Entra ID

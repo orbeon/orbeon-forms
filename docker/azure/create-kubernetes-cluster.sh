@@ -5,8 +5,9 @@ if ! az aks show \
     --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
   if ! az aks create \
       --resource-group "$RESOURCE_GROUP" \
-      --name "$KUBERNETES_CLUSTER_NAME" \
+      --name "$K8S_CLUSTER_NAME" \
       --node-count 1 \
+      --network-plugin azure \
       --generate-ssh-keys; then
     echo "Failed to create Kubernetes cluster $K8S_CLUSTER_NAME"
     return 1
@@ -19,7 +20,8 @@ fi
 # Retrieve AKS credentials, save them locally to ~/.kube/config, and set the AKS cluster as the current context
 az aks get-credentials \
   --resource-group "$RESOURCE_GROUP" \
-  --name "$K8S_CLUSTER_NAME"
+  --name "$K8S_CLUSTER_NAME" \
+  --overwrite-existing
 
 # Display all contexts and current context
 kubectl config get-contexts
@@ -103,7 +105,7 @@ spec:
      - name: orbeon-forms
        image: orbeon/orbeon-forms:$ORBEON_FORMS_DOCKER_TAG
        ports:
-       - containerPort: 8080
+       - containerPort: 8443
        volumeMounts:
          - name: azure-volume
            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/license.xml
@@ -144,8 +146,8 @@ spec:
    app: $K8S_APP
  ports:
    - protocol: TCP
-     port: 80
-     targetPort: 8080
+     port: 443
+     targetPort: 8443
 EOF
 
 # Import the deployment configuration
@@ -166,11 +168,15 @@ display_cluster_info() {
 display_cluster_info
 
 # Retrieve external/public IP
-K8S_EXTERNAL_IP=$(kubectl get service "$K8S_SERVICE" \
-                  --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo -e "\nWaiting for external IP for service $K8S_SERVICE..."
+while K8S_EXTERNAL_IP=$(kubectl get service "$K8S_SERVICE" --output jsonpath='{.status.loadBalancer.ingress[0].ip}') && [[ -z "$K8S_EXTERNAL_IP" ]]; do
+    echo -n "."
+    sleep 10
+done
+echo
 
 # Orbeon Forms app URL
-K8S_APP_URL="http://$K8S_EXTERNAL_IP/orbeon"
+K8S_APP_URL="https://$K8S_EXTERNAL_IP/orbeon"
 echo -e "\nOrbeon Forms now available on Azure Kubernetes cluster: $K8S_APP_URL\n"
 
 # Update the Entra ID redirect URIs

@@ -184,18 +184,18 @@ object OrbeonWebappPlugin {
 
     val providedClasspath =
       myFindUnmanagedJars(Provided,
-        unmanagedBase.value,
+        (ThisBuild / baseDirectory).value / "lib",
         (unmanagedJars / includeFilter).value,
         (unmanagedJars / excludeFilter).value
       )
-
-    val providedJars = providedClasspath.to[List].map(_.data).to[Set]
+    val providedJars    = providedClasspath.to[List].map(_.data).to[Set]
+    val notCompiledJars = notCompiled.map(_._1.data).to[Set]
+    val toInclude       = notCompiledJars -- providedJars
 
     cacheify(
       "lib-deps",
       { in => Some(webappTarget / "WEB-INF" / "lib" / in.getName) },
-      // Include non-compiled dependencies but exclude "provided" JARs
-      notCompiled.map(_._1.data).to[Set] -- providedJars
+      toInclude
     )
 
     webappPostProcess.value(webappTarget)

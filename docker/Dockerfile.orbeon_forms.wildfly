@@ -35,14 +35,23 @@ RUN rm -rf /tmp/orbeon_forms \
     && microdnf clean all
 
 # Prevent permission errors at runtime (Ehcache, etc.)
-RUN mkdir -p /tmp/orbeon
+RUN mkdir -p /tmp/orbeon \
+    && chown -R jboss:jboss /tmp
+
+# Add the entrypoint script
+COPY docker-entrypoint-wildfly.sh /
+RUN chmod +x /docker-entrypoint-wildfly.sh
+
+# Create the directory where users can place their config
+RUN mkdir -p /docker-entrypoint-wildfly.d \
+    && chown -R jboss:jboss /docker-entrypoint-wildfly.d
 
 # Use jboss user at runtime
-RUN chown -R jboss:jboss $WILDFLY_HOME \
-    && chown -R jboss:jboss /tmp
+RUN chown -R jboss:jboss $WILDFLY_HOME
 USER jboss
 
 EXPOSE 8080
 
 # As of WildFly 34, we need the preview stability level for OIDC scopes
+ENTRYPOINT ["/docker-entrypoint-wildfly.sh"]
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "--stability=preview"]

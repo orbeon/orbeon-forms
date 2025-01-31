@@ -28,8 +28,8 @@ create_firewall_rule() {
 
   if ! [[ $(az postgres flexible-server firewall-rule show \
       --rule-name "$rule_name" \
-      --resource-group "$RESOURCE_GROUP" \
-      --name "$DATABASE_SERVER" 2>/dev/null) ]]; then
+      --name "$DATABASE_SERVER" \
+      --resource-group "$RESOURCE_GROUP" 2>/dev/null) ]]; then
     if ! az postgres flexible-server firewall-rule create \
         --rule-name "$rule_name" \
         --name "$DATABASE_SERVER" \
@@ -56,15 +56,15 @@ echo "Local IP: $DATABASE_PUBLIC_IP"
 create_firewall_rule "$DATABASE_FIREWALL_RULE_LOCAL" "$DATABASE_PUBLIC_IP" "$DATABASE_PUBLIC_IP"
 
 if ! az postgres flexible-server db show \
-    --resource-group "$RESOURCE_GROUP" \
+    --database-name "$DATABASE_NAME" \
     --server-name "$DATABASE_SERVER" \
-    --database-name "$DATABASE_NAME" >/dev/null 2>&1; then
+    --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
   if ! az postgres flexible-server db create \
-     --resource-group "$RESOURCE_GROUP" \
-     --server-name "$DATABASE_SERVER" \
-     --database-name "$DATABASE_NAME"; then
+       --database-name "$DATABASE_NAME" \
+       --server-name "$DATABASE_SERVER" \
+       --resource-group "$RESOURCE_GROUP"; then
      echo "Failed to create database $DATABASE_NAME"
-     return 1
+     exit 1
   fi
   echo "Database $DATABASE_NAME created successfully"
 else
@@ -99,8 +99,7 @@ create_db_user() {
   return 0
 }
 
-# TODO: which user do we actually need (the qualified one or both?)
-#create_db_user "$DATABASE_USER" "$DATABASE_PASSWORD"
+# Azure PostgreSQL users need to follow the format "username@servername"
 create_db_user "$DATABASE_USER@$DATABASE_SERVER" "$DATABASE_PASSWORD"
 
 grant_privileges() {
@@ -125,7 +124,6 @@ grant_privileges() {
   return 0
 }
 
-#grant_privileges "$DATABASE_USER"
 grant_privileges "$DATABASE_USER@$DATABASE_SERVER"
 
 if ! [[ $(psql \
@@ -140,7 +138,7 @@ if ! [[ $(psql \
       --dbname "$DATABASE_NAME" \
       --file ./postgresql-2024_1.sql; then
     echo "Failed to create Orbeon Forms tables"
-    return 1
+    exit 1
   fi
   echo "Orbeon Forms tables created successfully"
 else
@@ -157,8 +155,8 @@ delete_firewall_rule() {
 
   if ! az postgres flexible-server firewall-rule delete \
       --rule-name "$rule_name" \
-      --resource-group "$RESOURCE_GROUP" \
       --name "$DATABASE_SERVER" \
+      --resource-group "$RESOURCE_GROUP" \
       --yes; then
     echo "Failed to delete firewall rule $rule_name"
     return 1

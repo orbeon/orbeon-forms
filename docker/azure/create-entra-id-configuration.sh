@@ -36,7 +36,7 @@ create_user() {
 
   if user_exists "$upn"; then
     echo "User $display_name already exists"
-    return 1
+    return 0
   fi
 
   echo "Creating user $upn"
@@ -70,7 +70,7 @@ create_group() {
 
 	if group_exists "$display_name"; then
 	  echo "Group $display_name already exists"
-	  return 1
+	  return 0
   fi
 
 	az ad group create --display-name "$display_name" --mail-nickname "$display_name"
@@ -101,7 +101,7 @@ add_user_to_group() {
 
 	if user_in_group "$user_display_name" "$group_display_name"; then
     echo "User $user_display_name is already in the group $group_display_name"
-    return 1
+    return 0
 	fi
 
   az ad group member add --group "$group_display_name" --member-id "$user_id"
@@ -112,13 +112,10 @@ add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME1" "$ENTRA_ID_USER_GROUP"
 add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_USER_GROUP"
 add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_ADMIN_GROUP"
 
-app_exists() {
-	local app_name=$1
-
-	az ad app list --filter "displayName eq '$app_name'" --query "[].displayName" -o tsv | grep -q "^$app_name$"
-}
-
-if app_exists "$ENTRA_ID_APP_NAME"; then
+if az ad app list \
+    --filter "displayName eq '$ENTRA_ID_APP_NAME'" \
+    --query "[].displayName" \
+    -o tsv | grep -q "^$ENTRA_ID_APP_NAME$"; then
 	echo "App $ENTRA_ID_APP_NAME already exists"
 else
 	# Create application
@@ -135,17 +132,10 @@ az ad app update --id "$ENTRA_ID_APP_ID" --identifier-uris "api://$ENTRA_ID_APP_
 
 ENTRA_ID_APP_OBJECT_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP_NAME'].id" -o tsv)
 
-scope_exists() {
-  local app_id="$1"
-  local scope_value="$2"
-
-  local scope_exists
-  scope_exists=$(az ad app show --id "$app_id" --query "api.oauth2PermissionScopes[?value=='$scope_value']" -o tsv)
-
-  [ -n "$scope_exists" ]
-}
-
-if scope_exists "$ENTRA_ID_APP_ID" "$ENTRA_ID_SCOPE_VALUE"; then
+if [[ -n $(az ad app show \
+    --id "$ENTRA_ID_APP_ID" \
+    --query "api.oauth2PermissionScopes[?value=='$ENTRA_ID_SCOPE_VALUE']" \
+    -o tsv) ]]; then
   echo "Scope $ENTRA_ID_SCOPE_VALUE already exists"
 else
 	# Add scope (az ad app update doesn't seem to work)
@@ -292,17 +282,17 @@ EOF
 # Generate the web.xml configuration file
 cp web.template.xml web.xml
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS
-    sed -i '' \
-        -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
-        -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
-        web.xml
+  # macOS
+  sed -i '' \
+      -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
+      -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
+      web.xml
 else
-    # Linux and other Unix-like systems
-    sed -i \
-        -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
-        -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
-        web.xml
+  # Linux and other Unix-like systems
+  sed -i \
+      -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
+      -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
+      web.xml
 fi
 
 # Print all IDs/URLs

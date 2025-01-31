@@ -44,21 +44,21 @@ register_provider() {
   if [[ "$registration_state" != "Registered" ]]; then
    echo "Registering $namespace provider..."
    if ! az provider register --namespace "$namespace"; then
-       echo "Failed to start registration for $namespace provider"
-       return 1
+     echo "Failed to start registration for $namespace provider"
+     return 1
    fi
 
    echo "Waiting for $namespace provider to be registered..."
    while [[ $(az provider show --namespace "$namespace" --query registrationState -o tsv) == "Registering" ]]; do
-       echo -n "."
-       sleep 10
+     echo -n "."
+     sleep 10
    done
    echo
 
    registration_state=$(az provider show --namespace "$namespace" --query registrationState -o tsv)
    if [[ "$registration_state" != "Registered" ]]; then
-       echo "Error: $namespace provider is in state $registration_state"
-       return 1
+     echo "Error: $namespace provider is in state $registration_state"
+     return 1
    fi
 
    echo "$namespace provider is now registered"
@@ -74,8 +74,10 @@ if ! check_azure_login "$AZURE_ACCOUNT_EMAIL"; then
   return
 fi
 
-# Register providers to be able to use storages, PostgreSQL, and AKS clusters
+# Register providers to be able to use Azure Storage, Database for PostgreSQL, Container Registry, and Managed
+# Kubernetes Service (AKS)
 register_provider "Microsoft.Compute"
+register_provider "Microsoft.ContainerRegistry"
 register_provider "Microsoft.ContainerService"
 register_provider "Microsoft.DBforPostgreSQL"
 register_provider "Microsoft.Storage"

@@ -1,6 +1,8 @@
+.container_registry_name
 .database_server_name
 .storage_account_name
 application.keystore
+Dockerfile
 form-builder-permissions.xml
 oidc.json
 orbeon-forms-deployment.yaml

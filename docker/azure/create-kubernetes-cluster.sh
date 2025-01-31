@@ -4,13 +4,13 @@ if ! az aks show \
     --name "$K8S_CLUSTER_NAME" \
     --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
   if ! az aks create \
-      --resource-group "$RESOURCE_GROUP" \
       --name "$K8S_CLUSTER_NAME" \
+      --resource-group "$RESOURCE_GROUP" \
       --node-count 1 \
       --network-plugin azure \
       --generate-ssh-keys; then
     echo "Failed to create Kubernetes cluster $K8S_CLUSTER_NAME"
-    return 1
+    exit 1
   fi
   echo "Kubernetes cluster $K8S_CLUSTER_NAME created successfully"
 else
@@ -19,9 +19,21 @@ fi
 
 # Retrieve AKS credentials, save them locally to ~/.kube/config, and set the AKS cluster as the current context
 az aks get-credentials \
-  --resource-group "$RESOURCE_GROUP" \
   --name "$K8S_CLUSTER_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
   --overwrite-existing
+
+if [ "$CONTAINER_CUSTOM_IMAGE_ENABLED" = 'true' ]; then
+  # Retrieve the cluster's client ID
+  K8S_CLIENT_ID=$(az aks show \
+                  --name "$K8S_CLUSTER_NAME" \
+                  --resource-group "$RESOURCE_GROUP" \
+                  --query "identityProfile.kubeletidentity.clientId" \
+                  -o tsv)
+
+  # Grant permission to the cluster to pull images from the Azure Container Registry
+  az role assignment create --assignee "$K8S_CLIENT_ID" --role AcrPull --scope "$CONTAINER_REGISTRY_ID"
+fi
 
 # Display all contexts and current context
 kubectl config get-contexts
@@ -34,11 +46,11 @@ cat > "$K8S_STORAGE_SECRET.yaml" << EOF
 apiVersion: v1
 kind: Secret
 metadata:
- name: $K8S_STORAGE_SECRET
+  name: $K8S_STORAGE_SECRET
 type: Opaque
 data:
- azurestorageaccountname: $(echo -n "$STORAGE_ACCOUNT" | base64)
- azurestorageaccountkey: $(echo -n "$STORAGE_ACCOUNT_SECRET_KEY" | base64)
+  azurestorageaccountname: $(echo -n "$STORAGE_ACCOUNT" | base64)
+  azurestorageaccountkey: $(echo -n "$STORAGE_ACCOUNT_SECRET_KEY" | base64)
 EOF
 
 # Import the storage account name/key secret
@@ -49,17 +61,17 @@ cat > "$K8S_PERSISTENCE_VOLUME.yaml" << EOF
 apiVersion: v1
 kind: PersistentVolume
 metadata:
- name: $K8S_PERSISTENCE_VOLUME
+  name: $K8S_PERSISTENCE_VOLUME
 spec:
- capacity:
-   storage: 5Gi
- accessModes:
-   - ReadWriteMany
- storageClassName: azure-file
- azureFile:
-   secretName: $K8S_STORAGE_SECRET
-   shareName: $STORAGE_SHARE_NAME
-   readOnly: false
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azure-file
+  azureFile:
+    secretName: $K8S_STORAGE_SECRET
+    shareName: $STORAGE_SHARE_NAME
+    readOnly: false
 EOF
 
 # Import the persistence volume configuration
@@ -70,84 +82,92 @@ cat > "$K8S_PERSISTENCE_VOLUME_CLAIM.yaml" << EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
- name: $K8S_PERSISTENCE_VOLUME_CLAIM
+  name: $K8S_PERSISTENCE_VOLUME_CLAIM
 spec:
- accessModes:
-   - ReadWriteMany
- storageClassName: azure-file
- resources:
-   requests:
-     storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azure-file
+  resources:
+    requests:
+      storage: 5Gi
 EOF
 
 # Import the persistence volume claim configuration
 kubectl apply -f "$K8S_PERSISTENCE_VOLUME_CLAIM.yaml"
+
+if [ "$CONTAINER_CUSTOM_IMAGE_ENABLED" = 'false' ]; then
+  # Unmodified Orbeon Forms image
+  K8S_IMAGE="orbeon/orbeon-forms:$ORBEON_FORMS_DOCKER_TAG"
+else
+  # Custom Orbeon Forms image
+  K8S_IMAGE="$CONTAINER_REGISTRY.azurecr.io/$CONTAINER_CUSTOM_IMAGE"
+fi
 
 # Generate the deployment configuration file
 cat > "$K8S_DEPLOYMENT.yaml" << EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: $K8S_DEPLOYMENT
- labels:
-   app: $K8S_APP
+  name: $K8S_DEPLOYMENT
+  labels:
+    app: $K8S_APP
 spec:
- replicas: 1
- selector:
-   matchLabels:
-     app: $K8S_APP
- template:
-   metadata:
-     labels:
-       app: $K8S_APP
-   spec:
-     containers:
-     - name: orbeon-forms
-       image: orbeon/orbeon-forms:$ORBEON_FORMS_DOCKER_TAG
-       ports:
-       - containerPort: 8443
-       volumeMounts:
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/license.xml
-           subPath: license.xml
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/form-builder-permissions.xml
-           subPath: form-builder-permissions.xml
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/properties-local.xml
-           subPath: properties-local.xml
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/jboss-web.xml
-           subPath: jboss-web.xml
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/oidc.json
-           subPath: oidc.json
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/web.xml
-           subPath: web.xml
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/configuration/application.keystore
-           subPath: application.keystore
-         - name: azure-volume
-           mountPath: /opt/jboss/wildfly/standalone/configuration/standalone.xml
-           subPath: standalone.xml
-     volumes:
-       - name: azure-volume
-         persistentVolumeClaim:
-           claimName: $K8S_PERSISTENCE_VOLUME_CLAIM
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $K8S_APP
+  template:
+    metadata:
+      labels:
+        app: $K8S_APP
+    spec:
+      containers:
+      - name: orbeon-forms
+        image: $K8S_IMAGE
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/license.xml
+            subPath: license.xml
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/form-builder-permissions.xml
+            subPath: form-builder-permissions.xml
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/resources/config/properties-local.xml
+            subPath: properties-local.xml
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/jboss-web.xml
+            subPath: jboss-web.xml
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/oidc.json
+            subPath: oidc.json
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/web.xml
+            subPath: web.xml
+          - name: azure-volume
+            mountPath: /opt/jboss/wildfly/standalone/configuration/application.keystore
+            subPath: application.keystore
+          - name: azure-volume
+            mountPath: /docker-entrypoint-wildfly.d/standalone.xml
+            subPath: standalone.xml
+      volumes:
+        - name: azure-volume
+          persistentVolumeClaim:
+            claimName: $K8S_PERSISTENCE_VOLUME_CLAIM
 ---
 apiVersion: v1
 kind: Service
 metadata:
- name: $K8S_SERVICE
+  name: $K8S_SERVICE
 spec:
- type: LoadBalancer
- selector:
-   app: $K8S_APP
- ports:
-   - protocol: TCP
-     port: 443
-     targetPort: 8443
+  type: LoadBalancer
+  selector:
+    app: $K8S_APP
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 8443
 EOF
 
 # Import the deployment configuration
@@ -170,8 +190,8 @@ display_cluster_info
 # Retrieve external/public IP
 echo -e "\nWaiting for external IP for service $K8S_SERVICE..."
 while K8S_EXTERNAL_IP=$(kubectl get service "$K8S_SERVICE" --output jsonpath='{.status.loadBalancer.ingress[0].ip}') && [[ -z "$K8S_EXTERNAL_IP" ]]; do
-    echo -n "."
-    sleep 10
+  echo -n "."
+  sleep 10
 done
 echo
 

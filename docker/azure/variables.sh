@@ -2,54 +2,54 @@
 
 ORBEON_FORMS_DOCKER_TAG="2024.1-pe-wildfly"
 
-#####################################
+#################################################
+# Function to generate unique names
+#################################################
+
+# The following names must be unique across all of Azure because they are used in endpoint URLs:
+#  - storage account
+#  - database server
+#  - container registry
+
+unique_name() {
+  local prefix="$1"
+  local file="$2"
+
+  if [[ ! -f "$file" ]]; then
+    # Make the name (statistically) unique and persist it to a local file
+    echo "${prefix}$(printf "%06d" $((RANDOM % 1000000)))" > "$file"
+  fi
+
+  # Always use the same value during multiple script invocations; delete the file to generate a new name
+  cat "$file"
+}
+
+#################################################
 # Azure account
-#####################################
+#################################################
 
 AZURE_ACCOUNT_EMAIL='...' # TODO: add your Azure account email here
 AZURE_LOCATION='westus'
 
-#####################################
+#################################################
 # Resource group
-#####################################
+#################################################
 
 RESOURCE_GROUP='orbeon-forms-resource-group'
 
-#####################################
+#################################################
 # Storage
-#####################################
+#################################################
 
-STORAGE_ACCOUNT_PREFIX='orbeonformsstorage'
-STORAGE_ACCOUNT_FILE='.storage_account_name'
-
-# The storage account name must be unique across all of Azure since it forms part of the storage endpoint URL
-
-if [[ ! -f "$STORAGE_ACCOUNT_FILE" ]]; then
-  # Make the storage account name (statistically) unique and persist it to a local file
-  echo "${STORAGE_ACCOUNT_PREFIX}$(printf "%06d" $((RANDOM % 1000000)))" > "$STORAGE_ACCOUNT_FILE"
-fi
-
-# Always use the same value during multiple script invocations; delete the file to generate a new storage account name
-STORAGE_ACCOUNT=$(cat "$STORAGE_ACCOUNT_FILE")
+STORAGE_ACCOUNT=$(unique_name 'orbeonformsstorage' '.storage_account_name')
 
 STORAGE_SHARE_NAME='orbeon-forms-share'
 
-#####################################
+#################################################
 # Database
-#####################################
+#################################################
 
-DATABASE_SERVER_PREFIX='orbeonformsdb'
-DATABASE_SERVER_FILE='.database_server_name'
-
-# The database server name must be unique across all of Azure since it forms part of the database endpoint URL
-
-if [[ ! -f "$DATABASE_SERVER_FILE" ]]; then
-  # Make the database server name (statistically) unique and persist it to a local file
-  echo "${DATABASE_SERVER_PREFIX}$(printf "%06d" $((RANDOM % 1000000)))" > "$DATABASE_SERVER_FILE"
-fi
-
-# Always use the same value during multiple script invocations; delete the file to generate a new database server name
-DATABASE_SERVER=$(cat "$DATABASE_SERVER_FILE")
+DATABASE_SERVER=$(unique_name 'orbeonformsdb' '.database_server_name')
 
 DATABASE_ADMIN_USERNAME='database_admin'
 DATABASE_ADMIN_PASSWORD='CHANGEME0!'
@@ -61,9 +61,18 @@ DATABASE_NAME='orbeon'
 DATABASE_USER='orbeon'
 DATABASE_PASSWORD='orbeon'
 
-#####################################
+#################################################
+# Container registry (for custom images)
+#################################################
+
+CONTAINER_REGISTRY=$(unique_name 'orbeonformsreg' '.container_registry_name')
+
+CONTAINER_CUSTOM_IMAGE_ENABLED='false'
+CONTAINER_CUSTOM_IMAGE="orbeon-forms-custom:$ORBEON_FORMS_DOCKER_TAG"
+
+#################################################
 # Kubernetes
-#####################################
+#################################################
 
 K8S_CLUSTER_NAME='orbeon-forms-cluster'
 K8S_STORAGE_SECRET='storage-secret'
@@ -73,9 +82,9 @@ K8S_APP='orbeon-forms'
 K8S_DEPLOYMENT='orbeon-forms-deployment'
 K8S_SERVICE='orbeon-forms-service'
 
-#####################################
+#################################################
 # Entra ID
-#####################################
+#################################################
 
 # 1st Entra ID test user
 ENTRA_ID_TEST_USER_EMAIL1='...' # TODO: add a test email here
@@ -97,8 +106,8 @@ ENTRA_ID_APP_NAME='Orbeon Forms'
 # Scope name/value
 ENTRA_ID_SCOPE_VALUE='groups.access'
 
-#####################################
+#################################################
 # Local deployment
-#####################################
+#################################################
 
 LOCAL_APP_URL='https://localhost:8443/orbeon'

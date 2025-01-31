@@ -25,5 +25,10 @@ source create-storage.sh
 # Create PostgreSQL database with Orbeon Forms model
 source create-postgresql-database.sh
 
+if [ "$CONTAINER_CUSTOM_IMAGE_ENABLED" = 'true' ]; then
+  # Create container registry and custom container image
+  source create-container-registry-and-image.sh
+fi
+
 # Deploy Orbeon Forms as a simple Kubernetes cluster
 source create-kubernetes-cluster.sh

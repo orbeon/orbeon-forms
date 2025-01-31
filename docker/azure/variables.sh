@@ -87,14 +87,16 @@ K8S_SERVICE='orbeon-forms-service'
 #################################################
 
 # 1st Entra ID test user
-ENTRA_ID_TEST_USER_EMAIL1='...' # TODO: add a test email here
-ENTRA_ID_TEST_USER_PASSWORD1='CHANGEME!'
+ENTRA_ID_TEST_USER_UPN_PREFIX1='testuser1'
+ENTRA_ID_TEST_USER_PASSWORD1='CHANGEME0!'
 ENTRA_ID_TEST_USER_DISPLAY_NAME1='Test User 1'
+ENTRA_ID_TEST_USER_EMAIL1='...' # TODO: add a test email here
 
 # 2nd Entra ID test user
-ENTRA_ID_TEST_USER_EMAIL2='...' # TODO: add a test email here
-ENTRA_ID_TEST_USER_PASSWORD2='CHANGEME!'
+ENTRA_ID_TEST_USER_UPN_PREFIX2='testuser2'
+ENTRA_ID_TEST_USER_PASSWORD2='CHANGEME0!'
 ENTRA_ID_TEST_USER_DISPLAY_NAME2='Test User 2'
+ENTRA_ID_TEST_USER_EMAIL2='...' # TODO: add a test email here
 
 # Orbeon user and admin group names
 ENTRA_ID_USER_GROUP='orbeon-user'

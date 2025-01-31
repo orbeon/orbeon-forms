@@ -3,19 +3,14 @@
 ENTRA_ID_DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv 2>&1)
 echo "Entra ID domain: $ENTRA_ID_DOMAIN"
 
-user_id_from_display_name() {
-  local display_name="$1"
+# UPN = UPN prefix '@' domain
+ENTRA_ID_TEST_USER_UPN1="$ENTRA_ID_TEST_USER_UPN_PREFIX1@$ENTRA_ID_DOMAIN"
+ENTRA_ID_TEST_USER_UPN2="$ENTRA_ID_TEST_USER_UPN_PREFIX2@$ENTRA_ID_DOMAIN"
 
-  az ad user list --filter "displayName eq '$display_name'" --query "[0].id" -o tsv
-}
+user_id_from_upn() {
+  local upn="$1"
 
-user_upn_from_email() {
-  local email="$1"
-
-  # Build principal name from email and domain (external users)
-  local upn="${email//[@+]/_}#EXT#@${ENTRA_ID_DOMAIN}"
-
-  echo "$upn"
+  az ad user show --id "$upn" --query id -o tsv
 }
 
 user_exists() {
@@ -27,38 +22,35 @@ user_exists() {
 }
 
 create_user() {
-  local email="$1"
+  local upn="$1"
   local password="$2"
   local display_name="$3"
-
-  local upn
-  upn=$(user_upn_from_email "$email")
+  local email="$4"
 
   if user_exists "$upn"; then
     echo "User $display_name already exists"
     return 0
   fi
 
-  echo "Creating user $upn"
+  echo "Creating user $display_name"
 
   if az ad user create \
-    --display-name "$display_name" \
-    --user-principal-name "$upn" \
-    --password "$password"; then
+      --user-principal-name "$upn" \
+      --password "$password" \
+      --display-name "$display_name"; then
+    local id
+    id=$(user_id_from_upn "$upn")
 
-    local object_id
-    object_id=$(az ad user show --id "$upn" --query id -o tsv)
-
-    echo "Setting email to $email"
+    echo "Setting email for $display_name to $email"
     az rest --method patch \
-      --url "https://graph.microsoft.com/v1.0/users/$object_id" \
+      --url "https://graph.microsoft.com/v1.0/users/$id" \
       --body "{\"mail\":\"$email\"}"
   fi
 }
 
 # Create a couple of test users
-create_user "$ENTRA_ID_TEST_USER_EMAIL1" "$ENTRA_ID_TEST_USER_PASSWORD1" "$ENTRA_ID_TEST_USER_DISPLAY_NAME1"
-create_user "$ENTRA_ID_TEST_USER_EMAIL2" "$ENTRA_ID_TEST_USER_PASSWORD2" "$ENTRA_ID_TEST_USER_DISPLAY_NAME2"
+create_user "$ENTRA_ID_TEST_USER_UPN1" "$ENTRA_ID_TEST_USER_PASSWORD1" "$ENTRA_ID_TEST_USER_DISPLAY_NAME1" "$ENTRA_ID_TEST_USER_EMAIL1"
+create_user "$ENTRA_ID_TEST_USER_UPN2" "$ENTRA_ID_TEST_USER_PASSWORD2" "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_TEST_USER_EMAIL2"
 
 group_exists() {
   local display_name="$1"
@@ -80,11 +72,8 @@ create_group "$ENTRA_ID_USER_GROUP"
 create_group "$ENTRA_ID_ADMIN_GROUP"
 
 user_in_group() {
-  local user_display_name="$1"
+  local user_id="$1"
   local group_display_name="$2"
-
-  local user_id
-  user_id=$(user_id_from_display_name "$user_display_name")
 
   local result
   result=$(az ad group member check --group "$group_display_name" --member-id "$user_id" --query value -o tsv)
@@ -93,14 +82,14 @@ user_in_group() {
 }
 
 add_user_to_group() {
-	local user_display_name="$1"
+	local user_upn="$1"
 	local group_display_name="$2"
 
   local user_id
-	user_id=$(user_id_from_display_name "$user_display_name")
+	user_id=$(user_id_from_upn "$user_upn")
 
-	if user_in_group "$user_display_name" "$group_display_name"; then
-    echo "User $user_display_name is already in the group $group_display_name"
+	if user_in_group "$user_id" "$group_display_name"; then
+    echo "User $user_upn is already in group $group_display_name"
     return 0
 	fi
 
@@ -108,9 +97,9 @@ add_user_to_group() {
 }
 
 # Assign groups to users
-add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME1" "$ENTRA_ID_USER_GROUP"
-add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_USER_GROUP"
-add_user_to_group "$ENTRA_ID_TEST_USER_DISPLAY_NAME2" "$ENTRA_ID_ADMIN_GROUP"
+add_user_to_group "$ENTRA_ID_TEST_USER_UPN1" "$ENTRA_ID_USER_GROUP"
+add_user_to_group "$ENTRA_ID_TEST_USER_UPN2" "$ENTRA_ID_USER_GROUP"
+add_user_to_group "$ENTRA_ID_TEST_USER_UPN2" "$ENTRA_ID_ADMIN_GROUP"
 
 if az ad app list \
     --filter "displayName eq '$ENTRA_ID_APP_NAME'" \

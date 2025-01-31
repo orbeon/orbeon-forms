@@ -438,6 +438,9 @@
                 <label>Maximum Aggregate Attachment Size</label>
                 <hint>Applies to all attachment controls in this form</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Maximum Number of Files per Control</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label>Allowed File Types</label>
                 <hint>For example "image/* application/pdf"</hint>
@@ -699,6 +702,7 @@
                 <item id="upload-max-size-per-file" multiple="false">Maximum Attachment Size</item>
                 <item id="upload-max-size-per-file" multiple="true">Maximum Attachment Size per File</item>
                 <item id="upload-max-size-aggregate-per-control">Maximum Aggregate Attachment Size</item>
+                <item id="upload-max-files-per-control">Maximum Number of Files per Control</item>
                 <item id="upload-mediatypes">Supported File Types</item>
                 <item id="excluded-dates">Dates to Exclude</item>
             </constraint>

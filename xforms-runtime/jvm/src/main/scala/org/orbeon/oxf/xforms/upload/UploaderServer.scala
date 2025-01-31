@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.upload
 
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, UploadContext}
-import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumFiles, MaximumSize}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.IOUtils.{runQuietly, useAndClose}
@@ -34,6 +34,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult as JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
@@ -58,7 +59,7 @@ object UploaderServer extends UploaderServer {
     actualSize  : Long
   )
 
-  protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
+  protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
     withDocumentAcquireLock(
       uuid    = uuid,
       timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout
@@ -83,7 +84,7 @@ trait UploaderServer {
 
   protected implicit val logger: slf4j.Logger = LoggerFactory.createLogger("org.orbeon.xforms.upload").logger
 
-  protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
+  protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)]
   protected def fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]]
 
   def processUpload(request: Request): (List[UploadResponse], Option[Throwable]) = {
@@ -122,7 +123,7 @@ trait UploaderServer {
             setMaxBytes              = trustedUploadContext.setMaxBytes,
             session                  = session
           ) {
-            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
+            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
               selfUploaderServer.getUploadConstraintsForControl(uuid, controlEffectiveId)
           }
         ),
@@ -351,7 +352,7 @@ trait UploaderServer {
     // Session keys created, for cleanup
     private val sessionKeys = m.ListBuffer[String]()
 
-    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
+    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)]
 
     // Can throw
     def fileItemStarting(fieldName: String, fileItem: DiskFileItem): (Option[MaximumSize], AllowedMediatypes) = {
@@ -362,7 +363,7 @@ trait UploaderServer {
       if (progressOpt.isDefined)
         throw new IllegalStateException("more than one file provided")
 
-      val ((maxUploadSizeForControl, allowedMediatypeRangesForControl), requestUri) =
+      val ((maxUploadSizeForControl, maxFilesForControl, allowedMediatypeRangesForControl), requestUri) =
         getUploadConstraintsForControl(uuid, fieldName).get // TODO: will throw if this is a `Failure`
 
       val fileItemHeadersOpt = Option(fileItem.getHeaders)
@@ -409,6 +410,15 @@ trait UploaderServer {
           case (UnlimitedSize,        LimitedSize(_))       => throw new IllegalStateException
           case (LimitedSize(current), LimitedSize(control)) => setMaxBytes(LimitedSize(current + control))
         }
+      }
+
+      // Handle max files
+      maxFilesForControl match {
+        case MaximumCurrentFiles.UnlimitedFiles =>
+          // Nothing to do, we're good
+        case MaximumCurrentFiles.LimitedFiles(current, max) =>
+          if (current + 1 > max)
+            throw TooManyFilesException(permitted = max)
       }
 
       // Handle mediatypes

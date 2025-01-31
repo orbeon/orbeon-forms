@@ -1183,6 +1183,17 @@
                                 event('actual')
                             )
                         )
+                    else if (event('error-type') = 'max-files-per-control') then
+                        xxf:format-message(
+                            xxf:r(
+                                'detail.messages.upload-error-max-files-per-control',
+                                'fr-fr-resources'
+                            ),
+                            (
+                                event('permitted'),
+                                event('actual')
+                            )
+                        )
                     else if (event('error-type') = 'mediatype-error') then
                         xxf:format-message(
                             xxf:r(

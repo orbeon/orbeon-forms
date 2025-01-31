@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.XFormsControls
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.upload.UploadSupport
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 
@@ -24,7 +25,7 @@ object FormRunnerUploadSupport extends UploadSupport {
 
   def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long] = {
     // Return None if we couldn't find an XFormsUploadControl for the given control effective ID...
-    val uploadControlOpt = controls.getCurrentControlTree.findControl(controlEffectiveId).collect { case c: XFormsUploadControl => c }
+    val uploadControlOpt = getUploadControlOpt(controls, controlEffectiveId)
 
     // ...or if we couldn't compute the size of the files currently attached to the corresponding bound node
     uploadControlOpt.flatMap(currentUploadSize)
@@ -41,17 +42,35 @@ object FormRunnerUploadSupport extends UploadSupport {
     }
   }
 
+  def currentUploadFilesForControl(controls: XFormsControls, controlEffectiveId: String): Option[Int] = {
+    val uploadControlOpt = getUploadControlOpt(controls, controlEffectiveId)
+    uploadControlOpt.flatMap { uploadControl =>
+      getAttachmentBoundNodeOpt(uploadControl).map { boundNode =>
+        boundNode.child("_").size
+      }
+    }
+  }
+
+  private def getUploadControlOpt(
+    controls           : XFormsControls,
+    controlEffectiveId : String
+  ): Option[XFormsUploadControl] =
+    controls.getCurrentControlTree
+      .findControl(controlEffectiveId)
+      .collect { case c: XFormsUploadControl => c }
+
+  private def getAttachmentBoundNodeOpt(uploadControl: XFormsUploadControl): Option[NodeInfo] =
+    uploadControl.container.associatedControlOpt
+      .collect { case c: XFormsComponentControl => c }
+      .filter(_.staticControl.element.getName == "attachment")
+      .flatMap(_.boundNodeOpt)
+
   private def currentUploadSize(uploadControl: XFormsUploadControl): Option[Long] = {
-    val sizes = for {
-      componentControl <- uploadControl.container.associatedControlOpt.collect { case c: XFormsComponentControl => c }
-      if componentControl.staticControl.element.getName == "attachment"
-      boundNode        <- componentControl.boundNodeOpt
-    } yield {
+    getAttachmentBoundNodeOpt(uploadControl).map { boundNode =>
       val singleAttachmentSizeOpt  = boundNode.attValueOpt("size")
       val multipleAttachmentsSizes = boundNode.child("_").flatMap(_.attValueOpt("size"))
-      (singleAttachmentSizeOpt.toSeq ++ multipleAttachmentsSizes).filter(_.nonEmpty).map(_.toLong)
+      val sizes = (singleAttachmentSizeOpt.toSeq ++ multipleAttachmentsSizes).filter(_.nonEmpty).map(_.toLong)
+      sizes.sum
     }
-
-    sizes.map(_.sum)
   }
 }

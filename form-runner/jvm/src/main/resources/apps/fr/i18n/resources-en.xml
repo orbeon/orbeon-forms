@@ -297,6 +297,7 @@
             <upload-error>There was an error during the upload. Please try again.</upload-error>
             <upload-error-empty-file>The file uploaded is empty.</upload-error-empty-file>
             <upload-error-size>The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.</upload-error-size>
+            <upload-error-max-files-per-control>Maximum number of files exceeded. Please select no more than {0} files.</upload-error-max-files-per-control>
             <upload-error-mediatype>The file uploaded is of an incorrect type: {0}</upload-error-mediatype>
             <upload-error-file-scan>The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".</upload-error-file-scan>
             <lost-attachments>Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.</lost-attachments>

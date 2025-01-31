@@ -4,8 +4,9 @@ import org.orbeon.datatypes.{Mediatype, MediatypeRange}
 
 sealed trait FileRejectionReason
 object FileRejectionReason {
-  case object EmptyFile                                                                                                          extends FileRejectionReason
+  case object EmptyFile                                                                                                         extends FileRejectionReason
   case class  SizeTooLarge       (permitted: Long, actual: Long)                                                                extends FileRejectionReason
+  case class  TooManyFiles       (permitted: Int)                                                                               extends FileRejectionReason
   case class  DisallowedMediatype(clientFilenameOpt: Option[String], permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends FileRejectionReason
   case class  FailedFileScan     (fieldName: String, message: Option[String])                                                   extends FileRejectionReason
 }

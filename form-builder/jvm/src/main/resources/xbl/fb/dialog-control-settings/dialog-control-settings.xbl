@@ -947,7 +947,7 @@
 
                 <xf:var
                     name="multiple-attachments-constraints"
-                    value="'upload-max-size-per-file', 'upload-max-size-aggregate-per-control', 'upload-mediatypes'"/>
+                    value="'upload-max-size-per-file', 'upload-max-size-aggregate-per-control', 'upload-max-files-per-control', 'upload-mediatypes'"/>
 
                 <xf:var
                     name="noargs-constraints"
@@ -1678,6 +1678,8 @@
                                                             $resources/dialog-form-settings/attachment-max-size-per-file/label
                                                         else if ($validation-type = 'upload-max-size-aggregate-per-control') then
                                                             $resources/dialog-form-settings/attachment-max-size-aggregate-per-control/label
+                                                        else if ($validation-type = 'upload-max-files-per-control') then
+                                                            $resources/dialog-form-settings/attachment-max-files-per-control/label
                                                         else
                                                             $resources/dialog-control-settings/integer-argument/label"/>
                                                 <xf:alert ref="$resources/dialog-control-settings/integer-argument/alert"/>

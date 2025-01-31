@@ -15,7 +15,8 @@ package org.orbeon.oxf.util
 
 import org.apache.commons.fileupload.UploadContext
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.MaximumFiles.UnlimitedFiles
+import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumSize}
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
@@ -87,9 +88,10 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
       parseMultipartRequest(
         uploadContext  = uploadContext,
         lifecycleOpt   = Some(
+
           new UploadProgressMultipartLifecycle(Some(body.length.toLong), None, uploadContext.getMaxBytes, uploadContext.setMaxBytes, session) {
-            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
-              Success(MaximumSize.unapply(maxSize.toString).get -> AllowedAnyMediatype -> URI.create("/acme/sales/new"))
+            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
+              Success((MaximumSize.unapply(maxSize.toString).get, MaximumCurrentFiles.UnlimitedFiles, AllowedAnyMediatype) -> URI.create("/acme/sales/new"))
           }
         ),
         maxSize        = MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),

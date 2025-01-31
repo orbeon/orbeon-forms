@@ -17,7 +17,7 @@ import cats.effect.IO
 import cats.syntax.option.*
 import org.log4s
 import org.log4s.LogLevel
-import org.orbeon.datatypes.{LocationData, MaximumSize}
+import org.orbeon.datatypes.{LocationData, MaximumCurrentFiles, MaximumFiles, MaximumSize}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -294,6 +294,10 @@ trait ContainingDocumentUpload {
     def currentUploadSizeAggregateForControl(controlEffectiveId: String): Option[Long] =
       uploadSupport.currentUploadSizeAggregateForControl(controls, controlEffectiveId)
 
+    def currentUploadFilesForControl(controlEffectiveId: String): Option[Int] =
+      uploadSupport.currentUploadFilesForControl(controls, controlEffectiveId)
+
+
     def currentUploadSizeAggregateForForm: Option[Long] =
       uploadSupport.currentUploadSizeAggregateForForm(controls)
 
@@ -302,7 +306,7 @@ trait ContainingDocumentUpload {
     def uploadMaxSizeAggregatePerFormProperty: MaximumSize    = staticState.uploadMaxSizeAggregatePerForm
   }
 
-  def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, AllowedMediatypes) = {
+  def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, MaximumCurrentFiles, AllowedMediatypes) = {
 
     val allowedMediatypesMaybeRange = {
 
@@ -319,7 +323,36 @@ trait ContainingDocumentUpload {
         AllowedMediatypes.AllowedAnyMediatype
     }
 
-    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange
+    val allowedFiles = {
+
+      def fromCommonConstraint = {
+        customMipForControl(controlEffectiveId, ValidationFunctionNames.UploadMaxFilesPerControl) flatMap
+          MaximumFiles.unapply
+      }
+
+      def fromFormSetting =
+        staticState.staticStringProperty(UploadMaxFilesPerControlProperty).trimAllToOpt flatMap
+          MaximumFiles.unapply
+
+      val maxFilesConstraint =
+        fromCommonConstraint orElse
+          fromFormSetting    getOrElse
+          MaximumFiles.UnlimitedFiles
+
+      maxFilesConstraint match {
+        case MaximumFiles.LimitedFiles(max) =>
+          val currentFiles = UploadChecker.currentUploadFilesForControl(controlEffectiveId)
+          MaximumCurrentFiles.LimitedFiles(currentFiles.getOrElse(0), max)
+        case MaximumFiles.UnlimitedFiles    =>
+          MaximumCurrentFiles.UnlimitedFiles
+      }
+    }
+
+    (
+      UploadChecker.uploadMaxSizeForControl(controlEffectiveId),
+      allowedFiles,
+      allowedMediatypesMaybeRange
+    )
   }
 }
 

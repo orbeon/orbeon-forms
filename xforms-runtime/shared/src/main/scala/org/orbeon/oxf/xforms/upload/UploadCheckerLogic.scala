@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.upload
 
-import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.MaximumFiles.{LimitedFiles, UnlimitedFiles}
+import org.orbeon.datatypes.{MaximumFiles, MaximumSize}
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 
@@ -10,6 +11,7 @@ trait UploadCheckerLogic {
 
   def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String]
   def currentUploadSizeAggregateForControl(controlEffectiveId: String)                             : Option[Long]
+  def currentUploadFilesForControl(controlEffectiveId: String)                                     : Option[Int]
   def currentUploadSizeAggregateForForm                                                            : Option[Long]
   def uploadMaxSizePerFileProperty                                                                 : MaximumSize
   def uploadMaxSizeAggregatePerControlProperty                                                     : MaximumSize

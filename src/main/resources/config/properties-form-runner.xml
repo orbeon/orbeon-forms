@@ -346,6 +346,7 @@
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-per-file.*.*"                value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*"   value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*"      value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.max-files-per-control.*.*"            value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                       value="*/*"/>
 
     <!-- PDF fonts -->

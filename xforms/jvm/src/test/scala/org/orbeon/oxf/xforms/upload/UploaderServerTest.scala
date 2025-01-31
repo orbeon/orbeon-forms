@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.upload
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.{HttpMultipartMode, MultipartEntityBuilder}
 import org.orbeon.connection.StreamedContent
-import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumFiles, MaximumSize}
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
@@ -67,6 +67,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
         val (uploadResponses, None) =
           new TestUploaderServer(
             maximumSize       = MaximumSize.UnlimitedSize,
+            maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
             allowedMediatypes = AllowedMediatypes.AllowedAnyMediatype,
             fileScanProvider  = None
           )
@@ -87,6 +88,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
         val (items, throwableOpt) =
           new TestUploaderServer(
             maximumSize       = MaximumSize.LimitedSize(4000),
+            maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
             allowedMediatypes = AllowedMediatypes.AllowedAnyMediatype,
             fileScanProvider  = None
           )
@@ -114,6 +116,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
           val (uploadResponses, None) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
+              maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
               allowedMediatypes = mediatype,
               fileScanProvider  = None
             )
@@ -140,6 +143,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
           val (items, throwableOpt) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
+              maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
               allowedMediatypes = mediatype,
               fileScanProvider  = None
             )
@@ -162,6 +166,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
           val (items, None) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
+              maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
               allowedMediatypes = mediatype,
               fileScanProvider  = Some(new TestFileScanProvider(newMediatypeOpt = Some("text/html")))
             )
@@ -183,6 +188,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
           val (items, throwableOpt) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
+              maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
               allowedMediatypes = mediatype,
               fileScanProvider  = Some(new TestFileScanProvider(newMediatypeOpt = Some("image/png")))
             )
@@ -254,12 +260,13 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
   class TestUploaderServer(
     maximumSize      : MaximumSize,
+    maximumFiles     : MaximumCurrentFiles,
     allowedMediatypes: AllowedMediatypes,
     fileScanProvider : Option[FileScanProvider2]
   ) extends UploaderServer {
 
-    protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
-      Success(((maximumSize, allowedMediatypes), URI.create("http://localhost:8080/orbeon/test-upload")))
+    protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
+      Success(((maximumSize, maximumFiles, allowedMediatypes), URI.create("http://localhost:8080/orbeon/test-upload")))
 
     protected def fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
       fileScanProvider.map(Left.apply)

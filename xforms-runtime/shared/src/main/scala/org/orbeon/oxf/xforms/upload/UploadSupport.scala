@@ -19,11 +19,13 @@ import org.orbeon.oxf.xforms.XFormsControls
 trait UploadSupport {
   def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long]
   def currentUploadSizeAggregateForForm   (controls: XFormsControls                            ): Option[Long]
+  def currentUploadFilesForControl        (controls: XFormsControls, controlEffectiveId: String): Option[Int]
 }
 
 object UploadSupport {
   def noUploadSupport: UploadSupport = new UploadSupport {
     def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long] = None
     def currentUploadSizeAggregateForForm   (controls: XFormsControls                            ): Option[Long] = None
+    def currentUploadFilesForControl        (controls: XFormsControls, controlEffectiveId: String): Option[Int]  = None
   }
 }

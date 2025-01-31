@@ -59,6 +59,7 @@ object XFormsProperties {
   val UploadMaxSizePerFileProperty                    = "upload.max-size-per-file"
   val UploadMaxSizeAggregatePerControlProperty        = "upload.max-size-aggregate-per-control"
   val UploadMaxSizeAggregatePerFormProperty           = "upload.max-size-aggregate-per-form"
+  val UploadMaxFilesPerControlProperty                = "upload.max-files-per-control"
   val UploadMediatypesProperty                        = "upload.mediatypes"
 
   val ExternalEventsProperty                          = "external-events"
@@ -199,6 +200,7 @@ object XFormsProperties {
       PropertyDefinition(UploadMaxSizePerFileProperty,                    "",                          propagateToClient = false), // blank default (see #2956)
       PropertyDefinition(UploadMaxSizeAggregatePerControlProperty,        "",                          propagateToClient = false),
       PropertyDefinition(UploadMaxSizeAggregatePerFormProperty,           "",                          propagateToClient = false),
+      PropertyDefinition(UploadMaxFilesPerControlProperty,                "",                          propagateToClient = false),
       PropertyDefinition(UploadMediatypesProperty,                        "*/*",                       propagateToClient = false),
       PropertyDefinition(ExternalEventsProperty,                          "",                          propagateToClient = false),
       PropertyDefinition(OptimizeGetAllProperty,                          true,                        propagateToClient = false),

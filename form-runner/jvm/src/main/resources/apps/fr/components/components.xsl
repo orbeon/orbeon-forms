@@ -373,6 +373,14 @@
             )[1]"/>
 
     <xsl:variable
+        name="valid-attachment-max-files-per-control-or-empty"
+        as="xs:string?"
+        select="
+            p:property(string-join(('oxf.fr.detail.attachment.max-files-per-control', $app, $form), '.'))[
+                . castable as xs:integer and xs:integer(.) ge 1
+            ]"/>
+
+    <xsl:variable
         name="attachment-mediatypes"
         as="xs:string"
         select="p:property(string-join(('oxf.fr.detail.attachment.mediatypes', $app, $form), '.'))"/>

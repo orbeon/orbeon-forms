@@ -57,7 +57,7 @@
                         name="captcha-enabled"
                         select="exists($captcha-namespace-name)"
                         as="xs:boolean"/>
-                    <xf:group xxf:appearance="internal">
+                    <xf:group appearance="xxf:internal">
                         <xsl:if test="$captcha-enabled">
                             <xf:action event="xxforms-visible" phase="target">
                                 <xf:setvalue ref="instance()/valid-on-visible" value="xxf:instance('fr-persistence-instance')/captcha"/>

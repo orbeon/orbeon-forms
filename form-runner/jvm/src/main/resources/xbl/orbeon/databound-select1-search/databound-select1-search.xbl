@@ -424,7 +424,7 @@
                         </xf:model>
 
                         <!-- Maintain `instance('local')/label` and do auto-selection -->
-                        <xf:group xxf:appearance="internal">
+                        <xf:group appearance="xxf:internal">
                             <xf:var
                                 name="maybe-open-selection"
                                 value="{if (exists(@selection)) then 'true()' else 'false()'}"/>
@@ -446,7 +446,7 @@
                                     ref="instance('local')/label"
                                     value="$bound-label-or-value"/>
                             </xf:var>
-                            <xf:group xxf:appearance="internal" xxbl:scope="outer">
+                            <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                 <xf:var name="fr-search-value"/>
                                 <xf:var name="fr-search-page"/>
                                 <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>

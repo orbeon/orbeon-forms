@@ -15,7 +15,6 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xh:title/>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
             <!-- Main instance -->

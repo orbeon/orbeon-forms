@@ -758,6 +758,15 @@ trait ControlOps extends ResourcesOps {
         (renameNodeContent(_, avt = false))
     }
 
+    // Update email headers
+    // https://github.com/orbeon/orbeon-forms/issues/6741
+    locally {
+      (ctx.metadataRootElem / "email" / "templates" / "template" / "headers" / "header")
+        .filter(_.attValueOpt("type").contains("control-value"))
+        .filter(_.stringValue == oldName)
+        .foreach(updateNode(newName))
+    }
+
     // Update new actions
     locally {
 

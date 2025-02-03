@@ -297,6 +297,7 @@
             <upload-error>上傳過程中出錯。請重試。</upload-error>
             <upload-error-empty-file>上傳的文件為空。</upload-error-empty-file>
             <upload-error-size>上傳的文件太大。允許的最大大小為 {0,number,integer} 字節，實際接收大小為 {1,number,integer} 字節。</upload-error-size>
+            <upload-error-max-files-per-control>超過最大檔案數。您不能在此控制項中附加超過 {0,number,integer} 個檔案。</upload-error-max-files-per-control>
             <upload-error-mediatype>上傳的文件類型不正確：{0}</upload-error-mediatype>
             <upload-error-file-scan>上傳的文件被文件掃描程序拒絕。請確保這不是一個受感染的文件。以下是文件掃描程序的消息："{0}"。</upload-error-file-scan>
             <lost-attachments>由於服務器問題，一些文件附件丟失。請檢查所有附件並在需要時重新上傳。</lost-attachments>

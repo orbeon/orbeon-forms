@@ -297,6 +297,7 @@
             <upload-error>W trakcie wgrywania pliku/-ów wystąpił błąd. Spróbuj ponownie.</upload-error>
             <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
             <upload-error-size>Wgrany plik jest zbyt duży. Maksymalny dozwolony rozmiar plikuto {0,number,integer} bajtów, a rozmiar otrzymanego pliku to {1,number,integer} bajtów.</upload-error-size>
+            <upload-error-max-files-per-control>Przekroczono maksymalną liczbę plików. Nie można dołączyć więcej niż {0,number,integer} plików do tego kontrolki.</upload-error-max-files-per-control>
             <upload-error-mediatype>Wgrany plik jest niewłaściwego typu: {0}</upload-error-mediatype>
             <upload-error-file-scan>Przesłany plik został odrzucony przez skaner plików. Upewnij się, że nie jest to zainfekowany plik. Oto komunikat skanera plików: „{0}”.</upload-error-file-scan>
             <lost-attachments>Niektóre załączniki zostały utracone z powodu problemu z serwerem. Sprawdź wszystkie załączniki i prześlij je ponownie w razie potrzeby.</lost-attachments>

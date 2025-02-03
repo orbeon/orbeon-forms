@@ -297,6 +297,7 @@
             <upload-error>Hiba történt a feltöltés során. Kérjük, próbálja újra.</upload-error>
             <upload-error-empty-file>A feltöltött fájl üres.</upload-error-empty-file>
             <upload-error-size>A feltöltött fájl túl nagy. A megengedett maximális méret {0,number,integer} bájt, a ténylegesen fogadott méret {1,number,integer} bájt.</upload-error-size>
+            <upload-error-max-files-per-control>Túllépte a fájlok maximális számát. Nem csatolhat több mint {0,number,integer} fájlt ehhez a vezérlőelemhez.</upload-error-max-files-per-control>
             <upload-error-mediatype>A feltöltött fájl típusa helytelen: {0}</upload-error-mediatype>
             <upload-error-file-scan>A feltöltött fájlt a fájlszkenner elutasította. Kérjük, győződjön meg arról, hogy ez nem fertőzött fájl. Itt van a fájlszkenner üzenete: „{0}".</upload-error-file-scan>
             <lost-attachments>Néhány fájlmelléklet elveszett egy szerverprobléma miatt. Kérjük, ellenőrizze az összes mellékletet, és szükség esetén töltse fel újra.</lost-attachments>

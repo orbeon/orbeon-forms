@@ -302,6 +302,7 @@
             <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
             <upload-error-size>L'arxiu es massa gran. El tamany permes és {0,number,integer} bytes i
                 el tamany del fitxer pujat és {1,number,integer} bytes.</upload-error-size>
+            <upload-error-max-files-per-control>S''ha superat el nombre màxim de fitxers. No podeu adjuntar més de {0,number,integer} fitxers a aquest control.</upload-error-max-files-per-control>
             <upload-error-mediatype>L'arxiu pujat és de tipus incorrecte: {0}</upload-error-mediatype>
             <upload-error-file-scan>L'arxiu pujat ha estat rebutjat per l'escàner de fitxers.
                 Asseguris que el fitxer no està infectat. Aquest és el missatge de l'escàner de

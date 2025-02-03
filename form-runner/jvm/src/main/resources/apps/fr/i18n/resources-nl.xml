@@ -297,6 +297,7 @@
             <upload-error>Er was een probleem tijdens de upload. Probeer opnieuw.</upload-error>
             <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
             <upload-error-size>Het geüploade bestand is te groot. De maximale, toegestane grootte is {0,number,integer} bytes en de huidige, ontvangen grootte is {1,number,integer} bytes.</upload-error-size>
+            <upload-error-max-files-per-control>Maximaal aantal bestanden overschreden. U kunt niet meer dan {0,number,integer} bestanden aan dit element toevoegen.</upload-error-max-files-per-control>
             <upload-error-mediatype>Het geüploade bestand heeft een onjuist type: {0}</upload-error-mediatype>
             <upload-error-file-scan>Het geüploade bestand is geweigerd door de bestandenscanner. Zorg dat dit geen geïnfecteerd bestand is. De melding uit de bestandenscanner was: "{0}".</upload-error-file-scan>
             <lost-attachments>Sommige bijlagen zijn verloren gegaan door een serverprobleem. Controleer uw bijlagen en upload deze opnieuw indien nodig.</lost-attachments>

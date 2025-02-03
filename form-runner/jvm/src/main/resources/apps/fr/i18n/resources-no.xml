@@ -291,6 +291,7 @@
             <upload-error>Det oppsto en feil under opplastingen. Vennligst prøv igjen.</upload-error>
             <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
             <upload-error-size>Filen er for stor. Maks filstørrelse er på {0,number,integer} bytes og størrelse på filen er {1,number,integer} bytes.</upload-error-size>
+            <upload-error-max-files-per-control>Maksimalt antall filer overskredet. Du kan ikke legge ved mer enn {0,number,integer} filer til denne kontrollen.</upload-error-max-files-per-control>
             <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
             <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
             <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>

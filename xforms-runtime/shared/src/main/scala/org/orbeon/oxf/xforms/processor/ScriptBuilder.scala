@@ -190,8 +190,7 @@ object ScriptBuilder {
       dialogsToShow =
         (
           for {
-            dialogControl <- containingDocument.controls.getCurrentControlTree.getDialogControls
-            if dialogControl.isDialogVisible
+            dialogControl <- containingDocument.controls.getCurrentControlTree.getVisibleDialogControls
           } yield
             rpc.Dialog(
               id         = containingDocument.namespaceId(dialogControl.effectiveId),

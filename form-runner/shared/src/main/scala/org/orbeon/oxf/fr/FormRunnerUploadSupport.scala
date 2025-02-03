@@ -24,27 +24,25 @@ import org.orbeon.scaxon.SimplePath.NodeInfoOps
 object FormRunnerUploadSupport extends UploadSupport {
 
   def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long] = {
-    // Return None if we couldn't find an XFormsUploadControl for the given control effective ID...
-    val uploadControlOpt = getUploadControlOpt(controls, controlEffectiveId)
+    // Return `None` if we couldn't find an `XFormsUploadControl` for the given control effective ID...
+    val uploadControlOpt = controls.getCurrentControlTree.findControl(controlEffectiveId).collect { case c: XFormsUploadControl => c }
 
-    // ...or if we couldn't compute the size of the files currently attached to the corresponding bound node
+    // ...or if we couldn't find the associated attachment XBL control or bound node
     uploadControlOpt.flatMap(currentUploadSize)
   }
 
+  // Return `None` if we can't find the associated attachment XBL control or bound node for any of the upload controls
   def currentUploadSizeAggregateForForm(controls: XFormsControls): Option[Long] = {
 
     val uploadControlsUploadSizes =
       controls.getCurrentControlTree
-        .getUploadControls
-        .filter(_.isRelevant) // https://github.com/orbeon/orbeon-forms/issues/6762
+        .getRelevantUploadControls // https://github.com/orbeon/orbeon-forms/issues/6762
         .map(currentUploadSize)
 
-    if (uploadControlsUploadSizes.exists(_.isEmpty)) {
-      // Return None if we can't find bound nodes for any of the upload controls
+    if (uploadControlsUploadSizes.exists(_.isEmpty))
       None
-    } else {
+    else
       Some(uploadControlsUploadSizes.flatten.sum)
-    }
   }
 
   def currentUploadFilesForControl(controls: XFormsControls, controlEffectiveId: String): Option[Int] = {
@@ -70,12 +68,12 @@ object FormRunnerUploadSupport extends UploadSupport {
       .filter(_.staticControl.element.getName == "attachment")
       .flatMap(_.boundNodeOpt)
 
-  private def currentUploadSize(uploadControl: XFormsUploadControl): Option[Long] = {
+  // Return `None` if we can't find the associated attachment XBL control or bound node
+  private def currentUploadSize(uploadControl: XFormsUploadControl): Option[Long] =
     getAttachmentBoundNodeOpt(uploadControl).map { boundNode =>
       val singleAttachmentSizeOpt  = boundNode.attValueOpt("size")
       val multipleAttachmentsSizes = boundNode.child("_").flatMap(_.attValueOpt("size"))
       val sizes = (singleAttachmentSizeOpt.toSeq ++ multipleAttachmentsSizes).filter(_.nonEmpty).map(_.toLong)
       sizes.sum
     }
-  }
 }

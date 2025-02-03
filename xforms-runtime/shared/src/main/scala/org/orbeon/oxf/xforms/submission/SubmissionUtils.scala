@@ -295,8 +295,8 @@ object SubmissionUtils {
 
         val boundRelevantPendingUploadControlsIt =
           for {
-            uploadControl <- doc.controls.getCurrentControlTree.getUploadControls.iterator
-            if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
+            uploadControl <- doc.controls.getCurrentControlTree.getRelevantUploadControls.iterator
+            if doc.isUploadPendingFor(uploadControl)
             node          <- uploadControl.boundNodeOpt
             if instance.model.findInstanceForNode(node) exists (_ eq instance)
           } yield
@@ -315,8 +315,7 @@ object SubmissionUtils {
    */
   def annotateBoundRelevantUploadControls(containingDocument: XFormsContainingDocument, currentInstance: XFormsInstance): Unit =
     for {
-      currentUploadControl <- containingDocument.controls.getCurrentControlTree.getUploadControls
-      if currentUploadControl.isRelevant
+      currentUploadControl <- containingDocument.controls.getCurrentControlTree.getRelevantUploadControls
       controlBoundNodeInfo <- currentUploadControl.boundNodeOpt
       if currentInstance eq currentInstance.model.getInstanceForNode(controlBoundNodeInfo)
     } locally {

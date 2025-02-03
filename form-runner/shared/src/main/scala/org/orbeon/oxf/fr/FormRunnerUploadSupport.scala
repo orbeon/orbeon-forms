@@ -32,7 +32,12 @@ object FormRunnerUploadSupport extends UploadSupport {
   }
 
   def currentUploadSizeAggregateForForm(controls: XFormsControls): Option[Long] = {
-    val uploadControlsUploadSizes = controls.getCurrentControlTree.getUploadControls.map(currentUploadSize)
+
+    val uploadControlsUploadSizes =
+      controls.getCurrentControlTree
+        .getUploadControls
+        .filter(_.isRelevant) // https://github.com/orbeon/orbeon-forms/issues/6762
+        .map(currentUploadSize)
 
     if (uploadControlsUploadSizes.exists(_.isEmpty)) {
       // Return None if we can't find bound nodes for any of the upload controls

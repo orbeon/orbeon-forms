@@ -16,7 +16,7 @@
         <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rejeter</reject>
 
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil</home>
-        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil3</landing>
+        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil</landing>
         <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>
         <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
         <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -75,7 +75,7 @@
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export Excel</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export Excel</excel-export-with-search>
         <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export XML</xml-export>
-        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export XHTML</form-definition-xhtml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; Export XHTML</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</save-publish>
 
@@ -315,7 +315,7 @@
             <view-drafts>Voir les documents enregistrés automatiquement</view-drafts>
             <start-new>Recommencer à zéro</start-new>
             <multiple-docs-title>Données de formulaire existantes</multiple-docs-title>
-            <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données _ _, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
+            <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
             <multiple-docs-view-data>Voir les données de formulaire existantes</multiple-docs-view-data>
         </draft-singleton>
         <labels>

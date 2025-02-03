@@ -42,20 +42,6 @@ upload_to_share() {
   return 0
 }
 
-# Generate the standalone.xml configuration file (update the PostgreSQL server URL)
-cp standalone.postgresql.azure.xml standalone.xml
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  # macOS
-  sed -i '' \
-      -e "s/DATABASE_SERVER/${DATABASE_SERVER}/g" \
-      standalone.xml
-else
-  # Linux and other Unix-like systems
-  sed -i \
-      -e "s/DATABASE_SERVER/${DATABASE_SERVER}/g" \
-      standalone.xml
-fi
-
 # Upload all configuration files to the file share (license, properties, Form Builder permissions, OIDC, etc.)
 upload_to_share "./application.keystore" "application.keystore"
 upload_to_share "./form-builder-permissions.xml" "form-builder-permissions.xml"

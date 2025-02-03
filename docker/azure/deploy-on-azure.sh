@@ -13,8 +13,14 @@ source variables.sh
 # Login if needed
 source login.sh
 
+# Generate self-signed certificate
+source generate-self-signed-certificate.sh
+
 # Create Entra ID configuration (test users, groups, permissions, etc.)
 source create-entra-id-configuration.sh
+
+# Generate configuration files (OIDC, Form Builder permissions, WildFly, etc.)
+source generate-configuration-files.sh
 
 # Create resource group (used by storage, database, and Azure Kubernetes Service (AKS) instances)
 source create-resource-group.sh

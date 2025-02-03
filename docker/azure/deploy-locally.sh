@@ -5,21 +5,11 @@ source variables.sh
 # Login if needed
 source login.sh
 
+# Generate self-signed certificate
+source generate-self-signed-certificate.sh
+
 # Create Entra ID configuration (test users, groups, permissions, etc.)
 source create-entra-id-configuration.sh
-
-if [ ! -f "application.keystore" ]; then
-  # Generate self-signed certificate (default passwords in WildFly's configuration are both "password")
-  keytool -genkey \
-    -alias server \
-    -keyalg RSA \
-    -validity 3650 \
-    -keysize 2048 \
-    -keystore application.keystore \
-    -storepass password \
-    -keypass password \
-    -dname "CN=localhost, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
-fi
 
 docker rm -f orbeon-forms-azure-local
 

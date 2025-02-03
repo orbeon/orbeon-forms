@@ -245,53 +245,18 @@ ENTRA_ID_PROVIDER_URL="https://login.microsoftonline.com/$ENTRA_ID_TENANT_ID/v2.
 # Build the API scope URL
 ENTRA_ID_API_SCOPE_URL="api://$ENTRA_ID_APP_ID/$ENTRA_ID_SCOPE_VALUE"
 
-# Generate the OIDC configuration file
-cat << EOF > oidc.json
-{
-  "client-id": "$ENTRA_ID_APP_ID",
-  "provider-url": "$ENTRA_ID_PROVIDER_URL",
-  "credentials": {
-    "secret": "$ENTRA_ID_CREDENTIAL_SECRET"
-  },
-  "principal-attribute": "oid",
-  "scope": "profile $ENTRA_ID_API_SCOPE_URL"
-}
-EOF
-
+# In OIDC, we'll refer to the groups by their IDs (not their display names)
 ENTRA_ID_USER_GROUP_ID=$(az ad group show --group "$ENTRA_ID_USER_GROUP" --query id -o tsv)
 ENTRA_ID_ADMIN_GROUP_ID=$(az ad group show --group "$ENTRA_ID_ADMIN_GROUP" --query id -o tsv)
 
-# Generate the Form Builder permissions file
-cat << EOF > form-builder-permissions.xml
-<roles>
-  <role name="$ENTRA_ID_ADMIN_GROUP_ID" app="*" form="*"/>
-</roles>
-EOF
-
-# Generate the web.xml configuration file
-cp web.template.xml web.xml
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  # macOS
-  sed -i '' \
-      -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
-      -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
-      web.xml
-else
-  # Linux and other Unix-like systems
-  sed -i \
-      -e "s/ENTRA_ID_USER_GROUP_ID/${ENTRA_ID_USER_GROUP_ID}/g" \
-      -e "s/ENTRA_ID_ADMIN_GROUP_ID/${ENTRA_ID_ADMIN_GROUP_ID}/g" \
-      web.xml
-fi
-
 # Print all IDs/URLs
-echo "User group ID: $ENTRA_ID_USER_GROUP_ID"
-echo "Admin group ID: $ENTRA_ID_ADMIN_GROUP_ID"
 echo "App ID: $ENTRA_ID_APP_ID"
 echo "App object ID: $ENTRA_ID_APP_OBJECT_ID"
 echo "Scope ID: $ENTRA_ID_SCOPE_ID"
 echo "Tenant ID: $ENTRA_ID_TENANT_ID"
 echo "Provider URL: $ENTRA_ID_PROVIDER_URL"
 echo "API scope URL: $ENTRA_ID_API_SCOPE_URL"
+echo "User group ID: $ENTRA_ID_USER_GROUP_ID"
+echo "Admin group ID: $ENTRA_ID_ADMIN_GROUP_ID"
 
 # TODO: disable MFA (can't seem to be able to do it via the CLI => Entra ID > Properties > Security defaults > disable, all from the UI)

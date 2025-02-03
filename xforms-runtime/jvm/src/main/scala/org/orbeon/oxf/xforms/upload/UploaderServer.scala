@@ -412,15 +412,6 @@ trait UploaderServer {
         }
       }
 
-      // Handle max files
-      maxFilesForControl match {
-        case MaximumCurrentFiles.UnlimitedFiles =>
-          // Nothing to do, we're good
-        case MaximumCurrentFiles.LimitedFiles(current, max) =>
-          if (current + 1 > max)
-            throw TooManyFilesException(permitted = max)
-      }
-
       // Handle mediatypes
       checkMediatypesThrowIfDisallowed(
         allowedMediatypeRanges    = allowedMediatypeRangesForControl,

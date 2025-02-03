@@ -1190,8 +1190,7 @@
                                 'fr-fr-resources'
                             ),
                             (
-                                event('permitted'),
-                                event('actual')
+                                event('permitted')
                             )
                         )
                     else if (event('error-type') = 'mediatype-error') then

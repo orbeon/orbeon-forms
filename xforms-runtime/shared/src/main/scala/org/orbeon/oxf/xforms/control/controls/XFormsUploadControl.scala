@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import cats.syntax.option.*
+import org.orbeon.datatypes.MaximumCurrentFiles
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -95,48 +96,65 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         containingDocument.endUpload(getUploadUniqueId)
         XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
       case storeEvent: XXFormsUploadStoreEvent =>
-        // https://github.com/orbeon/orbeon-forms/issues/6606
-        val size = storeEvent.contentLength.toLong
-        UploadCheckerLogic.checkSizeLimitExceeded(
-          maxSize     = containingDocument.getUploadConstraintsForControl(effectiveId)._1,
-          currentSize = size
-        ) match {
-          case Some(maxSize) =>
+        val (maxSize, maxCurrentFiles, _) = containingDocument.getUploadConstraintsForControl(effectiveId)
+        maxCurrentFiles match {
+          case MaximumCurrentFiles.LimitedFiles(current, max) if current >= max =>
             XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
             Dispatch.dispatchEvent(
               new XXFormsUploadErrorEvent(
                 this,
                 Map(
-                  "error-type" -> Some("size-error"),
-                  "permitted"  -> Some(maxSize),
-                  "actual"     -> Some(size)
+                  "error-type" -> Some("max-files-per-control"),
+                  "permitted"  -> Some(max)
                 )
               ),
               collector
             )
-          case None =>
-            containingDocument.endUpload(getUploadUniqueId)
-            XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
-            handleUploadedFile(
-              storeEvent.file,
-              Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
-              Option(storeEvent.contentType),
-              Option(storeEvent.contentLength),
-              collector
-            )
-            visitWithAncestors()
-            Dispatch.dispatchEvent(
-              new XXFormsUploadDoneEvent(
-                this,
-                Map(
-                  "filename"       -> Option(storeEvent.filename),
-                  "content-type"   -> Option(storeEvent.contentType),
-                  "content-length" -> Option(storeEvent.contentLength)
+          case _ =>
+            // https://github.com/orbeon/orbeon-forms/issues/6606
+            val size = storeEvent.contentLength.toLong
+            UploadCheckerLogic.checkSizeLimitExceeded(
+              maxSize     = maxSize,
+              currentSize = size
+            ) match {
+              case Some(maxSize) =>
+                XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
+                Dispatch.dispatchEvent(
+                  new XXFormsUploadErrorEvent(
+                    this,
+                    Map(
+                      "error-type" -> Some("size-error"),
+                      "permitted"  -> Some(maxSize),
+                      "actual"     -> Some(size)
+                    )
+                  ),
+                  collector
                 )
-              ),
-              collector
-            )
+              case None =>
+                containingDocument.endUpload(getUploadUniqueId)
+                XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
+                handleUploadedFile(
+                  storeEvent.file,
+                  Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
+                  Option(storeEvent.contentType),
+                  Option(storeEvent.contentLength),
+                  collector
+                )
+                visitWithAncestors()
+                Dispatch.dispatchEvent(
+                  new XXFormsUploadDoneEvent(
+                    this,
+                    Map(
+                      "filename"       -> Option(storeEvent.filename),
+                      "content-type"   -> Option(storeEvent.contentType),
+                      "content-length" -> Option(storeEvent.contentLength)
+                    )
+                  ),
+                  collector
+                )
+            }
         }
+
       case _ =>
     }
   }

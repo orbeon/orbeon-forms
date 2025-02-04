@@ -332,6 +332,7 @@
         <hints>
             <upload-max-size-per-file>A fájloknak {0} alattinak kell lenniük.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>A teljes fájlméretnek a vezérlőben {0} alattinak kell lennie.</upload-max-size-aggregate-per-control>
+            <upload-max-files-per-control>Legfeljebb {0} fájlt csatolhat.</upload-max-files-per-control>
             <upload-mediatypes>Csak {0} fájlok elfogadottak.</upload-mediatypes>
             <upload-image>kép</upload-image>
             <upload-video>videó</upload-video>

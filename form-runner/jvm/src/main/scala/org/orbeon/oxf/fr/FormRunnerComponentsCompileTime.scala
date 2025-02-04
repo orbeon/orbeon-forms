@@ -167,6 +167,9 @@ trait FormRunnerComponentsCompileTime {
           hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$displaySize'")
         }
 
+      case (constraintName @ ValidationFunctionNames.UploadMaxFilesPerControl, Some(max)) =>
+        Some(hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$max'"))
+
       case (constraintName @ ValidationFunctionNames.UploadMediatypes, Some(mediatypesStr)) =>
         val mediatypes        = mediatypesStr.splitTo[List]()
         val displayMediatypes = mediatypes.flatMap { mediatype =>

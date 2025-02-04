@@ -332,6 +332,7 @@
         <hints>
             <upload-max-size-per-file>Dosyalar {0} altında olmalıdır.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Kontroldeki toplam dosya boyutu {0} altında olmalıdır.</upload-max-size-aggregate-per-control>
+            <upload-max-files-per-control>{0} dosyaya kadar ekleyebilirsiniz.</upload-max-files-per-control>
             <upload-mediatypes>Sadece {0} dosyaları kabul edilir.</upload-mediatypes>
             <upload-image>resim</upload-image>
             <upload-video>video</upload-video>

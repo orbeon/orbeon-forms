@@ -332,6 +332,7 @@
         <hints>
             <upload-max-size-per-file>Die maximale Dateigröße ist {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-files-per-control>Sie können bis zu {0} Dateien anhängen.</upload-max-files-per-control>
             <upload-mediatypes>Es sind nur {0}-Dateien zulässig.</upload-mediatypes>
             <upload-image>Bild</upload-image>
             <upload-video>Video</upload-video>

@@ -64,6 +64,7 @@
                             <xf:property name="attachment-max-size-per-file"              value="bind('attachment-max-size-per-file-bind')"/>
                             <xf:property name="attachment-max-size-aggregate-per-control" value="bind('attachment-max-size-aggregate-per-control-bind')"/>
                             <xf:property name="attachment-max-size-aggregate-per-form"    value="bind('attachment-max-size-aggregate-per-form-bind')"/>
+                            <xf:property name="attachment-max-files-per-control"          value="bind('attachment-max-files-per-control-bind')"/>
                             <xf:property name="attachment-mediatypes"                     value="bind('attachment-mediatypes-bind')"/>
                             <xf:property name="wizard"                                    value="bind('wizard-bind')"/>
                             <xf:property name="wizard-mode"                               value="bind('wizard-mode-bind')"/>

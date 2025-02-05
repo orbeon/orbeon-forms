@@ -70,7 +70,7 @@
                     value="string-join(event('updated-with-versions'), ', ')"/>
 
                 <xf:setvalue
-                    iterate="'attachment-max-size-per-file', 'attachment-max-size-aggregate-per-form'"
+                    iterate="'attachment-max-size-per-file', 'attachment-max-size-aggregate-per-form', 'attachment-max-files-per-control'"
                     ref="$i/*[name() = context()]"
                     value="(event(context()), -2)[1]"/>
 
@@ -407,6 +407,7 @@
                         <xf:property name="singleton"                              value="$i/singleton/string()"/>
                         <xf:property name="attachment-max-size-per-file"           value="$i/attachment-max-size-per-file/string()"/>
                         <xf:property name="attachment-max-size-aggregate-per-form" value="$i/attachment-max-size-aggregate-per-form/string()"/>
+                        <xf:property name="attachment-max-files-per-control"          value="$i/attachment-max-files-per-control/string()"/>
                         <xf:property name="attachment-mediatypes"                  value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
                         <xf:property name="wizard"                                 value="$i/wizard/string()"/>
                         <xf:property name="wizard-mode"                            value="$i/wizard-mode/string()"/>
@@ -540,6 +541,7 @@
                         <density/>
                         <attachment-max-size-per-file/>
                         <attachment-max-size-aggregate-per-form/>
+                        <attachment-max-files-per-control/>
                         <attachment-mediatypes/>
                         <labels/>
                         <labels-placeholders/>
@@ -648,7 +650,7 @@
                     readonly="false()"
                     type="xs:boolean"/>
                 <xf:bind
-                    ref="attachment-max-size-per-file | attachment-max-size-aggregate-per-form"
+                    ref="attachment-max-size-per-file | attachment-max-size-aggregate-per-form | attachment-max-files-per-control"
                     type="xs:integer"
                     constraint="xxf:non-negative() or . = -2"/>
                 <xf:bind
@@ -1334,6 +1336,21 @@
                                     <xh:tr>
                                         <xh:td>
                                             <fr:open-select1
+                                                ref="attachment-max-files-per-control"
+                                                appearance="full xxf:horizontal"
+                                                type="integer"
+                                                class="fb-attachment-max-files-per-control">
+
+                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-files-per-control/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-files-per-control/hint"/>
+                                                <xf:itemset ref="$resources/property-yes-no/item[@id = 0]">
+                                                    <xf:label ref="."/>
+                                                    <xf:value>-2</xf:value>
+                                                </xf:itemset>
+                                            </fr:open-select1>
+                                        </xh:td>
+                                        <xh:td>
+                                            <fr:open-select1
                                                 ref="attachment-mediatypes"
                                                 appearance="full xxf:horizontal"
                                                 class="fb-attachment-mediatypes-control">
@@ -1346,6 +1363,8 @@
                                                 </xf:itemset>
                                             </fr:open-select1>
                                         </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
                                         <xh:td>
                                             <xf:select1 ref="automatic-hints" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/automatic-hints/label"/>
@@ -1355,6 +1374,7 @@
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>
+                                        <xh:td/>
                                     </xh:tr>
                                 </fr:grid>
 

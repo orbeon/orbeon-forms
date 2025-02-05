@@ -841,6 +841,14 @@
                         origin="xf:attribute('xxf:upload.max-size-aggregate-per-form', event('attachment-max-size-aggregate-per-form'))"/>
 
                     <xf:delete
+                        bind="attachment-max-files-per-control-bind"/>
+                    <xf:insert
+                        if="event('attachment-max-files-per-control') castable as xs:integer and
+                            xs:integer(event('attachment-max-files-per-control')) ge 1"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:upload.max-files-per-control', event('attachment-max-files-per-control'))"/>
+
+                    <xf:delete
                         bind="attachment-mediatypes-bind"/>
                     <xf:insert
                         if="xxf:non-blank(event('attachment-mediatypes'))"

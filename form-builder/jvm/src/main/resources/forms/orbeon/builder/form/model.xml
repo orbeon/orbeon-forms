@@ -425,8 +425,6 @@
                         else
                             xxf:instance('fr-language-instance')"/>
 
-            <xf:message value="concat('fb-lang: ', $fb-lang)"/>
-
             <xf:var
                 name="fb-resources"
                 value="instance('fr-form-resources')/(resource[@xml:lang = $fb-lang], resource)[1]"/>

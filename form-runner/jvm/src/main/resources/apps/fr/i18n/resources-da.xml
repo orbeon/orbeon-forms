@@ -290,7 +290,7 @@
             <upload-done>Indlæsning færdig</upload-done>
             <upload-error>Der skete en fejl under indlæsning. Prøv igen.</upload-error>
             <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
-            <upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0,number,integer} bytes og der blev indlæst {1,number,integer} bytes.]</upload-error-size>
+            <upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0} og der blev indlæst {1}.]</upload-error-size>
             <upload-error-max-files-per-control>Maksimalt antal filer overskredet. Du kan ikke vedhæfte mere end {0,number,integer} filer til denne kontrol.</upload-error-max-files-per-control>
             <upload-error-mediatype>Den uploadede fil har ikke en tilladt filtype: {0}</upload-error-mediatype>
             <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>

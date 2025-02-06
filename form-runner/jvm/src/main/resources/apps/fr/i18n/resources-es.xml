@@ -296,7 +296,7 @@
             <upload-done>Subidad de archivos completada</upload-done>
             <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
             <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
-            <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
+            <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0} y el tamaño del archivo subido es {1}.</upload-error-size>
             <upload-error-max-files-per-control>Número máximo de archivos excedido. No puede adjuntar más de {0,number,integer} archivos a este control.</upload-error-max-files-per-control>
             <upload-error-mediatype>El archivo subido es de tipo incorrecto: {0}</upload-error-mediatype>
             <upload-error-file-scan>El archivo subido fue rechazado por el escaner de archivos. Asegurese que el archivo no esta infectado. Este el es mensaje del escaner de archivos: "{0}".</upload-error-file-scan>

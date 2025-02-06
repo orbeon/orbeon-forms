@@ -296,7 +296,7 @@
             <upload-done>Tiedoston lähetys valmis</upload-done>
             <upload-error>Tiedoston lähetyksen aikana tapahtui virhe. Yritä uudelleen.</upload-error>
             <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
-            <upload-error-size>Lähetettävä tiedosto on liian suuri. Suurin sallittu tiedostokoko on {0,number,integer} tavua ja todellinen vastaanotettu koko on {1,number,integer} tavua.</upload-error-size>
+            <upload-error-size>Lähetettävä tiedosto on liian suuri. Suurin sallittu tiedostokoko on {0} ja todellinen vastaanotettu koko on {1}.</upload-error-size>
             <upload-error-max-files-per-control>Tiedostojen enimmäismäärä ylitetty. Et voi liittää enempää kuin {0,number,integer} tiedostoa tähän kenttään.</upload-error-max-files-per-control>
             <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
             <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>

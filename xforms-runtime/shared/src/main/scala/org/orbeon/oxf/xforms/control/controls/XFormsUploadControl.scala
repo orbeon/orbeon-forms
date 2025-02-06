@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls
 import cats.syntax.option.*
 import org.orbeon.datatypes.MaximumCurrentFiles
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -124,8 +123,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     this,
                     Map(
                       "error-type" -> Some("size-error"),
-                      "permitted"  -> Some(maxSize),
-                      "actual"     -> Some(size)
+                      "permitted"  -> Some(FileUtils.byteCountToDisplaySize(maxSize)),
+                      "actual"     -> Some(FileUtils.byteCountToDisplaySize(size))
                     )
                   ),
                   collector
@@ -388,7 +387,7 @@ object XFormsUploadControl {
 
   private def normalizeAndCheckRawValue(rawNewValue: String): Option[URI] =
     rawNewValue.trimAllToOpt map (URI.create(_).normalize()) match {
-      case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
+      case someNewValueUri @ Some(newValueUri) if org.orbeon.io.FileUtils.isTemporaryFileUri(newValueUri) =>
         someNewValueUri
       case Some(newValueUri) =>
         throw new OXFException(s"Unexpected incoming value for `xf:upload`: `$newValueUri`")

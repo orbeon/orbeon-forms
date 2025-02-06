@@ -296,7 +296,7 @@
             <upload-done>Yükleme tamamlandı</upload-done>
             <upload-error>Yükleme sırasında bir hata oluştu. Lütfen tekrar deneyin.</upload-error>
             <upload-error-empty-file>Yüklenen dosya boş.</upload-error-empty-file>
-            <upload-error-size>Yüklenen dosya çok büyük. İzin verilen maksimum boyut {0,number,integer} bayt ve alınan gerçek boyut {1,number,integer} bayt.</upload-error-size>
+            <upload-error-size>Yüklenen dosya çok büyük. İzin verilen maksimum boyut {0} ve alınan gerçek boyut {1}.</upload-error-size>
             <upload-error-max-files-per-control>Maksimum dosya sayısı aşıldı. Bu kontrole {0,number,integer} dosyadan fazla ekleyemezsiniz.</upload-error-max-files-per-control>
             <upload-error-mediatype>Yüklenen dosya yanlış türde: {0}</upload-error-mediatype>
             <upload-error-file-scan>Yüklenen dosya dosya tarayıcısı tarafından reddedildi. Lütfen bunun virüslü bir dosya olmadığından emin olun. İşte dosya tarayıcısı mesajı: "{0}".</upload-error-file-scan>

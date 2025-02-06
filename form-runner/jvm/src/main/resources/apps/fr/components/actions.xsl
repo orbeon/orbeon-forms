@@ -602,7 +602,15 @@
                                                 <xf:var
                                                     name="value"
                                                     context="instance('fr-form-instance')"
-                                                    value="{*:var[@name = 'source-path']/@value}"/>
+                                                    value="{
+                                                        frf:replaceVarReferencesWithFunctionCallsFromString(
+                                                            *:var[@name = 'source-path']/@value,
+                                                            *:var[@name = 'source-path']/@value,
+                                                            false(),
+                                                            $library-name,
+                                                            ()
+                                                        )
+                                                    }"/>
                                             </xsl:when>
                                             <xsl:otherwise/>
                                         </xsl:choose>

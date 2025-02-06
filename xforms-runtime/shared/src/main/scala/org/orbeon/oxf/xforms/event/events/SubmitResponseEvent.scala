@@ -102,7 +102,7 @@ private object SubmitResponseEvent {
 
   private def tryToReadBody(cxr: ConnectionResultT[_])(implicit logger: IndentedLogger): Option[String Either DocumentNodeInfoType] = {
     // Log response details if not done already
-    cxr.logResponseDetailsOnce(log4s.Error)
+    cxr.logResponseDetailsOnce(log4s.Debug)
 
     if (cxr.hasContent) {
 

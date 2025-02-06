@@ -27,5 +27,4 @@ class TestWebAppContext(logger: Logger, val attributes: mutable.Map[String, AnyR
   val initParameters                            : Map[String, String] = Map.empty
   def log(message: String, throwable: Throwable): Unit                = logger.error(throwable)(message)
   def log(message: String)                      : Unit                = logger.info(message)
-  def getNativeContext                          : AnyRef              = null
 }

@@ -65,7 +65,6 @@ class ServletWebAppContext(val servletContext: ServletContext) extends WebAppCon
 
   def log(message: String, throwable: Throwable)  = servletContext.log(message, throwable)
   def log(message: String) = servletContext.log(message)
-  def getNativeContext: AnyRef = servletContext
 
   protected def getInitParameter(s: String) = servletContext.getInitParameter(s)
   protected def getInitParameterNames: Seq[String] = servletContext.getInitParameterNames.asScala.toList
@@ -85,7 +84,6 @@ class PortletWebAppContext(val portletContext: PortletContext) extends WebAppCon
 
   def log(message: String, throwable: Throwable)  = portletContext.log(message, throwable)
   def log(message: String) = portletContext.log(message)
-  def getNativeContext: AnyRef = portletContext
 
   protected def getInitParameter(s: String) = portletContext.getInitParameter(s)
   protected def getInitParameterNames: Seq[String] = portletContext.getInitParameterNames.asScala.toList

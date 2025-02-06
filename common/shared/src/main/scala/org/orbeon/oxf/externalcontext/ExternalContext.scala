@@ -325,9 +325,6 @@ trait WebAppContext {
 
   private def webAppListenersOption: Option[WebAppListeners] =
     attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])
-
-  // Access to native context
-  def getNativeContext: AnyRef
 }
 
 trait WebAppListener {

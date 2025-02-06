@@ -137,7 +137,7 @@ object ExternalContext {
     def isUserInRole(role: String): Boolean
 
     def getLocale: ju.Locale
-    def getLocales: ju.Enumeration[_]
+    def getLocales: ju.Enumeration[ju.Locale] // unused except forwarding
 
     def getPathTranslated: String
     def getQueryString: String

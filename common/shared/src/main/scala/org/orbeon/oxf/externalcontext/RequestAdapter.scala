@@ -37,7 +37,7 @@ class RequestAdapter extends ExternalContext.Request {
   def credentials: Option[Credentials] = None
   def isUserInRole(role: String): Boolean = false
   def getLocale: ju.Locale = null
-  def getLocales: ju.Enumeration[_] = null
+  def getLocales: ju.Enumeration[ju.Locale] = ju.Collections.emptyEnumeration()
   def getPathTranslated: String = null
   def getQueryString: String = null
   def getRequestURI: String = null

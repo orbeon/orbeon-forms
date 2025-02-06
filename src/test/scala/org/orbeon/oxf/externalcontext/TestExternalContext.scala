@@ -200,8 +200,8 @@ class TestExternalContext(
       ju.Collections.unmodifiableMap(result)
     }
 
-    def getLocale: ju.Locale          = null
-    def getLocales: ju.Enumeration[_] = null
+    def getLocale: ju.Locale                  = null
+    def getLocales: ju.Enumeration[ju.Locale] = ju.Collections.emptyEnumeration()
 
     def getMethod: HttpMethod =
       HttpMethod.withNameInsensitive(XPathUtils.selectStringValueNormalize(requestDocument, "/*/method"))

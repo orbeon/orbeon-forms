@@ -87,7 +87,7 @@ class ServletExternalContext(
     def getRequestedSessionId      = nativeRequest.getRequestedSessionId
     def getServletPath             = nativeRequest.getServletPath
     def getLocale                  = nativeRequest.getLocale
-    def getLocales: util.Enumeration[_] = nativeRequest.getLocales
+    def getLocales: util.Enumeration[ju.Locale] = nativeRequest.getLocales
     def isRequestedSessionIdValid  = nativeRequest.isRequestedSessionIdValid
 
     def getContainerType           = "servlet"

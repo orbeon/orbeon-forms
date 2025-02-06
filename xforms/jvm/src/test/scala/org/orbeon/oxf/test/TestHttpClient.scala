@@ -179,7 +179,6 @@ object TestHttpClient {
     override val getRemoteAddr                           = RemoteAddr
     override val isSecure                                = Scheme == "https"
     override val getLocale : Locale                      = null
-    override val getLocales: util.Enumeration[_]         = null
     override val getServerName                           = ServerState.Host
     override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
     override def sessionInvalidate()                     = session.invalidate()

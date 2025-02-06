@@ -70,7 +70,7 @@ class LocalRequest private (
   val credentials: Option[Credentials],
 
   val getLocale: ju.Locale,
-  val getLocales: ju.Enumeration[_],
+  val getLocales: ju.Enumeration[ju.Locale],
 
   val getPathTranslated: String,
   val getQueryString: String,

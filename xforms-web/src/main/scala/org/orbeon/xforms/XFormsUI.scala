@@ -1437,7 +1437,7 @@ object XFormsUI {
 
     private def createLoaderElem: dom.Element = {
       val newDiv = dom.document.createElement("div")
-      newDiv.classList.add("orbeon-loader")
+      Seq("orbeon-loader", "loader", "loader-default").foreach(newDiv.classList.add)
       dom.document.body.appendChild(newDiv)
       newDiv
     }
@@ -1472,17 +1472,11 @@ object XFormsUI {
 
     def showModalProgressPanelRaw(): Unit = {
       val loaderElem = findLoaderElem.getOrElse(createLoaderElem)
-
-      // Move inside first open dialog, if any, for the loader to show above the dialog
-      dom.document.querySelectorAllT("dialog")
+      dom.document.querySelectorAllT("dialog") // Move inside first open dialog, if any, for the loader to show above the dialog
         .collectFirst { case dialog: dom.html.Dialog if dialog.open => dialog }
         .getOrElse(dom.document.body)
         .appendChild(loaderElem)
-
-      val cl = loaderElem.classList
-      cl.add("loader") // TODO: `add()` can take several arguments
-      cl.add("loader-default")
-      cl.add("is-active")
+      loaderElem.classList.add("is-active")
     }
 
     def hideModalProgressPanelRaw(): Unit =

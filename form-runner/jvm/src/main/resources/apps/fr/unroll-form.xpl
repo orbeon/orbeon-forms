@@ -103,7 +103,7 @@
     <!-- Handle XInclude -->
     <p:processor name="oxf:xinclude">
         <p:input name="config" href="#after-components"/>
-        <p:output name="data" ref="data" debug="xxx"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

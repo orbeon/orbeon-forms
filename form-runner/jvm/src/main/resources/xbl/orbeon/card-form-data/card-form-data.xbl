@@ -104,6 +104,11 @@
                         <xf:value value="$version"/>
                     </xf:header>
 
+                    <xf:setvalue
+                        event="xforms-submit"
+                        ref="instance('fr-state-instance')/@state"
+                        value="'loading'"/>
+
                     <xf:insert
                         event="xforms-submit-done"
                         ref="instance('fr-form-metadata-instance')"
@@ -144,9 +149,19 @@
                     </xf:header>
 
                     <xf:setvalue
+                        event="xforms-submit"
+                        ref="instance('fr-state-instance')/@state"
+                        value="'loading'"/>
+
+                    <xf:setvalue
                         event="xforms-submit-error"
                         ref="instance('fr-state-instance')/@state"
                         value="'error'"/>
+
+                    <xf:setvalue
+                        event="xforms-submit-done"
+                        ref="instance('fr-state-instance')/@state"
+                        value="'done'"/>
 
                     <!-- Set language upon submitting -->
                     <xf:action event="xforms-submit">
@@ -160,9 +175,6 @@
 <!--                        <xf:setvalue-->
 <!--                            ref="instance('fr-search-results-instance')/query[ends-with(@path, '/application-name')]"-->
 <!--                            value="fr:component-param-value('form')"/>-->
-                        <xf:setvalue
-                            ref="instance('fr-search-results-instance')/@state"
-                            value="'loading'"/>
                     </xf:action>
 
                 </xf:submission>

@@ -1433,7 +1433,7 @@ object XFormsUI {
       target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
     private def findLoaderElem: Option[dom.Element] =
-      Option(dom.document.querySelector("body > .orbeon-loader"))
+      Option(dom.document.querySelector(".orbeon-loader"))
 
     private def createLoaderElem: dom.Element = {
       val newDiv = dom.document.createElement("div")
@@ -1471,8 +1471,15 @@ object XFormsUI {
       attValueOpt(elem, name).map(_.toBoolean)
 
     def showModalProgressPanelRaw(): Unit = {
-      val elem = findLoaderElem getOrElse createLoaderElem
-      val cl = elem.classList
+      val loaderElem = findLoaderElem.getOrElse(createLoaderElem)
+
+      // Move inside first open dialog, if any, for the loader to show above the dialog
+      dom.document.querySelectorAllT("dialog")
+        .collectFirst { case dialog: dom.html.Dialog if dialog.open => dialog }
+        .getOrElse(dom.document.body)
+        .appendChild(loaderElem)
+
+      val cl = loaderElem.classList
       cl.add("loader") // TODO: `add()` can take several arguments
       cl.add("loader-default")
       cl.add("is-active")

@@ -79,7 +79,7 @@ class OrbeonXFormsFilterImpl extends Filter {
         val requestPath  = httpRequest.getRequestPathInfo
 
         // Set whether deployment is integrated or separate
-        // NOTE: Also for resources so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly.
+        // NOTE: Also for resources so that e.g. `/xforms-server`, `/xforms-server-submit` can handle URLs properly.
         httpRequest.setAttribute(
           RendererDeploymentAttributeName,
           if (orbeonContext eq servletContext) "integrated" else "separate"

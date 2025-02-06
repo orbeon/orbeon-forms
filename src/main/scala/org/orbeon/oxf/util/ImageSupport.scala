@@ -204,8 +204,8 @@ object ImageSupport {
       credentials     = None,
       content         = None,
       headers         = Map.empty,
-      loadState       = false,
-      saveState       = false,
+      loadState       = false, // only instance where we pass `false`
+      saveState       = false, // only instance where we pass `false`
       logBody         = false
     )
 

@@ -22,14 +22,13 @@ import org.orbeon.connection.*
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{UriScheme, UriUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.*
-import org.orbeon.oxf.http.*
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.servlet.{Cookie, HttpServletRequest}
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
@@ -75,7 +74,8 @@ object Connection extends ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
 
-    implicit val connectionContext: Option[ConnectionContextSupport.ConnectionContext] = None
+    implicit val connectionCtx : Option[ConnectionContextSupport.ConnectionContext] = None
+    implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
     val (cookieStore, cxr) =
       connectInternal(
@@ -89,7 +89,7 @@ object Connection extends ConnectionTrait {
       )
 
     if (saveState)
-      ConnectionState.saveHttpState(cookieStore, ConnectionState.stateScopeFromProperty)
+      ConnectionState.saveHttpState(cookieStore)
 
     cxr
   }
@@ -105,11 +105,11 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext,
+    safeRequestCtx  : SafeRequestContext,
     connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
-
+    
     // Copy `IndentedLogger` as we cannot share logger state with other threads, and the caller's logger might be
     // associated with the `XFormsContainingDocument` and reused by the calling thread.
     val newLogger = IndentedLogger(logger)
@@ -137,21 +137,19 @@ object Connection extends ConnectionTrait {
     def connectWithContentIo(requestStreamedContentOpt: Option[StreamedContent]): IO[AsyncConnectionResult] =
       IO {
         val (_, cxr) =
-          CoreCrossPlatformSupport.withExternalContext(externalContext) { // we can be in a different thread
-            connectInternal(
-              method      = method,
-              url         = url,
-              credentials = credentials,
-              content     = requestStreamedContentOpt,
-              headers     = headers,
-              loadState   = loadState,
-              logBody     = logBody
-            )(
-              logger          = newLogger,
-              externalContext = externalContext,
-              connectionCtx   = connectionCtx
-            )
-          }
+          connectInternal(
+            method      = method,
+            url         = url,
+            credentials = credentials,
+            content     = requestStreamedContentOpt,
+            headers     = headers,
+            loadState   = loadState,
+            logBody     = logBody
+          )(
+            logger         = newLogger,
+            safeRequestCtx = safeRequestCtx,
+            connectionCtx  = connectionCtx
+          )
 
         // Return an `AsyncConnectionResult` even though for now we obtain a synchronous `ConnectionResult`, so that
         // the callers deal with an `fs2.Stream` consistently for async calls on the JVM as well as JavaScript. Later
@@ -164,16 +162,16 @@ object Connection extends ConnectionTrait {
 
   // For Java callers
   def jConnectNow(
-    httpMethod        : HttpMethod,
-    url               : URI,
-    credentialsOrNull : BasicCredentials,
-    messageBodyOrNull : Array[Byte],
-    headers           : Map[String, List[String]],
-    loadState         : Boolean,
-    saveState         : Boolean,
-    logBody           : Boolean,
-    logger            : IndentedLogger,
-    externalContext   : ExternalContext
+    httpMethod       : HttpMethod,
+    url              : URI,
+    credentialsOrNull: BasicCredentials,
+    messageBodyOrNull: Array[Byte],
+    headers          : Map[String, List[String]],
+    loadState        : Boolean,
+    saveState        : Boolean,
+    logBody          : Boolean,
+    logger           : IndentedLogger,
+    externalContext  : ExternalContext
   ): ConnectionResult = {
 
     val messageBody: Option[Array[Byte]] =
@@ -207,40 +205,27 @@ object Connection extends ConnectionTrait {
   }
 
   def findInternalUrl(
-    normalizedUrl: URI,
-    filter       : String => Boolean
-  )(implicit
-    request: ExternalContext.Request
-  ): Option[String] = {
-
-    val normalizedUrlString = normalizedUrl.toString
-
-    val servicePrefix =
-      URLRewriterUtils.rewriteServiceURL(
-        request,
-        "/",
-        UrlRewriteMode.Absolute
-      )
-
+    normalizedUrl  : URI,
+    filter         : String => Boolean,
+    servicePrefix  : String
+  ): Option[String] =
     for {
-      pathQuery <- normalizedUrlString.substringAfterOpt(servicePrefix) map (_.prependSlash)
+      pathQuery <- normalizedUrl.toString.substringAfterOpt(servicePrefix).map(_.prependSlash)
       if filter(splitQuery(pathQuery)._1)
     } yield
       pathQuery
-  }
 
   // Build all the connection headers
   def buildConnectionHeadersCapitalizedIfNeeded(
-    url                      : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
-    hasCredentials           : Boolean,
-    customHeaders            : Map[String, List[String]],
-    headersToForward         : Set[String],
-    cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]]
+    url             : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
+    hasCredentials  : Boolean,
+    customHeaders   : Map[String, List[String]],
+    headersToForward: Set[String],
+    cookiesToForward: List[String],
+    getHeader       : String => Option[List[String]]
   )(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    logger          : IndentedLogger,
+    safeRequestCtx  : SafeRequestContext
   ): Map[String, List[String]] =
     if ((url.getScheme eq null) || UriScheme.SchemesWithHeaders(UriScheme.withName(url.getScheme)))
       buildConnectionHeadersCapitalized(url.normalize, hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
@@ -256,19 +241,18 @@ object Connection extends ConnectionTrait {
     headersToForward         : String,
     getHeader                : String => Option[List[String]],
     logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    externalContext          : ExternalContext
   ): Map[String, List[String]] =
     buildConnectionHeadersCapitalizedIfNeeded(
-      url                      = url,
-      hasCredentials           = hasCredentials,
-      customHeaders            = (Option(customHeadersOrNull) map (_.asScala.iterator map { case (k, v) => k -> v.toList } toMap)) getOrElse EmptyHeaders,
-      headersToForward         = valueAs[Set](headersToForward),
-      cookiesToForward         = cookiesToForwardFromProperty,
-      getHeader                = getHeader)(
-      logger                   = logger,
-      externalContext          = externalContext,
-      coreCrossPlatformSupport = coreCrossPlatformSupport
+      url              = url,
+      hasCredentials   = hasCredentials,
+      customHeaders    = (Option(customHeadersOrNull) map (_.asScala.iterator map { case (k, v) => k -> v.toList } toMap)) getOrElse EmptyHeaders,
+      headersToForward = valueAs[Set](headersToForward),
+      cookiesToForward = cookiesToForwardFromProperty,
+      getHeader        = getHeader
+    )(
+      logger           = logger,
+      safeRequestCtx   = SafeRequestContext(externalContext)
     )
 
   // Get a Set of header names to forward from the configuration properties
@@ -283,17 +267,18 @@ object Connection extends ConnectionTrait {
   def cookiesToForwardFromProperty: List[String] =
     valueAs[List](getPropertyHandleCustom(HttpForwardCookiesProperty)).distinct
 
-  def sessionCookieHeaderCapitalized(
-    externalContext  : ExternalContext,
-    cookiesToForward : List[String]
+  protected def sessionCookieHeaderCapitalized(
+    cookiesToForward: List[String]
   )(implicit
-    logger           : IndentedLogger
+    safeRequestCtx  : SafeRequestContext,
+    logger          : IndentedLogger
   ): Option[(String, List[String])] = {
 
     // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
     if (cookiesToForward.nonEmpty) {
 
       // By convention, the first cookie name is the session cookie
+      // xxx check
       val sessionCookieName = cookiesToForward.head
 
       // NOTES 2011-01-22:
@@ -313,25 +298,17 @@ object Connection extends ConnectionTrait {
       //      https://issues.apache.org/bugzilla/show_bug.cgi?id=50633
       //
 
-      // TODO: ExternalContext must provide direct access to cookies
-      val requestOption = Option(externalContext.getRequest)
-      val nativeRequestOption =
-        requestOption flatMap
-        (r => Option(r.getNativeRequest)) collect
-        { case r: HttpServletRequest => r }
-
       // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
       // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
       // WebSphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
       // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
-      def fromIncoming =
-        nativeRequestOption flatMap
-        (sessionCookieFromIncomingCapitalized(externalContext, _, cookiesToForward, sessionCookieName))
+      def fromIncoming: Option[(String, List[String])] =
+        sessionCookieFromIncomingCapitalized(cookiesToForward, sessionCookieName)
 
       // 2. If there is no incoming session cookie, try to make our own cookie. For this to work on WebSphere,
       // users will have the define the prefix and suffix properties.
-      def fromSession =
-        externalContext.getSessionOpt(false).map(session => {
+      def fromSession: Option[(String, List[String])] =
+        safeRequestCtx.findSessionOrThrow(false).map(session => {
           val propertySet   = Properties.instance.getPropertySet
           val prefix        = propertySet.getString(HttpForwardCookiesSessionPrefixProperty, default = "")
           val suffix        = propertySet.getString(HttpForwardCookiesSessionSuffixProperty, default = "")
@@ -342,38 +319,39 @@ object Connection extends ConnectionTrait {
 
       // Logging
       ifDebug {
-        val incomingSessionHeaders =
+        val incomingSessionCookieValue =
           for {
-            request       <- requestOption.toList
-            cookieHeaders <- request.getHeaderValuesMap.asScala.get("cookie").toList
-            cookieValue   <- cookieHeaders
-            if cookieValue.contains(sessionCookieName) // rough test
+            (name, value) <- safeRequestCtx.cookies
+            if name == sessionCookieName
           } yield
-            cookieValue
+            value
 
-        val incomingSessionCookies =
-          for {
-            nativeRequest <- nativeRequestOption.toList
-            cookies       <- Option(nativeRequest.getCookies).toList
-            cookie        <- cookies
-            if cookie.getName == sessionCookieName
-          } yield
-            cookie.getValue
-
-        val sessionOpt = externalContext.getSessionOpt(false)
+        val sessionOpt = safeRequestCtx.findSessionOrThrow(false)
 
         debug("setting cookie", List(
-          "new session"              -> (sessionOpt map (_.isNew.toString) orNull),
-          "session id"               -> (sessionOpt map (_.getId) orNull),
-          "requested session id"     -> (requestOption flatMap (r => Option(r.getRequestedSessionId)) orNull),
-          "session cookie name"      -> sessionCookieName,
-          "incoming session cookies" -> (incomingSessionCookies mkString " - "),
-          "incoming session headers" -> (incomingSessionHeaders mkString " - ")))
+          "new session"             -> (sessionOpt.map(_.isNew.toString).orNull),
+          "session id"              -> (sessionOpt.map(_.getId) orNull),
+          "requested session id"    -> (safeRequestCtx.requestedSessionId.orNull),
+          "session cookie name"     -> sessionCookieName,
+          "incoming session cookie" -> (incomingSessionCookieValue mkString " - ")))
       }
 
       fromIncoming orElse fromSession
     } else
       None
+  }
+
+  protected def buildTokenHeaderCapitalized(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
+  ): Option[(String, List[String])] = {
+
+    val token =
+      safeRequestCtx.webAppContext
+        .attributes
+        .getOrElseUpdate(OrbeonTokenLower, CoreCrossPlatformSupport.randomHexId).asInstanceOf[String]
+
+    Some(OrbeonToken -> List(token))
   }
 
   private object Private {
@@ -391,17 +369,17 @@ object Connection extends ConnectionTrait {
       value.trimAllToOpt map (_.splitTo[T]()) getOrElse cbf.newBuilder.result()
 
     def connectInternal(
-      method          : HttpMethod,
-      url             : URI,
-      credentials     : Option[BasicCredentials],
-      content         : Option[StreamedContent],
-      headers         : Map[String, List[String]],
-      loadState       : Boolean,
-      logBody         : Boolean
+      method        : HttpMethod,
+      url           : URI,
+      credentials   : Option[BasicCredentials],
+      content       : Option[StreamedContent],
+      headers       : Map[String, List[String]],
+      loadState     : Boolean,
+      logBody       : Boolean
     )(implicit
-      logger          : IndentedLogger,
-      externalContext : ExternalContext,
-      connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+      logger        : IndentedLogger,
+      safeRequestCtx: SafeRequestContext,
+      connectionCtx : Option[ConnectionContextSupport.ConnectionContext]
     ): (CookieStore, ConnectionResult) = {
 
       val normalizedUrlString = url.toString
@@ -410,8 +388,8 @@ object Connection extends ConnectionTrait {
         scheme == UriScheme.Http || scheme == UriScheme.Https
 
       val cookieStore =
-        loadState && isHttpOrHttps(UriScheme.withName(url.getScheme))           flatOption
-          ConnectionState.loadHttpState(ConnectionState.stateScopeFromProperty) getOrElse
+        loadState && isHttpOrHttps(UriScheme.withName(url.getScheme))  flatOption
+          ConnectionState.loadHttpState getOrElse
           new BasicCookieStore
 
       (
@@ -422,10 +400,6 @@ object Connection extends ConnectionTrait {
           credentials   = credentials,
           content       = content,
           cookieStore   = cookieStore,
-          findClient    = findInternalUrl(url, isInternalPath)(externalContext.getRequest) match {
-            case Some(internalPath) => (internalPath, InternalHttpClient)
-            case _ => (normalizedUrlString, PropertiesApacheHttpClient)
-          },
           headers       = headers,
           logBody       = logBody
         )
@@ -433,17 +407,17 @@ object Connection extends ConnectionTrait {
     }
 
     private def connect(
-      method          : HttpMethod,
-      normalizedUrl   : URI,
-      credentials     : Option[BasicCredentials],
-      content         : Option[StreamedContent],
-      cookieStore     : CookieStore,
-      findClient      : => (String, HttpClient[CookieStore]),
-      headers         : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
-      logBody         : Boolean
+      method        : HttpMethod,
+      normalizedUrl : URI,
+      credentials   : Option[BasicCredentials],
+      content       : Option[StreamedContent],
+      cookieStore   : CookieStore,
+      headers       : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
+      logBody       : Boolean
     )(implicit
-      logger          : IndentedLogger,
-      connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+      logger        : IndentedLogger,
+      safeRequestCtx: SafeRequestContext,
+      connectionCtx : Option[ConnectionContextSupport.ConnectionContext]
     ): ConnectionResult = {
 
       val normalizedUrlString = normalizedUrl.toString
@@ -539,17 +513,41 @@ object Connection extends ConnectionTrait {
               combineValues[String, String, List](capitalizedHeaders).toMap
             }
 
-            val (effectiveConnectionUrlString, client) = findClient
-
-            val response =
-              client.connect(
-                url         = effectiveConnectionUrlString,
-                credentials = credentials,
-                cookieStore = cookieStore,
-                method      = method,
-                headers     = cleanCapitalizedHeaders,
-                content     = content
-              )
+            val (clientType, effectiveConnectionUrlString, response) =
+              findInternalUrl(normalizedUrl, isInternalPath, safeRequestCtx.servicePrefix) match {
+                case Some(internalPath) =>
+                  (
+                    "internal",
+                    internalPath,
+                    InternalHttpClient.connect(
+                      url         = internalPath,
+                      credentials = credentials,
+                      cookieStore = cookieStore,
+                      method      = method,
+                      headers     = cleanCapitalizedHeaders,
+                      content     = content
+                    )(
+                      requestCtx    = Some(safeRequestCtx),
+                      connectionCtx = connectionCtx
+                    )
+                  )
+                case _ =>
+                  (
+                    "Apache",
+                    normalizedUrlString,
+                    PropertiesApacheHttpClient.connect(
+                      url           = normalizedUrlString,
+                      credentials   = credentials,
+                      cookieStore   = cookieStore,
+                      method        = method,
+                      headers       = cleanCapitalizedHeaders,
+                      content       = content
+                    )(
+                      requestCtx    = None,
+                      connectionCtx = connectionCtx
+                    )
+                  )
+              }
 
             ifDebug {
 
@@ -576,7 +574,7 @@ object Connection extends ConnectionTrait {
 
               debug("opened connection",
                 List(
-                  "client"        -> (if (client == InternalHttpClient) "internal" else "Apache"),
+                  "client"        -> clientType,
                   "effective URL" -> effectiveConnectionUriNoPassword.toString,
                   "method"        -> method.entryName
                 ) ++ cleanCapitalizedHeaders.view.mapValues(_ mkString ",")
@@ -614,33 +612,32 @@ object Connection extends ConnectionTrait {
     }
 
     def sessionCookieFromIncomingCapitalized(
-      externalContext   : ExternalContext,
-      nativeRequest     : HttpServletRequest,
-      cookiesToForward  : List[String],
-      sessionCookieName : String
+      cookiesToForward : List[String],
+      sessionCookieName: String
     )(implicit
-      logger            : IndentedLogger
+      safeRequestCtx  : SafeRequestContext,
+      logger           : IndentedLogger
     ): Option[(String, List[String])] = {
 
       def requestedSessionIdMatches =
-        externalContext.getSessionOpt(false) exists { session =>
-          val requestedSessionId = externalContext.getRequest.getRequestedSessionId
-          session.getId == requestedSessionId
+        safeRequestCtx.findSessionOrThrow(false) exists { session =>
+          val requestedSessionId = safeRequestCtx.requestedSessionId
+          requestedSessionId.contains(session.getId)
         }
 
-      val cookies = Option(nativeRequest.getCookies) getOrElse Array.empty[Cookie]
+      val cookies = safeRequestCtx.cookies
       if (cookies.nonEmpty) {
 
         val pairsToForward =
           for {
-            cookie <- cookies
+            (name, value) <- cookies
             // Only forward cookie listed as cookies to forward
-            if cookiesToForward.contains(cookie.getName)
+            if cookiesToForward.contains(name)
             // Only forward if there is the requested session id is the same as the current session. Otherwise,
             // it means that the current session is no longer valid, or that the incoming cookie is out of date.
-            if sessionCookieName != cookie.getName || requestedSessionIdMatches
+            if sessionCookieName != name || requestedSessionIdMatches
           } yield
-            cookie.getName + '=' + cookie.getValue
+            s"$name=$value"
 
         if (pairsToForward.nonEmpty) {
 
@@ -649,7 +646,7 @@ object Connection extends ConnectionTrait {
 
           debug("forwarding cookies", List(
             "cookie"               -> cookieHeaderValue,
-            "requested session id" -> externalContext.getRequest.getRequestedSessionId)
+            "requested session id" -> safeRequestCtx.requestedSessionId.orNull)
           )
 
           Some(Headers.Cookie -> List(cookieHeaderValue))
@@ -662,51 +659,36 @@ object Connection extends ConnectionTrait {
 
   private object ConnectionState {
 
-    private val HttpStateProperty        = "oxf.http.state"
     private val HttpCookieStoreAttribute = "oxf.http.cookie-store"
 
-    private val DefaultStateScope        = ExternalContext.Scope.Session
-
-    def loadHttpState(
-      stateScope      : ExternalContext.Scope
-    )(implicit
-      logger          : IndentedLogger,
-      externalContext : ExternalContext
+    def loadHttpState(implicit
+      logger         : IndentedLogger,
+      safeRequestCtx: SafeRequestContext
     ): Option[CookieStore] = {
 
       val cookieStoreOpt =
-        stateAttributes(stateScope, createSession = false) flatMap
-        (m => Option(m._1(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+        stateAttributes(createSession = false)
+          .flatMap(m => m._1(HttpCookieStoreAttribute))
+          .map(_.asInstanceOf[CookieStore])
 
-      debugStore(cookieStoreOpt, stateScope, "loaded HTTP state", "did not load HTTP state")
+      debugStore(cookieStoreOpt, "loaded HTTP state", "did not load HTTP state")
 
       cookieStoreOpt
     }
 
-    def saveHttpState(
-      cookieStore     : CookieStore,
-      stateScope      : ExternalContext.Scope
-    )(implicit
-      logger          : IndentedLogger,
-      externalContext : ExternalContext
+    def saveHttpState(cookieStore: CookieStore)(implicit
+      logger         : IndentedLogger,
+      safeRequestCtx: SafeRequestContext
     ): Unit = {
 
-      stateAttributes(stateScope, createSession = true) foreach
-        (_._2.apply(HttpCookieStoreAttribute, cookieStore))
+      stateAttributes(createSession = true)
+        .foreach(_._2.apply(HttpCookieStoreAttribute, cookieStore))
 
-      debugStore(cookieStore.some, stateScope, "saved HTTP state", "did not save HTTP state")
-    }
-
-    def stateScopeFromProperty: ExternalContext.Scope = {
-      val propertySet = Properties.instance.getPropertySet
-      val scopeString = propertySet.getString(HttpStateProperty, DefaultStateScope.entryName.toLowerCase)
-
-      ExternalContext.Scope.withNameLowercaseOnlyOption(scopeString).getOrElse(DefaultStateScope)
+      debugStore(cookieStore.some, "saved HTTP state", "did not save HTTP state")
     }
 
     private def debugStore(
       cookieStoreOpt : Option[CookieStore],
-      stateScope     : ExternalContext.Scope,
       positive       : String,
       negative       : String
     )(implicit
@@ -717,7 +699,6 @@ object Connection extends ConnectionTrait {
           case Some(cookieStore) =>
             val cookies = cookieStore.getCookies.asScala map (_.getName) mkString " | "
             debug(positive, List(
-              "scope"        -> stateScope.entryName.toLowerCase,
               "cookie names" -> (if (cookies.nonEmpty) cookies else null))
             )
           case None =>
@@ -725,27 +706,14 @@ object Connection extends ConnectionTrait {
         }
       }
 
-    private def stateAttributes(
-      stateScope      : ExternalContext.Scope,
-      createSession   : Boolean
-    )(implicit
-      externalContext : ExternalContext
-    ): Option[(String => AnyRef, (String, AnyRef) => Unit)] =
-      stateScope match {
-        case ExternalContext.Scope.Request =>
-          val m = externalContext.getRequest.getAttributesMap
-          Some((m.get, m.put))
-        case ExternalContext.Scope.Session if externalContext.getSessionOpt(createSession).isDefined =>
-          val s = externalContext.getSession(createSession)
-          Some(
-            (name: String)                => s.getAttribute(name,        SessionScope.Local).orNull,
-            (name: String, value: AnyRef) => s.setAttribute(name, value, SessionScope.Local)
-          )
-        case ExternalContext.Scope.Application =>
-          val m = externalContext.getWebAppContext.getAttributesMap
-          Some((m.get, m.put))
-        case _ =>
-          None
+    private def stateAttributes(createSession: Boolean)(implicit
+      safeRequestCtx: SafeRequestContext
+    ): Option[(String => Option[AnyRef], (String, AnyRef) => Unit)] =
+      safeRequestCtx.findSessionOrThrow(createSession).map { session =>
+        (
+          (name: String)                => session.getAttribute(name, SessionScope.Local),
+          (name: String, value: AnyRef) => session.setAttribute(name, value, SessionScope.Local)
+        )
       }
   }
 }

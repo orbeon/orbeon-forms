@@ -14,8 +14,10 @@ class RequestAdapter extends ExternalContext.Request {
   def getContextPath: String = null
   def getServletPath: String = null
   def getClientContextPath(urlString: String): String = null
+  def servicePrefix: String = null
   def getAttributesMap: ju.Map[String, AnyRef] = null
   def getHeaderValuesMap: ju.Map[String, Array[String]] = null
+  def incomingCookies: Iterable[(String, String)] = null
   def getParameterMap: ju.Map[String, Array[AnyRef]] = null
   def getCharacterEncoding: String = null
   def getContentLength: Int = 0

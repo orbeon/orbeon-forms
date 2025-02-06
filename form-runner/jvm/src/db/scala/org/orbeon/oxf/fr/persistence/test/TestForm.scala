@@ -1,17 +1,17 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
-import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.{AppForm, Version}
+import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xml.dom.Converter.ScalaElemConverterOps
 
 import java.time.Instant
@@ -69,12 +69,12 @@ case class TestForm(
   def formDataURL(id: String): String = HttpCall.crudURLPrefix(appForm) + s"data/$id/$DataXml"
 
   def putFormDefinition(
-    version                 : Version,
-    credentials             : Option[Credentials] = None,
-    update                  : Boolean = false)(implicit
-    logger                  : IndentedLogger,
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    version            : Version,
+    credentials        : Option[Credentials] = None,
+    update             : Boolean = false
+  )(implicit
+    logger             : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit =
     HttpAssert.put(
       url          = formDefinitionURL,
@@ -85,12 +85,12 @@ case class TestForm(
     )
 
   def putFormData(
-    version                 : Version,
-    formData                : Seq[FormData],
-    returnDates             : Boolean = false)(implicit
-    logger                  : IndentedLogger,
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    version            : Version,
+    formData           : Seq[FormData],
+    returnDates        : Boolean = false
+  )(implicit
+    logger             : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Seq[FormDataDates] =
     formData.flatMap { formData =>
       putSingleFormData(
@@ -105,16 +105,16 @@ case class TestForm(
     }
 
   def putSingleFormData(
-    version                 : Version,
-    id                      : String,
-    values                  : Seq[String],
-    createdByOpt            : Option[Credentials] = None,
-    modifiedByOpt           : Option[Credentials] = None,
-    workflowStageOpt        : Option[String] = None,
-    returnDates             : Boolean = false)(implicit
-    logger                  : IndentedLogger,
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    version            : Version,
+    id                 : String,
+    values             : Seq[String],
+    createdByOpt       : Option[Credentials] = None,
+    modifiedByOpt      : Option[Credentials] = None,
+    workflowStageOpt   : Option[String] = None,
+    returnDates        : Boolean = false
+  )(implicit
+    logger             : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Option[FormDataDates] = {
     val url            = formDataURL(id)
     val body           = HttpCall.XML(formData(values))

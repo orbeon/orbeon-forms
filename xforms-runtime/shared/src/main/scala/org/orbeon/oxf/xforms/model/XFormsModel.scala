@@ -17,7 +17,7 @@ import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -547,10 +547,9 @@ trait XFormsModelInstances {
 
           val absoluteResolvedUrl = URI.create(absoluteURLString)
 
-          implicit val ec                      : ExternalContext               = XFormsCrossPlatformSupport.externalContext
-          implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-          implicit val resourceResolver        : Option[ResourceResolver]      = containingDocument.staticState.resourceResolverOpt
-
+          implicit val ec              : ExternalContext          = XFormsCrossPlatformSupport.externalContext
+          implicit val resourceResolver: Option[ResourceResolver] = containingDocument.staticState.resourceResolverOpt
+          implicit val safeRequestCtx  : SafeRequestContext       = SafeRequestContext(ec)
 
           val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
             url              = absoluteResolvedUrl,

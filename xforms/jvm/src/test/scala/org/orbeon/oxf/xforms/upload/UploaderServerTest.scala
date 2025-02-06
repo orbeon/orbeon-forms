@@ -3,12 +3,12 @@ package org.orbeon.oxf.xforms.upload
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.{HttpMultipartMode, MultipartEntityBuilder}
 import org.orbeon.connection.StreamedContent
-import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumFiles, MaximumSize}
-import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest}
+import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumSize}
+import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, SafeRequestContext, TestWebAppContext}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{PipelineSupport, ResourceManagerSupport, TestHttpClient}
-import org.orbeon.oxf.util.ContentTypes
+import org.orbeon.oxf.util.{ContentTypes, LoggerFactory}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadResponse
@@ -20,10 +20,13 @@ import org.scalatest.funspec.AnyFunSpecLike
 import java.io.{File, InputStream}
 import java.net.URI
 import java.util
+import scala.collection.mutable
 import scala.util.{Success, Try}
 
 
 class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
+
+  private val Logger = LoggerFactory.createLogger(classOf[UploaderServerTest])
 
   def new8000BytesContentInputStream: InputStream =
     ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/util/miserables-8000.txt")
@@ -43,8 +46,11 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
     )
 
     LocalRequest(
-      incomingRequest         = TestHttpClient.makeBaseRequest(),
-      contextPath             = "/orbeon",
+      safeRequestCtx     =
+        SafeRequestContext(
+          new TestWebAppContext(Logger, mutable.LinkedHashMap[String, AnyRef]()),
+          TestHttpClient.makeBaseRequest()
+        ),
       pathQuery               = "/upload",
       method                  = HttpMethod.POST,
       headersMaybeCapitalized = headers,

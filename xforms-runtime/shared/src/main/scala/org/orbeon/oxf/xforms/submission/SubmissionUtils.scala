@@ -18,7 +18,7 @@ import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.*
@@ -201,7 +201,7 @@ object SubmissionUtils {
     resourceResolver    : Option[ResourceResolver]
   ): ConnectionResult = {
 
-    implicit val _coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+    implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
     Connection.connectNow(
       method          = method,

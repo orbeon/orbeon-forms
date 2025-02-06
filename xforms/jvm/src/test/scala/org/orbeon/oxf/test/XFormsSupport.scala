@@ -15,7 +15,7 @@ package org.orbeon.oxf.test
 
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.{ArgumentMatchers, Mockito}
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
@@ -48,6 +48,11 @@ trait XFormsSupport extends MockitoSugar {
       XFormsStateManager.sessionDestroyed)(
       body
     )
+
+  def withTestSafeRequestContext[T](body: SafeRequestContext => T): T =
+    withTestExternalContext { externalContext =>
+      body(SafeRequestContext(externalContext))
+    }
 
   def withActionAndDoc[T](url: String)(body: => T): T =
     withActionAndDoc(setupDocument(url))(body)

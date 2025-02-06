@@ -18,6 +18,7 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.URLRewriterImpl;
 import org.orbeon.oxf.externalcontext.UrlRewriteMode;
+import org.orbeon.oxf.externalcontext.UrlRewriterContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
@@ -75,7 +76,11 @@ public class URLRewriterUtils {
      * @return                  rewritten URL
      */
     public static String rewriteServiceURL(ExternalContext.Request request, String urlString, UrlRewriteMode rewriteMode) {
-        return URLRewriterImpl.rewriteServiceURL(request, urlString, rewriteMode, getServiceBaseURI());
+        return URLRewriterImpl.rewriteServiceUrl(request, urlString, rewriteMode, getServiceBaseURI());
+    }
+
+    public static String rewriteServiceURLPlain(UrlRewriterContext urlRewriterCtx, String urlString, UrlRewriteMode rewriteMode) {
+        return URLRewriterImpl.rewriteServiceUrlPlain(urlRewriterCtx, urlString, rewriteMode, getServiceBaseURI());
     }
 
     /**

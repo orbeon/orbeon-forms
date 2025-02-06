@@ -16,8 +16,8 @@ package org.orbeon.oxf.fr.process
 import cats.effect.IO
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.{setCreateUpdateResponse, updateAttachments}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
@@ -188,6 +188,8 @@ trait FormRunnerActionsCommon {
           (DataFormatVersionName -> databaseDataFormatVersion.entryName) ::
           Nil
         )
+
+      implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
       // Saving is an asynchronous operation
       val computation: IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] =

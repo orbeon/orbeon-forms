@@ -19,7 +19,7 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
+import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext}
 import org.orbeon.oxf.fr.Version.Unspecified
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
@@ -72,11 +72,11 @@ private[persistence] object HttpCall {
   )
 
   def assertCall(
-    actualRequest            : SolicitedRequest,
-    expectedResponse         : ExpectedResponse)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    actualRequest   : SolicitedRequest,
+    expectedResponse: ExpectedResponse
+  )(implicit
+    logger          : IndentedLogger,
+    safeRequestCtx  : SafeRequestContext
   ): Unit =
     assertCall(
       actualRequest  = actualRequest,
@@ -115,11 +115,11 @@ private[persistence] object HttpCall {
     )
 
   def request[T](
-    solicitedRequest        : SolicitedRequest,
-    responseProcessor       : Response => T)(implicit
-    logger                  : IndentedLogger,
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    solicitedRequest : SolicitedRequest,
+    responseProcessor: Response => T
+  )(implicit
+    logger           : IndentedLogger,
+    safeRequestCtx   : SafeRequestContext
   ): T = {
     useAndClose(
       request(
@@ -152,11 +152,11 @@ private[persistence] object HttpCall {
   }
 
   def assertCall(
-    actualRequest            : SolicitedRequest,
-    assertResponse           : Response => Unit)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    actualRequest : SolicitedRequest,
+    assertResponse: Response => Unit
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit =
     request(actualRequest, assertResponse)
 
@@ -168,10 +168,10 @@ private[persistence] object HttpCall {
     body                     : Option[Body],
     credentials              : Option[Credentials],
     httpRange                : Option[HttpRange] = None,
-    timeout                  : Option[Int] = None)(implicit
+    timeout                  : Option[Int]       = None
+  )(implicit
     logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    safeRequestCtx      : SafeRequestContext
   ): ClosableHttpResponse = {
 
     val documentURL = PersistenceBase.appendSlash + path.dropStartingSlash
@@ -241,46 +241,46 @@ private[persistence] object HttpCall {
   def distinctValueURL(provider: Provider, formName: String = DefaultFormName): String = s"distinct-values/${provider.entryName}/$formName"
 
   def post(
-    url                      : String,
-    version                  : Version,
-    body                     : Body,
-    credentials              : Option[Credentials] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    body          : Body,
+    credentials   : Option[Credentials] = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): HttpResponse =
     useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse)
 
   def put(
-    url                      : String,
-    version                  : Version,
-    stage                    : Option[Stage],
-    body                     : Body,
-    credentials              : Option[Credentials] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    stage         : Option[Stage],
+    body          : Body,
+    credentials   : Option[Credentials] = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): HttpResponse =
     useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse)
 
   def del(
-    url                      : String,
-    version                  : Version,
-    credentials              : Option[Credentials] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    credentials   : Option[Credentials] = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): HttpResponse =
     useAndClose(request(url, DELETE, version, None, None, credentials))(_.httpResponse)
 
   def get(
-    url                      : String,
-    version                  : Version,
-    credentials              : Option[Credentials] = None,
-    httpRange                : Option[HttpRange] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    credentials   : Option[Credentials] = None,
+    httpRange     : Option[HttpRange]   = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): (Int, Map[String, List[String]], Try[Array[Byte]]) =
     useAndClose(request(url, GET, version, None, None, credentials, httpRange)) { chr =>
 
@@ -299,33 +299,33 @@ private[persistence] object HttpCall {
     }
 
   def lock(
-    url                      : String,
-    lockInfo                 : LockInfo,
-    timeout                  : Int)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    lockInfo      : LockInfo,
+    timeout       : Int
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Int =
     Private.lockUnlock(LOCK, url, lockInfo, Some(timeout))
 
   def unlock(
-    url                      : String,
-    lockInfo                 : LockInfo)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    lockInfo      : LockInfo
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Int =
     Private.lockUnlock(UNLOCK, url, lockInfo, None)
 
   private object Private {
     def lockUnlock(
-      method                   : HttpMethod,
-      url                      : String,
-      lockInfo                 : LockInfo,
-      timeout                  : Option[Int])(implicit
-      logger                   : IndentedLogger,
-      externalContext          : ExternalContext,
-      coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+      method        : HttpMethod,
+      url           : String,
+      lockInfo      : LockInfo,
+      timeout       : Option[Int]
+    )(implicit
+      logger        : IndentedLogger,
+      safeRequestCtx: SafeRequestContext
     ): Int = {
       val body = Some(XML(LockInfo.toOrbeonDom(lockInfo)))
       useAndClose(request(url, method, Version.Unspecified, None, body, None, None, timeout))(_.httpResponse.statusCode)
@@ -334,16 +334,16 @@ private[persistence] object HttpCall {
 
   // Used to test PersistenceApi (dataHistory, etc.)
   def connectPersistence(
-    method                   : HttpMethod,
-    path                     : String,
-    requestBodyContent       : Option[StreamedContent] = None,
-    formVersionOpt           : Option[Either[FormDefinitionVersion, SearchVersion]]
+    method                  : HttpMethod,
+    path                    : String,
+    requestBodyContent      : Option[StreamedContent] = None,
+    formVersionOpt          : Option[Either[FormDefinitionVersion, SearchVersion]]
   )(implicit
-    logger                   : IndentedLogger,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): ConnectionResult = {
 
-    implicit val ec: ExternalContext = coreCrossPlatformSupport.externalContext
+    implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(coreCrossPlatformSupport.externalContext)
 
     val version = formVersionOpt.map {
       case Left (FormDefinitionVersion.Latest)      => Version.Unspecified

@@ -137,6 +137,9 @@ class ServletExternalContext(
 
     def getHeaderValuesMap = headerValuesMap.asJava
 
+    lazy val incomingCookies: Iterable[(String, String)] =
+      nativeRequest.getCookies.map(cookie => cookie.getName -> cookie.getValue)
+
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] = {
 
       // Only handle the `multipart/form-data"` case, as for `application/x-www-form-urlencoded` the servlet container

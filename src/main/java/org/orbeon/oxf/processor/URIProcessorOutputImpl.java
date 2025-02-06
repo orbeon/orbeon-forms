@@ -348,8 +348,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                         Connection.jHeadersToForward(),
                         Connection.getHeaderFromRequest(externalContext.getRequest()),
                         indentedLogger,
-                        externalContext,
-                        CoreCrossPlatformSupport$.MODULE$
+                        externalContext
                     );
 
                 final ConnectionResultT<InputStream> connectionResult =

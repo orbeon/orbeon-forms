@@ -17,14 +17,13 @@ import org.apache.http.client.CookieStore
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials as _, *}
-import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.webapp.ProcessorService
 
 import java.net.URI
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters.*
 
 
 // HTTP client for internal requests
@@ -32,6 +31,8 @@ import scala.jdk.CollectionConverters.*
 // - no actual HTTP requests are performed
 // - internal requests are made to the Orbeon servlet
 object InternalHttpClient extends HttpClient[CookieStore] {
+
+  type RequestCtx = SafeRequestContext
 
   def connect(
     url          : String,
@@ -41,18 +42,17 @@ object InternalHttpClient extends HttpClient[CookieStore] {
     headers      : Map[String, List[String]],
     content      : Option[StreamedContent]
   )(implicit
+    requestCtx   : Option[SafeRequestContext],
     connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
   ): HttpResponse =
     ConnectionContextSupport.withContext(URI.create(url), method, headers, Map.empty) {
 
-      require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
+      require(url.startsWith("/"),  "`InternalHttpClient` only supports absolute paths")
+      val safeRequestCtx = requestCtx.getOrElse(throw new IllegalArgumentException("`InternalHttpClient` requires a `SafeRequestContext`"))
 
       val currentProcessorService =
         ProcessorService.currentProcessorService.value getOrElse
         (throw new OXFException(s"InternalHttpClient: missing current servlet or portlet connecting to $url."))
-
-      val incomingExternalContext = NetUtils.getExternalContext // should be passed as implicit value
-      val incomingRequest         = incomingExternalContext.getRequest
 
       // NOTE: Only `oxf:redirect` calls `Response.sendRedirect` with `isServerSide = true`. In turn, `oxf:redirect`
       // is only called from the PFC with action results, and only passes `isServerSide = true` if
@@ -69,8 +69,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
 
         val localRequest =
           LocalRequest(
-            incomingRequest         = incomingRequest,
-            contextPath             = incomingRequest.getContextPath,
+            safeRequestCtx          = safeRequestCtx,
             pathQuery               = pathQuery,
             method                  = method,
             headersMaybeCapitalized = headers,
@@ -95,7 +94,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         currentProcessorService.service(
           new PipelineContext,
           new LocalExternalContext(
-            incomingExternalContext.getWebAppContext,
+            safeRequestCtx.webAppContext,
             localRequest,
             response
           )

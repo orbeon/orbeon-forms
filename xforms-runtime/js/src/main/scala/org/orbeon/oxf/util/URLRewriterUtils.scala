@@ -1,7 +1,7 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.externalcontext.UrlRewriteMode
+import org.orbeon.oxf.externalcontext.{UrlRewriteMode, UrlRewriterContext}
 import org.orbeon.oxf.util.PathUtils.*
 import org.scalajs.dom
 
@@ -68,8 +68,15 @@ object URLRewriterUtils {
   ): String =
       urlString
 
+  def rewriteServiceURLPlain(
+    urlRewriterCtx: UrlRewriterContext,
+    urlString     : String,
+    rewriteMode   : UrlRewriteMode
+  ): String =
+    urlString
+
   // Used by `rewriteResourceURL` for `XFormsOutputControl`.
   // Q: Does anything make sense there?
-  def getPathMatchers: ju.List[PathMatcher] =
+  def getPathMatchers =
     ju.Collections.emptyList[PathMatcher]
 }

@@ -18,7 +18,7 @@ import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
@@ -166,6 +166,8 @@ class OrbeonPdfBoxUserAgent(
     // Tell callee we are loading that we are a servlet environment, as in effect we act like
     // a browser retrieving resources directly, not like a portlet. This is the case also if we are
     // called by the proxy portlet or if we are directly within a portlet.
+
+    implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
     val url = URI.create(resolvedURI)
     val headers =

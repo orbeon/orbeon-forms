@@ -1032,8 +1032,7 @@ public class URLGenerator extends ProcessorImpl {
                         config.getForwardHeaders(),
                         Connection.getHeaderFromRequest(externalContext.getRequest()),
                         indentedLogger,
-                        externalContext,
-                        CoreCrossPlatformSupport$.MODULE$
+                        externalContext
                     );
 
                 connectionResult =

@@ -18,6 +18,7 @@ import java.net.URL
 
 
 object PropertiesApacheHttpClient extends ApacheHttpClient(PropertiesConnectionSettings.apply) {
+  override type RequestCtx = Option[Nothing]
   override def createURL(urlString: String): URL =
     URLFactory.createURL(urlString)
 }

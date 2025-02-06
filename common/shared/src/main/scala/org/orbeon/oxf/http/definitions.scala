@@ -212,6 +212,8 @@ object HttpMethod extends Enum[HttpMethod] {
 
 trait HttpClient[CookieStore] {
 
+  type RequestCtx
+
   def connect(
     url          : String,
     credentials  : Option[BasicCredentials],
@@ -220,6 +222,7 @@ trait HttpClient[CookieStore] {
     headers      : Map[String, List[String]],
     content      : Option[StreamedContent]
   )(implicit
+    requestCtx   : Option[RequestCtx],
     connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
   ): HttpResponse
 

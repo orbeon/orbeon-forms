@@ -31,7 +31,7 @@ import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
@@ -55,8 +55,7 @@ class RestApiTest
      with XMLSupport
      with XFormsSupport {
 
-  private implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
-  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
 
   private val CanCreate           = SpecificOperations(Set(Create))
   private val CanRead             = SpecificOperations(Set(Read))
@@ -69,7 +68,7 @@ class RestApiTest
   private val AnyoneCanCreateAndRead = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
   private val AnyoneCanCreate        = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Create)))))
 
-  private def createForm(provider: Provider, formName: String = DefaultFormName)(implicit ec: ExternalContext): Unit = {
+  private def createForm(provider: Provider, formName: String = DefaultFormName)(implicit safeRequestCtx: SafeRequestContext): Unit = {
     val form = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, formName, title = Some("first")))
     val formURL = HttpCall.crudURLPrefix(provider, formName) + "form/form.xhtml"
     HttpAssert.put(formURL, Unspecified, form, StatusCode.Created)
@@ -98,7 +97,7 @@ class RestApiTest
 
   describe("Form definition version") {
     it("must pass basic CRUD operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (_, provider) =>
 
           val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
@@ -153,7 +152,7 @@ class RestApiTest
 
   describe("Form data version and stage") {
     it("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form data version") { (_, provider) =>
 
           val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
@@ -202,7 +201,7 @@ class RestApiTest
 
   describe("Form definition corresponding to a document") {
     it("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form data") { (_, provider) =>
 
           val formURL       = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
@@ -227,7 +226,7 @@ class RestApiTest
 
   describe("Permissions") {
     it("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("permissions") { (_, provider) =>
 
           val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
@@ -299,7 +298,7 @@ class RestApiTest
 
   describe("Organizations") {
     ignore("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("Organization-based permissions") { (_, provider) =>
 
           val formURL   = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
@@ -345,7 +344,7 @@ class RestApiTest
       preTest  : (AppForm, FormOrData) => Unit = (_, _) => (),
       postTest : (AppForm, FormOrData) => Unit = (_, _) => ()
     ): Unit = {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("attachments") { (_, provider) =>
           val appForm = AppForm(provider.entryName, formName)
           val formOrData = FormOrData.Data
@@ -532,7 +531,7 @@ class RestApiTest
   // Try uploading files of 1 KB, 1 MB
   describe("Large XML documents") {
     it("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("large XML documents") { (_, provider) =>
 
           createForm(provider)
@@ -559,7 +558,7 @@ class RestApiTest
 
   describe("Drafts") {
     it("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("drafts") { (_, provider) =>
 
           createForm(provider)
@@ -588,7 +587,7 @@ class RestApiTest
 
   describe("Metadata extraction") {
     it("must pass basic operations") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("extract metadata") { (_, provider) =>
 
           val currentFormURL     = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"

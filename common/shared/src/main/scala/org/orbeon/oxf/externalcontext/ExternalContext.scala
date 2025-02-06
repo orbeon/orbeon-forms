@@ -103,10 +103,12 @@ object ExternalContext {
     def getContextPath: String
     def getServletPath: String
     def getClientContextPath(urlString: String): String
+    def servicePrefix: String
 
     def getAttributesMap: ju.Map[String, AnyRef]
     def getHeaderValuesMap: ju.Map[String, Array[String]] // TODO: don't use `Array`
     def getParameterMap: ju.Map[String, Array[AnyRef]]
+    def incomingCookies: Iterable[(String, String)]
 
     def getCharacterEncoding: String
     def getContentLength: Int

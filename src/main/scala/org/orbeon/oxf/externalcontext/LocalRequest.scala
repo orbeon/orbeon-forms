@@ -48,6 +48,7 @@ class LocalRequest private (
   val getAttributesMap: ju.Map[String, AnyRef],
   val getHeaderValuesMap: ju.Map[String, Array[String]],
   val getParameterMap: ju.Map[String, Array[AnyRef]],
+  val incomingCookies: Iterable[(String, String)],
 
   val getContentLength: Int,
   val getContentType: String,
@@ -139,17 +140,39 @@ class LocalRequest private (
       platformClientContextPath
     else
       applicationClientContextPath
+
+  lazy val servicePrefix: String =
+    URLRewriterImpl.rewriteServiceUrl(
+      this,
+      "/",
+      UrlRewriteMode.Absolute,
+      URLRewriterUtils.getServiceBaseURI
+    )
 }
 
 object LocalRequest {
 
   def apply(
-    incomingRequest         : Request,
-    contextPath             : String,
-    pathQuery               : String,
-    method                  : HttpMethod,
-    headersMaybeCapitalized : Map[String, List[String]],
-    content                 : Option[StreamedContent]
+    externalContext        : ExternalContext,
+    pathQuery              : String,
+    method                 : HttpMethod,
+    headersMaybeCapitalized: Map[String, List[String]],
+    content                : Option[StreamedContent]
+  ): LocalRequest =
+    apply(
+      safeRequestCtx          = SafeRequestContext(externalContext),
+      pathQuery               = pathQuery,
+      method                  = method,
+      headersMaybeCapitalized = headersMaybeCapitalized,
+      content                 = content
+    )
+
+  def apply(
+    safeRequestCtx         : SafeRequestContext,
+    pathQuery              : String,
+    method                 : HttpMethod,
+    headersMaybeCapitalized: Map[String, List[String]],
+    content                : Option[StreamedContent]
   ): LocalRequest = {
 
     val (pathInfo, queryStringOpt) = splitQuery(pathQuery)
@@ -163,7 +186,7 @@ object LocalRequest {
         headersMaybeCapitalized.iterator map { case (k, v) => k.toLowerCase -> v.toArray }
 
       def credentialsHeadersIt =
-        incomingRequest.credentials match {
+        safeRequestCtx.credentials match {
           case Some(credentials) => CredentialsSerializer.toHeaders[Array](credentials).iterator
           case None              => Iterator.empty
         }
@@ -185,7 +208,7 @@ object LocalRequest {
 
     // See https://github.com/orbeon/orbeon-forms/issues/5081
     val attributesMap =
-      ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef](incomingRequest.getAttributesMap))
+      ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef](safeRequestCtx.attributes.asJava))
 
     val queryAndBodyParameters = {
       // Query string
@@ -213,49 +236,50 @@ object LocalRequest {
 
     new LocalRequest(
 
-      getContainerType                        = incomingRequest.getContainerType,
-      getContainerNamespace                   = incomingRequest.getContainerNamespace,
+      getContainerType          = safeRequestCtx.containerType,
+      getContainerNamespace     = safeRequestCtx.containerNamespace,
 
-      getPathInfo                             = pathInfo,
-      getContextPath                          = contextPath,
-      getServletPath                          = "",
+      getPathInfo               = pathInfo,
+      getContextPath            = safeRequestCtx.contextPath,
+      getServletPath            = "",
 
-      getAttributesMap                        = attributesMap,
-      getHeaderValuesMap                      = headersIncludingAuthBodyLowercase,
-      getParameterMap                         = queryAndBodyParameters,
+      getAttributesMap          = attributesMap,
+      getHeaderValuesMap        = headersIncludingAuthBodyLowercase,
+      getParameterMap           = queryAndBodyParameters,
+      incomingCookies           = safeRequestCtx.cookies,
 
-      getContentLength                        = contentLengthOpt map (_.toInt) getOrElse -1,
-      getContentType                          = contentTypeOpt.orNull,
-      getInputStream                          = content map (_.stream) getOrElse EmptyInputStream,
+      getContentLength          = contentLengthOpt map (_.toInt) getOrElse -1,
+      getContentType            = contentTypeOpt.orNull,
+      getInputStream            = content map (_.stream) getOrElse EmptyInputStream,
 
       // Client and server are preserved, assuming all those relate to knowledge about URL rewriting
-      getProtocol                             = incomingRequest.getProtocol,
-      getRemoteHost                           = incomingRequest.getRemoteHost,
-      getRemoteAddr                           = incomingRequest.getRemoteAddr,
-      getScheme                               = incomingRequest.getScheme,
-      getMethod                               = method,
-      getServerName                           = incomingRequest.getServerName,
-      getServerPort                           = incomingRequest.getServerPort,
+      getProtocol               = safeRequestCtx.other.protocol,
+      getRemoteHost             = safeRequestCtx.other.remoteHost,
+      getRemoteAddr             = safeRequestCtx.other.remoteAddr,
+      getScheme                 = safeRequestCtx.scheme,
+      getMethod                 = method,
+      getServerName             = safeRequestCtx.serverName,
+      getServerPort             = safeRequestCtx.serverPort,
 
-      isRequestedSessionIdValid               = incomingRequest.isRequestedSessionIdValid,
-      getRequestedSessionId                   = incomingRequest.getRequestedSessionId,
+      isRequestedSessionIdValid = safeRequestCtx.other.requestedSessionIdValid,
+      getRequestedSessionId     = safeRequestCtx.requestedSessionId.orNull,
 
-      getAuthType                             = incomingRequest.getAuthType,
-      isSecure                                = incomingRequest.isSecure,
+      getAuthType               = safeRequestCtx.other.authType,
+      isSecure                  = safeRequestCtx.other.secure,
 
-      credentials                             = incomingRequest.credentials,
+      credentials               = safeRequestCtx.credentials,
 
-      getLocale                               = incomingRequest.getLocale,
-      getLocales                              = incomingRequest.getLocales,
+      getLocale                 = safeRequestCtx.other.locale,
+      getLocales                = safeRequestCtx.other.locales.iterator.asJavaEnumeration, // xxx should store collection, then iterate anytime getLocales is called
 
-      getPathTranslated                       = incomingRequest.getPathTranslated, // should really not be used
-      getQueryString                          = queryStringOpt.orNull,
+      getPathTranslated         = safeRequestCtx.other.pathTranslated, // should really not be used
+      getQueryString            = queryStringOpt.orNull,
 
-      getPortletMode                          = incomingRequest.getPortletMode,
-      getWindowState                          = incomingRequest.getWindowState,
+      getPortletMode            = safeRequestCtx.other.portletMode,
+      getWindowState            = safeRequestCtx.other.windowState,
     )(
-      _incomingRequestURL                     = incomingRequest.getRequestURL,
-      _sessionOpt                             = Option(incomingRequest.getSession(create = false))
+      _incomingRequestURL       = safeRequestCtx.other.requestURL,
+      _sessionOpt               = safeRequestCtx.findSessionOrThrow(create = false)
     )
   }
 }

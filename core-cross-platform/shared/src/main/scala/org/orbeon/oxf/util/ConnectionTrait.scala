@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import cats.effect.IO
 import org.orbeon.connection.*
 import org.orbeon.io.UriScheme
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode}
@@ -65,7 +65,7 @@ trait ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext,
+    safeRequestCtx  : SafeRequestContext,
     connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult]
@@ -73,22 +73,21 @@ trait ConnectionTrait {
   def isInternalPath(path: String): Boolean
 
   def findInternalUrl(
-    normalizedUrl : URI,
-    filter        : String => Boolean)(implicit
-    request       : ExternalContext.Request
+    normalizedUrl: URI,
+    filter       : String => Boolean,
+    servicePrefix: String
   ): Option[String]
 
   def buildConnectionHeadersCapitalizedIfNeeded(
-    url                      : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
-    hasCredentials           : Boolean,
-    customHeaders            : Map[String, List[String]],
-    headersToForward         : Set[String],
-    cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]]
+    url             : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
+    hasCredentials  : Boolean,
+    customHeaders   : Map[String, List[String]],
+    headersToForward: Set[String],
+    cookiesToForward: List[String],
+    getHeader       : String => Option[List[String]]
   )(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    logger          : IndentedLogger,
+    safeRequestCtx  : SafeRequestContext
   ): Map[String, List[String]]
 
   def headersToForwardFromProperty: Set[String]
@@ -100,12 +99,11 @@ trait ConnectionTrait {
       case None          => _    => None
     }
 
-  // TODO: `ExternalContext` must expose cookie directly
-  def sessionCookieHeaderCapitalized(
-    externalContext  : ExternalContext,
-    cookiesToForward : List[String]
+  protected def sessionCookieHeaderCapitalized(
+    cookiesToForward: List[String]
   )(implicit
-    logger           : IndentedLogger
+    safeRequestCtx  : SafeRequestContext,
+    logger          : IndentedLogger
   ): Option[(String, List[String])]
 
   def notFound(url: URI): ConnectionResult =
@@ -127,11 +125,11 @@ trait ConnectionTrait {
     )
 
   private def buildSOAPHeadersCapitalizedIfNeeded(
-    method                    : HttpMethod,
-    mediatypeMaybeWithCharset : Option[String],
-    encoding                  : String
+    method                   : HttpMethod,
+    mediatypeMaybeWithCharset: Option[String],
+    encoding                 : String
   )(implicit
-    logger                    : IndentedLogger
+    logger                   : IndentedLogger
   ): List[(String, List[String])] = {
 
     require(encoding ne null)
@@ -181,18 +179,17 @@ trait ConnectionTrait {
   }
 
   def buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-    url                      : URI,
-    method                   : HttpMethod,
-    hasCredentials           : Boolean,
-    mediatypeOpt             : Option[String],
-    encodingForSOAP          : String,
-    customHeaders            : Map[String, List[String]],
-    headersToForward         : Set[String],
-    getHeader                : String => Option[List[String]]
+    url             : URI,
+    method          : HttpMethod,
+    hasCredentials  : Boolean,
+    mediatypeOpt    : Option[String],
+    encodingForSOAP : String,
+    customHeaders   : Map[String, List[String]],
+    headersToForward: Set[String],
+    getHeader       : String => Option[List[String]]
   )(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    logger          : IndentedLogger,
+    safeRequestCtx  : SafeRequestContext
   ): Map[String, List[String]] =
     if ((url.getScheme eq null) || UriScheme.SchemesWithHeaders(UriScheme.withName(url.getScheme))) {
 
@@ -242,16 +239,15 @@ trait ConnectionTrait {
    * - a list of headers to forward
    */
   protected def buildConnectionHeadersCapitalized(
-    normalizedUrl            : URI,
-    hasCredentials           : Boolean,
-    customHeadersCapitalized : Map[String, List[String]],
-    headersToForward         : Set[String],
-    cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]]
+    normalizedUrl           : URI,
+    hasCredentials          : Boolean,
+    customHeadersCapitalized: Map[String, List[String]],
+    headersToForward        : Set[String],
+    cookiesToForward        : List[String],
+    getHeader               : String => Option[List[String]]
   )(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    logger                  : IndentedLogger,
+    safeRequestCtx          : SafeRequestContext
   ): Map[String, List[String]] = {
 
     // 1. Caller-specified list of headers to forward based on a space-separated list of header names
@@ -263,25 +259,26 @@ trait ConnectionTrait {
     // 3. Forward cookies for session handling only if no credentials have been explicitly set
     val newCookieHeaderCapitalized =
       if (! hasCredentials)
-        sessionCookieHeaderCapitalized(externalContext, cookiesToForward)
+        sessionCookieHeaderCapitalized(cookiesToForward)
       else
         None
 
     // 4. Authorization token only for internal connections
     // https://github.com/orbeon/orbeon-forms/issues/4388
-    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ => true)(externalContext.getRequest).isDefined list {
-
-      // Get token from web app scope
-      val token =
-        externalContext.getWebAppContext.attributes.getOrElseUpdate(OrbeonTokenLower, coreCrossPlatformSupport.randomHexId).asInstanceOf[String]
-
-      OrbeonToken -> List(token)
-    }
+    val tokenHeaderCapitalized =
+      findInternalUrl(normalizedUrl, _ => true, safeRequestCtx.servicePrefix)
+        .isDefined
+        .flatList(buildTokenHeaderCapitalized.toList)
 
     // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
     // New cookie header, if present, overrides any existing cookies
     headersToForwardCapitalized.toMap ++ customHeadersCapitalized ++ newCookieHeaderCapitalized ++ tokenHeaderCapitalized
   }
+
+  protected def buildTokenHeaderCapitalized(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
+  ): Option[(String, List[String])]
 
   // From header names and a getter for header values, find the list of headers to forward
   private def getHeadersToForwardCapitalized(

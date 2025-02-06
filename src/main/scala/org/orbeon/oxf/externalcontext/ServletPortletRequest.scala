@@ -58,4 +58,12 @@ trait ServletPortletRequest extends ExternalContext.Request {
 
   private lazy val applicationClientContextPath: String =
     URLRewriterUtils.getClientContextPath(this, false)
+
+  lazy val servicePrefix: String =
+    URLRewriterImpl.rewriteServiceUrl(
+      this,
+      "/",
+      UrlRewriteMode.Absolute,
+      URLRewriterUtils.getServiceBaseURI, // blank by default
+    )
 }

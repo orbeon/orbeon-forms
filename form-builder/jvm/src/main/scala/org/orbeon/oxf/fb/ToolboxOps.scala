@@ -18,7 +18,7 @@ import enumeratum.{Enum, EnumEntry}
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.UndoAction.*
 import org.orbeon.oxf.fb.XMLNames.*
@@ -881,8 +881,7 @@ object ToolboxOps {
 
     // Handle attachments if needed
     if (copyAttachments) {
-      implicit val ec                       = CoreCrossPlatformSupport.externalContext
-      implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+      implicit val ec = CoreCrossPlatformSupport.externalContext
       updateUnpublishedAttachment(xcvElem / XcvEntry.Holder.entryName / *)
     }
 
@@ -1110,8 +1109,7 @@ object ToolboxOps {
       def resources   = xcvElem / XcvEntry.Resources.entryName / "resource" / *
 
       if (copyAttachments) {
-        implicit val ec                       = CoreCrossPlatformSupport.externalContext
-        implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+        implicit val ec = CoreCrossPlatformSupport.externalContext
         updateUnpublishedAttachment(dataHolders)
       }
 
@@ -1254,11 +1252,10 @@ object ToolboxOps {
       }
 
     private def readUnpublishedAttachment(
-      sourceUrl               : String
+      sourceUrl      : String
     )(implicit
-      logger                  : IndentedLogger,
-      externalContext         : ExternalContext,
-      coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+      logger         : IndentedLogger,
+      externalContext: ExternalContext
     ): Try[(URI, Long)] = {
 
       // TODO: Check duplication from `FormRunnerCompiler`.
@@ -1272,6 +1269,8 @@ object ToolboxOps {
                 UrlRewriteMode.Absolute
               )
             )
+
+          implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
           val allHeaders =
             Connection.buildConnectionHeadersCapitalizedIfNeeded(
@@ -1311,11 +1310,11 @@ object ToolboxOps {
       )
 
     def updateUnpublishedAttachment(
-      holders                 : Iterable[NodeInfo])(implicit
-      params                  : FormRunnerParams,
-      logger                  : IndentedLogger,
-      externalContext         : ExternalContext,
-      coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+      holders        : Iterable[NodeInfo]
+    )(implicit
+      params         : FormRunnerParams,
+      logger         : IndentedLogger,
+      externalContext: ExternalContext
     ): Unit =
       holders foreach { holderElem =>
         collectUnpublishedAttachments(holderElem) foreach { case AttachmentWithHolder(fromPath, holder) =>

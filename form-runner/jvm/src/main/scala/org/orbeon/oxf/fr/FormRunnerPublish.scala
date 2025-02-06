@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option.*
 import org.orbeon.connection.ConnectionContextSupport
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
@@ -81,8 +81,8 @@ trait FormRunnerPublish {
         (FormRunner.createFormDefinitionBasePath(app,                         Names.LibraryFormName), appLibraryVersionOpt.getOrElse(1)),
       )
 
-    implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
+    implicit val safeRequestCtx          : SafeRequestContext                                 = SafeRequestContext(CoreCrossPlatformSupport.externalContext)
     implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.findContext(Map.empty)
     implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
     implicit val indentedLogger          : IndentedLogger                                     = xfcd.getIndentedLogger("form-builder")

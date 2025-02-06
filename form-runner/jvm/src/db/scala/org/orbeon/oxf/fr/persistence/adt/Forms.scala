@@ -1,18 +1,19 @@
 package org.orbeon.oxf.fr.persistence.adt
 
-import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.{AppForm, Version}
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
+import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.fr.persistence.adt.FormDefinitionOrDataInfo.{FormDataInfo, FormDefinitionInfo}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
 import org.orbeon.oxf.fr.persistence.http.HttpCall
-import Version.Specific
 import org.orbeon.oxf.fr.persistence.test.TestForm
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 
 import java.time.Instant
+
 
 case class Forms(forms: Seq[FormWithData]) {
   // Check that form titles are unique, so that we can identify form definitions by title
@@ -52,9 +53,10 @@ case class Forms(forms: Seq[FormWithData]) {
     )
 
   def formDataInfos(
-    formValuesOpt  : Option[Set[String]] = None,
-    persistedOpt   : Option[Boolean]     = None)(implicit
-    externalContext: ExternalContext
+    formValuesOpt : Option[Set[String]] = None,
+    persistedOpt  : Option[Boolean]     = None
+  )(implicit
+    safeRequestCtx: SafeRequestContext
   ): Seq[FormDataInfo] =
     for {
       form        <- forms
@@ -76,9 +78,10 @@ object Forms {
   implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   def urlPersisted(
-    url            : String,
-    version        : Version)(implicit
-    externalContext: ExternalContext
+    url                : String,
+    version            : Version
+  )(implicit
+    safeRequestCtx: SafeRequestContext
   ): Boolean =
     HttpCall.get(url, version)._1 ==  StatusCode.Ok
 }
@@ -86,8 +89,9 @@ object Forms {
 case class FormWithData(
   appFormVersion    : AppFormVersion,
   title             : String,
-  dataHistoryEntries: Seq[DataHistory])(implicit
-  externalContext   : ExternalContext
+  dataHistoryEntries: Seq[DataHistory]
+)(implicit
+  safeRequestCtx    : SafeRequestContext
 ) {
   import Forms.*
 
@@ -126,9 +130,10 @@ case class FormWithData(
 }
 
 case class DataHistory(
-  documentId     : String,
-  dataEntries    : Seq[Data])(implicit
-  externalContext: ExternalContext
+  documentId    : String,
+  dataEntries   : Seq[Data]
+)(implicit
+  safeRequestCtx: SafeRequestContext
 ) {
   assert(dataEntries.nonEmpty)
 
@@ -163,9 +168,10 @@ case class Data(
   filenameOpt : Option[String]  = None
 ) {
   def formDataPersisted(
-    formWithData   : FormWithData,
-    dataHistory    : DataHistory)(implicit
-    externalContext: ExternalContext
+    formWithData       : FormWithData,
+    dataHistory        : DataHistory
+  )(implicit
+    safeRequestCtx: SafeRequestContext
   ): Boolean =
     Forms.urlPersisted(url(formWithData, dataHistory), formWithData.version)
 

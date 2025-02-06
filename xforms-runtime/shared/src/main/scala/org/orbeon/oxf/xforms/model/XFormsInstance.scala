@@ -92,11 +92,11 @@ object InstanceCaching {
     InstanceCaching(
       timeToLive        = timeToLive,
       handleXInclude    = handleXInclude,
-      pathOrAbsoluteURI = Connection.findInternalUrl(
+      pathOrAbsoluteURI =
+        Connection.findInternalUrl(
           normalizedUrl = URI.create(sourceURI).normalize,
-          filter        = isInternalPath
-        )(
-          request       = XFormsCrossPlatformSupport.externalContext.getRequest
+          filter        = isInternalPath,
+          servicePrefix = XFormsCrossPlatformSupport.externalContext.getRequest.servicePrefix
         ).getOrElse(sourceURI), // adjust for internal path so replication works
       method            = method,
       requestContent    = requestContent.map { case (body, contentType) =>

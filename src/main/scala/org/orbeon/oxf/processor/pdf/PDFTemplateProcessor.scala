@@ -23,6 +23,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.*
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
@@ -31,9 +32,9 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.serializer.{BinaryTextXMLReceiver, HttpSerializerBase}
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
@@ -338,15 +339,15 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
               credentials      = None,
               content          = None,
               headers          = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-                url                      = url,
-                hasCredentials           = false,
-                customHeaders            = URLGeneratorBase.extractHeaders(context.element),
-                headersToForward         = Connection.headersToForwardFromProperty,
-                cookiesToForward         = Connection.cookiesToForwardFromProperty,
-                getHeader                = Connection.getHeaderFromRequest(externalContext.getRequest))(
-                logger                   = context.logger,
-                externalContext          = externalContext,
-                coreCrossPlatformSupport = CoreCrossPlatformSupport
+                url              = url,
+                hasCredentials   = false,
+                customHeaders    = URLGeneratorBase.extractHeaders(context.element),
+                headersToForward = Connection.headersToForwardFromProperty,
+                cookiesToForward = Connection.cookiesToForwardFromProperty,
+                getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
+              )(
+                logger           = context.logger,
+                safeRequestCtx   = SafeRequestContext(externalContext)
               ),
               loadState        = true,
               saveState        = true,

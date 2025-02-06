@@ -14,17 +14,17 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.http.{HttpRanges, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
 import org.orbeon.oxf.util.StaticXPath.{orbeonDomToTinyTree, tinyTreeToOrbeonDom}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
@@ -44,8 +44,7 @@ class FlatViewTest
 
   private object Private {
 
-    implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[FlatViewTest]), true)
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+    implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[FlatViewTest]), true)
 
     val UrlPrefix = "oxf:/org/orbeon/oxf/fr/"
 
@@ -55,7 +54,7 @@ class FlatViewTest
       HttpCall.XML(formDocument)
     }
 
-    def documentInfo(url: String, version: Int)(implicit ec: ExternalContext): DocumentInfo = {
+    def documentInfo(url: String, version: Int)(implicit safeRequestCtx: SafeRequestContext): DocumentInfo = {
       val formDefinitionByteArray = HttpCall.get(url, Specific(version))._3.get
       val formDefinitionDocument  = IOSupport.readOrbeonDom(new ByteArrayInputStream(formDefinitionByteArray))
       orbeonDomToTinyTree(formDefinitionDocument)
@@ -266,11 +265,11 @@ class FlatViewTest
       (x: Seq[String], y: Seq[String]) => x.view.zip(y).map { case (a, b) => a.compareTo(b) }.find(_ != 0).getOrElse(0)
   }
 
-  import Private._
+  import Private.*
 
   describe("Flat views") {
     it("expose forms with or without repetitions") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("flat views") { (connection, provider) =>
           if (Provider.FlatViewSupportedProviders.contains(provider)) {
             forms.foreach(testForm(provider, connection, _))
@@ -280,10 +279,11 @@ class FlatViewTest
     }
 
     def testForm(
-      provider  : Provider,
-      connection: Connection,
-      form      : Form)(implicit
-      ec        : ExternalContext
+      provider           : Provider,
+      connection         : Connection,
+      form               : Form
+    )(implicit
+      safeRequestCtx: SafeRequestContext
     ): Unit = {
       // Create form definition
       val formURL = HttpCall.crudURLPrefix(provider, form.name) + "form/form.xhtml"

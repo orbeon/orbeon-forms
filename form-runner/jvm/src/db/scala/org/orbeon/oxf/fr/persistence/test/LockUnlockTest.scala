@@ -14,12 +14,12 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
-import org.orbeon.oxf.externalcontext.UserAndGroup
+import org.orbeon.oxf.externalcontext.{SafeRequestContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.scalatestplus.junit.AssertionsForJUnit
 
 
@@ -31,7 +31,7 @@ class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit wit
   @Test def lockUnlockTest(): Unit = {
     Connect.withOrbeonTables("lease") { (_, provider) =>
 
-      implicit val externalContext = NetUtils.getExternalContext
+      implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(coreCrossPlatformSupport.externalContext)
 
       val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
       val homerLockInfo = LockInfo(UserAndGroup("hsimpson", Some("simpsons")))

@@ -17,17 +17,16 @@ package org.orbeon.oxf.xforms.submission
 import cats.effect.IO
 import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionContextSupport, ConnectionResultT, StreamedContent}
-import org.orbeon.io.IOUtils
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger}
+import org.orbeon.oxf.util.{Connection, IndentedLogger}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
 
 
 /**
@@ -47,7 +46,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(implicit
-    refContext          : RefContext
+    refContext             : RefContext
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
     implicit val logger: IndentedLogger = submission.getIndentedLogger
@@ -67,22 +66,21 @@ class RegularSubmission(submission: XFormsModelSubmission)
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        url                      = absoluteResolvedURL,
-        method                   = submissionParameters.httpMethod,
-        hasCredentials           = submissionParameters.credentialsOpt.isDefined,
-        mediatypeOpt             = serializationParameters.actualRequestMediatype.some,
-        encodingForSOAP          = submissionParameters.encoding,
-        customHeaders            = SubmissionUtils.evaluateHeaders(
+        url             = absoluteResolvedURL,
+        method          = submissionParameters.httpMethod,
+        hasCredentials  = submissionParameters.credentialsOpt.isDefined,
+        mediatypeOpt    = serializationParameters.actualRequestMediatype.some,
+        encodingForSOAP = submissionParameters.encoding,
+        customHeaders   = SubmissionUtils.evaluateHeaders(
           submission,
           submissionParameters.replaceType == ReplaceType.All,
           EventCollector.Throw
         ),
-        headersToForward         = Connection.headersToForwardFromProperty,
-        getHeader                = submission.containingDocument.headersGetter
+        headersToForward= Connection.headersToForwardFromProperty,
+        getHeader       = submission.containingDocument.headersGetter
       )(
-        logger                   = detailsLogger,
-        externalContext          = externalContext,
-        coreCrossPlatformSupport = CoreCrossPlatformSupport
+        logger          = detailsLogger,
+        safeRequestCtx  = SafeRequestContext(externalContext)
       )
 
     val submissionEffectiveId = submission.effectiveId
@@ -132,7 +130,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
             logBody          = BaseSubmission.isLogBody
           )(
             logger           = detailsLogger,
-            externalContext  = externalContext,
+            safeRequestCtx   = SafeRequestContext(externalContext),
             connectionCtx    = ConnectionContextSupport.findContext(Map.empty),
             resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
           ).map(createConnectResult(_))

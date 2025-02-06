@@ -1,12 +1,47 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils.*
 
 import java.net.URI
 
+
+trait UrlRewriterContext {
+  def scheme       : String
+  def method       : HttpMethod
+  def serverName   : String
+  def serverPort   : Int
+  def requestPath  : String
+  def servicePrefix: String
+  def contextPath  : String
+}
+
+object UrlRewriterContext {
+  def apply(request: ExternalContext.Request): UrlRewriterContext =
+    new UrlRewriterContext {
+      def scheme       : String     = request.getScheme
+      def method       : HttpMethod = request.getMethod
+      def serverName   : String     = request.getServerName
+      def serverPort   : Int        = request.getServerPort
+      def requestPath  : String     = request.getRequestPath
+      def servicePrefix: String     = request.servicePrefix
+      def contextPath  : String     = request.getContextPath
+    }
+
+  def apply(safeRequestCtx: SafeRequestContext): UrlRewriterContext =
+    new UrlRewriterContext {
+      def scheme       : String     = safeRequestCtx.scheme
+      def method       : HttpMethod = safeRequestCtx.method
+      def serverName   : String     = safeRequestCtx.serverName
+      def serverPort   : Int        = safeRequestCtx.serverPort
+      def requestPath  : String     = safeRequestCtx.requestPath
+      def servicePrefix: String     = safeRequestCtx.servicePrefix
+      def contextPath  : String     = safeRequestCtx.contextPath
+    }
+}
 
 object URLRewriterImpl {
 
@@ -21,11 +56,40 @@ object URLRewriterImpl {
       rewriteMode  = rewriteMode
     )
 
-  def rewriteServiceURL(
+  def rewriteServiceUrlPlain(
+    rewriterContext          : UrlRewriterContext,
+    urlString                : String,
+    rewriteMode              : UrlRewriteMode,
+    baseURIPropertyMaybeBlank: String,
+  ): String =
+    rewriteServiceURLImpl(
+      rewriterContext,
+      urlString,
+      rewriteMode,
+      baseURIPropertyMaybeBlank,
+      _ => rewriterContext.contextPath
+    )
+
+  def rewriteServiceUrl(
     request                  : ExternalContext.Request,
     urlString                : String,
     rewriteMode              : UrlRewriteMode,
     baseURIPropertyMaybeBlank: String,
+  ): String =
+    rewriteServiceURLImpl(
+      UrlRewriterContext(request),
+      urlString,
+      rewriteMode,
+      baseURIPropertyMaybeBlank,
+      request.getClientContextPath
+    )
+
+  private def rewriteServiceURLImpl(
+    rewriterContext          : UrlRewriterContext,
+    urlString                : String,
+    rewriteMode              : UrlRewriteMode,
+    baseURIPropertyMaybeBlank: String,
+    clientContextPath        : String => String
   ): String = {
 
     // NOTE: We used to assert here that the mode required an absolute URL, but as of 2016-03-17 one caller
@@ -38,11 +102,11 @@ object URLRewriterImpl {
       baseURIPropertyMaybeBlank.trimAllToOpt match {
         case None =>
           rewriteURL(
-            request.getScheme,
-            request.getServerName,
-            request.getServerPort,
-            request.getClientContextPath(urlString),
-            request.getRequestPath,
+            rewriterContext.scheme,
+            rewriterContext.serverName,
+            rewriterContext.serverPort,
+            clientContextPath(urlString),
+            rewriterContext.requestPath,
             urlString,
             rewriteMode
           )
@@ -61,14 +125,14 @@ object URLRewriterImpl {
             if (baseURI.getScheme != null)
               baseURI.getScheme
             else
-              request.getScheme,
+              rewriterContext.scheme,
             if (baseURI.getHost != null)
               baseURI.getHost
-            else request.getServerName,
+            else rewriterContext.serverName,
             if (baseURI.getHost != null)
               baseURI.getPort
             else
-              request.getServerPort,
+              rewriterContext.serverPort,
             baseURI.getPath,
             "",
             urlString,

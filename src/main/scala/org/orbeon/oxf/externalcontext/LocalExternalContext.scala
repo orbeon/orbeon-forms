@@ -16,12 +16,12 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 
 
-// This context uses the original `WebAppContext` and session
-class LocalExternalContext(val webAppContext: WebAppContext, request: Request, response: Response) extends ExternalContext {
-
-  def getWebAppContext = webAppContext
-  def getSession(create: Boolean) = request.getSession(create)
-
-  val getRequest  = request
-  val getResponse = response
+// This context uses the original `WebAppContext` and request `Session`
+class LocalExternalContext(
+  val webAppContext: WebAppContext,
+  val getRequest   : Request,
+  val getResponse  : Response
+) extends ExternalContext {
+  def getWebAppContext           : WebAppContext           = webAppContext
+  def getSession(create: Boolean): ExternalContext.Session = getRequest.getSession(create)
 }

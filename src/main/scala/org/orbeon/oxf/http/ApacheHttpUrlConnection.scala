@@ -15,7 +15,6 @@ package org.orbeon.oxf.http
 
 import java.io.OutputStream
 import java.net.{HttpURLConnection, URL, URLDecoder}
-
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.StringUtils.*
@@ -25,7 +24,7 @@ import scala.collection.mutable
 
 // Expose `ApacheHttpClient` as `HttpURLConnection`
 // 2019-12-13: No longer supports methods which set a body.
-class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.http.client.CookieStore]) extends HttpURLConnection(url) {
+class ApacheHttpUrlConnection(url: URL)(client: PropertiesApacheHttpClient.type) extends HttpURLConnection(url) {
 
   private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
 
@@ -67,6 +66,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
             headers       = _requestHeaders.view.mapValues(_.toList).toMap,
             content       = None
           )(
+            requestCtx    = None,
             connectionCtx = None
           )
         )

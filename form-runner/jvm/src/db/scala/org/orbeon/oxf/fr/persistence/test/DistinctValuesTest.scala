@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
+import org.orbeon.oxf.externalcontext.SafeRequestContext
+import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
-import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, XPath}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -33,8 +34,7 @@ class DistinctValuesTest
     with ResourceManagerSupport
     with AnyFunSpecLike {
 
-  private implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[DistinctValuesTest]), true)
-  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[DistinctValuesTest]), true)
 
   object Metadata {
     val CreatedBy      = "created-by"
@@ -144,7 +144,7 @@ class DistinctValuesTest
       formData              : Seq[FormData],
       expectedControlValues : Seq[String],
       expectedMetadataValues: Map[String, Seq[String]] = Map()
-    ): Unit = withTestExternalContext { implicit externalContext =>
+    ): Unit = withTestSafeRequestContext { implicit safeRequestCtx =>
       Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
         val testForm    = TestForm(provider, controls = Seq(TestForm.Control("control label")))

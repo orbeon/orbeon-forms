@@ -56,6 +56,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
     headers      : Map[String, List[String]],
     content      : Option[StreamedContent]
   )(implicit
+    requestCtx   : Option[RequestCtx],                                // unused
     connectionCtx: Option[ConnectionContextSupport.ConnectionContext] // unused for external HTTP connections
   ): org.orbeon.oxf.http.HttpResponse = {
 

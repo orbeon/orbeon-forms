@@ -17,7 +17,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -393,7 +393,7 @@ object XFormsAssetServerRoute extends NativeRoute {
     // an absolute URI.
     val serviceAbsoluteUrl = URI.create(
       URLRewriterUtils.rewriteServiceURL(
-        XFormsCrossPlatformSupport.externalContext.getRequest,
+        externalContext.getRequest,
         urlString,
         UrlRewriteMode.Absolute
       )
@@ -401,15 +401,15 @@ object XFormsAssetServerRoute extends NativeRoute {
 
     val outgoingHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        url                      = serviceAbsoluteUrl,
-        hasCredentials           = false,
-        customHeaders            = customHeaders,
-        headersToForward         = headersToForward,
-        cookiesToForward         = Connection.cookiesToForwardFromProperty,
-        getHeader                = getHeader)(
-        logger                   = logger,
-        externalContext          = externalContext,
-        coreCrossPlatformSupport = CoreCrossPlatformSupport
+        url              = serviceAbsoluteUrl,
+        hasCredentials   = false,
+        customHeaders    = customHeaders,
+        headersToForward = headersToForward,
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = getHeader
+      )(
+        logger           = logger,
+        safeRequestCtx   = SafeRequestContext(externalContext)
       )
 
     val resource =

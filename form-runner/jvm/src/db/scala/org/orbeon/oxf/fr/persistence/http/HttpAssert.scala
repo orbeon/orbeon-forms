@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.http
 
-import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
+import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext}
 import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalactic.Equality
 
@@ -50,14 +50,13 @@ private[persistence] object HttpAssert extends XMLSupport {
   case   class ExpectedCode(code: Int) extends Expected
 
   def get(
-    url                      : String,
-    version                  : Version,
-    expected                 : Expected,
-    credentials              : Option[Credentials] = None,
-    httpRange                : Option[HttpRange] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    expected      : Expected,
+    credentials   : Option[Credentials] = None,
+    httpRange     : Option[HttpRange] = None)(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
 
     val (resultCode, headers, resultBody) = {
@@ -98,66 +97,66 @@ private[persistence] object HttpAssert extends XMLSupport {
   }
 
   def post(
-    url                      : String,
-    version                  : Version,
-    body                     : HttpCall.Body,
-    expectedCode             : Int,
-    credentials              : Option[Credentials] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    body          : HttpCall.Body,
+    expectedCode  : Int,
+    credentials   : Option[Credentials] = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.post(url, version, body, credentials).statusCode
     assert(actualCode == expectedCode)
   }
 
   def put(
-    url                      : String,
-    version                  : Version,
-    body                     : HttpCall.Body,
-    expectedCode             : Int,
-    credentials              : Option[Credentials] = None,
-    stage                    : Option[Stage]       = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    body          : HttpCall.Body,
+    expectedCode  : Int,
+    credentials   : Option[Credentials] = None,
+    stage         : Option[Stage]       = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.put(url, version, stage, body, credentials).statusCode
     assert(actualCode == expectedCode)
   }
 
   def del(
-    url                      : String,
-    version                  : Version,
-    expectedCode             : Int,
-    credentials              : Option[Credentials] = None)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url           : String,
+    version       : Version,
+    expectedCode  : Int,
+    credentials   : Option[Credentials] = None
+  )(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.del(url, version, credentials).statusCode
     assert(actualCode == expectedCode)
   }
 
   def lock(
-    url                      : String,
-    lockInfo                 : LockInfo,
-    expectedCode             : Int)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url          : String,
+    lockInfo     : LockInfo,
+    expectedCode : Int
+  )(implicit
+    logger       : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.lock(url, lockInfo, 60)
     assert(actualCode == expectedCode)
   }
 
   def unlock(
-    url                      : String,
-    lockInfo                 : LockInfo,
-    expectedCode             : Int)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url         : String,
+    lockInfo    : LockInfo,
+    expectedCode: Int
+  )(implicit
+    logger      : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.unlock(url, lockInfo)
     assert(actualCode == expectedCode)

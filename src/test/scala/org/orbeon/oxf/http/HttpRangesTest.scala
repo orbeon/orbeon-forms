@@ -11,6 +11,7 @@ class HttpRangesTest extends AnyFunSpecLike {
   private def requestWithHeaders(headers: Seq[(String, String)]): ExternalContext.Request = new RequestAdapter {
     override val getHeaderValuesMap: ju.Map[String, Array[String]] =
       headers.map(kv => kv._1 -> Array(kv._2)).toMap.asJava
+    override def incomingCookies: Iterable[(String, String)] = Nil
   }
 
   describe("Parsing string ranges") {

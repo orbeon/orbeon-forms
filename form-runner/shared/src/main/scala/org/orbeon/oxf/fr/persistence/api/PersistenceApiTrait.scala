@@ -4,18 +4,18 @@ import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, SafeRequestContext, UrlRewriteMode}
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsBoolean}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
@@ -501,6 +501,8 @@ trait PersistenceApiTrait {
   ): ConnectionResult = {
 
     implicit val ec: ExternalContext = coreCrossPlatformSupport.externalContext
+    implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(ec)
+
     // Unneeded for persistence API, as this is called generally independently from a containing document
     implicit val resourceResolver: Option[ResourceResolver] = None
 
@@ -550,6 +552,7 @@ trait PersistenceApiTrait {
     new RequestAdapter {
       override def getMethod: HttpMethod = method
       override def getHeaderValuesMap: ju.Map[String, Array[String]] = headers
+      override def incomingCookies: Iterable[(String, String)] = Nil
       override def parameters: collection.Map[String, Array[AnyRef]] =
         params.map{ case (k, v) => k -> Array(v: AnyRef) }.toMap
     }

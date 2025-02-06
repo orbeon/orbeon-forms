@@ -416,6 +416,7 @@ object APISupport {
         headers       = requestDetails.headersMapWithContentType + (Headers.OrbeonClient -> List(ctx.client)),
         content       = requestDetails.content
       )(
+        requestCtx    = None,
         connectionCtx = None
       )
 

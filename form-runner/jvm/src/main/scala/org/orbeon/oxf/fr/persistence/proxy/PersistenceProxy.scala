@@ -906,8 +906,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     indentedLogger : IndentedLogger
   ): ConnectionResult = {
 
-    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+    implicit val externalContext: ExternalContext    = NetUtils.getExternalContext
+    implicit val safeRequestCtx : SafeRequestContext = SafeRequestContext(externalContext)
 
     val outgoingURL =
       URI.create(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, UrlRewriteMode.Absolute))

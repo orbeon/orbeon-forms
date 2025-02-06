@@ -41,15 +41,17 @@ object PipelineSupport {
     sessionDestroyed : Session => Any = _ => ()
   ): ExternalContext =
     new TestExternalContext(
-        pipelineContext,
-        ProcessorUtils.createDocumentFromURL(requestURL, null),
-        sessionCreated,
-        sessionDestroyed
-      ) |!> (
-        pipelineContext.setAttribute(
-          PipelineContext.EXTERNAL_CONTEXT,
-          _
-        )
+      pipelineContext,
+      ProcessorUtils.createDocumentFromURL(requestURL, null),
+      sessionCreated,
+      sessionDestroyed
+    ) |!> (
+      pipelineContext.setAttribute(
+        PipelineContext.EXTERNAL_CONTEXT,
+        _
+      )
+    ) |!> (
+      _.getSession(create = true) // make sure a session is available for downstream `SafeRequestContext`
     )
 
   def withTestExternalContext[T](

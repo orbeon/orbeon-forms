@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.submission
 import cats.effect.IO
 import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport}
+import org.orbeon.oxf.util.Connection
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io.ByteArrayInputStream
 import java.net.URI
-import scala.util.Success
 
 
 class EchoSubmission(submission: XFormsModelSubmission)
@@ -77,18 +77,17 @@ class EchoSubmission(submission: XFormsModelSubmission)
       )
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-      url                      = url,
-      method                   = submissionParameters.httpMethod,
-      hasCredentials           = submissionParameters.credentialsOpt.isDefined,
-      mediatypeOpt             = serializationParameters.actualRequestMediatype.some,
-      encodingForSOAP          = submissionParameters.encoding,
-      customHeaders            = customHeaderNameValues,
-      headersToForward         = Connection.headersToForwardFromProperty,
-      getHeader                = submission.containingDocument.headersGetter
+      url              = url,
+      method           = submissionParameters.httpMethod,
+      hasCredentials   = submissionParameters.credentialsOpt.isDefined,
+      mediatypeOpt     = serializationParameters.actualRequestMediatype.some,
+      encodingForSOAP  = submissionParameters.encoding,
+      customHeaders    = customHeaderNameValues,
+      headersToForward = Connection.headersToForwardFromProperty,
+      getHeader        = submission.containingDocument.headersGetter
     )(
-      logger                   = submission.getDetailsLogger,
-      externalContext          = XFormsCrossPlatformSupport.externalContext,
-      coreCrossPlatformSupport = CoreCrossPlatformSupport
+      logger           = submission.getDetailsLogger,
+      safeRequestCtx   = SafeRequestContext(XFormsCrossPlatformSupport.externalContext)
     )
 
     // Do as if we are receiving a regular XML response

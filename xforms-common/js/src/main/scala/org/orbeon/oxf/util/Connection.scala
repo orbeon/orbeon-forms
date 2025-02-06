@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import cats.effect.IO
 import org.orbeon.connection.*
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
@@ -25,10 +25,10 @@ import org.scalajs.dom.{Headers as JSHeaders, URL as JSURL}
 import java.io.InputStream
 import java.net.URI
 import scala.scalajs.js
-import scala.scalajs.js.{Iterator, |}
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.typedarray.Uint8Array
+import scala.scalajs.js.{Iterator, |}
 
 
 object Connection extends ConnectionTrait {
@@ -71,7 +71,7 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext,
+    safeRequestCtx  : SafeRequestContext,
     connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
@@ -222,7 +222,7 @@ object Connection extends ConnectionTrait {
     url    : URI,
     headers: Map[String, List[String]]
   )(implicit
-    logger   : IndentedLogger
+    logger : IndentedLogger
   ): JSHeaders = // The `Headers` constructor expects key/value pairs, with only one value per header
       // TODO: Check if we ever have more than one value per header
       new JSHeaders(
@@ -244,7 +244,7 @@ object Connection extends ConnectionTrait {
     url     : URI,
     response: SubmissionResponse
   )(implicit
-    logger   : IndentedLogger
+    logger  : IndentedLogger
   ): ConnectionResult = {
 
     val responseHeaders =
@@ -278,7 +278,7 @@ object Connection extends ConnectionTrait {
     url     : URI,
     response: SubmissionResponse
   )(implicit
-    logger   : IndentedLogger
+    logger  : IndentedLogger
   ): AsyncConnectionResult = {
 
     val responseHeaders =
@@ -321,30 +321,35 @@ object Connection extends ConnectionTrait {
   def isInternalPath(path: String): Boolean = false
 
   def findInternalUrl(
-    normalizedUrl : URI,
-    filter        : String => Boolean
-  )(implicit
-    request       : ExternalContext.Request
+    normalizedUrl: URI,
+    filter       : String => Boolean,
+    servicePrefix: String
   ): Option[String] = None
 
   def buildConnectionHeadersCapitalizedIfNeeded(
-    url                      : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
-    hasCredentials           : Boolean,
-    customHeaders            : Map[String, List[String]],
-    headersToForward         : Set[String],
-    cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]])(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    url             : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
+    hasCredentials  : Boolean,
+    customHeaders   : Map[String, List[String]],
+    headersToForward: Set[String],
+    cookiesToForward: List[String],
+    getHeader       : String => Option[List[String]]
+  )(implicit
+    logger          : IndentedLogger,
+    safeRequestCtx  : SafeRequestContext
   ): Map[String, List[String]] = customHeaders
 
   def headersToForwardFromProperty: Set[String]  = Set.empty
   def cookiesToForwardFromProperty: List[String] = Nil
 
-  def sessionCookieHeaderCapitalized(
-    externalContext  : ExternalContext,
-    cookiesToForward : List[String])(implicit
-    logger           : IndentedLogger
+  protected def sessionCookieHeaderCapitalized(
+    cookiesToForward: List[String]
+  )(implicit
+    safeRequestCtx: SafeRequestContext,
+    logger        : IndentedLogger
+  ): Option[(String, List[String])] = None
+
+  protected def buildTokenHeaderCapitalized(implicit
+    logger        : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Option[(String, List[String])] = None
 }

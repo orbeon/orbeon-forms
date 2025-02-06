@@ -69,6 +69,8 @@ class TestExternalContext(
     private var getInputStreamCalled         = false
     private val getReaderCalled              = false
 
+    def incomingCookies: Iterable[(String, String)] = Nil
+
     lazy val getAttributesMap: ju.Map[String, AnyRef] = {
 
       val result = new ju.LinkedHashMap[String, AnyRef]
@@ -297,6 +299,14 @@ class TestExternalContext(
 
     def getClientContextPath(urlString: String): String =
       URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
+
+    lazy val servicePrefix: String =
+      URLRewriterImpl.rewriteServiceUrl(
+        this,
+        "/",
+        UrlRewriteMode.Absolute,
+        URLRewriterUtils.getServiceBaseURI
+      )
 
     def isRequestedSessionIdValid   = false
 

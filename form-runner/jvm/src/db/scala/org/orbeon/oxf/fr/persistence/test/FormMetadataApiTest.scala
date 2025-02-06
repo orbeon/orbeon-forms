@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.test
 import cats.implicits.catsSyntaxOptionId
 import org.log4s.Logger
 import org.orbeon.dom.Document
-import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, UserAndGroup}
+import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, SafeRequestContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
 import org.orbeon.oxf.fr.persistence.relational.Provider
@@ -28,7 +28,7 @@ import org.orbeon.oxf.http.StatusCode.isSuccessCode
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, WithResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.StaticXPath.orbeonDomToTinyTree
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
@@ -154,7 +154,6 @@ class FormMetadataApiTest
     ActiveProviderResourceManagerSupport(applicationCounts = applicationCounts)
 
   private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
-  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   val FormMetadataPostApiURL = "form"
 
@@ -181,11 +180,12 @@ class FormMetadataApiTest
   }
 
   def assertCall(
-    searchRequest    : Document,
-    searchResult     : Document,
-    statusCode       : Int = StatusCode.Ok,
-    xmlResponseFilter: Document => Document = identity)(implicit
-    externalContext  : ExternalContext
+    searchRequest       : Document,
+    searchResult        : Document,
+    statusCode          : Int = StatusCode.Ok,
+    xmlResponseFilter   : Document => Document = identity
+  )(implicit
+    safeRequestCtx: SafeRequestContext
   ): Unit =
     HttpCall.assertCall(
       HttpCall.SolicitedRequest(
@@ -226,7 +226,7 @@ class FormMetadataApiTest
     expectedStatusCode: Int,
     assertFunction    : Seq[String] => Unit
   )(implicit
-   externalContext    : ExternalContext
+   safeRequestCtx: SafeRequestContext
   ): Unit = {
     HttpCall.assertCall(
       actualRequest  = solicitedRequest(searchRequest),
@@ -245,14 +245,14 @@ class FormMetadataApiTest
 
   private def assertFilter(
     metadata          : String,
-    requestLanguageOpt: Option[String] = None,
-    queryLanguageOpt  : Option[String] = None,
-    matchType         : String,
-    value             : String,
-    expectedFormNames : Set[String] = Set.empty,
-    expectedStatusCode: Int = StatusCode.Ok
+    requestLanguageOpt : Option[String] = None,
+    queryLanguageOpt   : Option[String] = None,
+    matchType          : String,
+    value              : String,
+    expectedFormNames  : Set[String] = Set.empty,
+    expectedStatusCode : Int = StatusCode.Ok
   )(implicit
-    externalContext   : ExternalContext
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
 
     val searchRequest =
@@ -275,7 +275,7 @@ class FormMetadataApiTest
     expectedSortedFormNames: Seq[String] = Seq.empty,
     expectedStatusCode     : Int = StatusCode.Ok
   )(implicit
-    externalContext        : ExternalContext
+    safeRequestCtx: SafeRequestContext
   ): Unit = {
 
     val searchRequest =
@@ -296,7 +296,7 @@ class FormMetadataApiTest
     expectedPaginatedFormNames: Seq[String] = Seq.empty,
     expectedStatusCode        : Int = StatusCode.Ok
   )(implicit
-    externalContext           : ExternalContext
+    safeRequestCtx            : SafeRequestContext
   ): Unit =
     assertPaginationWithStrings(
       pageNumber                 = pageNumber.toString,
@@ -311,7 +311,7 @@ class FormMetadataApiTest
     expectedPaginatedFormNames: Seq[String] = Seq.empty,
     expectedStatusCode        : Int = StatusCode.Ok
   )(implicit
-    externalContext           : ExternalContext
+    safeRequestCtx            : SafeRequestContext
   ): Unit = {
 
     val searchRequest =
@@ -328,7 +328,7 @@ class FormMetadataApiTest
   }
 
   // Create multiple form definitions with metadata all having different orders
-  def createTestForms(provider: Provider)(implicit externalContext: ExternalContext): Seq[PartialFormMetadata] = {
+  def createTestForms(provider: Provider)(implicit safeRequestCtx: SafeRequestContext): Seq[PartialFormMetadata] = {
 
     val testForm1 = TestForm(
       appForm          = AppForm(s"${provider.entryName}-3", "test-form-2"),
@@ -383,7 +383,9 @@ class FormMetadataApiTest
   describe("Form Metadata API") {
 
     it("returns an empty result when there are no form definition") {
-      withProvider { _ => implicit externalContext =>
+      withProvider { _ => externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
         val searchRequest = <search/>.toDocument
         val searchResult  = <forms search-total="0"/>.toDocument
@@ -393,7 +395,9 @@ class FormMetadataApiTest
     }
 
     it("returns a single result when there is a single form definition") {
-      withProvider { provider => implicit externalContext =>
+      withProvider { provider => externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
         val testForm = TestForm(provider, controls = Seq.empty, formName = "test-form-1")
         testForm.putFormDefinition(version = Version.Specific(1))
@@ -416,7 +420,9 @@ class FormMetadataApiTest
     }
 
     it("returns forms filtered according to filter query") {
-      withProvider { provider => implicit externalContext =>
+      withProvider { provider => externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
         val partialFormMetadata = createTestForms(provider).sortBy(_.formName)
 
@@ -735,7 +741,9 @@ class FormMetadataApiTest
     }
 
     it("returns forms sorted according to sort query") {
-      withProvider { provider => implicit externalContext =>
+      withProvider { provider => externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
         createTestForms(provider)
 
@@ -890,6 +898,8 @@ class FormMetadataApiTest
 
     it("returns forms paginated according to pagination query") {
       withProvider { provider => implicit externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
         createTestForms(provider)
 

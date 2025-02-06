@@ -15,8 +15,8 @@ package org.orbeon.oxf.test
 
 import org.orbeon.connection.StreamedContent
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
+import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.pipeline.InitUtils.*
@@ -105,11 +105,14 @@ object TestHttpClient {
 
         val (externalContext, response) = {
 
-          val webAppContext         = new TestWebAppContext(Logger, ServerState.serverAttributes)
+          val webAppContext  = new TestWebAppContext(Logger, ServerState.serverAttributes)
 
           val request = LocalRequest(
-            incomingRequest         = makeBaseRequest(attributes, credentials),
-            contextPath             = ServerState.ContextPath,
+            safeRequestCtx     =
+              SafeRequestContext(
+                webAppContext,
+                makeBaseRequest(attributes, credentials)
+              ),
             pathQuery               = url,
             method                  = method,
             headersMaybeCapitalized = headers + (OrbeonToken -> List(ServerState.OrbeonTokenValue)),
@@ -164,13 +167,11 @@ object TestHttpClient {
 
     override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
     override val getAttributesMap                        = ju.Collections.synchronizedMap(attributes.asJava)
+    override def incomingCookies                         = Nil
     override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
 
     override val getContainerType                        = "servlet"
     override val getContainerNamespace                   = ""
-    override val getPortletMode  : String                = null
-    override val getWindowState  : String                = null
-    override val getNativeRequest: AnyRef                = null
     override val getPathTranslated                       = ""
     override val getProtocol                             = "HTTP/1.1"
     override val getServerPort                           = ServerState.Port
@@ -178,11 +179,10 @@ object TestHttpClient {
     override val getRemoteHost                           = RemoteHost
     override val getRemoteAddr                           = RemoteAddr
     override val isSecure                                = Scheme == "https"
-    override val getLocale : Locale                      = null
     override val getServerName                           = ServerState.Host
     override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
+    override def servicePrefix: String                   = "" // xxx or "/" or compute?
     override def sessionInvalidate()                     = session.invalidate()
-    override val getRequestedSessionId: String           = null
 
     override val credentials                             = connectionCredentials
 

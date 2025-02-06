@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.NodeConversions
@@ -42,8 +42,7 @@ class SearchTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  private implicit val Logger                  : IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
-  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
 
   private val controlPath = "section-1/control-1"
 
@@ -58,7 +57,7 @@ class SearchTest
       </_>
 
     it("returns an empty result when there are no documents") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val SearchURL = HttpCall.searchURL(provider)
@@ -445,9 +444,9 @@ class SearchTest
     def expectStatusCode(
       path                    : String,
       searchRequest           : Document,
-      code                    : Int)(implicit
-      externalContext         : ExternalContext,
-      coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+      code                    : Int
+    )(implicit
+      safeRequestCtx: SafeRequestContext
     ): Unit =
       HttpCall.assertCall(
         HttpCall.SolicitedRequest(
@@ -460,7 +459,7 @@ class SearchTest
       )
 
     it("returns an error when specifying an invalid metadata attribute") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val SearchURL = HttpCall.searchURL(provider)
@@ -478,7 +477,7 @@ class SearchTest
     }
 
     it("returns an error when specifying an invalid match attribute") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val SearchURL = HttpCall.searchURL(provider)
@@ -510,7 +509,7 @@ class SearchTest
     }
 
     it("returns an error when specifying an invalid sort attribute") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val SearchURL = HttpCall.searchURL(provider)
@@ -527,7 +526,7 @@ class SearchTest
     }
 
     it("returns an error when specifying more than one sort attributes") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val SearchURL = HttpCall.searchURL(provider)
@@ -563,7 +562,7 @@ class SearchTest
     }
 
     it("returns an error when specifying a metadata query value without a match operator") {
-      withTestExternalContext { implicit externalContext =>
+      withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val SearchURL = HttpCall.searchURL(provider)
@@ -606,7 +605,7 @@ class SearchTest
     formData             : Seq[FormData],
     providers            : Option[List[Provider]] = None
   ): Unit =
-    withTestExternalContext { implicit externalContext =>
+    withTestSafeRequestContext { implicit safeRequestCtx =>
       Connect.withOrbeonTables("form definition") { (connection, provider) =>
         if (providers.forall(_.contains(provider))) {
           val testForm  = TestForm(provider, controls = Seq(TestForm.Control("control label")))

@@ -696,20 +696,19 @@ trait FormRunnerPersistence {
   }
 
   private def getAttachmentUriAndHeaders(
-    fromBasePaths           : Iterable[(String, Int)],
-    beforeUrl               : String
+    fromBasePaths : Iterable[(String, Int)],
+    beforeUrl     : String
   )(implicit
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    xfcd                    : XFormsContainingDocument,
-    indentedLogger          : IndentedLogger
+    safeRequestCtx: SafeRequestContext,
+    xfcd          : XFormsContainingDocument,
+    indentedLogger: IndentedLogger
   ): (URI, Map[String, List[String]]) = {
 
     def rewriteServiceUrl(url: String) =
-      URLRewriterUtils.rewriteServiceURL(
-        externalContext.getRequest,
+      URLRewriterUtils.rewriteServiceURLPlain(
+        UrlRewriterContext(safeRequestCtx),
         url,
-        UrlRewriteMode.Absolute
+        UrlRewriteMode.Absolute,
       )
 
     val attachmentVersionOpt =
@@ -746,8 +745,7 @@ trait FormRunnerPersistence {
     credentials   : Option[BasicCredentials],
     workflowStage : Option[String]
   )(implicit
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    safeRequestCtx          : SafeRequestContext,
     connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
     xfcd                    : XFormsContainingDocument,
     indentedLogger          : IndentedLogger
@@ -794,14 +792,13 @@ trait FormRunnerPersistence {
   }
 
   private def readAttachmentIo(
-    fromBasePaths           : Iterable[(String, Int)],
-    beforeUrl               : String
+    fromBasePaths    : Iterable[(String, Int)],
+    beforeUrl        : String
   )(implicit
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument,
-    indentedLogger          : IndentedLogger
+    safeRequestCtx   : SafeRequestContext,
+    connectionContext: Option[ConnectionContextSupport.ConnectionContext],
+    xfcd             : XFormsContainingDocument,
+    indentedLogger   : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
@@ -820,17 +817,16 @@ trait FormRunnerPersistence {
   }
 
   private def saveAttachmentIo(
-    stream         : fs2.Stream[IO, Byte],
-    pathToHolder   : String,
-    resolvedPutUri : URI,
-    formVersion    : Option[String],
-    credentials    : Option[BasicCredentials]
+    stream           : fs2.Stream[IO, Byte],
+    pathToHolder     : String,
+    resolvedPutUri   : URI,
+    formVersion      : Option[String],
+    credentials      : Option[BasicCredentials]
   )(implicit
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument,
-    indentedLogger          : IndentedLogger
+    safeRequestCtx   : SafeRequestContext,
+    connectionContext: Option[ConnectionContextSupport.ConnectionContext],
+    xfcd             : XFormsContainingDocument,
+    indentedLogger   : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
@@ -863,16 +859,16 @@ trait FormRunnerPersistence {
 
   // 1 use: `buildMultipartEntity()`
   def readAttachmentSync(
-    fromBasePaths           : Iterable[(String, Int)],
-    beforeUrl               : String
+    fromBasePaths  : Iterable[(String, Int)],
+    beforeUrl      : String
   )(implicit
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    xfcd                    : XFormsContainingDocument,
-    indentedLogger          : IndentedLogger
+    externalContext: ExternalContext,
+    xfcd           : XFormsContainingDocument,
+    indentedLogger : IndentedLogger
   ): ConnectionResult = {
 
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
+    implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
 
@@ -902,11 +898,10 @@ trait FormRunnerPersistence {
     formVersion       : Option[String] = None,
     workflowStage     : Option[String] = None
   )(implicit
-    externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument,
-    indentedLogger          : IndentedLogger
+    safeRequestCtx    : SafeRequestContext,
+    connectionContext : Option[ConnectionContextSupport.ConnectionContext],
+    xfcd              : XFormsContainingDocument,
+    indentedLogger    : IndentedLogger
   ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
     val credentials =
@@ -945,8 +940,8 @@ trait FormRunnerPersistence {
       )
 
     def rewriteServiceUrl(url: String) =
-      URLRewriterUtils.rewriteServiceURL(
-        externalContext.getRequest,
+      URLRewriterUtils.rewriteServiceURLPlain(
+        UrlRewriterContext(safeRequestCtx),
         url,
         UrlRewriteMode.Absolute
       )

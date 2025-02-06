@@ -19,7 +19,7 @@ package org.orbeon.oxf.util
 import java.math.BigInteger
 
 
-object FileUtils {
+object ByteSizeUtils {
 
   def byteCountToDisplaySize(size: Long): String =
     byteCountToDisplaySize(BigInteger.valueOf(size))

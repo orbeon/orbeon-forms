@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FileUtils, IndentedLogger, UploadProgress}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ByteSizeUtils, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.SingleItemBinding
 import org.orbeon.oxf.xforms.analysis.controls.WithFileMetadata
@@ -207,6 +207,6 @@ object FileMetadata {
   // Format a string containing a number of bytes to a human-readable string
   // If the input string doesn't represent a `Long`, return the string unchanged
   def humanReadableBytes(size: String): String =
-    try FileUtils.byteCountToDisplaySize(size.toLong)
+    try ByteSizeUtils.byteCountToDisplaySize(size.toLong)
     catch { case NonFatal(_) => size }
 }

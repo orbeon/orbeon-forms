@@ -6,7 +6,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{FileUtils, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{ByteSizeUtils, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.{BindingAttributeDescriptor, BindingDescriptor}
@@ -162,7 +162,7 @@ trait FormRunnerComponentsCompileTime {
                               ValidationFunctionNames.UploadMaxSizeAggregatePerControl |
                               // Backward compatibility
                               ValidationFunctionNames.UploadMaxSize), Some(value)) =>
-        val displaySizeOpt = value.toLongOption.map(FileUtils.byteCountToDisplaySize)
+        val displaySizeOpt = value.toLongOption.map(ByteSizeUtils.byteCountToDisplaySize)
         displaySizeOpt.map { displaySize =>
           hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$displaySize'")
         }

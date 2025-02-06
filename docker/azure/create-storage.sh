@@ -4,7 +4,6 @@ if [[ $(az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$RES
   az storage account create \
     --name "$STORAGE_ACCOUNT" \
     --resource-group "$RESOURCE_GROUP" \
-    --location "$AZURE_LOCATION" \
     --sku Standard_LRS
   echo "Storage account $STORAGE_ACCOUNT created"
 else

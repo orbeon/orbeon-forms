@@ -25,5 +25,5 @@ docker run \
   -v ./oidc.json:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/oidc.json \
   -v ./web.xml:/opt/jboss/wildfly/standalone/deployments/orbeon.war/WEB-INF/web.xml \
   -v ./application.keystore:/opt/jboss/wildfly/standalone/configuration/application.keystore \
-  -v ./standalone.postgresql.local.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
+  -v ./standalone.postgresql.local.xml:/docker-entrypoint-wildfly.d/standalone.xml \
   "orbeon/orbeon-forms:$ORBEON_FORMS_DOCKER_TAG"

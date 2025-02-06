@@ -6,7 +6,6 @@ if ! az postgres flexible-server show \
   if ! az postgres flexible-server create \
       --name "$DATABASE_SERVER" \
       --resource-group "$RESOURCE_GROUP" \
-      --location "$AZURE_LOCATION" \
       --admin-user "$DATABASE_ADMIN_USERNAME" \
       --admin-password "$DATABASE_ADMIN_PASSWORD" \
       --sku-name standard_d2ds_v4 \

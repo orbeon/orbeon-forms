@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENTRA_ID_DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv 2>&1)
+ENTRA_ID_DOMAIN=$(az rest --method get --url 'https://graph.microsoft.com/v1.0/domains' --query 'value[0].id' -o tsv)
 echo "Entra ID domain: $ENTRA_ID_DOMAIN"
 
 # UPN = UPN prefix '@' domain
@@ -42,7 +42,8 @@ create_user() {
     id=$(user_id_from_upn "$upn")
 
     echo "Setting email for $display_name to $email"
-    az rest --method patch \
+    az rest \
+      --method patch \
       --url "https://graph.microsoft.com/v1.0/users/$id" \
       --body "{\"mail\":\"$email\"}"
   fi
@@ -103,7 +104,7 @@ add_user_to_group "$ENTRA_ID_TEST_USER_UPN2" "$ENTRA_ID_ADMIN_GROUP"
 
 if az ad app list \
     --filter "displayName eq '$ENTRA_ID_APP_NAME'" \
-    --query "[].displayName" \
+    --query '[].displayName' \
     -o tsv | grep -q "^$ENTRA_ID_APP_NAME$"; then
 	echo "App $ENTRA_ID_APP_NAME already exists"
 else
@@ -111,7 +112,7 @@ else
 	az ad app create \
     --display-name "$ENTRA_ID_APP_NAME" \
     --web-redirect-uris "$LOCAL_APP_URL/*" \
-    --sign-in-audience "AzureADMyOrg"
+    --sign-in-audience 'AzureADMyOrg'
 fi
 
 ENTRA_ID_APP_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP_NAME'].appId" -o tsv)
@@ -128,9 +129,10 @@ if [[ -n $(az ad app show \
   echo "Scope $ENTRA_ID_SCOPE_VALUE already exists"
 else
 	# Add scope (az ad app update doesn't seem to work)
-	az rest --method PATCH \
+	az rest \
+	  --method PATCH \
     --uri "https://graph.microsoft.com/v1.0/applications/$ENTRA_ID_APP_OBJECT_ID" \
-    --headers "Content-Type=application/json" \
+    --headers 'Content-Type=application/json' \
     --body "$(jq -n \
       --arg scope_id "$(uuidgen)" \
       --arg scope_value "$ENTRA_ID_SCOPE_VALUE" \
@@ -151,7 +153,8 @@ else
 fi
 
 # Retrieve the scope ID given its name/value
-ENTRA_ID_SCOPE_ID=$(az ad app show --id "$ENTRA_ID_APP_ID" \
+ENTRA_ID_SCOPE_ID=$(az ad app show \
+                    --id "$ENTRA_ID_APP_ID" \
                     --query "api.oauth2PermissionScopes[?value=='$ENTRA_ID_SCOPE_VALUE'].id" \
                     -o tsv)
 
@@ -200,10 +203,6 @@ az ad app show --id "$ENTRA_ID_APP_ID" | \
   }' | \
   az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$ENTRA_ID_APP_OBJECT_ID" --body @-
 
-API_MICROSOFT_GRAPH="00000003-0000-0000-c000-000000000000"
-API_PERMISSION_OPENID="37f7f235-527c-4136-accd-4a02d197296e"
-API_PERMISSION_EMAIL="64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0"
-
 check_and_add_permission() {
   local app_id=$1
   local api_id=$2
@@ -226,14 +225,16 @@ check_and_add_permission() {
   fi
 }
 
+# Azure API constants
+API_MICROSOFT_GRAPH='00000003-0000-0000-c000-000000000000'
+API_PERMISSION_OPENID='37f7f235-527c-4136-accd-4a02d197296e'
+API_PERMISSION_EMAIL='64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0'
+
 # Microsoft Graph permissions
 check_and_add_permission "$ENTRA_ID_APP_ID" "$API_MICROSOFT_GRAPH" "$API_PERMISSION_OPENID" "Scope"
 check_and_add_permission "$ENTRA_ID_APP_ID" "$API_MICROSOFT_GRAPH" "$API_PERMISSION_EMAIL" "Scope"
 
-# App's own permissions
-check_and_add_permission "$ENTRA_ID_APP_ID" "$ENTRA_ID_APP_ID" "$ENTRA_ID_SCOPE_ID" "Scope"
-
-# Grant admin consent (for permissions above)
+# Grant admin consent for permissions above
 az ad app permission admin-consent --id "$ENTRA_ID_APP_ID"
 
 # Get the tenant ID
@@ -242,7 +243,7 @@ ENTRA_ID_TENANT_ID=$(az account show --query tenantId -o tsv)
 # Build the OIDC provider URL
 ENTRA_ID_PROVIDER_URL="https://login.microsoftonline.com/$ENTRA_ID_TENANT_ID/v2.0"
 
-# Build the API scope URL
+# Build the scope API URL
 ENTRA_ID_API_SCOPE_URL="api://$ENTRA_ID_APP_ID/$ENTRA_ID_SCOPE_VALUE"
 
 # In OIDC, we'll refer to the groups by their IDs (not their display names)

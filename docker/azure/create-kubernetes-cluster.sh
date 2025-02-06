@@ -35,12 +35,6 @@ if [ "$CONTAINER_CUSTOM_IMAGE_ENABLED" = 'true' ]; then
   az role assignment create --assignee "$K8S_CLIENT_ID" --role AcrPull --scope "$CONTAINER_REGISTRY_ID"
 fi
 
-# Display all contexts and current context
-kubectl config get-contexts
-
-# Display some information about the cluster
-kubectl cluster-info
-
 # Generate the storage account name/key secret file
 cat > "$K8S_STORAGE_SECRET.yaml" << EOF
 apiVersion: v1
@@ -173,7 +167,13 @@ EOF
 # Import the deployment configuration
 kubectl apply -f "$K8S_DEPLOYMENT.yaml"
 
-display_cluster_info() {
+display_info() {
+  echo -e "\nContexts information:\n"
+  kubectl config get-contexts
+
+  echo -e "\nCluster information:\n"
+  kubectl cluster-info
+
   echo -e "\nPods information:\n"
   kubectl describe pods
 
@@ -184,8 +184,8 @@ display_cluster_info() {
   kubectl get service "$K8S_SERVICE"
 }
 
-# Display various information about the K8S nodes, pods, and service
-display_cluster_info
+# Display various information about the K8S contexts, cluster, nodes, pods, and service
+display_info
 
 # Retrieve external/public IP
 echo -e "\nWaiting for external IP for service $K8S_SERVICE..."

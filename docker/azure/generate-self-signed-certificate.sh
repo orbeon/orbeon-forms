@@ -2,7 +2,8 @@
 
 if [ ! -f "application.keystore" ]; then
   # Generate self-signed certificate (default passwords in WildFly's configuration are both "password")
-  keytool -genkey \
+  keytool \
+    -genkey \
     -alias server \
     -keyalg RSA \
     -validity 3650 \

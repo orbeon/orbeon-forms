@@ -228,6 +228,7 @@
     </context-param>-->
     <!-- End session listener processors -->
 
+    <!-- PostgreSQL configuration -->
     <resource-ref>
         <description>DataSource</description>
         <res-ref-name>jdbc/postgresql</res-ref-name>
@@ -236,7 +237,7 @@
     </resource-ref>
 
     <!-- Form Runner authentication -->
-    <!-- Require the security role on /fr/auth by default. To protect everything this must be changed. -->
+    <!-- Restrict Orbeon Forms to the orbeon-user group/role -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Form Runner</web-resource-name>
@@ -246,6 +247,7 @@
             <role-name>ENTRA_ID_USER_GROUP_ID</role-name>
         </auth-constraint>
     </security-constraint>
+    <!-- Restrict Form Builder and Forms Admin pages to the orbeon-admin group/role -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Form Builder</web-resource-name>
@@ -280,6 +282,7 @@
         </user-data-constraint>
     </security-constraint>
     -->
+    <!-- Use OIDC for authentication -->
     <login-config>
         <auth-method>OIDC</auth-method>
     </login-config>

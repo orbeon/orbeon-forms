@@ -132,7 +132,7 @@ object ExternalContext {
     def credentials: Option[Credentials]
 
     // For Java callers
-    def getUsername: String = credentials map (_.userAndGroup.username) orNull
+    def getUsername: String = credentials.map(_.userAndGroup.username).orNull
 
     def isUserInRole(role: String): Boolean
 

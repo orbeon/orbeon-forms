@@ -17,11 +17,11 @@ import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{StreamedContent, StreamedContentT}
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
-import org.orbeon.oxf.http.HttpMethod.{HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.http.HttpMethod.{HttpMethodsWithRequestBody, POST}
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.*
 
 import java.io.InputStream
 import java.util as ju
@@ -208,7 +208,7 @@ object LocalRequest {
           None
 
       // Make sure to keep order
-      mutable.LinkedHashMap() ++ combineValues[String, AnyRef, Array](queryParameters ++ bodyParameters.getOrElse(Nil)) asJava
+      (mutable.LinkedHashMap() ++ combineValues[String, AnyRef, Array](queryParameters ++ bodyParameters.getOrElse(Nil))).asJava
     }
 
     new LocalRequest(

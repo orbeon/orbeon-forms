@@ -36,7 +36,7 @@ object ServletPortletRequest {
   }
 }
 
-// Implementations shared between ServletExternalContext and Portlet2ExternalContext.
+// Implementations shared between `ServletExternalContext` and `Portlet2ExternalContext`.
 trait ServletPortletRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]

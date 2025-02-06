@@ -26,10 +26,10 @@ object PropertiesConnectionSettings {
 
   def apply: HttpClientSettings = {
 
-    import HttpClientSettings._
+    import HttpClientSettings.*
     import org.orbeon.oxf.properties.Properties
 
-    import scala.concurrent.duration._
+    import scala.concurrent.duration.*
 
     val props = Properties.instance.getPropertySet
 

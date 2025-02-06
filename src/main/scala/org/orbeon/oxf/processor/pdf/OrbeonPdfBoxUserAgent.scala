@@ -45,7 +45,7 @@ class OrbeonPdfBoxUserAgent(
   coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
 ) extends PdfBoxUserAgent(outputDevice) {
 
-  import Private._
+  import Private.*
 
   // Unneeded for JVM platform
   private implicit val resourceResolver: Option[ResourceResolver] = None

@@ -660,7 +660,7 @@ class SearchTest
   // Filter the search results by removing the date attributes on the 'document' elements and by sorting the 'document'
   // elements by name
   def searchResultFilter(document: Document): Document = {
-    import scala.xml._
+    import scala.xml.*
 
     def withFilteredAttributes(elem: Elem): Elem = {
       val attributesToRemove =

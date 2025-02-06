@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
+
 /**
  * Utility class to rewrite URLs.
  */
@@ -87,7 +88,7 @@ public class URLRewriterUtils {
      */
     public static String getClientContextPath(ExternalContext.Request request, boolean isPlatformPath) {
         final Map<String, Object> attributes = request.getAttributesMap();
-        // NOTE: We don't check on javax.servlet.include.context_path, because that attribute behaves very differently:
+        // NOTE: We don't check on `javax.servlet.include.context_path`, because that attribute behaves very differently:
         // in the case of includes, it represents properties of the included servlet, not the values of the including
         // servlet.
         final String sourceContextPath = (String) attributes.get("javax.servlet.forward.context_path");
@@ -95,11 +96,11 @@ public class URLRewriterUtils {
             // This is the case of forwarding in separate deployment
             if (isPlatformPath) {
                 // Orbeon resources are forwarded
-                // E.g. /foobar/orbeon
+                // E.g. `/foobar/orbeon`
                 return sourceContextPath + request.getContextPath();
             } else {
                 // Application resources are loaded from the original context
-                // E.g. /foobar
+                // E.g. `/foobar`
                 return sourceContextPath;
             }
         } else {
@@ -204,7 +205,7 @@ public class URLRewriterUtils {
      * @param absolutePathNoContext path to check
      * @return                      true iif path is a platform path
      */
-    public static boolean isNonPlatformPathAppPath(String absolutePathNoContext) {
+    private static boolean isNonPlatformPathAppPath(String absolutePathNoContext) {
         final String regexp = Properties.instance().getPropertySet().getString(REWRITING_APP_PATHS_PROPERTY, null);
         // TODO: do not compile the regexp every time
         return regexp != null && RegexpMatcher.jMatchResult(Pattern.compile(regexp), absolutePathNoContext).matches();

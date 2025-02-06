@@ -82,7 +82,7 @@ abstract class ProcessorTestBase(
     }
   }
 
-  private def runOneTest(d: TestDescriptor) =
+  private def runOneTest(d: TestDescriptor): TestResult =
     try {
       // Create pipeline context
       InitUtils.withPipelineContext { pipelineContext =>
@@ -153,7 +153,7 @@ abstract class ProcessorTestBase(
                 ]
       """
 
-    implicit val ctx = XPathContext(vars = Map("edition" -> stringToStringValue(Version.Edition.toLowerCase)))
+    implicit val ctx: XPathContext = XPathContext(vars = Map("edition" -> stringToStringValue(Version.Edition.toLowerCase)))
 
     val testDescriptors =
       for {

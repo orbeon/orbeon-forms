@@ -24,6 +24,7 @@ import org.scalajs.dom.{KeyboardEvent, document, html}
 
 import scala.scalajs.js
 
+
 trait GridSectionMenus {
 
   import Util.*

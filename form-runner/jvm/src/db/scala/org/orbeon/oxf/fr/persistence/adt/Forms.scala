@@ -89,7 +89,7 @@ case class FormWithData(
   dataHistoryEntries: Seq[DataHistory])(implicit
   externalContext   : ExternalContext
 ) {
-  import Forms._
+  import Forms.*
 
   val appForm : AppForm  = appFormVersion._1
   val version : Version  = Specific(appFormVersion._2)
@@ -132,7 +132,7 @@ case class DataHistory(
 ) {
   assert(dataEntries.nonEmpty)
 
-  import Forms._
+  import Forms.*
 
   def save(formWithData: FormWithData): DataHistory = {
     val updatedDataEntries = dataEntries.zipWithIndex map { case (data, index) =>

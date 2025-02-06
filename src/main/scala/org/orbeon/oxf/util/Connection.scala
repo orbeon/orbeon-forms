@@ -58,7 +58,7 @@ import scala.util.control.NonFatal
  */
 object Connection extends ConnectionTrait {
 
-  import Private._
+  import Private.*
 
   def connectNow(
     method          : HttpMethod,

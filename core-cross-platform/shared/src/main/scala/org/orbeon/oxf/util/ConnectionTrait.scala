@@ -136,7 +136,7 @@ trait ConnectionTrait {
 
     require(encoding ne null)
 
-    import org.orbeon.oxf.util.ContentTypes._
+    import org.orbeon.oxf.util.ContentTypes.*
 
     val contentTypeMediaType = mediatypeMaybeWithCharset flatMap getContentTypeMediaType
 

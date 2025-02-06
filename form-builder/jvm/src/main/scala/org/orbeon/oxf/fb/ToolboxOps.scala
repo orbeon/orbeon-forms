@@ -22,19 +22,19 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.UndoAction.*
 import org.orbeon.oxf.fb.XMLNames.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.NodeInfoCell.*
+import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.*
-import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -46,8 +46,8 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.{Namespaces, XFormsNames}
 import org.orbeon.xforms.XFormsNames.{CLASS_QNAME, ID_QNAME}
+import org.orbeon.xforms.{Namespaces, XFormsNames}
 
 import java.net.URI
 import scala.collection.mutable
@@ -56,7 +56,7 @@ import scala.util.Try
 
 object ToolboxOps {
 
-  import Private._
+  import Private.*
 
   // Insert a new control in a cell
   //@XPathFunction
@@ -357,7 +357,7 @@ object ToolboxOps {
         allSections flatMap getControlNameOpt toSet
       }
 
-      ! allSectionNamesInUse(xblSectionName) option xblSectionName
+      (! allSectionNamesInUse(xblSectionName)) option xblSectionName
     }
 
     // Insert new section first
@@ -1253,10 +1253,12 @@ object ToolboxOps {
           (ctx.bodyElem, childrenContainers(ctx.bodyElem) lastOption)
       }
 
-    private def readUnpublishedAttachment(sourceUrl: String)(implicit
-      logger                   : IndentedLogger,
-      externalContext          : ExternalContext,
-      coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    private def readUnpublishedAttachment(
+      sourceUrl               : String
+    )(implicit
+      logger                  : IndentedLogger,
+      externalContext         : ExternalContext,
+      coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
     ): Try[(URI, Long)] = {
 
       // TODO: Check duplication from `FormRunnerCompiler`.

@@ -21,14 +21,14 @@ import org.orbeon.connection.{BufferedContent, Content, StreamedContent}
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
-import org.orbeon.oxf.http.*
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpServletResponse}
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
@@ -40,7 +40,7 @@ import scala.util.{Failure, Success}
 
 object APISupport {
 
-  import Private._
+  import Private.*
 
   val Logger = LoggerFactory.getLogger(List("org", "orbeon", "embedding") mkString ".") // so JARJAR doesn't touch this!
 
@@ -58,8 +58,9 @@ object APISupport {
     baseURL      : String,
     path         : String,
     headers      : List[(String, String)],
-    params       : List[(String, String)])(
-    implicit ctx : EmbeddingContextWithResponse
+    params       : List[(String, String)]
+  )(implicit
+    ctx          : EmbeddingContextWithResponse
   ): Unit = {
 
     Logger.debug(s"proxying page for path = `$path`")
@@ -139,7 +140,7 @@ object APISupport {
         StreamedContent(
           inputStream   = req.getInputStream,
           contentType   = Option(req.getContentType),
-          contentLength = Some(req.getContentLength.toLong) filter (_ >= 0),
+          contentLength = Some(req.getContentLength.toLong).filter(_ >= 0),
           title         = None
         )
 
@@ -162,7 +163,7 @@ object APISupport {
           ctx.setStatusCode(httpResponse.statusCode)
           httpResponse.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
 
-          proxyCapitalizeAndCombineHeaders(httpResponse.headers, request = false) foreach (ctx.setHeader _).tupled
+          proxyCapitalizeAndCombineHeaders(httpResponse.headers, request = false).foreach((ctx.setHeader _).tupled)
 
           useAndClose(content)(APISupport.writeResponseBody(mustRewriteForMediatype))
       }
@@ -177,7 +178,7 @@ object APISupport {
     ctx.setStatusCode(res.statusCode)
     res.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
 
-    proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
+    proxyCapitalizeAndCombineHeaders(res.headers, request = false).foreach((ctx.setHeader _).tupled)
 
     useAndClose(res.content)(writeResponseBody(mediatype => mustRewriteForMediatype(mediatype) || mustRewriteForPath(requestDetails.path)))
   }
@@ -228,10 +229,10 @@ object APISupport {
     }
 
   def writeResponseBody(doRewrite: String => Boolean)(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
-    content.contentType flatMap ContentTypes.getContentTypeMediaType match {
+    content.contentType.flatMap(ContentTypes.getContentTypeMediaType) match {
       case Some(mediatype) if doRewrite(mediatype) =>
         // Text/JSON/XML content type: rewrite response content
-        val encoding        = content.contentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
+        val encoding        = content.contentType.flatMap(ContentTypes.getContentTypeCharset).getOrElse(ExternalContext.StandardCharacterEncoding)
         val contentAsString = useAndClose(content.stream)(IOUtils.toString(_, encoding))
         val encodeForXML    = ContentTypes.isXMLMediatype(mediatype)
 
@@ -386,7 +387,7 @@ object APISupport {
     def hasNoParent(s: String) =
       ! s.contains("/..") && ! s.contains("../")
 
-    Option(s) map sanitizeResourcePath filter hasNoParent collect {
+    Option(s).map(sanitizeResourcePath).filter(hasNoParent).collect {
       case FormRunnerResourcePath(resourcePath) => resourcePath
     }
   }
@@ -418,8 +419,8 @@ object APISupport {
         connectionCtx = None
       )
 
-    def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =
-      ctx.getSessionAttribute(RemoteSessionIdKey) map (_.asInstanceOf[CookieStore]) getOrElse {
+    private def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =
+      ctx.getSessionAttribute(RemoteSessionIdKey).map(_.asInstanceOf[CookieStore]).getOrElse {
         val newCookieStore = new BasicCookieStore
         ctx.setSessionAttribute(RemoteSessionIdKey, newCookieStore)
         newCookieStore

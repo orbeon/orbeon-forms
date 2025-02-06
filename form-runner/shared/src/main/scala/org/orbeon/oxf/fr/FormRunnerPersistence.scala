@@ -15,8 +15,8 @@ package org.orbeon.oxf.fr
 
 import cats.effect.IO
 import cats.syntax.option.*
-import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
+import enumeratum.EnumEntry.Lowercase
 import org.orbeon.connection.{AsyncConnectionResult, ConnectionContextSupport, ConnectionResult, StreamedContent}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, QName}
@@ -25,11 +25,12 @@ import org.orbeon.oxf.common.{Defaults, OXFException}
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormModel
+import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.datamigration.{MigrationSupport, PathElem}
-import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.{Property, PropertySet}
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils.*
@@ -37,7 +38,6 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -268,7 +268,8 @@ object FormRunnerPersistence {
         headerName     = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
         headerValue    <- properties.getObjectOpt(propertyName)
       } yield
-        headerName -> headerValue.toString) toMap
+        headerName -> headerValue.toString
+    ).toMap
 
     val uri = providerPropertyAsUrlOpt(provider, "uri") getOrElse
       (throw new OXFException(s"no base URL specified for requested persistence provider `$provider` (check properties)"))
@@ -360,7 +361,7 @@ object FormRunnerPersistence {
     val maxVersionPassedOpt =
       allDistinctVersionsPassed.nonEmpty option allDistinctVersionsPassed.max
 
-    import scala.math.Ordering.Implicits._
+    import scala.math.Ordering.Implicits.*
 
     for {
       maxVersionPassed <- maxVersionPassedOpt
@@ -381,7 +382,7 @@ object FormRunnerPersistence {
 
 trait FormRunnerPersistence {
 
-  import FormRunnerPersistence._
+  import FormRunnerPersistence.*
 
   // Check whether a value correspond to an uploaded file
   //
@@ -525,7 +526,7 @@ trait FormRunnerPersistence {
 
   // Return the number of failed validations captured by the error summary for the given level
   def countValidationsByLevel(level: ValidationLevel): Int =
-    (frc.errorSummaryInstance.rootElement / "counts" /@ level.entryName stringValue).toInt
+    (frc.errorSummaryInstance.rootElement / "counts" /@ level.entryName).stringValue.toInt
 
   // Return whether the data is saved
   def isFormDataSaved: Boolean =
@@ -607,7 +608,7 @@ trait FormRunnerPersistence {
         filename
       }
 
-    filenames flatMap (_.trimAllToOpt) asJava
+    filenames.flatMap(_.trimAllToOpt).asJava
   }
 
 //  def collectUniqueUnsavedAttachments(

@@ -41,7 +41,8 @@ import java.security.KeyStore
 import javax.net.ssl.SSLContext
 
 
-abstract class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieStore] {
+abstract class ApacheHttpClient(settings: HttpClientSettings)
+  extends HttpClient[CookieStore] {
 
   import Private._
 
@@ -134,11 +135,10 @@ abstract class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient
         def contentTypeFromRequest =
           Headers.firstItemIgnoreCase(headers, Headers.ContentType)
 
-        val contentTypeHeader = (
+        val contentTypeHeader =
           contentTypeFromContent
-          orElse contentTypeFromRequest
-          getOrElse (throw new ProtocolException("Can't set request entity: Content-Type header is missing"))
-        )
+            .orElse(contentTypeFromRequest)
+            .getOrElse(throw new ProtocolException("Can't set request entity: Content-Type header is missing"))
 
         val is =
           content map (_.stream) getOrElse
@@ -184,7 +184,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient
         headers
       )
 
-      def disconnect() =
+      def disconnect(): Unit =
         EntityUtils.consume(response.getEntity)
     }
   }

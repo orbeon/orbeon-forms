@@ -115,7 +115,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
     implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
-    val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
+    val requestOpt = Option(externalContext).flatMap(ec => Option(ec.getRequest))
 
     val pdfRendererBuilder = new CustomPdfRendererBuilder
     XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
@@ -150,7 +150,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
       pdfRendererBuilder.withW3cDocument(
         readInputAsDOM(pipelineContext, input),
-        requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
+        requestOpt.map(_.getRequestURL).orNull // no base URL if can't get request URL from context
       )
 
       IOUtils.useAndClose(

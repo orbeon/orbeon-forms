@@ -93,7 +93,7 @@ object ExternalContext {
     case object Local       extends SessionScope(2)
   }
 
-  trait Request {
+  trait Request extends RarelyUsedRequest {
 
     def getContainerType: String
     def getContainerNamespace: String
@@ -102,6 +102,7 @@ object ExternalContext {
     def getRequestPath: String
     def getContextPath: String
     def getServletPath: String
+
     def getClientContextPath(urlString: String): String
     def servicePrefix: String
 
@@ -115,9 +116,6 @@ object ExternalContext {
     def getContentType: String
     def getInputStream: InputStream
 
-    def getProtocol: String
-    def getRemoteHost: String
-    def getRemoteAddr: String
     def getScheme: String
     def getMethod: HttpMethod
     def getServerName: String
@@ -125,39 +123,45 @@ object ExternalContext {
 
     def getSession(create: Boolean): Session
     def sessionInvalidate(): Unit
-    def isRequestedSessionIdValid: Boolean
     def getRequestedSessionId: String
-
-    def getAuthType: String
-    def isSecure: Boolean
 
     def credentials: Option[Credentials]
 
-    // For Java callers
-    def getUsername: String = credentials.map(_.userAndGroup.username).orNull
-
     def isUserInRole(role: String): Boolean
 
-    def getLocale: ju.Locale
-    def getLocales: ju.Enumeration[ju.Locale] // unused except forwarding
-
-    def getPathTranslated: String
     def getQueryString: String
     def getRequestURI: String
-    def getRequestURL: String
-
-    def getPortletMode: String
-    def getWindowState: String
-
-    def getNativeRequest: AnyRef
-
     def queryStringOpt: Option[String]                         = Option(getQueryString)
+
     // TODO: return immutable.Map[String, List[AnyRef]] -> what about AnyRef?
     def parameters: collection.Map[String, Array[AnyRef]]      = getParameterMap.asScala
     def getFirstParamAsString(name: String): Option[String]    = parameters.get(name) flatMap (_ collectFirst { case s: String => s })
     def getFirstHeaderIgnoreCase(name: String): Option[String] = Headers.firstItemIgnoreCase(getHeaderValuesMap.asScala, name)
+
     def sessionOpt: Option[Session]                            = Option(getSession(create = false))
     lazy val contentLengthOpt: Option[Long]                    = Headers.firstNonNegativeLongHeaderIgnoreCase(getHeaderValuesMap.asScala, Headers.ContentLength)
+
+    // For Java callers
+    def getUsername: String = credentials.map(_.userAndGroup.username).orNull
+  }
+
+  trait RarelyUsedRequest {
+
+    self: Request =>
+
+    def getProtocol              : String                    // unused except forwarding and `oxf:request`
+    def getRemoteHost            : String                    // unused except forwarding and `oxf:request`
+    def getRemoteAddr            : String                    // unused except forwarding and `oxf:request`, also `Authorizer` passes as `Orbeon-Remote-Address`
+    def getAuthType              : String                    // unused except forwarding and `oxf:request`/`oxf:request-security`
+    def isSecure                 : Boolean                   // unused except forwarding and `oxf:request`/`oxf:request-security`
+    def isRequestedSessionIdValid: Boolean                   // unused except forwarding
+    def getLocale                : ju.Locale                 // unused except forwarding
+    def getLocales               : ju.Enumeration[ju.Locale] // unused except forwarding
+    def getPathTranslated        : String                    // unused except forwarding and `oxf:request`
+    def getRequestURL            : String                    // unused except forwarding and `oxf:request`
+    def getPortletMode           : String                    // unused except forwarding and `oxf:request` and full portlet (deprecated)
+    def getWindowState           : String                    // unused except forwarding and `oxf:request` and full portlet (deprecated)
+    def getNativeRequest         : AnyRef                    // unused except full portlet (deprecated)
   }
 
   trait Rewriter extends URLRewriter {

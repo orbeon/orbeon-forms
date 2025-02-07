@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.TryUtils.*
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupportTrait, IndentedLogger, ResourceResolver, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
 import java.io.*
 import java.net.URI
@@ -35,14 +35,13 @@ import javax.imageio.ImageIO
 
 
 class OrbeonPdfBoxUserAgent(
-  jpegCompressionLevel     : Float,
-  outputDevice             : PdfBoxOutputDevice,
-  pipelineContext          : PipelineContext,
-  dotsPerPixel             : Int
+  jpegCompressionLevel: Float,
+  outputDevice        : PdfBoxOutputDevice,
+  pipelineContext     : PipelineContext,
+  dotsPerPixel        : Int
 )(implicit
-  externalContext          : ExternalContext,
-  indentedLogger           : IndentedLogger,
-  coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+  externalContext     : ExternalContext,
+  indentedLogger      : IndentedLogger
 ) extends PdfBoxUserAgent(outputDevice) {
 
   import Private.*
@@ -66,7 +65,7 @@ class OrbeonPdfBoxUserAgent(
 
     def scaleToOutputResolution(image: PdfBoxImage): Unit =
       if (dotsPerPixel != 1.0f)
-        image.scale((image.getWidth * dotsPerPixel), (image.getHeight * dotsPerPixel))
+        image.scale(image.getWidth * dotsPerPixel, image.getHeight * dotsPerPixel)
 
     val uriResolved = resolveURI(uriStr)
     if (uriResolved == null) {

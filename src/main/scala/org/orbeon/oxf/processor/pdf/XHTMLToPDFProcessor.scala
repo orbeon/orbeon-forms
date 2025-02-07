@@ -50,7 +50,7 @@ private object XHTMLToPDFProcessor {
   var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
-  def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder, propertySet: PropertySet): Unit =
+  private def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder, propertySet: PropertySet): Unit =
     for {
       propName <- propertySet.propertiesStartsWith(PdfFontPathProperty) ++ propertySet.propertiesStartsWith(PdfFontResourceProperty)
       path     <- propertySet.getNonBlankString(propName)
@@ -100,10 +100,10 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
 
-//  protected
+  //  protected
   def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
 
-//  protected
+  //  protected
   def readInput(
     pipelineContext : PipelineContext,
     input           : ProcessorInput,
@@ -111,9 +111,8 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
     outputStream    : OutputStream
   ): Unit = {
 
-    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
-    implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger : IndentedLogger  = new IndentedLogger(XHTMLToPDFProcessor.logger)
 
     val requestOpt = Option(externalContext).flatMap(ec => Option(ec.getRequest))
 

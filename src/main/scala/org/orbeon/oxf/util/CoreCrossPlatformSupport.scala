@@ -81,7 +81,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def isPE: Boolean = Version.isPE
   def isJsEnv: Boolean = false
   def randomHexId: String = SecureUtils.randomHexId
-  def getApplicationResourceVersion: Option[String] = Option(URLRewriterUtils.getApplicationResourceVersion)
+  def getApplicationResourceVersion: Option[String] = URLRewriterUtils.getApplicationResourceVersion
   def properties: PropertySet = Properties.instance.getPropertySet
   def getPropertySet(processorName: QName): PropertySet = Properties.instance.getPropertySet(processorName)
   def externalContext: ExternalContext = NetUtils.getExternalContext

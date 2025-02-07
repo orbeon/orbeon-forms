@@ -254,7 +254,7 @@ object AssetsAggregator extends Logging {
       val appVersion = URLRewriterUtils.getApplicationResourceVersion
 
       // All resource paths are hashed
-      val itemsToHash = assets ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set.empty)
+      val itemsToHash = assets ++ (if (hasAppResource && appVersion.exists(_.nonAllBlank)) appVersion.toSet else Set.empty)
       val resourcesHash = SecureUtils.digestStringToHexShort(itemsToHash mkString "|")
 
       // Cache mapping so that resource can be served by resource server
@@ -275,7 +275,7 @@ object AssetsAggregator extends Logging {
       debug("aggregating resources", Seq(
         "isCSS"          -> isCSS.toString,
         "hasAppResource" -> hasAppResource.toString,
-        "appVersion"     -> appVersion,
+        "appVersion"     -> appVersion.orNull,
         "resourcesHash"  -> resourcesHash,
         "namespaceOpt"   -> namespaceOpt.orNull,
         "resources"      -> (assets mkString " | ")

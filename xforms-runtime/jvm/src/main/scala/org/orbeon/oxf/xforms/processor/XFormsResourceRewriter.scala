@@ -76,10 +76,9 @@ object XFormsResourceRewriter {
     val pipelineContext = PipelineContext.get
 
     // Create matcher that matches all paths in case resources are versioned
-    if (pipelineContext.getAttribute(PageFlowControllerProcessor.PathMatchers) eq null) {
-      val matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher
-      pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, matchAllPathMatcher)
-    }
+    if (pipelineContext.getAttribute(PageFlowControllerProcessor.PathMatchers) eq null)
+      URLRewriterUtils.getMatchAllPathMatcher
+        .foreach(pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, _))
 
     val rm = ResourceManagerWrapper.instance
 

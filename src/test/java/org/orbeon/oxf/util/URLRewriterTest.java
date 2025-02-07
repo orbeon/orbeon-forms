@@ -17,7 +17,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orbeon.dom.Document;
-import org.orbeon.oxf.externalcontext.*;
+import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.TestExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriterImpl;
+import org.orbeon.oxf.externalcontext.UrlRewriteMode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.properties.Properties;
@@ -143,7 +146,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testResourceRewrite() {
 
-        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
+        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS();
         final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
@@ -262,7 +265,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testResourceRewriteForward() {
 
-        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
+        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS();
         final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
@@ -310,7 +313,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testResourceRewriteFilter() {
 
-        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
+        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS();
         final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
@@ -380,13 +383,13 @@ public class URLRewriterTest extends ResourceManagerTestBase {
                 assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath, true));
                 // Encoding/decoding
                 assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
-                        URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, UrlRewriteMode.AbsolutePathNoContext$.MODULE$), true));
+                        URLRewriterUtils.MATCH_ALL_PATH_MATCHERS(), UrlRewriteMode.AbsolutePathNoContext$.MODULE$), true));
             }
 
             // Check non-platform paths
             final String[] customPaths = { "/opsla", "/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/xforms-foo" };
             final String[] decodedCustomPaths = { "/apps/opsla", "/apps/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/apps/xforms-foo" };
-            final String appVersion = URLRewriterUtils.getApplicationResourceVersion();
+            final scala.Option<String> appVersionOpt = URLRewriterUtils.getApplicationResourceVersion();
             int i = 0;
             for (final String path: customPaths) {
                 // Make sure this is recognized as a non-platform path
@@ -394,15 +397,15 @@ public class URLRewriterTest extends ResourceManagerTestBase {
 
                 final String decodedCustomPath = decodedCustomPaths[i];
 
-                if (appVersion != null) {
+                if (appVersionOpt.isDefined()) {
                     // Case where there is an app version number
 
-                    final String versionedPath = "/" + appVersion + path;
+                    final String versionedPath = "/" + appVersionOpt.get() + path;
                     // Just decoding
                     assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(versionedPath, true));
                     // Encoding/decoding
                     assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
-                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, UrlRewriteMode.AbsolutePathNoContext$.MODULE$), true));
+                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS(), UrlRewriteMode.AbsolutePathNoContext$.MODULE$), true));
                 } else {
                     // Case where there is NO app version number
 
@@ -410,7 +413,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
                     assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(path, true));
                     // Encoding/decoding
                     assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
-                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, UrlRewriteMode.AbsolutePathNoContext$.MODULE$), true));
+                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS(), UrlRewriteMode.AbsolutePathNoContext$.MODULE$), true));
                 }
                 i++;
             }

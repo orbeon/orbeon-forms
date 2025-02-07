@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.processor
 
-import ProcessorImpl.*
-import RegexpMatcher.*
-import java.util.regex.Pattern
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.ProcessorImpl.*
+import org.orbeon.oxf.processor.RegexpMatcher.*
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
+import org.orbeon.oxf.util.ApacheGlobSupport.globToRegexp
 import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver}
-import org.orbeon.oxf.util.URLRewriterUtils.globToRegexp
+
+import java.util.regex.Pattern
+
 
 class RegexpProcessor extends ProcessorImpl {
 
@@ -87,8 +89,4 @@ object RegexpMatcher {
       MatchResult(matches, if (matches) 1 to matcher.groupCount map matcher.group else Nil)
     }
   }
-
-  // For Java callers
-  // 2024-10-11: Only used by `URLRewriterUtils`
-  def jMatchResult(pattern: Pattern, s: String): MatchResult = MatchResult(pattern, s)
 }

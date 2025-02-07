@@ -783,7 +783,12 @@ object FormBuilderXPathApi {
     getAllControlsWithIds.map { control =>
       val controlId    = control.attValue("id")
       val controlName  = FormRunner.controlNameFromId(controlId)
-      val controlLabel = resourceMap(controlName).firstChildOpt("label").map(_.getStringValue).getOrElse("")
+
+      val controlLabel =
+        resourceMap(controlName)
+          .firstChildOpt("label")
+          .map(_.getStringValue)
+          .getOrElse("")
       <item
         label={s"$controlLabel ($controlName)"}
         value={controlName}

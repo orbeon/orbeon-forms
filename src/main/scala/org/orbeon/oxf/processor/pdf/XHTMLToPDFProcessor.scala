@@ -148,9 +148,13 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
       pdfRendererBuilder.toStream(os)
 
+      // We are trying to avoid `getRequestURL`. Most likely, we do not rely on this to resolve resources in
+      // `OrbeonPdfBoxUserAgent`.
+      val baseUri = requestOpt.map(_.getRequestURI)
+
       pdfRendererBuilder.withW3cDocument(
         readInputAsDOM(pipelineContext, input),
-        requestOpt.map(_.getRequestURL).orNull // no base URL if can't get request URL from context
+        baseUri.orNull // no base URL if can't get request URL from context
       )
 
       IOUtils.useAndClose(

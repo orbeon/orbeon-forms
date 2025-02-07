@@ -353,6 +353,15 @@
          </xsl:element>
      </xsl:template>
 
+    <!-- See https://github.com/orbeon/orbeon-forms/issues/6771 -->
+    <xsl:template match="xh:td[empty(descendant-or-self::*[empty(*) and normalize-space() != ''])]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xh:span/><!-- Curiously, this is enough to prevent the issue! Has to be before the rest of the content. -->
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Remove empty grids -->
     <!-- See https://github.com/orbeon/orbeon-forms/issues/5051 -->
     <xsl:template

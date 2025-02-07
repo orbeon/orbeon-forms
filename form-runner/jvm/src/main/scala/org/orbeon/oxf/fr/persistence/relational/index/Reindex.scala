@@ -36,7 +36,7 @@ import scala.util.{Failure, Success}
 
 trait Reindex extends FormDefinition {
 
-  // Reindexing is a 3 step process:
+  // Reindexing is a 3-step process:
   //   1. Clean the index
   //   2. Get the documents to index
   //   3. For each document:

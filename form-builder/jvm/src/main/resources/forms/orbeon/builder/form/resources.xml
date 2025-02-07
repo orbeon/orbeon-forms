@@ -1997,6 +1997,9 @@
                 <label>Taille maximale agrégée des fichiers joints</label>
                 <hint>S'applique à tous les fichiers joints de ce formulaire</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Nombre maximal de fichiers par contrôle de pièces jointes</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label>Types de fichiers supportés</label>
                 <hint>Par exemple "image/* application/pdf"</hint>
@@ -3537,6 +3540,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Maksimalt antall filer per vedleggskontroll</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -5103,6 +5109,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Максимальное количество файлов на элемент управления вложениями</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -6669,6 +6678,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Numero massimo di file per controllo allegati</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -8199,6 +8211,9 @@
                 <label>Maximale Dateigröße aller Anhänge</label>
                 <hint>Beinhaltet alle Steuerelemente dieses Formulars</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Maximale Anzahl Dateien pro Anlage-Steuerelement</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label>Erlaubte Dateitypen</label>
                 <hint>Zum Beispiel "image/* application/pdf"</hint>
@@ -9732,6 +9747,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Liitetiedostojen enimmäismäärä ohjausyksikköä kohden</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -11290,6 +11308,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Número máximo de archivos por control de adjuntos</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -12849,6 +12870,9 @@
                 <label>Maximum totale bijlagegrootte</label>
                 <hint>Van toepassing op alle bijlage-controles in dit form</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Maximum aantal bestanden per bijlage-element</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label>Toegestane bestandstypen</label>
                 <hint>Bijvoorbeeld "image/* application/pdf"</hint>
@@ -14387,6 +14411,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Número máximo de ficheiros por controlo de anexos</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -15952,6 +15979,9 @@
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>Maximalt antal filer per bilagekontroll</label>
+            </attachment-max-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>

@@ -38,3 +38,10 @@ fi
 
 # Deploy Orbeon Forms as a simple Kubernetes cluster
 source create-kubernetes-cluster.sh
+
+# Create private network between AKS and PostgreSQL
+source create-private-network.sh
+
+# Display Orbeon Forms URL and command to display logs
+echo -e "\nOrbeon Forms now available on Azure Kubernetes cluster: $K8S_APP_URL"
+echo -e "\nUse this command to display the pod logs: kubectl logs $K8S_POD -f"

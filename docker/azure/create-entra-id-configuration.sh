@@ -103,24 +103,24 @@ add_user_to_group "$ENTRA_ID_TEST_USER_UPN2" "$ENTRA_ID_USER_GROUP"
 add_user_to_group "$ENTRA_ID_TEST_USER_UPN2" "$ENTRA_ID_ADMIN_GROUP"
 
 if az ad app list \
-    --filter "displayName eq '$ENTRA_ID_APP_NAME'" \
+    --filter "displayName eq '$ENTRA_ID_APP'" \
     --query '[].displayName' \
-    -o tsv | grep -q "^$ENTRA_ID_APP_NAME$"; then
-	echo "App $ENTRA_ID_APP_NAME already exists"
+    -o tsv | grep -q "^$ENTRA_ID_APP$"; then
+	echo "App $ENTRA_ID_APP already exists"
 else
 	# Create application
 	az ad app create \
-    --display-name "$ENTRA_ID_APP_NAME" \
+    --display-name "$ENTRA_ID_APP" \
     --web-redirect-uris "$LOCAL_APP_URL/*" \
     --sign-in-audience 'AzureADMyOrg'
 fi
 
-ENTRA_ID_APP_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP_NAME'].appId" -o tsv)
+ENTRA_ID_APP_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP'].appId" -o tsv)
 
 # Add identifier URI
 az ad app update --id "$ENTRA_ID_APP_ID" --identifier-uris "api://$ENTRA_ID_APP_ID"
 
-ENTRA_ID_APP_OBJECT_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP_NAME'].id" -o tsv)
+ENTRA_ID_APP_OBJECT_ID=$(az ad app list --query "[?displayName=='$ENTRA_ID_APP'].id" -o tsv)
 
 if [[ -n $(az ad app show \
     --id "$ENTRA_ID_APP_ID" \

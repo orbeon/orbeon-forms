@@ -11,15 +11,15 @@ else
 fi
 
 if [[ $(az storage share exists \
-    --name "$STORAGE_SHARE_NAME" \
+    --name "$STORAGE_SHARE" \
     --account-name "$STORAGE_ACCOUNT" \
     --query exists) == "false" ]]; then
   az storage share create \
-    --name "$STORAGE_SHARE_NAME" \
+    --name "$STORAGE_SHARE" \
     --account-name "$STORAGE_ACCOUNT"
-  echo "File share $STORAGE_SHARE_NAME created"
+  echo "File share $STORAGE_SHARE created"
 else
-  echo "File share $STORAGE_SHARE_NAME already exists"
+  echo "File share $STORAGE_SHARE already exists"
 fi
 
 upload_to_share() {
@@ -30,7 +30,7 @@ upload_to_share() {
 
   if ! az storage file upload \
       --account-name "$STORAGE_ACCOUNT" \
-      --share-name "$STORAGE_SHARE_NAME" \
+      --share-name "$STORAGE_SHARE" \
       --source "$source" \
       --path "$destination"; then
     echo "Failed to upload $source to $destination"

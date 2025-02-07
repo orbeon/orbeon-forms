@@ -43,7 +43,7 @@ RESOURCE_GROUP='orbeon-forms-resource-group'
 
 STORAGE_ACCOUNT=$(unique_name 'orbeonformsstorage' '.storage_account_name')
 
-STORAGE_SHARE_NAME='orbeon-forms-share'
+STORAGE_SHARE='orbeon-forms-share'
 
 #################################################
 # Database
@@ -74,13 +74,21 @@ CONTAINER_CUSTOM_IMAGE="orbeon-forms-custom:$ORBEON_FORMS_DOCKER_TAG"
 # Kubernetes
 #################################################
 
-K8S_CLUSTER_NAME='orbeon-forms-cluster'
+K8S_CLUSTER='orbeon-forms-cluster'
 K8S_STORAGE_SECRET='storage-secret'
 K8S_PERSISTENCE_VOLUME='orbeon-forms-pv'
 K8S_PERSISTENCE_VOLUME_CLAIM='orbeon-forms-pvc'
 K8S_APP='orbeon-forms'
 K8S_DEPLOYMENT='orbeon-forms-deployment'
 K8S_SERVICE='orbeon-forms-service'
+
+#################################################
+# Network
+#################################################
+
+NETWORK_POSTGRES_DNS_ZONE='private.postgres.database.azure.com'
+NETWORK_PRIVATE_ENDPOINT='postgres-pe'
+NETWORK_PRIVATE_ENDPOINT_CONNECTION='postgres-connection'
 
 #################################################
 # Entra ID
@@ -102,8 +110,8 @@ ENTRA_ID_TEST_USER_EMAIL2='...' # TODO: add a test email here
 ENTRA_ID_USER_GROUP='orbeon-user'
 ENTRA_ID_ADMIN_GROUP='orbeon-admin'
 
-# Application name and URL
-ENTRA_ID_APP_NAME='Orbeon Forms'
+# Application name
+ENTRA_ID_APP='Orbeon Forms'
 
 # Scope name/value
 ENTRA_ID_SCOPE_VALUE='groups.access'

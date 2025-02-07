@@ -137,7 +137,7 @@
                 </datasource>
                 <!-- PostgreSQL configuration -->
                 <datasource jndi-name="java:/jdbc/postgresql" pool-name="postgresql" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:postgresql://DATABASE_SERVER.postgres.database.azure.com:5432/orbeon?useUnicode=true&amp;characterEncoding=UTF8&amp;socketTimeout=30&amp;tcpKeepAlive=true</connection-url>
+                    <connection-url>jdbc:postgresql://DATABASE_SERVER.private.postgres.database.azure.com:5432/orbeon?useUnicode=true&amp;characterEncoding=UTF8&amp;socketTimeout=30&amp;tcpKeepAlive=true</connection-url>
                     <driver>postgresql-42.7.3.jar</driver>
                     <security user-name="orbeon@DATABASE_SERVER" password="orbeon"/>
                 </datasource>

@@ -144,9 +144,6 @@ else
   echo "Database already contains Orbeon Forms tables"
 fi
 
-# TODO: do this in a secure way (using private endpoints?)
-create_firewall_rule "$DATABASE_FIREWALL_RULE_ALL" "0.0.0.0" "255.255.255.255"
-
 unset PGPASSWORD
 
 delete_firewall_rule() {
@@ -165,4 +162,5 @@ delete_firewall_rule() {
   return 0
 }
 
+# Delete firewall rule created above
 delete_firewall_rule "$DATABASE_FIREWALL_RULE_LOCAL"

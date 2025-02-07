@@ -1,32 +1,32 @@
 #!/bin/bash
 
 if ! az aks show \
-    --name "$K8S_CLUSTER_NAME" \
+    --name "$K8S_CLUSTER" \
     --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
   if ! az aks create \
-      --name "$K8S_CLUSTER_NAME" \
+      --name "$K8S_CLUSTER" \
       --resource-group "$RESOURCE_GROUP" \
       --node-count 1 \
       --network-plugin azure \
       --generate-ssh-keys; then
-    echo "Failed to create Kubernetes cluster $K8S_CLUSTER_NAME"
+    echo "Failed to create Kubernetes cluster $K8S_CLUSTER"
     exit 1
   fi
-  echo "Kubernetes cluster $K8S_CLUSTER_NAME created successfully"
+  echo "Kubernetes cluster $K8S_CLUSTER created successfully"
 else
-  echo "Kubernetes cluster $K8S_CLUSTER_NAME already exists"
+  echo "Kubernetes cluster $K8S_CLUSTER already exists"
 fi
 
 # Retrieve AKS credentials, save them locally to ~/.kube/config, and set the AKS cluster as the current context
 az aks get-credentials \
-  --name "$K8S_CLUSTER_NAME" \
+  --name "$K8S_CLUSTER" \
   --resource-group "$RESOURCE_GROUP" \
   --overwrite-existing
 
 if [ "$CONTAINER_CUSTOM_IMAGE_ENABLED" = 'true' ]; then
   # Retrieve the cluster's client ID
   K8S_CLIENT_ID=$(az aks show \
-                  --name "$K8S_CLUSTER_NAME" \
+                  --name "$K8S_CLUSTER" \
                   --resource-group "$RESOURCE_GROUP" \
                   --query "identityProfile.kubeletidentity.clientId" \
                   -o tsv)
@@ -64,7 +64,7 @@ spec:
   storageClassName: azure-file
   azureFile:
     secretName: $K8S_STORAGE_SECRET
-    shareName: $STORAGE_SHARE_NAME
+    shareName: $STORAGE_SHARE
     readOnly: false
 EOF
 
@@ -195,9 +195,11 @@ while K8S_EXTERNAL_IP=$(kubectl get service "$K8S_SERVICE" --output jsonpath='{.
 done
 echo
 
+# Kubernetes node resource group
+K8S_NODE_RESOURCE_GROUP="MC_${RESOURCE_GROUP}_${K8S_CLUSTER}_${AZURE_LOCATION}"
+
 # Orbeon Forms app URL
 K8S_APP_URL="https://$K8S_EXTERNAL_IP/orbeon"
-echo -e "\nOrbeon Forms now available on Azure Kubernetes cluster: $K8S_APP_URL\n"
 
 # Update the Entra ID redirect URIs
 az ad app update --id "$ENTRA_ID_APP_ID" --web-redirect-uris "$LOCAL_APP_URL/*" "$K8S_APP_URL/*"
@@ -205,8 +207,6 @@ az ad app update --id "$ENTRA_ID_APP_ID" --web-redirect-uris "$LOCAL_APP_URL/*" 
 # Retrieve pod name
 K8S_POD=$(kubectl get pod -o name | head -1)
 echo -e "\nPod name: $K8S_POD\n"
-
-echo "Use this command to display the pod logs: kubectl logs $K8S_POD -f"
 
 undeploy() {
   kubectl delete -f "$K8S_DEPLOYMENT.yaml"

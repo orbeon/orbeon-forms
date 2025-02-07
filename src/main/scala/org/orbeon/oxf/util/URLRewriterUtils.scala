@@ -194,11 +194,12 @@ object URLRewriterUtils {
    * @param absolutePathNoContext path to check
    * @return true iif path is a platform path
    */
-  def isPlatformPath(absolutePathNoContext: String): Boolean = {
-    val regexp = Properties.instance.getPropertySet.getString(REWRITING_PLATFORM_PATHS_PROPERTY, null)
-    // TODO: do not compile the regexp every time
-    regexp != null && MatchResult(Pattern.compile(regexp), absolutePathNoContext).matches
-  }
+  def isPlatformPath(absolutePathNoContext: String): Boolean =
+    evaluateRegexProperty(
+      REWRITING_PLATFORM_PATHS_PROPERTY,
+      MatchResult(_, absolutePathNoContext).matches
+    )
+    .getOrElse(false)
 
   /**
    * Check if the given path is an application path, assuming it is not already a platform path.
@@ -206,11 +207,21 @@ object URLRewriterUtils {
    * @param absolutePathNoContext path to check
    * @return true iif path is a platform path
    */
-  private def isNonPlatformPathAppPath(absolutePathNoContext: String) = {
-    val regexp = Properties.instance.getPropertySet.getString(REWRITING_APP_PATHS_PROPERTY, null)
-    // TODO: do not compile the regexp every time
-    regexp != null && MatchResult(Pattern.compile(regexp), absolutePathNoContext).matches
-  }
+  private def isNonPlatformPathAppPath(absolutePathNoContext: String) =
+    evaluateRegexProperty(
+      REWRITING_APP_PATHS_PROPERTY,
+      MatchResult(_, absolutePathNoContext).matches
+    )
+    .getOrElse(false)
+
+  private def evaluateRegexProperty[T](propertyName: String, fn: Pattern => T): Option[T] =
+    Properties.instance.getPropertySet
+      .getPropertyOpt(propertyName)
+      .flatMap { property =>
+        property
+          .associatedValue(_.nonBlankStringValue.map(Pattern.compile))
+          .map(fn)
+      }
 
   /**
    * Decode an absolute path with no context, depending on whether there is an app version or not.

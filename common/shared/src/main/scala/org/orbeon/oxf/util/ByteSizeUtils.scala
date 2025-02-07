@@ -38,7 +38,7 @@ object ByteSizeUtils {
     else if (size.divide(ONE_KB_BI).compareTo(BigInteger.ZERO) > 0)
       String.valueOf(size.divide(ONE_KB_BI)) + " KB"
     else
-      String.valueOf(size) + " bytes"
+      String.valueOf(size) + " B"
 
   val ONE_KB    : Long       = 1024L
   val ONE_KB_BI : BigInteger = BigInteger.valueOf(ONE_KB)

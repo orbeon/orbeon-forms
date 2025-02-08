@@ -520,12 +520,12 @@ object Connection extends ConnectionTrait {
                     "internal",
                     internalPath,
                     InternalHttpClient.connect(
-                      url         = internalPath,
-                      credentials = credentials,
-                      cookieStore = cookieStore,
-                      method      = method,
-                      headers     = cleanCapitalizedHeaders,
-                      content     = content
+                      url           = internalPath,
+                      credentials   = credentials,
+                      cookieStore   = cookieStore,
+                      method        = method,
+                      headers       = cleanCapitalizedHeaders,
+                      content       = content
                     )(
                       requestCtx    = Some(safeRequestCtx),
                       connectionCtx = connectionCtx

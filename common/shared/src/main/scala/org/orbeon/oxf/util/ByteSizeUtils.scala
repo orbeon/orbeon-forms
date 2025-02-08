@@ -26,19 +26,19 @@ object ByteSizeUtils {
 
   def byteCountToDisplaySize(size: BigInteger): String =
     if (size.divide(ONE_EB_BI).compareTo(BigInteger.ZERO) > 0)
-      String.valueOf(size.divide(ONE_EB_BI)) + " EB"
+      s"${size.divide(ONE_EB_BI)} EB"
     else if (size.divide(ONE_PB_BI).compareTo(BigInteger.ZERO) > 0)
-      String.valueOf(size.divide(ONE_PB_BI)) + " PB"
+      s"${size.divide(ONE_PB_BI)} PB"
     else if (size.divide(ONE_TB_BI).compareTo(BigInteger.ZERO) > 0)
-      String.valueOf(size.divide(ONE_TB_BI)) + " TB"
+      s"${size.divide(ONE_TB_BI)} TB"
     else if (size.divide(ONE_GB_BI).compareTo(BigInteger.ZERO) > 0)
-      String.valueOf(size.divide(ONE_GB_BI)) + " GB"
+      s"${size.divide(ONE_GB_BI)} GB"
     else if (size.divide(ONE_MB_BI).compareTo(BigInteger.ZERO) > 0)
-      String.valueOf(size.divide(ONE_MB_BI)) + " MB"
+      s"${size.divide(ONE_MB_BI)} MB"
     else if (size.divide(ONE_KB_BI).compareTo(BigInteger.ZERO) > 0)
-      String.valueOf(size.divide(ONE_KB_BI)) + " KB"
+      s"${size.divide(ONE_KB_BI)} KB"
     else
-      String.valueOf(size) + " B"
+      s"${size} B"
 
   val ONE_KB    : Long       = 1024L
   val ONE_KB_BI : BigInteger = BigInteger.valueOf(ONE_KB)

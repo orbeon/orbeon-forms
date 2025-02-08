@@ -29,9 +29,9 @@ case class SafeRequestContext(
   containerType     : String,
   containerNamespace: String,
   attributes        : Map[String, AnyRef],
-  webAppContext     : WebAppContext,
   other             : RarelyUsedRequestContext,
 )(
+  val webAppContext : WebAppContext,
   session           : Option[ExternalContext.Session]
 ) {
 
@@ -87,7 +87,6 @@ object SafeRequestContext {
       containerType      = request.getContainerType,
       containerNamespace = request.getContainerNamespace,
       attributes         = Map.from(request.getAttributesMap.asScala), // make copy as original `ju.HashMap` can point to request
-      webAppContext      = webAppContext,
       other              =
         RarelyUsedRequestContext(
           protocol                = request.getProtocol,
@@ -104,6 +103,7 @@ object SafeRequestContext {
           requestURL              = request.getRequestURL
         )
     )(
+      webAppContext      = webAppContext,
       session            = Option(request.getSession(create = false))
     )
   }

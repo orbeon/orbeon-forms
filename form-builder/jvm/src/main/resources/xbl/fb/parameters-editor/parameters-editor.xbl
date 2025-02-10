@@ -232,7 +232,7 @@
                                     <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
                                     <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
                                     <xf:itemset ref="instance('controls-label-value-itemset')/item">
-                                        <xf:label value="string(xf:parse(concat('&lt;span>', @label, '&lt;/span>')))"/>
+                                        <xf:label value="frf:removeHtmlTags(@label)"/>
                                         <xf:value value="@value"/>
                                     </xf:itemset>
                                 </fr:dropdown-select1-search>

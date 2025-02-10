@@ -8,7 +8,8 @@ class HtmlParsingTest extends AnyFunSpec {
 
   describe("HTML parsing and sanitation") {
 
-    val KeepFilter: String => ElemFilter = _ => ElemFilter.Keep
+    val KeepFilter  : String => ElemFilter = _ => ElemFilter.Keep
+    val RemoveFilter: String => ElemFilter = _ => ElemFilter.Remove
 
     val expected = List[(String, String, String => ElemFilter)](
       ("""<a href="https://orbeon.com/">Link</a>"""                 , """<a href="https://orbeon.com/">Link</a>"""              , KeepFilter),
@@ -23,7 +24,10 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""Before <div>this is <i>italics</i>, etc.</div> after"""   , """Before <div>this is <i>italics</i>, etc.</div> after""", KeepFilter),
       ("""Before <div>this is <i>italics</i>, etc.</div> after"""   , """Before this is <i>italics</i>, etc. after"""           , s => if (s == "div") ElemFilter.Remove            else ElemFilter.Keep),
       ("""Before <div>this is <i>italics</i>, etc.</div> after"""   , """Before  after"""                                       , s => if (s == "div") ElemFilter.RemoveWithContent else ElemFilter.Keep),
-      // JVM: TagSoup removes element before we get to it, and keeps its content, so right now we can't make this work correctly cross-enviroment
+      ("""<i class="fa fa-fw fa-plus"></i> Create"""                , """ Create"""                                             , RemoveFilter),
+      ("""Let's <b>remove</b> all the <i>markup</i>!"""             , """Let's remove all the markup!"""                        , RemoveFilter),
+
+      // JVM: TagSoup removes element before we get to it, and keeps its content, so right now we can't make this work correctly cross-environment
 //      ("""This is a totally <custom>element</custom>"""             , """This is a totally element"""                           , KeepFilter),
     )
 

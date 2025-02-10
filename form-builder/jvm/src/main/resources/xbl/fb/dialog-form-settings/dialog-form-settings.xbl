@@ -1005,7 +1005,7 @@
                                 let $r := xxf:r(concat('buttons.', $i/for-button-name), '|fr-fr-resources|')
                                 return
                                     if (exists($r)) then
-                                        string(xf:parse(concat('&lt;span>', $r, '&lt;/span>')))
+                                        frf:removeHtmlTags($r)
                                     else
                                         $resources/dialog-form-settings/label
                             else

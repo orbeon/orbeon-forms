@@ -26,13 +26,13 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils, IndentedLogger}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils, HtmlParsing, IndentedLogger}
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{ElemFilter, SaxonUtils}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -567,6 +567,13 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
     (baseUrlFromProperty getOrElse baseUrlFromContext).appendSlash
   }
+
+  //@XPathFunction
+  def removeHtmlTags(html: String): String =
+    HtmlParsing.sanitizeHtmlString(
+      value           = html,
+      extraElemFilter = _ => ElemFilter.Remove
+    )
 }
 
 object FormRunnerBaseOps {

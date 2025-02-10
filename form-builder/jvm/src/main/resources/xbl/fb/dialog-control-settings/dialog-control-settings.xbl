@@ -135,7 +135,7 @@
                                    $process-name"/>
                     <xf:insert
                         context="instance('processes')"
-                        origin="xf:element($process-name, xxf:trim(string(xf:parse(concat('&lt;span>', $process-label, '&lt;/span>')))))"/>
+                        origin="xf:element($process-name, xxf:trim(frf:removeHtmlTags($process-label)))"/>
                 </xf:action>
 
                 <!-- Figure which one of label, hint, help, or text the control supports -->

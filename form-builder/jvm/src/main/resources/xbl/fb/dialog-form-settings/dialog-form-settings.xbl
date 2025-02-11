@@ -290,6 +290,28 @@
                     <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
+                <!-- Check for default template for backward compatibility -->
+                <!-- https://github.com/orbeon/orbeon-forms/issues/6782 -->
+                <xf:action if="doc-available('oxf:/forms/orbeon/builder/form/template.xml')">
+
+                    <xf:var name="template" value="doc('oxf:/forms/orbeon/builder/form/template.xml')"/>
+                    <xf:var name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
+
+                    <xf:insert
+                        context="instance('template-forms')"
+                        ref="_[1]"
+                        position="before"
+                        origin="
+                            xf:element(
+                                '_',
+                                (
+                                    xf:element('url', 'oxf:/forms/orbeon/builder/form/template.xml'),
+                                    ($metadata-instance//title[xxf:non-blank()], xf:element('title', xxf:r('dialog-form-settings.default-template', '|fr-form-resources|')))[1],
+                                    $metadata-instance//(description | thumbnail)[xxf:non-blank()]
+                                )
+                            )"/>
+                </xf:action>
+
                 <!-- Load form templates -->
                 <xf:send
                     if="$is-new-form and $max-templates gt count(instance('template-forms')/*)"
@@ -709,7 +731,7 @@
                 <xf:instance id="template-forms">
                     <_>
                         <_>
-                            <url>oxf:/forms/orbeon/builder/form/template.xml</url>
+                            <url>oxf:/forms/orbeon/builder/form/template-blank.xml</url>
                             <title xml:lang="en">Blank Form</title>
                             <title xml:lang="fr">Formulaire vide</title>
                             <description xml:lang="en">Use this template to start from scratch.</description>
@@ -727,7 +749,7 @@
                     </_>
                 </xf:instance>
 
-                <xf:instance id="fr-search-instance">
+                <xf:instance id="search-templates-instance">
                     <search xmlns="" return-all-indexed-fields="true">
                         <query/>
                         <query name="application-name"
@@ -756,7 +778,7 @@
 
                 <xf:submission
                     id="search-form-templates-submission"
-                    ref="instance('fr-search-instance')"
+                    ref="instance('search-templates-instance')"
                     validate="false"
                     method="post"
                     resource="/fr/service/persistence/search/orbeon/builder"

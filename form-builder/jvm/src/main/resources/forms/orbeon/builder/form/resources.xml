@@ -541,6 +541,7 @@
                 <label>Form Thumbnail</label>
                 <hint>Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template>Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control Settings: "{1}" / "{0}" ({2})</label>
@@ -2100,6 +2101,7 @@
                 <label>Image d'aperçu</label>
                 <hint>Pour les modèles et la page d'accueil</hint>
             </thumbnail>
+            <default-template>Modèle par défaut</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Paramètres du contrôle: "{1}" / "{0}" ({2})</label>
@@ -3643,6 +3645,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Rediger elementdetaljer: "{1}" / "{0}" ({2})</label>
@@ -5212,6 +5215,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Настройки элемента: "{1}" / "{0}" ({2})</label>
@@ -6781,6 +6785,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Impostazioni di controllo: "{1}" / "{0}" ({2})</label>
@@ -8314,6 +8319,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Einstellungen Steuerelemente: "{1}" / "{0}" ({2})</label>
@@ -9850,6 +9856,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Kontrolliyksityiskohdat: "{1}" / "{0}" ({2})</label>
@@ -11411,6 +11418,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configuración de Controles: "{1}" / "{0}" ({2})</label>
@@ -14514,6 +14522,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configurações do Controlo: "{1}" / "{0}" ({2})</label>
@@ -16082,6 +16091,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Inställningar för kontroll: "{1}" / "{0}" ({2})</label>

@@ -5372,6 +5372,47 @@
         </output>
     </test>
 
+    <test description="`xbl:handler` for event in outer scope" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:action event="xforms-ready">
+                            <xf:dispatch
+                                name="my-event"
+                                targetid="model"/>
+                        </xf:action>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:handlers>
+                                <xbl:handler event="my-event" observer="model" xxbl:scope="outer">
+                                    <xf:message>called</xf:message>
+                                </xbl:handler>
+                            </xbl:handlers>
+                            <xbl:template/>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:foo id="my-foo-1"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">called</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

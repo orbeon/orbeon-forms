@@ -171,7 +171,7 @@ class XFormsActionInterpreter(
           ("action name" -> actionQName.qualifiedName) ::
           (whileIterationAttribute.nonEmpty list ("while iteration" -> whileIteration.toString))
         ) {
-          // Push binding excluding excluding `@context` and `@model`
+          // Push binding excluding `@context` and `@model`
           // NOTE: If we repeat, re-evaluate the action binding.
           // For example:
           //

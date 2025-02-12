@@ -377,7 +377,7 @@
         <dialog-form-settings>
             <label>Form Settings</label>
             <save-as>Save as…</save-as>
-            <open><label>Form settings</label></open>
+            <open><label>Form Settings</label></open>
             <options>Form Options</options>
             <view-options>Appearance</view-options>
             <wizard-options>Wizard</wizard-options>
@@ -1074,7 +1074,7 @@
             <label>View Source</label>
         </dialog-view-source>
         <dialog-pdf>
-            <label>Attach PDF templates</label>
+            <label>PDF Templates</label>
             <pdf-upload>
                 <label>PDF File</label>
             </pdf-upload>
@@ -2637,7 +2637,7 @@
             <label>Code source</label>
         </dialog-view-source>
         <dialog-pdf>
-            <label>Joindre des modèles PDF</label>
+            <label>Modèles PDF</label>
             <pdf-upload>
                 <label>Fichier PDF</label>
             </pdf-upload>
@@ -3482,7 +3482,7 @@
         <dialog-form-settings>
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
-            <open><label todo="true">[Form settings]</label></open>
+            <open><label todo="true">[Form Settings]</label></open>
             <options todo="true">[Form Options]</options>
             <view-options todo="true">[Appearance]</view-options>
             <wizard-options todo="true">[Wizard]</wizard-options>

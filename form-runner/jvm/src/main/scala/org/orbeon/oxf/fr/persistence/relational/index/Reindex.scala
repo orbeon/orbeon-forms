@@ -197,7 +197,7 @@ trait Reindex extends FormDefinition {
         useAndClose(connection.prepareStatement(InsertIntoControlTextSql)) { insertIntoControlTextPS =>
           useAndClose(connection.prepareStatement(selectXmlSql)) { selectXmlPS =>
             paramSetter(currentDataPS)
-            useAndClose(currentDataPS.executeQuery()) { currentData =>
+            useAndClose(currentDataPS.executeQuery()) { currentDataRS =>
 
               // Info on indexed controls for a given app/form
               case class FormIndexedControls(
@@ -210,12 +210,12 @@ trait Reindex extends FormDefinition {
               // Go through each data document
               // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
               var prevIndexedControls: Option[FormIndexedControls] = None
-              while (currentData.next() && StatusStore.getStatus != Status.Stopping) {
+              while (currentDataRS.next() && StatusStore.getStatus != Status.Stopping) {
 
                 Backend.setProviderDocumentNext()
-                val app         = currentData.getString("app")
-                val form        = currentData.getString("form")
-                val formVersion = currentData.getInt   ("form_version")
+                val app         = currentDataRS.getString("app")
+                val form        = currentDataRS.getString("form")
+                val formVersion = currentDataRS.getInt   ("form_version")
 
                 // Get indexed controls for current app/form
                 val indexedControlsXPaths: List[String] = prevIndexedControls match {
@@ -237,22 +237,22 @@ trait Reindex extends FormDefinition {
                 // Insert into the "current data" table
                 val position = Iterator.from(1)
 
-                insertIntoCurrentPS.setInt      (position.next(), currentData.getInt("id"))
-                insertIntoCurrentPS.setTimestamp(position.next(), currentData.getTimestamp("created"))
-                insertIntoCurrentPS.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time"))
-                insertIntoCurrentPS.setString   (position.next(), currentData.getString("last_modified_by"))
-                insertIntoCurrentPS.setString   (position.next(), currentData.getString("username"))
-                insertIntoCurrentPS.setString   (position.next(), currentData.getString("groupname"))
-                RelationalUtils.getIntOpt(currentData, "organization_id") match {
+                insertIntoCurrentPS.setInt      (position.next(), currentDataRS.getInt("id"))
+                insertIntoCurrentPS.setTimestamp(position.next(), currentDataRS.getTimestamp("created"))
+                insertIntoCurrentPS.setTimestamp(position.next(), currentDataRS.getTimestamp("last_modified_time"))
+                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("last_modified_by"))
+                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("username"))
+                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("groupname"))
+                RelationalUtils.getIntOpt(currentDataRS, "organization_id") match {
                   case Some(id) => insertIntoCurrentPS.setInt(position.next(), id)
                   case None     => insertIntoCurrentPS.setNull(position.next(), java.sql.Types.INTEGER)
                 }
                 insertIntoCurrentPS.setString   (position.next(), app)
                 insertIntoCurrentPS.setString   (position.next(), form)
-                insertIntoCurrentPS.setInt      (position.next(), currentData.getInt("form_version"))
-                insertIntoCurrentPS.setString   (position.next(), currentData.getString("stage"))
-                insertIntoCurrentPS.setString   (position.next(), currentData.getString("document_id"))
-                insertIntoCurrentPS.setString   (position.next(), currentData.getString("draft"))
+                insertIntoCurrentPS.setInt      (position.next(), currentDataRS.getInt("form_version"))
+                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("stage"))
+                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("document_id"))
+                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("draft"))
                 insertIntoCurrentPS.addBatch()
                 currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
 
@@ -260,7 +260,7 @@ trait Reindex extends FormDefinition {
                 // - using lazy, as we might not need the data, if there are no controls to index
                 // - return root element, as XPath this is the node XPath expressions are relative to
                 lazy val dataRootElement: NodeInfo = {
-                  selectXmlPS.setInt(1, currentData.getInt("id"))
+                  selectXmlPS.setInt(1, currentDataRS.getInt("id"))
                   val document = useAndClose(selectXmlPS.executeQuery()) { selectXmlRS =>
                     selectXmlRS.next()
                     Provider.readXmlColumn(provider, selectXmlRS)
@@ -276,7 +276,7 @@ trait Reindex extends FormDefinition {
                     // For indexing, we are not interested in empty values
                     if (nodeValue.nonEmpty) {
                       val position = Iterator.from(1)
-                      insertIntoControlTextPS.setInt   (position.next(), currentData.getInt("id"))
+                      insertIntoControlTextPS.setInt   (position.next(), currentDataRS.getInt("id"))
                       insertIntoControlTextPS.setInt   (position.next(), pos + 1)
                       insertIntoControlTextPS.setString(position.next(), controlXPath)
                       insertIntoControlTextPS.setString(position.next(), nodeValue)

@@ -14,19 +14,19 @@
 package org.orbeon.oxf.fr.process
 
 import cats.syntax.option.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.permission.ModeType
+import org.orbeon.oxf.fr.persistence.S3
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -40,6 +40,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames.*
+import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
 import scala.language.postfixOps
@@ -52,7 +53,7 @@ trait FormRunnerActions
 
   self: XFormsActions => // for `tryCallback`
 
-  import FormRunnerRenderedFormat._
+  import FormRunnerRenderedFormat.*
 
   val AllowedFormRunnerActions: Map[String, Action] =
     CommonAllowedFormRunnerActions                        +
@@ -119,11 +120,8 @@ trait FormRunnerActions
 
       val currentFormLang = FormRunner.currentLang
 
-      val templateParams      = paramByNameUseAvt(params, "template").map("fr-template" -> _).toList
-      val templateMatchParam  = paramByNameUseAvt(params, "match").getOrElse("first")
-      val templateMatchParams = Seq("fr-match" -> templateMatchParam).toList
-      val pdfTiffParams =
-        for {
+      val urisByRenderedFormat =
+        (for {
           renderedFormat <- RenderedFormat.values.toList
           (uri, _)       <- renderedFormatPathOpt(
               urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
@@ -132,7 +130,12 @@ trait FormRunnerActions
               defaultLang          = currentFormLang
             )
         } yield
-          renderedFormat.entryName -> uri.toString
+          renderedFormat -> uri).toMap
+
+      val templateParams      = paramByNameUseAvt(params, "template").map("fr-template" -> _).toList
+      val templateMatchParam  = paramByNameUseAvt(params, "match").getOrElse("first")
+      val templateMatchParams = Seq("fr-match" -> templateMatchParam).toList
+      val pdfTiffParams       = urisByRenderedFormat.toList.map(kv => kv._1.entryName -> kv._2.toString)
 
       // https://github.com/orbeon/orbeon-forms/issues/5911
       val emailDataFormatVersion =
@@ -150,6 +153,48 @@ trait FormRunnerActions
           pdfTiffParams       :::
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )
+
+      val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
+
+      if (s3Store) {
+        // Retrieve S3 parameters either from action parameters or from properties
+        def fromParamsOrProperties(
+          name             : String,
+          default          : String,
+          defaultNamespaces: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+        ): (String, NamespaceMapping) =
+          paramByNameUseAvt(params, name)
+            .map((_, defaultNamespaces))
+            .orElse(formRunnerPropertyWithNs(s"oxf.fr.email.$name"))
+            .getOrElse((default, defaultNamespaces))
+
+        val (s3ConfigName, _               ) = fromParamsOrProperties("s3-config", default = "default")
+        val (s3Path      , s3PathNamespaces) = fromParamsOrProperties("s3-path"  , default = "")
+
+        implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+
+        val emailContentsTry = emailContents(
+          urisByRenderedFormat   = urisByRenderedFormat,
+          emailDataFormatVersion = emailDataFormatVersion,
+          matchAllTemplates      = templateMatchParam.trimAllToOpt.contains("all"),
+          language               = paramByNameUseAvt(params, "lang").getOrElse(currentFormLang), // Logic from createPdfOrTiffParams
+          templateNameOpt        = paramByNameUseAvt(params, "template")
+        )
+
+        val unitTry =
+          for {
+            emailContents <- emailContentsTry
+            s3Config      <- S3.Config.fromName(s3ConfigName)
+            _             <- {
+              // Implicits in for comprehensions supported in Scala 3 only
+              implicit val _s3Config: S3.Config = s3Config
+              storeEmailContentsToS3(emailContents, s3Path, s3PathNamespaces)
+            }
+          } yield ()
+
+        // Throw here in case of problem related to S3 storage of email contents
+        unitTry.get
+      }
 
       tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
     }

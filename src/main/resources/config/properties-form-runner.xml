@@ -322,6 +322,20 @@
         )
     </property>
 
+    <property as="xs:string" name="oxf.fr.email.s3-path.*.*">
+        concat(
+            fr:app-name(),
+            '/',
+            fr:form-name(),
+            '/',
+            fr:form-version(),
+            '/',
+            fr:document-id(),
+            '/',
+            current-dateTime()
+        )
+    </property>
+
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                       value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                            value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                   value="false"/>

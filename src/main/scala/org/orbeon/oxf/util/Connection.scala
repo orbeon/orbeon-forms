@@ -382,8 +382,6 @@ object Connection extends ConnectionTrait {
       connectionCtx : Option[ConnectionContextSupport.ConnectionContext]
     ): (CookieStore, ConnectionResult) = {
 
-      val normalizedUrlString = url.toString
-
       def isHttpOrHttps(scheme: UriScheme): Boolean =
         scheme == UriScheme.Http || scheme == UriScheme.Https
 

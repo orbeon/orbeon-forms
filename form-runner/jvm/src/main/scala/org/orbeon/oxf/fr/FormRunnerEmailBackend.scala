@@ -1,23 +1,31 @@
 package org.orbeon.oxf.fr
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom.{Element, Text}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
-import org.orbeon.oxf.fr.email.EmailMetadataParsing
+import org.orbeon.oxf.fr.email.{EmailContent, EmailMetadataParsing}
+import org.orbeon.oxf.fr.persistence.S3
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
+import org.orbeon.oxf.fr.process.RenderedFormat
+import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.PathUtils.PathOps
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, TryUtils, XPathCache}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
-import org.orbeon.scaxon.SimplePath.NodeInfoOps
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
 
+import java.net.URI
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 
 trait FormRunnerEmailBackend {
@@ -86,13 +94,13 @@ trait FormRunnerEmailBackend {
     values(formDefinition, formData, templateValues)
   }
 
-  private def values(
+  def values(
     formDefinition      : NodeInfo,
     formData            : NodeInfo,
     templateValues      : List[TemplateValue]
   ): SequenceIterator = {
 
-    val formDefinitionCtx  = new InDocFormRunnerDocContext(formDefinition)
+    val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
 
     templateValues.flatMap {
       // Control not in section template
@@ -114,21 +122,23 @@ trait FormRunnerEmailBackend {
         ).flatMap(_.holders).flatten
 
       case TemplateValue.Expression(expression) =>
-
-        val expressionWithProcessedVarReferences =
-          FormRunner.replaceVarReferencesWithFunctionCallsFromString(
-            elemOrAtt   = formDefinitionCtx.modelElem,
-            xpathString = expression,
-            avt         = false,
-            libraryName = "",
-            norewrite   = Array()
-          )
-
-        evaluatedExpressionAsStrings(formDefinition, expressionWithProcessedVarReferences)
+        evaluatedExpressionAsStrings(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression))
 
       case TemplateValue.Text(text) =>
         List(StringValue.makeStringValue(text))
     }
+  }
+
+  private def expressionWithProcessedVarReferences(formDefinition: NodeInfo, expression: String): String = {
+    val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
+
+    FormRunner.replaceVarReferencesWithFunctionCallsFromString(
+      elemOrAtt   = formDefinitionCtx.modelElem,
+      xpathString = expression,
+      avt         = false,
+      libraryName = "",
+      norewrite   = Array()
+    )
   }
 
   def evaluatedExpression(formDefinition: NodeInfo, expression: String): List[Any] = {
@@ -183,4 +193,99 @@ trait FormRunnerEmailBackend {
     }.map {
       StringValue.makeStringValue
     }
+
+  def emailContents(
+    urisByRenderedFormat    : Map[RenderedFormat, URI],
+    emailDataFormatVersion  : DataFormatVersion,
+    matchAllTemplates       : Boolean,
+    language                : String,
+    templateNameOpt         : Option[String]
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    formRunnerParams        : FormRunnerParams
+  ): Try[List[EmailContent]] = {
+
+    // Form definition
+    PersistenceApi.readPublishedFormDefinition(
+      appName  = formRunnerParams.app,
+      formName = formRunnerParams.form,
+      version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
+    ) map { case ((_, formDefinition), _) =>
+
+      // Parse email metadata
+      val emailMetadataNodeOpt = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
+      val emailMetadata        = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
+
+      // 1) Filter templates by language and name
+      val templatesFilteredByLanguageAndName = emailMetadata.templates.filter { template =>
+        (template.lang.isEmpty || template.lang.contains(language)) && templateNameOpt.forall(template.name == _)
+      }
+
+      // 2) Consider first template or all templates
+      val firstOrAllTemplates =
+        if (matchAllTemplates) templatesFilteredByLanguageAndName else templatesFilteredByLanguageAndName.take(1)
+
+      // 3) Consider only templates with enableIfTrue expression, if any, evaluating to true
+      val enabledTemplates = firstOrAllTemplates.filter { template =>
+        template.enableIfTrue.forall { expression =>
+          evaluatedExpressionAsBoolean(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression)).getBooleanValue
+        }
+      }
+
+      // TODO: check if steps 2) and 3) should be reversed (as of 2025-02-20, the XPL/XSL implementation does them in this order)
+
+      // For each email template, generate email content
+      enabledTemplates.map { template =>
+        EmailContent(
+          formDefinition         = formDefinition.rootElement,
+          formData               = frc.formInstance.root,
+          emailDataFormatVersion = emailDataFormatVersion,
+          urisByRenderedFormat   = urisByRenderedFormat,
+          template               = template,
+          parameters             = emailMetadata.params
+        )
+      }
+    }
+  }
+
+  def storeEmailContentsToS3(
+    emailContents           : List[EmailContent],
+    s3Path                  : String,
+    s3PathNamespaces        : NamespaceMapping
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    formRunnerParams        : FormRunnerParams,
+    s3Config                : S3.Config
+  ): Try[Unit] = {
+
+    // Evaluate S3 path prefix
+    val formData        = frc.formInstance.root
+    val s3PathPrefixOpt = s3Path.trimAllToOpt.flatMap(process.SimpleProcess.evaluateString(_, formData, s3PathNamespaces).trimAllToOpt)
+    val s3PathPrefix    = s3PathPrefixOpt.map(_.appendSlash).getOrElse("")
+
+    TryUtils.sequenceLazily(emailContents.flatMap(_.allAttachments)) { attachment =>
+      val key = s3PathPrefix + attachment.filename
+
+      val s3WriteTry = attachment.data match {
+        case Left(uri)        =>
+          // Attachment given as URI, stream/download it to S3
+          val connectionResult = PersistenceApi.connectPersistence(
+            method         = HttpMethod.GET,
+            pathQuery      = uri.toString,
+            formVersionOpt = Left(FormDefinitionVersion.Specific(formRunnerParams.formVersion)).some
+          )
+
+          S3.write(key, connectionResult.content.stream, connectionResult.content.contentLength)
+        case Right(byteArray) =>
+          // Attachment given as byte array, store it to S3 directly
+          S3.write(key, byteArray)
+      }
+
+      s3WriteTry
+    }.map {
+      _ => ()
+    }
+  }
 }

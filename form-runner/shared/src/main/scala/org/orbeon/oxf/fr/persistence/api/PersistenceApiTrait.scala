@@ -489,6 +489,7 @@ trait PersistenceApiTrait {
       .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, rfc1123HeaderName).map(Instant.ofEpochMilli))
 
   // TODO: call proxy directly?
+  // Works also for absolute URLs
   def connectPersistence(
     method            : HttpMethod,
     pathQuery         : String,

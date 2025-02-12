@@ -165,7 +165,8 @@ trait Reindex extends FormDefinition {
     }
 
     // Get all the row from orbeon_form_data that are "latest" and not deleted
-    val xmlCol = Provider.xmlColSelect(provider, "d")
+    val xmlCol         = Provider.xmlColSelect(provider, "d")
+    val selectXmlSql   = s"SELECT $xmlCol FROM orbeon_form_data d WHERE id = ?"
     val currentDataSql =
       s"""  SELECT d.id,
          |         d.created,
@@ -179,8 +180,7 @@ trait Reindex extends FormDefinition {
          |         d.form_version,
          |         d.stage,
          |         d.document_id,
-         |         d.draft,
-         |         $xmlCol
+         |         d.draft
          |$currentFromWhere
          |ORDER BY app, form, form_version
          |""".stripMargin
@@ -195,98 +195,104 @@ trait Reindex extends FormDefinition {
     useAndClose(connection.prepareStatement(currentDataSql)) { currentDataPS =>
       useAndClose(connection.prepareStatement(InsertIntoCurrentSql)) { insertIntoCurrentPS =>
         useAndClose(connection.prepareStatement(InsertIntoControlTextSql)) { insertIntoControlTextPS =>
-          paramSetter(currentDataPS)
-          useAndClose(currentDataPS.executeQuery()) { currentData =>
+          useAndClose(connection.prepareStatement(selectXmlSql)) { selectXmlPS =>
+            paramSetter(currentDataPS)
+            useAndClose(currentDataPS.executeQuery()) { currentData =>
 
-            // Info on indexed controls for a given app/form
-            case class FormIndexedControls(
-              app                  : String,
-              form                 : String,
-              formVersion          : Int,
-              indexedControlsXPaths: List[String]
-            )
+              // Info on indexed controls for a given app/form
+              case class FormIndexedControls(
+                app                  : String,
+                form                 : String,
+                formVersion          : Int,
+                indexedControlsXPaths: List[String]
+              )
 
-            // Go through each data document
-            // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
-            var prevIndexedControls: Option[FormIndexedControls] = None
-            while (currentData.next() && StatusStore.getStatus != Status.Stopping) {
+              // Go through each data document
+              // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
+              var prevIndexedControls: Option[FormIndexedControls] = None
+              while (currentData.next() && StatusStore.getStatus != Status.Stopping) {
 
-              Backend.setProviderDocumentNext()
-              val app         = currentData.getString("app")
-              val form        = currentData.getString("form")
-              val formVersion = currentData.getInt   ("form_version")
+                Backend.setProviderDocumentNext()
+                val app         = currentData.getString("app")
+                val form        = currentData.getString("form")
+                val formVersion = currentData.getInt   ("form_version")
 
-              // Get indexed controls for current app/form
-              val indexedControlsXPaths: List[String] = prevIndexedControls match {
-                case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControlsXPaths)) =>
-                  // Use indexed controls from previous iteration
-                  indexedControlsXPaths
-                case _ =>
-                  // Compute indexed controls reading the form definition
-                  val appForm = AppForm(app, form)
-                  PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, FormDefinitionVersion.Specific(formVersion)) match {
-                    case Failure(_) =>
-                      error(s"Can't index documents for $app/$form as form definition can't be found")
-                      Nil
-                    case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
-                      indexedFields.value
+                // Get indexed controls for current app/form
+                val indexedControlsXPaths: List[String] = prevIndexedControls match {
+                  case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControlsXPaths)) =>
+                    // Use indexed controls from previous iteration
+                    indexedControlsXPaths
+                  case _ =>
+                    // Compute indexed controls reading the form definition
+                    val appForm = AppForm(app, form)
+                    PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, FormDefinitionVersion.Specific(formVersion)) match {
+                      case Failure(_) =>
+                        error(s"Can't index documents for $app/$form as form definition can't be found")
+                        Nil
+                      case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
+                        indexedFields.value
+                    }
+                }
+
+                // Insert into the "current data" table
+                val position = Iterator.from(1)
+
+                insertIntoCurrentPS.setInt      (position.next(), currentData.getInt("id"))
+                insertIntoCurrentPS.setTimestamp(position.next(), currentData.getTimestamp("created"))
+                insertIntoCurrentPS.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time"))
+                insertIntoCurrentPS.setString   (position.next(), currentData.getString("last_modified_by"))
+                insertIntoCurrentPS.setString   (position.next(), currentData.getString("username"))
+                insertIntoCurrentPS.setString   (position.next(), currentData.getString("groupname"))
+                RelationalUtils.getIntOpt(currentData, "organization_id") match {
+                  case Some(id) => insertIntoCurrentPS.setInt(position.next(), id)
+                  case None     => insertIntoCurrentPS.setNull(position.next(), java.sql.Types.INTEGER)
+                }
+                insertIntoCurrentPS.setString   (position.next(), app)
+                insertIntoCurrentPS.setString   (position.next(), form)
+                insertIntoCurrentPS.setInt      (position.next(), currentData.getInt("form_version"))
+                insertIntoCurrentPS.setString   (position.next(), currentData.getString("stage"))
+                insertIntoCurrentPS.setString   (position.next(), currentData.getString("document_id"))
+                insertIntoCurrentPS.setString   (position.next(), currentData.getString("draft"))
+                insertIntoCurrentPS.addBatch()
+                currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
+
+                // Read data (XML)
+                // - using lazy, as we might not need the data, if there are no controls to index
+                // - return root element, as XPath this is the node XPath expressions are relative to
+                lazy val dataRootElement: NodeInfo = {
+                  selectXmlPS.setInt(1, currentData.getInt("id"))
+                  val document = useAndClose(selectXmlPS.executeQuery()) { selectXmlRS =>
+                    selectXmlRS.next()
+                    Provider.readXmlColumn(provider, selectXmlRS)
                   }
-              }
+                  document.descendant(*).head
+                }
 
-              // Insert into the "current data" table
-              val position = Iterator.from(1)
-
-              insertIntoCurrentPS.setInt      (position.next(), currentData.getInt("id"))
-              insertIntoCurrentPS.setTimestamp(position.next(), currentData.getTimestamp("created"))
-              insertIntoCurrentPS.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time"))
-              insertIntoCurrentPS.setString   (position.next(), currentData.getString("last_modified_by"))
-              insertIntoCurrentPS.setString   (position.next(), currentData.getString("username"))
-              insertIntoCurrentPS.setString   (position.next(), currentData.getString("groupname"))
-              RelationalUtils.getIntOpt(currentData, "organization_id") match {
-                case Some(id) => insertIntoCurrentPS.setInt(position.next(), id)
-                case None     => insertIntoCurrentPS.setNull(position.next(), java.sql.Types.INTEGER)
-              }
-              insertIntoCurrentPS.setString   (position.next(), app)
-              insertIntoCurrentPS.setString   (position.next(), form)
-              insertIntoCurrentPS.setInt      (position.next(), currentData.getInt("form_version"))
-              insertIntoCurrentPS.setString   (position.next(), currentData.getString("stage"))
-              insertIntoCurrentPS.setString   (position.next(), currentData.getString("document_id"))
-              insertIntoCurrentPS.setString   (position.next(), currentData.getString("draft"))
-              insertIntoCurrentPS.addBatch()
-              currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
-
-              // Read data (XML)
-              // - using lazy, as we might not need the data, if there are no controls to index
-              // - return root element, as XPath this is the node XPath expressions are relative to
-              lazy val dataRootElement: NodeInfo = {
-                val document = Provider.readXmlColumn(provider, currentData)
-                document.descendant(*).head
-              }
-
-              // Extract and insert value for each indexed control
-              for (controlXPath <- indexedControlsXPaths) {
-                val nodes = scaxon.XPath.evalNodes(dataRootElement, controlXPath, FbNamespaceMapping)
-                for ((node, pos) <- nodes.zipWithIndex) {
-                  val nodeValue = truncateValue(provider, node.getStringValue)
-                  // For indexing, we are not interested in empty values
-                  if (nodeValue.nonEmpty) {
-                    val position = Iterator.from(1)
-                    insertIntoControlTextPS.setInt   (position.next(), currentData.getInt("id"))
-                    insertIntoControlTextPS.setInt   (position.next(), pos + 1)
-                    insertIntoControlTextPS.setString(position.next(), controlXPath)
-                    insertIntoControlTextPS.setString(position.next(), nodeValue)
-                    insertIntoControlTextPS.addBatch()
-                    currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
+                // Extract and insert value for each indexed control
+                for (controlXPath <- indexedControlsXPaths) {
+                  val nodes = scaxon.XPath.evalNodes(dataRootElement, controlXPath, FbNamespaceMapping)
+                  for ((node, pos) <- nodes.zipWithIndex) {
+                    val nodeValue = truncateValue(provider, node.getStringValue)
+                    // For indexing, we are not interested in empty values
+                    if (nodeValue.nonEmpty) {
+                      val position = Iterator.from(1)
+                      insertIntoControlTextPS.setInt   (position.next(), currentData.getInt("id"))
+                      insertIntoControlTextPS.setInt   (position.next(), pos + 1)
+                      insertIntoControlTextPS.setString(position.next(), controlXPath)
+                      insertIntoControlTextPS.setString(position.next(), nodeValue)
+                      insertIntoControlTextPS.addBatch()
+                      currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
+                    }
                   }
                 }
+
+                // Pass current indexed controls to the next iteration
+                prevIndexedControls = Some(FormIndexedControls(app, form, formVersion, indexedControlsXPaths))
               }
 
-              // Pass current indexed controls to the next iteration
-              prevIndexedControls = Some(FormIndexedControls(app, form, formVersion, indexedControlsXPaths))
+              insertIntoCurrentPS.executeBatch()
+              insertIntoControlTextPS.executeBatch()
             }
-
-            insertIntoCurrentPS.executeBatch()
-            insertIntoControlTextPS.executeBatch()
           }
         }
       }

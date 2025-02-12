@@ -75,7 +75,15 @@
         </xbl:implementation>
 
         <xbl:handlers>
-            <!-- Hide the modal dialog when the lease is obtained successfully -->
+
+            <!-- In Form Builder, on load, show dialog if other user has the lease  -->
+            <xbl:handler event="xforms-enabled">
+                <xxf:show
+                    if="$is-fb and $fr-lease-state = 'other-user'"
+                    dialog="fr-lease-dialog"/>
+            </xbl:handler>
+
+            <!-- In Form Builder, hide the dialog when the lease is obtained successfully -->
             <xbl:handler event="xforms-submit-done" observer="fr-acquire-lease-submission" xxbl:scope="outer">
                 <xxf:hide dialog="fr-lease-dialog" xxbl:scope="inner"/>
             </xbl:handler>

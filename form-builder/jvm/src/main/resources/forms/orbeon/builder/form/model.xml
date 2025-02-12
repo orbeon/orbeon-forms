@@ -72,7 +72,7 @@
     <!-- Main instance -->
     <!-- Index ids on fb-form-instance for performance -->
     <xf:instance id="fb-form-instance" xxf:index="id"><_/></xf:instance>
-    <xf:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
+    <xf:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template-blank.xml"/>
 
     <!-- RPC request from the client -->
     <xf:action

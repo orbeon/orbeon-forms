@@ -2263,6 +2263,7 @@
                 <item id="upload-max-size-per-file" multiple="false">Taille maximale du fichier joint</item>
                 <item id="upload-max-size-per-file" multiple="true">Taille maximale par fichier joint</item>
                 <item id="upload-max-size-aggregate-per-control">Taille maximale de tous les fichiers joints du contrôle</item>
+                <item id="upload-max-files-per-control">Nombre maximum de fichiers par contrôle</item>
                 <item id="upload-mediatypes">Types de fichiers supportés</item>
                 <item id="excluded-dates">Dates à exclure</item>
             </constraint>
@@ -3808,6 +3809,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Maksimalt antall filer per kontroll</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -5377,6 +5379,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Максимальное количество файлов на элемент управления</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -6947,6 +6950,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Numero massimo di file per controllo</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -8481,6 +8485,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">Maximale Größe des Dateianhangs</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Maximale Anzahl Dateien pro Steuerelement</item>
                 <item id="upload-mediatypes">Erlaubte Dateitypen</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -10018,6 +10023,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Enimmäismäärä tiedostoja per kontrolli</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -11580,6 +11586,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Número máximo de archivos por control</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -13142,6 +13149,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">Maximum bijlagegrootte</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Maximaal aantal bestanden per besturingselement</item>
                 <item id="upload-mediatypes">Ondersteunde bestandstypen</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -14684,6 +14692,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Número máximo de arquivos por controle</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
@@ -16253,6 +16262,7 @@
                 <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
                 <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-files-per-control">Maximalt antal filer per kontroll</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
                 <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>

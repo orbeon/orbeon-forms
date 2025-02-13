@@ -490,6 +490,8 @@
 
                         <!-- Internal `xf:select1` so form author can access the itemset with `xxf:itemset()` -->
                         <xf:var name="result-raw" xxbl:scope="outer">
+                            <!-- So the control doesn't receive an `xforms-value-changed` when the itemset changes -->
+                            <xf:action event="xforms-value-changed" propagate="stop"/>
                             <xxf:value value="instance('result-raw')" xxbl:scope="inner"/>
                         </xf:var>
                         <xf:select1 ref="$binding" appearance="xxf:internal">

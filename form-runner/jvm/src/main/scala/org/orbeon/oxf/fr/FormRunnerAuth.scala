@@ -40,7 +40,7 @@ object FormRunnerAuth {
     Headers.OrbeonCredentials
   )
 
-  import Private._
+  import Private.*
 
   // We're using a distinct getAttribute parameter instead of adding getAttribute to the UserRolesFacade structural
   // type as doing so leads to weird runtime errors (NoClassDefFoundError related to javax vs jakarta packages). This
@@ -286,8 +286,8 @@ object FormRunnerAuth {
           case _ => List(value)
         }
 
-        def splitRoles(value: String) =
-          value split propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
+        def splitRoles(value: String): Array[String] =
+          propertySet.getPattern(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""").split(value)
 
         Credentials(
           userAndGroup  = UserAndGroup.fromStringsOrThrow(username, groupOpt.getOrElse("")),

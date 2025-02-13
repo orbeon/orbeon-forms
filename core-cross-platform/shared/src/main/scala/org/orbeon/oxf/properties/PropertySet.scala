@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
+import java.util.regex.Pattern
 import java.{lang as jl, util as ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
@@ -372,6 +373,14 @@ class PropertySet private (
   def getDateTimeOpt   (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDatetimeQname).map(_.asInstanceOf[ju.Date])
   def getQNameOpt      (name: String): Option[QName]          = getPropertyValueOpt(name, SomeXsQnameQname)   .map(_.asInstanceOf[QName])
   def getObjectOpt     (name: String): Option[AnyRef]         = getPropertyValueOpt(name, null)
+
+  def getPattern(propertyName: String, default: String): Pattern =
+    getPatternOpt(propertyName)
+    .getOrElse(Pattern.compile(default))
+
+  def getPatternOpt(propertyName: String): Option[Pattern] =
+    getPropertyOpt(propertyName)
+    .flatMap(_.associatedValue(_.nonBlankStringValue.map(Pattern.compile)))
 
   private def getPropertyValueOpt(name: String, typeToCheck: Option[QName]): Option[AnyRef] =
     getPropertyOptThrowIfTypeMismatch(name, typeToCheck).map(_.value)

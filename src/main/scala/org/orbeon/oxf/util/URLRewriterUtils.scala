@@ -216,12 +216,7 @@ object URLRewriterUtils {
 
   private def evaluateRegexProperty[T](propertyName: String, fn: Pattern => T): Option[T] =
     Properties.instance.getPropertySet
-      .getPropertyOpt(propertyName)
-      .flatMap { property =>
-        property
-          .associatedValue(_.nonBlankStringValue.map(Pattern.compile))
-          .map(fn)
-      }
+      .getPatternOpt(propertyName).map(fn)
 
   /**
    * Decode an absolute path with no context, depending on whether there is an app version or not.

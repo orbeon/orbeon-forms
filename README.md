@@ -4,7 +4,7 @@ Orbeon Forms
 Manage your web forms' entire lifecycle
 ---------------------------------------
 
-Last updated for Orbeon Forms 2024.1 (December 2024)
+Last updated for Orbeon Forms 2024.1.1 (February 2025)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -29,6 +29,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2023.1.7](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.7)
 - [Orbeon Forms 2024.1](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1)
 - [Orbeon Forms 2023.1.6](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.6)
 - [Orbeon Forms 2023.1.5](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.5)
@@ -199,4 +200,4 @@ Forms CE with the full-featured [YourKit Java Profiler](https://www.yourkit.com/
 
 ---
 
-Copyright 1999-2024 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2025 (C) Orbeon, Inc. All rights reserved.

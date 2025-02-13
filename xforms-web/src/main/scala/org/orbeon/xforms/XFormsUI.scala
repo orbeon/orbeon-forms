@@ -648,7 +648,7 @@ object XFormsUI {
     val attributes: js.UndefOr[js.Dictionary[String]]
     val children  : js.UndefOr[js.Array[ItemsetItem]]
     val label     : js.UndefOr[String]
-    val value     : String
+    val value     : js.UndefOr[String]
     val help      : js.UndefOr[String]
     val hint      : js.UndefOr[String]
   }
@@ -1247,12 +1247,12 @@ object XFormsUI {
       controlId        = controlId,
       itemsetTree      = js.Array(
         new ItemsetItem {
-          val attributes: UndefOr[Dictionary[String]]  = js.undefined // js.UndefOr[js.Dictionary[String]]
-          val children: UndefOr[js.Array[ItemsetItem]] = js.undefined
-          val label: UndefOr[String]                   = js.undefined
-          val value: String                            = true.toString
-          val help: UndefOr[String]                    = js.undefined
-          val hint: UndefOr[String]                    = js.undefined
+          val attributes: UndefOr[Dictionary[String]]    = js.undefined // js.UndefOr[js.Dictionary[String]]
+          val children  : UndefOr[js.Array[ItemsetItem]] = js.undefined
+          val label     : UndefOr[String]                = js.undefined
+          val value     : UndefOr[String]                = true.toString
+          val help      : UndefOr[String]                = js.undefined
+          val hint      : UndefOr[String]                = js.undefined
         }
       ),
       isSelect         = true,
@@ -1279,28 +1279,37 @@ object XFormsUI {
           val selectedValues =
             select.options.filter(_.selected).map(_.value)
 
-          def generateItem(itemElement: ItemsetItem): html.Element = {
+          def generateItem(itemElement: ItemsetItem): Option[html.Element] = {
 
             val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
 
-            itemElement.children.toOption match {
-              case None =>
-                dom.document.createOptionElement.kestrel { option =>
-                  option.value     = itemElement.value
-                  option.selected  = selectedValues.contains(itemElement.value)
-                  option.innerHTML = itemElement.label.getOrElse("")
-                  classOpt.foreach(option.className = _)
-                }
-              case Some(children) =>
-                dom.document.createOptGroupElement.kestrel { optgroup =>
-                  optgroup.label = itemElement.label.getOrElse("")
-                  classOpt.foreach(optgroup.className = _)
-                  optgroup.replaceChildren(children.map(generateItem).toList*)
-                }
+            (itemElement.children.toOption, itemElement.value.toOption) match {
+              case (None, Some(value)) =>
+                Some(
+                  dom.document.createOptionElement.kestrel { option =>
+                    option.value     = value
+                    option.selected  = itemElement.value.exists(selectedValues.contains)
+                    option.innerHTML = itemElement.label.getOrElse("")
+                    classOpt.foreach(option.className = _)
+                  }
+                )
+              case (Some(children), None) =>
+                Some(
+                  dom.document.createOptGroupElement.kestrel { optgroup =>
+                    optgroup.label = itemElement.label.getOrElse("")
+                    classOpt.foreach(optgroup.className = _)
+                    optgroup.replaceChildren(children.toList.flatMap(generateItem)*)
+                  }
+                )
+              case (Some(_), Some(_)) | (None, None) =>
+                // This should not happen
+                logger.error(s"Invalid itemset item has children and a value")
+                dom.console.log(itemElement)
+                None
             }
           }
 
-          select.replaceChildren(itemsetTree.toList.map(generateItem)*)
+          select.replaceChildren(itemsetTree.toList.flatMap(generateItem)*)
 
         case _ =>
           // This should not happen but if it does we'd like to know about it without entirely stopping the
@@ -1330,7 +1339,7 @@ object XFormsUI {
     val isReadonly = Controls.isReadonly(documentElement)
 
     // Remember currently-checked values
-    val checkedValues =
+    val checkedValues: Set[String] =
       into.children.flatMap { elem =>
         Option(elem.querySelector("input[type = checkbox], input[type = radio]").asInstanceOf[dom.html.Input])
           .filter(_.checked)
@@ -1370,8 +1379,8 @@ object XFormsUI {
         }
 
         val selectedClass =
-          if (checkedValues(itemElement.value)) "xforms-selected"
-          else                                  "xforms-deselected"
+          if (itemElement.value.exists(checkedValues)) "xforms-selected"
+          else                                         "xforms-deselected"
         span(cls := (selectedClass :: classOpt.toList mkString " ")) {
 
           def createInput: JsDom.TypedTag[html.Input] =
@@ -1381,8 +1390,8 @@ object XFormsUI {
               name     := groupNameOpt.getOrElse(controlId),
               value    := itemElement.value
             )(
-              checkedValues(itemElement.value).option(checked),
-              isReadonly                      .option(disabled)
+              itemElement.value.exists(checkedValues).option(checked),
+              isReadonly                             .option(disabled)
             )
 
           itemLabelNodesOpt match {

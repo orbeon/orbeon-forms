@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import java.util.List as JList
-import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -112,11 +112,18 @@ trait FormRunnerLang {
   // Public for unit tests
   def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
 
-    val request = CoreCrossPlatformSupport.externalContext.getRequest
+    // https://github.com/orbeon/orbeon-forms/issues/6788
+    lazy val doc = inScopeContainingDocument
 
-    def fromHeader  = request.getFirstHeaderIgnoreCase(frc.LiferayLanguageHeader) map cleanLanguage
-    def fromRequest = request.getFirstParamAsString(frc.LanguageParam)            map cleanLanguage
-    def fromSession = stringFromSession(request, frc.LanguageParam)
+    def fromHeader: Option[String] =
+      doc.getFirstHeaderIgnoreCase(frc.LiferayLanguageHeader).map(cleanLanguage)
+
+    def fromRequest: Option[String] =
+      doc.getFirstParamAsString(frc.LanguageParam) map cleanLanguage
+
+    def fromSession: Option[String] =
+      CoreCrossPlatformSupport.externalContext.getRequest.sessionOpt
+        .flatMap(stringFromSession(_, frc.LanguageParam))
 
     requestedLang.trimAllToOpt orElse
       fromHeader               orElse

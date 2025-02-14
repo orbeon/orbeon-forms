@@ -22,7 +22,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.http.SessionExpiredException
+import org.orbeon.oxf.http.{Headers, SessionExpiredException}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -651,6 +651,8 @@ trait ContainingDocumentRequest {
   }
 
   def headersGetter: String => Option[List[String]] = getRequestHeaders.get
+  def getFirstHeaderIgnoreCase(name: String): Option[String] = Headers.firstItemIgnoreCase(getRequestHeaders, name)
+  def getFirstParamAsString   (name: String): Option[String] = getRequestParameters.get(name).flatMap(_.headOption)
 
   def isPortletContainer       = _requestInformation.containerType == "portlet"
   def embeddingTypeFromHeaders = _requestInformation.embeddingType

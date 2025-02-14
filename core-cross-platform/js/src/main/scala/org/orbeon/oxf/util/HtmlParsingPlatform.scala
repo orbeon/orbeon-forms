@@ -6,6 +6,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import org.xml.sax.Attributes
 
+import scala.scalajs.js.JSConverters.*
 import scala.util.control.NonFatal
 
 
@@ -21,6 +22,8 @@ trait HtmlParsingPlatform {
 
       def processNode(node: dom.Node): Unit = node match {
         case e: html.Element =>
+
+          lazy val attsArray = e.attributes.toJSArray
 
           val atts =
             new Attributes {
@@ -40,8 +43,14 @@ trait HtmlParsingPlatform {
               override def getValue(index: Int): String =
                 if (index >= 0 && index < e.attributes.length) e.attributes(index).value else null
 
-              override def getIndex(uri: String, localName: String): Int = ???
-              override def getIndex(qName: String): Int = ???
+              // Not currently handling the namespace. In practice, we are getting called only for:
+              // `("http://orbeon.org/oxf/xml/formatting", "url-norewrite")`
+              override def getIndex(uri: String, localName: String): Int =
+                attsArray.indexWhere(_._1 == localName)
+
+              // In practice, not getting called
+              override def getIndex(qName: String): Int =
+                ???
 
               override def getType(uri: String, localName: String): String =
                 if (uri !=  "")

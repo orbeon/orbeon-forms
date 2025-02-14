@@ -72,7 +72,7 @@
     <!-- Main instance -->
     <!-- Index ids on fb-form-instance for performance -->
     <xf:instance id="fb-form-instance" xxf:index="id"><_/></xf:instance>
-    <xf:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template-blank.xml"/>
+    <xf:instance id="fr-form-instance"><_/></xf:instance>
 
     <!-- RPC request from the client -->
     <xf:action
@@ -197,7 +197,6 @@
 
         <xf:delete
             ref="$metadata/created-with-version"/>
-
         <xf:insert
             xmlns:version="java:org.orbeon.oxf.common.Version"
             context="$metadata"
@@ -463,8 +462,8 @@
                 <xf:property name="rendered-page-orientation"                 value="bind('rendered-page-orientation-bind')"/>
                 <xf:property name="rendered-page-size"                        value="bind('rendered-page-size-bind')"/>
                 <xf:property name="readonly-disable-calculate"                value="bind('readonly-disable-calculate-bind')"/>
-                <xf:property name="relevant"                                  value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
-                <xf:property name="readonly"                                  value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
+                <xf:property name="relevant"                                  value="()"/>
+                <xf:property name="readonly"                                  value="()"/>
                 <xf:property name="html-page-layout"                          value="bind('html-page-layout-bind')"/>
                 <xf:property name="density"                                   value="bind('density-bind')"/>
                 <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>
@@ -509,8 +508,8 @@
                 <xf:property name="rendered-page-orientation"                 value="bind('rendered-page-orientation-bind')"/>
                 <xf:property name="rendered-page-size"                        value="bind('rendered-page-size-bind')"/>
                 <xf:property name="readonly-disable-calculate"                value="bind('readonly-disable-calculate-bind')"/>
-                <xf:property name="relevant"                                  value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
-                <xf:property name="readonly"                                  value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
+                <xf:property name="relevant"                                  value="()"/>
+                <xf:property name="readonly"                                  value="()"/>
                 <xf:property name="html-page-layout"                          value="bind('html-page-layout-bind')"/>
                 <xf:property name="density"                                   value="bind('density-bind')"/>
                 <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>

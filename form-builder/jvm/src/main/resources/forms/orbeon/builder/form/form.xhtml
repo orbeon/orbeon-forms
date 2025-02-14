@@ -740,7 +740,9 @@
                 body-ref="$body">
 
                 <!-- Update title/description -->
-                <xf:action event="fb-update-metadata">
+                <xf:action
+                        event="fb-update-metadata"
+                        if="not(event('mode') = 'new')">
 
                     <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                     <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
@@ -947,11 +949,12 @@
                                     $control-settings-elems-to-preserve
                                 )
                             )"/>
-
+                </xf:action>
+                <xf:action
+                        event="fb-update-metadata"
+                        if="event('mode') = 'new' and xxf:non-blank(event('template-url'))">
                     <!-- Load a specific form template to get started -->
-                    <xf:send
-                        if="event('mode') = 'new' and xxf:non-blank(event('template-url'))"
-                        submission="fr-get-document-submission">
+                    <xf:send submission="fr-get-document-submission">
                         <xf:property name="data-or-draft" value="'data'"/>
                         <xf:property name="document-url"  value="event('template-url')"/>
                         <xf:property name="for"           value="'load-template'" xxf:tunnel="true"/>
@@ -960,7 +963,6 @@
                         <xf:property name="title"         value="event('title')" xxf:tunnel="true"/>
                         <xf:property name="description"   value="event('title')" xxf:tunnel="true"/>
                     </xf:send>
-
                 </xf:action>
                 <!-- Continuation of `fr-get-document-submission` after success loading the form template -->
                 <xf:action

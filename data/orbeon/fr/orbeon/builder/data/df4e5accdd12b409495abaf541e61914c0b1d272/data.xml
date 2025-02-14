@@ -1,0 +1,299 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:style>
+            .orbeon .xbl-fr-explanation {
+            	background-color: #eee;
+            	padding: 1em;
+            	border-radius: .5em;
+            }
+        </xh:style>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <dynamic-dropdown>
+                        <grid-2>
+                            <control-2/>
+                            <country-dropdown/>
+
+                        </grid-2>
+                    </dynamic-dropdown>
+                    <dependent-dropdowns>
+                        <grid-1>
+                            <control-4/>
+
+                            <state/>
+                            <city/>
+                            <zip/>
+                        </grid-1>
+
+                    </dependent-dropdowns>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="dynamic-dropdown-bind" ref="dynamic-dropdown" name="dynamic-dropdown">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="country-dropdown-bind" ref="country-dropdown" name="country-dropdown"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2"/>
+
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="dependent-dropdowns-bind" name="dependent-dropdowns"
+                         ref="dependent-dropdowns">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+
+                        <xf:bind id="state-bind" ref="state" name="state"/>
+                        <xf:bind id="city-bind" ref="city" name="city"/>
+                        <xf:bind id="zip-bind" ref="zip" name="zip"/>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"/>
+                    </xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon-features</application-name>
+                    <form-name>dependent-dropdowns</form-name>
+                    <title xml:lang="en">Orbeon Demo: Dependent Dropdowns</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+
+
+
+                    <allow-template-use>true</allow-template-use>
+                    <singleton>true</singleton>
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-4>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;This shows how dynamic dropdowns can depend from each other. This is the configuration:&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;
+&lt;div&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;State:&lt;/strong&gt; US State form control&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;City:&lt;/strong&gt; Dynamic Dropdown with Search
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Resource URL:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;/fr/service/custom/orbeon/zip-cities?state-abbreviation={$state}&amp;amp;zip={$zip}&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Choices formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;/*/city&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Label formula/Value formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;@name&lt;/span&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Zip:&lt;/strong&gt; Dynamic Dropdown with Search
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Resource URL:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;/fr/service/custom/orbeon/zip-zips?state-abbreviation={$state}&amp;amp;city={$city}&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Choices formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;/*/zip&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Label formula/Value formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;@code&lt;/span&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</text>
+                        </control-4>
+                        <control-2>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;This shows how the dynamic dropdown calls a simple service that returns a list of countries. This is the configuration:&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;
+&lt;div&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Country:&lt;/strong&gt; Dynamic Dropdown&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Resource URL:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;/fr/service/custom/orbeon/controls/countries?all=true&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Choices formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;/countries/country&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Label Formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;name&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Value formula:&lt;/strong&gt; &lt;span style="font-family: 'andale mono', monospace;"&gt;us-code&lt;/span&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</text>
+                        </control-2>
+                        <country-dropdown>
+                            <label>Country</label>
+                            <hint/>
+
+
+                        </country-dropdown>
+
+
+                        <state>
+                            <label>State</label>
+                            <hint/>
+                        </state>
+                        <city>
+                            <label>City</label>
+                            <hint/>
+
+
+                        </city>
+                        <zip>
+                            <label>Zip</label>
+                            <hint/>
+
+
+                        </zip>
+                        <dependent-dropdowns>
+                            <label>Dependent dropdowns</label>
+                        </dependent-dropdowns>
+                        <dynamic-dropdown>
+                            <label>Dynamic dropdown</label>
+                        </dynamic-dropdown>
+                        <grid-2/>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="dynamic-dropdown-section" bind="dynamic-dropdown-bind">
+                    <xf:label ref="$form-resources/dynamic-dropdown/label"/>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control"
+                                            bind="control-2-bind">
+                                <fr:text ref="$form-resources/control-2/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="country-dropdown-control"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="country-dropdown-bind">
+                                <xf:label ref="$form-resources/country-dropdown/label"/>
+                                <xf:hint ref="$form-resources/country-dropdown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="9">
+
+                        </fr:c>
+
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="dependent-dropdowns-section" bind="dependent-dropdowns-bind">
+                    <xf:label ref="$form-resources/dependent-dropdowns/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+
+
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control"
+                                            bind="control-4-bind">
+                                <fr:text ref="$form-resources/control-4/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="3">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         id="state-control"
+                                         bind="state-bind">
+                                <xf:label ref="$form-resources/state/label"/>
+                                <xf:hint ref="$form-resources/state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="city-control"
+                                                  bind="city-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/zip-cities?state-abbreviation={$state}&amp;zip={$zip}"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
+                                <xf:label ref="$form-resources/city/label"/>
+                                <xf:hint ref="$form-resources/city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/*/city">
+                                    <xf:label ref="@name"/>
+                                    <xf:value ref="@name"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3" h="1">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="zip-control"
+                                                  bind="zip-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/zip-zips?state-abbreviation={$state}&amp;city={$city}"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
+                                <xf:label ref="$form-resources/zip/label"/>
+                                <xf:hint ref="$form-resources/zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/*/zip">
+                                    <xf:label ref="@code"/>
+                                    <xf:value ref="@code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3" h="1"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

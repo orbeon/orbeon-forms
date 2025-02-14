@@ -47,15 +47,15 @@ case class RarelyUsedRequestContext(
   protocol               : String,
   remoteHost             : String,
   remoteAddr             : String,
-  requestedSessionIdValid: Boolean,
   authType               : String,
   secure                 : Boolean,
+  requestedSessionIdValid: Boolean,
   locale                 : ju.Locale,
   locales                : List[ju.Locale],
   pathTranslated         : String,
+  requestURL             : String,
   portletMode            : String,
   windowState            : String,
-  requestURL             : String,
 )
 
 object SafeRequestContext {
@@ -92,15 +92,15 @@ object SafeRequestContext {
           protocol                = request.getProtocol,
           remoteHost              = request.getRemoteHost,
           remoteAddr              = request.getRemoteAddr,
-          requestedSessionIdValid = request.isRequestedSessionIdValid,
           authType                = request.getAuthType,
           secure                  = request.isSecure,
+          requestedSessionIdValid = request.isRequestedSessionIdValid,
           locale                  = request.getLocale,
           locales                 = request.getLocales.asScala.toList,
           pathTranslated          = request.getPathTranslated,
+          requestURL              = request.getRequestURL,
           portletMode             = request.getPortletMode,
           windowState             = request.getWindowState,
-          requestURL              = request.getRequestURL
         )
     )(
       webAppContext      = webAppContext,

@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.fr
 
-import java.util.List as JList
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*
-import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath.*
 
+import java.util.List as JList
 import scala.jdk.CollectionConverters.*
 
 
@@ -33,7 +33,7 @@ import scala.jdk.CollectionConverters.*
 trait FormRunnerLang {
 
   // TEMP: Picked a different name or `fullOptJS` fails!
-  import FormRunnerLangPrivate._
+  import FormRunnerLangPrivate.*
 
   // The client passes "*" or blank to indicate that there is no current app/form name
   def getAppForm(app: String, form: String) = AppForm.isSpecificAppForm(app, form) option AppForm(app, form)
@@ -58,8 +58,8 @@ trait FormRunnerLang {
 
     val appForm = getAppForm(app, form)
 
-    val allowedFormLanguages = formLanguages.asScala.toList filter isAllowedLang(appForm)
-    val defaultLanguage = getDefaultLang(appForm)
+    val allowedFormLanguages = formLanguages.asScala.toList.filter(isAllowedLang(appForm))
+    val defaultLanguage      = getDefaultLang(appForm)
 
     // Reorder to put default language first if it is allowed
     if (allowedFormLanguages contains defaultLanguage)
@@ -76,7 +76,7 @@ trait FormRunnerLang {
     val appForm = getAppForm(app, form)
 
     val availableFormLangs  = getFormLangSelection(app, form, formLangs)
-    val actualRequestedLang = findRequestedLang(appForm, requestedLang) filter isAllowedLang(appForm)
+    val actualRequestedLang = findRequestedLang(appForm, requestedLang).filter(isAllowedLang(appForm))
 
     selectLangUseDefault(appForm, actualRequestedLang, availableFormLangs).orNull
   }
@@ -86,7 +86,7 @@ trait FormRunnerLang {
   //@XPathFunction
   def selectFormRunnerLang(app: String, form: String, requestedLang: String, formRunnerLangs: JList[String]): String = {
     val appForm = getAppForm(app, form)
-    val actualRequestedLang = findRequestedLang(appForm, requestedLang) filter isAllowedLang(appForm)
+    val actualRequestedLang = findRequestedLang(appForm, requestedLang).filter(isAllowedLang(appForm))
     selectLangUseDefault(appForm, actualRequestedLang, formRunnerLangs.asScala.toList).orNull
   }
 
@@ -94,16 +94,16 @@ trait FormRunnerLang {
   // If none is configured, return the global default "en"
   // Public for unit tests
   def getDefaultLang(appForm: Option[AppForm]): String = {
-    val suffix = appForm.toList flatMap (_.toList)
-    properties.getNonBlankString("oxf.fr.default-language" :: suffix mkString ".") map  cleanLanguage getOrElse "en"
+    val suffix = appForm.toList.flatMap(_.toList)
+    properties.getNonBlankString("oxf.fr.default-language" :: suffix mkString ".").map(cleanLanguage).getOrElse("en")
   }
 
   // Return a predicate telling whether a language is allowed based on properties. If app/form are specified, then the
   // result applies to that app/form, otherwise it is valid globally for Form Runner.
   // Public for unit tests
   def isAllowedLang(appForm: Option[AppForm]): String => Boolean = {
-    val suffix = appForm.toList flatMap (_.toList)
-    val set    = stringOptionToSet(properties.getNonBlankString("oxf.fr.available-languages" :: suffix mkString ".")) map cleanLanguage
+    val suffix = appForm.toList.flatMap(_.toList)
+    val set    = stringOptionToSet(properties.getNonBlankString("oxf.fr.available-languages" :: suffix mkString ".")).map(cleanLanguage)
     // If none specified via property or property contains a wildcard, all languages are considered available
     if (set.isEmpty || set("*")) _ => true else set
   }
@@ -169,25 +169,24 @@ trait FormRunnerLang {
       }
 
     def selectLangUseDefault(
-      appForm        : Option[AppForm],
-      requestedLang  : Option[String],
-      availableLangs : List[String]
+      appForm       : Option[AppForm],
+      requestedLang : Option[String],
+      availableLangs: List[String]
     ): Option[String] = {
 
-      def matchingLanguage = availableLangs intersect requestedLang.toList headOption
-      def defaultLanguage  = availableLangs intersect List(getDefaultLang(appForm)) headOption
-      def firstLanguage    = availableLangs headOption
+      def matchingLanguage = availableLangs.intersect(requestedLang.toList).headOption
+      def defaultLanguage  = availableLangs.intersect(List(getDefaultLang(appForm))).headOption
+      def firstLanguage    = availableLangs.headOption
 
       matchingLanguage orElse defaultLanguage orElse firstLanguage
     }
 
-    def stringFromSession(request: Request, name: String) =
-      request.sessionOpt flatMap
-        (_.getAttribute(frc.LanguageParam)) map {
+    def stringFromSession(session: ExternalContext.Session, name: String): Option[String] =
+      session.getAttribute(name)
+        .map {
           case item: Item => item.getStringValue
           case other      => other.toString
         }
-
   }
 }
 

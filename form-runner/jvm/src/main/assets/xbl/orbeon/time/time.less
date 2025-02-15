@@ -25,5 +25,9 @@
     input[type = "time"] {
         padding-top: 1px;
         padding-bottom: 1px;
+        // Fix alignment in iOS
+        &::-webkit-date-and-time-value {
+            padding-top: 4px;
+        }
     }
 }

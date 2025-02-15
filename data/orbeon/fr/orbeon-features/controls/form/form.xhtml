@@ -50,16 +50,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                     </typed-controls>
                     <date-time-controls>
-                        <grid-4><date-us/><date-eu/><date-iso/><dropdown-date/><fields-date/><native-date/>
+                        <grid-4>
+                            <date-us/>
+                            <date-eu/>
+                            <date-iso/>
+                            <dropdown-date/>
+                            <fields-date/>
+                            <native-date/>
 
 
 
                             <time/>
-                            <time-24hour/>
+                            <time-24hour/><native-time/>
 
 
                             <time-12hour-noseconds/>
-                            <time-24hour-noseconds/><datetime/>
+                            <time-24hour-noseconds/><native-time-noseconds/>
+                            <datetime/>
 
                         </grid-4>
                     </date-time-controls>
@@ -134,6 +141,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
+
                         </address-us>
                         <address-uk><grid-2>
                             <uk-address-line-1/>
@@ -146,8 +154,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </grid-2>
 
 
+
                         </address-uk>
                         <contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5>
+
 
 
 
@@ -187,19 +197,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"
-                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
 
 
-                        <xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time"
-                                 name="time-12hour-noseconds"
-                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
-                        <xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time"
-                                 name="time-24hour-noseconds"
-                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
-                        <xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour"
-                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
-                        <xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="date-iso-bind" ref="date-iso" name="date-iso" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/>
+                        <xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time" name="time-12hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time" name="time-24hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="date-iso-bind" ref="date-iso" name="date-iso" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/><xf:bind id="native-time-bind" ref="native-time" name="native-time" type="xf:time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="native-time-noseconds-bind" ref="native-time-noseconds" name="native-time-noseconds" type="xf:time" xxf:default="let $t := adjust-time-to-timezone(current-time(), ()),&#xA;    $s := seconds-from-time($t),&#xA;    $d := xs:dayTimeDuration(concat('PT', $s, 'S'))&#xA;return&#xA;    $t - $d"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
@@ -217,7 +227,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean" name="checkbox-input"/>
                         <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                         <xf:bind id="checkboxes-horizontal-bind" ref="checkboxes-horizontal" name="checkboxes-horizontal"/>
-                        <xf:bind id="radio-buttons-horizontal-bind" ref="radio-buttons-horizontal" name="radio-buttons-horizontal"/><xf:bind name="dynamic-dropdown-with-search-by-service" id="dynamic-dropdown-with-search-by-service-bind" ref="dynamic-dropdown-with-search-by-service"/><xf:bind id="open-selection-1-bind" ref="open-selection-1" name="open-selection-1" type="xf:boolean" xxf:default="false()"/><xf:bind id="open-selection-2-bind" ref="open-selection-2" name="open-selection-2" type="xf:boolean" xxf:default="false()"/>
+                        <xf:bind id="radio-buttons-horizontal-bind" ref="radio-buttons-horizontal" name="radio-buttons-horizontal"/>
+                        <xf:bind name="dynamic-dropdown-with-search-by-service" id="dynamic-dropdown-with-search-by-service-bind" ref="dynamic-dropdown-with-search-by-service"/>
+                        <xf:bind id="open-selection-1-bind" ref="open-selection-1" name="open-selection-1" type="xf:boolean" xxf:default="false()"/>
+                        <xf:bind id="open-selection-2-bind" ref="open-selection-2" name="open-selection-2" type="xf:boolean" xxf:default="false()"/>
 
                         <xf:bind name="dynamic-dropdown-with-search" id="dynamic-dropdown-with-search-bind" ref="dynamic-dropdown-with-search"/>
                         <xf:bind name="dynamic-dropdown-with-search-by-ui" id="dynamic-dropdown-with-search-by-ui-bind" ref="dynamic-dropdown-with-search-by-ui"/>
@@ -293,7 +306,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                     <library-versions>
-
+                        <_>1</_>
                     </library-versions>
 
 
@@ -321,7 +334,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <wizard-subsections-toc>all</wizard-subsections-toc>
                     <data-migration>enabled</data-migration>
                     <density>comfortable</density>
-                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2020.1 PE</updated-with-version><updated-with-version>2022.1 PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"textarea-resize"},{"value":"textarea-clipboard"},{"value":"input-clipboard"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"utility-controls"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-borderless"},{"value":"hidden-field"},{"value":"calculated-value-clipboard"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"us-phone"},{"value":"us-state"},{"value":"currency"},{"value":"number"},{"value":"currency-right"},{"value":"number-right"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date-us"},{"value":"date-eu"},{"value":"date-iso"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"native-date"},{"value":"time"},{"value":"time-24hour"},{"value":"time-12hour-noseconds"},{"value":"time-24hour-noseconds"},{"value":"datetime"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search-by-ui"},{"value":"open-selection-1"},{"value":"dynamic-dropdown-with-search"},{"value":"dynamic-dropdown-with-search-by-service"},{"value":"open-selection-2"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"checkbox-input"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"yesno-input"},{"value":"checkboxes-horizontal"},{"value":"radio-buttons-horizontal"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"static-video"},{"value":"image-attachment"},{"value":"video-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"primary-button"},{"value":"inverse-button"},{"value":"success-button"},{"value":"danger-button"},{"value":"warning-button"},{"value":"info-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"reusable-sections"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"},{"value":"control-4"}],"topLevel":false}]}</migration></metadata>
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2020.1 PE</updated-with-version><updated-with-version>2022.1 PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"textarea-resize"},{"value":"textarea-clipboard"},{"value":"input-clipboard"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"utility-controls"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-borderless"},{"value":"hidden-field"},{"value":"calculated-value-clipboard"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"us-phone"},{"value":"us-state"},{"value":"currency"},{"value":"number"},{"value":"currency-right"},{"value":"number-right"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date-us"},{"value":"date-eu"},{"value":"date-iso"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"native-date"},{"value":"time"},{"value":"time-24hour"},{"value":"native-time"},{"value":"time-12hour-noseconds"},{"value":"time-24hour-noseconds"},{"value":"native-time-noseconds"},{"value":"datetime"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search-by-ui"},{"value":"open-selection-1"},{"value":"dynamic-dropdown-with-search"},{"value":"dynamic-dropdown-with-search-by-service"},{"value":"open-selection-2"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"checkbox-input"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"yesno-input"},{"value":"checkboxes-horizontal"},{"value":"radio-buttons-horizontal"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"static-video"},{"value":"image-attachment"},{"value":"video-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"primary-button"},{"value":"inverse-button"},{"value":"success-button"},{"value":"danger-button"},{"value":"warning-button"},{"value":"info-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"reusable-sections"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"},{"value":"control-4"}],"topLevel":false}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -331,26 +344,44 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
             </xf:instance>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
-                    <resource xml:lang="en"><date-us><label>Date with US format</label><hint/>
+                    <resource xml:lang="en">
+                        <date-us>
+                            <label>Date with US format</label>
+                            <hint/>
 
 
-                        </date-us><date-eu><label>Date with European format</label><hint/>
+                        </date-us>
+                        <date-eu>
+                            <label>Date with European format</label>
+                            <hint/>
 
 
-                        </date-eu><date-iso><label>Date in ISO format</label><hint/>
+                        </date-eu>
+                        <date-iso>
+                            <label>Date in ISO format</label>
+                            <hint/>
 
 
-                        </date-iso><dropdown-date><label>Dropdown Date</label><hint>Date selector with dropdown menus</hint>
+                        </date-iso>
+                        <dropdown-date>
+                            <label>Dropdown Date</label>
+                            <hint>Date selector with dropdown menus</hint>
 
 
 
 
-                        </dropdown-date><fields-date><label>Fields Date</label><hint>Date selector with separate fields</hint>
+                        </dropdown-date>
+                        <fields-date>
+                            <label>Fields Date</label>
+                            <hint>Date selector with separate fields</hint>
 
 
 
 
-                        </fields-date><native-date><label>Browser Date</label><hint>Standard date field</hint>
+                        </fields-date>
+                        <native-date>
+                            <label>Browser Date</label>
+                            <hint>Standard date field</hint>
 
 
 
@@ -475,7 +506,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dynamic-dropdown-with-search-by-service>
                             <label>Dynamic Dropdown with service search</label>
                             <hint>Search done by the service</hint>
-                        </dynamic-dropdown-with-search-by-service><open-selection-2><label>Open Selection</label><hint/></open-selection-2>
+                        </dynamic-dropdown-with-search-by-service>
+                        <open-selection-2>
+                            <label>Open Selection</label>
+                            <hint/>
+                        </open-selection-2>
 
 
                         <checkboxes>
@@ -722,32 +757,43 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <time><label>12-Hour Time</label><hint>Standard time field</hint>
+                        <time>
+                            <label>12-Hour Time</label>
+                            <hint>Standard time field</hint>
 
 
 
 
                         </time>
-                        <time-24hour><label>24-Hour Time</label><hint>Standard time field</hint>
+                        <time-24hour>
+                            <label>24-Hour Time</label>
+                            <hint>Standard time field</hint>
 
 
 
 
-                        </time-24hour>
+                        </time-24hour><native-time><label>Browser Time</label><hint/></native-time>
 
 
-                        <time-12hour-noseconds><label>12-Hour Time (No Seconds)</label><hint>Standard time field</hint>
+                        <time-12hour-noseconds>
+                            <label>12-Hour Time (No Seconds)</label>
+                            <hint>Standard time field</hint>
 
 
 
 
                         </time-12hour-noseconds>
-                        <time-24hour-noseconds><label>24-Hour Time (No Seconds)</label><hint>Standard time field</hint>
+                        <time-24hour-noseconds>
+                            <label>24-Hour Time (No Seconds)</label>
+                            <hint>Standard time field</hint>
 
 
 
 
-                        </time-24hour-noseconds><datetime><label>Date and Time</label><hint>Standard date and time field</hint>
+                        </time-24hour-noseconds><native-time-noseconds><label>Browser Time (No Seconds)</label><hint/></native-time-noseconds>
+                        <datetime>
+                            <label>Date and Time</label>
+                            <hint>Standard date and time field</hint>
 
 
 
@@ -811,26 +857,44 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Image and File Attachments</label>
                         </attachment-controls>
                     </resource>
-                    <resource xml:lang="fr"><date-us><label>Date au format É.-U.</label><hint/>
+                    <resource xml:lang="fr">
+                        <date-us>
+                            <label>Date au format É.-U.</label>
+                            <hint/>
 
 
-                        </date-us><date-eu><label>Date au format Européen</label><hint/>
+                        </date-us>
+                        <date-eu>
+                            <label>Date au format Européen</label>
+                            <hint/>
 
 
-                        </date-eu><date-iso><label>Date au format ISO</label><hint/>
+                        </date-eu>
+                        <date-iso>
+                            <label>Date au format ISO</label>
+                            <hint/>
 
 
-                        </date-iso><dropdown-date><label>Date avec menus</label><hint>Sélecteur de date avec menus</hint>
+                        </date-iso>
+                        <dropdown-date>
+                            <label>Date avec menus</label>
+                            <hint>Sélecteur de date avec menus</hint>
 
 
 
 
-                        </dropdown-date><fields-date><label>Date avec champs</label><hint>Sélecteur de date avec champs séparés</hint>
+                        </dropdown-date>
+                        <fields-date>
+                            <label>Date avec champs</label>
+                            <hint>Sélecteur de date avec champs séparés</hint>
 
 
 
 
-                        </fields-date><native-date><label>Date du navigateur</label><hint>Champ date standard</hint>
+                        </fields-date>
+                        <native-date>
+                            <label>Date du navigateur</label>
+                            <hint>Champ date standard</hint>
 
 
 
@@ -957,7 +1021,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dynamic-dropdown-with-search-by-service>
                             <label>Menu déroulant dynamique avec recherche</label>
                             <hint>Recherche faite par le service</hint>
-                        </dynamic-dropdown-with-search-by-service><open-selection-2><label>Sélection ouverte</label><hint/></open-selection-2>
+                        </dynamic-dropdown-with-search-by-service>
+                        <open-selection-2>
+                            <label>Sélection ouverte</label>
+                            <hint/>
+                        </open-selection-2>
 
 
                         <checkboxes>
@@ -1204,32 +1272,43 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <time><label>Heure sur 12 heures</label><hint>Champ heure standard</hint>
+                        <time>
+                            <label>Heure sur 12 heures</label>
+                            <hint>Champ heure standard</hint>
 
 
 
 
                         </time>
-                        <time-24hour><label>Heure sur 24 heures</label><hint>Champ heure standard</hint>
+                        <time-24hour>
+                            <label>Heure sur 24 heures</label>
+                            <hint>Champ heure standard</hint>
 
 
 
 
-                        </time-24hour>
+                        </time-24hour><native-time><label/><hint/></native-time>
 
 
-                        <time-12hour-noseconds><label>Heure sur 12 heures (sans secondes)</label><hint>Champ heure sans secondes</hint>
+                        <time-12hour-noseconds>
+                            <label>Heure sur 12 heures (sans secondes)</label>
+                            <hint>Champ heure sans secondes</hint>
 
 
 
 
                         </time-12hour-noseconds>
-                        <time-24hour-noseconds><label>Heure sur 24 heures (sans secondes)</label><hint>Champ heure sans secondes</hint>
+                        <time-24hour-noseconds>
+                            <label>Heure sur 24 heures (sans secondes)</label>
+                            <hint>Champ heure sans secondes</hint>
 
 
 
 
-                        </time-24hour-noseconds><datetime><label>Date et heure</label><hint>Champ date et heure standard</hint>
+                        </time-24hour-noseconds><native-time-noseconds><label/><hint/></native-time-noseconds>
+                        <datetime>
+                            <label>Date et heure</label>
+                            <hint>Champ date et heure standard</hint>
 
 
 
@@ -1336,7 +1415,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </us-address-state><us-address-city xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                             <label>City</label>
                             <hint/>
-                        </us-address-city></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-us-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-address-us-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / address-us / v</xh:div><xf:label xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" ref="$form-resources/address-us/label"/><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-3-grid" bind="grid-3-bind" tab-order="columns">
+                        </us-address-city></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-us-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-address-us-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / address-us / v</xh:div><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-3-grid" bind="grid-3-bind" tab-order="columns">
                         <fr:c x="1" y="1" w="6">
                             <xf:input id="us-address-street-1-control" bind="us-address-street-1-bind" autocomplete="address-line1">
                                 <xf:label ref="$form-resources/us-address-street-1/label"/>
@@ -1428,7 +1507,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </uk-address-town><uk-address-postcode xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                             <label>Postcode</label>
                             <hint/>
-                        </uk-address-postcode></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-uk-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-address-uk-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / address-uk / v</xh:div><xf:label xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" ref="$form-resources/address-uk/label"/><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-2-grid" bind="grid-2-bind" tab-order="columns">
+                        </uk-address-postcode></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-uk-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-address-uk-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / address-uk / v</xh:div><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-2-grid" bind="grid-2-bind" tab-order="columns">
                         <fr:c x="1" y="1" w="6">
                             <xf:input id="uk-address-line-1-control" bind="uk-address-line-1-bind">
                                 <xf:label ref="$form-resources/uk-address-line-1/label"/>
@@ -1480,7 +1559,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="_-contact-information-component" element="component|contact-information" class="fr-section-component"><xbl:implementation><xf:model id="contact-information-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5></contact-information></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:email" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/></xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Contact information</label></contact-information><contact-information-first-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>First Name</label><hint/></contact-information-first-name><contact-information-phone xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Last Name</label><hint/></contact-information-phone><contact-information-email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Phone number</label><hint/></contact-information-email><control-4 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Email</label><hint/></control-4><contact-information-last-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Middle initial</label><hint/></contact-information-last-name></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="contact-information-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-contact-information-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / contact-information / v</xh:div><xf:label xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" ref="$form-resources/contact-information/label"/><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-grid" bind="grid-5-bind">
+                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="_-contact-information-component" element="component|contact-information" class="fr-section-component"><xbl:implementation><xf:model id="contact-information-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5></contact-information></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:email" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/></xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Contact information</label></contact-information><contact-information-first-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>First Name</label><hint/></contact-information-first-name><contact-information-phone xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Last Name</label><hint/></contact-information-phone><contact-information-email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Phone number</label><hint/></contact-information-email><control-4 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Email</label><hint/></control-4><contact-information-last-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Middle initial</label><hint/></contact-information-last-name></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="contact-information-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-contact-information-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / contact-information / v</xh:div><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-grid" bind="grid-5-bind">
               <fr:c x="1" y="1" w="4"><xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
                         <xf:label ref="$form-resources/contact-information-first-name/label"/>
                         <xf:hint ref="$form-resources/contact-information-first-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1703,51 +1782,70 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
                     <xf:label ref="$form-resources/date-time-controls/label"/>
                     <fr:grid columns="3" id="grid-4-grid" bind="grid-4-bind">
-                        <fr:c y="1" x="1" w="4"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-us-control" bind="date-us-bind" output-format="[M]/[D]/[Y]" field-width="natural">
+                        <fr:c y="1" x="1" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-us-control" bind="date-us-bind" output-format="[M]/[D]/[Y]" field-width="natural">
                                 <xf:label ref="$form-resources/date-us/label"/>
-                                <xf:hint ref="$form-resources/date-us/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/date-us/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:date>
 
                         </fr:c>
 
-                        <fr:c x="5" y="1" w="4"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-eu-control" bind="date-eu-bind" field-width="natural" output-format="[D]/[M]/[Y]">
+                        <fr:c x="5" y="1" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-eu-control" bind="date-eu-bind" field-width="natural" output-format="[D]/[M]/[Y]">
                                 <xf:label ref="$form-resources/date-eu/label"/>
-                                <xf:hint ref="$form-resources/date-eu/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/date-eu/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:date>
 
                         </fr:c>
-                        <fr:c y="1" x="9" w="4"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-iso-control" bind="date-iso-bind" field-width="natural" output-format="[Y]-[M01]-[D01]">
+                        <fr:c y="1" x="9" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-iso-control" bind="date-iso-bind" field-width="natural" output-format="[Y]-[M01]-[D01]">
                                 <xf:label ref="$form-resources/date-iso/label"/>
-                                <xf:hint ref="$form-resources/date-iso/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/date-iso/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:date>
 
-                        </fr:c><fr:c x="1" y="2" w="4"><fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
                                 <xf:label ref="$form-resources/dropdown-date/label"/>
-                                <xf:hint ref="$form-resources/dropdown-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/dropdown-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </fr:dropdown-date></fr:c><fr:c x="5" y="2" w="4"><fr:fields-date bind="fields-date-bind" id="fields-date-control">
+                            </fr:dropdown-date>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="4">
+                            <fr:fields-date bind="fields-date-bind" id="fields-date-control">
                                 <xf:label ref="$form-resources/fields-date/label"/>
-                                <xf:hint ref="$form-resources/fields-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/fields-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </fr:fields-date></fr:c><fr:c x="9" y="2" w="4"><fr:date bind="native-date-bind" id="native-date-control" ref="">
+                            </fr:fields-date>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4">
+                            <fr:date bind="native-date-bind" id="native-date-control" ref="">
                                 <xf:label ref="$form-resources/native-date/label"/>
-                                <xf:hint ref="$form-resources/native-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/native-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
 
-                            </fr:date></fr:c>
+                            </fr:date>
+                        </fr:c>
                         <fr:c y="3" x="1" w="4">
                             <fr:time bind="time-bind" id="time-control" field-width="natural" output-format="[h]:[m]:[s] [P,2-2]">
                                 <xf:label ref="$form-resources/time/label"/>
-                                <xf:hint ref="$form-resources/time/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/time/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:time>
@@ -1755,19 +1853,26 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c y="3" x="5" w="4">
                             <fr:time bind="time-24hour-bind" id="time-24hour-control" field-width="natural" output-format="[H]:[m]:[s]">
                                 <xf:label ref="$form-resources/time-24hour/label"/>
-                                <xf:hint ref="$form-resources/time-24hour/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/time-24hour/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:time>
 
                         </fr:c>
-                        <fr:c y="3" x="9" w="4">
+                        <fr:c y="3" x="9" w="4"><fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="native-time-control" bind="native-time-bind" native-picker="always" output-format="[h]:[m]:[s] [P,2-2]">
+                        <xf:label ref="$form-resources/native-time/label"/>
+                        <xf:hint ref="$form-resources/native-time/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:time>
 
                         </fr:c>
                         <fr:c x="1" y="4" w="4">
                             <fr:time bind="time-12hour-noseconds-bind" id="time-12hour-noseconds-control" field-width="natural" output-format="[h]:[m] [P,2-2]">
                                 <xf:label ref="$form-resources/time-12hour-noseconds/label"/>
-                                <xf:hint ref="$form-resources/time-12hour-noseconds/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/time-12hour-noseconds/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:time>
@@ -1775,19 +1880,31 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="5" y="4" w="4">
                             <fr:time bind="time-24hour-noseconds-bind" id="time-24hour-noseconds-control" field-width="natural" output-format="[H]:[m]">
                                 <xf:label ref="$form-resources/time-24hour-noseconds/label"/>
-                                <xf:hint ref="$form-resources/time-24hour-noseconds/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/time-24hour-noseconds/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:time>
                         </fr:c>
-                        <fr:c x="9" y="4" w="4">
+                        <fr:c x="9" y="4" w="4"><fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="native-time-noseconds-control" bind="native-time-noseconds-bind" native-picker="always" output-format="[h]:[m] [P,2-2]">
+                        <xf:label ref="$form-resources/native-time-noseconds/label"/>
+                        <xf:hint ref="$form-resources/native-time-noseconds/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
-                        </fr:c><fr:c x="1" y="5" w="7"><fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
+
+                    </fr:time>
+
+                        </fr:c>
+                        <fr:c x="1" y="5" w="7">
+                            <fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
                                 <xf:label ref="$form-resources/datetime/label"/>
-                                <xf:hint ref="$form-resources/datetime/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/datetime/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </fr:datetime></fr:c><fr:c x="8" y="5" w="1"/><fr:c x="9" y="5" w="4"/>
+                            </fr:datetime>
+                        </fr:c>
+                        <fr:c x="8" y="5" w="1"/>
+                        <fr:c x="9" y="5" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
@@ -1850,12 +1967,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
-                        <fr:c x="10" y="2" w="3"><fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-1-control" bind="open-selection-1-bind">
-                        <xf:label ref="$form-resources/open-selection-1/label"/>
-                        <xf:hint ref="$form-resources/open-selection-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:c x="10" y="2" w="3">
+                            <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-1-control" bind="open-selection-1-bind">
+                                <xf:label ref="$form-resources/open-selection-1/label"/>
+                                <xf:hint ref="$form-resources/open-selection-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:checkbox-input>
+                            </fr:checkbox-input>
 
                         </fr:c>
                         <fr:c x="1" y="3" w="4">
@@ -1879,12 +1998,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                     <xf:label ref="us-code"/>
                                     <xf:value ref="us-code"/>
                                 </xf:itemset>
-                            </fr:databound-select1></fr:c><fr:c x="10" y="3" w="3" h="1"><fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-2-control" bind="open-selection-2-bind">
-                        <xf:label ref="$form-resources/open-selection-2/label"/>
-                        <xf:hint ref="$form-resources/open-selection-2/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="10" y="3" w="3" h="1">
+                            <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-2-control" bind="open-selection-2-bind">
+                                <xf:label ref="$form-resources/open-selection-2/label"/>
+                                <xf:hint ref="$form-resources/open-selection-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:checkbox-input></fr:c>
+                            </fr:checkbox-input>
+                        </fr:c>
                         <fr:c y="4" x="1" w="4">
                             <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
                                 <xf:label ref="$form-resources/checkboxes/label"/>

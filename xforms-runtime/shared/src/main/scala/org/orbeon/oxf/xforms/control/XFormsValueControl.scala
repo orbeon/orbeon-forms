@@ -289,7 +289,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   ): Boolean =
     handleExternalValue && (
       previousControl match {
-        case Some(other: XFormsValueControl) =>
+        case Some(_: XFormsValueControl) =>
           previousExternalValue == externalValueOpt(collector) &&
             super.compareExternalUseExternalValue(previousExternalValue, previousControl, collector)
         case _ => false

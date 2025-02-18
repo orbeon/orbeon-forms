@@ -109,7 +109,7 @@ class XFormsValueComponentControl(
   override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
 
     def fromBinding =
-      staticControl.commonBinding.serializeExternalValueOpt flatMap { serializeExpr =>
+      staticControl.commonBinding.serializeExternalValueOpt.flatMap { serializeExpr =>
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(

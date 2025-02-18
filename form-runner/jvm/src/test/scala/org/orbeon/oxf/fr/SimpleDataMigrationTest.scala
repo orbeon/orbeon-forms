@@ -694,7 +694,8 @@ class SimpleDataMigrationTest
         SimpleDataMigration.diffSimilarXmlData(
           srcDocRootElem    = OldFormData.rootElement,
           dstDocRootElem    = NewFormData.rootElement,
-          isElementReadonly = _ => false)(
+          isElementReadonly = _ => false
+        )(
           formOps           = formOps)(
           mapBind           = formOps.bindNameOpt(_).getOrElse("[unknown]")
         )

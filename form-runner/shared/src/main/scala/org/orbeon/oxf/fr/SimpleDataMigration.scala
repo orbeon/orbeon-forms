@@ -458,7 +458,8 @@ object SimpleDataMigration {
     srcDocRootElem   : om.NodeInfo,
     dstDocRootElem   : om.NodeInfo,
     isElementReadonly: om.NodeInfo => Boolean)(
-    formOps          : FormOps)(
+    formOps          : FormOps
+  )(
     mapBind          : formOps.BindType => T
   ): List[FormDiff[T]] = {
 

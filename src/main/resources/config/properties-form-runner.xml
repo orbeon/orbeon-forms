@@ -212,7 +212,7 @@
     <property as="xs:string"  name="oxf.fr.detail.button.*.visible.*.*"                            value="fr:owns-lease-or-none-required()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                       value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.edit.visible.*.*"                         value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and fr:can-update()"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                      value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                      value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and fr:can-list()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                         value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.lease.show-in-view-mode.visible.*.*"      value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                          value="not(fr:is-browser-environment())"/>

@@ -397,6 +397,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   private val ReadOps   = Set("*", "read")
   private val UpdateOps = Set("*", "update")
   private val DeleteOps = Set("*", "delete")
+  private val ListOps   = Set("*", "list")
 
   def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
 
@@ -405,6 +406,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def canRead  : Boolean = (authorizedOperations intersect ReadOps)  .nonEmpty
   def canUpdate: Boolean = (authorizedOperations intersect UpdateOps).nonEmpty
   def canDelete: Boolean = (authorizedOperations intersect DeleteOps).nonEmpty
+  def canList  : Boolean = (authorizedOperations intersect ListOps).nonEmpty
 
   private def documentMetadataDate(name: String): Option[Long] =
     documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)

@@ -192,6 +192,7 @@ private object FormRunnerFunctions {
     "can-read"                    -> (() => FormRunner.canRead),
     "can-update"                  -> (() => FormRunner.canUpdate),
     "can-delete"                  -> (() => FormRunner.canDelete),
+    "can-list"                    -> (() => FormRunner.canList),
     "owns-lease-or-none-required" -> (() => FormRunner.userOwnsLeaseOrNoneRequired)
   )
 

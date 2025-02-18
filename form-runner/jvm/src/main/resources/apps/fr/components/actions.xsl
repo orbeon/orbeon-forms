@@ -698,7 +698,7 @@
                                         <xsl:for-each select="(*:variable | *:var)[@name = 'control-value']">
                                             <xf:var
                                                 name="{@name}"
-                                                value="{frf:replaceVarReferencesWithFunctionCallsFromString((@value | @select)[1], (@value | @select)[1], false(), (), $fr-form-model-vars)}"/>
+                                                value="{frf:replaceVarReferencesWithFunctionCallsFromString((@value | @select)[1], (@value | @select)[1], false(), $library-name, $fr-form-model-vars)}"/>
                                         </xsl:for-each>
 
                                         <!-- Set values (we choose to set all targets returned) -->

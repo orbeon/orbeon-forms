@@ -574,6 +574,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       value           = html,
       extraElemFilter = _ => ElemFilter.Remove
     )
+
+  //@XPathFunction
+  def sanitizeHtml(html: String): String =
+    HtmlParsing.sanitizeHtmlString(html)
 }
 
 object FormRunnerBaseOps {

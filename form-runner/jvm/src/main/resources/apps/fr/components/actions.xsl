@@ -834,16 +834,30 @@
     <!-- Match itemsets of controls which can be the target of an itemset action -->
     <xsl:template match="xf:itemset" mode="within-grid">
         <xsl:param name="itemset-action-control-names" tunnel="yes"/>
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:choose>
             <xsl:when test="frf:controlNameFromId(../@id) = $itemset-action-control-names">
                 <xsl:copy>
                     <!-- Update `@ref` attribute to disable the default itemset if an `@fr:itemsetid` attribute is present -->
-                    <xsl:if test="@ref">
+                    <xsl:if test="exists(@ref)">
                         <xsl:attribute
                             name="ref"
-                            select="concat('if (empty(@fr:itemsetid)) then ', @ref, ' else ()')"/>
-                   </xsl:if>
-                    <xsl:apply-templates select="@* except @ref | node()"/>
+                            select="
+                                concat(
+                                    'if (empty(@fr:itemsetid)) then ',
+                                    if (exists(fr:filter/fr:expr)) then
+                                        concat(
+                                            @ref,
+                                            '[boolean(',
+                                            frf:replaceVarReferencesWithFunctionCallsFromString(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
+                                            ')]'
+                                        )
+                                    else
+                                        @ref,
+                                    ' else ()'
+                                 )"/>
+                    </xsl:if>
+                    <xsl:apply-templates select="@* except @ref | node() except fr:filter"/>
                 </xsl:copy>
                 <!-- Add new itemset which kicks in if an `@fr:itemsetid` attribute is present -->
                 <xf:itemset ref="id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item">
@@ -854,6 +868,23 @@
                     <xf:value ref="value"/>
                     <xf:hint ref="hint"/>
                 </xf:itemset>
+            </xsl:when>
+            <xsl:when test="exists(fr:filter/fr:expr)">
+                <!-- Only check for the filter -->
+                <xsl:copy>
+                    <xsl:if test="exists(@ref)">
+                        <xsl:attribute
+                            name="ref"
+                            select="
+                                concat(
+                                    @ref,
+                                    '[boolean(',
+                                    frf:replaceVarReferencesWithFunctionCallsFromString(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
+                                    ')]'
+                                )"/>
+                    </xsl:if>
+                    <xsl:apply-templates select="@* except @ref | node() except fr:filter"/>
+                </xsl:copy>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:next-match/>

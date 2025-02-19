@@ -1105,6 +1105,9 @@
             <remove-all>
                 <label>Remove All</label>
             </remove-all>
+            <filter>
+                <label>Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>
@@ -2668,6 +2671,9 @@
             <remove-all>
                 <label>Tout supprimer</label>
             </remove-all>
+            <filter>
+                <label>Formule filtre</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editeur de services HTTP</label>
@@ -4211,6 +4217,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjenesteredigering</label>
@@ -5781,6 +5790,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Редактор HTTP-сервисов</label>
@@ -7344,6 +7356,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore servizi HTTP</label>
@@ -8880,6 +8895,9 @@
             <remove-all>
                 <label>Alle entfernen</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
@@ -10418,6 +10436,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>
@@ -11981,6 +12002,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor de Servicios HTTP</label>
@@ -13551,6 +13575,9 @@
             <remove-all>
                 <label>Alles verwijderen</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP service-editor</label>
@@ -15093,6 +15120,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor do serviço HTTP</label>
@@ -16664,6 +16694,9 @@
             <remove-all>
                 <label todo="true">[Remove All]</label>
             </remove-all>
+            <filter>
+                <label todo="true">Filter Formula</label>
+            </filter>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjänster</label>

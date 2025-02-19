@@ -41,6 +41,7 @@
                 <xf:setvalue ref="control-value"        value="fbf:findControlBoundNodeByEffectiveId($control-effective-id)"/>
                 <xf:setvalue ref="appearance"           value="event('control-element')/@appearance"/>
                 <xf:setvalue ref="html"                 value="fbf:isItemsetHTMLMediatype($control-name)"/>
+                <xf:setvalue ref="filter"               value="event('control-element')/xf:itemset[1]/fr:filter/fr:expr"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
 
@@ -88,6 +89,21 @@
                     fbf:setControlItems($i/control-name, $i/items),
                     fbf:setItemsetHTMLMediatype($i/control-name, $i/html)
                 </xf:action>
+                <xf:var name="control" value="fbf:findControlByNameOrEmpty($i/control-name)"/>
+                <xf:delete
+                    ref="$control/xf:itemset[1]/fr:filter"/>
+                <xf:action if="xxf:non-blank($i/filter)">
+                    <xf:insert
+                        context="$control/xf:itemset[1]"
+                        origin="
+                            xf:element(
+                                'fr:filter',
+                                xf:element(
+                                    'fr:expr',
+                                    string($i/filter)
+                                )
+                            )"/>
+                </xf:action>
             </xbl:handler>
 
             <!-- Add line when users press enter -->
@@ -97,7 +113,7 @@
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
-                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                <xf:instance id="i">
                     <instance>
                         <control-effective-id/>
                         <control-name/>     <!-- So we can find back the control when saving if users change the name -->
@@ -112,6 +128,7 @@
                             <enabled/>      <!-- A node that is always enabled -->
                             <disabled/>     <!-- A node that is always disabled -->
                         </triggers>
+                        <filter/>
                     </instance>
                 </xf:instance>
 
@@ -131,6 +148,13 @@
                     </xf:bind>
                 </xf:bind>
                 <xf:bind ref="triggers/disabled" readonly="true()"/>
+                <xf:bind
+                    ref="filter"
+                    type="xxf:XPath2"
+                    xxf:whitespace="trim"
+                    required="false()"
+                    constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/control-name, $i/control-name))"
+                />
 
             </xf:model>
         </xbl:implementation>
@@ -141,12 +165,12 @@
             <!-- Actual dialog -->
             <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">
                 <xf:label ref="$resources/dialog-itemsets/label"/>
-                <xh:div class="fb-dialog-body fb-hide-alert">
+                <xh:div class="fb-dialog-body">
 
                     <fb:language-choice ref="$i/lang"/>
 
                     <!-- Only allow HTML for full appearance -->
-                    <fr:checkbox-input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox">
+                    <fr:checkbox-input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox fb-hide-alert">
                         <xf:label ref="$resources/messages/lhha-checkbox"/>
                     </fr:checkbox-input>
 
@@ -154,7 +178,7 @@
 <!--                        <xf:var name="control-element" value="fbf:findControlByNameOrEmpty($i/control-name)"/>-->
                         <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
                              decide to remove support for legacy mode. -->
-                        <fr:grid id="fb-itemset-repeat" repeat="true" ref="item" template="$i/template/item">
+                        <fr:grid id="fb-itemset-repeat" repeat="true" ref="item" template="$i/template/item" class="fb-hide-alert">
                             <xh:tr>
                                 <xh:td>
                                     <xf:input ref="label[@lang = $i/lang]" id="fb-itemset-label-input" class="fb-itemset-label-input">
@@ -198,6 +222,14 @@
                             </xh:tr>
                         </fr:grid>
                     </xf:group>
+                    <fr:grid>
+                        <fr:c x="1" y="1" w="12" h="1">
+                            <xf:input ref="filter" appearance="xpath-completion" xpath-completion-updates="">
+                                <xf:label ref="xxf:r('dialog-itemsets.filter.label', '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('components.parameters-editor.xpath.alert', '|fr-form-resources|')"/>
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
 
                     <xh:div class="fr-dialog-buttons">
                         <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left">

@@ -425,7 +425,7 @@ trait CreateUpdateDelete {
           case None =>
             // Form definition: update index for this form version
             // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-            WhatToReindex.DataForForm(req.appForm, versionToSet)
+            WhatToReindex.DataForForm((req.appForm, versionToSet))
         }
 
         withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {

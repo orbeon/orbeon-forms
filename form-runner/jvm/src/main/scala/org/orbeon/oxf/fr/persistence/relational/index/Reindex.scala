@@ -61,15 +61,15 @@ trait Reindex extends FormDefinition {
           List("document_id = ?"),
           (ps: PreparedStatement) => ps.setString(1, id)
         )
-        case DataForForm(appForm, version) => (
+        case DataForForm((AppForm(app, form), version)) => (
           List(
             "app = ?",
             "form = ?",
             "form_version = ?"
           ),
           (ps: PreparedStatement) => {
-            ps.setString(1, appForm.app)
-            ps.setString(2, appForm.form)
+            ps.setString(1, app)
+            ps.setString(2, form)
             ps.setInt   (3, version)
           }
         )

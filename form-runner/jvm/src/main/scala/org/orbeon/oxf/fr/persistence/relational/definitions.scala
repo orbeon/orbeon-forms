@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.persistence.relational
 
 import cats.Eval
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.persistence.relational.index.Index.matchForControl
 import org.orbeon.oxf.util.MarkupUtils.*
@@ -30,9 +31,9 @@ case class EncryptionAndIndexDetails(
 
 sealed trait WhatToReindex
 object WhatToReindex {
-  case object AllData                                     extends WhatToReindex
-  case class  DataForDocumentId(documentId: String)       extends WhatToReindex
-  case class  DataForForm(appForm: AppForm, version: Int) extends WhatToReindex
+  case object AllData                               extends WhatToReindex
+  case class  DataForDocumentId(documentId: String) extends WhatToReindex
+  case class  DataForForm(appForm: AppFormVersion)  extends WhatToReindex
 }
 
 case class SummarySettings(

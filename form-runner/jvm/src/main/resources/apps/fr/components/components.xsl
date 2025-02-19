@@ -679,6 +679,13 @@
             $is-detail and
             p:property(string-join(('oxf.fr.navbar.revision-history.enable', $app, $form), '.'))"/>
 
+     <xsl:variable
+        name="allow-navbar-workflow-stage"
+        as="xs:boolean"
+        select="
+            $is-detail and
+            p:property(string-join(('oxf.fr.navbar.workflow-stage.enable', $app, $form), '.'))"/>
+
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"

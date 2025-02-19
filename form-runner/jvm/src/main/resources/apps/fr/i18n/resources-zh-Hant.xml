@@ -373,6 +373,9 @@
         <available-to>
             <message>此表單不再可用</message>
         </available-to>
+        <workflow-stage>
+            <label todo="true">Stage</label>
+        </workflow-stage>
     </detail>
     <save-locally>
         <dialog-title>本地保存</dialog-title>

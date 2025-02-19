@@ -373,6 +373,9 @@
         <available-to>
             <message>This form isn't available anymore</message>
         </available-to>
+        <workflow-stage>
+            <label>Stage</label>
+        </workflow-stage>
     </detail>
     <save-locally>
         <dialog-title>Save Locally</dialog-title>

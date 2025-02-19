@@ -373,6 +373,9 @@
         <available-to>
             <message>Ez az űrlap már nem érhető el</message>
         </available-to>
+        <workflow-stage>
+            <label todo="true">Stage</label>
+        </workflow-stage>
     </detail>
     <save-locally>
         <dialog-title>Helyi mentés</dialog-title>

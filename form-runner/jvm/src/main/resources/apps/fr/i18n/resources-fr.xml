@@ -376,6 +376,9 @@
         <available-to>
             <message>Ce formulaire n'est plus disponible</message>
         </available-to>
+        <workflow-stage>
+            <label>Étape</label>
+        </workflow-stage>
     </detail>
     <save-locally>
         <dialog-title>Enregistrer Localement</dialog-title>

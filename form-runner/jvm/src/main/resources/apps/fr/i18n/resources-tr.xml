@@ -373,6 +373,9 @@
         <available-to>
             <message>Bu form artık kullanılabilir değil</message>
         </available-to>
+        <workflow-stage>
+            <label todo="true">Stage</label>
+        </workflow-stage>
     </detail>
     <save-locally>
         <dialog-title>Yerel Olarak Kaydet</dialog-title>

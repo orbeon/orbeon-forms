@@ -71,7 +71,6 @@
         .navbar-brand {
             img {
                 max-height: 20px;
-
             }
         }
 
@@ -86,12 +85,29 @@
                 padding-left: .75em;
                 padding-right: .75em;
                 line-height: normal;
+                column-gap: 5px;
 
                 .fr-language-choice {
-                    margin-left: auto; // So this and what follows aligned to the left
+                    margin-left: auto;   // so this and what follows aligned to the left
+                    white-space: nowrap; // so that the menu arrow doesn't move under the language in narrow layout
+                }
+
+                .fr-workflow-stage {
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    display: flex;
+                    align-items: baseline;
+                    label, output {
+                        color: white;
+                    }
+                    label:after {
+                        content: ":"
+                    }
                 }
 
                 .fr-revision-history {
+                    padding-left: 5px;
+                    padding-right: 5px;
                     .btn-link {
                         padding: 0;
                     }
@@ -290,7 +306,6 @@
 
     // Language and mode selectors
     .fr-goto-content, .fr-status-icons, .fr-revision-history {
-        margin-right: 10px;
 
         .navbar-inverse & {
             .btn-link .fa {

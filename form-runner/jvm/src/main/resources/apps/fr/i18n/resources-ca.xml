@@ -386,6 +386,9 @@
         <available-to>
             <message todo="true">This form isn't available anymore</message>
         </available-to>
+        <workflow-stage>
+            <label todo="true">Stage</label>
+        </workflow-stage>
     </detail>
     <save-locally>
         <dialog-title>Guardar localment</dialog-title>

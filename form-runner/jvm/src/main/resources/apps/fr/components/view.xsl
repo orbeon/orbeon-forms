@@ -573,9 +573,7 @@
                         <fr:title/>
                         <!-- These are typically to the right -->
                         <fr:language-selector/>
-<!--                        <xh:div>-->
-<!--                            xxx: <xf:output value="fr:workflow-stage-value()"/>-->
-<!--                        </xh:div>-->
+                        <fr:navbar-workflow-stage/>
                         <fr:share-icon/>
                         <fr:revision-history-icon/>
                         <fr:status-icons/>
@@ -968,6 +966,15 @@
                     dialog="fr-share-dialog"/>
             </xf:trigger>
         </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:navbar-workflow-stage[$allow-navbar-workflow-stage]">
+        <xf:output
+            class="fr-workflow-stage"
+            appearance="minimal"
+            ref="fr:workflow-stage-value()[xxf:non-blank()]">
+            <xf:label ref="xxf:r('detail.workflow-stage.label', '|fr-fr-resources|')"/>
+        </xf:output>
     </xsl:template>
 
     <xsl:template match="fr:revision-history-icon[$allow-revision-history]">

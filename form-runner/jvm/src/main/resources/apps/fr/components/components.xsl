@@ -39,25 +39,26 @@
     <xsl:import href="legacy-repeat.xsl"/>    <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
-    <xsl:variable name="app"  select="doc('input:instance')/*/app" as="xs:string"/>
+    <xsl:variable name="app"  select="doc('input:instance')/*/app"  as="xs:string"/>
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
     <xsl:variable
         name="is-readonly-mode"
-        select="$mode = ('view', 'pdf', 'tiff', 'test-pdf', 'email', 'controls')" as="xs:boolean"/>
+        as="xs:boolean"
+        select="$mode = ('view', 'pdf', 'tiff', 'test-pdf', 'email', 'controls')"/>
 
     <!-- Same logic as `fr:is-service-path()` -->
     <xsl:variable
         name="is-service-path"
-        select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"/>
 
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
-        select="$is-service-path and $mode = ('new', 'edit', 'export')"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="$is-service-path and $mode = ('new', 'edit', 'export')"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
     <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>

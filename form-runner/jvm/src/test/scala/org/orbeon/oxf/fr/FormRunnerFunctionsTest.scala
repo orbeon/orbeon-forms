@@ -103,7 +103,7 @@ class FormRunnerFunctionsTest
         it (s"must default to `en` for `$v` requested language") {
           withTestExternalContext { _ =>
             withActionAndDoc(setupDocument(source)) {
-              assert(Some("en") == findRequestedLang(getAppForm(App, Form), v))
+              assert(findRequestedLang(getAppForm(App, Form), v).contains("en"))
             }
           }
         }
@@ -112,7 +112,7 @@ class FormRunnerFunctionsTest
         it(s"must find requested language for `$v`") {
           withTestExternalContext { _ =>
             withActionAndDoc(setupDocument(source)) {
-              assert(Some(v) == findRequestedLang(getAppForm(App, Form), v))
+              assert(findRequestedLang(getAppForm(App, Form), v).contains(v))
             }
           }
         }
@@ -121,7 +121,7 @@ class FormRunnerFunctionsTest
         withTestExternalContext { _ =>
           withActionAndDoc(setupDocument(source)) {
             NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-language", "fr")
-            assert(Some("fr") == findRequestedLang(getAppForm(App, Form), null))
+            assert(findRequestedLang(getAppForm(App, Form), null).contains("fr"))
           }
         }
       }
@@ -129,7 +129,7 @@ class FormRunnerFunctionsTest
       it("must use requested language even if a language is present in session") {
         withTestExternalContext { _ =>
           withActionAndDoc(setupDocument(source)) {
-            assert(Some("it") == findRequestedLang(getAppForm(App, Form), "it"))
+            assert(findRequestedLang(getAppForm(App, Form), "it").contains("it"))
           }
         }
       }
@@ -702,30 +702,30 @@ class FormRunnerFunctionsTest
           (
             "attachment",
             List(
-              ("filename"  -> "IMG_9847.jpg"),
-              ("mediatype" -> "image/jpeg"),
-              ("size"      -> "124073"),
-              ("name"      -> "_")
+              "filename"  -> "IMG_9847.jpg",
+              "mediatype" -> "image/jpeg",
+              "size"      -> "124073",
+              "name"      -> "_"
             ),
             "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/045c3dfbe8b56144f996fc3f9c2e59e19735b3f8.bin"
           ),
           (
             "attachment",
             List(
-              ("filename"  -> "IMG_9842.jpg"),
-              ("mediatype" -> "image/jpeg"),
-              ("size"      -> "115511"),
-              ("name"      -> "multiple")
+              "filename"  -> "IMG_9842.jpg",
+              "mediatype" -> "image/jpeg",
+              "size"      -> "115511",
+              "name"      -> "multiple"
             ),
             "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/c8a7e3e9f23e9e3c0d27943c2eb8fcd382ac1711.bin"
           ),
           (
             "attachment",
             List(
-              ("filename"  -> "IMG_9844.jpg"),
-              ("mediatype" -> "image/jpeg"),
-              ("size"      -> "122218"),
-              ("name"      -> "multiple")
+              "filename"  -> "IMG_9844.jpg",
+              "mediatype" -> "image/jpeg",
+              "size"      -> "122218",
+              "name"      -> "multiple"
             ),
             "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/6f6e4b83923bf72e0e4e1dba602746824ffc5ccd.bin"
           )

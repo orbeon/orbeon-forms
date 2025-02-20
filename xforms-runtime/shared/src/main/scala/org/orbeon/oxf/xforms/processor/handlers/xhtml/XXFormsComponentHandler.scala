@@ -61,6 +61,13 @@ class XXFormsComponentHandler(
       classes.append(' ')
 
     classes.append(matched.commonBinding.cssClasses)
+    // https://github.com/orbeon/orbeon-forms/issues/6707
+    // If the component doesn't have a direct binding, it doesn't have a CSS name either. In that case, we still want to
+    // add a CSS class based on the element name.
+    if (matched.commonBinding.cssName.isEmpty) {
+      classes.append(" xbl-")
+      classes.append(matched.element.getQName.qualifiedName.replace(':', '-'))
+    }
   }
 
   // This scenario is probably not useful right now, see:

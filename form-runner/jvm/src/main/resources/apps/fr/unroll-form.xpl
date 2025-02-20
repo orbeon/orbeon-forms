@@ -67,7 +67,8 @@
                         'fr-disable-calculate',
                         'fr-disable-default',
                         'fr-disable-relevant',
-                        'fr-internal-validate-selection-controls-choices'
+                        'fr-internal-validate-selection-controls-choices',
+                        'fr-use-pdf-template'
                     )]</include>
             </config>
         </p:input>

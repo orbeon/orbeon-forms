@@ -54,6 +54,11 @@
         as="xs:boolean"
         select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"/>
 
+    <xsl:variable
+        name="is-pdf-mode"
+        select="$mode = ('pdf', 'test-pdf', 'email')"
+        as="xs:boolean"/>
+
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
@@ -61,11 +66,12 @@
         select="$is-service-path and $mode = ('new', 'edit', 'export')"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
-    <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
-    <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
+    <xsl:variable name="fr-form-model"       select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
+    <xsl:variable name="fr-form-model-id"    select="generate-id($fr-form-model)"/>
 
-    <xsl:variable name="fr-form-metadata" select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
-    <xsl:variable name="fr-form-resources" select="($fr-form-model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>
+    <xsl:variable name="fr-form-metadata"    select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
+    <xsl:variable name="fr-form-resources"   select="($fr-form-model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>
+    <xsl:variable name="fr-form-attachments" select="($fr-form-model/xf:instance[@id = 'fr-form-attachments']/*)[1]"/>
 
     <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', 'landing', ''))" as="xs:boolean"/>
     <xsl:variable name="is-summary"          select="$mode = 'summary'"                               as="xs:boolean"/>
@@ -76,6 +82,33 @@
     <xsl:variable name="bs5"                 select="$is-landing"                                     as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
+
+    <xsl:variable
+        name="use-pdf-template"
+        select="
+            $is-pdf-mode                            and
+            $fr-form-attachments/pdf/p:trim() != '' and
+            not(
+                (
+                    (: TODO: should check `$is-service-path`? :)
+                    doc('input:request')/*/method = 'POST'
+                ) and
+                    doc('input:request')/*/parameters/parameter[
+                        name  = 'fr-use-pdf-template' and
+                        value = ('true', 'false')
+                    ]/value/xs:boolean(.) = false()
+            )"
+        as="xs:boolean"/>
+
+    <!-- Move static readonly detection here -->
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6707-->
+    <xsl:variable
+        name="is-static-readonly"
+        select="
+            $mode = 'view' or (
+                $is-pdf-mode and not($use-pdf-template)
+            )"
+        as="xs:boolean"/>
 
     <!-- Actions -->
     <xsl:variable
@@ -663,6 +696,47 @@
             else
                 map:merge(())"/>
 
+    <!-- TODO: should have `frf:` function for this -->
+    <xsl:variable
+        name="date-native-picker"
+        as="xs:string?"
+        select="
+            (
+                (: From form metadata :)
+                $fr-form-metadata/xbl/fr:date/@native-picker/string(),
+                (: From properties :)
+                p:property(
+                    string-join(
+                        (
+                            'oxf.xforms.xbl.fr.date.native-picker',
+                            $app,
+                            $form
+                        ),
+                        '.'
+                    )
+                )[normalize-space()]
+            )[1]"/>
+
+    <xsl:variable
+        name="time-native-picker"
+        as="xs:string?"
+        select="
+            (
+                (: From form metadata :)
+                $fr-form-metadata/xbl/fr:time/@native-picker/string(),
+                (: From properties :)
+                p:property(
+                    string-join(
+                        (
+                            'oxf.xforms.xbl.fr.time.native-picker',
+                            $app,
+                            $form
+                        ),
+                        '.'
+                    )
+                )[normalize-space()]
+            )[1]"/>
+
     <xsl:variable
         name="section-insert"
         as="xs:string?"
@@ -783,25 +857,17 @@
         <!-- Model receiving input parameters -->
         <xf:model
             id="fr-parameters-model"
-            xxf:readonly-appearance="{{
-                for $mode in fr:mode()
-                return
-                    if (
-                        $mode = 'view' or (
-                            $mode = ('pdf', 'test-pdf', 'email') and not(fr:use-pdf-template())
-                        )
-                    ) then
-                        'static'
-                    else
-                        'dynamic'
-            }}"
-            xxf:encrypt-item-values="{{
-                for $mode in fr:mode()
-                return not(
-                    $mode = ('pdf', 'test-pdf', 'email') and
-                    fr:use-pdf-template()
+            xxf:readonly-appearance="{
+                if ($is-static-readonly) then
+                    'static'
+                else
+                    'dynamic'
+            }"
+            xxf:encrypt-item-values="{
+                not(
+                    $is-pdf-mode and $use-pdf-template
                 )
-            }}"
+            }"
             xxf:order="{{
                 xxf:property(
                     string-join(

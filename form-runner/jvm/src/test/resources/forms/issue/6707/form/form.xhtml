@@ -1,0 +1,674 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xf="http://www.w3.org/2002/xforms">
+    <xh:head>
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model">
+            <xf:instance id="fr-form-instance" xxf:index="id">
+                <form>
+
+
+
+                    <date-time-controls>
+                        <grid-4>
+                            <date-us/>
+                            <time/>
+                            <datetime/>
+
+
+                            <dropdown-date/>
+                            <fields-date/>
+                            <native-date/>
+                            <native-time/>
+                            <number-with-suffix>299792458</number-with-suffix>
+                            <currency>10.99</currency>
+                            <currency-with-prefix>10.99</currency-with-prefix>
+
+                            <dropdown-pdf-radio-buttons>cat</dropdown-pdf-radio-buttons>
+                            <dropdown-pdf-value>cat</dropdown-pdf-value>
+                            <dynamic-dropdown itemset-empty="false">ca</dynamic-dropdown>
+                            <calculated-value>Great love and great achievements involve great risk.</calculated-value>
+                            <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless>
+                            <calculated-value-clipboard>Great love and great achievements involve great risk.</calculated-value-clipboard>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        </grid-4>
+                    </date-time-controls>
+
+
+
+
+
+
+
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+
+                <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
+                    <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+
+
+
+
+
+
+
+
+
+
+                        <xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date"
+                                 xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+
+                        <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"
+                                 xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"
+                                 xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+
+
+                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"
+                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"
+                                 xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/>
+                        <xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date"
+                                 xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind ref="number-with-suffix" id="number-with-suffix-bind" name="number-with-suffix"
+                                 type="xf:decimal"/>
+
+                        <xf:bind id="native-time-bind" ref="native-time" name="native-time" type="xf:time"
+                                 xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="dropdown-pdf-radio-buttons-bind" ref="dropdown-pdf-radio-buttons"
+                                 name="dropdown-pdf-radio-buttons"/>
+                        <xf:bind id="dropdown-pdf-value-bind" ref="dropdown-pdf-value" name="dropdown-pdf-value"/>
+                        <xf:bind ref="calculated-value" id="calculated-value-bind" name="calculated-value"/>
+                        <xf:bind ref="calculated-value-borderless" id="calculated-value-borderless-bind"
+                                 name="calculated-value-borderless"/>
+                        <xf:bind ref="calculated-value-clipboard" id="calculated-value-clipboard-bind"
+                                 name="calculated-value-clipboard"/>
+                        <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
+                        <xf:bind ref="currency-with-prefix" id="currency-with-prefix-bind" type="xf:decimal"
+                                 name="currency-with-prefix"/>
+                        <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"/>
+
+                    </xf:bind>
+                </xf:bind>
+
+
+
+
+
+
+
+
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6707</form-name>
+                    <title xml:lang="en">In view, label of date and number fields isn't not read #6707</title>
+                    <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
+                    <created-with-version>2024.1 PE</created-with-version>
+                    <updated-with-version>2024.1 PE</updated-with-version>
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <singleton>true</singleton>
+                    <wizard>false</wizard>
+                    <wizard-subsections-nav>true</wizard-subsections-nav>
+                    <wizard-separate-toc>false</wizard-separate-toc>
+                    <wizard-section-status>false</wizard-section-status>
+                    <wizard-mode>free</wizard-mode>
+                    <wizard-subsections-toc>all</wizard-subsections-toc>
+                    <data-migration>enabled</data-migration>
+                    <density>comfortable</density>
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf name="" lang="" filename="my-template.pdf" mediatype="application/pdf" size="81260">/fr/service/persistence/crud/orbeon/builder/data/448573f4219e6c12bd2e3d544d00cd638bfb6d3d/2589752ebeacecebb9f02c292ea2327c85b9c872.bin</pdf>
+
+                </attachments>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
+                <resources>
+                    <resource xml:lang="en">
+                        <date-us>
+                            <label>Date with US format</label>
+                            <hint/>
+
+
+                        </date-us>
+                        <time>
+                            <label>12-Hour Time</label>
+                            <hint>Standard time field</hint>
+
+
+
+
+                        </time>
+                        <datetime>
+                            <label>Date and Time</label>
+                            <hint>Standard date and time field</hint>
+
+
+
+
+                        </datetime>
+
+
+                        <dropdown-date>
+                            <label>Dropdown Date</label>
+                            <hint>Date selector with dropdown menus</hint>
+
+
+
+
+                        </dropdown-date>
+                        <fields-date>
+                            <label>Fields Date</label>
+                            <hint>Date selector with separate fields</hint>
+
+
+
+
+                        </fields-date>
+                        <native-date>
+                            <label>Browser Date</label>
+                            <hint>Standard date field</hint>
+
+
+
+
+
+
+
+
+                        </native-date>
+                        <native-time>
+                            <label>Browser Time</label>
+                            <hint/>
+                        </native-time>
+                        <number-with-suffix>
+                            <label>Number with suffix</label>
+                            <hint>Number field with validation</hint>
+
+
+                        </number-with-suffix>
+                        <currency>
+                            <label>Currency</label>
+                            <hint>Currency field</hint>
+                        </currency>
+                        <currency-with-prefix>
+                            <label>Currency with prefix</label>
+                            <hint>Currency field</hint>
+
+
+                        </currency-with-prefix>
+
+                        <dropdown-pdf-radio-buttons>
+                            <label>Dropdown (PDF shows radio buttons)</label>
+                            <hint/>
+
+
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </dropdown-pdf-radio-buttons>
+                        <dropdown-pdf-value>
+                            <label>Dropdown (PDF shows value)</label>
+                            <hint/>
+
+
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </dropdown-pdf-value>
+                        <dynamic-dropdown>
+                            <label>Dynamic Dropdown</label>
+                            <hint/>
+                        </dynamic-dropdown>
+                        <calculated-value>
+                            <label>Calculated Value</label>
+                            <hint>Standard text output with a label</hint>
+
+
+                        </calculated-value>
+                        <calculated-value-borderless>
+                            <label>Calculated Value without border</label>
+                            <hint>Standard text output with a label but no border</hint>
+                        </calculated-value-borderless>
+                        <calculated-value-clipboard>
+                            <label>Calculated Value with Clipboard Copy</label>
+                            <hint>Standard text output with a label and copy</hint>
+
+
+                        </calculated-value-clipboard>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <date-time-controls>
+
+                        </date-time-controls>
+
+
+                    </resource>
+
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+
+
+                <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
+
+                    <fr:grid columns="3" id="grid-4-grid" bind="grid-4-bind">
+                        <fr:c y="1" x="1" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="date-us-control"
+                                     bind="date-us-bind"
+                                     output-format="[M]/[D]/[Y]"
+                                     field-width="natural">
+                                <xf:label ref="$form-resources/date-us/label"/>
+                                <xf:hint ref="$form-resources/date-us/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:date>
+
+                        </fr:c>
+
+                        <fr:c x="5" y="1" w="4">
+                            <fr:time bind="time-bind" id="time-control" field-width="natural"
+                                     output-format="[h]:[m]:[s] [P,2-2]">
+                                <xf:label ref="$form-resources/time/label"/>
+                                <xf:hint ref="$form-resources/time/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:time>
+
+
+                        </fr:c>
+                        <fr:c y="1" x="9" w="4">
+                            <fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
+                                <xf:label ref="$form-resources/datetime/label"/>
+                                <xf:hint ref="$form-resources/datetime/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:datetime>
+
+
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
+                                <xf:label ref="$form-resources/dropdown-date/label"/>
+                                <xf:hint ref="$form-resources/dropdown-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:dropdown-date>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="4">
+                            <fr:fields-date bind="fields-date-bind" id="fields-date-control">
+                                <xf:label ref="$form-resources/fields-date/label"/>
+                                <xf:hint ref="$form-resources/fields-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:fields-date>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4">
+
+                        </fr:c>
+                        <fr:c y="3" x="1" w="4">
+                            <fr:date bind="native-date-bind" id="native-date-control" ref="" native-picker="always">
+                                <xf:label ref="$form-resources/native-date/label"/>
+                                <xf:hint ref="$form-resources/native-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:date>
+
+                        </fr:c>
+                        <fr:c y="3" x="5" w="4">
+                            <fr:time xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava"
+                                     id="native-time-control"
+                                     bind="native-time-bind"
+                                     native-picker="always"
+                                     output-format="[h]:[m]:[s] [P,2-2]">
+                                <xf:label ref="$form-resources/native-time/label"/>
+                                <xf:hint ref="$form-resources/native-time/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:time>
+
+
+                        </fr:c>
+                        <fr:c y="3" x="9" w="4">
+
+
+                        </fr:c>
+
+
+
+                        <fr:c x="1" y="4" w="4">
+                            <fr:number id="number-with-suffix-control" digits-after-decimal="0"
+                                       bind="number-with-suffix-bind"
+                                       suffix="m/s">
+                                <xf:label ref="$form-resources/number-with-suffix/label"/>
+                                <xf:hint ref="$form-resources/number-with-suffix/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </fr:number>
+
+                        </fr:c>
+                        <fr:c x="5" y="4" w="4">
+
+                        </fr:c>
+                        <fr:c x="9" y="4" w="4"/>
+                        <fr:c x="1" y="5" w="4">
+                            <fr:currency bind="currency-bind" id="currency-control">
+                                <xf:label ref="$form-resources/currency/label"/>
+                                <xf:hint ref="$form-resources/currency/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="5" y="5" w="4">
+                            <fr:currency bind="currency-with-prefix-bind" id="currency-with-prefix-control" prefix="CHF">
+                                <xf:label ref="$form-resources/currency-with-prefix/label"/>
+                                <xf:hint ref="$form-resources/currency-with-prefix/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="9" y="5" w="4"/>
+                        <fr:c x="1" y="6" w="4">
+                            <xf:select1 bind="dropdown-pdf-radio-buttons-bind" id="dropdown-pdf-radio-buttons-control"
+                                        ref=""
+                                        appearance="dropdown"
+                                        fr:pdf-appearance="full">
+                                <xf:label ref="$form-resources/dropdown-pdf-radio-buttons/label"/>
+                                <xf:hint ref="$form-resources/dropdown-pdf-radio-buttons/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="$form-resources/dropdown-pdf-radio-buttons/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="5" y="6" w="4">
+                            <xf:select1 bind="dropdown-pdf-value-bind" id="dropdown-pdf-value-control" ref=""
+                                        appearance="dropdown"
+                                        fr:pdf-appearance="dropdown">
+                                <xf:label ref="$form-resources/dropdown-pdf-value/label"/>
+                                <xf:hint ref="$form-resources/dropdown-pdf-value/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="$form-resources/dropdown-pdf-value/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="9" y="6" w="4">
+                            <fr:databound-select1 id="dynamic-dropdown-control"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="dynamic-dropdown-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="/*/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="1" y="7" w="4">
+                            <xf:output bind="calculated-value-bind" id="calculated-value-control">
+                                <xf:label ref="$form-resources/calculated-value/label"/>
+                                <xf:hint ref="$form-resources/calculated-value/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="5" y="7" w="4">
+                            <xf:output bind="calculated-value-borderless-bind"
+                                       id="calculated-value-borderless-control"
+                                       appearance="minimal">
+                                <xf:label ref="$form-resources/calculated-value-borderless/label"/>
+                                <xf:hint ref="$form-resources/calculated-value-borderless/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="9" y="7" w="4">
+                            <xf:output bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control"
+                                       appearance="clipboard-copy">
+                                <xf:label ref="$form-resources/calculated-value-clipboard/label"/>
+                                <xf:hint ref="$form-resources/calculated-value-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+
+
+
+
+
+
+
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

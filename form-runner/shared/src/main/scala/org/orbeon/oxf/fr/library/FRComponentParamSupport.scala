@@ -47,7 +47,7 @@ object FRComponentParamSupport {
       def fromMetadataAndProperties: Option[AtomicValue] =
         FRComponentParamSupport.fromMetadataAndProperties(
           partAnalysis  = sourceComponent.container.partAnalysis,
-          directNameOpt = staticControl.commonBinding.directName,
+          directNameOpt = staticControl.commonBinding.directName.orElse(staticControl.element.getQName.some), // https://github.com/orbeon/orbeon-forms/issues/6707
           paramName     = paramName,
           property      = property
         )

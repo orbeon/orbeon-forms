@@ -20,4 +20,5 @@
     <xi:include href="tests-actions.xml"/>
     <xi:include href="tests-excel.xml"/>
     <xi:include href="tests-data-migration.xml"/>
+    <xi:include href="tests-form-unrolling.xml"/>
 </tests>

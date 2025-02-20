@@ -17,7 +17,7 @@
     <xsl:variable
         name="controls-roots-for-pdf-appearance"
         select="
-            if ($mode = ('pdf', 'test-pdf')) then
+            if ($is-pdf-mode and not($use-pdf-template)) then
                 (
                     $body,
                     /xh:html/xh:head/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]/xbl:template
@@ -66,6 +66,9 @@
                     ]
                 )">
                 <fr:date>
+                    <xsl:if test="$is-static-readonly and ($is-pdf-mode or not($date-native-picker = 'always'))">
+                        <xsl:attribute name="static-readonly">true</xsl:attribute>
+                    </xsl:if>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                     <!-- See other comment further "Q: Do we really need this?" -->
                     <xsl:if test="empty(xf:alert)">
@@ -81,6 +84,9 @@
                     ]
                 )">
                 <fr:time>
+                    <xsl:if test="$is-static-readonly and ($is-pdf-mode or not($time-native-picker = 'always'))">
+                        <xsl:attribute name="static-readonly">true</xsl:attribute>
+                    </xsl:if>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                     <!-- See other comment further "Q: Do we really need this?" -->
                     <xsl:if test="empty(xf:alert)">
@@ -103,6 +109,9 @@
         mode="within-grid">
         <!-- For now this only applies to controls that have an `xf:select1` binding -->
         <xsl:element name="xf:select1">
+            <xsl:if test="$is-static-readonly">
+                <xsl:attribute name="static-readonly">true</xsl:attribute>
+            </xsl:if>
             <xsl:apply-templates select="@* except (@appearance, @fr:pdf-appearance)" mode="#current"/>
             <xsl:attribute name="appearance" select="(@fr:pdf-appearance, map:get($select1-pdf-appearances, fr:direct-name-for-select1-element(.)))[1]"/>
             <xsl:apply-templates select="node()" mode="#current"/>
@@ -137,6 +146,9 @@
         <xsl:choose>
             <xsl:when test="frf:controlNameFromId(@id) = $choice-validation-selection-control-names">
                 <xsl:copy>
+                    <xsl:if test="$is-static-readonly">
+                        <xsl:attribute name="static-readonly">true</xsl:attribute>
+                    </xsl:if>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                         <xf:alert
                             ref="
@@ -189,6 +201,9 @@
         match="xf:output[exists(xf:label) and empty(@appearance)]"
         mode="within-grid">
         <xsl:copy>
+            <xsl:if test="$is-static-readonly">
+                <xsl:attribute name="static-readonly">true</xsl:attribute>
+            </xsl:if>
             <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
                 <xsl:attribute name="appearance" select="."/>
             </xsl:for-each>
@@ -202,6 +217,9 @@
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
+            <xsl:if test="$is-static-readonly">
+                <xsl:attribute name="static-readonly">true</xsl:attribute>
+            </xsl:if>
             <xsl:for-each select="@prefix | @suffix">
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
             </xsl:for-each>
@@ -215,6 +233,9 @@
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
+            <xsl:if test="$is-static-readonly">
+                <xsl:attribute name="static-readonly">true</xsl:attribute>
+            </xsl:if>
             <xsl:if test="exists(@resource | @selection)">
                 <!-- As calls below can generate `frf:controlVariableValue()` -->
                 <xsl:namespace name="frf" select="'java:org.orbeon.oxf.fr.FormRunner'"/>
@@ -233,19 +254,6 @@
         mode="within-databound-itemset">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., false(), $library-name, ())"/>
-    </xsl:template>
-
-    <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->
-    <!-- Q: Do we really need this? -->
-    <!-- NOTE: Lower priority so that `xf:input[@bind]` rules match. -->
-    <xsl:template
-        priority="-20"
-        match="xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
-        mode="within-grid">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
-            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
-        </xsl:copy>
     </xsl:template>
 
     <xsl:template
@@ -340,6 +348,45 @@
                             '), '' '')'
                         )
                     else @ref"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- Annotate remaining (most) controls with `static-readonly` if needed -->
+    <xsl:template
+        mode="within-grid"
+        match="*[parent::fr:c or parent::xh:td]"
+        priority="-10">
+        <xsl:copy>
+            <xsl:if test="
+                $is-static-readonly and (
+                    $is-pdf-mode or (
+                        (: `view` mode :)
+                        not(
+                            (exists(self::fr:date) and (@native-picker/string(), $date-native-picker)[1] = 'always') or
+                            (exists(self::fr:time) and (@native-picker/string(), $time-native-picker)[1] = 'always')
+                        )
+                    )
+                )
+            ">
+                <xsl:attribute name="static-readonly">true</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->
+    <!-- Q: Do we really need this? -->
+    <!-- NOTE: Lower priority so that `xf:input[@bind]` rules match. -->
+    <xsl:template
+        mode="within-grid"
+        match="xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
+        priority="-20">
+        <xsl:copy>
+            <xsl:if test="$is-static-readonly">
+                <xsl:attribute name="static-readonly">true</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
         </xsl:copy>
     </xsl:template>
 

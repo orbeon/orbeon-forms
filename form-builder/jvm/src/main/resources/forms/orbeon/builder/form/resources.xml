@@ -13012,6 +13012,7 @@
                 <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
             </thumbnail>
+            <default-template todo="true">Default Template</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control-instellingen: "{1}" / "{0}" ({2})</label>

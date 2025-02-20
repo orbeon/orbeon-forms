@@ -339,6 +339,10 @@
                     $readonly or
                     (not(xxf:is-blank(string($binding))) and not($multiple))"/>
 
+            <xf:var
+                name="disable-download"
+                value="xs:string(fr:component-param-value('allow-download')) = 'false' or fr:mode() = ('pdf', 'email')"/>
+
             <xh:div id="fr-attachment-elem" xxf:control="true" tabindex="-1">
                 <fr:dnd-repeat
                     ref="
@@ -383,10 +387,6 @@
                                 else
                                     'fa-file-o'
                         }"/>
-
-                        <xf:var
-                            name="disable-download"
-                            value="fr:component-param-value('allow-download') = 'false' or fr:mode() = ('pdf', 'email')"/>
 
                         <xf:output
                             ref=".[$disable-download]"

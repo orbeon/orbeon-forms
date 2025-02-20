@@ -67,16 +67,34 @@ class FormRunnerFunctionsTest
     val App  = "acme"
     val Form = "order"
 
+    // Scope document as `findRequestedLang()` uses the in-scope `XFormsContainingDocument`, not the `ExternalContext`
+    // https://github.com/orbeon/orbeon-forms/issues/6788
+    def source: dom.Document =
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+        <xh:head>
+          <xf:model>
+            <xf:instance>
+              <_/>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body/>
+      </xh:html>.toDocument
+
     it("`oxf.fr.default-language` not set so `en` is the default") {
       withTestExternalContext { _ =>
-        assert("en" == getDefaultLang(getAppForm(App, Form)))
+        withActionAndDoc(setupDocument(source)) {
+          assert("en" == getDefaultLang(getAppForm(App, Form)))
+        }
       }
     }
 
     it("`oxf.fr.available-languages` not set so all languages are allowed") {
       withTestExternalContext { _ =>
-        assert(isAllowedLang(getAppForm(App, Form))("en"))
-        assert(isAllowedLang(getAppForm(App, Form))("foo"))
+        withActionAndDoc(setupDocument(source)) {
+          assert(isAllowedLang(getAppForm(App, Form))("en"))
+          assert(isAllowedLang(getAppForm(App, Form))("foo"))
+        }
       }
     }
 
@@ -84,27 +102,35 @@ class FormRunnerFunctionsTest
       for (v <- List(null, "   "))
         it (s"must default to `en` for `$v` requested language") {
           withTestExternalContext { _ =>
-            assert(Some("en") == findRequestedLang(getAppForm(App, Form), v))
+            withActionAndDoc(setupDocument(source)) {
+              assert(Some("en") == findRequestedLang(getAppForm(App, Form), v))
+            }
           }
         }
 
       for (v <- List("es", "en"))
         it(s"must find requested language for `$v`") {
           withTestExternalContext { _ =>
-            assert(Some(v) == findRequestedLang(getAppForm(App, Form), v))
+            withActionAndDoc(setupDocument(source)) {
+              assert(Some(v) == findRequestedLang(getAppForm(App, Form), v))
+            }
           }
         }
 
       it("must find language in session if present and not requested") {
         withTestExternalContext { _ =>
-          NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-language", "fr")
-          assert(Some("fr") == findRequestedLang(getAppForm(App, Form), null))
+          withActionAndDoc(setupDocument(source)) {
+            NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-language", "fr")
+            assert(Some("fr") == findRequestedLang(getAppForm(App, Form), null))
+          }
         }
       }
 
       it("must use requested language even if a language is present in session") {
         withTestExternalContext { _ =>
-          assert(Some("it") == findRequestedLang(getAppForm(App, Form), "it"))
+          withActionAndDoc(setupDocument(source)) {
+            assert(Some("it") == findRequestedLang(getAppForm(App, Form), "it"))
+          }
         }
       }
     }

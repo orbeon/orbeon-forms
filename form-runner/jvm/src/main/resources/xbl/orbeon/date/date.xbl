@@ -404,28 +404,17 @@
         </xbl:implementation>
 
         <xbl:template>
-
-            <xf:var
-                name="binding"
-                value="xxf:binding('fr-date')"/>
-            <xf:var
-                name="view"
-                value="
-                    (
-                        xxf:is-control-static-readonly('fr-date') and
-                        (: Still use the native picker if static readonly, to have consistent output format :)
-                        not(fr:component-param-value('native-picker') = 'always')
-                    ) or
-                    fr:mode() = 'pdf'
-                "/>
-            <xf:var name="class-field-width"     value="concat('fr-field-width-'  ,   fr:component-param-value('field-width'))"/>
-            <xf:var name="class-native-picker"   value="concat('fr-native-picker-',   fr:component-param-value('native-picker'))"/>
-            <xf:var name="class-today-highlight" value="concat('fr-today-highlight-', fr:component-param-value('today-highlight'))"/>
-
-            <xf:group class="{$class-field-width} {$class-native-picker} {$class-today-highlight}">
-
-                <xf:group ref="$binding[not($view)]" class="input-append date">
+            <xf:group
+                class="fr-field-width-{
+                        fr:component-param-value('field-width')
+                    } fr-native-picker-{
+                        fr:component-param-value('native-picker')
+                    } fr-today-highlight-{
+                        fr:component-param-value('today-highlight')
+                    }">
+                <xf:group ref="xxf:binding('fr-date')" class="input-append date">
                     <xh:input
+                        id="input"
                         xh:type="text"
                         placeholder="{
                             DateSupport:generatePlaceholder(
@@ -435,27 +424,41 @@
                                 xxf:r('format')
                             )
                         }"
-                        id="input"
                         xxf:control="true"
                         xbl:attr="autocomplete"/>
                     <xh:span class="add-on" tabindex="0">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>
                 </xf:group>
-
-                <xf:input
-                    ref="$binding[$view]"
-                    class="{$class-field-width}"
-                    xbl:attr="xxf:readonly-appearance"
-                    xxf:format="
-                        DateSupport:formatReadonlyModeDate(
-                            xxf:binding('fr-date'),
-                            (: Reminder: empty string property returns the empty sequence :)
-                            (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1]
-                        )"/>
-
             </xf:group>
-
         </xbl:template>
     </xbl:binding>
+
+    <xbl:binding
+        id="fr-date-output"
+        element="
+            fr|date[static-readonly = true],
+            fr|dropdown-date[static-readonly = true],
+            fr|fields-date[static-readonly = true]"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/date/date.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-date-output')"
+                class="fr-field-width-{fr:component-param-value('field-width')}"
+                xbl:attr="xxf:readonly-appearance"
+                xxf:format="
+                    DateSupport:formatReadonlyModeDate(
+                        .,
+                        (: Reminder: empty string property returns the empty sequence :)
+                        (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1]
+                    )"/>
+        </xbl:template>
+    </xbl:binding>
+
 </xbl:xbl>

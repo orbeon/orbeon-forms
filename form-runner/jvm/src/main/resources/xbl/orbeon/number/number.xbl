@@ -387,29 +387,13 @@
                 name="binding"
                 value="xxf:binding('fr-number')"/>
 
-            <xf:var
-                xxbl:keep-if-function-available="fr:mode"
-                name="view"
-                value="
-                    xxf:is-control-readonly('fr-number') and (
-                        xxf:is-control-static-readonly('fr-number') or
-                        (: See https://github.com/orbeon/orbeon-forms/issues/3800 :)
-                        fr:mode() = 'pdf'
-                    )
-                "/>
-            <xf:var
-                xxbl:keep-if-function-unavailable="fr:mode"
-                name="view"
-                value="false()"/>
-
             <!--<xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>-->
 
             <xf:var name="prefix" value="fr:component-param-value('prefix')"/>
             <xf:var name="suffix" value="fr:component-param-value('suffix')"/>
 
-            <!-- Readwrite mode -->
             <xf:group
-                ref="$binding[not($view)]"
+                ref="$binding"
                 class="{
                     'xforms-help-popover-control',
                     'input-prepend'[xxf:non-blank($prefix)],
@@ -468,12 +452,45 @@
                     <xf:output id="suffix" value="$suffix"/>
                 </xf:group>
             </xf:group>
-            <!-- Static readonly mode -->
-            <xf:input
-                class="{for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)}"
-                ref="$binding[$view]"
-                xxf:format="xxf:formatted-value('fr-number')"/>
 
         </xbl:template>
     </xbl:binding>
+
+    <xbl:binding
+        id="fr-number-output"
+        element="
+            fr|number[static-readonly = true],
+            fr|currency[static-readonly = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            string-join(
+                (
+                    fr:component-param-value('prefix'),
+                    NumberSupport:getDisplayValueJava(
+                        xxf:binding('fr-number-output'),
+                        fr:component-param-value('decimal-separator'),
+                        fr:component-param-value('grouping-separator'),
+                        fr:component-param-value('prefix'),
+                        fr:component-param-value('digits-after-decimal'),
+                        string(fr:component-param-value('round-when-formatting')) = 'true',
+                        string(fr:component-param-value('round-when-storing'))    = 'true'
+                    ),
+                    fr:component-param-value('suffix')
+                ),
+                ' '
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/number/number.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:input
+                id="input"
+                class="{for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)}"
+                ref="xxf:binding('fr-number-output')"
+                xxf:format="xxf:formatted-value('fr-number-output')"/>
+        </xbl:template>
+    </xbl:binding>
+
 </xbl:xbl>

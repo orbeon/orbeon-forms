@@ -59,6 +59,20 @@
         select="$mode = ('pdf', 'test-pdf', 'email')"
         as="xs:boolean"/>
 
+<!--    not(-->
+<!--        (-->
+<!--            frf:isServicePath(p:get-request-path()) or-->
+<!--            p:get-request-method() = 'POST'-->
+<!--        ) and-->
+<!--            p:get-request-parameter('fr-use-pdf-template') = 'false'-->
+<!--    ) and-->
+<!--        (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')-->
+
+<!--    listPdfTemplates.nonEmpty && ! (-->
+<!--      req.getMethod == HttpMethod.POST &&-->
+<!--      req.getFirstParamAsString(s"fr-$UsePdfTemplateParam").contains(false.toString)-->
+<!--    )-->
+
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"

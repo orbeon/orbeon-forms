@@ -252,6 +252,11 @@
         fr:databound-select1-search
         fr:autosize-textarea
         fb:xpath-completion
+        <!-- For static readonly output bindings -->
+        fr:date
+        fr:time
+        fr:datetime
+        fr:number
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.tinymce.config">

@@ -153,10 +153,8 @@
 
         <xbl:template>
 
-            <xf:var name="binding"    value="xxf:binding('fr-datetime')"/>
             <xf:var name="local-date" value="instance('i')/date"/>
             <xf:var name="local-time" value="instance('i')/time"/>
-            <xf:var name="view"       value="xxf:readonly($binding) and xxf:is-control-static-readonly('fr-datetime')"/>
 
             <!-- Update local date and time from bound node -->
             <xf:var name="value" as="xs:string" value="xxf:value('fr-datetime')">
@@ -190,7 +188,7 @@
                     event="xforms-value-changed"
                     observer="date time">
                 <xf:setvalue
-                    ref="$binding"
+                    ref="xxf:binding('fr-datetime')"
                     value="if ($local-date/string() castable as xs:date and
                                $local-time/string() castable as xs:time)
                            then dateTime(xs:date($local-date), xs:time($local-time))
@@ -203,20 +201,30 @@
                                       translate($local-time/string(), 'T', ''))"/>
             </xf:action>
 
-            <xf:var
-                name="field-width"
-                value="fr:component-param-value('field-width')"/>
-            <xh:div id="fr-datetime-elem" class="fr-datetime-fields fr-field-width-{$field-width}" xxf:control="true">
-                <fr:date ref="$local-date[not($view)]" id="date">
+            <xh:div id="fr-datetime-elem" class="fr-datetime-fields fr-field-width-{fr:component-param-value('field-width')}" xxf:control="true">
+                <fr:date ref="$local-date" id="date">
                     <xf:label ref="xxf:r('date')"/>
                 </fr:date>
-                <fr:time ref="$local-time[not($view)]" id="time">
+                <fr:time ref="$local-time" id="time">
                     <xf:label ref="xxf:r('time')"/>
                 </fr:time>
             </xh:div>
-            <xf:input ref="$binding[$view]" xbl:attr="xxf:readonly-appearance"/>
         </xbl:template>
 
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-datetime-output"
+        element="fr|datetime[static-readonly = true]"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input">
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-datetime-output')"
+                class="fr-field-width-{fr:component-param-value('field-width')}"
+                xbl:attr="xxf:readonly-appearance"/>
+        </xbl:template>
     </xbl:binding>
 
 </xbl:xbl>

@@ -776,10 +776,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date≡xf-10" class="fr-field-width-natural fr-native-picker-ios fr-today-highlight-true"/>
-                        <xxf:control id="my-date≡xf-11" class="input-append date"/>
+                        <xxf:control id="my-date≡xf-5" class="fr-field-width-natural fr-native-picker-ios fr-today-highlight-true"/>
+                        <xxf:control id="my-date≡xf-6" class="input-append date"/>
                         <xxf:attribute for="my-date≡input" name="placeholder">MM/DD/YYYY</xxf:attribute>
-                        <xxf:control id="my-date≡xf-12" relevant="false"/>
                         <xxf:init id="my-date">
                             <xxf:value>{"isoOrUnrecognizedValue":{"Left":{"value":{"year":2010,"month":1,"day":13}}},"format":{"firstComponent":{"Month":{}},"separator":"/","isPadDayMonthDigits":false},"excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>
@@ -825,8 +824,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                       <xxf:control id="my-currency≡xf-9" class="xforms-help-popover-control input-prepend fr-field-width-natural"/>
-                       <xxf:control id="my-currency≡xf-10" class="add-on"/>
+                        <xxf:control id="my-currency≡xf-8" class="xforms-help-popover-control input-prepend fr-field-width-natural"/>
+                        <xxf:control id="my-currency≡xf-9" class="add-on"/>
                         <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
@@ -835,7 +834,6 @@
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-11" relevant="false"/>
                         <xxf:init id="my-currency">
                             <xxf:value>{"displayValue":"12.34","editValue":"12.34","decimalSeparator":"."}</xxf:value>
                         </xxf:init>

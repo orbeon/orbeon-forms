@@ -7,12 +7,11 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
-import org.orbeon.oxf.fr.email.{EmailContent, EmailMetadataParsing}
+import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadataParsing}
 import org.orbeon.oxf.fr.persistence.S3
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.PathUtils.PathOps
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, TryUtils, XPathCache}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
@@ -22,6 +21,7 @@ import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
 
 import java.net.URI
 import scala.jdk.CollectionConverters.*
@@ -249,43 +249,44 @@ trait FormRunnerEmailBackend {
     }
   }
 
-  def storeEmailContentsToS3(
-    emailContents           : List[EmailContent],
-    s3Path                  : String,
-    s3PathNamespaces        : NamespaceMapping
+  def storeEmailContentToS3(
+    emailContent            : EmailContent,
+    s3PathPrefix            : String
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
     s3Config                : S3.Config
   ): Try[Unit] = {
+    // TODO: store email body and headers as well
+    TryUtils.sequenceLazily(emailContent.allAttachments)(storeAttachmentToS3(_, s3PathPrefix)).map(_ => ())
+  }
 
-    // Evaluate S3 path prefix
-    val formData        = frc.formInstance.root
-    val s3PathPrefixOpt = s3Path.trimAllToOpt.flatMap(process.SimpleProcess.evaluateString(_, formData, s3PathNamespaces).trimAllToOpt)
-    val s3PathPrefix    = s3PathPrefixOpt.map(_.appendSlash).getOrElse("")
+  private def storeAttachmentToS3(
+    attachment              : Attachment,
+    s3PathPrefix            : String
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    formRunnerParams        : FormRunnerParams,
+    s3Config                : S3.Config
+  ): Try[PutObjectResponse] = {
 
-    TryUtils.sequenceLazily(emailContents.flatMap(_.allAttachments)) { attachment =>
-      val key = s3PathPrefix + attachment.filename
+    val key = s3PathPrefix + attachment.filename
 
-      val s3WriteTry = attachment.data match {
-        case Left(uri)        =>
-          // Attachment given as URI, stream/download it to S3
-          val connectionResult = PersistenceApi.connectPersistence(
-            method         = HttpMethod.GET,
-            pathQuery      = uri.toString,
-            formVersionOpt = Left(FormDefinitionVersion.Specific(formRunnerParams.formVersion)).some
-          )
+    attachment.data match {
+      case Left(uri)        =>
+        // Attachment given as URI, stream/download it to S3
+        val connectionResult = PersistenceApi.connectPersistence(
+          method         = HttpMethod.GET,
+          pathQuery      = uri.toString,
+          formVersionOpt = Left(FormDefinitionVersion.Specific(formRunnerParams.formVersion)).some
+        )
 
-          S3.write(key, connectionResult.content.stream, connectionResult.content.contentLength)
-        case Right(byteArray) =>
-          // Attachment given as byte array, store it to S3 directly
-          S3.write(key, byteArray)
-      }
-
-      s3WriteTry
-    }.map {
-      _ => ()
+        S3.write(key, connectionResult.content.stream, connectionResult.content.contentLength)
+      case Right(byteArray) =>
+        // Attachment given as byte array, store it to S3 directly
+        S3.write(key, byteArray)
     }
   }
 }

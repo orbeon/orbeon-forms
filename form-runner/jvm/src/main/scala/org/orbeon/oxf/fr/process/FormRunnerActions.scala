@@ -157,47 +157,72 @@ trait FormRunnerActions
       val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
 
       if (s3Store) {
-        // Retrieve S3 parameters either from action parameters or from properties
-        def fromParamsOrProperties(
-          name             : String,
-          default          : String,
-          defaultNamespaces: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
-        ): (String, NamespaceMapping) =
-          paramByNameUseAvt(params, name)
-            .map((_, defaultNamespaces))
-            .orElse(formRunnerPropertyWithNs(s"oxf.fr.email.$name"))
-            .getOrElse((default, defaultNamespaces))
-
-        val (s3ConfigName, _               ) = fromParamsOrProperties("s3-config", default = "default")
-        val (s3Path      , s3PathNamespaces) = fromParamsOrProperties("s3-path"  , default = "")
-
-        implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-
-        val emailContentsTry = emailContents(
+        storeEmailContentsToS3(
+          params                 = params,
           urisByRenderedFormat   = urisByRenderedFormat,
           emailDataFormatVersion = emailDataFormatVersion,
-          matchAllTemplates      = templateMatchParam.trimAllToOpt.contains("all"),
-          language               = paramByNameUseAvt(params, "lang").getOrElse(currentFormLang), // Logic from createPdfOrTiffParams
-          templateNameOpt        = paramByNameUseAvt(params, "template")
-        )
-
-        val unitTry =
-          for {
-            emailContents <- emailContentsTry
-            s3Config      <- S3.Config.fromName(s3ConfigName)
-            _             <- {
-              // Implicits in for comprehensions supported in Scala 3 only
-              implicit val _s3Config: S3.Config = s3Config
-              storeEmailContentsToS3(emailContents, s3Path, s3PathNamespaces)
-            }
-          } yield ()
-
-        // Throw here in case of problem related to S3 storage of email contents
-        unitTry.get
+          templateMatchParam     = templateMatchParam
+        ).get
       }
 
       tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
     }
+
+  private def storeEmailContentsToS3(
+    params                : ActionParams,
+    urisByRenderedFormat  : Map[RenderedFormat, URI],
+    emailDataFormatVersion: DataFormatVersion,
+    templateMatchParam    : String
+  )(implicit
+    formRunnerParams      : FormRunnerParams,
+  ): Try[Unit] = {
+
+    val formData = frc.formInstance.root
+
+    // Retrieve S3 parameters either from action parameters or from properties
+    def fromParamsOrProperties(
+      name             : String,
+      default          : String,
+      defaultNamespaces: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+    ): (String, NamespaceMapping) =
+      paramByNameUseAvt(params, name)
+        .map((_, defaultNamespaces))
+        .orElse(formRunnerPropertyWithNs(s"oxf.fr.email.$name"))
+        .getOrElse((default, defaultNamespaces))
+
+    val (s3ConfigName, _               ) = fromParamsOrProperties("s3-config", default = "default")
+    val (s3Path      , s3PathNamespaces) = fromParamsOrProperties("s3-path"  , default = "")
+
+    def s3PathPrefixTry: Try[String] = Try {
+      // Evaluate S3 path prefix
+      s3Path
+        .trimAllToOpt
+        .flatMap(process.SimpleProcess.evaluateString(_, formData, s3PathNamespaces).trimAllToOpt)
+        .map(_.appendSlash)
+        .getOrElse("")
+    }
+
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+
+    val emailContentsTry = emailContents(
+      urisByRenderedFormat   = urisByRenderedFormat,
+      emailDataFormatVersion = emailDataFormatVersion,
+      matchAllTemplates      = templateMatchParam.trimAllToOpt.contains("all"),
+      language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang), // Logic from createPdfOrTiffParams
+      templateNameOpt        = paramByNameUseAvt(params, "template")
+    )
+
+    for {
+      emailContents <- emailContentsTry
+      s3PathPrefix  <- s3PathPrefixTry
+      s3Config      <- S3.Config.fromName(s3ConfigName)
+      _             <- {
+        // Implicits in for comprehensions supported in Scala 3 only
+        implicit val _s3Config: S3.Config = s3Config
+        TryUtils.sequenceLazily(emailContents)(storeEmailContentToS3(_, s3PathPrefix))
+      }
+    } yield ()
+  }
 
   def trySend(params: ActionParams): ActionResult = {
 

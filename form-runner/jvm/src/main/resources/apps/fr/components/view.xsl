@@ -792,7 +792,17 @@
     <xsl:template match="fr:logo">
         <xsl:if test="not($hide-logo) and exists($default-logo-uri)">
             <xh:div class="navbar-brand">
-                <xh:img src="{$default-logo-uri}" alt=""/>
+                <xsl:choose>
+                    <xsl:when test="ends-with($default-logo-uri, '.svg')">
+                        <xh:picture>
+                            <xh:source srcset="{$default-logo-uri}" type="image/svg+xml"/>
+                            <xh:img src="{replace($default-logo-uri, '\.svg$', '.png')}" alt=""/>
+                        </xh:picture>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xh:img src="{$default-logo-uri}" alt=""/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xh:div>
         </xsl:if>
     </xsl:template>

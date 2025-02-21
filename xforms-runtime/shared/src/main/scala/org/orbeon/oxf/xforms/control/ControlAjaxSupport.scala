@@ -256,9 +256,9 @@ object ControlAjaxSupport {
   val AriaDescribedby  = "aria-describedby"
   val AriaErrorMessage = "aria-errormessage"
 
-  val AriaReadonlyQName    = QName("aria-readonly")
-  val AriaLabelledbyQName  = QName("aria-labelledby")
-  val AriaDescribedbyQName = QName("aria-describedby")
+  val AriaReadonlyQName    = QName(AriaReadonly)
+  val AriaLabelledbyQName  = QName(AriaLabelledby)
+  val AriaDescribedbyQName = QName(AriaDescribedby)
 //  val AriaDetails     = "aria-details"
 
   val AriaRequired    = "aria-required"

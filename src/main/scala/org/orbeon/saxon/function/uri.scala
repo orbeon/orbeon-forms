@@ -95,7 +95,10 @@ class UriFragment extends UriFunction[StringValue] {
 class UriParamNames extends FunctionSupport {
   override def iterate(context: XPathContext): SequenceIterator = {
     implicit val ctx = context
-    PathUtils.decodeSimpleQuery(URI.create(stringArgument(0)).getRawQuery) map (_._1)
+    Option(URI.create(stringArgument(0)).getRawQuery)
+      .map(PathUtils.decodeSimpleQuery)
+      .getOrElse(Nil)
+      .map(_._1)
   }
 }
 
@@ -104,6 +107,9 @@ class UriParamValues extends FunctionSupport {
   override def iterate(context: XPathContext): SequenceIterator = {
     implicit val ctx = context
     val paramName = stringArgument(1)
-    PathUtils.decodeSimpleQuery(URI.create(stringArgument(0)).getRawQuery) collect { case (`paramName`, value) => value}
+    Option(URI.create(stringArgument(0)).getRawQuery)
+      .map(PathUtils.decodeSimpleQuery)
+      .getOrElse(Nil)
+      .collect { case (`paramName`, value) => value}
   }
 }

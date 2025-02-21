@@ -129,9 +129,16 @@
                     </xf:switch>
                 </xh:div>
 
-                <!-- 'Try to acquire lease' button -->
                 <xh:div class="fr-dialog-buttons">
                     <xf:group>
+
+                        <!-- 'Navigate to Summary' button -->
+                        <xf:trigger ref=".[fr:can-list()]">
+                            <xf:label ref="$fr-resources/home/buttons/navigate-summary"/>
+                            <xf:load event="DOMActivate" resource="/fr/{fr:app-name()}/{fr:form-name()}/summary"/>
+                        </xf:trigger>
+
+                        <!-- 'Try to acquire lease' button -->
                         <xf:trigger class="xforms-trigger-appearance-modal">
                             <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
                             <xf:action event="DOMActivate">
@@ -140,6 +147,7 @@
                                 <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
                             </xf:action>
                         </xf:trigger>
+
                     </xf:group>
                 </xh:div>
             </xxf:dialog>
@@ -157,7 +165,7 @@
             </fr:alert-dialog>
 
             <xf:group
-                ref="if ($lease-banner-shown) then '' else ()"
+                ref="if ($lease-banner-shown) then xf:element('_') else ()"
                 class="alert alert-info fr-top-alert"
                 xxf:element="div">
 
@@ -230,6 +238,13 @@
                 </xf:group>
 
                 <xf:group ref=".[not($has-lease)]" xxf:element="div" class="fr-top-alert-buttons">
+
+
+                    <!-- 'Navigate to Summary' button -->
+                    <xf:trigger ref=".[fr:can-list()]">
+                        <xf:label ref="$fr-resources/home/buttons/navigate-summary"/>
+                        <xf:load event="DOMActivate" resource="/fr/{fr:app-name()}/{fr:form-name()}/summary"/>
+                    </xf:trigger>
 
                     <!-- 'Try to acquire lease' button -->
                     <xf:trigger class="xforms-trigger-appearance-modal">

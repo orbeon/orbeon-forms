@@ -13,7 +13,6 @@ case class CommonBinding(
   bindingElemId               : Option[String],
   bindingElemNamespaceMapping : NamespaceMapping,
   directName                  : Option[QName],
-  cssName                     : Option[String],
   containerElementName        : String,
   modeBinding                 : Boolean,
   modeValue                   : Boolean,

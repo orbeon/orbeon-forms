@@ -315,7 +315,6 @@ object XFormsStaticStateSerializer {
         b += "bindingElemId"               -> a.bindingElemId.asJson
         b += "bindingElemNamespaceMapping" -> Json.fromInt(collectedNamespacesWithPositions(a.bindingElemNamespaceMapping.mapping))
         b += "directName"                  -> (a.directName map collectedQNamesWithPositions).asJson
-        b += "cssName"                     -> a.cssName.asJson
         if (a.containerElementName != "div")
           b += "containerElementName"        -> Json.fromString(a.containerElementName)
         if (a.modeBinding)

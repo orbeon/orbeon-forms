@@ -116,7 +116,6 @@ object CommonBindingBuilder {
       bindingElemId               = bindingElem.idOpt,
       bindingElemNamespaceMapping = bindingElemNamespaceMapping,
       directName                  = directName,
-      cssName                     = cssName,
       containerElementName        = bindingElem.attributeValueOpt(XXBL_CONTAINER_QNAME) getOrElse "div",
       modeBinding                 = xblMode("binding"), // "optional binding" (would need mandatory, optional, and prohibited)
       modeValue                   = modeValue,
@@ -251,7 +250,8 @@ object AbstractBinding {
     val directName =
       selectors collectFirst BindingDescriptor.directBindingPF(bindingElemNamespaceMapping, None) flatMap (_.elementName)
 
-    // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
+    // Get CSS name from direct binding if there is one.
+    // If there is no direct binding, we use the concrete bound element name later.
     val cssName =
       directName map (_.qualifiedName) map (_.replace(':', '-'))
 

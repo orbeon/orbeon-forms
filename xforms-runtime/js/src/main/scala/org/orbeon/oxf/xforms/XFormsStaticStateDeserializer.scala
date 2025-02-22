@@ -208,7 +208,6 @@ object XFormsStaticStateDeserializer {
         bindingElemId               <- c.get[Option[String]]("bindingElemId")
         bindingElemNamespaceMapping <- c.get[Int]("bindingElemNamespaceMapping")
         directName                  <- c.get[Option[Int]]("directName")
-        cssName                     <- c.get[Option[String]]("cssName")
         containerElementName        <- c.getOrElse[String]("containerElementName")("div")
         modeBinding                 <- c.getOrElse[Boolean]("modeBinding")(false)
         modeValue                   <- c.getOrElse[Boolean]("modeValue")(false)
@@ -233,7 +232,6 @@ object XFormsStaticStateDeserializer {
           bindingElemId,
           NamespaceMapping(collectedNamespaces(bindingElemNamespaceMapping)),
           directName map collectedQNames,
-          cssName,
           containerElementName,
           modeBinding,
           modeValue,

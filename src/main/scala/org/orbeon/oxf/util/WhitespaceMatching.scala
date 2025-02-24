@@ -23,7 +23,7 @@ import scala.collection.mutable
 
 object WhitespaceMatching  {
 
-  import CSSSelectorParser._
+  import CSSSelectorParser.*
 
   // Only support a small subset of selectors for now
   sealed trait Matcher
@@ -94,18 +94,17 @@ object WhitespaceMatching  {
 
     val propertySet = Properties.instance.getPropertySet
 
-    def whitespacePropertyDontAssociate(scope: String, policy: String) = (
+    def whitespacePropertyDontAssociate(scope: String, policy: String): Option[(Map[String, String], String)] =
       propertySet.getPropertyOpt(scope + '.' + policy)
-      map (property => property.namespaces -> property.stringValue.trimAllToEmpty)
-    )
+        .map(property => property.namespaces -> property.stringValue.trimAllToEmpty)
 
     // NOTE: Not ideal if no whitespace property is present, there won't be any caching associated with properties.
-    def whitespacePolicyAssociateIfPossible[T](scope: String, evaluate: => T): T = (
-      propertySet.propertiesStartsWith(scope, matchWildcards = false).headOption
-      map       propertySet.getPropertyOrThrow
-      map       (_.associatedValue(_ => evaluate))
-      getOrElse evaluate
-    )
+    def whitespacePolicyAssociateIfPossible[T](scope: String, evaluate: => T): T =
+      propertySet.propertiesStartsWith(scope, matchWildcards = false)
+        .headOption
+        .map(propertySet.getPropertyOrThrow)
+        .map(_.associatedValue(_ => evaluate))
+        .getOrElse(evaluate)
 
     def matchersForPolicy(policy: Policy): List[Matcher] =
       whitespacePropertyDontAssociate(scope, policy.entryName) map {

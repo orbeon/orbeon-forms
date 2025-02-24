@@ -91,7 +91,7 @@ object ProcessParser {
   val CombinatorsByName: Map[String, Combinator] =
     List(Combinator.Then, Combinator.Recover).map(c => c.name -> c).toMap
 
-  private def quote(s: String) =
+  private def quote(s: String): String =
     "\"" + escapeJava(s) + "\""
 
   // XXX TODO
@@ -103,7 +103,7 @@ object ProcessParser {
 
   case class ActionNode(name: String, params: Map[Option[String], String]) extends ExprNode {
 
-    private def serializeParams =
+    private def serializeParams: String =
       if (params.isEmpty) "" else params map {
         case (Some(name), value) => name + " = " + quote(value)
         case (None, value)       => quote(value)
@@ -114,7 +114,7 @@ object ProcessParser {
 
   case class GroupNode(expr: ExprNode, rest: List[(Combinator, ExprNode)]) extends ExprNode {
 
-    private def serializeRest =
+    private def serializeRest: String =
       if (rest.isEmpty) "" else " " + (rest flatMap { case (combinator, expr) => List(combinator.name, expr.serialize) } mkString " ")
 
     def serialize: String = "(" + expr.serialize + serializeRest + ")"
@@ -127,7 +127,7 @@ object ProcessParser {
 
   case class ConditionNode(xpath: String, thenBranch: ExprNode, elseBranch: Option[ExprNode]) extends ExprNode {
 
-    private def serializeElse =
+    private def serializeElse: String =
       elseBranch map (" else " + _.serialize) getOrElse ""
 
     def serialize: String = "if (" + quote(xpath) + ") then " + thenBranch.serialize + serializeElse

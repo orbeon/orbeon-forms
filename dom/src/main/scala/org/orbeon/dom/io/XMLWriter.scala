@@ -353,7 +353,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
     writer.write("<?xml version=\"1.0\"")
     writer.write(" encoding=\"" + OutputFormat.StandardEncoding + "\"")
     writer.write("?>")
-    writeNewLine()
+    writeNewLineIfNeeded()
   }
 
   private def writeEmptyElementClose(qualifiedName: String): Unit =

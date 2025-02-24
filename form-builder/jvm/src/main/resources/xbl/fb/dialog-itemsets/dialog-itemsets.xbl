@@ -222,14 +222,10 @@
                             </xh:tr>
                         </fr:grid>
                     </xf:group>
-                    <fr:grid>
-                        <fr:c x="1" y="1" w="12" h="1">
-                            <xf:input ref="filter" appearance="xpath-completion" xpath-completion-updates="">
-                                <xf:label ref="xxf:r('dialog-itemsets.filter.label', '|fr-form-resources|')"/>
-                                <xf:alert ref="xxf:r('components.parameters-editor.xpath.alert', '|fr-form-resources|')"/>
-                            </xf:input>
-                        </fr:c>
-                    </fr:grid>
+                    <xf:input ref="filter" appearance="xpath-completion" xpath-completion-updates="">
+                        <xf:label ref="xxf:r('dialog-itemsets.filter.label', '|fr-form-resources|')"/>
+                        <xf:alert ref="xxf:r('components.parameters-editor.xpath.alert', '|fr-form-resources|')"/>
+                    </xf:input>
 
                     <xh:div class="fr-dialog-buttons">
                         <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left">

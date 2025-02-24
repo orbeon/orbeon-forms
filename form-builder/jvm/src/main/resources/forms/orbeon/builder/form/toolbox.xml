@@ -450,7 +450,7 @@
                             <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
                         </fr:trigger>
 
-                        <!-- Reload components -->
+                        <!-- Reload toolbox components -->
                         <fr:trigger
                                 bind="fb-relevant-bind"
                                 name="toolbox.reload-components"

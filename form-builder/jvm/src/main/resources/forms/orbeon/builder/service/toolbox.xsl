@@ -47,9 +47,10 @@
                         <xsl:copy-of select="$metadata"/>
 
                         <!-- Copy all the scripts and bindings -->
-                        <xsl:for-each select="$resources">
-                            <!-- XBL spec says script and binding can be in any order -->
-                            <xsl:apply-templates select="/*/(* except fb:metadata)"/>
+                        <xsl:for-each select="$resources/xbl:xbl/xbl:binding[exists(fb:metadata)]">
+                            <xsl:copy>
+                                <xsl:apply-templates select="@* | fb:metadata"/>
+                            </xsl:copy>
                         </xsl:for-each>
                     </xbl:xbl>
                 </xsl:if>

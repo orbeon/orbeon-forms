@@ -24,6 +24,11 @@
         width: 600px;
         max-width: none;
 
+        .fb-dialog-body {
+            overflow: auto;
+            padding: 5px;                                               // For `box-shadow` on focused input not to be clipped
+        }
+
         .xbl-fr-grid {
             .fr-grid { table-layout: auto }                             // So we can remove columns (hint) with display: none
             clear: both;

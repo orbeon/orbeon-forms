@@ -1289,16 +1289,19 @@ body.orbeon {
         }
     }
 
+    // Override the `position: relative` set in `grid.less` so variable completion isn't clipped
+    // When we remove the `position: relative` in `grid.less`, we can remove this as well
+    .fb-dialog-control-settings,
+    .fb-dialog-email-settings {
+        .xbl-fr-grid .fr-grid:not(.fr-grid-css) .fr-grid-body .fr-grid-td {
+            position: static;
+        }
+    }
+
     .fb-dialog-control-settings {
 
         width: 1000px;
         max-width: none;
-
-        // Override the `position: relative` set in `grid.less` so variable completion isn't clipped
-        // When we remove the `position: relative` in `grid.less`, we can remove this as well
-        .xbl-fr-grid .fr-grid:not(.fr-grid-css) .fr-grid-body .fr-grid-td {
-            position: static;
-        }
 
         .xforms-label {
             margin-top: 5px;

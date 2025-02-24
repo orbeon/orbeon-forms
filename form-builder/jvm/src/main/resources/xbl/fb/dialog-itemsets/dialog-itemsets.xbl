@@ -227,21 +227,21 @@
                         <xf:alert ref="xxf:r('components.parameters-editor.xpath.alert', '|fr-form-resources|')"/>
                     </xf:input>
 
-                    <xh:div class="fr-dialog-buttons">
-                        <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left">
-                            <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>
-                        </xf:trigger>
-                        <xf:trigger id="clear-value-trigger">
-                            <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
-                        </xf:trigger>
-                        <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
-                            <xf:label ref="$resources/apply/label"/>
-                        </xf:trigger>
-                        <xf:output value="$resources/or/label"/>
-                        <xf:trigger appearance="minimal" id="cancel-trigger">
-                            <xf:label ref="$resources/cancel/label"/>
-                        </xf:trigger>
-                    </xh:div>
+                </xh:div>
+                <xh:div class="fr-dialog-buttons">
+                    <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left">
+                        <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>
+                    </xf:trigger>
+                    <xf:trigger id="clear-value-trigger">
+                        <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
+                    </xf:trigger>
+                    <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
+                        <xf:label ref="$resources/apply/label"/>
+                    </xf:trigger>
+                    <xf:output value="$resources/or/label"/>
+                    <xf:trigger appearance="minimal" id="cancel-trigger">
+                        <xf:label ref="$resources/cancel/label"/>
+                    </xf:trigger>
                 </xh:div>
             </xxf:dialog>
         </xbl:template>

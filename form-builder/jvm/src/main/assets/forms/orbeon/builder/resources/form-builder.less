@@ -761,22 +761,15 @@ body.orbeon {
             }
         }
 
-        .fb-settings-mode-new .tab-content {
-            &, & > div.active {
-              overflow: visible; // In new mode, the scrolling is done at the `.fb-template-cards-container` level
-              display: flex;
-              flex-direction: column;
-              min-height: 0;
-            }
-        }
-
         .fb-dialog-form-settings-fields {
 
-            div.fb-template-cards-container {
-                overflow-y: scroll;
-                padding: 5px; // so that selection outline/shadow is not clipped
+            .tab-content:has(.fb-template-cards-container) {
                 min-height: 234px; // empirically fit one line
                 max-height: 482px; // empirically fit two lines
+            }
+
+            div.fb-template-cards-container {
+                padding: 5px; // so that selection outline/shadow is not clipped
             }
 
             div.fb-template-cards { // try to make stronger

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.css.CSSSelectorParser
-import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, TypeSelector}
+import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, NsType, Selector, TypeSelector}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
@@ -156,7 +156,7 @@ trait BindingMetadata extends Logging {
       binding.selectors collectFirst {
         case Selector(
           ElementWithFiltersSelector(
-            Some(TypeSelector(Some(Some(prefix)), `localname`)),
+            Some(TypeSelector(NsType.Specific(prefix), `localname`)),
             Nil),
           Nil) if ns.mapping.get(prefix) == someURI =>
       } isDefined

@@ -175,7 +175,7 @@ object BindingDescriptor {
   ): PartialFunction[Selector, BindingDescriptor] = {
     case Selector(
         ElementWithFiltersSelector(
-          Some(TypeSelector(Some(Some(prefix)), localname)),
+          Some(TypeSelector(NsType.Specific(prefix), localname)),
           Nil),
         Nil) =>
 
@@ -197,14 +197,19 @@ object BindingDescriptor {
     case Selector(
         ElementWithFiltersSelector(
           typeSelectorOpt,
-          List(AttributeFilter(None, attName, attPredicate))
+          List(AttributeFilter(typeSelector, attPredicate))
         ),
         Nil) =>
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
         None,
-        Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
+        Some(
+          BindingAttributeDescriptor(
+            typeSelector.toQName(ns),
+            attPredicate
+          )
+        )
       )(binding)
   }
 
@@ -275,7 +280,7 @@ object BindingDescriptor {
 
     def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: NamespaceMapping): Option[QName] =
       selectorOpt collect {
-        case TypeSelector(Some(Some(prefix)), localname) => QName(localname, prefix, ns.mapping(prefix))
+        case TypeSelector(NsType.Specific(prefix), localname) => QName(localname, prefix, ns.mapping(prefix))
       }
 
     // Example: `xf|input:xxf-type("xs:decimal")`
@@ -285,7 +290,7 @@ object BindingDescriptor {
     ): PartialFunction[Selector, BindingDescriptor] = {
       case Selector(
           ElementWithFiltersSelector(
-            Some(TypeSelector(Some(Some(prefix)), localname)),
+            Some(TypeSelector(NsType.Specific(prefix), localname)),
             List(FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))))
           ),
           Nil) =>
@@ -307,7 +312,7 @@ object BindingDescriptor {
             typeSelectorOpt,
             List(
               FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))),
-              AttributeFilter(None, attName, attPredicate)
+              AttributeFilter(typeSelector, attPredicate)
             )
           ),
           Nil) =>
@@ -315,13 +320,19 @@ object BindingDescriptor {
         BindingDescriptor(
           qNameFromElementSelector(typeSelectorOpt, ns),
           datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping.get, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
-          Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
+          Some(
+            BindingAttributeDescriptor(
+              typeSelector.toQName(ns),
+              attPredicate
+            )
+          )
+
         )(binding)
     }
 
     def getAllSelectorsWithPF(
-      bindings  : Iterable[NodeInfo],
-      collector : (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
+      bindings : Iterable[NodeInfo],
+      collector: (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
     ): Iterable[BindingDescriptor] = {
 
       def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo): (String, NamespaceMapping) =

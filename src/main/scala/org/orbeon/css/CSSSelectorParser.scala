@@ -13,8 +13,11 @@
  */
 package org.orbeon.css
 
+import org.orbeon.dom.QName
+import org.orbeon.xml.NamespaceMapping
 import org.parboiled2.*
 
+import scala.reflect.macros.Names
 import scala.util.{Failure, Success}
 
 
@@ -22,10 +25,8 @@ import scala.util.{Failure, Success}
 //
 // Bugs and RFEs:
 //
-// - fix parsing of `a[foo|bar|="en"]`, which currently fails
 // - `:nth-child(10n+-1)` should be invalid
 // - `not` should not be accepted as the name of a functional pseudo-class
-// - better representation of namespaced names
 // - tests escapes in identifiers and strings
 // - tests newlines in identifiers and strings
 object CSSSelectorParser {
@@ -44,9 +45,52 @@ object CSSSelectorParser {
   case object FollowingCombinator            extends Combinator
   case object DescendantCombinator           extends Combinator
 
+  trait NsType
+  object NsType {
+    case class  Specific(prefix: String) extends NsType // `ns|E`
+    case object Any                      extends NsType // `*|E`
+    case object None                     extends NsType // `|E`
+    case object Default                  extends NsType // `E`
+  }
+
   trait SimpleElementSelector extends SelectorNode
-  case class TypeSelector(prefix: Option[Option[String]], name: String) extends SimpleElementSelector
-  case class UniversalSelector(prefix: Option[Option[String]]) extends SimpleElementSelector
+
+  case class TypeSelector(prefix: NsType, localName: String) extends SimpleElementSelector {
+    def toQName(ns: NamespaceMapping): QName =
+      prefix match {
+        case NsType.Specific(p) => QName(localName, p, ns.mapping(p))
+        case NsType.Any         => throw new IllegalArgumentException("Cannot create a QName for a universal selector")
+        case NsType.None        => QName(localName)
+        case NsType.Default     => QName(localName) // assume we live in "none" as the default namespace
+      }
+  }
+
+  case class UniversalSelector(prefix: NsType) extends SimpleElementSelector
+
+  object TypeSelector {
+    def applyOpt(prefix: Option[Option[String]], localName: String): TypeSelector =
+      TypeSelector(
+        prefix match {
+          case None            => NsType.Default
+          case Some(None)      => NsType.None
+          case Some(Some("*")) => NsType.Any
+          case Some(Some(p))   => NsType.Specific(p)
+        },
+        localName
+      )
+  }
+
+  object UniversalSelector {
+    def applyOpt(prefix: Option[Option[String]]): UniversalSelector =
+      UniversalSelector(
+        prefix match {
+          case None            => NsType.Default
+          case Some(None)      => NsType.None
+          case Some(Some("*")) => NsType.Any
+          case Some(Some(p))   => NsType.Specific(p)
+        }
+      )
+  }
 
   sealed trait AttributePredicate
   object AttributePredicate {
@@ -74,7 +118,7 @@ object CSSSelectorParser {
   trait Filter extends SelectorNode
   case class IdFilter(id: String) extends Filter
   case class ClassFilter(className: String) extends Filter
-  case class AttributeFilter(prefix: Option[Option[String]], name: String, predicate: AttributePredicate) extends Filter
+  case class AttributeFilter(name: TypeSelector, predicate: AttributePredicate) extends Filter
   case class NegationFilter(selector: SelectorNode) extends Filter
 
   trait Expr extends SelectorNode
@@ -147,9 +191,18 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   }
 
   def typeSelector: Rule1[TypeSelector] = rule {
-    optional(namespacePrefix) ~ elementName ~> TypeSelector.apply
+    optional(namespacePrefix) ~ elementName ~> TypeSelector.applyOpt
   }
 
+  def typeSelectorNoNs: Rule1[TypeSelector] = rule {
+    push[Option[Option[String]]](None) ~ elementName ~> TypeSelector.applyOpt
+  }
+
+  // By spec, `|E` means "element with name E without a namespace".
+  // `E` can mean "element with name E in the default namespace" or "element with name E in any namespace", for
+  // elements.
+  // Here we don't make a distinction between `|E` and `E` for now. We don't handle default namespaces for elements or
+  // attributes in our selectors, so this is not a problem at the moment.
   def namespacePrefix: Rule1[Option[String]] = rule {
     optional(ident | capture("*")) ~ "|"
   }
@@ -157,7 +210,7 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   def elementName: Rule1[String] = ident
 
   def universal: Rule1[UniversalSelector] = rule {
-    optional(namespacePrefix) ~> UniversalSelector.apply ~ "*"
+    optional(namespacePrefix) ~> UniversalSelector.applyOpt ~ "*"
   }
 
   def className: Rule1[ClassFilter] = rule { "." ~ (ident ~> ClassFilter.apply) }
@@ -165,8 +218,7 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   def attribute: Rule1[AttributeFilter] = rule {
     "[" ~
       OptWhiteSpace ~
-      push[Option[Option[String]]](None) ~ //FIXME: optional(namespacePrefix) ~
-      ident ~
+      (typeSelector | typeSelectorNoNs) ~ // so that `E[ns|foo|="en"]` is parsed correctly
       OptWhiteSpace ~
       (
         (

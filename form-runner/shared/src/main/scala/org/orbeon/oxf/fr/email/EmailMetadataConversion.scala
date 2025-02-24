@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.email
 
 import org.orbeon.oxf.fr.email.EmailMetadata.Legacy.{FormField, FormFieldRole}
-import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, Template, TemplateValue}
+import org.orbeon.oxf.fr.email.EmailMetadata.{FilesToAttach, HeaderName, Template, TemplateValue}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.saxon.function.ProcessTemplateSupport
 
@@ -111,7 +111,7 @@ object EmailMetadataConversion {
       case None       => List(None)
     }
 
-    val attachControls = controlsWithFormFieldRole(metadata.formFields, FormFieldRole.Attachment)
+    val controlsToAttach = controlsWithFormFieldRole(metadata.formFields, FormFieldRole.Attachment)
 
     EmailMetadata.Metadata(
       templates = langs.map { langOpt =>
@@ -126,16 +126,16 @@ object EmailMetadataConversion {
         }
 
         EmailMetadata.Template(
-          name                        = "default",
-          lang                        = langOpt,
-          headers                     = headersFromFormFields(metadata.formFields),
+          name                                  = "default",
+          lang                                  = langOpt,
+          headers                               = headersFromFormFields(metadata.formFields),
           subject                     = subject,
           body                        = body,
           attachPdf                   = None,
           attachXml                   = None,
-          attachFiles                 = None,
-          attachControls              = attachControls,
-          excludeFromAllControlValues = controlsWithFormFieldRole(metadata.formFields, FormFieldRole.ExcludeFromAllFields)
+          filesToAttach                         = None,
+          controlsToAttach                      = controlsToAttach,
+          controlsToExcludeFromAllControlValues = controlsWithFormFieldRole(metadata.formFields, FormFieldRole.ExcludeFromAllFields)
         )
       },
       params =
@@ -149,19 +149,19 @@ object EmailMetadataConversion {
   ): EmailMetadata.Metadata =
     EmailMetadata.Metadata(
       templates = metadata.templates.map { template2022 =>
-        val attachControls = controlsWithFormFieldRole(template2022.formFields, FormFieldRole.Attachment)
+        val controlsToAttach = controlsWithFormFieldRole(template2022.formFields, FormFieldRole.Attachment)
 
         Template(
-          name                        = template2022.name,
-          lang                        = template2022.lang,
-          headers                     = headersFromFormFields(template2022.formFields),
+          name                                  = template2022.name,
+          lang                                  = template2022.lang,
+          headers                               = headersFromFormFields(template2022.formFields),
           subject                     = template2022.subject,
           body                        = template2022.body,
           attachPdf                   = template2022.attachPdf,
           attachXml                   = None,
-          attachFiles                 = template2022.attachFiles,
-          attachControls              = attachControls,
-          excludeFromAllControlValues = controlsWithFormFieldRole(template2022.formFields, FormFieldRole.ExcludeFromAllFields),
+          filesToAttach                         = template2022.attachFiles.map(FilesToAttach.withName),
+          controlsToAttach                      = controlsToAttach,
+          controlsToExcludeFromAllControlValues = controlsWithFormFieldRole(template2022.formFields, FormFieldRole.ExcludeFromAllFields),
         )
       },
       params = metadata.params

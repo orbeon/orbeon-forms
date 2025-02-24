@@ -6,7 +6,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
-import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
+import org.orbeon.oxf.fr.email.EmailMetadata.{TemplateMatch, TemplateValue}
 import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadataParsing}
 import org.orbeon.oxf.fr.persistence.S3
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -89,7 +89,7 @@ trait FormRunnerEmailBackend {
     formData            : NodeInfo
   ): SequenceIterator = {
     val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
-    val templateValues   = emailTemplateOpt.toList.flatMap(_.attachControls)
+    val templateValues   = emailTemplateOpt.toList.flatMap(_.controlsToAttach)
 
     values(formDefinition, formData, templateValues)
   }
@@ -197,7 +197,7 @@ trait FormRunnerEmailBackend {
   def emailContents(
     urisByRenderedFormat    : Map[RenderedFormat, URI],
     emailDataFormatVersion  : DataFormatVersion,
-    matchAllTemplates       : Boolean,
+    templateMatch           : TemplateMatch,
     language                : String,
     templateNameOpt         : Option[String]
   )(implicit
@@ -223,8 +223,10 @@ trait FormRunnerEmailBackend {
       }
 
       // 2) Consider first template or all templates
-      val firstOrAllTemplates =
-        if (matchAllTemplates) templatesFilteredByLanguageAndName else templatesFilteredByLanguageAndName.take(1)
+      val firstOrAllTemplates = templateMatch match {
+        case TemplateMatch.First => templatesFilteredByLanguageAndName.take(1)
+        case TemplateMatch.All   => templatesFilteredByLanguageAndName
+      }
 
       // 3) Consider only templates with enableIfTrue expression, if any, evaluating to true
       val enabledTemplates = firstOrAllTemplates.filter { template =>

@@ -13,17 +13,26 @@ object EmailMetadata {
   )
 
   case class Template(
-    name                       : String,
-    lang                       : Option[String],
-    headers                    : List[(HeaderName, TemplateValue)],
-    subject                    : Option[Part],
-    body                       : Option[Part],
-    attachPdf                  : Option[Boolean],
-    attachXml                  : Option[Boolean],
-    attachFiles                : Option[String],
-    attachControls             : List[TemplateValue.Control],
-    excludeFromAllControlValues: List[TemplateValue.Control]
+    name                                 : String,
+    lang                                 : Option[String],
+    headers                              : List[(HeaderName, TemplateValue)],
+    subject                              : Option[Part],
+    body                                 : Option[Part],
+    attachPdf                            : Option[Boolean],
+    attachXml                            : Option[Boolean],
+    filesToAttach                        : Option[FilesToAttach],
+    controlsToAttach                     : List[TemplateValue.Control],
+    controlsToExcludeFromAllControlValues: List[TemplateValue.Control]
   )
+
+  sealed trait FilesToAttach extends EnumEntry with Hyphencase
+  object FilesToAttach extends Enum[FilesToAttach] {
+    case object All      extends FilesToAttach
+    case object None     extends FilesToAttach
+    case object Selected extends FilesToAttach
+
+    override def values: immutable.IndexedSeq[FilesToAttach] = super.findValues
+  }
 
   sealed trait TemplateValue
   object TemplateValue {
@@ -135,5 +144,13 @@ object EmailMetadata {
       attachPdf  : Option[Boolean],
       attachFiles: Option[String]
     )
+  }
+
+  sealed trait TemplateMatch extends EnumEntry with Hyphencase
+  object TemplateMatch extends Enum[TemplateMatch] {
+    case object First extends TemplateMatch
+    case object All   extends TemplateMatch
+
+    override def values: immutable.IndexedSeq[TemplateMatch] = super.findValues
   }
 }

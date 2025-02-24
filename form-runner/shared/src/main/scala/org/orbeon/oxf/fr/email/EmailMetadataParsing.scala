@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr.email
 
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.XMLNames
-import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, Legacy, TemplateValue}
+import org.orbeon.oxf.fr.email.EmailMetadata.{FilesToAttach, HeaderName, Legacy, TemplateValue}
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -48,16 +48,16 @@ object EmailMetadataParsing {
       values.collect { case (_, templateValue: TemplateValue.Control) => templateValue }
 
     EmailMetadata.Template(
-      name                        = templateNodeInfo.attValue("name"),
-      lang                        = templateNodeInfo.attValueOpt(XMLConstants.XML_LANG_QNAME),
-      headers                     = withHeaderNamesOnly(templateValuesInRootElement("headers")),
+      name                                  = templateNodeInfo.attValue("name"),
+      lang                                  = templateNodeInfo.attValueOpt(XMLConstants.XML_LANG_QNAME),
+      headers                               = withHeaderNamesOnly(templateValuesInRootElement("headers")),
       subject                     = templateNodeInfo.child("subject").headOption.map(parseCurrentPart),
       body                        = templateNodeInfo.child("body"   ).headOption.map(parseCurrentPart),
       attachPdf                   = templateNodeInfo.child("attach").att("pdf"  ).headOption.map(_.stringValue == "true"),
       attachXml                   = templateNodeInfo.child("attach").att("xml"  ).headOption.map(_.stringValue == "true"),
-      attachFiles                 = templateNodeInfo.child("attach").att("files").headOption.map(_.stringValue),
-      attachControls              = controlsOnly(templateValuesInRootElement("attach")),
-      excludeFromAllControlValues = controlsOnly(templateValuesInRootElement("exclude-from-all-control-values"))
+      filesToAttach                         = templateNodeInfo.child("attach").att("files").headOption.map(_.stringValue).map(FilesToAttach.withName),
+      controlsToAttach                      = controlsOnly(templateValuesInRootElement("attach")),
+      controlsToExcludeFromAllControlValues = controlsOnly(templateValuesInRootElement("exclude-from-all-control-values"))
     )
   }
 

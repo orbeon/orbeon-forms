@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
+import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.persistence.S3
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
@@ -157,12 +158,9 @@ trait FormRunnerActions
       val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
 
       if (s3Store) {
-        storeEmailContentsToS3(
-          params                 = params,
-          urisByRenderedFormat   = urisByRenderedFormat,
-          emailDataFormatVersion = emailDataFormatVersion,
-          templateMatchParam     = templateMatchParam
-        ).get
+        val templateMatch = templateMatchParam.trimAllToOpt.map(TemplateMatch.withName).getOrElse(TemplateMatch.First)
+
+        storeEmailContentsToS3(params, urisByRenderedFormat, emailDataFormatVersion, templateMatch).get
       }
 
       tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
@@ -172,7 +170,7 @@ trait FormRunnerActions
     params                : ActionParams,
     urisByRenderedFormat  : Map[RenderedFormat, URI],
     emailDataFormatVersion: DataFormatVersion,
-    templateMatchParam    : String
+    templateMatch         : TemplateMatch
   )(implicit
     formRunnerParams      : FormRunnerParams,
   ): Try[Unit] = {
@@ -207,7 +205,7 @@ trait FormRunnerActions
     val emailContentsTry = emailContents(
       urisByRenderedFormat   = urisByRenderedFormat,
       emailDataFormatVersion = emailDataFormatVersion,
-      matchAllTemplates      = templateMatchParam.trimAllToOpt.contains("all"),
+      templateMatch          = templateMatch,
       language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang), // Logic from createPdfOrTiffParams
       templateNameOpt        = paramByNameUseAvt(params, "template")
     )

@@ -17,6 +17,8 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach
+import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach.All
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, FormRunnerParams, GridDataMigration}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -140,22 +142,27 @@ object EmailContent {
     formRunnerParams: FormRunnerParams
   ): List[Attachment] = {
 
-    // TODO: use case objects
-    val attachFiles = template.attachFiles.orElse(formRunnerProperty("oxf.fr.email.attach-files")).getOrElse("all")
+    // Determine which attachments to include from template or property
+    val filesToAttach = template.filesToAttach
+      .orElse(formRunnerProperty("oxf.fr.email.attach-files").map(FilesToAttach.withName))
+      .getOrElse(All)
 
-    val body = (formDefinition / "*:body").head
-    val head = (formDefinition / "*:head").head
+    val attachmentHolders = filesToAttach match {
+      case FilesToAttach.All =>
+        val body = (formDefinition / "*:body").head
+        val head = (formDefinition / "*:head").head
 
-    val AttachmentClass = "fr-attachment"
+        val AttachmentClass = "fr-attachment"
 
-    val attachmentHolders =
-      if (attachFiles == "all")
         searchHoldersForClassTopLevelOnly       (             body = body, data = formData, classNames = AttachmentClass).toList ++
         searchHoldersForClassUseSectionTemplates(head = head, body = body, data = formData, classNames = AttachmentClass).toList
-      else if (attachFiles == "selected")
-        values(formDefinition, formData, template.attachControls).toList
-      else
+
+      case FilesToAttach.Selected =>
+        values(formDefinition, formData, template.controlsToAttach).toList
+
+      case FilesToAttach.None =>
         Nil
+    }
 
     val attachmentHolderNodes = attachmentHolders.collect { case nodeInfo: NodeInfo => nodeInfo }
 

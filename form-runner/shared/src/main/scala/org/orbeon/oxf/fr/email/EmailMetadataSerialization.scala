@@ -58,18 +58,18 @@ object EmailMetadataSerialization {
             ).flatten
           )
         ),
-        (template.attachPdf.isDefined || template.attachFiles.isDefined || template.attachControls.nonEmpty).option {
+        (template.attachPdf.isDefined || template.filesToAttach.isDefined || template.controlsToAttach.nonEmpty).option {
           NodeInfoFactory.elementInfo(
             QName("attach"),
             template.attachPdf.map(attachPdf => NodeInfoFactory.attributeInfo(QName("pdf"), attachPdf.toString)).toList :::
             template.attachXml.map(attachXml => NodeInfoFactory.attributeInfo(QName("xml"), attachXml.toString)).toList :::
-            template.attachFiles.map(NodeInfoFactory.attributeInfo(QName("files"), _)).toList                           :::
-            template.attachControls.map(serializeControl)
+            template.filesToAttach.map(filesToAttach => NodeInfoFactory.attributeInfo(QName("files"), filesToAttach.entryName)).toList                           :::
+            template.controlsToAttach.map(serializeControl)
           )
         },
         Some(NodeInfoFactory.elementInfo(
           QName("exclude-from-all-control-values"),
-          template.excludeFromAllControlValues.map(serializeControl)
+          template.controlsToExcludeFromAllControlValues.map(serializeControl)
         ))
       ).flatten
     )

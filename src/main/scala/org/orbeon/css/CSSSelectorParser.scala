@@ -17,7 +17,6 @@ import org.orbeon.dom.QName
 import org.orbeon.xml.NamespaceMapping
 import org.parboiled2.*
 
-import scala.reflect.macros.Names
 import scala.util.{Failure, Success}
 
 
@@ -33,17 +32,28 @@ object CSSSelectorParser {
 
   // AST
   sealed trait SelectorNode
+
   case class Selector(head: ElementWithFiltersSelector, tail: Seq[(Combinator, ElementWithFiltersSelector)]) extends SelectorNode
+
   object Selector {
     def applySeq(head: ElementWithFiltersSelector, tail: Seq[(Combinator, ElementWithFiltersSelector)]): Selector =
       Selector(head, tail.toList)
   }
 
   trait Combinator extends SelectorNode
-  case object ImmediatelyFollowingCombinator extends Combinator
-  case object ChildCombinator                extends Combinator
-  case object FollowingCombinator            extends Combinator
-  case object DescendantCombinator           extends Combinator
+  object Combinator {
+    case object ImmediatelyFollowing extends Combinator
+    case object Child                extends Combinator
+    case object Following            extends Combinator
+    case object Descendant           extends Combinator
+
+    def apply(s: String): Combinator = s match {
+      case "+" => ImmediatelyFollowing
+      case ">" => Child
+      case "~" => Following
+      case _   => Descendant
+    }
+  }
 
   trait NsType
   object NsType {
@@ -116,18 +126,24 @@ object CSSSelectorParser {
   }
 
   trait Filter extends SelectorNode
-  case class IdFilter(id: String) extends Filter
-  case class ClassFilter(className: String) extends Filter
-  case class AttributeFilter(name: TypeSelector, predicate: AttributePredicate) extends Filter
-  case class NegationFilter(selector: SelectorNode) extends Filter
+
+  object Filter {
+    case class Id(id: String)                                               extends Filter
+    case class Class(className: String)                                     extends Filter
+    case class Attribute(name: TypeSelector, predicate: AttributePredicate) extends Filter
+    case class Negation(selector: SelectorNode)                             extends Filter
+  }
 
   trait Expr extends SelectorNode
-  case object PlusExpr                                  extends Expr
-  case object MinusExpr                                 extends Expr
-  case class  DimensionExpr(num: String, ident: String) extends Expr
-  case class  NumberExpr(s: String)                     extends Expr
-  case class  StringExpr(s: String)                     extends Expr
-  case class  IdentExpr(s: String)                      extends Expr
+
+  object Expr {
+    case object Plus                                  extends Expr
+    case object Minus                                 extends Expr
+    case class  Dimension(num: String, ident: String) extends Expr
+    case class  Num(s: String)                        extends Expr
+    case class  Str(s: String)                        extends Expr
+    case class  Ident(s: String)                      extends Expr
+  }
 
   trait PseudoClassFilter extends Filter
   case class SimplePseudoClassFilter(classname: String) extends PseudoClassFilter
@@ -138,15 +154,6 @@ object CSSSelectorParser {
   }
 
   case class ElementWithFiltersSelector(element: Option[SimpleElementSelector], filters: List[Filter]) extends SelectorNode
-
-  object Combinator {
-    def apply(s: String): Combinator = s match {
-      case "+" => ImmediatelyFollowingCombinator
-      case ">" => ChildCombinator
-      case "~" => FollowingCombinator
-      case _   => DescendantCombinator
-    }
-  }
 
   object ElementWithFiltersSelector {
     def applyFilters(filters: Seq[Filter]): ElementWithFiltersSelector = ElementWithFiltersSelector(None, filters.toList)
@@ -213,9 +220,9 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
     optional(namespacePrefix) ~> UniversalSelector.applyOpt ~ "*"
   }
 
-  def className: Rule1[ClassFilter] = rule { "." ~ (ident ~> ClassFilter.apply) }
+  def className: Rule1[Filter.Class] = rule { "." ~ (ident ~> Filter.Class.apply) }
 
-  def attribute: Rule1[AttributeFilter] = rule {
+  def attribute: Rule1[Filter.Attribute] = rule {
     "[" ~
       OptWhiteSpace ~
       (typeSelector | typeSelectorNoNs) ~ // so that `E[ns|foo|="en"]` is parsed correctly
@@ -228,7 +235,7 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
           OptWhiteSpace ~> AttributePredicate.apply
         ) |
           push(AttributePredicate.Exist)
-      ) ~> AttributeFilter.apply ~
+      ) ~> Filter.Attribute.apply ~
     "]"
   }
 
@@ -240,29 +247,29 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   }
 
   def expression: Rule1[Seq[Expr]] = rule {
-    oneOrMore((plus | minus | dimension | number ~> NumberExpr.apply | string ~> StringExpr.apply | ident ~> IdentExpr.apply) ~ OptWhiteSpace)
+    oneOrMore((plus | minus | dimension | number ~> Expr.Num.apply | string ~> Expr.Str.apply | ident ~> Expr.Ident.apply) ~ OptWhiteSpace)
   }
 
-  def negation: Rule1[NegationFilter] = rule {
-    ":not(" ~ OptWhiteSpace ~ negationArg ~> NegationFilter.apply ~ OptWhiteSpace ~ ")"
+  def negation: Rule1[Filter.Negation] = rule {
+    ":not(" ~ OptWhiteSpace ~ negationArg ~> Filter.Negation.apply ~ OptWhiteSpace ~ ")"
   }
 
   def negationArg: Rule1[SelectorNode] = rule {
     typeSelector | universal | hash | className | attribute | pseudo
   }
 
-  def hash     : Rule1[IdFilter] = rule { "#" ~ (capture(oneOrMore(nmchar)) ~> IdFilter.apply) }
+  def hash     : Rule1[Filter.Id] = rule { "#" ~ (capture(oneOrMore(nmchar)) ~> Filter.Id.apply) }
 
-  def plus     : Rule1[Expr]   = rule { OptWhiteSpace ~ "+" ~ push(PlusExpr) }
-  def minus    : Rule1[Expr]   = rule { "-" ~ push(MinusExpr) }
-  def dimension: Rule1[Expr]   = rule { number ~ ident ~> (DimensionExpr.apply _) }
+  def plus     : Rule1[Expr]   = rule { OptWhiteSpace ~ "+" ~ push(Expr.Plus) }
+  def minus    : Rule1[Expr]   = rule { "-" ~ push(Expr.Minus) }
+  def dimension: Rule1[Expr]   = rule { number ~ ident ~> Expr.Dimension.apply }
   def number   : Rule1[String] = rule { capture(oneOrMore("0" - "9")) | capture(zeroOrMore("0" - "9") ~ "." ~ oneOrMore("0" - "9")) }
 
   def string   : Rule1[String] = rule { string1 | string2 }
   def string1  : Rule1[String] = rule { "\"" ~ capture(zeroOrMore(! anyOf("\"\n\r\f\\") ~ ANY | NewLine | nonascii | escape)) ~ "\"" }
   def string2  : Rule1[String] = rule { "'"  ~ capture(zeroOrMore(! anyOf("'\n\r\f\\")  ~ ANY | NewLine | nonascii | escape)) ~ "'"  }
 
-  def ident    : Rule1[String] = rule { capture(optional("-") ~ nmstart ~ zeroOrMore(nmchar)) }
+  def ident        : Rule1[String] = rule { capture(optional("-") ~ nmstart ~ zeroOrMore(nmchar)) }
 
   def nmstart      : Rule0 = rule { "_" | "a" - "z" | "A" - "Z" | nonascii | escape }
   def nmchar       : Rule0 = rule { ("_" | "a" - "z" | "A" - "Z" | "0" - "9" | "-") | nonascii | escape }

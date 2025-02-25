@@ -197,7 +197,7 @@ object BindingDescriptor {
     case Selector(
         ElementWithFiltersSelector(
           typeSelectorOpt,
-          List(AttributeFilter(typeSelector, attPredicate))
+          List(Filter.Attribute(typeSelector, attPredicate))
         ),
         Nil) =>
 
@@ -291,7 +291,7 @@ object BindingDescriptor {
       case Selector(
           ElementWithFiltersSelector(
             Some(TypeSelector(NsType.Specific(prefix), localname)),
-            List(FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))))
+            List(FunctionalPseudoClassFilter("xxf-type", List(Expr.Str(datatype))))
           ),
           Nil) =>
 
@@ -311,8 +311,8 @@ object BindingDescriptor {
           ElementWithFiltersSelector(
             typeSelectorOpt,
             List(
-              FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))),
-              AttributeFilter(typeSelector, attPredicate)
+              FunctionalPseudoClassFilter("xxf-type", List(Expr.Str(datatype))),
+              Filter.Attribute(typeSelector, attPredicate)
             )
           ),
           Nil) =>

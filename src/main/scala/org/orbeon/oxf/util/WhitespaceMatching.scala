@@ -113,13 +113,13 @@ object WhitespaceMatching  {
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(NsType.Specific(prefix), localname)), Nil), Nil) =>
               ElementMatcher(ns(prefix) -> localname)
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(NsType.Specific(prefix), localname)), Nil),
-                List((ChildCombinator, ElementWithFiltersSelector(Some(UniversalSelector(NsType.Default)), Nil)))) =>
+                List((Combinator.Child, ElementWithFiltersSelector(Some(UniversalSelector(NsType.Default)), Nil)))) =>
               AnyElementChildOfMatcher(ns(prefix) -> localname)
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(NsType.Specific(prefix), localname)),
-                List(NegationFilter(AttributeFilter(TypeSelector(NsType.Default, attrName), AttributePredicate.Equal(attrValue))))), Nil) =>
+                List(Filter.Negation(Filter.Attribute(TypeSelector(NsType.Default, attrName), AttributePredicate.Equal(attrValue))))), Nil) =>
               ElementAttributeValueMatcher(ns(prefix) -> localname, attrName, attrValue, negate = true)
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(NsType.Specific(prefix), localname)),
-                List(AttributeFilter(TypeSelector(NsType.Default, attrName), AttributePredicate.Equal(attrValue)))), Nil) =>
+                List(Filter.Attribute(TypeSelector(NsType.Default, attrName), AttributePredicate.Equal(attrValue)))), Nil) =>
               ElementAttributeValueMatcher(ns(prefix) -> localname, attrName, attrValue, negate = false)
             case _ =>
               throw new IllegalArgumentException(s"Unrecognized whitespace policy: $value")

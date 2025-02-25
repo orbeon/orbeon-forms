@@ -29,8 +29,8 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 object SectionGridEditor {
 
-  lazy val sectionGridEditorContainer : JQuery        = $(".fb-section-grid-editor")
-  var currentSectionGridOpt           : Option[Block] = None
+  def sectionGridEditorContainer : JQuery        = $(".fb-section-grid-editor")
+  var currentSectionGridOpt      : Option[Block] = None
 
   private def allIcons =
     sectionGridEditorContainer.find(".fa")

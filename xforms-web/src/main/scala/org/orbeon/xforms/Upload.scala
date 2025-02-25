@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.*
@@ -31,8 +32,6 @@ import scala.scalajs.js.annotation.JSExport
 object Upload {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
-
-  private val ClickEvent     = s"click"
 
   logger.debug("init object")
 
@@ -101,7 +100,7 @@ class Upload {
 
       // Register listener on the cancel link
       findDescendantElem(UploadCancelClass) foreach { cancelAnchor =>
-        cancelAnchor.addEventListener(ClickEvent, self.cancelButtonActivated _)
+        cancelAnchor.addEventListener(DomEventNames.Click, self.cancelButtonActivated _)
       }
     }
   }

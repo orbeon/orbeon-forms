@@ -44,7 +44,6 @@ val ScalaJsTimeVersion               = "2.6.0"
 val ScalaJsLocalesVersion            = "1.4.1"
 
 // Scala libraries for Scala JVM only
-val Parboiled1Version                = "1.3.1"
 val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
@@ -96,7 +95,6 @@ val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
-  "org.parboiled"               %% "parboiled-scala"                % Parboiled1Version,
   "org.parboiled"               %% "parboiled"                      % Parboiled2Version,
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,

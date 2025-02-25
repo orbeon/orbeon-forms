@@ -13,8 +13,10 @@
  */
 package org.orbeon.css
 
-import org.parboiled.errors.{ErrorUtils, ParsingException}
-import org.parboiled.scala.*
+import org.parboiled2.*
+
+import scala.util.{Failure, Success}
+
 
 // CSS 3 selector parser based on the grammar specified at: http://www.w3.org/TR/css3-selectors/
 //
@@ -26,11 +28,15 @@ import org.parboiled.scala.*
 // - better representation of namespaced names
 // - tests escapes in identifiers and strings
 // - tests newlines in identifiers and strings
-object CSSSelectorParser extends Parser {
+object CSSSelectorParser {
 
   // AST
   sealed trait SelectorNode
-  case class Selector(head: ElementWithFiltersSelector, tail: List[(Combinator, ElementWithFiltersSelector)]) extends SelectorNode
+  case class Selector(head: ElementWithFiltersSelector, tail: Seq[(Combinator, ElementWithFiltersSelector)]) extends SelectorNode
+  object Selector {
+    def applySeq(head: ElementWithFiltersSelector, tail: Seq[(Combinator, ElementWithFiltersSelector)]): Selector =
+      Selector(head, tail.toList)
+  }
 
   trait Combinator extends SelectorNode
   case object ImmediatelyFollowingCombinator extends Combinator
@@ -72,16 +78,20 @@ object CSSSelectorParser extends Parser {
   case class NegationFilter(selector: SelectorNode) extends Filter
 
   trait Expr extends SelectorNode
-  case object PlusExpr extends Expr
-  case object MinusExpr extends Expr
-  case class DimensionExpr(num: String, ident: String) extends Expr
-  case class NumberExpr(s: String) extends Expr
-  case class StringExpr(s: String) extends Expr
-  case class IdentExpr(s: String) extends Expr
+  case object PlusExpr                                  extends Expr
+  case object MinusExpr                                 extends Expr
+  case class  DimensionExpr(num: String, ident: String) extends Expr
+  case class  NumberExpr(s: String)                     extends Expr
+  case class  StringExpr(s: String)                     extends Expr
+  case class  IdentExpr(s: String)                      extends Expr
 
   trait PseudoClassFilter extends Filter
   case class SimplePseudoClassFilter(classname: String) extends PseudoClassFilter
   case class FunctionalPseudoClassFilter(function: String, exprs: List[Expr]) extends PseudoClassFilter
+  object FunctionalPseudoClassFilter {
+    def applySeq(function: String, exprs: Seq[Expr]): FunctionalPseudoClassFilter =
+      FunctionalPseudoClassFilter(function, exprs.toList)
+  }
 
   case class ElementWithFiltersSelector(element: Option[SimpleElementSelector], filters: List[Filter]) extends SelectorNode
 
@@ -95,25 +105,41 @@ object CSSSelectorParser extends Parser {
   }
 
   object ElementWithFiltersSelector {
-    def apply1(filters: List[Filter]): ElementWithFiltersSelector = ElementWithFiltersSelector(None, filters)
-    def apply2(selector: SimpleElementSelector, filters: List[Filter]): ElementWithFiltersSelector = ElementWithFiltersSelector(Some(selector), filters)
+    def applyFilters(filters: Seq[Filter]): ElementWithFiltersSelector = ElementWithFiltersSelector(None, filters.toList)
+    def applySelectorAndFilters(selector: SimpleElementSelector, filters: Seq[Filter]): ElementWithFiltersSelector = ElementWithFiltersSelector(Some(selector), filters.toList)
   }
 
+  def parseSelectors(process: String): List[Selector] =
+     new CSSSelectorParser(process).selectorsGroup.run() match {
+      case Success(astRoot) => astRoot.toList
+      case Failure(t)       => throw t
+    }
+}
+
+class CSSSelectorParser(val input: ParserInput)  extends Parser {
+
+  import CSSSelectorParser.*
+
   // Rules (for naming rules, see http://users.parboiled.org/Scala-performance-td4024217.html)
-  def selectorsGroup: Rule1[List[Selector]] = rule {
-    OptWhiteSpace ~ zeroOrMore(selector, OptWhiteSpace ~ "," ~ OptWhiteSpace) ~ EOI
+  def selectorsGroup: Rule1[Seq[Selector]] = rule {
+    OptWhiteSpace ~ zeroOrMore(selector).separatedBy(OptWhiteSpace ~ "," ~ OptWhiteSpace) ~ EOI
   }
 
   def selector: Rule1[Selector] = rule {
-    simpleSelectorSequence ~ zeroOrMore(combinator ~ simpleSelectorSequence) ~~> Selector.apply
+    (simpleSelectorSequence ~ zeroOrMore(selectorTuple)) ~> Selector.applySeq
+  }
+
+  def selectorTuple: Rule1[(Combinator, ElementWithFiltersSelector)] = rule {
+    combinator ~ simpleSelectorSequence ~> Tuple2[Combinator, ElementWithFiltersSelector].apply
   }
 
   def combinator: Rule1[Combinator] = rule {
-    (OptWhiteSpace ~ anyOf("+>~") ~> Combinator.apply | WhiteSpace ~> Combinator.apply) ~ OptWhiteSpace
+    (OptWhiteSpace ~ capture(anyOf("+>~")) ~> Combinator.apply | capture(WhiteSpace) ~> Combinator.apply) ~ OptWhiteSpace
   }
 
   def simpleSelectorSequence: Rule1[ElementWithFiltersSelector] = rule {
-    ((typeSelector | universal) ~ zeroOrMore(filters) ~~> ElementWithFiltersSelector.apply2 _) | (oneOrMore(filters) ~~> ElementWithFiltersSelector.apply1)
+    ((typeSelector | universal) ~ zeroOrMore(filters) ~> ElementWithFiltersSelector.applySelectorAndFilters _) |
+      (oneOrMore(filters) ~> ElementWithFiltersSelector.applyFilters)
   }
 
   def filters: Rule1[Filter] = rule {
@@ -121,20 +147,20 @@ object CSSSelectorParser extends Parser {
   }
 
   def typeSelector: Rule1[TypeSelector] = rule {
-    optional(namespacePrefix) ~ elementName ~~> TypeSelector.apply
+    optional(namespacePrefix) ~ elementName ~> TypeSelector.apply
   }
 
   def namespacePrefix: Rule1[Option[String]] = rule {
-    optional(ident | "*" ~> identity) ~ "|"
+    optional(ident | capture("*")) ~ "|"
   }
 
   def elementName: Rule1[String] = ident
 
   def universal: Rule1[UniversalSelector] = rule {
-    optional(namespacePrefix) ~~> (UniversalSelector.apply _) ~ "*"
+    optional(namespacePrefix) ~> UniversalSelector.apply ~ "*"
   }
 
-  def className = rule { "." ~ (ident ~~> (ClassFilter.apply _)) }
+  def className: Rule1[ClassFilter] = rule { "." ~ (ident ~> ClassFilter.apply) }
 
   def attribute: Rule1[AttributeFilter] = rule {
     "[" ~
@@ -144,67 +170,57 @@ object CSSSelectorParser extends Parser {
       OptWhiteSpace ~
       (
         (
-          ("^=" | "$=" | "*=" | "=" | "~=" | "|=") ~> identity ~
+          capture("^=" | "$=" | "*=" | "=" | "~=" | "|=") ~
           OptWhiteSpace ~
           (string | ident) ~
-          OptWhiteSpace  ~~> AttributePredicate.apply _
-        ) | (
+          OptWhiteSpace ~> AttributePredicate.apply
+        ) |
           push(AttributePredicate.Exist)
-        )
-      ) ~~> (AttributeFilter.apply _) ~
+      ) ~> AttributeFilter.apply ~
     "]"
   }
 
-  def pseudo: Rule1[PseudoClassFilter] = rule { ":" ~ optional(":") ~ (functionalPseudo | ident ~~> SimplePseudoClassFilter.apply) }
+  def pseudo: Rule1[PseudoClassFilter] = rule { ":" ~ optional(":") ~ (functionalPseudo | ident ~> SimplePseudoClassFilter.apply) }
 
   // FIXME: ident must not be "not" as that's handled by the negation
   def functionalPseudo: Rule1[FunctionalPseudoClassFilter] = rule {
-    ident ~ "(" ~ OptWhiteSpace ~ expression ~ ")" ~~> FunctionalPseudoClassFilter.apply
+    ident ~ "(" ~ OptWhiteSpace ~ expression ~ ")" ~> (FunctionalPseudoClassFilter.applySeq _)
   }
 
-  def expression: Rule1[List[Expr]] = rule {
-    oneOrMore((plus | minus | dimension | number ~~> NumberExpr.apply | string ~~> StringExpr.apply | ident ~~> IdentExpr.apply) ~ OptWhiteSpace)
+  def expression: Rule1[Seq[Expr]] = rule {
+    oneOrMore((plus | minus | dimension | number ~> NumberExpr.apply | string ~> StringExpr.apply | ident ~> IdentExpr.apply) ~ OptWhiteSpace)
   }
 
   def negation: Rule1[NegationFilter] = rule {
-    ":not(" ~ OptWhiteSpace ~ negationArg ~~> (NegationFilter.apply _) ~ OptWhiteSpace ~ ")"
+    ":not(" ~ OptWhiteSpace ~ negationArg ~> NegationFilter.apply ~ OptWhiteSpace ~ ")"
   }
 
-  def negationArg = rule {
+  def negationArg: Rule1[SelectorNode] = rule {
     typeSelector | universal | hash | className | attribute | pseudo
   }
 
-  def hash = rule { "#" ~ (oneOrMore(nmchar) ~> IdFilter.apply) }
-  def plus = rule { OptWhiteSpace ~ "+" ~ push(PlusExpr) }
-  def minus = rule { "-" ~ push(MinusExpr) }
-  def dimension = rule { number ~ ident ~~> (DimensionExpr.apply _) }
-  def number = rule { oneOrMore("0" - "9") ~> identity | group(zeroOrMore("0" - "9") ~ "." ~ oneOrMore("0" - "9")) ~> identity }
+  def hash     : Rule1[IdFilter] = rule { "#" ~ (capture(oneOrMore(nmchar)) ~> IdFilter.apply) }
 
-  def string  = rule { string1 | string2 }
-  def string1 = rule { "\"" ~ zeroOrMore(! anyOf("\"\n\r\f\\") ~ ANY | NewLine | nonascii | escape) ~> identity ~ "\"" }
-  def string2 = rule { "'"  ~ zeroOrMore(! anyOf("'\n\r\f\\")  ~ ANY | NewLine | nonascii | escape) ~> identity ~ "'"  }
+  def plus     : Rule1[Expr]   = rule { OptWhiteSpace ~ "+" ~ push(PlusExpr) }
+  def minus    : Rule1[Expr]   = rule { "-" ~ push(MinusExpr) }
+  def dimension: Rule1[Expr]   = rule { number ~ ident ~> (DimensionExpr.apply _) }
+  def number   : Rule1[String] = rule { capture(oneOrMore("0" - "9")) | capture(zeroOrMore("0" - "9") ~ "." ~ oneOrMore("0" - "9")) }
 
-  def ident = rule { group(optional("-") ~ nmstart ~ zeroOrMore(nmchar)) ~> identity }
-  def nmstart: Rule0 = rule {"_" | "a" - "z" | "A" - "Z" | nonascii | escape }
-  def nmchar: Rule0 = rule { ("_" | "a" - "z" | "A" - "Z" | "0" - "9" | "-") | nonascii | escape }
+  def string   : Rule1[String] = rule { string1 | string2 }
+  def string1  : Rule1[String] = rule { "\"" ~ capture(zeroOrMore(! anyOf("\"\n\r\f\\") ~ ANY | NewLine | nonascii | escape)) ~ "\"" }
+  def string2  : Rule1[String] = rule { "'"  ~ capture(zeroOrMore(! anyOf("'\n\r\f\\")  ~ ANY | NewLine | nonascii | escape)) ~ "'"  }
 
-  def nonascii: Rule0 = rule { ! ("\u0000" - "\u007f") ~ ANY }
+  def ident    : Rule1[String] = rule { capture(optional("-") ~ nmstart ~ zeroOrMore(nmchar)) }
 
-  def escape: Rule0 = rule { unicode | "\\" ~ ! ("\n" | "\r" | "\f" | "0" - "9" | "a" - "f") ~ ANY }
-  def unicode: Rule0 = rule { "\\" ~ oneOrMore("0" - "9" | "a" - "f") ~ optional("\r\n" | WhiteSpace) }
+  def nmstart      : Rule0 = rule { "_" | "a" - "z" | "A" - "Z" | nonascii | escape }
+  def nmchar       : Rule0 = rule { ("_" | "a" - "z" | "A" - "Z" | "0" - "9" | "-") | nonascii | escape }
 
-  def NewLine       = rule { "\n" | "\r\n" | "\r" | "\f" }
-  def WhiteSpace    = rule { oneOrMore(anyOf(" \n\r\t\f")) }
-  def OptWhiteSpace = rule { zeroOrMore(anyOf(" \n\r\t\f")) }
+  def nonascii     : Rule0 = rule { ! ("\u0000" - "\u007f") ~ ANY }
 
-  // Instantiate parser only once as parser creation is costly
-  val SelectorsGroupParser = selectorsGroup
+  def escape       : Rule0 = rule { unicode | "\\" ~ ! ("\n" | "\r" | "\f" | "0" - "9" | "a" - "f") ~ ANY }
+  def unicode      : Rule0 = rule { "\\" ~ oneOrMore("0" - "9" | "a" - "f") ~ optional("\r\n" | WhiteSpace) }
 
-  def parseSelectors(selectors: String): List[Selector] = {
-    val parsingResult = ReportingParseRunner(SelectorsGroupParser).run(selectors)
-    parsingResult.result match {
-      case Some(list) => list
-      case None       => throw new ParsingException("Invalid source:\n" + ErrorUtils.printParseErrors(parsingResult))
-    }
-  }
+  def NewLine      : Rule0 = rule { "\n" | "\r\n" | "\r" | "\f" }
+  def WhiteSpace   : Rule0 = rule { oneOrMore(anyOf(" \n\r\t\f")) }
+  def OptWhiteSpace: Rule0 = rule { zeroOrMore(anyOf(" \n\r\t\f")) }
 }

@@ -163,7 +163,7 @@
                         <xf:delete
                             ref="@fr:tmp-file"/>
                     </xf:action>
-                    <xf:action event="xforms-upload-done">
+                    <xf:action event="xxforms-upload-done">
                         <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
                         <xf:delete
                             ref="@fr:tmp-file"/>

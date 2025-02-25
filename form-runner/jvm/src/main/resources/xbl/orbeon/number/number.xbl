@@ -459,8 +459,8 @@
     <xbl:binding
         id="fr-number-output"
         element="
-            fr|number[static-readonly = true],
-            fr|currency[static-readonly = true]"
+            fr|number[fr|static-readonly = true],
+            fr|currency[fr|static-readonly = true]"
         xxbl:mode="lhha binding value allow-minimal-label-hint"
         xxbl:label-for="input"
         xxbl:format="

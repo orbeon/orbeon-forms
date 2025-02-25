@@ -437,9 +437,9 @@
     <xbl:binding
         id="fr-date-output"
         element="
-            fr|date[static-readonly = true],
-            fr|dropdown-date[static-readonly = true],
-            fr|fields-date[static-readonly = true]"
+            fr|date[fr|static-readonly = true],
+            fr|dropdown-date[fr|static-readonly = true],
+            fr|fields-date[fr|static-readonly = true]"
         xxbl:mode="lhha binding value"
         xxbl:label-for="input"
     >

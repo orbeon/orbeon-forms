@@ -67,7 +67,7 @@
                 )">
                 <fr:date>
                     <xsl:if test="$is-static-readonly and ($is-pdf-mode or not($date-native-picker = 'always'))">
-                        <xsl:attribute name="static-readonly">true</xsl:attribute>
+                        <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
                     </xsl:if>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                     <!-- See other comment further "Q: Do we really need this?" -->
@@ -85,7 +85,7 @@
                 )">
                 <fr:time>
                     <xsl:if test="$is-static-readonly and ($is-pdf-mode or not($time-native-picker = 'always'))">
-                        <xsl:attribute name="static-readonly">true</xsl:attribute>
+                        <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
                     </xsl:if>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                     <!-- See other comment further "Q: Do we really need this?" -->
@@ -110,7 +110,7 @@
         <!-- For now this only applies to controls that have an `xf:select1` binding -->
         <xsl:element name="xf:select1">
             <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="static-readonly">true</xsl:attribute>
+                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
             </xsl:if>
             <xsl:apply-templates select="@* except (@appearance, @fr:pdf-appearance)" mode="#current"/>
             <xsl:attribute name="appearance" select="(@fr:pdf-appearance, map:get($select1-pdf-appearances, fr:direct-name-for-select1-element(.)))[1]"/>
@@ -147,7 +147,7 @@
             <xsl:when test="frf:controlNameFromId(@id) = $choice-validation-selection-control-names">
                 <xsl:copy>
                     <xsl:if test="$is-static-readonly">
-                        <xsl:attribute name="static-readonly">true</xsl:attribute>
+                        <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
                     </xsl:if>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                         <xf:alert
@@ -202,7 +202,7 @@
         mode="within-grid">
         <xsl:copy>
             <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="static-readonly">true</xsl:attribute>
+                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
             </xsl:if>
             <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
                 <xsl:attribute name="appearance" select="."/>
@@ -218,7 +218,7 @@
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
             <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="static-readonly">true</xsl:attribute>
+                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
             </xsl:if>
             <xsl:for-each select="@prefix | @suffix">
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
@@ -234,7 +234,7 @@
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
             <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="static-readonly">true</xsl:attribute>
+                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
             </xsl:if>
             <xsl:if test="exists(@resource | @selection)">
                 <!-- As calls below can generate `frf:controlVariableValue()` -->
@@ -368,7 +368,7 @@
                     )
                 )
             ">
-                <xsl:attribute name="static-readonly">true</xsl:attribute>
+                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
             </xsl:if>
             <xsl:apply-templates select="@* | node()" mode="#current"/>
         </xsl:copy>
@@ -383,7 +383,7 @@
         priority="-20">
         <xsl:copy>
             <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="static-readonly">true</xsl:attribute>
+                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
             </xsl:if>
             <xsl:apply-templates select="@* | node()" mode="#current"/>
             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>

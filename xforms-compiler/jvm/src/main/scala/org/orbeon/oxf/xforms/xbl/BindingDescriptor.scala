@@ -33,7 +33,7 @@ import org.orbeon.xml.NamespaceMapping
 // elements. Namely, we can bind:
 //
 // - by element name only
-// - by element name and datatype (with the `xxf:type()` )
+// - by element name and datatype (with the `xxf:type()` functional pseudo-class)
 // - by element name and a single `appearance` attribute
 // - by a single `appearance` attribute
 // - by element name, a datatype, and a single `appearance` attribute

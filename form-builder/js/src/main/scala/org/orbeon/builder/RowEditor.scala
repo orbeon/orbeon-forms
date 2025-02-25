@@ -24,6 +24,7 @@ import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import io.udash.wrappers.jquery.JQuery
+import org.orbeon.web.DomSupport.DomEventOps
 import org.scalajs.dom
 
 import scala.collection.immutable
@@ -32,9 +33,9 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 object RowEditor {
 
-  private var      currentGridBodyOpt  : Option[Block] = None
-  private var      currentRowPosOpt    : Option[Int]   = None
-  private lazy val rowEditorContainer  : JQuery        = $(".fb-row-editor")
+  private var currentGridBodyOpt  : Option[Block] = None
+  private var currentRowPosOpt    : Option[Int]   = None
+  private def rowEditorContainer  : JQuery        = $(".fb-row-editor")
 
   private def withCurrentGridBody[T](f: Block => T): Option[T] =
     currentGridBodyOpt flatMap { currentGridBody =>
@@ -138,24 +139,26 @@ object RowEditor {
     currentGridBodyOpt = None
   }
 
-  RowEditor.values foreach { rowEditor =>
-    val iconEl = rowEditorContainer.children(rowEditor.className)
-    iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
-      withCurrentGridBody { currentGridBody =>
-        currentRowPosOpt foreach { currentRowPos =>
+  document.addEventListener("click", (clickEvent: dom.Event) => {
+    RowEditor.values foreach { rowEditor =>
+      val iconEl = rowEditorContainer.children(rowEditor.className)
+      if (iconEl.is(clickEvent.targetT)) {
+        withCurrentGridBody { currentGridBody =>
+          currentRowPosOpt foreach { currentRowPos =>
 
-          val gridEl    = currentGridBody.el.closest(BlockCache.GridSelector)
-          val controlId = gridEl.attr("id").get
-          val client    = RpcClient[FormBuilderRpcApi]
+            val gridEl    = currentGridBody.el.closest(BlockCache.GridSelector)
+            val controlId = gridEl.attr("id").get
+            val client    = RpcClient[FormBuilderRpcApi]
 
-          rowEditor match {
-            case InsertAbove => client.rowInsert(controlId, currentRowPos, AboveBelow.Above.entryName).call()
-            case Delete      => client.rowDelete(controlId, currentRowPos).call()
-            case InsertBelow => client.rowInsert(controlId, currentRowPos, AboveBelow.Below.entryName).call()
+            rowEditor match {
+              case InsertAbove => client.rowInsert(controlId, currentRowPos, AboveBelow.Above.entryName).call()
+              case Delete      => client.rowDelete(controlId, currentRowPos).call()
+              case InsertBelow => client.rowInsert(controlId, currentRowPos, AboveBelow.Below.entryName).call()
+            }
           }
         }
       }
-    }))
-  }
+    }
+  })
 
 }

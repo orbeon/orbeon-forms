@@ -13,15 +13,14 @@
  */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.JQuery
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
-import org.scalajs.dom.{EventListenerOptions, document, html}
-import io.udash.wrappers.jquery.JQuery
-import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom
+import org.scalajs.dom.{EventListenerOptions, html}
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic
@@ -36,24 +35,12 @@ object WPaint {
 
     def annotationEl : JQuery = $(containerElem).find(".fr-wpaint-annotation img")
     def imageEl      : JQuery = $(containerElem).find(".fr-wpaint-image img")
-    def noCanvasEl   : JQuery = $(containerElem).find(".fr-wpaint-no-canvas")
     def wpaintElA    : JQuery = $(containerElem).find(".fr-wpaint-container-a")
     def wpaintElB    : JQuery = $(containerElem).find(".fr-wpaint-container-b")
-    def uploadEl     : JQuery = $(containerElem).find(".xforms-upload")
     var wpaintElC    : JQuery = null
 
-    override def init(): Unit = {
-      if (canvasSupported) {
-
-        // Hide the canvas element used just to show the browser doesn't support the canvas feature, and show the image selector
-        // We don't remove it as it contains an `xf:output` which needs to be there in case the FR language changes.
-        noCanvasEl.addClass("xforms-hidden")
-        uploadEl.removeClass("xforms-hidden")
-
-        // Register events
-        imageEl.asInstanceOf[Dynamic].imagesLoaded(backgroundImageChanged _)
-      }
-    }
+    override def init(): Unit =
+      imageEl.asInstanceOf[Dynamic].imagesLoaded(backgroundImageChanged _)
 
     def enabled  () = ()
     def readonly () = ()
@@ -99,13 +86,6 @@ object WPaint {
           listener = (_: dom.Event) => backgroundImageChanged(),
           options  = new EventListenerOptions { once = true })
       )
-    }
-
-    // Test canvas support, see http://stackoverflow.com/a/2746983/5295
-    private def canvasSupported: Boolean = {
-      val testCanvas = document.createElement("canvas").asInstanceOf[Dynamic]
-      (! js.isUndefined(testCanvas.getContext)) &&
-        (! js.isUndefined(testCanvas.getContext("2d")))
     }
 
     // Send the image data from wPaint to the server, which will put it in <annotation>

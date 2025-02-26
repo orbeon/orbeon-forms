@@ -28,7 +28,11 @@
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/wPaint.js"/>
     <xbl:script src="/ops/javascript/imagesloaded/imagesloaded.pkgd.min.js"/>
 
-    <xbl:binding id="fr-wpaint" element="fr|wpaint" xxbl:mode="lhha binding" xxf:external-events="fr-update-annotation">
+    <xbl:binding
+        id="fr-wpaint"
+        element="fr|wpaint"
+        xxbl:mode="lhha binding javascript-lifecycle"
+        xxf:external-events="fr-update-annotation">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.css"/>
@@ -63,11 +67,8 @@
         </fb:metadata>
 
         <xbl:handlers>
-            <xbl:handler event="xxforms-visible"  type="javascript">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.enabled  ();</xbl:handler>
-            <xbl:handler event="xforms-readonly"  type="javascript">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.readonly ();</xbl:handler>
-            <xbl:handler event="xforms-readwrite" type="javascript">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.readwrite();</xbl:handler>
             <!-- On upload, set annotation to be the image that was just uploaded -->
-            <xbl:handler event="xxforms-upload-done" observer="image"><xf:setvalue ref="annotation" value="../image"/></xbl:handler>
+            <xbl:handler event="xxforms-upload-done" observer="upload"><xf:setvalue ref="annotation" value="../image"/></xbl:handler>
             <xbl:handler event="fr-update-annotation"><xf:setvalue ref="annotation" value="event('value')"/></xbl:handler>
         </xbl:handlers>
 
@@ -122,55 +123,51 @@
         </xbl:implementation>
 
         <xbl:template>
-            <xf:group appearance="xxf:internal">
 
-                <!-- Allow access to annotation and image from JavaScript -->
-                <xf:output class="fr-wpaint-image"      ref="image[not(xxf:is-control-readonly('fr-wpaint'))]" mediatype="image/*"/>
-                <xf:output class="fr-wpaint-annotation" ref="annotation" alt="{xxf:r('annotated-image')}"      mediatype="image/*"/>
+            <xf:var name="is-readonly" value="xxf:is-control-readonly('fr-wpaint')"/>
 
-                <!-- Message in case the canvas is not supported
-                     - completely static, so it is shown even without JavaScript
-                     - this canvas is removed by JS, once it determines canvas is supported -->
-                <xh:canvas class="fr-wpaint-no-canvas"><xf:output value="xxf:r('errors.canvas-not-supported', '|fr-fr-resources|')"/></xh:canvas>
+            <!-- Allow access to annotation and image from JavaScript -->
+            <xf:output id="image"      class="fr-wpaint-image"      ref="image[not($is-readonly)]" mediatype="image/*"/>
+            <xf:output id="annotation" class="fr-wpaint-annotation {'xforms-hidden'[not($is-readonly)]}" ref="annotation" alt="{xxf:r('annotated-image')}" mediatype="image/*"/>
 
-                <!-- Block in which wPaint renders its canvas -->
-                <xf:var
-                    name="start-stroke-color-class"
-                    value="
-                        for $start-stroke-color in fr:component-param-value('start-stroke-color')
-                        return
-                            concat(
-                                'fr-wpaint-start-stroke-color-',
-                                if (contains($start-stroke-color, '#'))
-                                then substring-after($start-stroke-color, '#')
-                                else $start-stroke-color
-                            )"/>
-                <xh:div class="fr-wpaint-container-a{ for $c in $start-stroke-color-class return concat(' ', $c) }">
-                    <xh:div class="fr-wpaint-container-b"/>
-                </xh:div>
+            <!-- Block in which wPaint renders its canvas -->
+            <xf:var
+                name="start-stroke-color-class"
+                value="
+                    for $start-stroke-color in fr:component-param-value('start-stroke-color')
+                    return
+                        concat(
+                            'fr-wpaint-start-stroke-color-',
+                            if (contains($start-stroke-color, '#'))
+                            then substring-after($start-stroke-color, '#')
+                            else $start-stroke-color
+                        )"/>
+            <xh:div class="fr-wpaint-container-a{ for $c in $start-stroke-color-class return concat(' ', $c) }{' xforms-hidden'[not($is-readonly)]}">
+                <xh:div class="fr-wpaint-container-b"/>
+            </xh:div>
 
-                <!-- Background image selection
-                     - has xforms-hidden class, as it will be shown by JS once it determined canvas is supported -->
-                <xf:upload ref="image" id="image" accept="image/*" class="xforms-hidden">
-                    <xf:filename ref="@filename"/>
-                    <xf:mediatype ref="@mediatype"/>
-                    <xxf:size ref="@size"/>
+            <!-- Background image selection -->
+            <fr:attachment id="upload" ref="image[not(xxf:is-control-readonly('fr-wpaint'))]">
+                <xf:filename ref="@filename"/>
+                <xf:mediatype ref="@mediatype"/>
+                <xxf:size ref="@size"/>
 
-                    <!-- Clear annotation when the image is cleared -->
-                    <xf:action event="xforms-value-changed" if="xxf:is-blank(.)">
-                        <xf:setvalue ref="../annotation"/>
-                        <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
-                        <xf:delete
-                            ref="@fr:tmp-file"/>
-                    </xf:action>
-                    <xf:action event="xxforms-upload-done">
-                        <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
-                        <xf:delete
-                            ref="@fr:tmp-file"/>
-                    </xf:action>
-                </xf:upload>
+                <!-- Clear annotation when the image is cleared -->
+                <xf:action event="xforms-value-changed" if="xxf:is-blank(event('xxf:value'))">
+                    <xf:setvalue ref="../annotation"/>
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                    <xf:delete
+                        ref="@fr:tmp-file"/>
+                </xf:action>
+                <xf:action event="xxforms-upload-done">
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                    <xf:delete
+                        ref="@fr:tmp-file"/>
+                </xf:action>
+            </fr:attachment>
 
-            </xf:group>
+        </xbl:template>
+    </xbl:binding>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

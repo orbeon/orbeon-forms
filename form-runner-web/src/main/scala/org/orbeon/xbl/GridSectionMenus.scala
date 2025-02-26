@@ -64,7 +64,7 @@ trait GridSectionMenus {
 
       val target  = event.targetT
       if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(event)
-      if (target.matches   (s".fr-$componentName-remove-button")           ) removeIterationHandler(event)
+      if (target.closestOpt(s".fr-$componentName-remove-button").nonEmpty  ) removeIterationHandler(event)
 
       // Menu actions
       Operation.values.foreach { op =>

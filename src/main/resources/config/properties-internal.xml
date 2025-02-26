@@ -640,9 +640,13 @@
 
         +/ops/dragula/dragula.min.js
         -/ops/javascript/scalajs/orbeon-xforms-web.js
-        -/apps/fr/resources/scalajs/orbeon-form-runner-web.js
         +/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
         +fr:ladda-button
+        +fr:dropdown-select1-search
+        +fr:handwritten-signature
+        +fr:wpaint
+        +fr:tinymce
+        +fr:autosize-textarea
     </property>
 
 </properties>

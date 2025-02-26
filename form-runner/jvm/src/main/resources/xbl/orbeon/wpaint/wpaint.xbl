@@ -168,6 +168,20 @@
 
         </xbl:template>
     </xbl:binding>
+
+    <xbl:binding
+        id="fr-wpaint-output"
+        element="fr|wpaint[fr|static-readonly = true]"
+        xxbl:mode="lhha binding">
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/wpaint/wpaint.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:output
+                class="fr-wpaint-annotation"
+                ref="xxf:binding('fr-wpaint-output')/annotation"
+                alt="{xxf:r('annotated-image')}"
+                mediatype="image/*"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

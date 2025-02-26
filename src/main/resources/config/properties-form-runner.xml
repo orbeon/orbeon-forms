@@ -331,7 +331,7 @@
             fr:form-version(),
             '/',
             current-dateTime(),
-            '-'
+            '-',
             fr:document-id()
         )
     </property>

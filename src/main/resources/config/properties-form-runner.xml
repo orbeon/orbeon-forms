@@ -330,9 +330,9 @@
             '/',
             fr:form-version(),
             '/',
-            fr:document-id(),
-            '/',
-            current-dateTime()
+            current-dateTime(),
+            '-'
+            fr:document-id()
         )
     </property>
 

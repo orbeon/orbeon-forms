@@ -22,8 +22,8 @@ import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.permission.ModeType
-import org.orbeon.oxf.fr.persistence.S3
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
+import org.orbeon.oxf.fr.s3.S3
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*

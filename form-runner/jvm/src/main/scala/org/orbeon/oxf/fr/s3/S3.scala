@@ -12,7 +12,7 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-package org.orbeon.oxf.fr.persistence
+package org.orbeon.oxf.fr.s3
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.io.IOUtils.runQuietly

@@ -426,6 +426,8 @@
                                 <xf:delete
                                     if="$multiple"
                                     ref="."/>
+                                <!-- TODO: can we, should we dispatch an `xforms-value-changed` for multiple control selection? Ideally
+                                      yes, but how, as the "value" is not a string? -->
                                 <xf:action if="not($multiple)">
                                     <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
                                     <xf:delete
@@ -433,6 +435,11 @@
                                     <xf:setvalue
                                         iterate="., @filename, @mediatype, @size"
                                         ref="."/>
+                                    <xf:dispatch
+                                        targetid="fr-attachment"
+                                        name="xforms-value-changed">
+                                        <xf:property name="xxf:value" value="''"/>
+                                    </xf:dispatch>
                                 </xf:action>
                             </xf:action>
                         </xf:trigger>
@@ -542,15 +549,27 @@
                             <xf:property name="message"    value="event('message')"/>
                         </xf:dispatch>
 
+                        <!-- 2025-02-25: `xforms-deselect` can only be dispatched by the client, but if the value changes on the
+                             server independently, this is currently not dispatched. However, implementing native `xforms-deselect`
+                             to support all cases in the native `xf:upload` control doesn't help here, because we clear the local
+                             upload value after having copied it out to the bound element. In other words, we should not deal with
+                             or forward `xforms-deselect` here, and instead react to other events.
+
+                             So here we use `xforms-upload-done`.
+
+                             TODO: can we, should we dispatch an `xforms-value-changed` for multiple control selection? Ideally
+                              yes, but how, as the "value" is not a string?
+                        -->
                         <xf:dispatch
-                            event="xforms-deselect"
-                            propagate="stop"
-                            defaultAction="cancel"
+                            event="xforms-upload-done"
+                            if="not($multiple)"
 
                             targetid="fr-attachment"
-                            name="{event('xxf:type')}">
+                            name="xforms-value-changed">
+                            <xf:property name="xxf:value" value="instance()/string()"/>
                         </xf:dispatch>
 
+                        <!-- Clear local instance upon upload completion, successful or not -->
                         <xf:action event="xxforms-upload-done xxforms-upload-error">
                             <xf:setvalue
                                 iterate="instance(), instance()/@*"

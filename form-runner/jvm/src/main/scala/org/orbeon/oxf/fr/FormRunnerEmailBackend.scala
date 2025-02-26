@@ -222,23 +222,21 @@ trait FormRunnerEmailBackend {
         (template.lang.isEmpty || template.lang.contains(language)) && templateNameOpt.forall(template.name == _)
       }
 
-      // 2) Consider first template or all templates
-      val firstOrAllTemplates = templateMatch match {
-        case TemplateMatch.First => templatesFilteredByLanguageAndName.take(1)
-        case TemplateMatch.All   => templatesFilteredByLanguageAndName
-      }
-
-      // 3) Consider only templates with enableIfTrue expression, if any, evaluating to true
-      val enabledTemplates = firstOrAllTemplates.filter { template =>
+      // 2) Consider only templates with enableIfTrue expression, if any, evaluating to true
+      val enabledTemplates = templatesFilteredByLanguageAndName.filter { template =>
         template.enableIfTrue.forall { expression =>
           evaluatedExpressionAsBoolean(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression)).getBooleanValue
         }
       }
 
-      // TODO: check if steps 2) and 3) should be reversed (as of 2025-02-20, the XPL/XSL implementation does them in this order)
+      // 3) Consider first template or all templates
+      val firstOrAllTemplates = templateMatch match {
+        case TemplateMatch.First => enabledTemplates.take(1)
+        case TemplateMatch.All   => enabledTemplates
+      }
 
       // For each email template, generate email content
-      enabledTemplates.map { template =>
+      firstOrAllTemplates.map { template =>
         EmailContent(
           formDefinition         = formDefinition.rootElement,
           formData               = frc.formInstance.root,

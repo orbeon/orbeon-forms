@@ -40,15 +40,36 @@
     <xsl:variable
         name="request-match"
         select="$request/parameters/parameter[name = 'fr-match']/value"/>
+
+    <!-- 1) Filter templates by language and name -->
     <xsl:variable
-        name="template-elems-all"
+        name="templates-filtered-by-language-and-name"
         select="$metadata-elem/email/templates/template[
             (p:is-blank(@xml:lang)    or @xml:lang = $request-language) and
             (empty($request-template) or @name = $request-template)
         ]"/>
+
+    <!-- 2) Consider only templates with enable-if-true expression, if any, evaluating to true -->
     <xsl:variable
-        name="template-elems"
-        select="if ($request-match = 'all') then $template-elems-all else $template-elems-all[1]"/>
+            name="enabled-templates"
+            select="$templates-filtered-by-language-and-name[
+                not(enable-if-true) or
+                frf:evaluatedExpressionAsBoolean(
+                    $xhtml,
+                    frf:replaceVarReferencesWithFunctionCallsFromString(
+                        enable-if-true,
+                        enable-if-true,
+                        false(),
+                        (),
+                        ()
+                    )
+                )
+            ]"/>
+
+    <!-- 3) Consider first template or all templates -->
+    <xsl:variable
+        name="first-or-all-templates"
+        select="if ($request-match = 'all') then $enabled-templates else $enabled-templates[1]"/>
 
     <!-- App and form -->
     <xsl:variable name="app"  select="doc('input:parameters')/*/app"  as="xs:string"/>
@@ -166,249 +187,232 @@
     </xsl:function>
 
     <xsl:template match="template">
-        <xsl:variable
-            name="enable-if-true"
-            as="xs:boolean"
-            select="
-            (
-                for $expression in enable-if-true
-                return frf:evaluatedExpressionAsBoolean($xhtml, frf:replaceVarReferencesWithFunctionCallsFromString($expression, $expression, false(), (), ())),
-                true()
-            )[1]
-            "/>
+        <message>
+            <xsl:variable name="template-elem" select="."/>
 
-        <xsl:choose>
-            <xsl:when test="$enable-if-true">
-                <message>
-                    <xsl:variable name="template-elem" select="."/>
+            <xsl:variable
+                name="from-email-addresses"
+                as="xs:string*"
+                select="fr:header-values($template-elem, 'from', 'oxf.fr.email.from')[1]"/>
 
-                    <xsl:variable
-                        name="from-email-addresses"
-                        as="xs:string*"
-                        select="fr:header-values($template-elem, 'from', 'oxf.fr.email.from')[1]"/>
+            <xsl:variable
+                name="reply-to-email-addresses"
+                as="xs:string*"
+                select="fr:header-values($template-elem, 'reply-to', 'oxf.fr.email.reply-to')"/>
 
-                    <xsl:variable
-                        name="reply-to-email-addresses"
-                        as="xs:string*"
-                        select="fr:header-values($template-elem, 'reply-to', 'oxf.fr.email.reply-to')"/>
+            <xsl:variable
+                name="to-email-addresses"
+                as="xs:string*"
+                select="fr:header-values($template-elem, 'to', 'oxf.fr.email.to')"/>
 
-                    <xsl:variable
-                        name="to-email-addresses"
-                        as="xs:string*"
-                        select="fr:header-values($template-elem, 'to', 'oxf.fr.email.to')"/>
+            <xsl:variable
+                name="cc-email-addresses"
+                as="xs:string*"
+                select="fr:header-values($template-elem, 'cc', 'oxf.fr.email.cc')"/>
 
-                    <xsl:variable
-                        name="cc-email-addresses"
-                        as="xs:string*"
-                        select="fr:header-values($template-elem, 'cc', 'oxf.fr.email.cc')"/>
+            <xsl:variable
+                name="bcc-email-addresses"
+                as="xs:string*"
+                select="fr:header-values($template-elem, 'bcc', 'oxf.fr.email.bcc')"/>
 
-                    <xsl:variable
-                        name="bcc-email-addresses"
-                        as="xs:string*"
-                        select="fr:header-values($template-elem, 'bcc', 'oxf.fr.email.bcc')"/>
+            <!-- SMTP outgoing server settings -->
+            <smtp-host>
+                <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
+            </smtp-host>
+            <xsl:variable name="port" select="p:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
+            <xsl:if test="normalize-space($port)">
+                <smtp-port><xsl:value-of select="$port"/></smtp-port>
+            </xsl:if>
+            <encryption>
+                <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
+            </encryption>
+            <credentials>
+                <username>
+                    <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
+                </username>
+                <password>
+                    <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
+                </password>
+            </credentials>
 
-                    <!-- SMTP outgoing server settings -->
-                    <smtp-host>
-                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
-                    </smtp-host>
-                    <xsl:variable name="port" select="p:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
-                    <xsl:if test="normalize-space($port)">
-                        <smtp-port><xsl:value-of select="$port"/></smtp-port>
-                    </xsl:if>
-                    <encryption>
-                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
-                    </encryption>
-                    <credentials>
-                        <username>
-                            <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
-                        </username>
-                        <password>
-                            <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
-                        </password>
-                    </credentials>
+            <!-- Sender -->
+            <!-- Take the first one only, see https://serverfault.com/questions/554520 -->
+            <xsl:for-each select="$from-email-addresses[1]">
+                <from>
+                    <email>
+                        <xsl:value-of select="."/>
+                    </email>
+                </from>
+            </xsl:for-each>
+            <!-- Reply-To -->
+            <xsl:for-each select="$reply-to-email-addresses">
+                <reply-to>
+                    <email>
+                        <xsl:value-of select="."/>
+                    </email>
+                </reply-to>
+            </xsl:for-each>
+            <!-- Recipients -->
+            <xsl:for-each select="$to-email-addresses">
+                <to>
+                    <email>
+                        <xsl:value-of select="."/>
+                    </email>
+                </to>
+            </xsl:for-each>
+            <xsl:for-each select="$cc-email-addresses">
+                <cc>
+                    <email>
+                        <xsl:value-of select="."/>
+                    </email>
+                </cc>
+            </xsl:for-each>
+            <xsl:for-each select="$bcc-email-addresses">
+                <bcc>
+                    <email>
+                        <xsl:value-of select="."/>
+                    </email>
+                </bcc>
+            </xsl:for-each>
+            <!-- Subject -->
+            <subject>
+                <xsl:value-of select="fr:build-message($template-elem, 'subject', false())"/>
+            </subject>
+            <!-- Custom headers -->
+            <xsl:for-each select="frf:customHeaderNames($xhtml, $template-elem)">
+                <header>
+                    <name>
+                        <xsl:value-of select="."/>
+                    </name>
+                    <value>
+                        <xsl:value-of select="frf:headerValues($xhtml, $template-elem, $data, .)[1]"/>
+                    </value>
+                </header>
+            </xsl:for-each>
+            <!-- Multipart body -->
+            <body content-type="multipart/related">
+                <!-- Email body -->
 
-                    <!-- Sender -->
-                    <!-- Take the first one only, see https://serverfault.com/questions/554520 -->
-                    <xsl:for-each select="$from-email-addresses[1]">
-                        <from>
-                            <email>
-                                <xsl:value-of select="."/>
-                            </email>
-                        </from>
-                    </xsl:for-each>
-                    <!-- Reply-To -->
-                    <xsl:for-each select="$reply-to-email-addresses">
-                        <reply-to>
-                            <email>
-                                <xsl:value-of select="."/>
-                            </email>
-                        </reply-to>
-                    </xsl:for-each>
-                    <!-- Recipients -->
-                    <xsl:for-each select="$to-email-addresses">
-                        <to>
-                            <email>
-                                <xsl:value-of select="."/>
-                            </email>
-                        </to>
-                    </xsl:for-each>
-                    <xsl:for-each select="$cc-email-addresses">
-                        <cc>
-                            <email>
-                                <xsl:value-of select="."/>
-                            </email>
-                        </cc>
-                    </xsl:for-each>
-                    <xsl:for-each select="$bcc-email-addresses">
-                        <bcc>
-                            <email>
-                                <xsl:value-of select="."/>
-                            </email>
-                        </bcc>
-                    </xsl:for-each>
-                    <!-- Subject -->
-                    <subject>
-                        <xsl:value-of select="fr:build-message($template-elem, 'subject', false())"/>
-                    </subject>
-                    <!-- Custom headers -->
-                    <xsl:for-each select="frf:customHeaderNames($xhtml, $template-elem)">
-                        <header>
-                            <name>
-                                <xsl:value-of select="."/>
-                            </name>
-                            <value>
-                                <xsl:value-of select="frf:headerValues($xhtml, $template-elem, $data, .)[1]"/>
-                            </value>
-                        </header>
-                    </xsl:for-each>
-                    <!-- Multipart body -->
-                    <body content-type="multipart/related">
-                        <!-- Email body -->
+                <xsl:variable
+                    name="is-html"
+                    select="$template-elem/body/@mediatype = 'text/html'"/>
 
-                        <xsl:variable
-                            name="is-html"
-                            select="$template-elem/body/@mediatype = 'text/html'"/>
+                <part name="text" content-type="{if ($is-html) then 'text/html' else 'text/plain'}">
+                    <xsl:choose>
+                        <xsl:when test="$is-html">
 
-                        <part name="text" content-type="{if ($is-html) then 'text/html' else 'text/plain'}">
-                            <xsl:choose>
-                                <xsl:when test="$is-html">
-
-                                    <xsl:variable
-                                        name="style"
-                                        select="p:property(string-join(('oxf.fr.email.css.custom.inline', $app, $form), '.'))"/>
-
-                                    <xsl:variable
-                                        name="style-seq"
-                                        select="
-                                            if (p:non-blank($style)) then
-                                                (
-                                                    '&lt;head>',
-                                                    '&lt;style type=&quot;text/css&quot;>',
-                                                    $style,
-                                                    '&lt;/style>',
-                                                    '&lt;/head>'
-                                                )
-                                            else
-                                                ()"/>
-
-                                    <xsl:value-of
-                                        select="
-                                        string-join(
-                                            (
-                                                '&lt;html>',
-                                                $style-seq,
-                                                '&lt;body>',
-                                                fr:build-message($template-elem, 'body', $is-html),
-                                                '&lt;/body>',
-                                                '&lt;/html>'
-                                            ),
-                                            ''
-                                        )"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="fr:build-message($template-elem, 'body', $is-html)"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </part>
-                        <!-- XML, PDF and TIFF attachments if needed -->
-                        <xsl:for-each select="'xml', 'pdf', 'tiff'">
-
-                            <xsl:variable name="type" select="."/>
-                            <xsl:variable name="property-prefix" select="concat('oxf.fr.email.attach-', $type)"/>
                             <xsl:variable
-                                name="do-attach"
+                                name="style"
+                                select="p:property(string-join(('oxf.fr.email.css.custom.inline', $app, $form), '.'))"/>
+
+                            <xsl:variable
+                                name="style-seq"
                                 select="
+                                    if (p:non-blank($style)) then
+                                        (
+                                            '&lt;head>',
+                                            '&lt;style type=&quot;text/css&quot;>',
+                                            $style,
+                                            '&lt;/style>',
+                                            '&lt;/head>'
+                                        )
+                                    else
+                                        ()"/>
+
+                            <xsl:value-of
+                                select="
+                                string-join(
                                     (
-                                        for $attribute in $template-elem/attach/@*[local-name() = $type] return $attribute = 'true',
-                                        p:property(string-join(($property-prefix, $app, $form), '.')),
-                                        false()
-                                    )[1]"
-                                as="xs:boolean"/>
+                                        '&lt;html>',
+                                        $style-seq,
+                                        '&lt;body>',
+                                        fr:build-message($template-elem, 'body', $is-html),
+                                        '&lt;/body>',
+                                        '&lt;/html>'
+                                    ),
+                                    ''
+                                )"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="fr:build-message($template-elem, 'body', $is-html)"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </part>
+                <!-- XML, PDF and TIFF attachments if needed -->
+                <xsl:for-each select="'xml', 'pdf', 'tiff'">
 
-                            <xsl:if test="$do-attach">
+                    <xsl:variable name="type" select="."/>
+                    <xsl:variable name="property-prefix" select="concat('oxf.fr.email.attach-', $type)"/>
+                    <xsl:variable
+                        name="do-attach"
+                        select="
+                            (
+                                for $attribute in $template-elem/attach/@*[local-name() = $type] return $attribute = 'true',
+                                p:property(string-join(($property-prefix, $app, $form), '.')),
+                                false()
+                            )[1]"
+                        as="xs:boolean"/>
 
-                                <xsl:variable
-                                    name="filename"
-                                    select="(frf:emailAttachmentFilename($data, $type, $app, $form), concat('form.', $type))[1]"/>
+                    <xsl:if test="$do-attach">
 
-                                <part
-                                    name="form-{$type}"
-                                    content-type="{if ($type = 'tiff') then 'image/tiff' else concat('application/', $type)}"
-                                    content-disposition="attachment; filename=&quot;{$filename}&quot;"
-                                    src="input:form-{$type}"/>
-                            </xsl:if>
-                        </xsl:for-each>
-
-                        <!-- Other attachments if needed -->
                         <xsl:variable
-                            name="attach-files"
-                            select="
-                                (
-                                    $template-elem/attach/@files/string(),
-                                    p:property(string-join(('oxf.fr.email.attach-files', $app, $form), '.')),
-                                    'all'
-                                )[1]"
-                            as="xs:string"/>
-                        <xsl:variable
-                            name="attachment-holders"
-                            as="element()*"
-                            select="
-                                if ($attach-files = 'all') then
-                                    (
-                                        frf:searchHoldersForClassTopLevelOnly       ($xhtml/xh:body,                 $data, 'fr-attachment'),
-                                        frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-attachment')
-                                    )
-                                else if ($attach-files = 'selected') then
-                                    frf:attachments($xhtml, $template-elem, $data)
-                                else
-                                    ()"/>
-                        <xsl:for-each
-                            select="
-                                $attachment-holders/(
-                                    self::*[@filename and (p:non-blank(.))], (: single attachment    :)
-                                    _[@filename and (p:non-blank(.))]        (: multiple attachments :)
-                                )">
-                            <!-- URL may be absolute or already point to persistence layer -->
-                            <!-- Use `@fr:tmp-file` first if present, see https://github.com/orbeon/orbeon-forms/issues/5768 -->
-                            <part
-                                name="attachment-{position()}"
-                                content-type="{@mediatype}"
-                                content-disposition="attachment; filename=&quot;{@filename}&quot;"
-                                src="input:attachment-{position()}"
-                                fr:uri="{p:rewrite-service-uri(p:trim((@fr:tmp-file, .)[p:non-blank(.)][1]), true())}"/>
-                        </xsl:for-each>
+                            name="filename"
+                            select="(frf:emailAttachmentFilename($data, $type, $app, $form), concat('form.', $type))[1]"/>
 
-                    </body>
-                </message>
-            </xsl:when>
-            <xsl:otherwise/>
-        </xsl:choose>
+                        <part
+                            name="form-{$type}"
+                            content-type="{if ($type = 'tiff') then 'image/tiff' else concat('application/', $type)}"
+                            content-disposition="attachment; filename=&quot;{$filename}&quot;"
+                            src="input:form-{$type}"/>
+                    </xsl:if>
+                </xsl:for-each>
 
+                <!-- Other attachments if needed -->
+                <xsl:variable
+                    name="attach-files"
+                    select="
+                        (
+                            $template-elem/attach/@files/string(),
+                            p:property(string-join(('oxf.fr.email.attach-files', $app, $form), '.')),
+                            'all'
+                        )[1]"
+                    as="xs:string"/>
+                <xsl:variable
+                    name="attachment-holders"
+                    as="element()*"
+                    select="
+                        if ($attach-files = 'all') then
+                            (
+                                frf:searchHoldersForClassTopLevelOnly       ($xhtml/xh:body,                 $data, 'fr-attachment'),
+                                frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-attachment')
+                            )
+                        else if ($attach-files = 'selected') then
+                            frf:attachments($xhtml, $template-elem, $data)
+                        else
+                            ()"/>
+                <xsl:for-each
+                    select="
+                        $attachment-holders/(
+                            self::*[@filename and (p:non-blank(.))], (: single attachment    :)
+                            _[@filename and (p:non-blank(.))]        (: multiple attachments :)
+                        )">
+                    <!-- URL may be absolute or already point to persistence layer -->
+                    <!-- Use `@fr:tmp-file` first if present, see https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                    <part
+                        name="attachment-{position()}"
+                        content-type="{@mediatype}"
+                        content-disposition="attachment; filename=&quot;{@filename}&quot;"
+                        src="input:attachment-{position()}"
+                        fr:uri="{p:rewrite-service-uri(p:trim((@fr:tmp-file, .)[p:non-blank(.)][1]), true())}"/>
+                </xsl:for-each>
+
+            </body>
+        </message>
     </xsl:template>
 
     <xsl:template match="/">
         <messages>
-            <xsl:for-each select="$template-elems">
+            <xsl:for-each select="$first-or-all-templates">
                 <xsl:apply-templates select="." />
             </xsl:for-each>
         </messages>

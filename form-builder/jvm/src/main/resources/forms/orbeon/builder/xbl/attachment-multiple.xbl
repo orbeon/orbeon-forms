@@ -15,7 +15,7 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
-    <xbl:binding id="fr-attachment" element="fr|attachment">
+    <xbl:binding id="fr-attachment" element="fr|attachment[multiple ~= true]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Multiple File Attachments</display-name>
             <display-name lang="es">[Multiple File Attachments]</display-name>

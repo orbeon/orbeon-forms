@@ -555,13 +555,13 @@
                              upload value after having copied it out to the bound element. In other words, we should not deal with
                              or forward `xforms-deselect` here, and instead react to other events.
 
-                             So here we use `xforms-upload-done`.
+                             So here we use `xxforms-upload-done`.
 
                              TODO: can we, should we dispatch an `xforms-value-changed` for multiple control selection? Ideally
                               yes, but how, as the "value" is not a string?
                         -->
                         <xf:dispatch
-                            event="xforms-upload-done"
+                            event="xxforms-upload-done"
                             if="not($multiple)"
 
                             targetid="fr-attachment"

@@ -116,17 +116,17 @@ object BindingIndex {
     atts  : Iterable[(QName, String)]
   ): Option[(IndexableBinding, Boolean)] = {
 
-    def attMatches(attDesc: BindingAttributeDescriptor) =
+    def attMatches(attDesc: BindingAttributeDescriptor): Boolean =
       atts exists {
         case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
       }
 
-    def attExists(name: QName) =
+    def attExists(name: QName): Option[(IndexableBinding, Boolean)] =
       atts exists {
         case (attName, _) => attName == name
       }
 
-    def fromNameAndAttValue =
+    def fromNameAndAttValue: Option[(IndexableBinding, Boolean)] =
       index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
         indexedBindings.collectFirst {
           case (BindingDescriptor(_, None, Some(attDesc)), binding) if attMatches(attDesc) =>
@@ -142,7 +142,7 @@ object BindingIndex {
         }
       }
 
-    def fromAttValueOnly =
+    def fromAttValueOnly: Option[(IndexableBinding, Boolean)] =
       index.attOnlySelectors collectFirst {
         case (BindingDescriptor(None, None, Some(attDesc)), binding) if attMatches(attDesc) =>
           (binding, false)
@@ -154,7 +154,7 @@ object BindingIndex {
           (binding, false)
       }
 
-    def fromNameOnly =
+    def fromNameOnly: Option[(IndexableBinding, Boolean)] =
       index.byNameOnly.get(qName) flatMap (_.headOption) map (_._2 -> true)
 
     // Specificity: https://drafts.csswg.org/selectors-4/#specificity

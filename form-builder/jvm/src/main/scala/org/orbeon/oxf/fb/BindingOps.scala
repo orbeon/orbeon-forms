@@ -138,7 +138,7 @@ trait BindingOps {
     descriptors             : Iterable[BindingDescriptor]
   ): List[NodeInfo] = {
 
-    def appearanceMatches(appearanceOpt: Option[String]) = appearanceOpt match {
+    def appearanceMatches(appearanceOpt: Option[String]): Boolean = appearanceOpt match {
       case Some(appearance) => appearancesForSelection contains appearance
       case None             => appearancesForSelection.isEmpty
     }
@@ -202,7 +202,7 @@ trait BindingOps {
 
         // See also toolbox.xml which duplicates some of this logic
         val fullDisplayNameOpt       = findMetadata(lang, metadata / FBDisplayNameTest)
-        val iconClasses              = findMetadata(lang, metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
+        val iconClasses              = findMetadata(lang, metadata / FBIconTest / FBIconClassTest).getOrElse("fa fa-fw fa-puzzle-piece")
         val iconPathOpt              = findMetadata(lang, metadata / FBIconTest / FBSmallIconTest)
         val appearanceDisplayNameOpt = findMetadata(lang, metadata / FBAppearanceDisplayNameTest)
 
@@ -282,8 +282,8 @@ trait BindingOps {
     val descriptors = getAllRelevantDescriptors(bindings)
 
     for {
-      descriptor      <- findMostSpecificWithoutDatatype(elemName, appearances, Nil, descriptors)
-      binding         <- descriptor.binding
+      descriptor <- findMostSpecificWithoutDatatype(elemName, appearances, Nil, descriptors)
+      binding    <- descriptor.binding
     } yield
       binding
   }

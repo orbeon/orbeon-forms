@@ -99,13 +99,8 @@ object FormRunnerApp extends App {
     })
   }
 
-  private def initSessionExpirationDialog(): Unit =
-    document.querySelectorOpt(".fr-session-expiration-dialog").foreach { dialog =>
-
-      val modal = Bootstrap.newModal(dialog, new js.Object {
-        val backdrop = "static" // Click on the background doesn't hide dialog
-        val keyboard = false    // Can't use esc to close the dialog
-      })
+  private def initSessionExpirationDialog(): Unit = {
+    document.querySelectorOpt(".fr-session-expiration-dialog").collect { case dialog: HTMLDialogElement =>
 
       // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
       // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
@@ -167,12 +162,13 @@ object FormRunnerApp extends App {
         }
 
       def updateDialog(): Unit = {
-        val headerContainer = dialog.querySelectorT(".modal-header")
-        val bodyContainer   = dialog.querySelectorT(".modal-body")
-        val footer          = dialog.querySelectorT(".modal-footer")
+        val headerContent = dialog.querySelectorAllT(".xxforms-dialog-head .xforms-output")
+        val bodyContent   = dialog.querySelectorAllT(".xxforms-dialog-body .xforms-mediatype-text-html")
+        val buttons       = dialog.querySelectorT   (".fr-dialog-buttons")
 
-        val visibleWhenExpiring = List(headerContainer.childrenT.head, bodyContainer.childrenT.head, footer)
-        val visibleWhenExpired  = List(headerContainer.childrenT.last, bodyContainer.childrenT.last)
+        org.scalajs.dom.console.log(headerContent.toArray, bodyContent.toArray, buttons)
+        val visibleWhenExpiring = List(headerContent.head, bodyContent.head, buttons)
+        val visibleWhenExpired  = List(headerContent.last, bodyContent.last)
 
         def setDisplay(elements: List[html.Element], display: String): Unit =
           elements.foreach(_.style.display = display)
@@ -194,15 +190,16 @@ object FormRunnerApp extends App {
       }
 
       def showDialog(): Unit = {
-        modal.show()
+        dialog.showModal()
         dialogShown = true
       }
 
       def hideDialog(): Unit = {
-        modal.hide()
+        dialog.close()
         dialogShown = false
       }
     }
+  }
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

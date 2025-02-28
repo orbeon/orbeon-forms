@@ -1261,33 +1261,22 @@
             name="session-expiration-dialog-enabled"
             value="xxf:property(string-join(('oxf.fr.detail.session-expiration-dialog.enabled', fr:app-name(), fr:form-name()), '.'))"/>
 
-        <!-- Session about to expire or expired dialog -->
-        <!-- Do not use `fade` class in this modal, as it will prevent the dialog from being hidden when the page/tab is not visible.
-             See: https://stackoverflow.com/questions/23677765/bootstrap-modal-hide-is-not-working -->
-        <xh:div
-            class="
-                fr-session-expiration-dialog modal hide
-                fr-feature-{{ if ($session-expiration-dialog-enabled) then 'enabled' else 'disabled' }}"
-            tabindex="-1" role="dialog" aria-hidden="true">
-
-            <xh:div class="modal-dialog">
-                <xh:div class="modal-content">
-                    <xh:div class="modal-header">
-                        <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expiring"/></xh:h4>
-                        <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expired"/></xh:h4>
-                    </xh:div>
-                    <xh:div class="modal-body">
-                        <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/>
-                        <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/>
-                    </xh:div>
-                    <xh:div class="modal-footer">
-                        <xh:button class="btn btn-primary">
-                            <xf:output value="$fr-resources/detail/session-expiration/renew-button"/>
-                        </xh:button>
-                    </xh:div>
+        <!-- Session about to expire or expired dialog, when the heartbeat is disabled -->
+        <xh:dialog class="xforms-dialog fr-session-expiration-dialog fr-feature-{{ if ($session-expiration-dialog-enabled) then 'enabled' else 'disabled' }}">
+            <xh:div class="xxforms-dialog-head">
+                <xf:output value="$fr-resources/detail/session-expiration/title/expiring"/>
+                <xf:output value="$fr-resources/detail/session-expiration/title/expired"/>
+            </xh:div>
+            <xh:div class="xxforms-dialog-body">
+                <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/>
+                <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/>
+                <xh:div class="fr-dialog-buttons">
+                    <xh:button class="btn btn-primary">
+                        <xf:output value="$fr-resources/detail/session-expiration/renew-button"/>
+                    </xh:button>
                 </xh:div>
             </xh:div>
-        </xh:div>
+        </xh:dialog>
 
     </xsl:template>
 

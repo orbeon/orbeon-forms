@@ -1,4 +1,5 @@
 <xh:div xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">
+
     <xh:div class="xforms-error-panel xforms-initially-hidden" role="dialog" aria-labelledby="error-dialog-title">
         <xh:div class="hd" id="error-dialog-title">An error has occurred</xh:div>
         <xh:div class="bd">
@@ -45,19 +46,19 @@
             </xh:div>
         </xh:div>
     </xh:div>
-    <xh:div class="xforms-login-detected-dialog modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <xh:div class="modal-header">
-            <xh:h4>Reloading form</xh:h4>
-        </xh:div>
-        <xh:div class="modal-body">
+
+    <xh:dialog class="xforms-login-detected-dialog xforms-dialog" tabindex="-1">
+        <xh:div class="xxforms-dialog-head">Reloading form</xh:div>
+        <xh:div class="xxforms-dialog-body">
             <xh:p>
                 This form has to be reloaded. This most likely happened because your session has expired, which might
                 take you to the login page. (If you think that you shouldn't see this message and that the problem
                 persists, please contact support.)
             </xh:p>
+            <xh:div class="fr-dialog-buttons">
+                <xh:button class="btn btn-primary">OK</xh:button>
+            </xh:div>
         </xh:div>
-        <xh:div class="modal-footer">
-            <xh:button class="btn btn-primary">OK</xh:button>
-        </xh:div>
-    </xh:div>
+    </xh:dialog>
+
 </xh:div>

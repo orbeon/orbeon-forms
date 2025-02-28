@@ -15,7 +15,7 @@
     .xforms-dialog, .xforms-message-dialog {
 
         &::backdrop {
-            background-color: rgba(0, 0, 0, 0.25);
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         &[open] { display: flex }     // Don't override the user agent `display: none` closed
@@ -117,10 +117,6 @@
     }
 
     .fr-session-expiration-dialog {
-        z-index: 3000;
-
-        .modal-footer {
-            text-align: right;
-        }
+        width: min(400px, 80%);
     }
 }

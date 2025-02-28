@@ -153,6 +153,7 @@ object AjaxClient {
 
   def showLoginDetectedDialog(formId: String): Unit = {
     // It seems we got a login page back, so display dialog and reload form
+    // The dialog is declared in `error-dialog.xml`
     val dialogEl = dom.document.querySelectorT(s"#$formId .xforms-login-detected-dialog")
 
     def getUniqueId(prefix: String): String = {
@@ -166,7 +167,7 @@ object AjaxClient {
     }
 
     // Link dialog with title for ARIA
-    val title = dialogEl.querySelectorT("h4")
+    val title = dialogEl.querySelectorT(".xxforms-dialog-head")
     if (title.id.isAllBlank) {
       val titleId = getUniqueId("xf-aria-dialog-title-")
       title.id = titleId
@@ -182,10 +183,8 @@ object AjaxClient {
         options  = new EventListenerOptions { once = true })
       )
 
-    $(dialogEl).asInstanceOf[js.Dynamic].modal(new js.Object {
-      val backdrop = "static" // Click on the background doesn't hide dialog
-      val keyboard = false    // Can't use esc to close the dialog
-    })
+    // Show the dialog
+    dialogEl.asInstanceOf[js.Dynamic].showModal()
   }
 
   @JSExport

@@ -74,7 +74,7 @@ private val AttributeRe = "@(.+)".r
         for {
           controlElem <- controlElemOpt
           appearances = controlElem attTokens XFormsNames.APPEARANCE_QNAME
-          descriptor  <- findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
+          descriptor  <- findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, Nil, descriptors)
           binding     <- descriptor.binding
         } yield
           Some(newDataHolder(controlName, binding))

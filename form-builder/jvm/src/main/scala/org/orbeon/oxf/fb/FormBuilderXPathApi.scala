@@ -957,7 +957,7 @@ object FormBuilderXPathApi {
       )
 
     for {
-      descriptor <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+      descriptor <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), Nil, descriptors)
       binding    <- descriptor.binding
     } yield
       binding

@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.StringUtils.*
 
 import scala.collection.mutable
+
 
 case class BindingIndex[+T](
   nameAndAttSelectors : List[(BindingDescriptor, T)],
@@ -117,19 +116,9 @@ object BindingIndex {
     atts  : Iterable[(QName, String)]
   ): Option[(IndexableBinding, Boolean)] = {
 
-    def attValueMatches(attPredicate: AttributePredicate, attValue: String) = attPredicate match {
-      case AttributePredicate.Exist           => true
-      case AttributePredicate.Equal   (value) => attValue == value
-      case AttributePredicate.Token   (value) => attValue.tokenizeToSet.contains(value)
-      case AttributePredicate.Lang    (value) => attValue == value || attValue.startsWith(value + '-')
-      case AttributePredicate.Start   (value) => value != "" && attValue.startsWith(value)
-      case AttributePredicate.End     (value) => value != "" && attValue.endsWith(value)
-      case AttributePredicate.Contains(value) => value != "" && attValue.contains(value)
-    }
-
     def attMatches(attDesc: BindingAttributeDescriptor) =
       atts exists {
-        case (attName, attValue) => attName == attDesc.name && attValueMatches(attDesc.predicate, attValue)
+        case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
       }
 
     def attExists(name: QName) =

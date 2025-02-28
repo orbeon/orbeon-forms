@@ -33,11 +33,12 @@ import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 trait BindingOps {
 
   def possibleAppearancesByControlNameAsXML(
-    controlName       : String,
-    isInitialLoad     : Boolean,
-    builtinDatatype   : String,
-    desiredAppearance : String)(implicit // relevant only if isInitialLoad == false
-    ctx               : FormBuilderDocContext
+    controlName      : String,
+    isInitialLoad    : Boolean,
+    builtinDatatype  : String,
+    desiredAppearance: String // relevant only if isInitialLoad == false
+  )(implicit
+    ctx              : FormBuilderDocContext
   ): List[NodeInfo] = {
 
     val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
@@ -55,15 +56,16 @@ trait BindingOps {
           )
         newDatatype                  = Types.qNameForBuiltinTypeName(builtinDatatype, required = false)
       } yield
-        (virtualName, appearanceOpt, newDatatype)
+        (virtualName, appearanceOpt, newDatatype, controlElem /@ @*)
 
     val descriptionOpt =
       for {
-        (virtualName, appearanceOpt, newDatatype) <- detailsOpt
+        (virtualName, appearanceOpt, newDatatype, attNodes) <- detailsOpt
         description <- findControlDescriptionAsXml(
           elemName                = virtualName,
           builtinType             = newDatatype,
           appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
+          atts                    = attNodes.view.map(attNode => (attNode.qName, attNode.stringValue)),
           lang                    = lang,
           descriptors             = descriptors
         )
@@ -72,8 +74,8 @@ trait BindingOps {
 
     val appearanceElems =
       for {
-        (virtualName, appearanceOpt, newDatatype) <- detailsOpt.toList
-        appearanceElem                            <- possibleAppearancesWithLabelAsXML(
+        (virtualName, appearanceOpt, newDatatype, attNodes) <- detailsOpt.toList
+        appearanceElem <- possibleAppearancesWithLabelAsXML(
           elemName                = virtualName,
           builtinType             = newDatatype,
           // Upon initial load, we want to select as current the original appearance. Later, we want to try
@@ -82,6 +84,7 @@ trait BindingOps {
           // If the appearance doesn't match, then no appearance is marked as current. The UI will pick the
           // first appearance listed as current.
           appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
+          atts                    = attNodes.view.map(attNode => (attNode.qName, attNode.stringValue)),
           lang                    = lang,
           descriptors             = descriptors
         )
@@ -95,10 +98,11 @@ trait BindingOps {
     elemName                : QName,
     builtinType             : QName,
     appearancesForSelection : Set[String],
+    atts                    : Iterable[(QName, String)],
     lang                    : String,
     descriptors             : Iterable[BindingDescriptor]
   ): Option[String] =
-    findMostSpecificMaybeWithDatatype(elemName, builtinType, appearancesForSelection, descriptors)
+    findMostSpecificMaybeWithDatatype(elemName, builtinType, appearancesForSelection, atts, descriptors)
       .flatMap(_.binding)
       .flatMap(bindingMetadata(_).headOption)
       .flatMap(metadata => findMetadata(lang, metadata / FBDisplayNameTest))
@@ -107,6 +111,7 @@ trait BindingOps {
     elemName                : QName,
     builtinType             : QName,
     appearancesForSelection : Set[String],
+    atts                    : Iterable[(QName, String)],
     lang                    : String,
     descriptors             : Iterable[BindingDescriptor]
   ): Option[NodeInfo] =
@@ -114,6 +119,7 @@ trait BindingOps {
       elemName,
       builtinType,
       appearancesForSelection,
+      atts,
       lang,
       descriptors
     ).map { description =>
@@ -124,6 +130,7 @@ trait BindingOps {
     elemName                : QName,
     builtinType             : QName,
     appearancesForSelection : Set[String],
+    atts                    : Iterable[(QName, String)],
     lang                    : String,
     descriptors             : Iterable[BindingDescriptor]
   ): List[NodeInfo] = {
@@ -138,6 +145,7 @@ trait BindingOps {
         (valueOpt, fullLabelOpt, label, iconPathOpt, iconClasses) <- possibleAppearancesWithLabel(
             elemName,
             builtinType,
+            atts,
             lang,
             descriptors
           )
@@ -173,6 +181,7 @@ trait BindingOps {
   def possibleAppearancesWithLabel(
     elemName   : QName,
     datatype   : QName,
+    atts       : Iterable[(QName, String)],
     lang       : String,
     descriptors: Iterable[BindingDescriptor]
   ): Iterable[(Option[String], Option[String], String, Option[String], String)] = {
@@ -180,7 +189,7 @@ trait BindingOps {
     def metadataOpt(bindingOpt: Option[NodeInfo]): Option[NodeInfo] =
       bindingOpt.toList flatMap bindingMetadata headOption
 
-    possibleAppearancesWithBindings(elemName, datatype, descriptors) map {
+    possibleAppearancesWithBindings(elemName, datatype, atts, descriptors) map {
       case (appearanceOpt, bindingOpt, _) =>
         (appearanceOpt, metadataOpt(bindingOpt))
     } collect {
@@ -268,7 +277,7 @@ trait BindingOps {
     val descriptors = getAllRelevantDescriptors(bindings)
 
     for {
-      descriptor      <- findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+      descriptor      <- findMostSpecificWithoutDatatype(elemName, appearances, Nil, descriptors)
       binding         <- descriptor.binding
     } yield
       binding

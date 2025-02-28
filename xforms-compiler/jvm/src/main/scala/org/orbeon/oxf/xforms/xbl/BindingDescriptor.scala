@@ -61,6 +61,16 @@ object BindingDescriptor {
   import CSSSelectorParser.*
   import Private.*
 
+  def attValueMatches(attPredicate: AttributePredicate, attValue: String): Boolean = attPredicate match {
+    case AttributePredicate.Exist           => true
+    case AttributePredicate.Equal   (value) => attValue == value
+    case AttributePredicate.Token   (value) => attValue.tokenizeToSet.contains(value)
+    case AttributePredicate.Lang    (value) => attValue == value || attValue.startsWith(value + '-')
+    case AttributePredicate.Start   (value) => value != "" && attValue.startsWith(value)
+    case AttributePredicate.End     (value) => value != "" && attValue.endsWith(value)
+    case AttributePredicate.Contains(value) => value != "" && attValue.contains(value)
+  }
+
   // Return a new element name and appearance for the control if needed.
   // See `BindingDescriptorTest`'s "New element name" test for examples.
   def newElementName(
@@ -79,7 +89,7 @@ object BindingDescriptor {
 
     val newTupleOpt =
       for {
-        descriptor                <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+        descriptor                <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), Nil, descriptors)
         relatedDescriptors        = findRelatedDescriptors(descriptor, descriptors)
         (elemName, appearanceOpt) <- findStaticBindingInRelated(virtualName, newAppearanceOpt.to(Set), relatedDescriptors)
       } yield
@@ -108,7 +118,7 @@ object BindingDescriptor {
 
     val virtualNameAndAppearanceOpt =
       for {
-        descriptor                                <- findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
+        descriptor                                <- findMostSpecificWithoutDatatype(searchElemName, searchAppearances, Nil, descriptors)
         if descriptor.att.isEmpty // only a direct binding can be an alias for another related binding
         relatedDescriptors                        = findRelatedDescriptors(descriptor, descriptors)
         BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(searchDatatype, relatedDescriptors)
@@ -128,44 +138,68 @@ object BindingDescriptor {
   def possibleAppearancesWithBindings(
     elemName   : QName,
     datatype   : QName,
+    atts       : Iterable[(QName, String)],
     descriptors: Iterable[BindingDescriptor]
   ): Iterable[(Option[String], Option[NodeInfo], Boolean)] = {
 
     val Datatype1 = datatype
     val Datatype2 = Types.getVariationTypeOrKeep(datatype)
 
-    val appearancesToBindingMaybeMultiple =
-      descriptors collect {
-        case b @ BindingDescriptor(
-            Some(`elemName`),
-            d @ (None | Some(Datatype1 | Datatype2)),
-            None
-          ) =>
-          (None, b.binding, d.isDefined)
-        case b @ BindingDescriptor(
-            Some(`elemName`), // None | would also match raw attribute selectors
-            d @ (None | Some(Datatype1 | Datatype2)),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(attValue)))
-          ) =>
-          (Some(attValue), b.binding, d.isDefined)
-        case b @ BindingDescriptor(
-            Some(`elemName`), // None | would also match raw attribute selectors
-            d @ (None | Some(Datatype1 | Datatype2)),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(attValue)))
-          ) =>
-          (Some(attValue), b.binding, d.isDefined)
+    // TODO: remove duplication; can write custom extractor?
+    def attMatches(attDesc: BindingAttributeDescriptor): Boolean =
+      atts.exists {
+        case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
       }
 
-    // Keep only the first among identical bindings
-    val appearancesToBinding =
-      appearancesToBindingMaybeMultiple.toList.keepDistinctBy(_._2)
+    val matchesOnOtherAttributes =
+      descriptors collectFirst {
+        case b @ BindingDescriptor(
+            Some(`elemName`),
+            None | Some(Datatype1 | Datatype2),
+            Some(attDesc @ BindingAttributeDescriptor(name, _))
+          ) if name != APPEARANCE_QNAME && attMatches(attDesc) =>
+            b.binding
+      }
 
-    if (appearancesToBinding.forall(_._1.isEmpty)) // no appearance -> no choice (#4558)
+    // If we match on another attribute, we don't support appearances at this point
+    // https://github.com/orbeon/orbeon-forms/issues/6811
+    if (matchesOnOtherAttributes.nonEmpty)
       Nil
-    else if (appearancesToBinding exists (_._3))    // datatype is significant -> filter out matches which don't have a datatype
-      appearancesToBinding filter (_._3)
-    else
-      appearancesToBinding
+    else {
+
+      val appearancesToBindingMaybeMultiple =
+        descriptors collect {
+          case b @ BindingDescriptor(
+              Some(`elemName`),
+              d @ (None | Some(Datatype1 | Datatype2)),
+              None
+            ) =>
+              (None, b.binding, d.isDefined)
+          case b @ BindingDescriptor(
+              Some(`elemName`), // None | would also match raw attribute selectors
+              d @ (None | Some(Datatype1 | Datatype2)),
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(attValue)))
+            ) =>
+              (Some(attValue), b.binding, d.isDefined)
+          case b @ BindingDescriptor(
+              Some(`elemName`), // None | would also match raw attribute selectors
+              d @ (None | Some(Datatype1 | Datatype2)),
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(attValue)))
+            ) =>
+              (Some(attValue), b.binding, d.isDefined)
+        }
+
+      // Keep only the first among identical bindings
+      val appearancesToBinding =
+        appearancesToBindingMaybeMultiple.toList.keepDistinctBy(_._2)
+
+      if (appearancesToBinding.forall(_._1.isEmpty)) // no appearance -> no choice (#4558)
+        Nil
+      else if (appearancesToBinding.exists(_._3))   // datatype is significant -> filter out matches which don't have a datatype
+        appearancesToBinding.filter(_._3)
+      else
+        appearancesToBinding
+    }
   }
 
   // Example: `fr|number`, `xf|textarea`
@@ -226,8 +260,14 @@ object BindingDescriptor {
   def findMostSpecificWithoutDatatype(
     searchElemName    : QName,
     searchAppearances : Set[String],
+    atts              : Iterable[(QName, String)],
     searchDescriptors : Iterable[BindingDescriptor]
   ): Option[BindingDescriptor] = {
+
+    def attMatches(attDesc: BindingAttributeDescriptor): Boolean =
+      atts.exists {
+        case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
+      }
 
     def findByNameAndAppearance: Option[BindingDescriptor] =
       searchDescriptors collectFirst {
@@ -243,6 +283,15 @@ object BindingDescriptor {
           ) if searchAppearances(appearance) => descriptor
       }
 
+    def findByNameAndOtherAttribute: Option[BindingDescriptor] =
+      searchDescriptors collectFirst {
+        case descriptor @ BindingDescriptor(
+            Some(`searchElemName`),
+            None,
+            Some(attDesc)
+          ) if attMatches(attDesc) => descriptor
+      }
+
     def findByNameOnly: Option[BindingDescriptor] =
       searchDescriptors collectFirst {
         case descriptor @ BindingDescriptor(
@@ -252,20 +301,23 @@ object BindingDescriptor {
           ) => descriptor
       }
 
-    findByNameAndAppearance orElse findByNameOnly
+    findByNameAndAppearance       orElse
+      findByNameAndOtherAttribute orElse
+      findByNameOnly
   }
 
   def findMostSpecificMaybeWithDatatype(
     searchElemName   : QName,
     searchDatatype   : QName,
     searchAppearances: Set[String],
+    atts             : Iterable[(QName, String)],
     descriptors      : Iterable[BindingDescriptor]
   ): Option[BindingDescriptor] =
     if (StringQNames(searchDatatype))
-      findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
+      findMostSpecificWithoutDatatype(searchElemName, searchAppearances, atts, descriptors)
     else
-      findMostSpecificWithDatatype(searchElemName, searchDatatype, searchAppearances, descriptors) orElse
-        findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
+      findMostSpecificWithDatatype(searchElemName, searchDatatype, searchAppearances, atts, descriptors) orElse
+        findMostSpecificWithoutDatatype(searchElemName, searchAppearances, atts, descriptors)
 
   private object Private {
 
@@ -399,11 +451,17 @@ object BindingDescriptor {
       searchElemName   : QName,
       searchDatatype   : QName,
       searchAppearances: Set[String],
+      atts             : Iterable[(QName, String)],
       descriptors      : Iterable[BindingDescriptor]
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
       val Datatype2 = Types.getVariationTypeOrKeep(searchDatatype)
+
+      def attMatches(attDesc: BindingAttributeDescriptor): Boolean =
+        atts.exists {
+          case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
+        }
 
       def findWithDatatypeAndAppearance: Option[BindingDescriptor] =
         descriptors collectFirst {
@@ -419,6 +477,15 @@ object BindingDescriptor {
             ) if searchAppearances(appearance) => descriptor
         }
 
+      def findByNameAndOtherAttribute: Option[BindingDescriptor] =
+        descriptors collectFirst {
+          case descriptor @ BindingDescriptor(
+              Some(`searchElemName`),
+              Some(Datatype1 | Datatype2),
+              Some(attDesc)
+            ) if attMatches(attDesc) => descriptor
+        }
+
       def findWithDatatypeOnly: Option[BindingDescriptor] =
         descriptors collectFirst {
           case descriptor @ BindingDescriptor(
@@ -428,7 +495,9 @@ object BindingDescriptor {
             ) => descriptor
         }
 
-      findWithDatatypeAndAppearance orElse findWithDatatypeOnly
+      findWithDatatypeAndAppearance orElse
+        findByNameAndOtherAttribute orElse
+        findWithDatatypeOnly
     }
 
     def findRelatedVaryNameAndAppearance(

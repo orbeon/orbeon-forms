@@ -267,6 +267,8 @@ object SimplePath {
       if (uri eq null) "" else uri
     }
 
+    def qName: QName = QName(nodeInfo.getLocalPart, nodeInfo.getPrefix, namespaceURI)
+
     private def resolveStructuredQName(lexicalQName: String): StructuredQName = {
 
       val checker = Name10Checker.getInstance

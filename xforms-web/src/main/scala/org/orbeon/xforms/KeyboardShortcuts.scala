@@ -16,12 +16,22 @@ object KeyboardShortcuts {
   lazy val isAppleOs: Boolean =
     Bowser.osname.exists(Set("macOS", "iOS"))
 
-  private val ModifiersMap = Map(
+  private val FormFieldTags = Set("INPUT", "SELECT", "TEXTAREA")
+  private val ModifiersMap  = Map(
     '⌘' -> "command", // same as 'meta'
     '⌃' -> "ctrl",    // cross-platform
     '⌥' -> "option",  // same as 'alt'
     '⇧' -> "shift",   // cross-platform
   )
+
+  // Allow shortcuts with modifiers inside form fields
+  Mousetrap.asInstanceOf[js.Dynamic].prototype.stopCallback =
+    (e: dom.KeyboardEvent, element: dom.Element, _: String) => {
+      val isFormField   = FormFieldTags.contains(element.tagName) ||
+                          element.asInstanceOf[js.Dynamic].isContentEditable.asInstanceOf[Boolean]
+      val isModifierKey = (e.altKey || e.ctrlKey || e.metaKey)
+      isFormField && ! isModifierKey
+    }
 
   // If a single shortcut is provided, use '⌘' on Apple OS and '⌃' on other OSes
   private lazy val convertIfNotApple: Char => Char = {

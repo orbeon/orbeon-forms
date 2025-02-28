@@ -50,7 +50,7 @@ class BindingDescriptorTest
 
         <xbl:binding element="xf|textarea">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Text Area</display-name>
+            <display-name lang="en">Plain Text Area</display-name>
           </metadata>
         </xbl:binding>
 
@@ -101,6 +101,25 @@ class BindingDescriptorTest
             <display-name lang="en">With Character Counter</display-name>
           </metadata>
         </xbl:binding>
+
+        <xbl:binding element="fr|tinymce, xf|textarea[mediatype = 'text/html']">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Formatted Text Area</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|attachment">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Single File Attachment</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|attachment[multiple ~= true]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Multiple File Attachments</display-name>
+          </metadata>
+        </xbl:binding>
+
       </xbl:xbl>
     </components>
 
@@ -120,7 +139,8 @@ class BindingDescriptorTest
       oldDatatype    : QName,
       oldAppearance  : Option[String],
       newDatatype    : QName,
-      newAppearance  : Option[String])(
+      newAppearance  : Option[String]
+    )(
       expected       : Option[(QName, Option[String])]
     ): Unit =
       it(s"must pass with $oldControlName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
@@ -128,7 +148,7 @@ class BindingDescriptorTest
           oldT <- List(oldDatatype, Types.getVariationTypeOrKeep(oldDatatype))
           newT <- List(newDatatype, Types.getVariationTypeOrKeep(newDatatype))
         } locally {
-          assert(expected === newElementName(oldControlName, oldT, oldAppearance.to(Set), newT, newAppearance, Bindings))
+          assert(expected == newElementName(oldControlName, oldT, oldAppearance.to(Set), newT, newAppearance, Bindings))
         }
       }
 
@@ -155,27 +175,67 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "textarea"     , XS -> "string" , Some("character-counter"), XS -> "string" , None                     )(Some(XF -> "textarea"     , None))
 
     assertVaryTypes(XF -> "input"        , XS -> "string" , Some("character-counter"), XS -> "double" , Some("character-counter"))(None)
+
+    assertVaryTypes(FR -> "attachment"   , XS -> "string" , None                     , XS -> "string" , None)(None)
   }
 
   describe("Possible appearances with label") {
 
     def assertVaryTypes(
       elemName : QName,
-      dataType : QName)(
+      dataType : QName,
+      atts     : Iterable[(QName, String)] = Nil,
+    )(
       expected : Seq[(Option[String], String)]
     ): Unit =
-      it(s"must pass with $elemName/$dataType") {
+      it(s"must pass with $elemName/$dataType${if (atts.nonEmpty) "/"}${atts.mkString("=")}") {
         for {
           newT <- List(dataType, Types.getVariationTypeOrKeep(dataType))
         } locally {
-          assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", getAllRelevantDescriptors(Bindings)) map (t => t._1 -> t._3)))
+          assert(expected == possibleAppearancesWithLabel(elemName, newT, atts, "en")(getAllRelevantDescriptors(Bindings)).map(t => t._1 -> t._3))
         }
       }
 
-    assertVaryTypes(XF -> "input"   , XS -> "string" )(Seq(None         -> "Input Field"  , Some("character-counter") -> "With Character Counter"))
-    assertVaryTypes(XF -> "textarea", XS -> "string" )(Seq(None         -> "Text Area"    , Some("character-counter") -> "With Character Counter"))
-    assertVaryTypes(XF -> "input"   , XS -> "decimal")(Seq(None         -> "Number"))
-    assertVaryTypes(XF -> "input"   , XS -> "date"   )(Seq(None         -> "Date"         , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
-    assertVaryTypes(XF -> "select1" , XS -> "string" )(Seq(Some("full") -> "Radio Buttons", Some("dropdown")          -> "Dropdown Menu"))
+    assertVaryTypes(XF -> "input"     , XS -> "string" )(Seq(None         -> "Input Field"    , Some("character-counter") -> "With Character Counter"))
+    assertVaryTypes(XF -> "textarea"  , XS -> "string" )(Seq(None         -> "Plain Text Area", Some("character-counter") -> "With Character Counter"))
+    assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"))
+    assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
+    assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons"  , Some("dropdown")          -> "Dropdown Menu"))
+
+    assertVaryTypes(XF -> "textarea"  , XS -> "string" , List(QName("mediatype") -> "text/html"))(Nil)
+    assertVaryTypes(FR -> "attachment", XS -> "string" , List(QName("mediatype") -> "text/html"))(Nil)
+    assertVaryTypes(FR -> "attachment", XS -> "string" , List(QName("multiple")  -> "true")     )(Nil)
+  }
+
+  describe("Control description") {
+
+    def assertVaryTypes(
+      elemName  : QName,
+      dataType  : QName,
+      appearance: Option[String],
+      atts      : Iterable[(QName, String)] = Nil,
+    )(
+      expected : String
+    ): Unit =
+      it(s"must pass with $elemName/$dataType/$appearance${if (atts.nonEmpty) "/"}${atts.mkString("=")}") {
+        for {
+          newT <- List(dataType, Types.getVariationTypeOrKeep(dataType))
+        } locally {
+          assert(findControlDescription(elemName, newT, appearance.toSet, atts, "en")(getAllRelevantDescriptors(Bindings)).contains(expected))
+        }
+      }
+
+    assertVaryTypes(XF -> "input"     , XS -> "string" , None            )("Input Field")
+    assertVaryTypes(XF -> "textarea"  , XS -> "string" , None            )("Plain Text Area")
+    assertVaryTypes(XF -> "input"     , XS -> "decimal", None            )("Number")
+    assertVaryTypes(XF -> "input"     , XS -> "date"   , None            )("Date")
+    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("full")    )("Radio Buttons")
+    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("dropdown"))("Dropdown Menu")
+
+    assertVaryTypes(XF -> "textarea"  , XS -> "string" , None, List(QName("mediatype") -> "text/html") )("Formatted Text Area")
+    assertVaryTypes(XF -> "textarea"  , XS -> "string" , None, List(QName("mediatype") -> "text/plain"))("Plain Text Area")
+    assertVaryTypes(FR -> "attachment", XS -> "string" , None, Nil                                     )("Single File Attachment")
+    assertVaryTypes(FR -> "attachment", XS -> "string" , None, List(QName("multiple")  -> "false")     )("Single File Attachment")
+    assertVaryTypes(FR -> "attachment", XS -> "string" , None, List(QName("multiple")  -> "true")      )("Multiple File Attachments")
   }
 }

@@ -94,13 +94,15 @@ trait BindingOps {
     descriptionOpt.toList ::: appearanceElems
   }
 
-  private def findControlDescription(
-    elemName                : QName,
-    builtinType             : QName,
-    appearancesForSelection : Set[String],
-    atts                    : Iterable[(QName, String)],
-    lang                    : String,
-    descriptors             : Iterable[BindingDescriptor]
+  private[fb] // for tests
+  def findControlDescription(
+    elemName               : QName,
+    builtinType            : QName,
+    appearancesForSelection: Set[String],
+    atts                   : Iterable[(QName, String)],
+    lang                   : String
+  )(
+    descriptors            : Iterable[BindingDescriptor]
   ): Option[String] =
     findMostSpecificMaybeWithDatatype(elemName, builtinType, appearancesForSelection, atts, descriptors)
       .flatMap(_.binding)
@@ -120,7 +122,8 @@ trait BindingOps {
       builtinType,
       appearancesForSelection,
       atts,
-      lang,
+      lang
+    )(
       descriptors
     ).map { description =>
       <description>{description}</description>
@@ -146,7 +149,8 @@ trait BindingOps {
             elemName,
             builtinType,
             atts,
-            lang,
+            lang
+          )(
             descriptors
           )
       } yield
@@ -182,7 +186,8 @@ trait BindingOps {
     elemName   : QName,
     datatype   : QName,
     atts       : Iterable[(QName, String)],
-    lang       : String,
+    lang       : String
+  )(
     descriptors: Iterable[BindingDescriptor]
   ): Iterable[(Option[String], Option[String], String, Option[String], String)] = {
 

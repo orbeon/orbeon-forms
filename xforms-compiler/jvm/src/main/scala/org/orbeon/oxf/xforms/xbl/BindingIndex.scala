@@ -121,11 +121,6 @@ object BindingIndex {
         case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
       }
 
-    def attExists(name: QName): Option[(IndexableBinding, Boolean)] =
-      atts exists {
-        case (attName, _) => attName == name
-      }
-
     def fromNameAndAttValue: Option[(IndexableBinding, Boolean)] =
       index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
         indexedBindings.collectFirst {
@@ -134,23 +129,9 @@ object BindingIndex {
         }
       }
 
-    def fromNameAndAttExistence =
-      index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
-        indexedBindings.collectFirst {
-          case (BindingDescriptor(_, None, Some(BindingAttributeDescriptor(attName, AttributePredicate.Exist))), binding) if attExists(attName) =>
-            (binding, false)
-        }
-      }
-
     def fromAttValueOnly: Option[(IndexableBinding, Boolean)] =
       index.attOnlySelectors collectFirst {
         case (BindingDescriptor(None, None, Some(attDesc)), binding) if attMatches(attDesc) =>
-          (binding, false)
-      }
-
-    def fromAttExistenceOnly =
-      index.attOnlySelectors collectFirst {
-        case (BindingDescriptor(None, None, Some(BindingAttributeDescriptor(attName, AttributePredicate.Exist))), binding) if attExists(attName) =>
           (binding, false)
       }
 
@@ -167,10 +148,8 @@ object BindingIndex {
     //
     // But that would be reasonable.
     //
-    fromNameAndAttValue       orElse
-      fromNameAndAttExistence orElse
-      fromAttValueOnly        orElse
-      fromAttExistenceOnly    orElse
+    fromNameAndAttValue orElse
+      fromAttValueOnly  orElse
       fromNameOnly
   }
 

@@ -16,25 +16,30 @@
  */
 package org.orbeon.oxf.util
 
-import java.math.BigInteger
-
+import java.math.{BigDecimal, BigInteger, RoundingMode}
 
 object ByteSizeUtils {
 
   def byteCountToDisplaySize(size: Long): String =
     byteCountToDisplaySize(BigInteger.valueOf(size))
 
+  private def formatSize(size: BigInteger, divisor: BigInteger, decimalPlaces: Int): String =
+    new BigDecimal(size)
+      .divide(new BigDecimal(divisor), decimalPlaces, RoundingMode.HALF_UP)
+      .stripTrailingZeros()
+      .toPlainString
+
   def byteCountToDisplaySize(size: BigInteger): String =
     if (size.divide(ONE_EB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${size.divide(ONE_EB_BI)} EB"
+      s"${formatSize(size, ONE_EB_BI, 5)} EB"
     else if (size.divide(ONE_PB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${size.divide(ONE_PB_BI)} PB"
+      s"${formatSize(size, ONE_PB_BI, 4)} PB"
     else if (size.divide(ONE_TB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${size.divide(ONE_TB_BI)} TB"
+      s"${formatSize(size, ONE_TB_BI, 3)} TB"
     else if (size.divide(ONE_GB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${size.divide(ONE_GB_BI)} GB"
+      s"${formatSize(size, ONE_GB_BI, 2)} GB"
     else if (size.divide(ONE_MB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${size.divide(ONE_MB_BI)} MB"
+      s"${formatSize(size, ONE_MB_BI, 1)} MB"
     else if (size.divide(ONE_KB_BI).compareTo(BigInteger.ZERO) > 0)
       s"${size.divide(ONE_KB_BI)} KB"
     else

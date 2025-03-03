@@ -222,7 +222,7 @@
                             </xh:tr>
                         </fr:grid>
                     </xf:group>
-                    <fr:grid ref="$i">
+                    <fr:grid ref="$i" markup="css-grid">
                         <fr:c x="1" w="12">
                             <xf:textarea ref="filter" appearance="xpath-completion" xpath-completion-updates="">
                                 <xf:label ref="xxf:r('dialog-itemsets.filter.label', '|fr-form-resources|')"/>

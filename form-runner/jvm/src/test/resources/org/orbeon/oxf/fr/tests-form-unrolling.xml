@@ -44,22 +44,22 @@
         <input name="config" href="unrolling/unroll.xpl"/>
         <output name="data">
             <_ xmlns:xf="http://www.w3.org/2002/xforms">
-                <fr:date static-readonly="true" id="date-us-control" bind="date-us-bind" output-format="[M]/[D]/[Y]" field-width="natural"/>
-                <fr:time static-readonly="true" bind="time-bind" id="time-control" field-width="natural" output-format="[h]:[m]:[s] [P,2-2]"/>
-                <fr:datetime static-readonly="true" bind="datetime-bind" id="datetime-control" field-width="natural"/>
-                <fr:dropdown-date static-readonly="true" bind="dropdown-date-bind" id="dropdown-date-control"/>
-                <fr:fields-date static-readonly="true" bind="fields-date-bind" id="fields-date-control"/>
+                <fr:date fr:static-readonly="true" id="date-us-control" bind="date-us-bind" output-format="[M]/[D]/[Y]" field-width="natural"/>
+                <fr:time fr:static-readonly="true" bind="time-bind" id="time-control" field-width="natural" output-format="[h]:[m]:[s] [P,2-2]"/>
+                <fr:datetime fr:static-readonly="true" bind="datetime-bind" id="datetime-control" field-width="natural"/>
+                <fr:dropdown-date fr:static-readonly="true" bind="dropdown-date-bind" id="dropdown-date-control"/>
+                <fr:fields-date fr:static-readonly="true" bind="fields-date-bind" id="fields-date-control"/>
                 <fr:date bind="native-date-bind" id="native-date-control" ref="" native-picker="always"/>
                 <fr:time id="native-time-control" bind="native-time-bind" native-picker="always" output-format="[h]:[m]:[s] [P,2-2]"/>
-                <fr:number static-readonly="true" suffix="m/s" id="number-with-suffix-control" digits-after-decimal="0" bind="number-with-suffix-bind"/>
-                <fr:currency static-readonly="true" bind="currency-bind" id="currency-control"/>
-                <fr:currency static-readonly="true" prefix="CHF" bind="currency-with-prefix-bind" id="currency-with-prefix-control"/>
-                <xf:select1 static-readonly="true" bind="dropdown-pdf-radio-buttons-bind" id="dropdown-pdf-radio-buttons-control" ref="" appearance="dropdown" fr:pdf-appearance="full"/>
-                <xf:select1 static-readonly="true" bind="dropdown-pdf-value-bind" id="dropdown-pdf-value-control" ref="" appearance="dropdown" fr:pdf-appearance="dropdown"/>
-                <fr:databound-select1 static-readonly="true" resource="/fr/service/custom/orbeon/controls/countries?all=true" id="dynamic-dropdown-control" bind="dynamic-dropdown-bind"/>
-                <xf:output static-readonly="true" bind="calculated-value-bind" id="calculated-value-control"/>
-                <xf:output static-readonly="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
-                <xf:output static-readonly="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
+                <fr:number fr:static-readonly="true" suffix="m/s" id="number-with-suffix-control" digits-after-decimal="0" bind="number-with-suffix-bind"/>
+                <fr:currency fr:static-readonly="true" bind="currency-bind" id="currency-control"/>
+                <fr:currency fr:static-readonly="true" prefix="CHF" bind="currency-with-prefix-bind" id="currency-with-prefix-control"/>
+                <xf:select1 fr:static-readonly="true" bind="dropdown-pdf-radio-buttons-bind" id="dropdown-pdf-radio-buttons-control" ref="" appearance="dropdown" fr:pdf-appearance="full"/>
+                <xf:select1 fr:static-readonly="true" bind="dropdown-pdf-value-bind" id="dropdown-pdf-value-control" ref="" appearance="dropdown" fr:pdf-appearance="dropdown"/>
+                <fr:databound-select1 fr:static-readonly="true" resource="/fr/service/custom/orbeon/controls/countries?all=true" id="dynamic-dropdown-control" bind="dynamic-dropdown-bind"/>
+                <xf:output fr:static-readonly="true" bind="calculated-value-bind" id="calculated-value-control"/>
+                <xf:output fr:static-readonly="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
+                <xf:output fr:static-readonly="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
             </_>
         </output>
     </test>
@@ -104,22 +104,22 @@
         <input name="config" href="unrolling/unroll.xpl"/>
         <output name="data">
             <_ xmlns:xf="http://www.w3.org/2002/xforms">
-                <fr:date static-readonly="true" id="date-us-control" bind="date-us-bind" output-format="[M]/[D]/[Y]" field-width="natural"/>
-                <fr:time static-readonly="true" bind="time-bind" id="time-control" field-width="natural" output-format="[h]:[m]:[s] [P,2-2]"/>
-                <fr:datetime static-readonly="true" bind="datetime-bind" id="datetime-control" field-width="natural"/>
-                <fr:dropdown-date static-readonly="true" bind="dropdown-date-bind" id="dropdown-date-control"/>
-                <fr:fields-date static-readonly="true" bind="fields-date-bind" id="fields-date-control"/>
-                <fr:date static-readonly="true" bind="native-date-bind" id="native-date-control" ref="" native-picker="always"/>
-                <fr:time static-readonly="true" id="native-time-control" bind="native-time-bind" native-picker="always" output-format="[h]:[m]:[s] [P,2-2]"/>
-                <fr:number static-readonly="true" suffix="m/s" id="number-with-suffix-control" digits-after-decimal="0" bind="number-with-suffix-bind"/>
-                <fr:currency static-readonly="true" bind="currency-bind" id="currency-control"/>
-                <fr:currency static-readonly="true" prefix="CHF" bind="currency-with-prefix-bind" id="currency-with-prefix-control"/>
-                <xf:select1 static-readonly="true" bind="dropdown-pdf-radio-buttons-bind" id="dropdown-pdf-radio-buttons-control" ref="" appearance="full"/>
-                <xf:select1 static-readonly="true" bind="dropdown-pdf-value-bind" id="dropdown-pdf-value-control" ref="" appearance="dropdown"/>
-                <fr:databound-select1 static-readonly="true" resource="/fr/service/custom/orbeon/controls/countries?all=true" id="dynamic-dropdown-control" bind="dynamic-dropdown-bind"/>
-                <xf:output static-readonly="true" bind="calculated-value-bind" id="calculated-value-control"/>
-                <xf:output static-readonly="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
-                <xf:output static-readonly="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
+                <fr:date fr:static-readonly="true" id="date-us-control" bind="date-us-bind" output-format="[M]/[D]/[Y]" field-width="natural"/>
+                <fr:time fr:static-readonly="true" bind="time-bind" id="time-control" field-width="natural" output-format="[h]:[m]:[s] [P,2-2]"/>
+                <fr:datetime fr:static-readonly="true" bind="datetime-bind" id="datetime-control" field-width="natural"/>
+                <fr:dropdown-date fr:static-readonly="true" bind="dropdown-date-bind" id="dropdown-date-control"/>
+                <fr:fields-date fr:static-readonly="true" bind="fields-date-bind" id="fields-date-control"/>
+                <fr:date fr:static-readonly="true" bind="native-date-bind" id="native-date-control" ref="" native-picker="always"/>
+                <fr:time fr:static-readonly="true" id="native-time-control" bind="native-time-bind" native-picker="always" output-format="[h]:[m]:[s] [P,2-2]"/>
+                <fr:number fr:static-readonly="true" suffix="m/s" id="number-with-suffix-control" digits-after-decimal="0" bind="number-with-suffix-bind"/>
+                <fr:currency fr:static-readonly="true" bind="currency-bind" id="currency-control"/>
+                <fr:currency fr:static-readonly="true" prefix="CHF" bind="currency-with-prefix-bind" id="currency-with-prefix-control"/>
+                <xf:select1 fr:static-readonly="true" bind="dropdown-pdf-radio-buttons-bind" id="dropdown-pdf-radio-buttons-control" ref="" appearance="full"/>
+                <xf:select1 fr:static-readonly="true" bind="dropdown-pdf-value-bind" id="dropdown-pdf-value-control" ref="" appearance="dropdown"/>
+                <fr:databound-select1 fr:static-readonly="true" resource="/fr/service/custom/orbeon/controls/countries?all=true" id="dynamic-dropdown-control" bind="dynamic-dropdown-bind"/>
+                <xf:output fr:static-readonly="true" bind="calculated-value-bind" id="calculated-value-control"/>
+                <xf:output fr:static-readonly="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
+                <xf:output fr:static-readonly="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
             </_>
         </output>
     </test>

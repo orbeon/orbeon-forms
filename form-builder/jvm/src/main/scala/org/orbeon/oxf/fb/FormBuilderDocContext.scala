@@ -16,6 +16,8 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fr.{FormRunnerDocContext, Names}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.{buildIndexFromBindingDescriptors, getAllRelevantDescriptors}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -33,10 +35,13 @@ case class FormBuilderDocContext(
 
   lazy val formDefinitionRootElem = explicitFormDefinitionInstance getOrElse formDefinitionInstance.get.rootElement
 
-  lazy val componentBindings: Seq[NodeInfo] =
-    asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
-
   lazy val undoRootElem = undoInstance.get.rootElement
+
+  lazy implicit val bindingIndex: BindingIndex[BindingDescriptor] =
+    buildIndexFromBindingDescriptors(getAllRelevantDescriptors(componentBindings))
+
+  private def componentBindings: Seq[NodeInfo] =
+    asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 }
 
 object FormBuilderDocContext {

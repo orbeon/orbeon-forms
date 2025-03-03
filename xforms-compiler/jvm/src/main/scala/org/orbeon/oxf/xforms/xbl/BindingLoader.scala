@@ -18,15 +18,14 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
-import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets, XFormsAssetsBuilder}
+import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
+import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets, XFormsAssetsBuilder}
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.Attributes
-
-import scala.collection.mutable
 
 
 trait BindingLoader extends Logging {
@@ -197,7 +196,7 @@ trait BindingLoader extends Logging {
       val qName   = QName(localname, "", uri)
       val attsSeq = convertAttributes(atts)
 
-      BindingIndex.findMostSpecificBinding(currentIndex, qName, attsSeq) match {
+      BindingIndex.findMostSpecificBinding(currentIndex, qName, DatatypeMatch.Exclude, attsSeq) match {
         case Some((binding, true)) if mustCheckBindingPath(binding) =>
 
           // We found a binding by name, but we haven't checked if that path is up-to-date yet. So make sure
@@ -211,7 +210,7 @@ trait BindingLoader extends Logging {
 
           // If the binding was updated, try again but only once
           if (bindingUpdated)
-            BindingIndex.findMostSpecificBinding(currentIndex, qName, attsSeq) map (_._1)
+            BindingIndex.findMostSpecificBinding(currentIndex, qName, DatatypeMatch.Exclude, attsSeq) map (_._1)
           else
             Some(binding)
 

@@ -40,8 +40,9 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
+import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
@@ -51,7 +52,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsNames.XFORMS_VAR_QNAME
+import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_VAR_QNAME}
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
@@ -469,10 +470,18 @@ object FormBuilderXPathApi {
     FormBuilderDocContext(doc).metadataInstanceElem
 
   // Create template content from a bind name
+  // Called from XSLT in `annotate-migrate.xbl`
   // FIXME: Saxon can pass null as `bindings`.
   //@XPathFunction
-  def createTemplateContentFromBindName(inDoc: NodeInfo, name: String, bindings: List[NodeInfo]): Option[NodeInfo] =
-    FormRunnerTemplatesOps.createTemplateContentFromBindName(name, Option(bindings) getOrElse Nil)(FormBuilderDocContext(inDoc))
+  def createTemplateContentFromBindName(inDoc: NodeInfo, name: String, bindingsOrNull: List[NodeInfo]): Option[NodeInfo] = {
+    val bindings = Option(bindingsOrNull) getOrElse Nil
+    // Don't use `ctx.bindingIndex`, which won't work as there is no live Form Builder document yet given that this is
+    // called during XSLT form migration. Instead, the caller passes an explicit list of bindings.
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
+    implicit val index: BindingIndex[BindingDescriptor] =
+      buildIndexFromBindingDescriptors(getAllRelevantDescriptors(bindings))
+    FormRunnerTemplatesOps.createTemplateContentFromBindName(name)
+  }
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
   // See: https://github.com/orbeon/orbeon-forms/issues/3073
@@ -578,8 +587,8 @@ object FormBuilderXPathApi {
   // From a control element (say `<fr:autocomplete>`), returns the corresponding `<xbl:binding>`
   //@XPathFunction
   def bindingForControlElementOrEmpty(controlElement: NodeInfo): NodeInfo = {
-    implicit val ctx = FormBuilderDocContext()
-    FormBuilder.bindingForControlElement(controlElement, ctx.componentBindings).orNull
+    implicit val index: BindingIndex[BindingDescriptor] = FormBuilderDocContext().bindingIndex
+    FormBuilder.bindingForControlElement(controlElement).orNull
   }
 
   //@XPathFunction
@@ -693,13 +702,13 @@ object FormBuilderXPathApi {
   def possibleAppearancesByControlNameAsXML(
     controlName       : String,
     isInitialLoad     : Boolean,
-    builtinDatatype   : String,
-    desiredAppearance : String    // relevant only if isInitialLoad == false
+    newBuiltinDatatype: String,
+    desiredAppearance : String // relevant only if `isInitialLoad == false`
   ): Array[NodeInfo] =
     FormBuilder.possibleAppearancesByControlNameAsXML(
       controlName,
       isInitialLoad,
-      builtinDatatype,
+      newBuiltinDatatype,
       desiredAppearance
     )(FormBuilderDocContext()).to(Array)
 
@@ -778,7 +787,7 @@ object FormBuilderXPathApi {
   // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
   //@XPathFunction
   def findControlBoundNodeByEffectiveId(controlEffectiveId: String): Option[NodeInfo] =
-    findConcreteControlByEffectiveId(controlEffectiveId)(FormBuilderDocContext())
+    findConcreteControlByEffectiveId(controlEffectiveId)
       .collect { case c: XFormsSingleNodeControl => c }
       .flatMap(_.boundNodeOpt)
 
@@ -820,8 +829,11 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def getControlItemsGroupedByValue(controlName: String): Iterable[NodeInfo] =
-    FormBuilder.getControlItemsGroupedByValue(controlName)(FormBuilderDocContext())
+  def getControlItemsGroupedByValue(controlName: String): Iterable[NodeInfo] = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    import ctx.bindingIndex
+    FormBuilder.getControlItemsGroupedByValue(controlName)
+  }
 
   //@XPathFunction
   def resourcesRoot: NodeInfo =
@@ -867,8 +879,10 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def hasEditor(controlElement: NodeInfo, editor: String): Boolean =
-    FormBuilder.hasEditor(controlElement, editor)(FormBuilderDocContext())
+  def hasEditor(controlElement: NodeInfo, editor: String): Boolean = {
+    implicit val index: BindingIndex[BindingDescriptor] = FormBuilderDocContext().bindingIndex
+    FormBuilder.hasEditor(controlElement, editor)
+  }
 
   //@XPathExpression
   def alwaysShowRoles: List[String] =
@@ -957,12 +971,12 @@ object FormBuilderXPathApi {
     newAppearanceOpt         : Option[String]
   ): Option[NodeInfo] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    import ctx.bindingIndex
 
-    val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
-
-    val originalControlElem = findControlByNameOrEmpty(controlName)
-    val originalDatatype    = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
+    val oldControlElem = findControlByNameOrEmpty(controlName)
+    val oldDatatype    = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
+    val oldAtts        = (oldControlElem /@ @*).view.map(attNode => (attNode.qName, attNode.stringValue))
 
     val newDatatype =
       DatatypeValidation.fromXml(
@@ -973,14 +987,18 @@ object FormBuilderXPathApi {
 
     val (virtualName, _) =
       findVirtualNameAndAppearance(
-        searchElemName    = originalControlElem.uriQualifiedName,
-        searchDatatype    = originalDatatype,
-        searchAppearances = originalControlElem attTokens XFormsNames.APPEARANCE_QNAME,
-        descriptors       = descriptors
+        searchElemName = oldControlElem.uriQualifiedName,
+        searchDatatype = oldDatatype,
+        searchAtts     = oldAtts
       )
 
     for {
-      descriptor <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), Nil, descriptors)
+      descriptor <-
+        findMostSpecificBindingDescriptor(
+          searchElemName = virtualName,
+          datatypeMatch  = DatatypeMatch.makeExcludeStringMatch(newDatatype),
+          searchAtts     = updateAttAppearance(oldAtts, newAppearanceOpt)
+        )
       binding    <- descriptor.binding
     } yield
       binding

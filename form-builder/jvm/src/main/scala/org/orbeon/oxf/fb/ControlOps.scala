@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
@@ -266,20 +267,24 @@ trait ControlOps extends ResourcesOps {
       if (oldName != newName) {
         findDataHolders(oldName) foreach (rename(_, newName))
         renameBinds(oldName, newName)
-        FormRunnerTemplatesOps.updateTemplates(None, ctx.componentBindings)
+        import ctx.bindingIndex
+        FormRunnerTemplatesOps.updateTemplates(None)
       }
     }
   }
 
-  def renameControl(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
+  def renameControl(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {
+    import ctx.bindingIndex
     findControlByName(oldName) foreach
       (renameControlByElement(_, newName))
+  }
 
   // Rename the control (but NOT its holders, binds, etc.)
   def renameControlByElement(
-    controlElement : NodeInfo,
-    newName        : String)(implicit
-    ctx            : FormBuilderDocContext
+    controlElement: NodeInfo,
+    newName       : String
+  )(implicit
+    index         : BindingIndex[BindingDescriptor]
   ): Unit = {
 
     // Produce `section-` and `grid-` for sections and grids
@@ -469,11 +474,16 @@ trait ControlOps extends ResourcesOps {
     iterateNamesInUseCtx.toSet
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
-  def hasEditor(controlElement: NodeInfo, editor: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, ctx.componentBindings)
+  def hasEditor(
+    controlElement: NodeInfo,
+    editor        : String
+  )(implicit
+    index         : BindingIndex[BindingDescriptor]
+  ): Boolean =
+    FormBuilder.controlElementHasEditor(controlElement, editor)
 
   // Find the control by name (resolved from the top-level form model `fr-form-model`)
-  def findConcreteControlByEffectiveId(controlEffectiveId: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] =
+  def findConcreteControlByEffectiveId(controlEffectiveId: String): Option[XFormsControl] =
     inScopeContainingDocument.findObjectByEffectiveId(controlEffectiveId)
       .map(_.asInstanceOf[XFormsControl])
 
@@ -635,6 +645,8 @@ trait ControlOps extends ResourcesOps {
 
   // Set the control's items for all languages
   def setControlItems(controlName: String, items: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
+
+    import ctx.bindingIndex
 
     val addHints = FormBuilder.hasItemHintEditor(controlName)
 

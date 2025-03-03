@@ -28,7 +28,7 @@
                 xf|input[appearance ~= character-counter],
                 xf|textarea[appearance ~= character-counter],
                 xf|secret[appearance ~= character-counter],
-                fr|tinymce[appearance ~= character-counter]"
+                xf|textarea[appearance ~= character-counter][mediatype = 'text/html']"
             xxbl:mode="binding lhha value"
             xxbl:label-for="field"
             xxbl:container="span">

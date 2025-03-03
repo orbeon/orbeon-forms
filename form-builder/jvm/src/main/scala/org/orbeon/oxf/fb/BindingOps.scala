@@ -20,63 +20,63 @@ import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
+import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 
 
 
 trait BindingOps {
 
   def possibleAppearancesByControlNameAsXML(
-    controlName      : String,
-    isInitialLoad    : Boolean,
-    builtinDatatype  : String,
-    desiredAppearance: String // relevant only if isInitialLoad == false
+    controlName       : String,
+    isInitialLoad     : Boolean,
+    newBuiltinDatatype: String,
+    desiredAppearance : String // relevant only if `isInitialLoad == false`
   )(implicit
     ctx              : FormBuilderDocContext
   ): List[NodeInfo] = {
 
-    val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
-    val lang        = FormRunner.currentLang
+    import ctx.bindingIndex
+
+    val lang = FormRunner.currentLang
 
     val detailsOpt =
       for {
         controlElem                  <- findControlByName(controlName)
-        originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
-        (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
-            searchElemName    = controlElem.uriQualifiedName,
-            searchDatatype    = originalDatatype,
-            searchAppearances = controlElem attTokens APPEARANCE_QNAME,
-            descriptors       = descriptors
+        oldDatatype                  = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
+        oldAtts                      = BindingDescriptor.getAtts(controlElem)
+        (virtualName, appearanceOpt) =
+          findVirtualNameAndAppearance(
+            searchElemName = controlElem.uriQualifiedName,
+            searchDatatype = oldDatatype,
+            searchAtts     = oldAtts
           )
-        newDatatype                  = Types.qNameForBuiltinTypeName(builtinDatatype, required = false)
+        newDatatype                  = Types.qNameForBuiltinTypeName(newBuiltinDatatype, required = false)
       } yield
-        (virtualName, appearanceOpt, newDatatype, controlElem /@ @*)
+        (virtualName, appearanceOpt, newDatatype, oldAtts)
 
     val descriptionOpt =
       for {
-        (virtualName, appearanceOpt, newDatatype, attNodes) <- detailsOpt
+        (virtualName, appearanceOpt, newDatatype, oldAtts) <- detailsOpt
         description <- findControlDescriptionAsXml(
-          elemName                = virtualName,
-          builtinType             = newDatatype,
-          appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
-          atts                    = attNodes.view.map(attNode => (attNode.qName, attNode.stringValue)),
-          lang                    = lang,
-          descriptors             = descriptors
+          elemName    = virtualName,
+          builtinType = newDatatype,
+          atts        = updateAttAppearance(oldAtts, if (isInitialLoad) appearanceOpt else Some(desiredAppearance)),
+          lang        = lang
         )
       } yield
         description
 
     val appearanceElems =
       for {
-        (virtualName, appearanceOpt, newDatatype, attNodes) <- detailsOpt.toList
+        (virtualName, appearanceOpt, newDatatype, atts) <- detailsOpt.toList
         appearanceElem <- possibleAppearancesWithLabelAsXML(
-          elemName                = virtualName,
+          virtualName                = virtualName,
           builtinType             = newDatatype,
           // Upon initial load, we want to select as current the original appearance. Later, we want to try
           // to keep the current appearance. For example, if dropdown has type `string`, and we change the
@@ -84,9 +84,8 @@ trait BindingOps {
           // If the appearance doesn't match, then no appearance is marked as current. The UI will pick the
           // first appearance listed as current.
           appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
-          atts                    = attNodes.view.map(attNode => (attNode.qName, attNode.stringValue)),
-          lang                    = lang,
-          descriptors             = descriptors
+          atts                    = atts,
+          lang                    = lang
         )
       } yield
         appearanceElem
@@ -98,13 +97,12 @@ trait BindingOps {
   def findControlDescription(
     elemName               : QName,
     builtinType            : QName,
-    appearancesForSelection: Set[String],
     atts                   : Iterable[(QName, String)],
     lang                   : String
-  )(
-    descriptors            : Iterable[BindingDescriptor]
+  )(implicit
+    index                  : BindingIndex[BindingDescriptor]
   ): Option[String] =
-    findMostSpecificMaybeWithDatatype(elemName, builtinType, appearancesForSelection, atts, descriptors)
+    findMostSpecificBindingDescriptor(elemName, DatatypeMatch.makeExcludeStringMatch(builtinType), atts)
       .flatMap(_.binding)
       .flatMap(bindingMetadata(_).headOption)
       .flatMap(metadata => findMetadata(lang, metadata / FBDisplayNameTest))
@@ -112,30 +110,28 @@ trait BindingOps {
   private def findControlDescriptionAsXml(
     elemName                : QName,
     builtinType             : QName,
-    appearancesForSelection : Set[String],
     atts                    : Iterable[(QName, String)],
-    lang                    : String,
-    descriptors             : Iterable[BindingDescriptor]
+    lang                    : String
+  )(implicit
+    index                   : BindingIndex[BindingDescriptor]
   ): Option[NodeInfo] =
     findControlDescription(
       elemName,
       builtinType,
-      appearancesForSelection,
       atts,
       lang
-    )(
-      descriptors
     ).map { description =>
       <description>{description}</description>
     }.map(elemToNodeInfo)
 
   private def possibleAppearancesWithLabelAsXML(
-    elemName                : QName,
-    builtinType             : QName,
-    appearancesForSelection : Set[String],
-    atts                    : Iterable[(QName, String)],
-    lang                    : String,
-    descriptors             : Iterable[BindingDescriptor]
+    virtualName            : QName,
+    builtinType            : QName,
+    appearancesForSelection: Set[String],
+    atts                   : Iterable[(QName, String)],
+    lang                   : String
+   )(implicit
+    index                  : BindingIndex[BindingDescriptor],
   ): List[NodeInfo] = {
 
     def appearanceMatches(appearanceOpt: Option[String]): Boolean = appearanceOpt match {
@@ -145,13 +141,12 @@ trait BindingOps {
 
     val appearancesXML =
       for {
-        (valueOpt, fullLabelOpt, label, iconPathOpt, iconClasses) <- possibleAppearancesWithLabel(
-            elemName,
+        (valueOpt, fullLabelOpt, label, iconPathOpt, iconClasses) <-
+          possibleAppearancesWithLabel(
+            virtualName,
             builtinType,
             atts,
             lang
-          )(
-            descriptors
           )
       } yield
         <appearance current={appearanceMatches(valueOpt).toString}>
@@ -183,19 +178,19 @@ trait BindingOps {
   // - `None` represents no appearance (default appearance)
   // - `Some(appearance)` represents a specific appearance
   def possibleAppearancesWithLabel(
-    elemName   : QName,
+    virtualName: QName,
     datatype   : QName,
     atts       : Iterable[(QName, String)],
     lang       : String
-  )(
-    descriptors: Iterable[BindingDescriptor]
+  )(implicit
+    index   : BindingIndex[BindingDescriptor]
   ): Iterable[(Option[String], Option[String], String, Option[String], String)] = {
 
     def metadataOpt(bindingOpt: Option[NodeInfo]): Option[NodeInfo] =
       bindingOpt.toList flatMap bindingMetadata headOption
 
-    possibleAppearancesWithBindings(elemName, datatype, atts, descriptors) map {
-      case (appearanceOpt, bindingOpt, _) =>
+    possibleAppearancesWithBindings(virtualName, datatype, atts) map {
+      case (appearanceOpt, bindingOpt) =>
         (appearanceOpt, metadataOpt(bindingOpt))
     } collect {
       case (appearanceOpt, Some(metadata)) =>
@@ -213,7 +208,7 @@ trait BindingOps {
     }
   }
 
-  private def bindingMetadata(binding: NodeInfo): Seq[NodeInfo] =
+  private def bindingMetadata(binding: NodeInfo): NodeColl =
     binding / FBMetadataTest
 
   // From an `<xbl:binding>`, return the view template (say `<fr:autocomplete>`)
@@ -275,25 +270,33 @@ trait BindingOps {
   }
 
   // From a control element (say `<fr:autocomplete>`), returns the corresponding `<xbl:binding>`
-  def bindingForControlElement(controlElem: NodeInfo, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
-
-    val elemName    = controlElem.uriQualifiedName
-    val appearances = controlElem attTokens APPEARANCE_QNAME
-    val descriptors = getAllRelevantDescriptors(bindings)
-
+  def bindingForControlElement(
+    controlElem: NodeInfo
+  )(implicit
+    index      : BindingIndex[BindingDescriptor]
+  ): Option[NodeInfo] =
     for {
-      descriptor <- findMostSpecificWithoutDatatype(elemName, appearances, Nil, descriptors)
+      descriptor <-
+        findMostSpecificBindingDescriptor(
+          searchElemName = controlElem.uriQualifiedName,
+          datatypeMatch  = DatatypeMatch.Exclude,
+          searchAtts     = BindingDescriptor.getAtts(controlElem)
+        )
       binding    <- descriptor.binding
     } yield
       binding
-  }
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
-  def controlElementHasEditor(controlElem: NodeInfo, editor: String, bindings: Seq[NodeInfo]): Boolean = {
+  def controlElementHasEditor(
+    controlElem: NodeInfo,
+    editor     : String
+  )(implicit
+    index      : BindingIndex[BindingDescriptor]
+  ): Boolean = {
 
     val editorAttributeValueOpt =
       for {
-        binding         <- bindingForControlElement(controlElem, bindings)
+        binding         <- bindingForControlElement(controlElem)
         editorAttribute <- (bindingMetadata(binding) / FBEditorsTest /@ editor).headOption
       } yield
         editorAttribute.stringValue

@@ -4,18 +4,19 @@ import cats.syntax.option.*
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
 import org.orbeon.oxf.fr.library.FRComponentParamSupport.findLibraryVersions
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, ResourceResolver, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.model.BasicIdIndex
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.{buildIndexFromBindingDescriptors, getAllRelevantDescriptors}
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath.*
@@ -101,7 +102,7 @@ object Transforms {
       val formDoc =
         new DocumentWrapper(TransformerUtils.readOrbeonDom(is, null, false, false), null, XPath.GlobalConfiguration)
 
-      val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDoc)
+      implicit val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDoc)
 
       // Set an id index to help with migration performance
       // The index is not updated with `insert` and `delete`, but we convinced ourselves that it's ok because:
@@ -155,11 +156,9 @@ object Transforms {
       )
 
       // 4. Migrate templates
-      FormRunnerTemplatesOps.updateTemplates(
-        None,
-        componentBindings.rootElement / XBLXBLTest / XBLBindingTest)(
-        frDocCtx
-      )
+      implicit val index: BindingIndex[BindingDescriptor] =
+        buildIndexFromBindingDescriptors(getAllRelevantDescriptors(componentBindings.rootElement / XBLXBLTest / XBLBindingTest))
+      FormRunnerTemplatesOps.updateTemplates(None)
 
       // Serialize out the result
       val receiver =

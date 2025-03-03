@@ -13,7 +13,11 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.analysis.model.Types
+import org.orbeon.oxf.xforms.analysis.model.Types.StringQNames
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.{AppearanceExtractor, FirstAttExtractor}
 
 import scala.collection.mutable
 
@@ -24,14 +28,37 @@ case class BindingIndex[+T](
   nameOnlySelectors   : List[(BindingDescriptor, T)]
 ) {
   // Index by name to make lookups faster
-  val byNameWithAtt = nameAndAttSelectors filter (_._1.elementName.isDefined) groupBy (_._1.elementName.get)
-  val byNameOnly    = nameOnlySelectors   filter (_._1.elementName.isDefined) groupBy (_._1.elementName.get)
+  val byNameWithAtt: Map[QName, List[(BindingDescriptor, T)]] = filterAndGroup(nameAndAttSelectors)
+  val byNameOnly   : Map[QName, List[(BindingDescriptor, T)]] = filterAndGroup(nameOnlySelectors)
+
+  def iterateRelatedDescriptors(bindingDescriptor: BindingDescriptor): Iterator[BindingDescriptor] =
+    iterateDescriptors.filter(_.binding == bindingDescriptor.binding)
+
+  def iterateDescriptors: Iterator[BindingDescriptor] =
+    (nameAndAttSelectors.iterator ++ attOnlySelectors ++ nameOnlySelectors).map(_._1)
+
+  private def filterAndGroup[U](selectors: List[(BindingDescriptor, U)]): Map[QName, List[(BindingDescriptor, U)]] =
+    selectors filter (_._1.elementName.isDefined) groupBy (_._1.elementName.get)
 }
 
 // Implementation strategy: all the functions take an immutable index and return a new immutable index. The global index
 // can be retrieved and updated atomically. There is no lock on the index. This assumes that the index is only a cache
 // and that there are not too many concurrent operations on the index.
 object BindingIndex {
+
+  sealed trait DatatypeMatch
+
+  object DatatypeMatch {
+    case object Exclude             extends DatatypeMatch
+    case object Ignore              extends DatatypeMatch
+    case class  Match(qName: QName) extends DatatypeMatch
+
+    def makeExcludeStringMatch(qName: QName): DatatypeMatch =
+      if (StringQNames(qName))
+        Exclude
+      else
+        Match(qName)
+  }
 
   def stats(index: BindingIndex[IndexableBinding]) = List(
     "name and attribute selectors" -> index.nameAndAttSelectors.size.toString,
@@ -64,29 +91,39 @@ object BindingIndex {
   }
 
   def indexBinding(
-    index   : BindingIndex[IndexableBinding],
-    binding : IndexableBinding
+    index                      : BindingIndex[IndexableBinding],
+    binding                    : IndexableBinding
   ): BindingIndex[IndexableBinding] = {
 
     val ns = binding.namespaceMapping
 
-    val attDescriptors      = binding.selectors.iterator collect BindingDescriptor.attributeBindingPF(ns, None)
+    val attDescriptors      = binding.selectors.iterator collect BindingDescriptor.attributeBindingPF(ns, None, includeBindingsWithDatatype = false)
     val nameOnlyDescriptors = binding.selectors.iterator collect BindingDescriptor.directBindingPF(ns, None)
 
-    var currentIndex = index
-
-    attDescriptors ++ nameOnlyDescriptors foreach {
-      case b @ BindingDescriptor(Some(elemName), None, Some(BindingAttributeDescriptor(name, predicate))) =>
-        currentIndex = currentIndex.copy(nameAndAttSelectors = (b -> binding) :: currentIndex.nameAndAttSelectors)
-      case b @ BindingDescriptor(None, None, Some(BindingAttributeDescriptor(name, predicate))) =>
-        currentIndex = currentIndex.copy(attOnlySelectors = (b -> binding) :: currentIndex.attOnlySelectors)
-      case b @ BindingDescriptor(Some(elemName), None, None) =>
-        currentIndex = currentIndex.copy(nameOnlySelectors = (b -> binding) :: currentIndex.nameOnlySelectors)
-      case _ =>
+    (attDescriptors ++ nameOnlyDescriptors).foldLeft(index) { case (index, bindingDescriptor) =>
+      indexBindingDescriptor(index, binding, bindingDescriptor, includeBindingsWithDatatype = false)
     }
-
-    currentIndex
   }
+
+  def indexBindingDescriptor[T](
+    index                      : BindingIndex[T],
+    value                      : T,
+    bindingDescriptor          : BindingDescriptor,
+    includeBindingsWithDatatype: Boolean
+  ): BindingIndex[T] =
+    bindingDescriptor match {
+      case b @ BindingDescriptor(Some(_), datatypeOpt, None, None)
+        if includeBindingsWithDatatype || datatypeOpt.isEmpty =>
+          index.copy(nameOnlySelectors   = (b -> value) :: index.nameOnlySelectors)
+      case b @ BindingDescriptor(Some(_), datatypeOpt, _, _)
+        if includeBindingsWithDatatype || datatypeOpt.isEmpty =>
+          index.copy(nameAndAttSelectors = (b -> value) :: index.nameAndAttSelectors)
+      case b @ BindingDescriptor(None, datatypeOpt, _, _)
+        if includeBindingsWithDatatype || datatypeOpt.isEmpty =>
+          index.copy(attOnlySelectors    = (b -> value) :: index.attOnlySelectors)
+      case _ =>
+        index
+    }
 
   def deIndexBinding(
     index   : BindingIndex[IndexableBinding],
@@ -110,33 +147,73 @@ object BindingIndex {
   }
 
   // If found return the binding and a Boolean flag indicating if the match was by name only.
-  def findMostSpecificBinding(
-    index : BindingIndex[IndexableBinding],
-    qName : QName,
-    atts  : Iterable[(QName, String)]
-  ): Option[(IndexableBinding, Boolean)] = {
+  def findMostSpecificBinding[T](
+    index           : BindingIndex[T],
+    qName           : QName,
+    datatypeMatch   : DatatypeMatch,
+    atts            : Iterable[(QName, String)],
+    filterAppearance: AttributePredicate => Boolean = _ => true
+  ): Option[(T, Boolean)] = {
 
-    def attMatches(attDesc: BindingAttributeDescriptor): Boolean =
-      atts exists {
-        case (attName, attValue) => attName == attDesc.name && BindingDescriptor.attValueMatches(attDesc.predicate, attValue)
-      }
+    object AppearanceExtractor extends AppearanceExtractor {
+      def getAtts: Iterable[(QName, String)] = atts
+      def getFilterAppearance: AttributePredicate => Boolean = filterAppearance
+    }
 
-    def fromNameAndAttValue: Option[(IndexableBinding, Boolean)] =
+    object TypeExtractor {
+
+      val (datatype1Opt, datatype2Opt) =
+        datatypeMatch match {
+          case DatatypeMatch.Match(datatype) =>
+            (Some(datatype), Some(Types.getVariationTypeOrKeep(datatype)))
+          case _ =>
+            (None, None)
+        }
+
+      def unapply(datatypeOpt: Option[QName]): Boolean =
+        datatypeMatch match {
+          case DatatypeMatch.Exclude  => datatypeOpt.isEmpty
+          case DatatypeMatch.Ignore   => true
+          case DatatypeMatch.Match(_) => datatypeOpt == datatype1Opt || datatypeOpt == datatype2Opt
+        }
+    }
+
+    object FirstAttExtractor extends FirstAttExtractor {
+      def getAtts: Iterable[(QName, String)] = atts
+    }
+
+    def fromNameAndAppearanceAndAtt: Option[(T, Boolean)] =
       index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
         indexedBindings.collectFirst {
-          case (BindingDescriptor(_, None, Some(attDesc)), binding) if attMatches(attDesc) =>
-            (binding, false)
+          case (BindingDescriptor(_, TypeExtractor(), AppearanceExtractor(_), FirstAttExtractor(_)), binding) => (binding, false)
         }
       }
 
-    def fromAttValueOnly: Option[(IndexableBinding, Boolean)] =
-      index.attOnlySelectors collectFirst {
-        case (BindingDescriptor(None, None, Some(attDesc)), binding) if attMatches(attDesc) =>
-          (binding, false)
+    def fromNameAndAppearanceOrAtt: Option[(T, Boolean)] =
+      index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
+        indexedBindings.collectFirst {
+          case (BindingDescriptor(_, TypeExtractor(), AppearanceExtractor(_), None), binding) => (binding, false)
+          case (BindingDescriptor(_, TypeExtractor(), None, FirstAttExtractor(_)), binding)  => (binding, false)
+        }
       }
 
-    def fromNameOnly: Option[(IndexableBinding, Boolean)] =
-      index.byNameOnly.get(qName) flatMap (_.headOption) map (_._2 -> true)
+    def fromAppearanceAndAtt: Option[(T, Boolean)] =
+      index.attOnlySelectors collectFirst {
+        case (BindingDescriptor(None, TypeExtractor(), AppearanceExtractor(_), FirstAttExtractor(_)), binding) => (binding, false)
+      }
+
+    def fromAppearanceOrAtt: Option[(T, Boolean)] =
+      index.attOnlySelectors collectFirst {
+        case (BindingDescriptor(None, TypeExtractor(), AppearanceExtractor(_), None), binding) => (binding, false)
+        case (BindingDescriptor(None, TypeExtractor(), None, FirstAttExtractor(_)), binding)  => (binding, false)
+      }
+
+    def fromName: Option[(T, Boolean)] =
+      index.byNameOnly.get(qName).flatMap {
+        _.collectFirst {
+          case (BindingDescriptor(_, TypeExtractor(), None, None), binding) => (binding, true)
+        }
+      }
 
     // Specificity: https://drafts.csswg.org/selectors-4/#specificity
     //
@@ -148,9 +225,11 @@ object BindingIndex {
     //
     // But that would be reasonable.
     //
-    fromNameAndAttValue orElse
-      fromAttValueOnly  orElse
-      fromNameOnly
+    fromNameAndAppearanceAndAtt  orElse
+      fromNameAndAppearanceOrAtt orElse
+      fromAppearanceAndAtt       orElse
+      fromAppearanceOrAtt        orElse
+      fromName
   }
 
   private val abstractPF: PartialFunction[(BindingDescriptor, IndexableBinding), (BindingDescriptor, AbstractBinding)] =

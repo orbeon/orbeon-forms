@@ -15,9 +15,10 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder.*
+import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.analysis.model.Types
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
@@ -96,7 +97,7 @@ class BindingDescriptorTest
             xf|input[appearance ~= character-counter],
             xf|textarea[appearance ~= character-counter],
             xf|secret[appearance ~= character-counter],
-            fr|tinymce[appearance ~= character-counter]">
+            xf|textarea[appearance ~= character-counter][mediatype = 'text/html']">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Character Counter</display-name>
           </metadata>
@@ -130,25 +131,28 @@ class BindingDescriptorTest
   val FR  = "http://orbeon.org/oxf/xml/form-runner"
   val FB  = "http://orbeon.org/oxf/xml/form-builder"
 
-  val Bindings = ComponentsDocument.rootElement child (XBL -> "xbl") child (XBL -> "binding")
+  implicit val index: BindingIndex[BindingDescriptor] = {
+    val bindings = ComponentsDocument.rootElement / XBLXBLTest / XBLBindingTest
+    buildIndexFromBindingDescriptors(getAllRelevantDescriptors(bindings))
+  }
 
   describe("New element name") {
 
     def assertVaryTypes(
-      oldControlName : QName,
-      oldDatatype    : QName,
-      oldAppearance  : Option[String],
-      newDatatype    : QName,
-      newAppearance  : Option[String]
+      oldControlElemName: QName,
+      oldDatatype       : QName,
+      oldAppearance     : Option[String],
+      newDatatype       : QName,
+      newAppearance     : Option[String]
     )(
       expected       : Option[(QName, Option[String])]
     ): Unit =
-      it(s"must pass with $oldControlName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
+      it(s"must pass with $oldControlElemName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
         for {
           oldT <- List(oldDatatype, Types.getVariationTypeOrKeep(oldDatatype))
           newT <- List(newDatatype, Types.getVariationTypeOrKeep(newDatatype))
         } locally {
-          assert(expected == newElementName(oldControlName, oldT, oldAppearance.to(Set), newT, newAppearance, Bindings))
+          assert(expected == newElementName(oldControlElemName, oldT, BindingDescriptor.updateAttAppearance(Nil, oldAppearance), newT, newAppearance))
         }
       }
 
@@ -192,7 +196,7 @@ class BindingDescriptorTest
         for {
           newT <- List(dataType, Types.getVariationTypeOrKeep(dataType))
         } locally {
-          assert(expected == possibleAppearancesWithLabel(elemName, newT, atts, "en")(getAllRelevantDescriptors(Bindings)).map(t => t._1 -> t._3))
+          assert(expected.toSet == possibleAppearancesWithLabel(elemName, newT, atts, "en").map(t => t._1 -> t._3).toSet)
         }
       }
 
@@ -202,7 +206,7 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
     assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons"  , Some("dropdown")          -> "Dropdown Menu"))
 
-    assertVaryTypes(XF -> "textarea"  , XS -> "string" , List(QName("mediatype") -> "text/html"))(Nil)
+    assertVaryTypes(XF -> "textarea"  , XS -> "string" , List(QName("mediatype") -> "text/html"))(Seq(None-> "Formatted Text Area", Some("character-counter") -> "With Character Counter") )
     assertVaryTypes(FR -> "attachment", XS -> "string" , List(QName("mediatype") -> "text/html"))(Nil)
     assertVaryTypes(FR -> "attachment", XS -> "string" , List(QName("multiple")  -> "true")     )(Nil)
   }
@@ -221,7 +225,7 @@ class BindingDescriptorTest
         for {
           newT <- List(dataType, Types.getVariationTypeOrKeep(dataType))
         } locally {
-          assert(findControlDescription(elemName, newT, appearance.toSet, atts, "en")(getAllRelevantDescriptors(Bindings)).contains(expected))
+          assert(findControlDescription(elemName, newT, BindingDescriptor.updateAttAppearance(atts, appearance), "en").contains(expected))
         }
       }
 

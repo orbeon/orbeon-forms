@@ -9,7 +9,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ByteSizeUtils, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.xbl.{BindingAttributeDescriptor, BindingDescriptor}
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
@@ -17,7 +17,6 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -49,45 +48,57 @@ trait FormRunnerComponentsCompileTime {
 
     def findByNameAndDatatypeAndAppearance: Option[String] =
       relatedDescriptors collectFirst {
-        case BindingDescriptor(
+        case
+          BindingDescriptor(
             Some(name),
             d @ Some(_),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+            Some(AttributePredicate.Equal(appearance)),
+            _
           ) => buildName(name, d, Some(appearance))
-        case BindingDescriptor(
+        case
+          BindingDescriptor(
             Some(name),
             d @ Some(_),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+            Some(AttributePredicate.Token(appearance)),
+            _
           ) => buildName(name, d, Some(appearance))
       }
 
     def findByNameAndDatatype: Option[String] =
       relatedDescriptors collectFirst {
-        case BindingDescriptor(
+        case
+          BindingDescriptor(
             Some(name),
             d @ Some(_),
-            None
+            None,
+            _
           ) => buildName(name, d, None)
       }
 
   def findByNameAndAppearance: Option[String] =
       relatedDescriptors collectFirst {
-        case BindingDescriptor(
+        case
+          BindingDescriptor(
             Some(name),
             None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+            Some(AttributePredicate.Equal(appearance)),
+            _
           ) => buildName(name, None, Some(appearance))
-        case BindingDescriptor(
+        case
+          BindingDescriptor(
             Some(name),
             None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+            Some(AttributePredicate.Token(appearance)),
+            _
           ) => buildName(name, None, Some(appearance))
       }
 
     def findDirect: Option[String] =
       relatedDescriptors collectFirst {
-        case BindingDescriptor(
+        case
+          BindingDescriptor(
             Some(name),
+            None,
             None,
             None
           ) => buildName(name, None, None)

@@ -350,19 +350,20 @@ trait AlertsAndConstraintsOps extends ControlOps {
     )(implicit
       ctx             : FormBuilderDocContext
     ): Unit = {
+      import ctx.bindingIndex
       val newDatatype = datatypeQName
       for {
-        controlElem    <- findControlByName(controlName)
-        oldDatatype    = DatatypeValidation.fromForm(controlName).datatypeQName
-        oldAppearances = controlElem attTokens APPEARANCE_QNAME
-        (newElemName, newAppearanceAttOpt) <- BindingDescriptor.newElementName(
-          controlElem.uriQualifiedName,
-          oldDatatype,
-          oldAppearances,
-          newDatatype,
-          newAppearanceOpt,
-          ctx.componentBindings
-        )
+        controlElem <- findControlByName(controlName)
+        oldDatatype = DatatypeValidation.fromForm(controlName).datatypeQName
+        oldAtts     = BindingDescriptor.getAtts(controlElem)
+        (newElemName, newAppearanceAttOpt) <-
+          BindingDescriptor.newElementName(
+            controlElem.uriQualifiedName,
+            oldDatatype,
+            oldAtts,
+            newDatatype,
+            newAppearanceOpt
+          )
       } locally {
         // Q: If binding changes, what about instance and bind templates? Should also be updated? Not a
         // concrete case as of now, but can happen depending on which bindings are available.

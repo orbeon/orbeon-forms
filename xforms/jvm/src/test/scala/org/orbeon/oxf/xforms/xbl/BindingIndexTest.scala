@@ -16,13 +16,18 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
+import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.xml.NamespaceMapping
-import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.funspec.AnyFunSpecLike
 
 
-class BindingIndexTest extends AnyFunSpec {
+class BindingIndexTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
   case class TestBinding(
     selectors        : List[Selector],
@@ -51,6 +56,7 @@ class BindingIndexTest extends AnyFunSpec {
         [appearance *= gaga],
         foo|bar[appearance ~= baz],
         foo|bar[repeat = content],
+        foo|bar[appearance ~= baz][repeat = content],
         foo|bar[repeat]
       """.trimAllToEmpty
     )
@@ -70,6 +76,7 @@ class BindingIndexTest extends AnyFunSpec {
       appearanceContainsGagaBinding   ::
       fooBarAppearanceBazBinding      ::
       fooBarRepeatContent             ::
+      fooBarAppearanceAndAtt          ::
       fooBarRepeat                    ::
       Nil
     ) = AllBindings
@@ -103,10 +110,10 @@ class BindingIndexTest extends AnyFunSpec {
     val elem = parseXMLElemWithNamespaces(xmlElem)
     val atts = elem.attributes map (a => a.getQName -> a.getValue)
 
-    val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, atts)
+    val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, DatatypeMatch.Exclude, atts)
 
     it(s"must pass with `$xmlElem`") {
-      assert(Some(binding) === (found map (_._1)))
+      assert(found.map(_._1).contains(binding))
     }
   }
 
@@ -114,15 +121,16 @@ class BindingIndexTest extends AnyFunSpec {
 
     val currentIndex = indexWithAllBindings
 
-    assertElemMatched(currentIndex, """<foo:bar/>""",                            fooBarBinding)
-    assertElemMatched(currentIndex, """<foo:baz/>""",                            fooBazBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="bar"/>""",           fooBarBinding)
-    assertElemMatched(currentIndex, """<foo:baz appearance="bar"/>""",           fooBazBinding)
-    assertElemMatched(currentIndex, """<foo:baz appearance="baz"/>""",           appearanceTokenBazBinding)
-    assertElemMatched(currentIndex, """<foo:baz appearance="fuzz baz toto"/>""", appearanceTokenBazBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",           fooBarAppearanceBazBinding)
-    assertElemMatched(currentIndex, """<foo:bar repeat="content"/>""",           fooBarRepeatContent)
-    assertElemMatched(currentIndex, """<foo:bar repeat="true"/>""",              fooBarRepeat)
+    assertElemMatched(currentIndex, """<foo:bar/>""",                                   fooBarBinding)
+    assertElemMatched(currentIndex, """<foo:baz/>""",                                   fooBazBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="bar"/>""",                  fooBarBinding)
+    assertElemMatched(currentIndex, """<foo:baz appearance="bar"/>""",                  fooBazBinding)
+    assertElemMatched(currentIndex, """<foo:baz appearance="baz"/>""",                  appearanceTokenBazBinding)
+    assertElemMatched(currentIndex, """<foo:baz appearance="fuzz baz toto"/>""",        appearanceTokenBazBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",                  fooBarAppearanceBazBinding)
+    assertElemMatched(currentIndex, """<foo:bar repeat="content"/>""",                  fooBarRepeatContent)
+    assertElemMatched(currentIndex, """<foo:bar appearance="baz" repeat="content"/>""", fooBarAppearanceAndAtt)
+    assertElemMatched(currentIndex, """<foo:bar repeat="true"/>""",                     fooBarRepeat)
   }
 
   describe("Matching by attribute") {

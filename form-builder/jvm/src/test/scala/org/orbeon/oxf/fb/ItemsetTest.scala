@@ -40,6 +40,8 @@ class ItemsetTest
 
         def assertControl(controlName: String, expectedItems: Seq[Elem]): Unit = {
 
+          import ctx.bindingIndex
+
           val actualItems =
             FormBuilder.getControlItemsGroupedByValue(controlName) map TransformerUtils.tinyTreeToOrbeonDom
 

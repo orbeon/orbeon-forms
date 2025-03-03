@@ -29,7 +29,6 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
 
-
 trait ContainerOps extends ControlOps {
 
   self: GridOps => // funky dependency, to resolve at some point
@@ -184,7 +183,8 @@ trait ContainerOps extends ControlOps {
         }
 
         // Moving sections can impact templates
-        FormRunnerTemplatesOps.updateTemplates(None, ctx.componentBindings)
+        import ctx.bindingIndex
+        FormRunnerTemplatesOps.updateTemplates(None)
 
       case _ =>
     }
@@ -288,10 +288,12 @@ trait ContainerOps extends ControlOps {
         // NOTE: Could skip if top-level repeat
         updateTemplatesCheckContainers(findAncestorRepeatNames(control).to(Set))
 
+        import ctx.bindingIndex
+
         // Ensure new template rooted at iteration
         FormRunnerTemplatesOps.ensureTemplateReplaceContent(
           controlName,
-          FormRunnerTemplatesOps.createTemplateContentFromBind(iterationBind.head, ctx.componentBindings)
+          FormRunnerTemplatesOps.createTemplateContentFromBind(iterationBind.head)
         )
 
       } else if (wasRepeat && ! repeat) {
@@ -344,6 +346,8 @@ trait ContainerOps extends ControlOps {
     instanceElem(doc, templateId(controlName))
 
   // Update templates but only those which might contain one of specified names
-  def updateTemplatesCheckContainers(ancestorContainerNames: Set[String])(implicit ctx: FormBuilderDocContext): Unit =
-    FormRunnerTemplatesOps.updateTemplates(Some(ancestorContainerNames), ctx.componentBindings)
+  def updateTemplatesCheckContainers(ancestorContainerNames: Set[String])(implicit ctx: FormBuilderDocContext): Unit = {
+    import ctx.bindingIndex
+    FormRunnerTemplatesOps.updateTemplates(Some(ancestorContainerNames))
+  }
 }

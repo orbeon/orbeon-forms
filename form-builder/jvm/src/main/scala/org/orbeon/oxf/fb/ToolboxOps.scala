@@ -63,6 +63,7 @@ object ToolboxOps {
   def insertNewControl(bindingElem: NodeInfo): Option[String] = {
 
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    import ctx.bindingIndex
 
     ensureEmptyCell() match {
       case Some(gridTd) =>
@@ -904,6 +905,7 @@ object ToolboxOps {
           val oldName = controlNameFromId(controlElem.id)
 
           oldToNewNames.get(oldName) foreach { newName =>
+            import ctx.bindingIndex
             renameControlByElement(controlElem, newName)
           }
         }
@@ -1062,9 +1064,12 @@ object ToolboxOps {
       val newControlName = getControlName(containerElem)
       val bindElem       = findBindByName(newControlName).get
 
+      import ctx.bindingIndex
+
       FormRunnerTemplatesOps.ensureTemplateReplaceContent(
         controlName = newControlName,
-        content     = FormRunnerTemplatesOps.createTemplateContentFromBind(bindElem firstChildOpt * head, ctx.componentBindings))
+        content     = FormRunnerTemplatesOps.createTemplateContentFromBind(bindElem firstChildOpt * head)
+      )
     }
 
     // Update ancestor templates if any
@@ -1123,6 +1128,7 @@ object ToolboxOps {
           val newName = controlNameFromId(nextId(XcvEntry.Control.entryName))
 
           // Rename everything
+          import ctx.bindingIndex
           renameControlByElement(controlElem, newName)
 
           dataHolders ++ resources foreach

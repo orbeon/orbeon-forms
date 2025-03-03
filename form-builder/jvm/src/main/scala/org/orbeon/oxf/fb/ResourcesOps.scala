@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
@@ -119,11 +120,21 @@ trait ResourcesOps extends BaseOps {
     }
   }
 
-  def hasItemHintEditor(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
+  def hasItemHintEditor(
+    controlName: String
+  )(implicit
+    ctx        : FormBuilderDocContext,
+    index      : BindingIndex[BindingDescriptor]
+  ): Boolean =
     findControlByName(controlName) exists (e => FormBuilder.hasEditor(e, "item-hint"))
 
   // Get the control's items for all languages
-  def getControlItemsGroupedByValue(controlName: String)(implicit ctx: FormBuilderDocContext): collection.Seq[NodeInfo] = {
+  def getControlItemsGroupedByValue(
+    controlName: String
+  )(implicit
+    ctx        : FormBuilderDocContext,
+    index      : BindingIndex[BindingDescriptor]
+  ): collection.Seq[NodeInfo] = {
 
     val localResourcesRoot = resourcesRoot
 

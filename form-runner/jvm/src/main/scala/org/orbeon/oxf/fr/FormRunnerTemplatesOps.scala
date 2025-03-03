@@ -3,18 +3,20 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.NodeInfoFactory
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor.{findMostSpecificWithoutDatatype, getAllRelevantDescriptors}
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.findMostSpecificBindingDescriptor
+import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions.*
-import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.{Namespaces, XFormsNames}
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.NodeInfoConversions
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
+import org.orbeon.xforms.{Namespaces, XFormsNames}
 
 
 
@@ -22,38 +24,39 @@ object FormRunnerTemplatesOps {
 
   // Make sure all template instances reflect the current bind structure
   def updateTemplates(
-    ancestorContainerNames : Option[Set[String]],
-    componentBindings      : Iterable[NodeInfo])(implicit
-    ctx                    : FormRunnerDocContext
+    ancestorContainerNames: Option[Set[String]]
+  )(implicit
+    ctx                   : FormRunnerDocContext,
+    index                 : BindingIndex[BindingDescriptor]
   ): Unit =
     for {
       templateInstance <- templateInstanceElements(ctx.formDefinitionRootElem)
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
       iterationName    <- findRepeatIterationName(repeatName)
-      template         <- createTemplateContentFromBindName(iterationName, componentBindings)
+      template         <- createTemplateContentFromBindName(iterationName)
     } locally {
       ensureTemplateReplaceContent(repeatName, template)
     }
 
   def createTemplateContentFromBindName(
-    bindName : String,
-    bindings : Iterable[NodeInfo])(implicit
-    ctx      : FormRunnerDocContext
+    bindName: String
+  )(implicit
+    ctx     : FormRunnerDocContext,
+    index   : BindingIndex[BindingDescriptor]
   ): Option[NodeInfo] =
-    findBindByName(bindName) map (createTemplateContentFromBind(_, bindings))
+    findBindByName(bindName).map(createTemplateContentFromBind)
 
-private val AttributeRe = "@(.+)".r
+  private val AttributeRe = "@(.+)".r
 
   // Create an instance template based on a hierarchy of binds rooted at the given bind
   // This checks each control binding in case the control specifies a custom data holder.
   def createTemplateContentFromBind(
-    startBindElem : NodeInfo,
-    bindings      : Iterable[NodeInfo])(implicit
-    ctx           : FormRunnerDocContext
+    startBindElem: NodeInfo
+  )(implicit
+    ctx          : FormRunnerDocContext,
+    index        : BindingIndex[BindingDescriptor]
   ): NodeInfo = {
-
-    val descriptors = getAllRelevantDescriptors(bindings)
 
     val allControlsByName = getAllControlsWithIds map (c => controlNameFromId(c.id) -> c) toMap
 
@@ -73,8 +76,12 @@ private val AttributeRe = "@(.+)".r
       def fromBinding =
         for {
           controlElem <- controlElemOpt
-          appearances = controlElem attTokens XFormsNames.APPEARANCE_QNAME
-          descriptor  <- findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, Nil, descriptors)
+          descriptor  <-
+            findMostSpecificBindingDescriptor(
+              searchElemName = controlElem.uriQualifiedName,
+              datatypeMatch  = DatatypeMatch.Exclude,
+              searchAtts     = BindingDescriptor.getAtts(controlElem)
+            )
           binding     <- descriptor.binding
         } yield
           Some(newDataHolder(controlName, binding))

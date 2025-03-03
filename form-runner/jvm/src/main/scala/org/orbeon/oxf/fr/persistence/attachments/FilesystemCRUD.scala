@@ -19,9 +19,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
 import org.orbeon.oxf.http.{HttpRanges, StatusCode}
-import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, XPathCache}
-import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory}
+import org.orbeon.saxon.function.Property.evaluateAsAvt
 import org.orbeon.xml.NamespaceMapping
 
 import java.io.*
@@ -178,21 +177,4 @@ object FilesystemCRUD {
 
     path.toRealPath()
   }
-
-  object FunctionLibrary extends PipelineFunctionLibrary {
-    override protected lazy val environmentVariableClass: Class[? <: EnvironmentVariable] = classOf[EnvironmentVariableAlwaysEnabled]
-  }
-
-  def evaluateAsAvt(value: String, namespaceMapping: NamespaceMapping): String =
-    XPathCache.evaluateAsAvt(
-      contextItem = null,
-      value,
-      namespaceMapping,
-      variableToValueMap = null,
-      FunctionLibrary,
-      functionContext = null,
-      baseURI = null,
-      locationData = null,
-      reporter = null
-    )
 }

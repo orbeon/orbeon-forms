@@ -1,0 +1,147 @@
+<xh:html
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+        xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+        xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:sql="http://orbeon.org/oxf/xml/sql"
+        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <control-1 filename="attachment1.txt" mediatype="text/plain" size="12">/fr/service/persistence/crud/issue/6751/form/6741d4e8a798659bf732b96739f109cb5a8948c3.bin</control-1>
+                            <control-2 filename="attachment2.txt" mediatype="text/plain" size="12">/fr/service/persistence/crud/issue/6751/form/bb8c6604c759a3347b5c1f3cf6125c2d7ca7ae7f.bin</control-2>
+                            <control-3 filename="attachment3.txt" mediatype="text/plain" size="12">/fr/service/persistence/crud/issue/6751/form/e5a67819ac4906887d951199b17d9750b77d7c5c.bin</control-3>
+                            <control-4 filename="attachment4.txt" mediatype="text/plain" size="12">/fr/service/persistence/crud/issue/6751/form/5964613a644a03d9d96c3106136bca3369269710.bin</control-4>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" type="xf:anyURI"></xf:bind>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="xf:anyURI"></xf:bind>
+                        <xf:bind id="control-3-bind" ref="control-3" name="control-3" type="xf:anyURI"></xf:bind>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:anyURI"></xf:bind>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6751</form-name>
+                    <title xml:lang="en">Issue #6751</title>
+                    <description xml:lang="en"></description>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers></headers>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
+                            </template>
+                        </templates>
+                        <parameters></parameters>
+                    </email>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-2"},{"value":"control-3"},{"value":"control-4"}],"topLevel":true}]}</migration>
+                </metadata>
+            </xf:instance>
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments></attachments>
+            </xf:instance>
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-1>
+                            <label>File Attachment 1</label>
+                            <hint></hint>
+                        </control-1>
+                        <control-2>
+                            <label>File Attachment 2</label>
+                            <hint></hint>
+                        </control-2>
+                        <control-3>
+                            <label>File Attachment 3</label>
+                            <hint></hint>
+                        </control-3>
+                        <control-4>
+                            <label>File Attachment 4</label>
+                            <hint></hint>
+                        </control-4>
+                        <section-1>
+                            <label></label>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body
+                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    xmlns:xbl="http://www.w3.org/ns/xbl"
+                    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <fr:attachment
+                                    xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control" class="fr-attachment" bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"></xf:label>
+                                <xf:hint ref="$form-resources/control-1/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <fr:attachment
+                                    xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control" class="fr-attachment" bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"></xf:label>
+                                <xf:hint ref="$form-resources/control-2/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:attachment
+                                    xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-3-control" class="fr-attachment" bind="control-3-bind">
+                                <xf:label ref="$form-resources/control-3/label"></xf:label>
+                                <xf:hint ref="$form-resources/control-3/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <fr:attachment
+                                    xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control" class="fr-attachment" bind="control-4-bind">
+                                <xf:label ref="$form-resources/control-4/label"></xf:label>
+                                <xf:hint ref="$form-resources/control-4/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            </fr:attachment>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -60,7 +60,7 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String], 
  */
 object PropertySet {
 
-  import Private._
+  import Private.*
 
   val PasswordPlaceholder = "xxxxxxxx"
 

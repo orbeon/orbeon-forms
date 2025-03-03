@@ -14,13 +14,15 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
+import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPathCache}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.xml.NamespaceMapping
 
 
 // 2024-11-06: Some of this code is also present in `CoreSupport`, which is currently only on the JS side. It would be
@@ -44,6 +46,24 @@ object Property {
 
   def propertyAsString(propertyName: String): Option[String] =
     property(propertyName) map (_.getStringValue)
+
+  private object FunctionLibrary extends PipelineFunctionLibrary {
+    override protected lazy val environmentVariableClass: Class[? <: EnvironmentVariable] = classOf[EnvironmentVariableAlwaysEnabled]
+  }
+
+  // TODO: is there a better place for this method?
+  def evaluateAsAvt(value: String, namespaceMapping: NamespaceMapping): String =
+    XPathCache.evaluateAsAvt(
+      contextItem        = null,
+      xpathString        = value,
+      namespaceMapping   = namespaceMapping,
+      variableToValueMap = null,
+      functionLibrary    = FunctionLibrary,
+      functionContext    = null,
+      baseURI            = null,
+      locationData       = null,
+      reporter           = null
+    )
 }
 
 class PropertiesStartsWith extends DefaultFunctionSupport with RuntimeDependentFunction {

@@ -16,70 +16,34 @@ package org.orbeon.oxf.fr.s3
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.io.IOUtils.runQuietly
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
+import org.orbeon.oxf.util.NetUtils
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
-import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{PutObjectRequest, PutObjectResponse}
+import software.amazon.awssdk.services.s3.model.*
 
 import java.io.{ByteArrayInputStream, InputStream}
-import scala.jdk.CollectionConverters.CollectionHasAsScala
-import scala.util.{Failure, Success, Try}
+import scala.jdk.CollectionConverters.ListHasAsScala
+import scala.util.Try
+
 
 object S3 {
-  case class Config(endpoint: String, region: Region, bucket: String, accessKey: String, secretAccessKey: String)
+  def withS3Client[T](body: S3Client => T)(implicit s3Config: S3Config): T = {
+    val client = newS3Client()
 
-  object Config {
-    val PropertyPrefix = "oxf.fr.s3."
-
-    private val DefaultEndpoint = "s3.amazonaws.com"
-    private val DefaultRegion   = "aws-global"
-
-    def fromName(configName: String): Try[Config] = {
-      val prefix      = s"$PropertyPrefix$configName."
-      val propertySet = CoreCrossPlatformSupport.properties
-
-      def value(name: String, defaultOpt: Option[String] = None): Try[String] = {
-        val propertyName = prefix + name
-
-        propertySet.getNonBlankString(propertyName) match {
-          case Some(value)       => Success(value)
-          case None              =>
-            defaultOpt match {
-              case Some(default) => Success(default)
-              case None          => Failure(new Exception(s"Mandatory property $propertyName not found"))
-            }
-        }
-      }
-
-      def regionTry: Try[Region] =
-        value("region", DefaultRegion.some).flatMap { regionName =>
-          // Convert region name into Region instance
-          Region.regions().asScala.find(_.id() == regionName) match {
-            case Some(region) => Success(region)
-            case None         => Failure(new Exception(s"Invalid region $regionName"))
-          }
-        }
-
-      for {
-        endpoint        <- value("endpoint", DefaultEndpoint.some)
-        region          <- regionTry
-        bucket          <- value("bucket")
-        accessKey       <- value("accesskey")
-        secretAccessKey <- value("secretaccesskey")
-      } yield
-        Config(
-          endpoint        = endpoint,
-          region          = region,
-          bucket          = bucket,
-          accessKey       = accessKey,
-          secretAccessKey = secretAccessKey
-        )
+    try {
+      body(client)
+    } finally {
+      runQuietly(client.close())
     }
   }
 
-  def write(key: String, bytes: Array[Byte])(implicit config: Config): Try[PutObjectResponse] = {
+  def write(
+    key: String, bytes: Array[Byte]
+  )(implicit
+    s3Config        : S3Config,
+    s3Client        : S3Client
+  ): Try[PutObjectResponse] = {
     val inputStream = new ByteArrayInputStream(bytes)
 
     try {
@@ -94,16 +58,11 @@ object S3 {
     inputStream     : InputStream,
     contentLengthOpt: Option[Long]
   )(implicit
-    config          : Config
+    s3Config        : S3Config,
+    s3Client        : S3Client
   ): Try[PutObjectResponse] = Try {
-    val credentials = AwsBasicCredentials.create(config.accessKey, config.secretAccessKey)
 
-    val s3Client = S3Client.builder()
-      .credentialsProvider(StaticCredentialsProvider.create(credentials))
-      .region(config.region)
-      .build()
-
-    val putObjectRequest = PutObjectRequest.builder().bucket(config.bucket).key(key).build()
+    val putObjectRequest = PutObjectRequest.builder().bucket(s3Config.bucket).key(key).build()
 
     // If we know the content length, we can pass the input stream to the AWS S3 SDK directly; if not, we'll download
     // the stream into a byte array and pass that to the SDK
@@ -117,5 +76,36 @@ object S3 {
     } finally {
       inputStreamToCloseOpt.foreach(_.close())
     }
+  }
+
+  def createBucket(bucketName: String)(implicit s3Client: S3Client): Try[CreateBucketResponse] = {
+    val createBucketRequest = CreateBucketRequest.builder().bucket(bucketName).build()
+    Try(s3Client.createBucket(createBucketRequest))
+  }
+
+  def deleteBucket(bucketName: String)(implicit s3Client: S3Client): Try[DeleteBucketResponse] = {
+    val deleteBucketRequest = DeleteBucketRequest.builder().bucket(bucketName).build()
+    Try(s3Client.deleteBucket(deleteBucketRequest))
+  }
+
+  // No streaming for now
+  def objects(bucketName: String, prefix: String = "")(implicit s3Client: S3Client): Try[List[S3Object]] = {
+    val listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build()
+    val listObjectsResponse = s3Client.listObjects(listObjectsRequest)
+    Try(listObjectsResponse.contents().asScala.toList)
+  }
+
+  def deleteObject(bucketName: String, key: String)(implicit s3Client: S3Client): Try[DeleteObjectResponse] = {
+    val deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(key).build()
+    Try(s3Client.deleteObject(deleteObjectRequest))
+  }
+
+  def newS3Client()(implicit config: S3Config): S3Client = {
+    val credentials = AwsBasicCredentials.create(config.accessKey, config.secretAccessKey)
+
+    S3Client.builder()
+      .credentialsProvider(StaticCredentialsProvider.create(credentials))
+      .region(config.region)
+      .build()
   }
 }

@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
-import org.orbeon.oxf.fr.s3.S3
+import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -163,7 +163,12 @@ trait FormRunnerActions
         storeEmailContentsToS3(params, urisByRenderedFormat, emailDataFormatVersion, templateMatch).get
       }
 
-      tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
+      // S3 tests disable the actual sending of email (this parameter is not documented)
+      val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
+
+      if (sendEmail) {
+        tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
+      }
     }
 
   private def storeEmailContentsToS3(
@@ -213,11 +218,14 @@ trait FormRunnerActions
     for {
       emailContents <- emailContentsTry
       s3PathPrefix  <- s3PathPrefixTry
-      s3Config      <- S3.Config.fromName(s3ConfigName)
+      s3Config      <- S3Config.fromProperties(s3ConfigName)
       _             <- {
         // Implicits in for comprehensions supported in Scala 3 only
-        implicit val _s3Config: S3.Config = s3Config
-        TryUtils.sequenceLazily(emailContents)(storeEmailContentToS3(_, s3PathPrefix))
+        implicit val _s3Config: S3Config = s3Config
+
+        S3.withS3Client { implicit s3Client =>
+          TryUtils.sequenceLazily(emailContents)(storeEmailContentToS3(_, s3PathPrefix))
+        }
       }
     } yield ()
   }

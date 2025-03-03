@@ -2,7 +2,6 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
-
     <property as="xs:string"  name="oxf.fr.persistence.provider.oracle.*.*"                 value="oracle"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.mysql.*.*"                  value="mysql"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.sqlserver.*.*"              value="sqlserver"/>
@@ -59,4 +58,9 @@
         resources
     </property>
 
+    <property as="xs:string"  name="oxf.fr.s3.issue-6751.endpoint"        value="s3.amazonaws.com"/>
+    <property as="xs:string"  name="oxf.fr.s3.issue-6751.region"          value="{environment-variable('S3_TEST_REGION')}"/>
+    <property as="xs:string"  name="oxf.fr.s3.issue-6751.bucket"          value="orbeon-test-issue-6751"/>
+    <property as="xs:string"  name="oxf.fr.s3.issue-6751.accesskey"       value="{environment-variable('S3_TEST_ACCESSKEY')}"/>
+    <property as="xs:string"  name="oxf.fr.s3.issue-6751.secretaccesskey" value="{environment-variable('S3_TEST_SECRETACCESSKEY')}"/>
 </properties>

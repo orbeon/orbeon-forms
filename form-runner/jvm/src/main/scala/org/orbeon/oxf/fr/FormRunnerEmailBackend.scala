@@ -10,7 +10,7 @@ import org.orbeon.oxf.fr.email.EmailMetadata.{TemplateMatch, TemplateValue}
 import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadataParsing}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.RenderedFormat
-import org.orbeon.oxf.fr.s3.S3
+import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, TryUtils, XPathCache}
@@ -21,6 +21,7 @@ import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
+import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 
 import java.net.URI
@@ -256,7 +257,8 @@ trait FormRunnerEmailBackend {
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    s3Config                : S3.Config
+    s3Config                : S3Config,
+    s3Client                : S3Client
   ): Try[Unit] = {
     // TODO: store email body and headers as well
     TryUtils.sequenceLazily(emailContent.allAttachments)(storeAttachmentToS3(_, s3PathPrefix)).map(_ => ())
@@ -269,7 +271,8 @@ trait FormRunnerEmailBackend {
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    s3Config                : S3.Config
+    s3Config                : S3Config,
+    s3Client                : S3Client
   ): Try[PutObjectResponse] = {
 
     val key = s3PathPrefix + attachment.filename

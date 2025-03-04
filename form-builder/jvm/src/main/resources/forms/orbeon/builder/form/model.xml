@@ -158,7 +158,7 @@
     </xf:action>
 
     <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->
-    <xf:action ev:event="fb-data-ready" if="not($mode = 'new')">
+    <xf:action event="fb-data-ready" if="not($mode = 'new')">
 
         <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
             <xf:property name="deannotate" value="false()"/>
@@ -172,7 +172,7 @@
     </xf:action>
 
     <!-- Mode = "new": just annotate template -->
-    <xf:action ev:event="fb-data-ready" if="$mode = 'new'">
+    <xf:action event="fb-data-ready" if="$mode = 'new'">
 
         <!-- Point to template -->
         <xf:var
@@ -251,7 +251,7 @@
             <xf:property name="data" value="$template"/>
         </xf:dispatch>
 
-        <!-- Free fr-form-instance -->
+        <!-- Free `fr-form-instance` -->
         <xf:insert
             ref="instance('fr-form-instance')"
             origin="xf:element('_')"/>

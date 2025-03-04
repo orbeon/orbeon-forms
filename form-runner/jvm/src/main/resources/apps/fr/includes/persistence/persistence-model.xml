@@ -395,7 +395,9 @@
 
     </xf:action>
 
+    <!-- fr-load-document-handle-drafts($refresh-needed as xs:boolean) -->
     <xf:action event="fr-load-document-handle-drafts">
+
         <!-- Load document with the provided id from persistence layer -->
         <xf:message level="xxf:log-debug">Loading data by id from persistence layer: <xf:output value="$document"/></xf:message>
         <xf:var name="draft-requested" value="xxf:get-request-parameter('draft') = 'true'"/>
@@ -837,7 +839,7 @@
             <xf:dispatch
                 if="event('load-document') = true()"
                 name="fr-load-document-handle-drafts"
-                target="fr-persistence-model">
+                targetid="fr-persistence-model">
                 <xf:property name="refresh-needed" value="event('refresh-needed')"/>
             </xf:dispatch>
         </xf:action>
@@ -855,6 +857,7 @@
         replace="none"/>
 
     <!-- Get document -->
+    <!-- fr-get-document-submission($document-url as xs:string?, $data-or-draft as xs:string?) -->
     <xf:submission
         xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava"
 

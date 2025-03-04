@@ -46,12 +46,8 @@
                         <!-- TODO: what if missing? -->
                         <xsl:copy-of select="$metadata"/>
 
-                        <!-- Copy all the scripts and bindings -->
-                        <xsl:for-each select="$resources/xbl:xbl/xbl:binding[exists(fb:metadata)]">
-                            <xsl:copy>
-                                <xsl:apply-templates select="@* | fb:metadata"/>
-                            </xsl:copy>
-                        </xsl:for-each>
+                        <!-- Process bindings with metadata -->
+                        <xsl:apply-templates select="$resources/xbl:xbl/xbl:binding[exists(fb:metadata)]"/>
                     </xbl:xbl>
                 </xsl:if>
 
@@ -106,4 +102,8 @@
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
     </xsl:template>
+
+    <!--  Filter out unneeded elements -->
+    <xsl:template match="xbl:resources | xbl:handlers | xbl:implementation | xbl:template"/>
+
 </xsl:transform>

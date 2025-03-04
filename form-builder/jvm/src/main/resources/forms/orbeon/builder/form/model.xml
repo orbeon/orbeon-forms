@@ -179,8 +179,6 @@
             name="template"
             value="instance('fr-form-instance')"/>
 
-        <!-- Set language in all blank @xml:lang on template -->
-        <!-- See https://github.com/orbeon/orbeon-forms/issues/3457 -->
         <xf:var
             name="fb-lang"
             value="
@@ -213,11 +211,6 @@
                     )
                 )"/>
 
-        <xf:setvalue
-            iterate="$template//@xml:lang[xxf:is-blank()]"
-            ref="."
-            value="$fb-lang"/>
-
         <!-- Used after loading a template -->
         <xf:action if="exists(event('allow-template-use'))">
             <!-- Add/remove allow-template-use setting as needed -->
@@ -234,6 +227,15 @@
                 ref="$metadata/thumbnail"/>
         </xf:action>
 
+        <!-- Set language in all blank `@xml:lang` on template to `$fb-lang` computed above.
+             See https://github.com/orbeon/orbeon-forms/issues/3457
+             Q: What if someone creates a template in multiple languages?
+             In default templates: `title`, `description`, and `resource` element.
+            TODO: If `xml:lang` is already populated, skip? -->
+        <xf:setvalue
+            iterate="$template//@xml:lang[xxf:is-blank()]"
+            ref="."
+            value="$fb-lang"/>
 
         <xf:setvalue
             if="exists(event('title'))"

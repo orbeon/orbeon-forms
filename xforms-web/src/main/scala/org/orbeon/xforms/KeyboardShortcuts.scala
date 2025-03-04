@@ -24,13 +24,15 @@ object KeyboardShortcuts {
     '⇧' -> "shift",   // cross-platform
   )
 
-  // Allow shortcuts with modifiers inside form fields
+  // Handle shortcuts with modifiers inside form fields, except for cut/copy/paste
   Mousetrap.asInstanceOf[js.Dynamic].prototype.stopCallback =
     (e: dom.KeyboardEvent, element: dom.Element, _: String) => {
-      val isFormField   = FormFieldTags.contains(element.tagName) ||
-                          element.asInstanceOf[js.Dynamic].isContentEditable.asInstanceOf[Boolean]
-      val isModifierKey = (e.altKey || e.ctrlKey || e.metaKey)
-      isFormField && ! isModifierKey
+      val isFormField    = FormFieldTags.contains(element.tagName) ||
+                           element.asInstanceOf[js.Dynamic].isContentEditable.asInstanceOf[Boolean]
+      val isModifierKey  = (e.altKey || e.ctrlKey || e.metaKey)
+      val isCutCopyPaste = (e.ctrlKey || e.metaKey) &&
+                           (e.key == "x" || e.key == "c" || e.key == "v")
+      isFormField && (!isModifierKey || isCutCopyPaste)
     }
 
   // If a single shortcut is provided, use '⌘' on Apple OS and '⌃' on other OSes

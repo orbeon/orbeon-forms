@@ -33,7 +33,9 @@ class ConnectionTest
   extends ResourceManagerSupport // for properties in particular
      with AnyFunSpecLike {
 
-  def newMockExternalContext: ExternalContext = {
+  private val OrbeonBaseUrl = URI.create("http://example.org/orbeon")
+
+  def newMockExternalContext(servicePrefixUri: URI): ExternalContext = {
 
     val incomingRequest = new RequestAdapter {
 
@@ -44,10 +46,9 @@ class ConnectionTest
         "cookie"        -> Array("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C")
       ).asJava
 
-      // Match what we have set with `oxf.url-rewriting.service.base-uri` for tests
-      override def getContextPath: String = "/cool"
-      override def servicePrefix: String = "http://example.org/cool"
-      
+      override val getContextPath: String = servicePrefixUri.getPath
+      override val servicePrefix: String = servicePrefixUri.toString
+
       override def incomingCookies: Iterable[(String, String)] = Nil
       override def getAttributesMap: ju.Map[String, AnyRef] = new ju.HashMap
     }
@@ -72,7 +73,7 @@ class ConnectionTest
 
     it("must process request and response headers") {
 
-      val externalContext = newMockExternalContext
+      val externalContext = newMockExternalContext(OrbeonBaseUrl)
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
@@ -127,7 +128,7 @@ class ConnectionTest
 
     it("must combine them") {
 
-      val externalContext = newMockExternalContext
+      val externalContext = newMockExternalContext(OrbeonBaseUrl)
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
@@ -160,7 +161,7 @@ class ConnectionTest
 
   describe("#4384: GET service must not send a `Content-Type` header") {
 
-    val externalContext = newMockExternalContext
+    val externalContext = newMockExternalContext(OrbeonBaseUrl)
 
     val contentType = ContentTypes.XmlContentType
 
@@ -200,20 +201,23 @@ class ConnectionTest
 
   describe("#4388: Don't send `Orbeon-Token` to external services") {
 
-    val externalContext = newMockExternalContext
+    val externalContext = newMockExternalContext(OrbeonBaseUrl)
 
     val Expected = List(
-      "/foo/bar"                       -> true,
-      "/fr/service/custom/orbeon/echo" -> true,
-      "/exist/crud/"                   -> true,
-      "http://example.org/service"     -> false,
-      "https://example.org/service"    -> false
+      "/foo/bar"                         -> true,
+      "/fr/service/custom/orbeon/echo"   -> true,
+      "/exist/crud/"                     -> true,
+      OrbeonBaseUrl.toString             -> true,
+      "http://example.org/other-prefix"  -> false,
+      "https://example.org/other-prefix" -> false,
+      "http://other.example.org/orbeon"  -> false,
+      "https://other.example.org/orbeon" -> false,
     )
 
     for {
       (urlString, mustIncludeToken) <- Expected
       httpMethod                    <- List(HttpMethod.GET, HttpMethod.POST)
-      serviceAbsoluteUrl            = URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, urlString, UrlRewriteMode.Absolute)
+      serviceAbsoluteUrl            = URLRewriterImpl.rewriteServiceUrl(externalContext.getRequest, urlString, UrlRewriteMode.Absolute, OrbeonBaseUrl.toString)
     } locally {
       it(s"call to `$urlString` with `$httpMethod` must ${if (mustIncludeToken) "" else "not " }include an `Orbeon-Token` header") {
         val headersCapitalized =

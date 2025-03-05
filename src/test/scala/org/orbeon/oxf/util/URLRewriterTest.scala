@@ -13,362 +13,442 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Assert.*
-import org.junit.{After, Before, Test}
 import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.test.ResourceManagerSupport
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funspec.AnyFunSpecLike
 
 
-class URLRewriterTest extends ResourceManagerTestBase {
+class URLRewriterTest
+  extends ResourceManagerSupport
+     with AnyFunSpecLike
+     with BeforeAndAfterAll {
 
-  private var directPipelineContext: PipelineContext = null
-  private var forwardPipelineContext: PipelineContext = null
-  private var filterPipelineContext: PipelineContext = null
+  private val ServiceBaseUri = "http://example.org/cool/service"
 
-  private var directRequest: ExternalContext.Request = null
-  private var forwardRequest: ExternalContext.Request = null
-  private var filterRequest: ExternalContext.Request = null
+  private val directRequest: ExternalContext.Request =
+    new TestExternalContext(
+      new PipelineContext,
+      ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request.xml", null)
+    ).getRequest
 
-  @Before override def setupResourceManagerTestPipelineContext(): Unit = {
-    locally {
-      directPipelineContext = new PipelineContext
-      val requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request.xml", null)
-      val externalContext = new TestExternalContext(directPipelineContext, requestDocument)
-      directRequest = externalContext.getRequest
-      // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
-      directPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-    }
-    locally {
-      forwardPipelineContext = new PipelineContext
-      val requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-forward.xml", null)
-      val externalContext = new TestExternalContext(forwardPipelineContext, requestDocument)
-      forwardRequest = externalContext.getRequest
-      // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
-      forwardPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-    }
-    locally {
-      filterPipelineContext = new PipelineContext
-      val requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-filter.xml", null)
-      val externalContext = new TestExternalContext(filterPipelineContext, requestDocument)
-      filterRequest = externalContext.getRequest
-      // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
-      filterPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-    }
+  private val forwardRequest: ExternalContext.Request =
+    new TestExternalContext(
+      new PipelineContext,
+      ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-forward.xml", null)
+    ).getRequest
 
-    // Reinitialize properties to enable versioned resources
+  private val filterRequest: ExternalContext.Request =
+    new TestExternalContext(
+      new PipelineContext,
+      ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-filter.xml", null)
+    ).getRequest
+
+  // For most tests of the suite, use `properties-versioned-all.xml`
+  override protected def beforeAll(): Unit = {
     Properties.invalidate()
-    org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties-versioned-all.xml")
+    Properties.init("oxf:/ops/unit-tests/properties-versioned-all.xml")
   }
 
-  @After override def tearDownResourceManagerTestPipelineContext(): Unit = {
-    directPipelineContext.destroy(true)
-    forwardPipelineContext.destroy(true)
-    filterPipelineContext.destroy(true)
-  }
+  describe("The `rewriteServiceUrl()` with a direct request") {
 
-  @Test def testServiceRewrite(): Unit = {
-    val baseURIProperty = URLRewriterUtils.getServiceBaseURI
-    // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceUrl(directRequest, "https://foo.com/bar", UrlRewriteMode.Absolute, baseURIProperty))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", UrlRewriteMode.Absolute));
-    assertEquals("http://example.org/cool/service/bar", URLRewriterImpl.rewriteServiceUrl(directRequest, "/bar", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(directRequest, "/bar?a=1&amp;b=2", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceUrl(directRequest, "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(directRequest, "?a=1&amp;b=2", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceUrl(directRequest, "https://foo.com/bar", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", UrlRewriteMode.AbsoluteNoContext));
-    assertEquals("http://example.org/bar", URLRewriterImpl.rewriteServiceUrl(directRequest, "/bar", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    assertEquals("http://example.org/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(directRequest, "/bar?a=1&amp;b=2", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    assertEquals("http://example.org/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceUrl(directRequest, "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    // NOTE: Ideally should have a "/" between host name and query
-    assertEquals("http://example.org?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(directRequest, "?a=1&amp;b=2", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
+    val Expected = List(
+      ("https://foo.com/bar"                                  , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service/bar"                  , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service/bar?a=1&amp;b=2"      , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service/bar?a=1&amp;b=2#there", "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service?a=1&amp;b=2"          , "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+      ("https://foo.com/bar"                                  , "https://foo.com/bar"   , UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org/bar"                               , "/bar"                  , UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org/bar?a=1&amp;b=2"                   , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org/bar?a=1&amp;b=2#there"             , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org?a=1&amp;b=2"                       , "?a=1&amp;b=2"          , UrlRewriteMode.AbsoluteNoContext), // ideally should have a "/" between host name and query
+    )
+
+  for ((expected, url, mode) <- Expected)
+    it (s"must pass for $url and $mode") {
+      assert(expected == URLRewriterImpl.rewriteServiceUrl(directRequest, url, mode, ServiceBaseUri))
+    }
+
+    // assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", mode))
     // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
     // TODO: test without oxf.url-rewriting.service.base-uri set
   }
 
-  @Test def testRewrite(): Unit = {
-    // Test against request
-    var mode: UrlRewriteMode = UrlRewriteMode.Absolute
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("http://localhost:8080/orbeon/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode))
-    assertEquals("http://localhost:8080/orbeon/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("http://localhost:8080/orbeon/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("http://localhost:8080/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode))
-    mode = UrlRewriteMode.AbsolutePath
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("/orbeon/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode))
-    assertEquals("/orbeon/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("/orbeon/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode))
-    mode = UrlRewriteMode.AbsolutePathNoContext
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode))
-    assertEquals("/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode))
-    mode = UrlRewriteMode.AbsolutePathOrRelative
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("/orbeon/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode))
-    assertEquals("/orbeon/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("/orbeon/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode))
+  describe("The `rewriteURL()` with a direct request") {
+
+    val Expected = List(
+      ("https://foo.com/bar"                                      , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/bar"                         , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/bar?a=1&amp;b=2"             , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/bar?a=1&amp;b=2#there"       , "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/doc/home-welcome?a=1&amp;b=2", "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+
+      ("https://foo.com/bar"                                      , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/bar"                                              , "/bar"                  , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/bar?a=1&amp;b=2"                                  , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/bar?a=1&amp;b=2#there"                            , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePath),
+      ("/orbeon/doc/home-welcome?a=1&amp;b=2"                     , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePath),
+
+      ("https://foo.com/bar"                                      , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar"                                                     , "/bar"                  , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2"                                         , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2#there"                                   , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathNoContext),
+      ("/doc/home-welcome?a=1&amp;b=2"                            , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathNoContext),
+
+      ("https://foo.com/bar"                                      , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/bar"                                              , "/bar"                  , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/bar?a=1&amp;b=2"                                  , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/bar?a=1&amp;b=2#there"                            , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/doc/home-welcome?a=1&amp;b=2"                     , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathOrRelative),
+    )
+
+    for ((expected, url, mode) <- Expected)
+      it (s"must pass for $url and $mode") {
+        assert(expected == URLRewriterImpl.rewriteURL(directRequest, url, mode))
+      }
+
+    // assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode))
   }
 
-  @Test def testResourceRewrite(): Unit = {
+  describe("The `rewriteResourceUrl()` with a direct request") {
+
     val pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS
     val version = URLRewriterUtils.getOrbeonVersionForClient
-    // Test against request
-    var mode: UrlRewriteMode = UrlRewriteMode.Absolute
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("http://localhost:8080/orbeon/42/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar", pathMatchers, mode))
-    assertEquals("http://localhost:8080/orbeon/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("http://localhost:8080/orbeon/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("http://localhost:8080/orbeon/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("http://localhost:8080/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("http://localhost:8080/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePath
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/orbeon/42/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar", pathMatchers, mode))
-    assertEquals("/orbeon/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/orbeon/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/orbeon/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathNoContext
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/42/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar", pathMatchers, mode))
-    assertEquals("/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathOrRelative
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/orbeon/42/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar", pathMatchers, mode))
-    assertEquals("/orbeon/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/orbeon/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/orbeon/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathNoPrefix
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/bar", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar", pathMatchers, mode))
-    assertEquals("/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(directRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(directRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/ops/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/config/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/config/bar.png", pathMatchers, mode))
+
+    val Expected = List(
+      ("https://foo.com/bar"                                         , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/42/bar"                         , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/42/bar?a=1&amp;b=2"             , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/42/bar?a=1&amp;b=2#there"       , "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/42/doc/home-welcome?a=1&amp;b=2", "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/" + version + "/ops/bar.png"    , "/ops/bar.png"          , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/orbeon/" + version + "/config/bar.png" , "/config/bar.png"       , UrlRewriteMode.Absolute),
+
+      ("https://foo.com/bar"                                         , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/42/bar"                                              , "/bar"                  , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/42/bar?a=1&amp;b=2"                                  , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/42/bar?a=1&amp;b=2#there"                            , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePath),
+      ("/orbeon/42/doc/home-welcome?a=1&amp;b=2"                     , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/" + version + "/ops/bar.png"                         , "/ops/bar.png"          , UrlRewriteMode.AbsolutePath),
+      ("/orbeon/" + version + "/config/bar.png"                      , "/config/bar.png"       , UrlRewriteMode.AbsolutePath),
+
+      ("https://foo.com/bar"                                         , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathNoContext),
+      ("/42/bar"                                                     , "/bar"                  , UrlRewriteMode.AbsolutePathNoContext),
+      ("/42/bar?a=1&amp;b=2"                                         , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathNoContext),
+      ("/42/bar?a=1&amp;b=2#there"                                   , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathNoContext),
+      ("/42/doc/home-welcome?a=1&amp;b=2"                            , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathNoContext),
+      ("/" + version + "/ops/bar.png"                                , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathNoContext),
+      ("/" + version + "/config/bar.png"                             , "/config/bar.png"       , UrlRewriteMode.AbsolutePathNoContext),
+
+      ("https://foo.com/bar"                                         , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/42/bar"                                              , "/bar"                  , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/42/bar?a=1&amp;b=2"                                  , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/42/bar?a=1&amp;b=2#there"                            , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/42/doc/home-welcome?a=1&amp;b=2"                     , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/" + version + "/ops/bar.png"                         , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/orbeon/" + version + "/config/bar.png"                      , "/config/bar.png"       , UrlRewriteMode.AbsolutePathOrRelative),
+
+      ("https://foo.com/bar"                                         , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathNoPrefix),
+      ("/bar"                                                        , "/bar"                  , UrlRewriteMode.AbsolutePathNoPrefix),
+      ("/bar?a=1&amp;b=2"                                            , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathNoPrefix),
+      ("/bar?a=1&amp;b=2#there"                                      , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathNoPrefix),
+      ("/doc/home-welcome?a=1&amp;b=2"                               , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathNoPrefix),
+      ("/ops/bar.png"                                                , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathNoPrefix),
+      ("/config/bar.png"                                             , "/config/bar.png"       , UrlRewriteMode.AbsolutePathNoPrefix),
+    )
+
+    for ((expected, url, mode) <- Expected)
+      it (s"must pass for $url and $mode") {
+        assert(expected == URLRewriterUtils.rewriteResourceURL(directRequest, url, pathMatchers, mode))
+      }
+
+    // ("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode)
   }
 
-  @Test def testServiceRewriteForward(): Unit = {
-    val baseURIProperty = URLRewriterUtils.getServiceBaseURI
-    // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "https://foo.com/bar", UrlRewriteMode.Absolute, baseURIProperty))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", UrlRewriteMode.Absolute));
-    assertEquals("http://example.org/cool/service/bar", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "/bar", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "/bar?a=1&amp;b=2", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "?a=1&amp;b=2", UrlRewriteMode.Absolute, baseURIProperty))
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "https://foo.com/bar", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", UrlRewriteMode.AbsoluteNoContext));
-    assertEquals("http://example.org/bar", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "/bar", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    assertEquals("http://example.org/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "/bar?a=1&amp;b=2", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    assertEquals("http://example.org/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    // NOTE: Ideally should have a "/" between host name and query
-    assertEquals("http://example.org?a=1&amp;b=2", URLRewriterImpl.rewriteServiceUrl(forwardRequest, "?a=1&amp;b=2", UrlRewriteMode.AbsoluteNoContext, baseURIProperty))
-    // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
-    // TODO: test without oxf.url-rewriting.service.base-uri set
+  describe("The `rewriteServiceUrl()` with a forward request") {
+
+    val Expected = List(
+      ("https://foo.com/bar"                                  , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service/bar"                  , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service/bar?a=1&amp;b=2"      , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service/bar?a=1&amp;b=2#there", "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://example.org/cool/service?a=1&amp;b=2"          , "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+
+      ("https://foo.com/bar"                                  , "https://foo.com/bar"   , UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org/bar"                               , "/bar"                  , UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org/bar?a=1&amp;b=2"                   , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org/bar?a=1&amp;b=2#there"             , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsoluteNoContext),
+      ("http://example.org?a=1&amp;b=2"                       , "?a=1&amp;b=2"          , UrlRewriteMode.AbsoluteNoContext), // ideally should have a "/" between host name and query
+      // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
+      // TODO: test without oxf.url-rewriting.service.base-uri set
+    )
+
+    for ((expected, url, mode) <- Expected)
+      it(s"must pass for $url and $mode") {
+        assert(expected == URLRewriterImpl.rewriteServiceUrl(forwardRequest, url, mode, ServiceBaseUri))
+      }
+
+    // assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", mode))
   }
 
-  @Test def testRewriteForward(): Unit = {
-    // Test against request
-    var mode: UrlRewriteMode = UrlRewriteMode.Absolute
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("http://localhost:8080/myapp/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode))
-    assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode))
-    mode = UrlRewriteMode.AbsolutePath
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("/myapp/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode))
-    mode = UrlRewriteMode.AbsolutePathNoContext
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode))
-    assertEquals("/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode))
-    mode = UrlRewriteMode.AbsolutePathOrRelative
-    assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
-    assertEquals("/myapp/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode))
-    assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode))
+  describe("The `rewriteURL()` with a forward request") {
+
+    val Expected = List(
+      ("https://foo.com/bar"                                     , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar"                         , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar?a=1&amp;b=2"             , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar?a=1&amp;b=2#there"       , "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+
+      ("https://foo.com/bar"                                     , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar"                                              , "/bar"                  , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar?a=1&amp;b=2"                                  , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar?a=1&amp;b=2#there"                            , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePath),
+      ("/myapp/doc/home-welcome?a=1&amp;b=2"                     , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePath),
+
+      ("https://foo.com/bar"                                     , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar"                                                    , "/bar"                  , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2"                                        , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2#there"                                  , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathNoContext),
+      ("/doc/home-welcome?a=1&amp;b=2"                           , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathNoContext),
+
+      ("https://foo.com/bar"                                     , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar"                                              , "/bar"                  , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar?a=1&amp;b=2"                                  , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar?a=1&amp;b=2#there"                            , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/doc/home-welcome?a=1&amp;b=2"                     , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathOrRelative),
+    )
+
+    for ((expected, url, mode) <- Expected)
+      it(s"must pass for $url and $mode") {
+        assert(expected == URLRewriterImpl.rewriteURL(forwardRequest, url, mode))
+      }
+
+    // assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode))
   }
 
-  @Test def testResourceRewriteForward(): Unit = {
+  describe("The `rewriteResourceURL()` with a forward request") {
+
     val pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS
     val version = URLRewriterUtils.getOrbeonVersionForClient
-    // Test against request
-    var mode: UrlRewriteMode = UrlRewriteMode.Absolute
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("http://localhost:8080/myapp/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePath
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/myapp/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathNoContext
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers, mode))
-    assertEquals("/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathOrRelative
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/myapp/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers, mode))
+
+    val Expected = List(
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar"                                  , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar?a=1&amp;b=2"                      , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar?a=1&amp;b=2#there"                , "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2"         , "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png"   , "/ops/bar.png"          , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", "/config/bar.png"       , UrlRewriteMode.Absolute),
+
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar"                                                       , "/bar"                  , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar?a=1&amp;b=2"                                           , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar?a=1&amp;b=2#there"                                     , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePath),
+      ("/myapp/doc/home-welcome?a=1&amp;b=2"                              , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePath),
+      ("/myapp/orbeon/" + version + "/ops/bar.png"                        , "/ops/bar.png"          , UrlRewriteMode.AbsolutePath),
+      ("/myapp/orbeon/" + version + "/config/bar.png"                     , "/config/bar.png"       , UrlRewriteMode.AbsolutePath),
+
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar"                                                             , "/bar"                  , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2"                                                 , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2#there"                                           , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathNoContext),
+      ("/doc/home-welcome?a=1&amp;b=2"                                    , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathNoContext),
+      ("/" + version + "/ops/bar.png"                                     , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathNoContext),
+      ("/" + version + "/config/bar.png"                                  , "/config/bar.png"       , UrlRewriteMode.AbsolutePathNoContext),
+
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar"                                                       , "/bar"                  , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar?a=1&amp;b=2"                                           , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar?a=1&amp;b=2#there",                                     "/bar?a=1&amp;b=2#there" , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/doc/home-welcome?a=1&amp;b=2"                              , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/orbeon/" + version + "/ops/bar.png"                        , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/orbeon/" + version + "/config/bar.png"                     , "/config/bar.png"       , UrlRewriteMode.AbsolutePathOrRelative),
+    )
+
+    for ((expected, url, mode) <- Expected)
+      it(s"must pass for $url and $mode") {
+        assert(expected == URLRewriterUtils.rewriteResourceURL(forwardRequest, url, pathMatchers, mode))
+      }
+
+    // assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode))
   }
 
-  @Test def testResourceRewriteFilter(): Unit = {
+  describe("The `rewriteResourceURL()` with a filter request") {
+
     val pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS
     val version = URLRewriterUtils.getOrbeonVersionForClient
-    // Test against request
-    var mode: UrlRewriteMode = UrlRewriteMode.Absolute
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("http://localhost:8080/myapp/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePath
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/myapp/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathNoContext
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers, mode))
-    assertEquals("/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers, mode))
-    mode = UrlRewriteMode.AbsolutePathOrRelative
-    assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers, mode))
-    //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-    assertEquals("/myapp/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers, mode))
-    assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers, mode))
-    assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers, mode))
+
+    val Expected = List(
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar"                                  , "/bar"                  , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar?a=1&amp;b=2"                      , "/bar?a=1&amp;b=2"      , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/bar?a=1&amp;b=2#there"                , "/bar?a=1&amp;b=2#there", UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2"         , "?a=1&amp;b=2"          , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png"   , "/ops/bar.png"          , UrlRewriteMode.Absolute),
+      ("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", "/config/bar.png"       , UrlRewriteMode.Absolute),
+
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar"                                                       , "/bar"                  , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar?a=1&amp;b=2"                                           , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePath),
+      ("/myapp/bar?a=1&amp;b=2#there"                                     , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePath),
+      ("/myapp/doc/home-welcome?a=1&amp;b=2"                              , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePath),
+      ("/myapp/orbeon/" + version + "/ops/bar.png"                        , "/ops/bar.png"          , UrlRewriteMode.AbsolutePath),
+      ("/myapp/orbeon/" + version + "/config/bar.png"                     , "/config/bar.png"       , UrlRewriteMode.AbsolutePath),
+
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar"                                                             , "/bar"                  , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2"                                                 , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathNoContext),
+      ("/bar?a=1&amp;b=2#there"                                           , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathNoContext),
+      ("/doc/home-welcome?a=1&amp;b=2"                                    , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathNoContext),
+      ("/" + version + "/ops/bar.png"                                     , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathNoContext),
+      ("/" + version + "/config/bar.png"                                  , "/config/bar.png"       , UrlRewriteMode.AbsolutePathNoContext),
+
+      ("https://foo.com/bar"                                              , "https://foo.com/bar"   , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar"                                                       , "/bar"                  , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar?a=1&amp;b=2"                                           , "/bar?a=1&amp;b=2"      , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/bar?a=1&amp;b=2#there"                                     , "/bar?a=1&amp;b=2#there", UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/doc/home-welcome?a=1&amp;b=2"                              , "?a=1&amp;b=2"          , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/orbeon/" + version + "/ops/bar.png"                        , "/ops/bar.png"          , UrlRewriteMode.AbsolutePathOrRelative),
+      ("/myapp/orbeon/" + version + "/config/bar.png"                     , "/config/bar.png"       , UrlRewriteMode.AbsolutePathOrRelative),
+    )
+
+    for ((expected, url, mode) <- Expected)
+      it(s"must pass for $url and $mode") {
+        assert(expected == URLRewriterUtils.rewriteResourceURL(filterRequest, url, pathMatchers, mode))
+      }
+
+    // assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode))
   }
 
-  @Test def testDecodeResourceURI(): Unit = {
-    // NOTE: Unclear case: /xforms-server/foobar. URLRewriterUtils.rewriteResourceURL() does not rewrite
-    // /xforms-server/foobar as a resource URL and it is not clear why.
+  describe("The `decodeResourceURI()` function") {
+
+    // NOTE: Unclear case: `/xforms-server/foobar`. `URLRewriterUtils.rewriteResourceURL()` does not rewrite
+    // `/xforms-server/foobar` as a resource URL and it is not clear why.
+
     val orbeonVersion = URLRewriterUtils.getOrbeonVersionForClient
-    val propertiesURLs = Array("oxf:/ops/unit-tests/properties-versioned-all.xml", "oxf:/ops/unit-tests/properties-versioned-orbeon.xml")
-    val platformPaths = Array("/ops/bar", "/config/bar", "/xbl/orbeon/bar", "/forms/orbeon/bar", "/apps/fr/bar", "/xforms-server")
+
+    val propertiesURLs = List(
+      "oxf:/ops/unit-tests/properties-versioned-all.xml",
+      "oxf:/ops/unit-tests/properties-versioned-orbeon.xml",
+    )
+
+    val platformPaths = List(
+      "/ops/bar",
+      "/config/bar",
+      "/xbl/orbeon/bar",
+      "/forms/orbeon/bar",
+      "/apps/fr/bar",
+      "/xforms-server",
+    )
+
     for (propertiesURL <- propertiesURLs) {
+
       // Reinitialize properties
       Properties.invalidate()
-      org.orbeon.oxf.properties.Properties.init(propertiesURL)
+      Properties.init(propertiesURL)
+
       // Check platform paths
       for (path <- platformPaths) {
-        val versionedPath = "/" + orbeonVersion + path
-        // Make sure this is recognized as a platform path
-        assertTrue(URLRewriterUtils.isPlatformPath(path))
-        // Just decoding
-        assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath, isVersioned = true))
-        // Encoding/decoding
-        assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path, URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, UrlRewriteMode.AbsolutePathNoContext), isVersioned = true))
+        val versionedPath = s"/$orbeonVersion$path"
+        it(s"must pass platform paths for $path (${if (propertiesURL == propertiesURLs.head) "versioned all" else "versioned Orbeon"})") {
+          // Make sure this is recognized as a platform path
+          assert(URLRewriterUtils.isPlatformPath(path))
+          // Just decoding
+          assert(path == URLRewriterUtils.decodeResourceURI(versionedPath, isVersioned = true))
+          // Encoding/decoding
+          assert(
+            path ==
+              URLRewriterUtils.decodeResourceURI(
+                URLRewriterUtils.rewriteResourceURL(
+                  request      = directRequest,
+                  urlString    = path,
+                  pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS,
+                  rewriteMode  = UrlRewriteMode.AbsolutePathNoContext
+                ),
+                isVersioned = true
+              )
+          )
+        }
       }
+
       // Check non-platform paths
-      val customPaths = Array("/opsla", "/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/xforms-foo")
-      val decodedCustomPaths = Array("/apps/opsla", "/apps/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/apps/xforms-foo")
-      val appVersionOpt = URLRewriterUtils.getApplicationResourceVersion
-      var i = 0
-      for (path <- customPaths) {
-        // Make sure this is recognized as a non-platform path
-        assertFalse(URLRewriterUtils.isPlatformPath(path))
-        val decodedCustomPath = decodedCustomPaths(i)
-        if (appVersionOpt.isDefined) {
-          // Case where there is an app version number
-          val versionedPath = "/" + appVersionOpt.get + path
-          // Just decoding
-          assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(versionedPath, isVersioned = true))
-          // Encoding/decoding
-          assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path, URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, UrlRewriteMode.AbsolutePathNoContext), isVersioned = true))
+      val customPaths = List(
+        "/opsla"          -> "/apps/opsla",
+        "/configuration"  -> "/apps/configuration",
+        "/xbl/acme/bar"   -> "/xbl/acme/bar",
+        "/forms/acme/bar" -> "/forms/acme/bar",
+        "/apps/myapp/bar" -> "/apps/myapp/bar",
+        "/xforms-foo"     -> "/apps/xforms-foo",
+      )
+
+      for ((path, decodedCustomPath) <- customPaths) {
+        it(s"must pass non-platform paths for $path (${if (propertiesURL == propertiesURLs.head) "versioned all" else "versioned Orbeon"})") {
+          // Make sure this is recognized as a non-platform path
+          assert(! URLRewriterUtils.isPlatformPath(path))
+          URLRewriterUtils.getApplicationResourceVersion match {
+            case Some(appVersion) =>
+              // Case where there is an app version number
+              val versionedPath = s"/$appVersion$path"
+              // Just decoding
+              assert(decodedCustomPath == URLRewriterUtils.decodeResourceURI(versionedPath, isVersioned = true))
+              // Encoding/decoding
+              assert(
+                decodedCustomPath ==
+                  URLRewriterUtils.decodeResourceURI(
+                    URLRewriterUtils.rewriteResourceURL(
+                      request      = directRequest,
+                      urlString    = path,
+                      pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS,
+                      rewriteMode  = UrlRewriteMode.AbsolutePathNoContext
+                    ),
+                    isVersioned = true
+                  )
+              )
+          case None =>
+            // Case where there is NO app version number
+            // Just decoding
+            assert(decodedCustomPath == URLRewriterUtils.decodeResourceURI(path, isVersioned = true))
+            // Encoding/decoding
+            assert(
+              decodedCustomPath ==
+              URLRewriterUtils.decodeResourceURI(
+                URLRewriterUtils.rewriteResourceURL(
+                  request      = directRequest,
+                  urlString    = path,
+                  pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS,
+                  rewriteMode  = UrlRewriteMode.AbsolutePathNoContext
+                ),
+                isVersioned = true
+              )
+            )
+          }
         }
-        else {
-          // Case where there is NO app version number
-          // Just decoding
-          assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(path, isVersioned = true))
-          // Encoding/decoding
-          assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path, URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, UrlRewriteMode.AbsolutePathNoContext), isVersioned = true))
-        }
-        i += 1
       }
     }
   }
 
-  @Test def testHRRI(): Unit = {
-    // Test for spaces
-    assertEquals("http://localhost:8080/myapp/a%20b", MarkupUtils.encodeHRRI("http://localhost:8080/myapp/a b", processSpace = true))
-    assertEquals("http://localhost:8080/myapp/a b", MarkupUtils.encodeHRRI("http://localhost:8080/myapp/a b", processSpace = false))
-    // Test for trim()
-    assertEquals("http://localhost:8080/", MarkupUtils.encodeHRRI("  http://localhost:8080/  ", processSpace = true))
-    // Test for other characters
-    assertEquals("http://localhost:8080/myapp/%3C%3E%22%7B%7D%7C%5C%5E%60", MarkupUtils.encodeHRRI("http://localhost:8080/myapp/<>\"{}|\\^`", processSpace = true))
+  describe("HRRI encoding") {
+    it("must process spaces") {
+      assert("http://localhost:8080/myapp/a%20b" == MarkupUtils.encodeHRRI("http://localhost:8080/myapp/a b", processSpace = true))
+      assert("http://localhost:8080/myapp/a b"   == MarkupUtils.encodeHRRI("http://localhost:8080/myapp/a b", processSpace = false))
+    }
+    it("must trim the input") {
+      assert("http://localhost:8080/" == MarkupUtils.encodeHRRI("  http://localhost:8080/  ", processSpace = true))
+    }
+    it("must handle other characters") {
+      assert("http://localhost:8080/myapp/%3C%3E%22%7B%7D%7C%5C%5E%60" == MarkupUtils.encodeHRRI("http://localhost:8080/myapp/<>\"{}|\\^`", processSpace = true))
+    }
   }
 
-  @Test def testResolveURI(): Unit = {
-    assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("a b", "http://localhost:8080/myapp/"))
-    assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("http://localhost:8080/myapp/a b", null))
+  describe("The `resolveURI()` function") {
+    it("must resolve URIs") {
+      assert("http://localhost:8080/myapp/a%20b" == NetUtils.resolveURI("a b", "http://localhost:8080/myapp/"))
+      assert("http://localhost:8080/myapp/a%20b" == NetUtils.resolveURI("http://localhost:8080/myapp/a b", null))
+    }
   }
 }

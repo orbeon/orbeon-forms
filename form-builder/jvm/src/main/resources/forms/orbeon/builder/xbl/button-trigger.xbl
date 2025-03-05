@@ -26,11 +26,243 @@
             <display-name lang="nl">Knop</display-name>
             <display-name lang="sv">Knapp</display-name>
             <display-name lang="pt">Botão</display-name>
+            <appearance-display-name lang="en">Default</appearance-display-name>
+            <appearance-display-name lang="es">Predeterminado</appearance-display-name>
+            <appearance-display-name lang="fi">Oletus</appearance-display-name>
+            <appearance-display-name lang="fr">Défaut</appearance-display-name>
+            <appearance-display-name lang="ru">По умолчанию</appearance-display-name>
+            <appearance-display-name lang="de">Standard</appearance-display-name>
+            <appearance-display-name lang="it">Predefinito</appearance-display-name>
+            <appearance-display-name lang="nl">Standaard</appearance-display-name>
+            <appearance-display-name lang="sv">Standard</appearance-display-name>
+            <appearance-display-name lang="pt">Padrão</appearance-display-name>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
             <template>
                 <xf:trigger id="" xmlns="">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-primary" element="xf|trigger[appearance = 'xxf:primary']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Button (Primary)</display-name>
+            <display-name lang="es">Botón (Primario)</display-name>
+            <display-name lang="fi">Painike (Ensisijainen)</display-name>
+            <display-name lang="fr">Bouton (Principal)</display-name>
+            <display-name lang="ru">Кнопка (Основная)</display-name>
+            <display-name lang="de">Schaltfläche (Primär)</display-name>
+            <display-name lang="it">Pulsante (Primario)</display-name>
+            <display-name lang="nl">Knop (Primair)</display-name>
+            <display-name lang="sv">Knapp (Primär)</display-name>
+            <display-name lang="pt">Botão (Primário)</display-name>
+            <appearance-display-name lang="en">Primary</appearance-display-name>
+            <appearance-display-name lang="es">Primario</appearance-display-name>
+            <appearance-display-name lang="fi">Ensisijainen</appearance-display-name>
+            <appearance-display-name lang="fr">Principal</appearance-display-name>
+            <appearance-display-name lang="ru">Основная</appearance-display-name>
+            <appearance-display-name lang="de">Primär</appearance-display-name>
+            <appearance-display-name lang="it">Primario</appearance-display-name>
+            <appearance-display-name lang="nl">Primair</appearance-display-name>
+            <appearance-display-name lang="sv">Primär</appearance-display-name>
+            <appearance-display-name lang="pt">Primário</appearance-display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
+            </icon>
+            <template>
+                <xf:trigger id="" xmlns="" appearance="xxf:primary">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-inverse" element="xf|trigger[appearance = 'xxf:inverse']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Button (Inverse)</display-name>
+            <display-name lang="es">Botón (Inverso)</display-name>
+            <display-name lang="fi">Painike (Käänteinen)</display-name>
+            <display-name lang="fr">Bouton (Inversé)</display-name>
+            <display-name lang="ru">Кнопка (Обратная)</display-name>
+            <display-name lang="de">Schaltfläche (Umgekehrt)</display-name>
+            <display-name lang="it">Pulsante (Inverso)</display-name>
+            <display-name lang="nl">Knop (Omgekeerd)</display-name>
+            <display-name lang="sv">Knapp (Omvänd)</display-name>
+            <display-name lang="pt">Botão (Invertido)</display-name>
+            <appearance-display-name lang="en">Inverse</appearance-display-name>
+            <appearance-display-name lang="es">Inverso</appearance-display-name>
+            <appearance-display-name lang="fi">Käänteinen</appearance-display-name>
+            <appearance-display-name lang="fr">Inversé</appearance-display-name>
+            <appearance-display-name lang="ru">Обратная</appearance-display-name>
+            <appearance-display-name lang="de">Umgekehrt</appearance-display-name>
+            <appearance-display-name lang="it">Inverso</appearance-display-name>
+            <appearance-display-name lang="nl">Omgekeerd</appearance-display-name>
+            <appearance-display-name lang="sv">Omvänd</appearance-display-name>
+            <appearance-display-name lang="pt">Invertido</appearance-display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
+            </icon>
+            <template>
+                <xf:trigger id="" xmlns="" appearance="xxf:inverse">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-success" element="xf|trigger[appearance = 'xxf:success']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Button (Success)</display-name>
+            <display-name lang="es">Botón (Éxito)</display-name>
+            <display-name lang="fi">Painike (Onnistunut)</display-name>
+            <display-name lang="fr">Bouton (Succès)</display-name>
+            <display-name lang="ru">Кнопка (Успех)</display-name>
+            <display-name lang="de">Schaltfläche (Erfolg)</display-name>
+            <display-name lang="it">Pulsante (Successo)</display-name>
+            <display-name lang="nl">Knop (Succes)</display-name>
+            <display-name lang="sv">Knapp (Framgång)</display-name>
+            <display-name lang="pt">Botão (Sucesso)</display-name>
+            <appearance-display-name lang="en">Success</appearance-display-name>
+            <appearance-display-name lang="es">Éxito</appearance-display-name>
+            <appearance-display-name lang="fi">Onnistunut</appearance-display-name>
+            <appearance-display-name lang="fr">Succès</appearance-display-name>
+            <appearance-display-name lang="ru">Успех</appearance-display-name>
+            <appearance-display-name lang="de">Erfolg</appearance-display-name>
+            <appearance-display-name lang="it">Successo</appearance-display-name>
+            <appearance-display-name lang="nl">Succes</appearance-display-name>
+            <appearance-display-name lang="sv">Framgång</appearance-display-name>
+            <appearance-display-name lang="pt">Sucesso</appearance-display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
+            </icon>
+            <template>
+                <xf:trigger id="" xmlns="" appearance="xxf:success">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-danger" element="xf|trigger[appearance = 'xxf:danger']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Button (Danger)</display-name>
+            <display-name lang="es">Botón (Peligro)</display-name>
+            <display-name lang="fi">Painike (Vaara)</display-name>
+            <display-name lang="fr">Bouton (Danger)</display-name>
+            <display-name lang="ru">Кнопка (Опасность)</display-name>
+            <display-name lang="de">Schaltfläche (Gefahr)</display-name>
+            <display-name lang="it">Pulsante (Pericolo)</display-name>
+            <display-name lang="nl">Knop (Gevaar)</display-name>
+            <display-name lang="sv">Knapp (Farlig)</display-name>
+            <display-name lang="pt">Botão (Perigo)</display-name>
+            <appearance-display-name lang="en">Danger</appearance-display-name>
+            <appearance-display-name lang="es">Peligro</appearance-display-name>
+            <appearance-display-name lang="fi">Vaara</appearance-display-name>
+            <appearance-display-name lang="fr">Danger</appearance-display-name>
+            <appearance-display-name lang="ru">Опасность</appearance-display-name>
+            <appearance-display-name lang="de">Gefahr</appearance-display-name>
+            <appearance-display-name lang="it">Pericolo</appearance-display-name>
+            <appearance-display-name lang="nl">Gevaar</appearance-display-name>
+            <appearance-display-name lang="sv">Farlig</appearance-display-name>
+            <appearance-display-name lang="pt">Perigo</appearance-display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
+            </icon>
+            <template>
+                <xf:trigger id="" xmlns="" appearance="xxf:danger">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-warning" element="xf|trigger[appearance = 'xxf:warning']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Button (Warning)</display-name>
+            <display-name lang="es">Botón (Advertencia)</display-name>
+            <display-name lang="fi">Painike (Varoitus)</display-name>
+            <display-name lang="fr">Bouton (Avertissement)</display-name>
+            <display-name lang="ru">Кнопка (Предупреждение)</display-name>
+            <display-name lang="de">Schaltfläche (Warnung)</display-name>
+            <display-name lang="it">Pulsante (Avviso)</display-name>
+            <display-name lang="nl">Knop (Waarschuwing)</display-name>
+            <display-name lang="sv">Knapp (Varning)</display-name>
+            <display-name lang="pt">Botão (Aviso)</display-name>
+            <appearance-display-name lang="en">Warning</appearance-display-name>
+            <appearance-display-name lang="es">Advertencia</appearance-display-name>
+            <appearance-display-name lang="fi">Varoitus</appearance-display-name>
+            <appearance-display-name lang="fr">Avertissement</appearance-display-name>
+            <appearance-display-name lang="ru">Предупреждение</appearance-display-name>
+            <appearance-display-name lang="de">Warnung</appearance-display-name>
+            <appearance-display-name lang="it">Avviso</appearance-display-name>
+            <appearance-display-name lang="nl">Waarschuwing</appearance-display-name>
+            <appearance-display-name lang="sv">Varning</appearance-display-name>
+            <appearance-display-name lang="pt">Aviso</appearance-display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
+            </icon>
+            <template>
+                <xf:trigger id="" xmlns="" appearance="xxf:warning">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-info" element="xf|trigger[appearance = 'xxf:info']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Button (Info)</display-name>
+            <display-name lang="es">Botón (Información)</display-name>
+            <display-name lang="fi">Painike (Tiedot)</display-name>
+            <display-name lang="fr">Bouton (Information)</display-name>
+            <display-name lang="ru">Кнопка (Информация)</display-name>
+            <display-name lang="de">Schaltfläche (Information)</display-name>
+            <display-name lang="it">Pulsante (Informazione)</display-name>
+            <display-name lang="nl">Knop (Informatie)</display-name>
+            <display-name lang="sv">Knapp (Information)</display-name>
+            <display-name lang="pt">Botão (Informação)</display-name>
+            <appearance-display-name lang="en">Info</appearance-display-name>
+            <appearance-display-name lang="es">Información</appearance-display-name>
+            <appearance-display-name lang="fi">Tiedot</appearance-display-name>
+            <appearance-display-name lang="fr">Information</appearance-display-name>
+            <appearance-display-name lang="ru">Информация</appearance-display-name>
+            <appearance-display-name lang="de">Information</appearance-display-name>
+            <appearance-display-name lang="it">Informazione</appearance-display-name>
+            <appearance-display-name lang="nl">Informatie</appearance-display-name>
+            <appearance-display-name lang="sv">Information</appearance-display-name>
+            <appearance-display-name lang="pt">Informação</appearance-display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
+            </icon>
+            <template>
+                <xf:trigger id="" xmlns="" appearance="xxf:info">
                     <xf:label ref=""/>
                     <xf:help ref=""/>
                     <xf:hint ref=""/>

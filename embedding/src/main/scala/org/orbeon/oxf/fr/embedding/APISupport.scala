@@ -350,7 +350,8 @@ object APISupport {
           # Optional versioned resources token
           (?:
             /
-            [^/^.]+
+            # https://github.com/orbeon/orbeon-forms/issues/6833
+            [^/]+
           )?
           /
           (?:

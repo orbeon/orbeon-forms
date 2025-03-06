@@ -141,7 +141,7 @@ trait FormRunnerComponentsCompileTime {
 
   // Called from XSLT only
   //@XPathFunction
-  def replaceVarReferencesWithFunctionCallsFromProperty(
+  def replaceVarReferencesWithFunctionCallsFromPropertyAsString(
     propertyName : String,
     avt          : Boolean,
     libraryName  : String,

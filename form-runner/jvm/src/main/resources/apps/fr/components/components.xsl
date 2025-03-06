@@ -553,7 +553,7 @@
         as="xs:string"
         select="
             (
-                frf:replaceVarReferencesWithFunctionCallsFromProperty(
+                frf:replaceVarReferencesWithFunctionCallsFromPropertyAsString(
                     (: propertyName :) string-join(('oxf.fr.detail.captcha.visible', $app, $form), '.'),
                     (: avt          :) true(),
                     (: libraryName  :) (), (: Ok to be empty since this the XPath is not used inside a section template :)

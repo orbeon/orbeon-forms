@@ -1067,6 +1067,8 @@
 
     <xsl:template match="fr:navigate" mode="within-action-2018.2">
 
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
+
         <xsl:variable name="location" select="@location/string()" as="xs:string"/>
         <xsl:variable name="target"   select="@target/string()"   as="xs:string?"/>
 
@@ -1081,7 +1083,7 @@
 
         <!-- Prefer `<xf:load>` to `fr:run-process(…, 'navigate(…))`, as the latter builds a process (string) with
              XPath, which requires escaping, and is thus more error-prone -->
-        <xf:load resource="{$location}" class="fr-action-impl">
+        <xf:load resource="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $location, true(), $library-name, ())}" class="fr-action-impl">
             <xsl:if test="exists($target)">
                 <xsl:attribute name="xxf:target" select="$target"/>
             </xsl:if>

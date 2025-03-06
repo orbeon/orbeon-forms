@@ -103,16 +103,16 @@ class ConnectionTest
       // See #3135 regarding `LocalRequest` capitalization. We might want to change how this works.
       val headerValuesMap = request.getHeaderValuesMap.asScala
 
-      assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
-      assert("xsifj1skf3"                                  === headerValuesMap("authorization")(0))
-      assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" === headerValuesMap("cookie")(0))
-      assert(None                                          === headerValuesMap.get("host"))
-      assert(None                                          === headerValuesMap.get("foobar"))
+      assert("Mozilla 12.1"                                == headerValuesMap("user-agent")(0))
+      assert("xsifj1skf3"                                  == headerValuesMap("authorization")(0))
+      assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" == headerValuesMap("cookie")(0))
+      assert(None                                          == headerValuesMap.get("host"))
+      assert(None                                          == headerValuesMap.get("foobar"))
 
       // Test custom headers received
-      assert("my-value"                                    === headerValuesMap("my-stuff")(0))
-      assert("your-value-1"                                === headerValuesMap("your-stuff")(0))
-      assert("your-value-2"                                === headerValuesMap("your-stuff")(1))
+      assert("my-value"                                    == headerValuesMap("my-stuff")(0))
+      assert("your-value-1"                                == headerValuesMap("your-stuff")(0))
+      assert("your-value-2"                                == headerValuesMap("your-stuff")(1))
     }
   }
 

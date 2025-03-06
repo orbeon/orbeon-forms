@@ -1,6 +1,7 @@
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
-            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.oracle.*.*"                 value="oracle"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.mysql.*.*"                  value="mysql"/>
@@ -60,7 +61,14 @@
 
     <property as="xs:string"  name="oxf.fr.s3.issue-6751.endpoint"        value="s3.amazonaws.com"/>
     <property as="xs:string"  name="oxf.fr.s3.issue-6751.region"          value="{environment-variable('S3_TEST_REGION')}"/>
-    <property as="xs:string"  name="oxf.fr.s3.issue-6751.bucket"          value="orbeon-test-issue-6751"/>
+    <property as="xs:string"  name="oxf.fr.s3.issue-6751.bucket"          value="orbeon-test"/>
     <property as="xs:string"  name="oxf.fr.s3.issue-6751.accesskey"       value="{environment-variable('S3_TEST_ACCESSKEY')}"/>
     <property as="xs:string"  name="oxf.fr.s3.issue-6751.secretaccesskey" value="{environment-variable('S3_TEST_SECRETACCESSKEY')}"/>
+
+    <property as="xs:string" name="oxf.fr.email.pdf.filename.issue.6751"  value="concat(fr:form-title(), '.pdf')"/>
+    <property as="xs:string" name="oxf.fr.email.tiff.filename.issue.6751" value="concat(fr:form-title(), '.tiff')"/>
+    <property as="xs:string" name="oxf.fr.email.xml.filename.issue.6751"  value="concat(fr:form-title(), '.xml')"/>
+
+    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.issue.6751" value="false"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-xml.issue.6751" value="true"/>
 </properties>

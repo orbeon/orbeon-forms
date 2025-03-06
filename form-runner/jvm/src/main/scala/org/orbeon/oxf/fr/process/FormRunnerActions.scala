@@ -217,14 +217,21 @@ trait FormRunnerActions
 
     for {
       emailContents <- emailContentsTry
-      s3PathPrefix  <- s3PathPrefixTry
       s3Config      <- S3Config.fromProperties(s3ConfigName)
       _             <- {
         // Implicits in for comprehensions supported in Scala 3 only
         implicit val _s3Config: S3Config = s3Config
 
         S3.withS3Client { implicit s3Client =>
-          TryUtils.sequenceLazily(emailContents)(storeEmailContentToS3(_, s3PathPrefix))
+          TryUtils.sequenceLazily(emailContents) { emailContent =>
+            for {
+              // Evaluate the s3-path parameter/property for each email, as the evaluation might return a different
+              // value for each call (e.g. date/time function)
+              s3PathPrefix <- s3PathPrefixTry
+              _            <- storeEmailContentToS3(emailContent, s3PathPrefix)
+            } yield ()
+
+          }
         }
       }
     } yield ()

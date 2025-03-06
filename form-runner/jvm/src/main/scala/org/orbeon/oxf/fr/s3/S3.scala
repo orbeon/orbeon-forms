@@ -15,6 +15,7 @@
 package org.orbeon.oxf.fr.s3
 
 import cats.implicits.catsSyntaxOptionId
+import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.oxf.util.NetUtils
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
@@ -24,7 +25,7 @@ import software.amazon.awssdk.services.s3.model.*
 
 import java.io.{ByteArrayInputStream, InputStream}
 import scala.jdk.CollectionConverters.ListHasAsScala
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 
 object S3 {
@@ -77,6 +78,32 @@ object S3 {
       inputStreamToCloseOpt.foreach(_.close())
     }
   }
+
+  def objectAsString(
+    bucket  : String,
+    key     : String
+  )(implicit
+    s3Client: S3Client
+  ): String = {
+    val getObjectRequest = GetObjectRequest.builder()
+      .bucket(bucket)
+      .key(key)
+      .build()
+
+    IOUtils.readStreamAsStringAndClose(s3Client.getObject(getObjectRequest), charset = None)
+  }
+
+  def headBucket(bucketName: String)(implicit s3Client: S3Client): Try[HeadBucketResponse] = {
+    val headBucketRequest = HeadBucketRequest.builder().bucket(bucketName).build()
+    Try(s3Client.headBucket(headBucketRequest))
+  }
+
+  def bucketExists(bucketName: String)(implicit s3Client: S3Client): Try[Boolean] =
+    headBucket(bucketName) match {
+      case Success(_)                        => Success(true)
+      case Failure(_: NoSuchBucketException) => Success(false)
+      case Failure(t)                        => Failure(t)
+    }
 
   def createBucket(bucketName: String)(implicit s3Client: S3Client): Try[CreateBucketResponse] = {
     val createBucketRequest = CreateBucketRequest.builder().bucket(bucketName).build()

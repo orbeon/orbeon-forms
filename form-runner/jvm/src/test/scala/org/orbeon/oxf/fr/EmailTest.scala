@@ -78,10 +78,28 @@ class EmailTest
     describe("without section templates") {
 
       val expectedForClassName = List(
-        ("fr-email-recipient"               , List("info+toplevel@orbeon.com")              , List("section-1/control-1")),
-        ("fr-email-subject"                 , Nil                                           , Nil),
-        ("fr-attachment"                    , List("attachment-13.bin", "attachment-14.bin"), List("section-1/control-13", "section-1/control-14")),
-        ("fr-attachment fr-email-attachment", List("attachment-14.bin")                     , List("section-1/control-14"))
+        (
+          "fr-email-recipient",
+          List("info+toplevel@orbeon.com"),
+          List("section-1/control-1")),
+        (
+          "fr-email-subject",
+          Nil,
+          Nil
+        ),
+        (
+          "fr-attachment",
+          List(
+            "file:/tmp/attachment-13.bin",
+            "/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin"
+          ),
+          List("section-1/control-13", "section-1/control-14")
+        ),
+        (
+          "fr-attachment fr-email-attachment",
+          List("/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin"),
+          List("section-1/control-14")
+        )
       )
 
       for ((classNames, expectedValues, expectedPath) <- expectedForClassName)
@@ -102,10 +120,25 @@ class EmailTest
     describe("within section templates") {
 
       val expectedForClassName = List(
-        ("fr-email-recipient"               , List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"), List("section-3/control-1", "section-3/section-3/grid-4/grid-4-iteration/control-6")),
-        ("fr-email-subject"                 , List("Abc", "Def", "Ghi")                                          , List("section-3/control-8", "section-3/section-3/grid-4/grid-4-iteration/control-7")),
-        ("fr-attachment"                    , List("attachment-10.bin", "attachment-11.bin")                     , List("section-3/control-10","section-3/control-11")),
-        ("fr-attachment fr-email-attachment", List("attachment-11.bin")                                          , List("section-3/control-11"))
+        ("fr-email-recipient",
+          List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"),
+          List("section-3/control-1", "section-3/section-3/grid-4/grid-4-iteration/control-6")
+        ),
+        ("fr-email-subject",
+          List("Abc", "Def", "Ghi"),
+          List("section-3/control-8", "section-3/section-3/grid-4/grid-4-iteration/control-7")),
+        ("fr-attachment",
+          List(
+            "/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-10.bin",
+            "/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-11.bin"
+          ),
+          List("section-3/control-10","section-3/control-11")
+        ),
+        (
+          "fr-attachment fr-email-attachment",
+          List("/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-11.bin"),
+          List("section-3/control-11")
+        )
       )
 
       for ((classNames, expectedValues, expectedPath) <- expectedForClassName)

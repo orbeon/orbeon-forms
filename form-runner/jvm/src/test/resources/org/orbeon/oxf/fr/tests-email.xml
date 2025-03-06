@@ -51,15 +51,15 @@
                                 <control-3>bcc+toplevel@orbeon.com</control-3>
                                 <control-4>from+toplevel@orbeon.com</control-4>
                                 <control-12>attachment-12.bin</control-12>
-                                <control-13 filename="" mediatype="" size="">attachment-13.bin</control-13>
-                                <control-14 filename="" mediatype="" size="">attachment-14.bin</control-14>
+                                <control-13 filename="" mediatype="" size="">file:/tmp/attachment-13.bin</control-13>
+                                <control-14 filename="" mediatype="" size="">/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin</control-14>
                             </section-1>
                             <section-3>
                                 <control-1>info+0@orbeon.com</control-1>
                                 <control-8>Abc</control-8>
                                 <control-9>attachment-9.bin</control-9>
-                                <control-10 filename="" mediatype="" size="">attachment-10.bin</control-10>
-                                <control-11 filename="" mediatype="" size="">attachment-11.bin</control-11>
+                                <control-10 filename="" mediatype="" size="">/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-10.bin</control-10>
+                                <control-11 filename="" mediatype="" size="">/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-11.bin</control-11>
                                 <section-3>
                                     <grid-4>
                                         <grid-4-iteration>
@@ -126,10 +126,10 @@
                        <part name="text" content-type="text/plain">Please find attached the form in PDF and XML format.</part>
                        <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                        <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
-                       <part name="attachment-1" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-1" fr:uri="http://example.org/cool/serviceattachment-13.bin"/>
-                       <part name="attachment-2" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-2" fr:uri="http://example.org/cool/serviceattachment-14.bin"/>
-                       <part name="attachment-3" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-3" fr:uri="http://example.org/cool/serviceattachment-10.bin"/>
-                       <part name="attachment-4" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-4" fr:uri="http://example.org/cool/serviceattachment-11.bin"/>
+                       <part name="attachment-1" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-1" fr:uri="file:/tmp/attachment-13.bin"/>
+                       <part name="attachment-2" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-2" fr:uri="http://example.org/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin"/>
+                       <part name="attachment-3" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-3" fr:uri="http://example.org/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-10.bin"/>
+                       <part name="attachment-4" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-4" fr:uri="http://example.org/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-11.bin"/>
                    </body>
                 </message>
             </messages>

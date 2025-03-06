@@ -29,7 +29,7 @@ class XFormsAssetServerTest
 
     it("must work for an absolute path") {
       withTestExternalContext { _ =>
-        assert("/xforms-server/dynamic/73fc31eb6b660322abb1ff7929cff31a909540d4" ==
+        assert("/xforms-server/dynamic/90708537d90397725fa2ce0c8c4a4d6457551feb" ==
           XFormsAssetServerRoute.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ => None).toString)
       }
     }

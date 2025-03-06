@@ -114,6 +114,20 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
 
+  // https://github.com/orbeon/orbeon-forms/issues/6837
+  //@XPathFunction
+  def controlVariableValueForAction(
+    actionSourceAbsoluteId: String,
+    targetControlName     : String,
+    libraryName           : String
+  ): SequenceIterator =
+    resolveTargetRelativeToActionSourceOpt(
+      actionSourceAbsoluteId  = actionSourceAbsoluteId,
+      targetControlName       = targetControlName,
+      followIndexes           = false,
+      libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
+    ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
+
   def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
     container              : XBLContainer,
     actionSourceAbsoluteId : String, // TODO: review if we need to resolve against this

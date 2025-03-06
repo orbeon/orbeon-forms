@@ -217,6 +217,33 @@ object FormRunnerRename {
       )
     }
 
+    // https://github.com/orbeon/orbeon-forms/issues/6837
+    def replaceVarReferencesWithFunctionCallsForAction(
+      xpathString     : String,
+      namespaceMapping: NamespaceMapping,
+      library         : FunctionLibrary,
+      avt             : Boolean,
+      libraryNameOpt  : Option[String],
+      norewrite       : Set[String]
+    )(implicit
+      logger          : IndentedLogger
+    ): String = {
+      val combinedNorewrite : Set[String]       = DefaultNorewriteSet ++ norewrite
+      val nameMapping       : String => String  = name =>
+        if (combinedNorewrite.contains(name))
+          s"$$$name"
+        else
+          s"frf:controlVariableValueForAction(xxf:get-document-attribute($$current-action-id, 'action-source'), '$name', ${libraryNameOpt.flatMap(_.trimAllToOpt).map("'" + _ + "'").getOrElse("()")})"
+
+      replaceVarReferencesWithFunctionCallsFromString(
+        xpathString,
+        namespaceMapping,
+        library,
+        avt,
+        nameMapping
+      )
+    }
+
   private val FRControlStringValueName = new StructuredQName(FRPrefix, FR, "control-string-value")
   private val FRControlTypedValueName  = new StructuredQName(FRPrefix, FR, "control-typed-value")
 

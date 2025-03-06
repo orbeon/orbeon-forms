@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.embedding.APISupport
 import org.scalatest.funspec.AnyFunSpec
 
 
-class OrbeonProxyPortletTest extends AnyFunSpec {
+class EmbeddingApiSupportTest extends AnyFunSpec {
 
   import APISupport._
 

@@ -55,10 +55,10 @@ class OrbeonProxyPortletTest extends AnyFunSpec {
     )
   }
 
-  def distinctAllowedPaths =
+  def distinctAllowedPaths: List[String] =
     List(false, true) flatMap allowedPaths distinct
 
-  def rejectedPaths(versioned: Boolean) = {
+  def rejectedPaths(versioned: Boolean): List[String] = {
 
     val optionalPath = if (versioned) Versioned else ""
 
@@ -97,7 +97,7 @@ class OrbeonProxyPortletTest extends AnyFunSpec {
     )
   }
 
-  def distinctRejectedPaths =
+  def distinctRejectedPaths: List[String] =
     List(false, true) flatMap rejectedPaths distinct
 
   val FormRunnerResourcePath = DefaultFormRunnerResourcePath.r

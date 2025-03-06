@@ -1080,7 +1080,7 @@
         </xxf:log>
 
         <!-- Prefer `<xf:load>` to `fr:run-process(…, 'navigate(…))`, as the latter builds a process (string) with
-             XPath, which requires escaping, and is thus more error prone -->
+             XPath, which requires escaping, and is thus more error-prone -->
         <xf:load resource="{$location}" class="fr-action-impl">
             <xsl:if test="exists($target)">
                 <xsl:attribute name="xxf:target" select="$target"/>

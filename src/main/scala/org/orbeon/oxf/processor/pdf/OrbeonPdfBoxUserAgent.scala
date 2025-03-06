@@ -130,17 +130,16 @@ class OrbeonPdfBoxUserAgent(
     resource
   }
 
-  override def resolveURI(uri: String): String = {
-
-    // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
-    // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
-    // the servlet context and version number if needed. In addition, CSS resources must either use
-    // relative paths when pointing to other CSS files or images, or go through the XForms CSS rewriter,
-    // which also generates absolute paths.
-    // So all we need to do here is rewrite the resulting path to an absolute URL.
-    // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
-    // However this caused issues, for example resources like background images referred by CSS files
-    // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
+  // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
+  // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
+  // the servlet context and version number if needed. In addition, CSS resources must either use
+  // relative paths when pointing to other CSS files or images, or go through the XForms CSS rewriter,
+  // which also generates absolute paths.
+  // So all we need to do here is rewrite the resulting path to an absolute URL.
+  // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
+  // However this caused issues, for example resources like background images referred by CSS files
+  // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
+  override def resolveURI(uri: String): String =
     withDebug(s"before resolving URL `$uri`") {
       URLRewriterUtils.rewriteServiceURL(
         requestOpt.orNull,
@@ -148,7 +147,6 @@ class OrbeonPdfBoxUserAgent(
         UrlRewriteMode.AbsoluteNoContext
       )
     }
-  }
 
   // Called by:
   // - getCSSResource

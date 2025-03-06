@@ -45,7 +45,6 @@ public class RewriteServiceURI extends SystemFunction {
         final Expression modeExpression = (argument.length < 2) ? null : argument[1];
         final boolean absolute = (modeExpression != null) && modeExpression.effectiveBooleanValue(xpathContext);
 
-        // Get property value
         final String rewrittenURI = rewriteServiceURI(uri, absolute);
 
         return Implicits.stringToStringValue(rewrittenURI);

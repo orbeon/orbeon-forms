@@ -1129,7 +1129,13 @@
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-control-settings/tab-base/label"/>
-
+                            <xf:var
+                                name="suggestion"
+                                value="
+                                    if (matches($i/control-name, '^control-[\d]+$') and xxf:non-blank($i/label/value)) then
+                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $i/label/value)
+                                    else
+                                        ()"/>
                             <xh:div class="fb-base-tab-div">
                                 <xh:div class="fb-base-tab-left">
                                     <fr:grid id="fb-base-tab-grid">
@@ -1139,8 +1145,25 @@
                                                 <xf:input ref="$i/control-name" incremental="true" id="control-name-input">
                                                     <xf:label ref="$resources/dialog-control-settings/control-name/label"/>
                                                     <xf:alert ref="$resources/dialog-control-settings/control-name/alert"/>
-                                                    <xf:hint  ref="$resources/dialog-control-settings/control-name/hint"/>
+                                                    <xf:hint  ref="if (exists($suggestion)) then () else $resources/dialog-control-settings/control-name/hint"/>
                                                 </xf:input>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:trigger ref=".[exists($suggestion)]" appearance="minimal">
+                                                    <xf:label
+                                                        mediatype="text/html"
+                                                        ref="
+                                                            xxf:format-message(
+                                                                xxf:r('suggestion.label', '|fr-form-resources|'),
+                                                                $suggestion
+                                                            )"/>
+                                                    <xf:setvalue
+                                                        event="DOMActivate"
+                                                        ref="$i/control-name"
+                                                        value="$suggestion"/>
+                                                </xf:trigger>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>

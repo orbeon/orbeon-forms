@@ -33,7 +33,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
+import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils, StaticXPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
@@ -1134,6 +1134,54 @@ object FormBuilderXPathApi {
       }
     else
       false
+
+  // Simple suggestion logic from a text label to a control name
+  //@XPathFunction
+  def controlNameSuggestionFromLabel(
+    controlNameMaybeUpdated: String,
+    updates                : String,
+    label                  : String,
+  ): String = {
+
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    val updatesSet = updates.tokenizeToSet
+    val toRemove   = updatesSet.filter(_.startsWith("-")).map(_.substring(1)).headOption
+    val toAdd      = updatesSet.filter(_.startsWith("+")).map(_.substring(1)).headOption
+
+    val formControl = findControlByName(toRemove.getOrElse(controlNameMaybeUpdated))
+
+    // TODO: Do better than ASCII letters and numbers. Other characters are allowed.
+    val cleaned    = label.replaceAll("[^a-zA-Z0-9\\-_\\s]", "_")
+    val suggestion = {
+      val replaced = cleaned.trim.replaceAll("\\s+", "-").toLowerCase
+      if (! SaxonUtils.isValidNCName(replaced))
+        s"_$replaced"
+      else
+        replaced
+    }
+
+    // TODO:
+    //  - consider using section name, vs. numeric suffix
+    //      - my-section-email
+    //      - email2
+    //      - email-2
+    //      - if section doesn't have a nice label, what about using the section label as well? what about grid label?
+    //  - maybe return multiple suggestions
+
+    val availableControlNames =
+      FormBuilder.iterateNamesInUseCtx.toList
+
+    Iterator.iterate((suggestion, None: Option[Int])) { case (base, indexOpt) =>
+      val index = indexOpt.getOrElse(0) + 1
+      (base, Some(index))
+    }
+    .collectFirst {
+      case (base, None)        if ! availableControlNames.contains(base)            => base
+      case (base, Some(index)) if ! availableControlNames.contains(s"$base-$index") => s"$base-$index"
+    }
+    .orNull
+  }
 
   //@XPathFunction
   def renameControlReferences(

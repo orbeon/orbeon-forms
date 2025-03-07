@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
+import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.scalatest.funspec.AnyFunSpecLike
@@ -71,6 +72,8 @@ class S3Test
           withFormRunnerDocument(processorService, doc) {
             withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>
               S3.withS3Client { implicit s3Client =>
+                clearRenderedFormatsResources()
+
                 body(s3Config)(s3Path)(s3Client)
               }
             }
@@ -82,7 +85,7 @@ class S3Test
         val baseParams = Map[Option[String], String]("send-email".some -> "false")
 
         // Include date/time in path so that different templates are stored in different sub-paths
-        val s3Params   = Map[Option[String], String](
+        val s3Params = Map[Option[String], String](
           "s3-store".some  -> "true",
           "s3-config".some -> "issue-6751"
         ) ++ s3PathOpt.map(s3Path => "s3-path".some -> s"concat('$s3Path', '/', current-dateTime())").toMap
@@ -94,17 +97,10 @@ class S3Test
         )
       }
 
-     it("must leave S3 bucket untouched if S3 storage disabled") {
+      it("must leave S3 bucket untouched if S3 storage disabled") {
         testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
           sendEmail(s3Store = false, s3PathOpt = None)
           assert(S3.objects(s3Config.bucket, prefix = s3Path).get.isEmpty)
-        }
-      }
-
-      it("must store some S3 objects in the bucket if S3 storage enabled") {
-        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
-          sendEmail(s3Store = true, s3PathOpt = s3Path.some, "match" -> "all")
-          assert(S3.objects(s3Config.bucket, prefix = s3Path).get.nonEmpty)
         }
       }
 
@@ -160,9 +156,6 @@ class S3Test
     }
   }
 
-  // TODO: remove this when PDF problem is solved
-  protected val disablePdfChecks: Boolean = true
-
   case class Template(
     name        : String,
     staticEnable: Option[Boolean],
@@ -211,7 +204,7 @@ class S3Test
       .map { s3Object =>
         // Check that the S3 objects contain something
         assert(
-          s3Object.size() > 0L || (disablePdfChecks && s3Object.key.endsWith(".pdf")),
+          s3Object.size() > 0L,
           s"Empty S3 object: ${s3Object.key}"
         )
 
@@ -268,7 +261,7 @@ class S3Test
         val expectedPdfCount = if (template.pdf.getOrElse(DefaultAttachPdf)) 1 else 0
 
         assert(
-          expectedPdfCount == pdfFiles.size || disablePdfChecks,
+          expectedPdfCount == pdfFiles.size,
           s"Unexpected PDF count for template ${template.name}: expected=$expectedPdfCount, actual=${pdfFiles.size}"
         )
 

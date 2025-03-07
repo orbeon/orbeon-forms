@@ -230,7 +230,6 @@ trait FormRunnerActions
               s3PathPrefix <- s3PathPrefixTry
               _            <- storeEmailContentToS3(emailContent, s3PathPrefix)
             } yield ()
-
           }
         }
       }

@@ -17,18 +17,21 @@ import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.scalatest.Tag
 import org.scalatest.funspec.AnyFunSpecLike
 import software.amazon.awssdk.services.s3.S3Client
 
 import java.util.UUID
 
 
+// There's apparently no way to tag a "describe" section globally, so we need to tag all "it" statements individually
+object S3Tag extends Tag("S3")
+
 class S3Test
   extends DocumentTestBase
     with ResourceManagerSupport
     with AnyFunSpecLike
     with FormRunnerSupport {
-
 
   def withTestS3ConfigAndPath(configName: String)(body: S3Config => String => Unit): Unit = {
 
@@ -97,14 +100,14 @@ class S3Test
         )
       }
 
-      it("must leave S3 bucket untouched if S3 storage disabled") {
+      it("must leave S3 bucket untouched if S3 storage disabled", S3Tag) {
         testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
           sendEmail(s3Store = false, s3PathOpt = None)
           assert(S3.objects(s3Config.bucket, prefix = s3Path).get.isEmpty)
         }
       }
 
-      it("must store expected S3 objects when email templates are selected by name") {
+      it("must store expected S3 objects when email templates are selected by name", S3Tag) {
         val allTemplateNames                = templates.map(_.name)
         val staticallyDisabledTemplateNames = templates.filter(_.staticEnable.contains(false)).map(_.name).toSet
 
@@ -133,7 +136,7 @@ class S3Test
         }
       }
 
-      it("must store expected S3 objects when all email templates are selected") {
+      it("must store expected S3 objects when all email templates are selected", S3Tag) {
         testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
           // Select all email templates
           sendEmail(s3Store = true, s3PathOpt = s3Path.some, "match" -> "all")

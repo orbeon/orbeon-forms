@@ -693,6 +693,25 @@ lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType
     name := "orbeon-form-runner"
   )
 
+def s3ScalaTestArguments: Seq[String] = {
+  val onTravis             = sys.env.contains("TRAVIS")
+  val s3TestEnvVarsPresent = Seq(
+    "S3_TEST_REGION",
+    "S3_TEST_ACCESSKEY",
+    "S3_TEST_SECRETACCESSKEY"
+  ).forall(sys.env.contains)
+
+  println(s"On Travis: $onTravis")
+  println(s"S3_TEST_* environment variables present: $s3TestEnvVarsPresent")
+
+  if (!onTravis && !s3TestEnvVarsPresent) Seq("-l", "S3") else Seq()
+}
+
+lazy val s3TestSettings = Seq(
+  // If not on Travis and missing required environment variables, exclude S3 tests
+  Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, s3ScalaTestArguments: _*)
+)
+
 lazy val formRunnerJVM = formRunner.jvm
   .dependsOn(
     xformsJVM,
@@ -711,6 +730,7 @@ lazy val formRunnerJVM = formRunner.jvm
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
+  .settings(s3TestSettings)
   .settings(
     DebugTest / sourceDirectory         := (Test / sourceDirectory).value,
     DebugTest / javaOptions             += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",

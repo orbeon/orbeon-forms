@@ -7,7 +7,7 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
 import org.orbeon.oxf.fr.email.EmailMetadata.{TemplateMatch, TemplateValue}
-import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadataParsing}
+import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadata, EmailMetadataParsing}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
@@ -16,6 +16,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, TryUtils, XPathCache}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
@@ -196,57 +197,45 @@ trait FormRunnerEmailBackend {
     }
 
   def emailContents(
+    formDefinition          : om.DocumentInfo,
+    emailMetadata           : EmailMetadata.Metadata,
     urisByRenderedFormat    : Map[RenderedFormat, URI],
     emailDataFormatVersion  : DataFormatVersion,
     templateMatch           : TemplateMatch,
     language                : String,
     templateNameOpt         : Option[String]
   )(implicit
-    logger                  : IndentedLogger,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams
-  ): Try[List[EmailContent]] = {
+  ): List[EmailContent] = {
 
-    // Form definition
-    PersistenceApi.readPublishedFormDefinition(
-      appName  = formRunnerParams.app,
-      formName = formRunnerParams.form,
-      version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
-    ) map { case ((_, formDefinition), _) =>
+    // 1) Filter templates by language and name
+    val templatesFilteredByLanguageAndName = emailMetadata.templates.filter { template =>
+      (template.lang.isEmpty || template.lang.contains(language)) && templateNameOpt.forall(template.name == _)
+    }
 
-      // Parse email metadata
-      val emailMetadataNodeOpt = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
-      val emailMetadata        = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
-
-      // 1) Filter templates by language and name
-      val templatesFilteredByLanguageAndName = emailMetadata.templates.filter { template =>
-        (template.lang.isEmpty || template.lang.contains(language)) && templateNameOpt.forall(template.name == _)
+    // 2) Consider only templates with enableIfTrue expression, if any, evaluating to true
+    val enabledTemplates = templatesFilteredByLanguageAndName.filter { template =>
+      template.enableIfTrue.forall { expression =>
+        evaluatedExpressionAsBoolean(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression)).getBooleanValue
       }
+    }
 
-      // 2) Consider only templates with enableIfTrue expression, if any, evaluating to true
-      val enabledTemplates = templatesFilteredByLanguageAndName.filter { template =>
-        template.enableIfTrue.forall { expression =>
-          evaluatedExpressionAsBoolean(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression)).getBooleanValue
-        }
-      }
+    // 3) Consider first template or all templates
+    val firstOrAllTemplates = templateMatch match {
+      case TemplateMatch.First => enabledTemplates.take(1)
+      case TemplateMatch.All   => enabledTemplates
+    }
 
-      // 3) Consider first template or all templates
-      val firstOrAllTemplates = templateMatch match {
-        case TemplateMatch.First => enabledTemplates.take(1)
-        case TemplateMatch.All   => enabledTemplates
-      }
-
-      // For each email template, generate email content
-      firstOrAllTemplates.map { template =>
-        EmailContent(
-          formDefinition         = formDefinition.rootElement,
-          formData               = frc.formInstance.root,
-          emailDataFormatVersion = emailDataFormatVersion,
-          urisByRenderedFormat   = urisByRenderedFormat,
-          template               = template,
-          parameters             = emailMetadata.params
-        )
-      }
+    // For each email template, generate email content
+    firstOrAllTemplates.map { template =>
+      EmailContent(
+        formDefinition         = formDefinition.rootElement,
+        formData               = frc.formInstance.root,
+        emailDataFormatVersion = emailDataFormatVersion,
+        urisByRenderedFormat   = urisByRenderedFormat,
+        template               = template,
+        parameters             = emailMetadata.params
+      )
     }
   }
 

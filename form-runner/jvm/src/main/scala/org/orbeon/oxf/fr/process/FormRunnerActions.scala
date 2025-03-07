@@ -20,8 +20,10 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
+import org.orbeon.oxf.fr.email.EmailMetadata
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.permission.ModeType
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -37,6 +39,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
 import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.submission.ReplaceType
 import org.orbeon.saxon.functions.EscapeURI
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
@@ -107,13 +110,26 @@ trait FormRunnerActions
 
   def trySendEmail(params: ActionParams): ActionResult =
     ActionResult.trySync {
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                 = CoreCrossPlatformSupport
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 
+      val formDefinition = PersistenceApi.readPublishedFormDefinition(
+        appName  = formRunnerParams.app,
+        formName = formRunnerParams.form,
+        version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
+      ).get._1._2
+
+      val emailMetadataNodeOpt = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
+      val emailMetadata        = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
+
+      val pdfRequiredByTemplate = emailMetadata.templates.exists(_.attachPdf.contains(true))
+
       val selectedRenderFormats =
         RenderedFormat.values filter { format =>
-          booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}")
+          booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}") ||
+          (format == RenderedFormat.Pdf && pdfRequiredByTemplate)
         }
 
       selectedRenderFormats foreach
@@ -160,7 +176,14 @@ trait FormRunnerActions
       if (s3Store) {
         val templateMatch = templateMatchParam.trimAllToOpt.map(TemplateMatch.withName).getOrElse(TemplateMatch.First)
 
-        storeEmailContentsToS3(params, urisByRenderedFormat, emailDataFormatVersion, templateMatch).get
+        storeEmailContentsToS3(
+          formDefinition,
+          emailMetadata,
+          params,
+          urisByRenderedFormat,
+          emailDataFormatVersion,
+          templateMatch
+        ).get
       }
 
       // S3 tests disable the actual sending of email (this parameter is not documented)
@@ -172,12 +195,15 @@ trait FormRunnerActions
     }
 
   private def storeEmailContentsToS3(
-    params                : ActionParams,
-    urisByRenderedFormat  : Map[RenderedFormat, URI],
-    emailDataFormatVersion: DataFormatVersion,
-    templateMatch         : TemplateMatch
+    formDefinition          : om.DocumentInfo,
+    emailMetadata           : EmailMetadata.Metadata,
+    params                  : ActionParams,
+    urisByRenderedFormat    : Map[RenderedFormat, URI],
+    emailDataFormatVersion  : DataFormatVersion,
+    templateMatch           : TemplateMatch
   )(implicit
-    formRunnerParams      : FormRunnerParams,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    formRunnerParams        : FormRunnerParams
   ): Try[Unit] = {
 
     val formData = frc.formInstance.root
@@ -205,9 +231,9 @@ trait FormRunnerActions
         .getOrElse("")
     }
 
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-
-    val emailContentsTry = emailContents(
+    val emailContentsFromTemplates = emailContents(
+      formDefinition         = formDefinition,
+      emailMetadata          = emailMetadata,
       urisByRenderedFormat   = urisByRenderedFormat,
       emailDataFormatVersion = emailDataFormatVersion,
       templateMatch          = templateMatch,
@@ -216,14 +242,13 @@ trait FormRunnerActions
     )
 
     for {
-      emailContents <- emailContentsTry
       s3Config      <- S3Config.fromProperties(s3ConfigName)
       _             <- {
         // Implicits in for comprehensions supported in Scala 3 only
         implicit val _s3Config: S3Config = s3Config
 
         S3.withS3Client { implicit s3Client =>
-          TryUtils.sequenceLazily(emailContents) { emailContent =>
+          TryUtils.sequenceLazily(emailContentsFromTemplates) { emailContent =>
             for {
               // Evaluate the s3-path parameter/property for each email, as the evaluation might return a different
               // value for each call (e.g. date/time function)

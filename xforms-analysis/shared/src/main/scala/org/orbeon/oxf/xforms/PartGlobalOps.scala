@@ -62,6 +62,8 @@ trait PartGlobalOps {
   def hasAttributeControl(prefixedForAttribute: String): Boolean
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
 
+  def getSelect1Groups(groupName: String): List[SelectionControl]
+
   // Client-side assets
   def scriptsByPrefixedId: Map[String, StaticScript]
   def uniqueJsScripts: List[ShareableScript]

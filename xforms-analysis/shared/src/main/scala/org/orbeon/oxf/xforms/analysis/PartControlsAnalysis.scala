@@ -71,6 +71,18 @@ trait PartControlsAnalysis extends TransientState {
       }
     }
 
+  private var _select1Groups: Map[String, List[SelectionControl]] = Map.empty
+
+  def indexSelect1Groups(select1Groups: mutable.Map[String, mutable.Buffer[SelectionControl]]): Unit =
+    _select1Groups = select1Groups.foldLeft(_select1Groups) {
+      case (existingMap, (groupName, select1Group)) =>
+        val existingSelect1Group = existingMap.getOrElse(groupName, Nil)
+        existingMap + (groupName -> (existingSelect1Group ++ select1Group))
+    }
+
+  def getSelect1Groups(groupName: String): List[SelectionControl] =
+    _select1Groups.getOrElse(groupName, Nil)
+
   def controlElement(prefixedId: String): Option[om.NodeInfo] =
     findControlAnalysis(prefixedId) map { control =>
       wrapElement(control.element)

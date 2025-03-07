@@ -79,6 +79,7 @@ object XFormsStaticStateDeserializer {
       val eventHandlers      = mutable.Buffer[EventHandler]()
       val models             = mutable.Buffer[Model]()
       val attributes         = mutable.Buffer[AttributeControl]()
+      val select1Groups      = mutable.Map[String, mutable.Buffer[SelectionControl]]()
 
       var namespaces         = Map[String, NamespaceMapping]()
 
@@ -101,6 +102,7 @@ object XFormsStaticStateDeserializer {
           case e: EventHandler                                                          => eventHandlers += e
           case e: Model                                                                 => models        += e
           case e: AttributeControl                                                      => attributes    += e
+          case e: SelectionControl if e.groupName.isDefined                             => select1Groups.getOrElseUpdate(e.groupName.get, mutable.Buffer()) += e
           case _                                                                        =>
         }
       }
@@ -975,6 +977,7 @@ object XFormsStaticStateDeserializer {
           Index.eventHandlers,
           Index.models,
           Index.attributes,
+          Index.select1Groups,
           Index.namespaces,
           functionLibrary
         )
@@ -1171,6 +1174,7 @@ object TopLevelPartAnalysisImpl {
     eventHandlers        : mutable.Buffer[EventHandler],
     models               : mutable.Buffer[Model],
     attributes           : mutable.Buffer[AttributeControl],
+    select1Groups        : mutable.Map[String, mutable.Buffer[SelectionControl]],
     namespaces           : Map[String, NamespaceMapping],
     _functionLibrary     : FunctionLibrary)(implicit
     logger               : IndentedLogger
@@ -1241,6 +1245,7 @@ object TopLevelPartAnalysisImpl {
 
     partAnalysis.registerEventHandlers(eventHandlers)
     partAnalysis.indexAttributeControls(attributes)
+    partAnalysis.indexSelect1Groups(select1Groups)
 
 //    ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, container)
 

@@ -20,8 +20,8 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, SelectionControlTrait}
-import org.orbeon.oxf.xforms.control.ControlAjaxSupport.outputAriaDiff
 import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.outputAriaDiff
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -36,6 +36,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.*
+import shapeless.syntax.typeable.*
 
 import scala.util.control.NonFatal
 
@@ -75,10 +76,6 @@ class XFormsSelect1Control(
     if (restoreState)
       getItemset(collector)
   }
-
-  // The static control ensures that this can be present only for `xf|select1[appearance = full]`
-  def getGroupName: Option[String] =
-    extensionAttributeValue(XXFORMS_GROUP_QNAME)
 
   override def hasJavaScriptInitialization: Boolean =
     staticControl.appearances contains XFORMS_COMPACT_APPEARANCE_QNAME
@@ -169,6 +166,22 @@ class XFormsSelect1Control(
         getCurrentItemValueFromData(boundItem, collector),
         externalValue
       )
+
+    // https://github.com/orbeon/orbeon-forms/issues/5699
+    // If we are selecting a value, deselect all other controls in the same named group if any. The other controls are
+    // searched in the current scope, and should be in the same repeat iteration.
+    if (selectEvents.nonEmpty && externalValue != "")
+      staticControl.groupName.foreach { groupName =>
+        container
+          .partAnalysis
+          .getSelect1Groups(groupName)
+          .iterator
+          .filter(_ ne staticControl)
+          .flatMap(other => container.resolveObjectByIdInScope(this.effectiveId, other.staticId))
+          .flatMap(_.narrowTo[XFormsSelect1Control])
+          .filter(_.isRelevant)
+          .foreach(_.storeExternalValue("", collector))
+      }
 
     for (currentEvent <- deselectEvents)
       Dispatch.dispatchEvent(currentEvent, collector)
@@ -368,7 +381,7 @@ class XFormsSelect1Control(
     val outputNestedContent = (ch: XMLReceiverHelper) => {
 
       val atts =
-        getGroupName.map(name => Array("group", name)).getOrElse(Array.empty)
+        staticControl.groupName.map(name => Array("group", name)).getOrElse(Array.empty)
 
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", atts)
 

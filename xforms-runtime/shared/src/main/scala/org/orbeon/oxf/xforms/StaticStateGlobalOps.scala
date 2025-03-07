@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, SelectionControl}
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, NestedPartAnalysis, PartAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.xbl.XBLAssets
@@ -85,6 +85,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))
   def getAttributeControl(prefixedForAttribute: String, attributeName: String) = findInParts(_.getAttributeControl(prefixedForAttribute, attributeName)).orNull
+
+  def getSelect1Groups(groupName: String): List[SelectionControl] = findInParts(_.getSelect1Groups(groupName)).getOrElse(Nil)
 
   def iterateGlobals = iterateInParts(_.iterateGlobals)
 

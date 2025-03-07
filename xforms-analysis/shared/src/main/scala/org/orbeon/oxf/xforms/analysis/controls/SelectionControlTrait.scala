@@ -36,6 +36,12 @@ trait SelectionControlTrait
   val isNorefresh: Boolean =
     element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
 
+  val groupName: Option[String] =
+    if (isFull)
+      element.attributeValueOpt(XXFORMS_GROUP_QNAME)
+    else
+      None
+
   final var itemsetAnalysis: Option[XPathAnalysis] = None
 
   def staticItemset: Option[Itemset]

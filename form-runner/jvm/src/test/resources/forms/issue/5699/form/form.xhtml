@@ -1,0 +1,238 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <button-1/>
+                            <control-1/>
+                            <button-2/>
+                            <control-2/>
+                            <button-3/>
+                            <control-3/>
+                        </grid-1>
+
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="button-1-bind" ref="button-1" name="button-1"/>
+                        <xf:bind id="button-2-bind" ref="button-2" name="button-2"/>
+                        <xf:bind id="button-3-bind" ref="button-3" name="button-3"/>
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" calculate="$button-1"
+                                 readonly="false()"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" calculate="$button-2"
+                                 readonly="false()"/>
+                        <xf:bind id="control-3-bind" ref="control-3" name="control-3" calculate="$button-3"
+                                 readonly="false()"/>
+                    </xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>5699</form-name>
+                    <title xml:lang="en">Improve radio buttons xxf:group support #5699</title>
+                    <description xml:lang="en"/>
+                    <grid-tab-order>default</grid-tab-order>
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <button-1>
+                            <label>Button 1</label>
+                            <hint/>
+
+
+                            <item>
+                                <label>Button 1</label>
+                                <hint/>
+                                <value>true</value>
+                            </item>
+                        </button-1>
+                        <control-1>
+                            <label>Button 1 value</label>
+                            <hint/>
+                        </control-1>
+                        <button-2>
+                            <label>Button 2</label>
+                            <hint/>
+
+
+                            <item>
+                                <label>Button 1</label>
+                                <hint/>
+                                <value>true</value>
+                            </item>
+                        </button-2>
+                        <control-2>
+                            <label>Button 2 value</label>
+                            <hint/>
+                        </control-2>
+                        <button-3>
+                            <label>Button 3</label>
+                            <hint/>
+
+
+                            <item>
+                                <label>Button 1</label>
+                                <hint/>
+                                <value>true</value>
+                            </item>
+                        </button-3>
+                        <control-3>
+                            <label>Button 3 value</label>
+                            <hint/>
+                        </control-3>
+                        <section-1>
+                            <label/>
+                        </section-1>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="button-1-control"
+                                        appearance="full"
+                                        xxf:group="my-button-group"
+                                        bind="button-1-bind">
+                                <xf:label ref="$form-resources/button-1/label"/>
+                                <xf:hint ref="$form-resources/button-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/button-1/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-1-control"
+                                       bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="button-2-control"
+                                        appearance="full"
+                                        xxf:group="my-button-group"
+                                        bind="button-2-bind">
+                                <xf:label ref="$form-resources/button-2/label"/>
+                                <xf:hint ref="$form-resources/button-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/button-2/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-2-control"
+                                       bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="button-3-control"
+                                        appearance="full"
+                                        xxf:group="my-button-group"
+                                        bind="button-3-bind">
+                                <xf:label ref="$form-resources/button-3/label"/>
+                                <xf:hint ref="$form-resources/button-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/button-3/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-3-control"
+                                       bind="control-3-bind">
+                                <xf:label ref="$form-resources/control-3/label"/>
+                                <xf:hint ref="$form-resources/control-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

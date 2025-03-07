@@ -89,6 +89,7 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
   def registerEventHandlers(eventHandlers: Iterable[EventHandler])(implicit logger: IndentedLogger): Unit
   def gatherScripts(): Unit
   def indexAttributeControls(attributes: Iterable[AttributeControl]): Unit
+  def indexSelect1Groups(select1Groups: mutable.Map[String, mutable.Buffer[SelectionControl]]): Unit
 
   def iterateControlsNoModels: Iterator[ElementAnalysis]
   def iterateModels: Iterator[Model]
@@ -99,6 +100,7 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
+  def getSelect1Groups(groupName: String): List[SelectionControl]
 }
 
 trait NestedPartAnalysis

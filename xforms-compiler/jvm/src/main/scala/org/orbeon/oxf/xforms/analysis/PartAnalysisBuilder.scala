@@ -285,11 +285,12 @@ object PartAnalysisBuilder {
       val eventHandlers = mutable.Buffer[EventHandler]()
       val models        = mutable.Buffer[Model]()
       val attributes    = mutable.Buffer[AttributeControl]()
+      val select1Groups = mutable.Map[String, mutable.Buffer[SelectionControl]]()
 
       ElementAnalysisTreeBuilder.buildAllElemDescendants(
         partAnalysisCtx,
         container,
-        buildOne(partAnalysisCtx, _, _, _, _, indexNewControl(partAnalysisCtx, _, lhhas, eventHandlers, models, attributes)),
+        buildOne(partAnalysisCtx, _, _, _, _, indexNewControl(partAnalysisCtx, _, lhhas, eventHandlers, models, attributes, select1Groups)),
         ElementAnalysisTreeBuilder.componentChildrenForBindingUpdate(partAnalysisCtx, container).some // explicit children
       )
 
@@ -298,7 +299,8 @@ object PartAnalysisBuilder {
         models,
         lhhas,
         eventHandlers,
-        attributes
+        attributes,
+        select1Groups
       )
 
       ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, container)
@@ -313,7 +315,8 @@ object PartAnalysisBuilder {
     models         : Iterable[Model],
     lhhas          : Iterable[LHHAAnalysis],
     eventHandlers  : Iterable[EventHandler],
-    attributes     : Iterable[AttributeControl]
+    attributes     : Iterable[AttributeControl],
+    select1Groups  : mutable.Map[String, mutable.Buffer[SelectionControl]]
   )(implicit
     logger         : IndentedLogger
   ): Unit = {
@@ -326,6 +329,7 @@ object PartAnalysisBuilder {
     partAnalysisCtx.registerEventHandlers(eventHandlers)
     partAnalysisCtx.gatherScripts()
     partAnalysisCtx.indexAttributeControls(attributes)
+    partAnalysisCtx.indexSelect1Groups(select1Groups)
   }
 
   def rebuildBindTree(
@@ -387,6 +391,7 @@ object PartAnalysisBuilder {
       val eventHandlers = mutable.Buffer[EventHandler]()
       val models        = mutable.Buffer[Model]()
       val attributes    = mutable.Buffer[AttributeControl]()
+      val select1Groups = mutable.Map[String, mutable.Buffer[SelectionControl]]()
 
       // Create and index root control
       val rootControlPrefixedId = partAnalysisCtx.startScope.fullPrefix + Constants.DocumentId
@@ -407,11 +412,11 @@ object PartAnalysisBuilder {
           elementInParent  = elementInParentPartOpt
         )
 
-      indexNewControl(partAnalysisCtx, rootControlAnalysis, lhhas, eventHandlers, models, attributes)
+      indexNewControl(partAnalysisCtx, rootControlAnalysis, lhhas, eventHandlers, models, attributes, select1Groups)
 
       // Build the entire tree
       val buildOneGatherStuff: ElementAnalysisTreeBuilder.Builder =
-        buildOne(partAnalysisCtx, _, _, _, _, indexNewControl(partAnalysisCtx, _, lhhas, eventHandlers, models, attributes))
+        buildOne(partAnalysisCtx, _, _, _, _, indexNewControl(partAnalysisCtx, _, lhhas, eventHandlers, models, attributes, select1Groups))
 
       ElementAnalysisTreeBuilder.buildAllElemDescendants(partAnalysisCtx, rootControlAnalysis, buildOneGatherStuff)
 
@@ -449,7 +454,8 @@ object PartAnalysisBuilder {
         models,
         lhhas,
         eventHandlers,
-        attributes
+        attributes,
+        select1Groups
       )
 
       // Language on the root element is handled differently, but it must be done after the tree has been built
@@ -500,7 +506,8 @@ object PartAnalysisBuilder {
     lhhas           : mutable.Buffer[LHHAAnalysis],
     eventHandlers   : mutable.Buffer[EventHandler],
     models          : mutable.Buffer[Model],
-    attributes      : mutable.Buffer[AttributeControl]
+    attributes      : mutable.Buffer[AttributeControl],
+    select1Groups   : mutable.Map[String, mutable.Buffer[SelectionControl]]
   ): Unit = {
 
     indexNewControlOnly(partAnalysisCtx, elementAnalysis)
@@ -511,6 +518,7 @@ object PartAnalysisBuilder {
       case e: EventHandler                                                          => eventHandlers += e
       case e: Model                                                                 => models        += e
       case e: AttributeControl                                                      => attributes    += e
+      case e: SelectionControl if e.groupName.isDefined                             => select1Groups.getOrElseUpdate(e.groupName.get, mutable.Buffer()) += e
       case _                                                                        =>
     }
   }

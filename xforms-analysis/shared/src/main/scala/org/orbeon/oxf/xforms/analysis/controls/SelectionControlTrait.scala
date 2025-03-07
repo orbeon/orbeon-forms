@@ -65,8 +65,6 @@ object SelectionControlUtil {
   val AttributesToPropagate = List(CLASS_QNAME, STYLE_QNAME, XXFORMS_OPEN_QNAME)
   val TopLevelItemsetQNames = Set(XFORMS_ITEM_QNAME, XFORMS_ITEMSET_QNAME, XFORMS_CHOICES_QNAME)
 
-  def isTopLevelItemsetElement(e: Element): Boolean = TopLevelItemsetQNames(e.getQName)
-
   def getAttributes(itemChoiceItemset: Element): List[(QName, String)] =
     for {
       attributeName   <- AttributesToPropagate

@@ -16,6 +16,7 @@ object EmailMetadata {
     name                                 : String,
     lang                                 : Option[String],
     headers                              : List[(HeaderName, TemplateValue)],
+    enableIfTrue                         : Option[String],
     subject                              : Option[Part],
     body                                 : Option[Part],
     attachPdf                            : Option[Boolean],

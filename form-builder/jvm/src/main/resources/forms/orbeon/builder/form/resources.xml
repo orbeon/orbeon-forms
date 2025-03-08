@@ -554,7 +554,7 @@
             <control-name>
                 <label>Control Name</label>
                 <alert>Name is already in use or incorrect</alert>
-                <hint>E.g.: "first-name"</hint>
+                <hint>For example: "first-name"</hint>
             </control-name>
             <pdf-field-name>
                 <label>Name of the PDF field</label>
@@ -874,7 +874,7 @@
             <control-name>
                 <label>Name</label>
                 <alert>Name is already in use or incorrect</alert>
-                <hint>E.g.: "address"</hint>
+                <hint>For example: "address"</hint>
             </control-name>
             <grid-columns>
                 <label>Number of Grid Columns</label>
@@ -2120,7 +2120,7 @@
             <control-name>
                 <label>Nom du contrôle</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
-                <hint>E.g.: "nom-de-famille"</hint>
+                <hint>Par exemple: "nom-de-famille"</hint>
             </control-name>
             <pdf-field-name>
                 <label>Nom du champ PDF</label>

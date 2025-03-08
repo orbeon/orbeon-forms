@@ -611,14 +611,20 @@
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-container-settings/tab-base/label"/>
-
+                            <xf:var
+                                name="suggestion"
+                                value="
+                                    if ((matches($i/control-name, '^(section|grid)-[\d]+$') or xxf:is-blank($i/control-name)) and xxf:non-blank($i/label/value)) then
+                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $i/label/value)
+                                    else
+                                        ()"/>
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xf:input ref="control-name" incremental="true" id="control-name-input">
                                             <xf:label ref="$resources/dialog-container-settings/control-name/label"/>
                                             <xf:alert ref="$resources/dialog-container-settings/control-name/alert"/>
-                                            <xf:hint  ref="$resources/dialog-container-settings/control-name/hint"/>
+                                            <xf:hint  ref="if (exists($suggestion)) then () else $resources/dialog-container-settings/control-name/hint"/>
                                         </xf:input>
                                     </xh:td>
                                     <xh:td colspan="1">
@@ -642,7 +648,21 @@
                                     </xh:td>
                                 </xh:tr>
                                 <xh:tr>
-                                    <xh:td colspan="2"/>
+                                    <xh:td colspan="2">
+                                        <xf:trigger ref=".[exists($suggestion)]" appearance="minimal">
+                                            <xf:label
+                                                mediatype="text/html"
+                                                ref="
+                                                    xxf:format-message(
+                                                        xxf:r('suggestion.label', '|fr-form-resources|'),
+                                                        $suggestion
+                                                    )"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                ref="$i/control-name"
+                                                value="$suggestion"/>
+                                        </xf:trigger>
+                                    </xh:td>
                                     <xh:td colspan="2">
                                         <xf:select1 appearance="full xxf:horizontal" ref="grid-tab-order">
                                             <xf:label ref="$resources/dialog-container-settings/grid-tab-order/label"/>

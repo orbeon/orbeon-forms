@@ -94,7 +94,7 @@
                 <!-- Sending the submission directly from `fr:alert-dialog` doesn't seem to work -->
                 <xf:send submission="fr-acquire-lease-submission" xxbl:scope="outer">
                     <xf:property name="load-document"  value="event('load-document')"  xxf:tunnel="true"/>
-                    <xf:property name="refresh-needed" value="event('refresh-needed')" xxf:tunnel="true"/>
+                    <xf:property name="fr-data-ready-needed" value="event('fr-data-ready-needed')" xxf:tunnel="true"/>
                 </xf:send>
             </xbl:handler>
 
@@ -265,7 +265,7 @@
                         <xf:action event="DOMActivate">
                             <xf:dispatch name="fr-acquire-lease" targetid="fr-lease">
                                 <xf:property name="load-document" value="true()"/>
-                                <xf:property name="refresh-needed" value="$is-fb"/>
+                                <xf:property name="fr-data-ready-needed" value="$is-fb"/>
                             </xf:dispatch>
                         </xf:action>
                     </xf:trigger>

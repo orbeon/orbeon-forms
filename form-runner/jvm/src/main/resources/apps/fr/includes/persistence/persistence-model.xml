@@ -355,7 +355,7 @@
                 </xf:action>
 
                 <xf:action if="not($lease-enabled)">
-                    <xf:dispatch name="fr-load-document-handle-drafts" target="fr-persistence-model"/>
+                    <xf:dispatch name="fr-get-document-handle-drafts" target="fr-persistence-model"/>
                 </xf:action>
             </xf:action>
 
@@ -370,9 +370,23 @@
                 frf:sendError(403)
             </xf:action>
 
-            <!-- Notify that the data is ready (or not quite) -->
-            <xf:dispatch targetid="fr-form-model" name="fr-data-ready">
-                <!-- For sanity, include how we got the data -->
+            <xf:var
+                name="data-not-actually-ready"
+                value="
+                    $lease-state-elem = 'other-user' or
+                    instance('fr-persistence-instance')/found-document-message-to-show = (
+                        'found-multiple-docs-for-singleton',
+                        'found-draft-for-never-saved',
+                        'found-drafts-for-never-saved'
+                    )"/>
+
+            <!-- Notify that the data is ready if needed -->
+            <xf:dispatch
+                if="not($data-not-actually-ready)"
+
+                name="fr-data-ready"
+                targetid="fr-form-model">
+                <!-- How we got the data -->
                 <xf:property
                     name="data-source"
                     value="
@@ -380,12 +394,6 @@
                             'submit'
                         else if ($new-from-service) then
                             'service'
-                        else if (instance('fr-persistence-instance')/found-document-message-to-show = 'found-multiple-docs-for-singleton') then
-                            'none-singleton'
-                        else if (instance('fr-persistence-instance')/found-document-message-to-show = ('found-draft-for-never-saved', 'found-drafts-for-never-saved')) then
-                            'none-drafts'
-                        else if ($lease-state-elem = 'other-user') then
-                            'none-lease'
                         else if ($mode = ('new', 'test')) then
                             'template'
                         else
@@ -395,8 +403,8 @@
 
     </xf:action>
 
-    <!-- fr-load-document-handle-drafts($refresh-needed as xs:boolean) -->
-    <xf:action event="fr-load-document-handle-drafts">
+    <!-- fr-get-document-handle-drafts($fr-data-ready-needed as xs:boolean) -->
+    <xf:action event="fr-get-document-handle-drafts">
 
         <!-- Load document with the provided id from persistence layer -->
         <xf:message level="xxf:log-debug">Loading data by id from persistence layer: <xf:output value="$document"/></xf:message>
@@ -404,7 +412,7 @@
         <xf:action if="$draft-requested">
             <xf:send submission="fr-get-document-submission">
                 <xf:property name="data-or-draft"  value="'draft'"/>
-                <xf:property name="refresh-needed" value="event('refresh-needed')" xxf:tunnel="true"/>
+                <xf:property name="fr-data-ready-needed" value="event('fr-data-ready-needed')" xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
         <xf:action if="not($draft-requested)">
@@ -426,7 +434,7 @@
             <!-- Otherwise just load the data -->
             <xf:send if="not($draft-found)" submission="fr-get-document-submission">
                 <xf:property name="data-or-draft"  value="'data'"/>
-                <xf:property name="refresh-needed" value="event('refresh-needed')" xxf:tunnel="true"/>
+                <xf:property name="fr-data-ready-needed" value="event('fr-data-ready-needed')" xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
     </xf:action>
@@ -838,9 +846,10 @@
                 "/>
             <xf:dispatch
                 if="event('load-document') = true()"
-                name="fr-load-document-handle-drafts"
+
+                name="fr-get-document-handle-drafts"
                 targetid="fr-persistence-model">
-                <xf:property name="refresh-needed" value="event('refresh-needed')"/>
+                <xf:property name="fr-data-ready-needed" value="event('fr-data-ready-needed')"/>
             </xf:dispatch>
         </xf:action>
         <xf:action event="xforms-submit-error">
@@ -987,17 +996,18 @@
         <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
         <xf:recalculate model="fr-form-model"/>
 
-        <!-- This will be the case if the user uses the `try-acquire` button -->
-        <xf:action if="event('refresh-needed') = true()">
-            <!-- Notify that the data is ready -->
-            <xf:dispatch targetid="fr-form-model" name="fr-data-ready">
-                <xf:property
-                    name="data-source"
-                    value="'persistence'"/>
-            </xf:dispatch>
-            <!-- Unclear if this is needed here -->
-            <xf:refresh model="fr-form-model"/>
-        </xf:action>
+        <!-- During initialization, when `fr-get-document-submission` is called, we dispatch directly `fr-data-ready`.
+             Here, we dispatch it upon request by the user, at a later time. `fr-data-ready` is also dispatched
+             explicitly by Form Builder after loading a template. This should be improved. -->
+        <xf:dispatch
+            if="event('fr-data-ready-needed') = true()"
+
+            name="fr-data-ready"
+            targetid="fr-form-model">
+            <xf:property
+                name="data-source"
+                value="'persistence'"/>
+        </xf:dispatch>
     </xf:action>
 
     <xf:action

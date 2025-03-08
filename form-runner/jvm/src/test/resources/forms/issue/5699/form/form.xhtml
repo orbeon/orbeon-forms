@@ -28,6 +28,8 @@
                             <control-2/>
                             <button-3/>
                             <control-3/>
+                            <button-4/>
+                            <control-4/>
                         </grid-1>
 
                     </section-1>
@@ -47,6 +49,9 @@
                                  readonly="false()"/>
                         <xf:bind id="control-3-bind" ref="control-3" name="control-3" calculate="$button-3"
                                  readonly="false()"/>
+                        <xf:bind id="button-4-bind" ref="button-4" name="button-4"/>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" calculate="$button-4"
+                                 readonly="false()"/>
                     </xf:bind>
 
                 </xf:bind>
@@ -65,6 +70,7 @@
                         <orbeon>1</orbeon>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
                     <email>
                         <templates>
@@ -132,6 +138,32 @@
                             <label>Button 3 value</label>
                             <hint/>
                         </control-3>
+                        <button-4>
+                            <label>Button 3</label>
+                            <hint/>
+                            <item>
+                                <label>One</label>
+                                <hint/>
+                                <value>one</value>
+                            </item>
+                            <item>
+                                <label>Two</label>
+                                <hint/>
+                                <value>two</value>
+                            </item>
+                            <item>
+                                <label>Three</label>
+                                <hint/>
+                                <value>three</value>
+                            </item>
+
+
+
+                        </button-4>
+                        <control-4>
+                            <label>Button 3 value</label>
+                            <hint/>
+                        </control-4>
                         <section-1>
                             <label/>
                         </section-1>
@@ -225,6 +257,33 @@
                                        bind="control-3-bind">
                                 <xf:label ref="$form-resources/control-3/label"/>
                                 <xf:hint ref="$form-resources/control-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="6">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="button-4-control"
+                                        appearance="full"
+                                        xxf:group="my-button-group"
+                                        bind="button-4-bind">
+                                <xf:label ref="$form-resources/button-4/label"/>
+                                <xf:hint ref="$form-resources/button-4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/button-4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-4-control"
+                                       bind="control-4-bind">
+                                <xf:label ref="$form-resources/control-4/label"/>
+                                <xf:hint ref="$form-resources/control-4/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 

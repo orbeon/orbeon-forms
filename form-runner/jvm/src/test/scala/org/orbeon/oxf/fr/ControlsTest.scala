@@ -24,22 +24,23 @@ class ControlsTest
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
 
-            val LineCount = 3
+            val LineCount = 4
 
-            for (index <- 1 to LineCount) {
+            for (_ <- 1 to 2) // do it twice to check that the last select1 control is also cleared
+              for (index <- 1 to LineCount) {
 
-              val buttonControl = resolveObject[XFormsValueControl](s"button-$index-control").get
+                val buttonControl = resolveObject[XFormsValueControl](s"button-$index-control").get
 
-              setControlValueWithEventSearchNested(buttonControl.effectiveId, "0")
-              assert(buttonControl.getValue(EventCollector.Throw) == "true")
+                setControlValueWithEventSearchNested(buttonControl.effectiveId, "0")
+                assert(buttonControl.getValue(EventCollector.Throw) == (if (index == LineCount) "one" else "true")) // last select1 has multiple items
 
-              (1 to LineCount)
-                .filter(_ != index)
-                .map(i => resolveObject[XFormsValueControl](s"control-$i-control").get)
-                .foreach { control =>
-                  assert(control.getValue(EventCollector.Throw) == "")
-                }
-            }
+                (1 to LineCount)
+                  .filter(_ != index)
+                  .map(i => resolveObject[XFormsValueControl](s"control-$i-control").get)
+                  .foreach { control =>
+                    assert(control.getValue(EventCollector.Throw) == "")
+                  }
+              }
           }
         }
       }

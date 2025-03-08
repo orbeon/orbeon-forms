@@ -1132,7 +1132,7 @@
                             <xf:var
                                 name="suggestion"
                                 value="
-                                    if (matches($i/control-name, '^control-[\d]+$') and xxf:non-blank($i/label/value)) then
+                                    if ((matches($i/control-name, '^control-[\d]+$') or xxf:is-blank($i/control-name)) and xxf:non-blank($i/label/value)) then
                                         fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $i/label/value)
                                     else
                                         ()"/>

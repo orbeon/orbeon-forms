@@ -196,7 +196,7 @@ class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 
 object XXFormsUploadErrorEvent {
   // Attempt to retrieve a reason if any
-  def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
+  private def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
     target.cast[XFormsUploadControl].to(List) flatMap
       FileMetadata.progress                   flatMap {
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.EmptyFile))) =>
@@ -204,8 +204,8 @@ object XXFormsUploadErrorEvent {
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.SizeTooLarge(permitted, actual)))) =>
         List(
           "error-type" -> Some("size-error"),
-          "permitted"  -> Some(ByteSizeUtils.byteCountToDisplaySize(permitted)),
-          "actual"     -> Some(ByteSizeUtils.byteCountToDisplaySize(actual))
+          "permitted"  -> Some(ByteSizeUtils.byteCountToFullDisplaySize(permitted)),
+          "actual"     -> Some(ByteSizeUtils.byteCountToFullDisplaySize(actual))
         )
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)))) =>
         List(

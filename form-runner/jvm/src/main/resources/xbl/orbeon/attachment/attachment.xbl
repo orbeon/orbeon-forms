@@ -414,7 +414,7 @@
 
                         <xf:output
                             xmlns:filemetadata="java:org.orbeon.oxf.xforms.control.controls.FileMetadata"
-                            value="filemetadata:humanReadableBytes(@size)"
+                            value="filemetadata:humanReadableBytesCompact(@size)"
                             class="fr-attachment-size"/>
 
                         <xf:trigger ref="." appearance="minimal" class="fr-attachment-remove" xxf:title="{xxf:r('remove')}">

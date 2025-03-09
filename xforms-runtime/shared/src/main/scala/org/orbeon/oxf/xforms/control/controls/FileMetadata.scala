@@ -79,7 +79,7 @@ trait FileMetadata extends XFormsValueControl {
   }
 
   def humanReadableFileSize(collector: ErrorEventCollector): Option[String] =
-    fileSize(collector) filter (_.nonAllBlank) map humanReadableBytes
+    fileSize(collector) filter (_.nonAllBlank) map humanReadableBytesCompact
 
   // "Instant" evaluators which go straight to the bound nodes if possible
   def boundFileMediatype(collector: ErrorEventCollector): String = Evaluators("mediatype").evaluate(self, collector)
@@ -206,7 +206,7 @@ object FileMetadata {
 
   // Format a string containing a number of bytes to a human-readable string
   // If the input string doesn't represent a `Long`, return the string unchanged
-  def humanReadableBytes(size: String): String =
-    try ByteSizeUtils.byteCountToDisplaySize(size.toLong)
+  def humanReadableBytesCompact(size: String): String =
+    try ByteSizeUtils.byteCountToCompactDisplaySize(size.toLong)
     catch { case NonFatal(_) => size }
 }

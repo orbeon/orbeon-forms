@@ -124,8 +124,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     this,
                     Map(
                       "error-type" -> Some("size-error"),
-                      "permitted"  -> Some(ByteSizeUtils.byteCountToDisplaySize(maxSize)),
-                      "actual"     -> Some(ByteSizeUtils.byteCountToDisplaySize(size))
+                      "permitted"  -> Some(ByteSizeUtils.byteCountToFullDisplaySize(maxSize)),
+                      "actual"     -> Some(ByteSizeUtils.byteCountToFullDisplaySize(size))
                     )
                   ),
                   collector

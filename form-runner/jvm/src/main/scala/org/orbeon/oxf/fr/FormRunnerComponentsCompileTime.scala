@@ -181,7 +181,7 @@ trait FormRunnerComponentsCompileTime {
                               ValidationFunctionNames.UploadMaxSizeAggregatePerControl |
                               // Backward compatibility
                               ValidationFunctionNames.UploadMaxSize), Some(value)) =>
-        val displaySizeOpt = value.toLongOption.map(ByteSizeUtils.byteCountToDisplaySize)
+        val displaySizeOpt = value.toLongOption.map(ByteSizeUtils.byteCountToCompactDisplaySize)
         displaySizeOpt.map { displaySize =>
           hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$displaySize'")
         }

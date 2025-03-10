@@ -14,9 +14,12 @@
 package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
+import org.orbeon.oxf.fr.Names.ResourcesModel
 import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelModel
 import org.scalatest.Tag
 import org.scalatest.funspec.AnyFunSpecLike
 import software.amazon.awssdk.services.s3.S3Client
@@ -108,14 +111,23 @@ class S3Test
       }
 
       it("must store expected S3 objects when email templates are selected by name", S3Tag) {
-        val allTemplateNames                = templates.map(_.name)
-        val staticallyDisabledTemplateNames = templates.filter(_.staticEnable.contains(false)).map(_.name).toSet
+        val expectedTemplates = List(
+          "0" -> List("0"),
+          "1" -> List("1"),
+          "2" -> List("2"),
+          "3" -> List("3"),
+          "4" -> List("4"),
+          "5" -> List("5"),
+          "6" -> List(),    // Excluded because of "enable if true" XPath expression (static)
+          "7" -> List("7"),
+          "8" -> List(),    // Excluded because of language
+          "9" -> List()     // Excluded because of "enable if true" XPath expression (dynamic)
+        )
 
         for {
-          templateName       <- allTemplateNames
-          staticallyDisabled = staticallyDisabledTemplateNames.contains(templateName)
+          (templateName, expectedTemplateNames) <- expectedTemplates
           // Try with no match param (defaults to "first) and match=first
-          matchParam         <- List(None, Some("first"))
+          matchParam                            <- List(None, Some("first"))
         } {
           testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
             // Select email template by name and match first template only
@@ -123,10 +135,7 @@ class S3Test
 
             sendEmail(s3Store = true, s3PathOpt = s3Path.some, params *)
 
-            val storedTemplates = checkS3PathAgainstTemplateDefinitions(s3Path)
-
-            val expectedTemplateNames = if (staticallyDisabled) Set.empty else Set(templateName)
-            val actualTemplateNames   = storedTemplates.map(_.name).toSet
+            val actualTemplateNames = checkS3PathAgainstTemplateDefinitions(s3Path).map(_.name)
 
             assert(
               expectedTemplateNames == actualTemplateNames,
@@ -138,14 +147,11 @@ class S3Test
 
       it("must store expected S3 objects when all email templates are selected", S3Tag) {
         testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
-          // Select all email templates
+          // Select all email templates (current language is the default one, i.e. "en")
           sendEmail(s3Store = true, s3PathOpt = s3Path.some, "match" -> "all")
 
-          val storedTemplates = checkS3PathAgainstTemplateDefinitions(s3Path)
-
-          // We should select all templates that are not statically disabled
-          val expectedTemplateNames = templates.filterNot(_.staticEnable.contains(false)).map(_.name)
-          val actualTemplateNames   = storedTemplates.map(_.name)
+          val expectedTemplateNames = List("0", "1", "2", "3", "4", "5", "7")
+          val actualTemplateNames   = checkS3PathAgainstTemplateDefinitions(s3Path).map(_.name)
 
           assert(
             expectedTemplateNames == actualTemplateNames,
@@ -154,13 +160,54 @@ class S3Test
         }
       }
 
-      // TODO: check template selection by language
-      // TODO: check dynamic template enabling/disabling (e.g. using a control value as a condition)
+      it("must store expected S3 objects when non-default language is selected", S3Tag) {
+        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+          // Select a non-default language
+          setLang("fr")
+
+          // Select all email templates (current language is "fr")
+          sendEmail(s3Store = true, s3PathOpt = s3Path.some, "match" -> "all")
+
+          // We should select all templates that are not statically disabled
+          val expectedTemplateNames = List("0", "1", "2", "3", "4", "5", "8")
+          val actualTemplateNames   = checkS3PathAgainstTemplateDefinitions(s3Path).map(_.name)
+
+          assert(
+            expectedTemplateNames == actualTemplateNames,
+            s"Unexpected stored templates: expected=${expectedTemplateNames.mkString(", ")}, actual=${actualTemplateNames.mkString(", ")}"
+          )
+        }
+      }
+
+      it("must store expected S3 objects when dynamic 'enable if true' expression specified", S3Tag) {
+        val expectedTemplates = List(
+          "disabled" -> List(),
+          "enabled"  -> List("9")
+        )
+
+        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+
+          for ((controlValue, expectedTemplateNames) <- expectedTemplates) {
+            // Set the control value to enable or disable the template
+            setControlValue("section-1-section≡grid-1-grid≡control-text-control", controlValue)
+
+            sendEmail(s3Store = true, s3PathOpt = s3Path.some, "template" -> "9")
+
+            val actualTemplateNames   = checkS3PathAgainstTemplateDefinitions(s3Path).map(_.name)
+
+            assert(
+              actualTemplateNames == expectedTemplateNames,
+              s"Unexpected stored templates: expected=${expectedTemplateNames.mkString(", ")}, actual=${actualTemplateNames.mkString(", ")}"
+            )
+          }
+        }
+      }
     }
   }
 
   case class Template(
     name        : String,
+    langOpt     : Option[String],
     staticEnable: Option[Boolean],
     pdf         : Option[Boolean],
     xml         : Option[Boolean],
@@ -171,17 +218,25 @@ class S3Test
   // match the email template used, as we have currently no way to include the email template name anywhere in the
   // email content.
   protected val templates = List(
-    Template("0", staticEnable = None      , pdf = None      , xml = None      , files = Set.empty),
-    Template("1", staticEnable = None      , pdf = false.some, xml = false.some, files = Set("1.txt")),
-    Template("2", staticEnable = None      , pdf = false.some, xml = true.some , files = Set("2.txt")),
-    Template("3", staticEnable = None      , pdf = true.some , xml = false.some, files = Set("3.txt")),
-    Template("4", staticEnable = None      , pdf = true.some , xml = true.some , files = Set("4.txt")),
-    Template("5", staticEnable = true.some , pdf = None      , xml = None      , files = Set("1.txt", "2.txt", "3.txt", "4.txt")),
-    Template("6", staticEnable = false.some, pdf = None      , xml = None      , files = Set("1.txt", "2.txt"))
+    Template("0", langOpt = None     , staticEnable = None      , pdf = None      , xml = None      , files = Set.empty),
+    Template("1", langOpt = None     , staticEnable = None      , pdf = false.some, xml = false.some, files = Set("1.txt")),
+    Template("2", langOpt = None     , staticEnable = None      , pdf = false.some, xml = true.some , files = Set("2.txt")),
+    Template("3", langOpt = None     , staticEnable = None      , pdf = true.some , xml = false.some, files = Set("3.txt")),
+    Template("4", langOpt = None     , staticEnable = None      , pdf = true.some , xml = true.some , files = Set("4.txt")),
+    Template("5", langOpt = None     , staticEnable = true.some , pdf = None      , xml = None      , files = Set("1.txt", "2.txt", "3.txt", "4.txt")),
+    Template("6", langOpt = None     , staticEnable = false.some, pdf = None      , xml = None      , files = Set("1.txt", "2.txt")),
+    Template("7", langOpt = "en".some, staticEnable = None      , pdf = None      , xml = None      , files = Set("1.txt", "2.txt", "3.txt")),
+    Template("8", langOpt = "fr".some, staticEnable = None      , pdf = None      , xml = None      , files = Set("1.txt", "3.txt", "4.txt")),
+    Template("9", langOpt = None     , staticEnable = None      , pdf = None      , xml = None      , files = Set("2.txt", "3.txt", "4.txt"))
   )
 
   protected val DefaultAttachPdf = false // Should match oxf.fr.email.attach-pdf.issue.6751
   protected val DefaultAttachXml = true  // Should match oxf.fr.email.attach-xml.issue.6751
+
+  protected def setLang(lang: String): Unit =
+    List("lang", "fr-lang").foreach { variable =>
+      XFormsAPI.setvalue(Seq(topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo(variable)), lang)
+    }
 
   // The following method will list the S3 objects in a path and try to find matching email templates, based on the
   // files attached.

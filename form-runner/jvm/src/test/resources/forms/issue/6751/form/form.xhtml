@@ -27,6 +27,7 @@
                             <control-2 filename="2.txt" mediatype="text/plain" size="1">/fr/service/persistence/crud/issue/6751/form/bb8c6604c759a3347b5c1f3cf6125c2d7ca7ae7f.bin</control-2>
                             <control-3 filename="3.txt" mediatype="text/plain" size="1">/fr/service/persistence/crud/issue/6751/form/e5a67819ac4906887d951199b17d9750b77d7c5c.bin</control-3>
                             <control-4 filename="4.txt" mediatype="text/plain" size="1">/fr/service/persistence/crud/issue/6751/form/5964613a644a03d9d96c3106136bca3369269710.bin</control-4>
+                            <control-text></control-text>
                         </grid-1>
                     </section-1>
                 </form>
@@ -39,6 +40,7 @@
                         <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="xf:anyURI"></xf:bind>
                         <xf:bind id="control-3-bind" ref="control-3" name="control-3" type="xf:anyURI"></xf:bind>
                         <xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:anyURI"></xf:bind>
+                        <xf:bind id="control-text-bind" ref="control-text" name="control-text" xxf:whitespace="trim"></xf:bind>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -49,58 +51,92 @@
                     <form-name>6751</form-name>
                     <title xml:lang="en">Issue #6751</title>
                     <description xml:lang="en"></description>
+                    <title xml:lang="fr">Issue #6751</title>
+                    <description xml:lang="fr"></description>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <email>
                         <templates>
                             <template name="0">
-                                <headers/>
-                                <attach files="none"/>
-                                <exclude-from-all-control-values/>
+                                <headers></headers>
+                                <attach files="none"></attach>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                             <template name="1">
-                                <headers/>
-                                <attach files="selected" pdf="false" xml="false">
+                                <headers></headers>
+                                <attach pdf="false" xml="false" files="selected">
                                     <control type="control-value">control-1</control>
                                 </attach>
-                                <exclude-from-all-control-values/>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                             <template name="2">
-                                <headers/>
-                                <attach files="selected" pdf="false" xml="true">
+                                <headers></headers>
+                                <attach pdf="false" xml="true" files="selected">
                                     <control type="control-value">control-2</control>
                                 </attach>
-                                <exclude-from-all-control-values/>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                             <template name="3">
-                                <headers/>
-                                <attach files="selected" pdf="true" xml="false">
+                                <headers></headers>
+                                <attach pdf="true" xml="false" files="selected">
                                     <control type="control-value">control-3</control>
                                 </attach>
-                                <exclude-from-all-control-values/>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                             <template name="4">
-                                <headers/>
-                                <attach files="selected" pdf="true" xml="true">
+                                <headers></headers>
+                                <attach pdf="true" xml="true" files="selected">
                                     <control type="control-value">control-4</control>
                                 </attach>
-                                <exclude-from-all-control-values/>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                             <template name="5">
+                                <headers></headers>
                                 <enable-if-true>true()</enable-if-true>
-                                <attach files="all"/>
+                                <attach files="all"></attach>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                             <template name="6">
+                                <headers></headers>
                                 <enable-if-true>false()</enable-if-true>
                                 <attach files="selected">
-                                    <control>control-1</control>
-                                    <control>control-2</control>
+                                    <control type="control-value">control-1</control>
+                                    <control type="control-value">control-2</control>
                                 </attach>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
+                            </template>
+                            <template name="7" xml:lang="en">
+                                <headers></headers>
+                                <attach files="selected">
+                                    <control type="control-value">control-1</control>
+                                    <control type="control-value">control-2</control>
+                                    <control type="control-value">control-3</control>
+                                </attach>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
+                            </template>
+                            <template name="8" xml:lang="fr">
+                                <headers></headers>
+                                <attach files="selected">
+                                    <control type="control-value">control-1</control>
+                                    <control type="control-value">control-3</control>
+                                    <control type="control-value">control-4</control>
+                                </attach>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
+                            </template>
+                            <template name="9">
+                                <headers></headers>
+                                <enable-if-true>$control-text='enabled'</enable-if-true>
+                                <attach files="selected">
+                                    <control type="control-value">control-2</control>
+                                    <control type="control-value">control-3</control>
+                                    <control type="control-value">control-4</control>
+                                </attach>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
                             </template>
                         </templates>
                         <parameters></parameters>
                     </email>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
-                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-2"},{"value":"control-3"},{"value":"control-4"}],"topLevel":true}]}</migration>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-2"},{"value":"control-3"},{"value":"control-4"},{"value":"control-text"}],"topLevel":true}]}</migration>
                 </metadata>
             </xf:instance>
             <!-- Attachments -->
@@ -127,6 +163,35 @@
                             <label>File Attachment 4</label>
                             <hint></hint>
                         </control-4>
+                        <control-text>
+                            <label>Text Field</label>
+                            <hint></hint>
+                        </control-text>
+                        <section-1>
+                            <label></label>
+                        </section-1>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <control-1>
+                            <label>File Attachment 1</label>
+                            <hint></hint>
+                        </control-1>
+                        <control-2>
+                            <label>File Attachment 2</label>
+                            <hint></hint>
+                        </control-2>
+                        <control-3>
+                            <label>File Attachment 3</label>
+                            <hint></hint>
+                        </control-3>
+                        <control-4>
+                            <label>File Attachment 4</label>
+                            <hint></hint>
+                        </control-4>
+                        <control-text>
+                            <label>Text Field</label>
+                            <hint></hint>
+                        </control-text>
                         <section-1>
                             <label></label>
                         </section-1>
@@ -138,8 +203,8 @@
     <xh:body>
         <fr:view>
             <fr:body
-                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
@@ -179,6 +244,15 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
                             </fr:attachment>
                         </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <xf:input
+                                    xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-text-control" bind="control-text-bind">
+                                <xf:label ref="$form-resources/control-text/label"></xf:label>
+                                <xf:hint ref="$form-resources/control-text/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6"></fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

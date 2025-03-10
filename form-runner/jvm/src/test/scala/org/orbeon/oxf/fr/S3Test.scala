@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.Names.ResourcesModel
-import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -68,18 +67,16 @@ class S3Test
 
     describe("#6751: Store all attachments sent by email in AWS S3") {
 
-      val (processorService, docOpt, _) =
-        runFormRunner("issue", "6751", "new", initialize = true)
-
-      val doc = docOpt.get
-
       def testWithS3Config(configName: String)(body: S3Config => String => S3Client => Unit): Unit =
         withTestExternalContext { _ =>
-          withFormRunnerDocument(processorService, doc) {
+          // It's important to use a new document for each test, as URLs to dynamic resources for rendered formats
+          // (e.g. PDF) are stored in a document instance, but dynamic resources are tracked in XFormsAssetServerRoute
+          // in the session attributes, and a new session is used for each test.
+          val (processorService, docOpt, _) = runFormRunner("issue", "6751", "new", initialize = true)
+
+          withFormRunnerDocument(processorService, doc = docOpt.get) {
             withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>
               S3.withS3Client { implicit s3Client =>
-                clearRenderedFormatsResources()
-
                 body(s3Config)(s3Path)(s3Client)
               }
             }

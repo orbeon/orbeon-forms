@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
-import java.io.Writer
+import java.io.{OutputStream, Writer}
 import java.net.URL
 import scala.util.Try
 
@@ -53,8 +53,11 @@ class ServletEmbeddingContextWithResponse(
   httpClient
 ) with EmbeddingContextWithResponse {
 
-  def writer                                 = out.fold(identity, _.getWriter)
-  def outputStream                           = Try(out.fold(_ => throw new IllegalStateException, _.getOutputStream))
+  def output: Either[Writer, OutputStream] = out.fold(
+    writer   => Left(writer),
+    response => Right(response.getOutputStream)
+  )
+
   def setHeader(name: String, value: String) = out.foreach(_.setHeader(name, value))
   override def setStatusCode(code: Int)      = out.foreach(_.setStatus(code))
 

@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.xforms.Constants
 
 import java.io.{OutputStream, Writer}
+import scala.Either
 import scala.util.Try
 import scala.util.matching.Regex
 
@@ -63,9 +64,8 @@ trait EmbeddingContext {
   def client                                           : String
 }
 
-trait EmbeddingContextWithResponse extends EmbeddingContext{
-  def writer                                 : Writer
-  def outputStream                           : Try[OutputStream]
+trait EmbeddingContextWithResponse extends EmbeddingContext {
+  def output                                 : Writer Either OutputStream
   def setHeader(name: String, value: String) : Unit
   def setStatusCode(code: Int)               : Unit
   def decodeURL(encoded: String)             : String

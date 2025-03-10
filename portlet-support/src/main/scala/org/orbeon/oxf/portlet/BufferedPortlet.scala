@@ -25,11 +25,11 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport.PathParameterName
 
-import java.io.{OutputStream, PrintWriter}
+import java.io.{OutputStream, PrintWriter, Writer}
 import java.util as ju
 import javax.portlet.*
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 
 class PortletEmbeddingContext(
@@ -62,8 +62,12 @@ class PortletEmbeddingContextWithResponse(
   httpClient
 ) with EmbeddingContextWithResponse {
 
-  def writer                    : PrintWriter       = response.getWriter
-  def outputStream              : Try[OutputStream] = Try(response.getPortletOutputStream)
+  def output: Either[Writer, OutputStream] =
+    Try(response.getPortletOutputStream) match {
+      case Success(outputStream) => Right(outputStream)
+      case Failure(_)            => Left(response.getWriter)
+    }
+
   def decodeURL(encoded: String): String            = LiferayURL.wsrpToPortletURL(encoded, response)
   def setStatusCode(code: Int)  : Unit              = () // Q: Can we do anything meaningful for resource caching?
 

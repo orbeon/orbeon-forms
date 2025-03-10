@@ -33,9 +33,8 @@ import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 
-import java.io.Writer
+import java.io.{BufferedWriter, OutputStreamWriter, Writer}
 import scala.util.matching.Regex
-import scala.util.{Failure, Success}
 
 
 object APISupport {
@@ -241,21 +240,24 @@ object APISupport {
           if (encodeForXML) decodedURL.escapeXmlMinimal else decodedURL
         }
 
-        WSRPSupport.decodeWSRPContent(
-          contentAsString,
-          ctx.namespace,
-          decodeURL,
-          ctx.writer
-        )
+        // `Writer` is only used for `embedPageJava()`
+        useAndClose(ctx.output.fold(identity, os => new BufferedWriter(new OutputStreamWriter(os, encoding)))) { writer =>
+          WSRPSupport.decodeWSRPContent(
+            content   = contentAsString,
+            ns        = ctx.namespace,
+            decodeURL = decodeURL,
+            writer    = writer
+          )
+        }
       case other =>
         // All other types: just copy
         Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
-        ctx.outputStream match {
-          case Success(os) =>
+        ctx.output match {
+          case Right(os) =>
             useAndClose(content.stream)(IOUtils.copy(_, os): Unit)
-          case Failure(t)  =>
-            Logger.warn(s"unable to obtain `OutputStream` possibly because of a missing mediatype downstream", t)
-            ctx.writer.write("unable to provide content")
+          case Left(writer)  =>
+            Logger.warn(s"unable to obtain `OutputStream` possibly because of a missing mediatype downstream")
+            writer.write("unable to provide content")
         }
     }
 

@@ -359,28 +359,27 @@
 
         <xbl:template>
             <xf:group
-                class="fr-field-width-{
+                ref="xxf:binding('fr-time')"
+                class="input-append fr-field-width-{
                         fr:component-param-value('field-width')
                     } fr-native-picker-{
                         fr:component-param-value('native-picker')
                     }">
-                <xf:group ref="xxf:binding('fr-time')" class="input-append">
-                    <xh:input
-                        id="input"
-                        xh:type="text"
-                        placeholder="{
-                            TimeSupport:generatePlaceholder(
-                                (: Reminder: empty string property returns the empty sequence :)
-                                (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
-                                instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                                xxf:r('format')
-                            )}"
-                        xxf:control="true"
-                        xbl:attr="autocomplete"/>
-                    <xh:span class="add-on">
-                        <xh:i class="fa fa-fw fa-clock-o"/>
-                    </xh:span>
-                </xf:group>
+                <xh:input
+                    id="input"
+                    xh:type="text"
+                    placeholder="{
+                        TimeSupport:generatePlaceholder(
+                            (: Reminder: empty string property returns the empty sequence :)
+                            (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
+                            instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                            xxf:r('format')
+                        )}"
+                    xxf:control="true"
+                    xbl:attr="autocomplete"/>
+                <xh:span class="add-on">
+                    <xh:i class="fa fa-fw fa-clock-o"/>
+                </xh:span>
             </xf:group>
         </xbl:template>
     </xbl:binding>

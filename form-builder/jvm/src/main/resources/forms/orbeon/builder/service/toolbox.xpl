@@ -132,30 +132,41 @@
     </p:processor>
 
     <!-- Read template form for application library -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
-        <p:input name="instance" href="#parameters"/>
-        <p:output name="data" id="app-template-form"/>
-    </p:processor>
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6801 -->
+    <p:choose href="#parameters">
+        <p:when test="p:non-blank(/*/app)">
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
+                <p:input name="instance" href="#parameters"/>
+                <p:output name="data" id="app-template-form"/>
+            </p:processor>
 
-    <p:processor name="oxf:pipeline">
-        <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
-        <p:input name="data"       href="#app-template-form"/>
-        <p:input name="bindings"   href="#components-but-not-section-templates"/>
-        <p:output name="data"      id="app-template-form-annotated"/>
-    </p:processor>
+            <p:processor name="oxf:pipeline">
+                <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
+                <p:input name="data"       href="#app-template-form"/>
+                <p:input name="bindings"   href="#components-but-not-section-templates"/>
+                <p:output name="data"      id="app-template-form-annotated"/>
+            </p:processor>
 
-    <p:processor name="oxf:pipeline">
-        <p:input name="config"     href="/forms/orbeon/builder/form/deannotate.xpl"/>
-        <p:input name="data"       href="#app-template-form-annotated"/>
-        <p:output name="data"      id="app-template-form-deannotated"/>
-    </p:processor>
+            <p:processor name="oxf:pipeline">
+                <p:input name="config"     href="/forms/orbeon/builder/form/deannotate.xpl"/>
+                <p:input name="data"       href="#app-template-form-annotated"/>
+                <p:output name="data"      id="app-template-form-deannotated"/>
+            </p:processor>
 
-    <p:processor name="oxf:exception-catcher">
-        <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
-        <p:input name="data" href="#app-template-form-deannotated"/>
-        <p:output name="data" id="app-template-form-safe"/>
-    </p:processor>
+            <p:processor name="oxf:exception-catcher">
+                <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
+                <p:input name="data" href="#app-template-form-deannotated"/>
+                <p:output name="data" id="app-template-form-safe"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:identity">
+                <p:input name="data"><_/></p:input>
+                <p:output name="data" id="app-template-form-safe"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
     <!-- Convert templates to XBL -->
 

@@ -450,7 +450,6 @@
             <xf:input
                 id="input"
                 ref="xxf:binding('fr-date-output')"
-                class="fr-field-width-{fr:component-param-value('field-width')}"
                 xbl:attr="xxf:readonly-appearance"
                 xxf:format="
                     DateSupport:formatReadonlyModeDate(

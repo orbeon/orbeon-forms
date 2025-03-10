@@ -402,7 +402,6 @@
             <xf:input
                 id="input"
                 ref="xxf:binding('fr-time-output')"
-                class="fr-field-width-{fr:component-param-value('field-width')}"
                 xbl:attr="xxf:readonly-appearance"
                 xxf:format="
                     TimeSupport:formatReadonlyModeTime(

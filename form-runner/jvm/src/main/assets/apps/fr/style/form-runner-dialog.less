@@ -18,6 +18,10 @@
             background-color: rgba(0, 0, 0, 0.5);
         }
 
+        &:focus {
+           outline: none;             // The blue outline set by the browser is distracting and unhelpful
+        }
+
         &[open] { display: flex }     // Don't override the user agent `display: none` closed
         flex-direction: column;
         max-width: 500px;  // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones

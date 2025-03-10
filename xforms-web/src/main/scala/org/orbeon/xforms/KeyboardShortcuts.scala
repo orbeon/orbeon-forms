@@ -2,6 +2,7 @@ package org.orbeon.xforms
 
 import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
@@ -99,7 +100,17 @@ object KeyboardShortcuts {
           (e: dom.KeyboardEvent, _: String) => {
             if (condition.forall(_.apply())) {
               e.preventDefault()
-              clickElem.click()
+              val activeElem = dom.document.activeElementT
+              if (activeElem == clickElem) {
+                clickElem.click()
+              } else {
+                // So if the focus is on a control and the user changed its value, the new value is sent to the server
+                // This is as if users clicked on the button, but without losing the focus on the control
+                activeElem.blur()
+                clickElem.focus()
+                clickElem.click()
+                activeElem.focus()
+              }
             }
           }
         )

@@ -700,8 +700,13 @@
                 $fb-lang
             }"
         xxf:target="fb-test-iframe"
-        xxf:show-progress="false"
-    />
+        xxf:show-progress="false">
+        <!-- https://github.com/orbeon/orbeon-forms/issues/4483 -->
+        <xf:header ref=".[fr:is-embedded('javascript-api')]">
+            <xf:name>Orbeon-Client</xf:name>
+            <xf:value/>
+        </xf:header>
+    </xf:submission>
 
     <xf:submission
         id="fb-test-formulas-form-submission"
@@ -741,8 +746,12 @@
                 $fb-lang
             }"
         xxf:target="fb-test-iframe"
-        xxf:show-progress="false"
-    />
+        xxf:show-progress="false">
+        <xf:header ref=".[fr:is-embedded('javascript-api')]">
+            <xf:name>Orbeon-Client</xf:name>
+            <xf:value/>
+        </xf:header>
+    </xf:submission>
 
     <xf:submission
         id="fb-test-offline-submission"
@@ -786,8 +795,12 @@
                 (bind('form-name-bind')[xxf:non-blank()], '_')[1]
             }/compile?format=zip"
         xxf:target="fb-test-iframe"
-        xxf:show-progress="false"
-    />
+        xxf:show-progress="false">
+        <xf:header ref=".[fr:is-embedded('javascript-api')]">
+            <xf:name>Orbeon-Client</xf:name>
+            <xf:value/>
+        </xf:header>
+    </xf:submission>
 
     <!-- TODO: Reduce duplication with above submission if possible. -->
     <xf:submission

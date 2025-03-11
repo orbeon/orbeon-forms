@@ -94,7 +94,7 @@ trait BufferedPortlet {
     ctx      : EmbeddingContextWithResponse
   ): Unit =
     findStoredResponseWithParameters match {
-      case Some(ResponseWithParams(content: BufferedContent, params)) if matchesStoredResponse(request.getParameterMap, params) =>
+      case Some(ResponseWithParams(Left(content), params)) if matchesStoredResponse(request.getParameterMap, params) =>
         // The result of an action with the current parameters is available
         // NOTE: Until we can correctly handle multiple render requests for an XForms page, we should detect the
         // situation where a second render request tries to load a deferred action response, and display an

@@ -76,18 +76,16 @@ object InternalHttpClient extends HttpClient[CookieStore] {
             content                 = content
           )
 
-        // Honor `Orbeon-Client` header (see also ServletExternalContext)
+        // Honor `Orbeon-Client` header (see also `ServletExternalContext`)
         val urlRewriter =
-          Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) match {
-            case Some(client) if Headers.EmbeddedClientValues(client) =>
+          if (Headers.isEmbeddedFromHeaders(headers))
               new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, localRequest, wsrpEncodeResources = true)
-            case _ =>
+          else
               new ServletURLRewriter(localRequest)
             // We used to have `incomingExternalContext.getResponse: URLRewriter`, but this must not be done for async
             // submissions. In practice, either we use the WSRP rewriter when in embedded mode, or we use the servlet
             // rewriter, so we should never have to use the response rewriter.
             // See https://github.com/orbeon/orbeon-forms/issues/5696
-          }
 
         val response = new LocalResponse(urlRewriter)
 

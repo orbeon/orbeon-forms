@@ -332,7 +332,7 @@ class ServletExternalContext(
   private def isEmbedded: Boolean =
     Headers.isEmbeddedFromHeaders(requestImpl.headerValuesMap)
 
-  // NOTE: This whole logic below could be used by ServletExternalContext and PortletExternalContext
+  // NOTE: This whole logic below could be used by `ServletExternalContext` and `PortletExternalContext`
   // Check if there is an override of container type. This is currently used by the proxy portlet and by
   // XHTMLToPDF, as both require a specific type of URL rewriting to take place. Using this header means that
   // using a global property is not required anymore.

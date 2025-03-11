@@ -191,7 +191,6 @@ object Headers {
   def embeddedClientValueFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Option[String] =
     Headers.firstItemIgnoreCase(headers, OrbeonClient)
 
-  // 2022-07-28: Only 1 use left.
   def isEmbeddedFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Boolean =
     embeddedClientValueFromHeaders(headers) exists EmbeddedClientValues
 

@@ -94,7 +94,8 @@ trait BufferedPortlet {
     ctx      : EmbeddingContextWithResponse
   ): Unit =
     findStoredResponseWithParameters match {
-      case Some(ResponseWithParams(Left(content), params)) if matchesStoredResponse(request.getParameterMap, params) =>
+
+      case Some(ResponseWithParams(Left(content), params)) if matchesStoredResponse(request.getRenderParameters, params) =>
         // The result of an action with the current parameters is available
         // NOTE: Until we can correctly handle multiple render requests for an XForms page, we should detect the
         // situation where a second render request tries to load a deferred action response, and display an
@@ -186,13 +187,14 @@ trait BufferedPortlet {
     )
 
     object StoredParams {
-      def fromJavaMap(requestParamsJava: ju.Map[String, Array[String]]): Option[StoredParams] =
+      def fromRenderParameters(renderParams: RenderParameters): Option[StoredParams] = {
+        val paramsMap = renderParams.getNames.asScala.map(name => name -> renderParams.getValues(name)).toMap
         for {
-          methodString <- Headers.firstItemIgnoreCase(requestParamsJava.asScala, MethodParameter)
+          methodString <- Headers.firstItemIgnoreCase(paramsMap, MethodParameter)
           method       <- HttpMethod.withNameOption(methodString)
-          path         <- Headers.firstItemIgnoreCase(requestParamsJava.asScala, PathParameter)
-        } yield
-          StoredParams(method, path)
+          path         <- Headers.firstItemIgnoreCase(paramsMap, PathParameter)
+        } yield StoredParams(method, path)
+      }
     }
 
     // Immutable response with parameters
@@ -203,10 +205,10 @@ trait BufferedPortlet {
 
     // https://github.com/orbeon/orbeon-forms/issues/3978
     def matchesStoredResponse(
-      requestParamsJava : ju.Map[String, Array[String]],
-      storedParams      : StoredParams
+      renderParams : RenderParameters,
+      storedParams : StoredParams
     ): Boolean =
-      StoredParams.fromJavaMap(requestParamsJava) contains storedParams
+      StoredParams.fromRenderParameters(renderParams) contains storedParams
 
     def findStoredResponseWithParameters(implicit ctx: EmbeddingContext): Option[ResponseWithParams] =
       ctx.getSessionAttribute(ResponseSessionKey) map (_.asInstanceOf[ResponseWithParams])

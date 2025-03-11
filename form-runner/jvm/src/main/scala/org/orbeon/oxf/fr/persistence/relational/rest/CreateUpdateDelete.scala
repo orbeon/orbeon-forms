@@ -402,55 +402,48 @@ trait CreateUpdateDelete {
       }
     }
 
-    RelationalUtils.withConnection { connection =>
+    // Update database
+    val lastModifiedOpt = RelationalUtils.withConnection { connection =>
+      store(connection, req, reqBodyOpt, delete, versionToSet)
+    }
 
-      // Update database
-      val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
-
-      debug("CRUD: database updated, before commit", List("version" -> versionToSet.toString))
-
-      // Commit before reindexing, as reindexing will read back the form definition, which can
-      // cause a deadlock since we're still in the transaction writing the form definition
-      connection.commit()
-
-      debug("CRUD: after commit")
-
-      // Update index if needed
-      if (! req.dataPart.exists(_.forceDelete)) { // no need as we only delete historical data, not current data, so data must already be deindexed
-
-        val whatToReindex = req.dataPart match {
-          case Some(dataPart) =>
-            // Data: update index for this document id
-            WhatToReindex.DataForDocumentId(dataPart.documentId)
-          case None =>
-            // Form definition: update index for this form version
-            // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-            WhatToReindex.DataForForm((req.appForm, versionToSet))
-        }
-
-        withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-          Index.reindex(req.provider, connection, whatToReindex)
-        }
-
-        // Create flat view if needed
-        if (createFlatView)
-          withDebug("CRUD: creating flat view") {
-
-            val prefixesInMainViewColumnNames = FormRunner.providerPropertyAsBoolean(
-              req.provider.entryName,
-              "flat-view.prefixes-in-main-view-column-names",
-              default = true
-            )
-
-            val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
-              req.provider.entryName,
-              "flat-view.max-identifier-length",
-              default = FlatView.CompatibilityMaxIdentifierLength
-            )
-
-            FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, prefixesInMainViewColumnNames, maxIdentifierLength)
-          }
+    // Update index if needed
+    // No need to reindex as we only delete historical data, which is not indexed
+    if (! req.dataPart.exists(_.forceDelete)) {
+      val whatToReindex = req.dataPart match {
+        case Some(dataPart) =>
+          // Data: update index for this document id
+          WhatToReindex.DataForDocumentId(dataPart.documentId)
+        case None =>
+          // Form definition: update index for this form version
+          // Re. the asInstanceOf, when updating a form, we must have a specific version specified
+          WhatToReindex.DataForForm((req.appForm, versionToSet))
       }
+
+      withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
+        Index.reindex(req.provider, whatToReindex)
+      }
+    }
+
+    RelationalUtils.withConnection { connection =>
+      // Create flat view if needed
+      if (createFlatView)
+        withDebug("CRUD: creating flat view") {
+
+          val prefixesInMainViewColumnNames = FormRunner.providerPropertyAsBoolean(
+            req.provider.entryName,
+            "flat-view.prefixes-in-main-view-column-names",
+            default = true
+          )
+
+          val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
+            req.provider.entryName,
+            "flat-view.max-identifier-length",
+            default = FlatView.CompatibilityMaxIdentifierLength
+          )
+
+          FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, prefixesInMainViewColumnNames, maxIdentifierLength)
+        }
 
       val httpResponse = externalContext.getResponse
 

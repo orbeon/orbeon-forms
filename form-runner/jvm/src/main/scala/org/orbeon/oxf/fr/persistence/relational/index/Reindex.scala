@@ -14,10 +14,12 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.io.IOUtils.*
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.WhatToReindex.*
-import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.util.CoreUtils.*
@@ -30,7 +32,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping
 
-import java.sql.{Connection, PreparedStatement}
+import java.sql.PreparedStatement
 import scala.util.{Failure, Success}
 
 
@@ -43,11 +45,11 @@ trait Reindex extends FormDefinition {
   //      - add 1 row to orbeon_i_current
   //      - add as many as necessary to orbeon_i_control_text
   def reindex(
-    provider      : Provider,
-    connection    : Connection,
-    whatToReindex : WhatToReindex
+    provider        : Provider,
+    whatToReindex   : WhatToReindex
   )(implicit
-    indentedLogger: IndentedLogger
+    externalContext : ExternalContext,
+    indentedLogger  : IndentedLogger
   ): Unit = {
 
     // If a document id was provided, produce WHERE clause, and set parameter
@@ -75,60 +77,6 @@ trait Reindex extends FormDefinition {
         )
       }
 
-    // Clean index
-    locally {
-
-      val deleteWhereClause = whereConditions match {
-        case Nil => ""
-        case _   => "WHERE " + whereConditions.mkString(" AND ")
-      }
-      val orderByClause = provider match {
-        case Provider.MySQL => " ORDER BY data_id"
-        case _              => ""
-      }
-      val deleteFromValueIndexWhereSql =
-        whatToReindex match {
-          case AllData => ""
-          case _ =>
-            s"""|WHERE data_id IN (
-                |   SELECT data_id
-                |     FROM orbeon_i_current
-                |   $deleteWhereClause
-                | )
-                |""".stripMargin
-        }
-
-      val countFromValueIndexSql  = "SELECT count(*) FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
-      val deleteFromValueIndexSql = "DELETE          FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
-
-      // Check if there is anything to delete from the value index
-      val countFromValueIndex =
-        useAndClose(connection.prepareStatement(countFromValueIndexSql)) { ps =>
-          paramSetter(ps)
-          useAndClose(ps.executeQuery()) { rs =>
-            rs.next()
-            rs.getInt(1)
-          }
-        }
-
-      val deleteFromCurrentIndex =
-        s"""|DELETE FROM orbeon_i_current
-            |$deleteWhereClause
-            |""".stripMargin
-
-      val deleteSql = List(
-        if (countFromValueIndex > 0) Some(deleteFromValueIndexSql) else None,
-        Some(deleteFromCurrentIndex)
-      ).flatten
-
-      deleteSql.foreach { deleteSql =>
-        useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps =>
-          paramSetter(ps)
-          ps.executeUpdate()
-        }
-      }
-    }
-
     val currentFromWhere =
       s"""|    FROM
           |      orbeon_form_data d,
@@ -150,148 +98,217 @@ trait Reindex extends FormDefinition {
           |     d.deleted = 'N'
           |""".stripMargin
 
-    // Count how many documents we'll reindex, and tell progress code
-    val countSql =
-      s"""|SELECT count(*)
-          |$currentFromWhere
-          |""".stripMargin
-    useAndClose(connection.prepareStatement(countSql)) { ps =>
-      paramSetter(ps)
-      useAndClose(ps.executeQuery()) { rs =>
-        rs.next()
-        val count = rs.getInt(1)
-        Backend.setProviderDocumentTotal(count)
+    val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection { connection =>
+
+      // Clean index
+      locally {
+
+        val deleteWhereClause = whereConditions match {
+          case Nil => ""
+          case _   => "WHERE " + whereConditions.mkString(" AND ")
+        }
+        val orderByClause = provider match {
+          case Provider.MySQL => " ORDER BY data_id"
+          case _              => ""
+        }
+        val deleteFromValueIndexWhereSql =
+          whatToReindex match {
+            case AllData => ""
+            case _ =>
+              s"""|WHERE data_id IN (
+                  |   SELECT data_id
+                  |     FROM orbeon_i_current
+                  |   $deleteWhereClause
+                  | )
+                  |""".stripMargin
+          }
+
+        val countFromValueIndexSql  = "SELECT count(*) FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
+        val deleteFromValueIndexSql = "DELETE          FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
+
+        // Check if there is anything to delete from the value index
+        val countFromValueIndex =
+          useAndClose(connection.prepareStatement(countFromValueIndexSql)) { ps =>
+            paramSetter(ps)
+            useAndClose(ps.executeQuery()) { rs =>
+              rs.next()
+              rs.getInt(1)
+            }
+          }
+
+        val deleteFromCurrentIndex =
+          s"""|DELETE FROM orbeon_i_current
+              |$deleteWhereClause
+              |""".stripMargin
+
+        val deleteSql = List(
+          if (countFromValueIndex > 0) Some(deleteFromValueIndexSql) else None,
+          Some(deleteFromCurrentIndex)
+        ).flatten
+
+        deleteSql.foreach { deleteSql =>
+          useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps =>
+            paramSetter(ps)
+            ps.executeUpdate()
+          }
+        }
       }
+
+      // Count how many documents we'll reindex, and tell progress code (side effect)
+      val countSql =
+        s"""|SELECT count(*)
+            |$currentFromWhere
+            |""".stripMargin
+      useAndClose(connection.prepareStatement(countSql)) { ps =>
+        paramSetter(ps)
+        useAndClose(ps.executeQuery()) { rs =>
+          rs.next()
+          val count = rs.getInt(1)
+          Backend.setProviderDocumentTotal(count)
+        }
+      }
+
+      val distinctFormsSql =
+        s"""|SELECT DISTINCT
+            |       app,
+            |       form,
+            |       form_version
+            |$currentFromWhere
+            |""".stripMargin
+
+        useAndClose(connection.prepareStatement(distinctFormsSql)) { ps =>
+          paramSetter(ps)
+          useAndClose(ps.executeQuery()) { rs =>
+            var forms = List.empty[AppFormVersion]
+            while (rs.next()) {
+              val app     = rs.getString("app")
+              val form    = rs.getString("form")
+              val version = rs.getInt("form_version")
+              forms = (AppForm(app, form), version) :: forms
+            }
+            forms
+          }
+        }
     }
 
-    // Get all the row from orbeon_form_data that are "latest" and not deleted
-    val xmlCol         = Provider.xmlColSelect(provider, "d")
-    val selectXmlSql   = s"SELECT $xmlCol FROM orbeon_form_data d WHERE id = ?"
-    val currentDataSql =
-      s"""  SELECT d.id,
-         |         d.created,
-         |         d.last_modified_time,
-         |         d.last_modified_by,
-         |         d.username,
-         |         d.groupname,
-         |         d.organization_id,
-         |         d.app,
-         |         d.form,
-         |         d.form_version,
-         |         d.stage,
-         |         d.document_id,
-         |         d.draft
-         |$currentFromWhere
-         |ORDER BY app, form, form_version
-         |""".stripMargin
+    val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
+      distinctForms.map { case appFormVersion@(appForm@AppForm(app, form), version) =>
+        val formDetailsTry =
+          PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(
+            appForm, FormDefinitionVersion.Specific(version))
+        val indexedControlsXPaths = formDetailsTry match {
+          case Failure(_) =>
+            error(s"Can't index documents for $app/$form as form definition can't be found")
+            Nil
+          case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
+            indexedFields.value
+        }
+        appFormVersion -> indexedControlsXPaths
+      }.toMap
 
-    var currentBatchSize = 0
-    val maxBatchSize     = FormRunner.providerPropertyAsInteger(
-        provider = provider.entryName,
-        property = "max-batch-size",
-        default  = 1000
-      )
+    RelationalUtils.withConnection { connection =>
+      // Get all the row from orbeon_form_data that are "latest" and not deleted
+      val xmlCol         = Provider.xmlColSelect(provider, "d")
+      val selectXmlSql   = s"SELECT $xmlCol FROM orbeon_form_data d WHERE id = ?"
+      val currentDataSql =
+        s"""  SELECT d.id,
+           |         d.created,
+           |         d.last_modified_time,
+           |         d.last_modified_by,
+           |         d.username,
+           |         d.groupname,
+           |         d.organization_id,
+           |         d.app,
+           |         d.form,
+           |         d.form_version,
+           |         d.stage,
+           |         d.document_id,
+           |         d.draft
+           |$currentFromWhere
+           |ORDER BY app, form, form_version
+           |""".stripMargin
 
-    useAndClose(connection.prepareStatement(currentDataSql)) { currentDataPS =>
-      useAndClose(connection.prepareStatement(InsertIntoCurrentSql)) { insertIntoCurrentPS =>
-        useAndClose(connection.prepareStatement(InsertIntoControlTextSql)) { insertIntoControlTextPS =>
-          useAndClose(connection.prepareStatement(selectXmlSql)) { selectXmlPS =>
-            paramSetter(currentDataPS)
-            useAndClose(currentDataPS.executeQuery()) { currentDataRS =>
+      var currentBatchSize = 0
+      val maxBatchSize     = FormRunner.providerPropertyAsInteger(
+          provider = provider.entryName,
+          property = "max-batch-size",
+          default  = 1000
+        )
 
-              // Info on indexed controls for a given app/form
-              case class FormIndexedControls(
-                app                  : String,
-                form                 : String,
-                formVersion          : Int,
-                indexedControlsXPaths: List[String]
-              )
+      useAndClose(connection.prepareStatement(currentDataSql)) { currentDataPS =>
+        useAndClose(connection.prepareStatement(InsertIntoCurrentSql)) { insertIntoCurrentPS =>
+          useAndClose(connection.prepareStatement(InsertIntoControlTextSql)) { insertIntoControlTextPS =>
+            useAndClose(connection.prepareStatement(selectXmlSql)) { selectXmlPS =>
+              paramSetter(currentDataPS)
+              useAndClose(currentDataPS.executeQuery()) { currentDataRS =>
 
-              // Go through each data document
-              // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
-              var prevIndexedControls: Option[FormIndexedControls] = None
-              while (currentDataRS.next() && StatusStore.getStatus != Status.Stopping) {
+                // Go through each data document
+                while (currentDataRS.next() && StatusStore.getStatus != Status.Stopping) {
 
-                Backend.setProviderDocumentNext()
-                val app         = currentDataRS.getString("app")
-                val form        = currentDataRS.getString("form")
-                val formVersion = currentDataRS.getInt   ("form_version")
+                  Backend.setProviderDocumentNext()
+                  val app         = currentDataRS.getString("app")
+                  val form        = currentDataRS.getString("form")
+                  val formVersion = currentDataRS.getInt   ("form_version")
 
-                // Get indexed controls for current app/form
-                val indexedControlsXPaths: List[String] = prevIndexedControls match {
-                  case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControlsXPaths)) =>
-                    // Use indexed controls from previous iteration
-                    indexedControlsXPaths
-                  case _ =>
-                    // Compute indexed controls reading the form definition
-                    val appForm = AppForm(app, form)
-                    PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, FormDefinitionVersion.Specific(formVersion)) match {
-                      case Failure(_) =>
-                        error(s"Can't index documents for $app/$form as form definition can't be found")
-                        Nil
-                      case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
-                        indexedFields.value
-                    }
-                }
+                  // Get indexed controls for current app/form
+                  val indexedControlsXPaths: List[String] = formsToIndexedControlsXPaths(AppForm(app, form), formVersion)
 
-                // Insert into the "current data" table
-                val position = Iterator.from(1)
+                  // Insert into the "current data" table
+                  val position = Iterator.from(1)
 
-                insertIntoCurrentPS.setInt      (position.next(), currentDataRS.getInt("id"))
-                insertIntoCurrentPS.setTimestamp(position.next(), currentDataRS.getTimestamp("created"))
-                insertIntoCurrentPS.setTimestamp(position.next(), currentDataRS.getTimestamp("last_modified_time"))
-                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("last_modified_by"))
-                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("username"))
-                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("groupname"))
-                RelationalUtils.getIntOpt(currentDataRS, "organization_id") match {
-                  case Some(id) => insertIntoCurrentPS.setInt(position.next(), id)
-                  case None     => insertIntoCurrentPS.setNull(position.next(), java.sql.Types.INTEGER)
-                }
-                insertIntoCurrentPS.setString   (position.next(), app)
-                insertIntoCurrentPS.setString   (position.next(), form)
-                insertIntoCurrentPS.setInt      (position.next(), currentDataRS.getInt("form_version"))
-                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("stage"))
-                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("document_id"))
-                insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("draft"))
-                insertIntoCurrentPS.addBatch()
-                currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
-
-                // Read data (XML)
-                // - using lazy, as we might not need the data, if there are no controls to index
-                // - return root element, as XPath this is the node XPath expressions are relative to
-                lazy val dataRootElement: NodeInfo = {
-                  selectXmlPS.setInt(1, currentDataRS.getInt("id"))
-                  val document = useAndClose(selectXmlPS.executeQuery()) { selectXmlRS =>
-                    selectXmlRS.next()
-                    Provider.readXmlColumn(provider, selectXmlRS)
+                  insertIntoCurrentPS.setInt      (position.next(), currentDataRS.getInt("id"))
+                  insertIntoCurrentPS.setTimestamp(position.next(), currentDataRS.getTimestamp("created"))
+                  insertIntoCurrentPS.setTimestamp(position.next(), currentDataRS.getTimestamp("last_modified_time"))
+                  insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("last_modified_by"))
+                  insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("username"))
+                  insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("groupname"))
+                  RelationalUtils.getIntOpt(currentDataRS, "organization_id") match {
+                    case Some(id) => insertIntoCurrentPS.setInt(position.next(), id)
+                    case None     => insertIntoCurrentPS.setNull(position.next(), java.sql.Types.INTEGER)
                   }
-                  document.descendant(*).head
-                }
+                  insertIntoCurrentPS.setString   (position.next(), app)
+                  insertIntoCurrentPS.setString   (position.next(), form)
+                  insertIntoCurrentPS.setInt      (position.next(), currentDataRS.getInt("form_version"))
+                  insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("stage"))
+                  insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("document_id"))
+                  insertIntoCurrentPS.setString   (position.next(), currentDataRS.getString("draft"))
+                  insertIntoCurrentPS.addBatch()
+                  currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
 
-                // Extract and insert value for each indexed control
-                for (controlXPath <- indexedControlsXPaths) {
-                  val nodes = scaxon.XPath.evalNodes(dataRootElement, controlXPath, FbNamespaceMapping)
-                  for ((node, pos) <- nodes.zipWithIndex) {
-                    val nodeValue = truncateValue(provider, node.getStringValue)
-                    // For indexing, we are not interested in empty values
-                    if (nodeValue.nonEmpty) {
-                      val position = Iterator.from(1)
-                      insertIntoControlTextPS.setInt   (position.next(), currentDataRS.getInt("id"))
-                      insertIntoControlTextPS.setInt   (position.next(), pos + 1)
-                      insertIntoControlTextPS.setString(position.next(), controlXPath)
-                      insertIntoControlTextPS.setString(position.next(), nodeValue)
-                      insertIntoControlTextPS.addBatch()
-                      currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
+                  // Read data (XML)
+                  // - using lazy, as we might not need the data, if there are no controls to index
+                  // - return root element, as XPath this is the node XPath expressions are relative to
+                  lazy val dataRootElement: NodeInfo = {
+                    selectXmlPS.setInt(1, currentDataRS.getInt("id"))
+                    val document = useAndClose(selectXmlPS.executeQuery()) { selectXmlRS =>
+                      selectXmlRS.next()
+                      Provider.readXmlColumn(provider, selectXmlRS)
+                    }
+                    document.descendant(*).head
+                  }
+
+                  // Extract and insert value for each indexed control
+                  for (controlXPath <- indexedControlsXPaths) {
+                    val nodes = scaxon.XPath.evalNodes(dataRootElement, controlXPath, FbNamespaceMapping)
+                    for ((node, pos) <- nodes.zipWithIndex) {
+                      val nodeValue = truncateValue(provider, node.getStringValue)
+                      // For indexing, we are not interested in empty values
+                      if (nodeValue.nonEmpty) {
+                        val position = Iterator.from(1)
+                        insertIntoControlTextPS.setInt   (position.next(), currentDataRS.getInt("id"))
+                        insertIntoControlTextPS.setInt   (position.next(), pos + 1)
+                        insertIntoControlTextPS.setString(position.next(), controlXPath)
+                        insertIntoControlTextPS.setString(position.next(), nodeValue)
+                        insertIntoControlTextPS.addBatch()
+                        currentBatchSize = maybeExecuteBatches(insertIntoCurrentPS, insertIntoControlTextPS, currentBatchSize, maxBatchSize)
+                      }
                     }
                   }
                 }
 
-                // Pass current indexed controls to the next iteration
-                prevIndexedControls = Some(FormIndexedControls(app, form, formVersion, indexedControlsXPaths))
+                insertIntoCurrentPS.executeBatch()
+                insertIntoControlTextPS.executeBatch()
               }
-
-              insertIntoCurrentPS.executeBatch()
-              insertIntoControlTextPS.executeBatch()
             }
           }
         }

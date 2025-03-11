@@ -42,6 +42,6 @@ object ReindexRoute extends NativeRoute {
     implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
 
     val ReindexPathRegex(providerToken) = ec.getRequest.getRequestPath
-    RelationalUtils.withConnection(Index.reindex(Provider.withName(providerToken), _, WhatToReindex.AllData))
+    Index.reindex(Provider.withName(providerToken),WhatToReindex.AllData)
   }
 }

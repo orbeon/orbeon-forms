@@ -101,17 +101,17 @@ trait FormRunnerPDF {
   //
   //@XPathFunction
   def optionFromMetadataOrPropertiesXPath(
-    metadataInstanceRootElem : NodeInfo,
-    featureName              : String,
-    app                      : String,
-    form                     : String,
-    mode                     : String
+    metadataInstanceRootElemOrNull: NodeInfo,
+    featureName                   : String,
+    app                           : String,
+    form                          : String,
+    mode                          : String
   ): Option[String] =
     FormRunner.optionFromMetadataOrProperties(
-      metadataInstanceRootElem = metadataInstanceRootElem,
-      featureName              = featureName
+      metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
+      featureName                 = featureName
     )(
-      formRunnerParams         = FormRunnerParams(app, form, 1, None, None, mode)
+      formRunnerParams            = FormRunnerParams(app, form, 1, None, None, mode)
     )
 
   import URLFinder._

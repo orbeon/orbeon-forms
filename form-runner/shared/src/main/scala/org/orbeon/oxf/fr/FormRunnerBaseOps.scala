@@ -423,13 +423,13 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def isNewOrEditMode: Boolean = isNewOrEditMode(FormRunnerParams().mode)
 
   def optionFromMetadataOrProperties(
-    metadataInstanceRootElem : NodeInfo,
-    featureName              : String
+    metadataInstanceRootElemOpt: Option[NodeInfo],
+    featureName                : String
   )(implicit
-    formRunnerParams         : FormRunnerParams
+    formRunnerParams           : FormRunnerParams
   ): Option[String] =
-    metadataInstanceRootElem.elemValueOpt(featureName) orElse
-    formRunnerProperty(s"oxf.fr.detail.$featureName")
+    metadataInstanceRootElemOpt.flatMap(_.elemValueOpt(featureName))
+      .orElse(formRunnerProperty(s"oxf.fr.detail.$featureName"))
 
   //@XPathFunction
   def optionFromMetadataOrPropertiesDynamicXPath(

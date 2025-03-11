@@ -148,9 +148,9 @@ object Cell {
   }
 
   def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
-    grid       : Underlying,
-    simplify   : Boolean,
-    transpose  : Boolean
+    grid      : Underlying,
+    simplify  : Boolean,
+    transpose : Boolean
   ): GridModel[Underlying] = {
 
     val ops          = implicitly[CellOps[Underlying]]

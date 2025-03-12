@@ -239,9 +239,15 @@ trait GridOps extends ContainerOps {
   private def selectedCellVar(implicit ctx: FormBuilderDocContext) =
     ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("selected-cell")
 
+  private def startingCellVar(implicit ctx: FormBuilderDocContext) =
+    ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("starting-cell")
+
   // Find the currently selected grid cell if any
   def findSelectedCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findInViewTryIndex(selectedCellVar.stringValue)
+
+  def findStartingCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    findInViewTryIndex(startingCellVar.stringValue)
 
   // Make the given grid cell selected
   def selectCell(newCellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =

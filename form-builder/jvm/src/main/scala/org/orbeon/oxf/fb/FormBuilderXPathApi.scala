@@ -63,6 +63,23 @@ import scala.util.{Failure, Success, Try}
 object FormBuilderXPathApi {
 
   //@XPathFunction
+  def containerMove(directionString: String): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    findSelectedCell
+      .map(FormRunner.findAncestorContainersLeafToRoot(_, includeSelf = false))
+      .flatMap(_.headOption)
+      .foreach { container =>
+        FormBuilder.moveSection(
+          container,
+          Direction.withName(directionString)
+        ) foreach
+          Undo.pushUserUndoAction
+      }
+  }
+
+  //@XPathFunction
   def publishForm(
     doc                  : NodeInfo,
     documentId           : String,
@@ -292,6 +309,10 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def getCurrentlySelectedCell(): NodeInfo =
     findSelectedCell(FormBuilderDocContext()).orNull
+
+  //@XPathFunction
+  def getStartingCell(): NodeInfo =
+    findStartingCell(FormBuilderDocContext()).orNull
 
   // Write back everything
   //@XPathFunction
@@ -615,7 +636,7 @@ object FormBuilderXPathApi {
     }
 
   //@XPathFunction
-  def findNextControlId(controlName: String, previousOrNext: String): Option[String] = {
+  def findNextControlId(controlName: String, leftOrRight: String): Option[String] = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -624,41 +645,104 @@ object FormBuilderXPathApi {
       // Make sure we don't go outside the body when looking for cells
       // https://github.com/orbeon/orbeon-forms/issues/5073
       val firstCellWithChild =
-        (control parent CellTest).headOption flatMap (findPrevOrNextCells(_, previousOrNext, allowEmptyCell = false).headOption)
+        (control parent CellTest)
+          .headOption
+          .flatMap(findCellsByDirection(_, None, Direction.withName(leftOrRight), allowEmptyCell = false).headOption)
 
       firstCellWithChild flatMap (_ child * map (_.id) headOption)
     }
   }
 
   //@XPathFunction
-  def selectNextOrPreviousCell(currentCell: NodeInfo, previousOrNext: String, allowEmptyCell: Boolean): Unit = {
+  def selectNextOrPreviousCell(
+    currentCell   : NodeInfo,
+    startCellElem : NodeInfo,
+    leftOrRight   : String,
+    allowEmptyCell: Boolean
+  ): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    findPrevOrNextCells(currentCell, previousOrNext, allowEmptyCell).headOption foreach selectCell
+    findCellsByDirection(
+      currentCell,
+      Option(startCellElem),
+      Direction.withName(leftOrRight),
+      allowEmptyCell
+    ).headOption.foreach { td =>
+      println(s"xxx selecting cell ${td.id}")
+      selectCell(td)
+    }
   }
 
-  private def findPrevOrNextCells(
-    currentCell    : NodeInfo,
-    previousOrNext : String,
-    allowEmptyCell : Boolean)(implicit
-    ctx            : FormBuilderDocContext
-  ): Seq[NodeInfo] = {
+  private def findCellsByDirection(
+    currentCellElem : NodeInfo,
+    startCellElemOpt: Option[NodeInfo],
+    direction       : Direction,
+    allowEmptyCell  : Boolean
+  )(implicit
+    ctx             : FormBuilderDocContext
+  ): Seq[NodeInfo] =
+    direction match {
+      case Direction.Left | Direction.Right =>
 
-    val prevOrNextCells =
-      previousOrNext match {
-        case "previous" => currentCell preceding CellTest
-        case "next"     => currentCell following CellTest
-      }
+        val prevOrNextCells =
+          if (direction == Direction.Left)
+            currentCellElem preceding CellTest
+          else
+            currentCellElem following CellTest
 
-    // Make sure we don't go outside the body when looking for cells
-    // https://github.com/orbeon/orbeon-forms/issues/5073
-    val prevOrNextCellsInBody =
-      prevOrNextCells takeWhile (_ ancestor * exists (_ isSameNodeInfo ctx.bodyElem))
+        // Make sure we don't go outside the body when looking for cells
+        // https://github.com/orbeon/orbeon-forms/issues/5073
+        val prevOrNextCellsInBody =
+          prevOrNextCells takeWhile (_ ancestor * exists (_ isSameNodeInfo ctx.bodyElem))
 
-    if (allowEmptyCell)
-      prevOrNextCellsInBody
-    else
-      prevOrNextCellsInBody filter (_.hasChildElement)
-  }
+        if (allowEmptyCell)
+          prevOrNextCellsInBody
+        else
+          prevOrNextCellsInBody filter (_.hasChildElement)
+
+      case Direction.Up | Direction.Down =>
+
+        val currentGridElem  = FormRunner.findAncestorContainersLeafToRoot(currentCellElem).head // there must be one
+        val currentGridModel = Cell.analyze12ColumnGridAndFillHoles(currentGridElem, simplify = false, transpose = false)
+
+        val selectedCell =
+          Cell.findOriginCell(currentGridModel, currentCellElem)
+            .getOrElse(throw new IllegalStateException("Selected cell not found"))
+
+        val startCellX =
+          startCellElemOpt.flatMap { startCellElem =>
+
+            val startCellGridElem  = FormRunner.findAncestorContainersLeafToRoot(startCellElem).head // there must be one
+            val startCellGridModel = Cell.analyze12ColumnGridAndFillHoles(startCellGridElem, simplify = false, transpose = false)
+
+            Cell.findOriginCell(startCellGridModel, startCellElem)
+          }
+          .getOrElse(selectedCell)
+          .x
+
+        val otherGridElems =
+          if (direction == Direction.Up)
+            FormRunner.precedingOrSelfContainers(currentGridElem, includeSelf = false).filter(FormRunner.IsGrid)
+          else
+            FormRunner.followingOrSelfContainers(currentGridElem, includeSelf = false).filter(FormRunner.IsGrid)
+
+        val gridModelsWithStartY =
+          LazyList((currentGridModel, selectedCell.y)) ++ {
+            otherGridElems.map { gridElem =>
+              val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
+              (gridModel, if (direction == Direction.Up) gridModel.height + 1 else 0)
+            }
+          }
+
+        def findInGridModel(gridModel: GridModel[NodeInfo], startY: Int): Option[Cell[NodeInfo]] =
+          if (direction == Direction.Up)
+            (startY > 1) option
+              gridModel.originalCellAt(startCellX, startY - 1)
+          else
+            (startY < currentGridModel.height) option
+              gridModel.originalCellAt(startCellX, startY + 1)
+
+        gridModelsWithStartY.flatMap((findInGridModel _).tupled).map(_.td).headOption.toList
+    }
 
   //@XPathFunction
   def formInstanceRoot: NodeInfo =
@@ -1115,13 +1199,14 @@ object FormBuilderXPathApi {
           validBindNames = (
             FormBuilder.iterateNamesInUseCtx
               .filterNot(_ == originalName)
-              ++
-              Iterator(
-                newName,
-                "form-resources", // Issue #5909
-                "fr-mode"         // Issue #6220
+              .concat(
+                Iterator(
+                  newName,
+                  "form-resources", // Issue #5909
+                  "fr-mode"         // Issue #6220
+                )
               )
-              ++ (                // Issue #6145
+              .concat(              // Issue #6145
                 ctx.modelElem / XFORMS_VAR_QNAME attValue "name"
               )
           ).toSet

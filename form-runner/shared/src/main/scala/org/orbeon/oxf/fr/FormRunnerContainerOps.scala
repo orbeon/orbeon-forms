@@ -15,12 +15,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.scaxon.Implicits.*
-
 
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
@@ -71,8 +68,26 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   //@XPathFunction
   def getContainerNameOrEmpty(elem: NodeInfo): String = getControlNameOpt(elem).orNull
 
-  def precedingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): List[NodeInfo] =
-    (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
+  def precedingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): NodeColl =
+    (includeSelf lazyList container) ++ (container precedingSibling * filter IsContainer)
+
+  def followingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): NodeColl =
+    (includeSelf lazyList container) ++ (container followingSibling * filter IsContainer)
+
+  private def isWithinBody(n: NodeInfo): Boolean =
+    n.ancestor(*).exists(isFBBody)
+
+  // NOTE: This doesn't include ancestor containers!
+  def precedingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): NodeColl =
+    (includeSelf lazyList container) ++
+      (container preceding * filter IsContainer)
+        .takeWhile(isWithinBody)
+
+  // NOTE: This doesn't include ancestor containers!
+  def followingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): NodeColl =
+    (includeSelf lazyList container) ++
+      ((container following *) filter IsContainer)
+        .takeWhile(isWithinBody)
 
   // Find ancestor sections and grids and root
   def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): NodeColl =

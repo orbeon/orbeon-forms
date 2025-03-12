@@ -42,6 +42,7 @@ object CoreUtils {
     def seq[A](a: => A)                : Seq[A]      = if (b) Seq(a)             else Nil
     def set[A](a: => A)                : Set[A]      = if (b) Set(a)             else Set.empty[A]
     def iterator[A](a: => A)           : Iterator[A] = if (b) Iterator.single(a) else Iterator.empty
+    def lazyList[A](a: => A)           : LazyList[A] = if (b) LazyList(a)        else LazyList.empty
   }
 
   @inline def asUnit(body: => Any): Unit = body

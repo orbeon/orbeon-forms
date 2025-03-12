@@ -176,6 +176,10 @@
                                 <xf:setvalue
                                     ref="xxf:get-variable('fr-form-model', 'selected-cell')"
                                     value="$new-selected-cell-id"/>
+                                <!-- Manual cell selection sets the starting cell -->
+                                <xf:setvalue
+                                    ref="xxf:get-variable('fr-form-model', 'starting-cell')"
+                                    value="$new-selected-cell-id"/>
                             </xf:action>
                         </xf:action>
 

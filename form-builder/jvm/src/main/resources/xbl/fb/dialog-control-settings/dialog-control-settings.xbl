@@ -241,14 +241,14 @@
                     value="
                         fbf:findNextControlId(
                             $i/control-name,
-                            'previous'
+                            'left'
                         )"/>
                 <xf:setvalue
                     ref="$i/next-control-id"
                     value="
                         fbf:findNextControlId(
                             $i/control-name,
-                            'next'
+                            'right'
                         )"/>
 
                 <!-- Remove all namespace nodes on the root element and insert those from the external `xf:bind`. This

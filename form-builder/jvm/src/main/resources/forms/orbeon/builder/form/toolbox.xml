@@ -102,7 +102,7 @@
                     <xf:label><xh:i class="fa fa-cut fa-fw"/></xf:label>
                     <xf:hint ref="$form-resources/cut/label"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:cutToClipboard($current-td)
+                        toolboxOps:cutToClipboard(fbf:getCurrentlySelectedCell())
                     </xf:action>
                 </fr:trigger>
                 <fr:trigger
@@ -114,7 +114,7 @@
                     <xf:label><xh:i class="fa fa-copy fa-fw"/></xf:label>
                     <xf:hint ref="$form-resources/copy/label"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:copyToClipboard($current-td)
+                        toolboxOps:copyToClipboard(fbf:getCurrentlySelectedCell())
                     </xf:action>
                 </fr:trigger>
                 <fr:trigger

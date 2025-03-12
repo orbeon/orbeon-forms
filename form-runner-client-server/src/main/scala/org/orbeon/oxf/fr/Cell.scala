@@ -30,7 +30,14 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
   def missing      = origin.isDefined
 }
 
-case class GridModel[Underlying](cells: List[List[Cell[Underlying]]])
+case class GridModel[Underlying](cells: List[List[Cell[Underlying]]]) {
+  def height: Int = cells.size
+  def cellAt(x: Int, y: Int): Cell[Underlying] = cells(y - 1)(x - 1)
+  def originalCellAt(x: Int, y: Int): Cell[Underlying] = {
+    val cell = cellAt(x, y)
+    if (cell.missing) cell.origin.get else cell
+  }
+}
 
 sealed trait WallPosition extends EnumEntry
 object WallPosition extends Enum[WallPosition] {

@@ -4,7 +4,7 @@ Orbeon Forms
 Manage your web forms' entire lifecycle
 ---------------------------------------
 
-Last updated for Orbeon Forms 2024.1.1 (February 2025)
+Last updated for Orbeon Forms 2024.1.1 (March 2025)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -29,6 +29,8 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+
+- [Orbeon Forms 2024.1.1](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.1)
 - [Orbeon Forms 2023.1.7](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.7)
 - [Orbeon Forms 2024.1](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1)
 - [Orbeon Forms 2023.1.6](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.6)

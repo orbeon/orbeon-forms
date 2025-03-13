@@ -12,14 +12,12 @@ USER root
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
-RUN microdnf update -y && microdnf install -y unzip
-
 # Download Orbeon Forms and extract WAR file
 RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
-    && unzip $file \
+    && jar xf $file \
     && basename=${file%.zip} \
     && mv $basename/orbeon.war . \
-    && unzip orbeon.war \
+    && jar xf orbeon.war \
     && rm -rf $DEPLOYMENT_DIR/* \
     && mkdir -p $DEPLOYMENT_DIR/orbeon.war \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon.war/
@@ -30,9 +28,7 @@ COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
 # We might want to use WildFly's deployment overlays to customize the Orbeon Forms WAR instead of exploding it
 
 # Cleanup
-RUN rm -rf /tmp/orbeon_forms \
-    && microdnf remove -y unzip \
-    && microdnf clean all
+RUN rm -rf /tmp/orbeon_forms
 
 # Prevent permission errors at runtime (Ehcache, etc.)
 RUN mkdir -p /tmp/orbeon \

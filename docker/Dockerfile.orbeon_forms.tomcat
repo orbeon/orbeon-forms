@@ -11,14 +11,12 @@ ENV DEPLOYMENT_DIR=$TOMCAT_HOME/webapps
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
-RUN apt-get update -y && apt-get install -y unzip
-
 # Download Orbeon Forms and extract WAR file
 RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
-    && unzip $file \
+    && jar xf $file \
     && basename=${file%.zip} \
     && mv $basename/orbeon.war . \
-    && unzip orbeon.war \
+    && jar xf orbeon.war \
     && rm -rf $DEPLOYMENT_DIR/* \
     && mkdir -p $DEPLOYMENT_DIR/orbeon \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon/
@@ -30,9 +28,6 @@ COPY server.gzip.xml $CONFIG_DIR/server.xml
 RUN mkdir -p $CONTEXT_DIR
 
 # Cleanup
-RUN rm -rf /tmp/orbeon_forms \
-    && apt-get remove -y unzip \
-    && apt-get autoremove -y \
-    && apt-get clean
+RUN rm -rf /tmp/orbeon_forms
 
 EXPOSE 8080

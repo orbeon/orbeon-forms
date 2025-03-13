@@ -26,8 +26,8 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
   require(x > 0 && y > 0 && h > 0 && w > 0,                 s"`$x`, `$y`, `$h`, `$w`")
   require(x <= maxGridWidth && (x + w - 1) <= maxGridWidth, s"`$x`, `$y`, `$h`, `$w`")
 
-  def td           = u getOrElse (throw new NoSuchElementException)
-  def missing      = origin.isDefined
+  def td: Underlying = u.getOrElse(throw new NoSuchElementException)
+  def missing: Boolean = origin.isDefined
 }
 
 case class GridModel[Underlying](cells: List[List[Cell[Underlying]]]) {
@@ -69,7 +69,7 @@ trait CellOps[Underlying] {
 
 object Cell {
 
-  import Private._
+  import Private.*
 
   val StandardGridWidth = 12
 
@@ -137,7 +137,7 @@ object Cell {
 
       // NOTE: Checking the first row should be enough if the grid is well-formed.
       val actualGridWidth = {
-        val widths = xy.iterator map (_.iterator filter (c => (c ne null) && ! c.missing) map (_.w) sum)
+        val widths = xy.iterator.map(_.iterator.filter(c => (c ne null) && ! c.missing).map(_.w).sum)
         if (widths.nonEmpty) widths.max else 0
       }
 
@@ -165,7 +165,7 @@ object Cell {
     val maxGridWidth = ops.maxGridWidth(grid)
 
     // TODO: can it be 0?
-    val gridHeight = if (cs.nonEmpty) cs map (c => ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1) max else 0
+    val gridHeight = if (cs.nonEmpty) cs.map(c => ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1).max else 0
 
     val xy = Array.fill[Cell[Underlying]](gridHeight, maxGridWidth)(null)
 
@@ -400,7 +400,7 @@ object Cell {
     }
 
     def xyToList[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): GridModel[Underlying] =
-      GridModel(xy map (_ take width toList) toList)
+      GridModel(xy.map(_.take(width).toList).toList)
 
      // Fill holes with cells that can span columns (but not rows, to make things simpler)
     def fillHoles[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): Unit =
@@ -453,10 +453,12 @@ object Cell {
           Divisors find (d => v1 % d == 0 && v2 % d == 0) getOrElse 1
 
         val distinctValues =
-          xy.iterator   flatMap
-          (_.iterator)  filter
-          (! _.missing) flatMap
-          (c => Iterator(c.x - 1, c.w)) toSet
+          xy
+            .iterator
+            .flatMap(_.iterator)
+            .filter(!_.missing)
+            .flatMap(c => Iterator(c.x - 1, c.w))
+            .toSet
 
         if (distinctValues.size == 1)
           distinctValues.head
@@ -465,7 +467,16 @@ object Cell {
       }
 
       if (gcd > 1)
-        GridModel(xy map (_ grouped gcd map (x => x.head) map (c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)(maxGridWidth)) toList) toList)
+        GridModel(
+          xy
+            .map(
+              _.grouped(gcd)
+                .map(x => x.head)
+                .map(c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)(maxGridWidth))
+                .toList
+            )
+            .toList
+        )
       else
         xyToList(xy, maxGridWidth)
     }
@@ -494,8 +505,8 @@ object Cell {
       val existingKeys   = existingMapping.keySet
       val existingValues = existingMapping.values.toSet
 
-      val distinctUs  = (gridModel.cells.flatten collect { case Cell(Some(u), None, _, _, _, _) => u } distinct) filterNot existingKeys
-      val lettersIt   = Iterator.tabulate(26)('A'.toInt + _ toChar)                          filterNot existingValues
+      val distinctUs  = gridModel.cells.flatten.collect{ case Cell(Some(u), None, _, _, _, _) => u }.distinct filterNot existingKeys
+      val lettersIt   = Iterator.tabulate(26)(i => ('A'.toInt + i).toChar)                                    filterNot existingValues
 
       existingMapping ++ (distinctUs.iterator zip lettersIt)
     }

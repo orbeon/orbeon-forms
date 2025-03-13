@@ -16,10 +16,9 @@
         <xbl:implementation>
             <xf:model>
 
-                <!-- FIXME: Read from property. Tried to pass it from parent but it doesn't work. -->
                 <xf:var
                     name="page-size"
-                    value="8"/>
+                    value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
 
                 <xf:var
                     name="tz"

@@ -22,18 +22,18 @@ import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction.*
 import org.orbeon.oxf.fr
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.{allLangs, findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell.*
 import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFBindTest, XFSendTest}
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils, StaticXPath}
+import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
@@ -667,7 +667,6 @@ object FormBuilderXPathApi {
       Direction.withName(leftOrRight),
       allowEmptyCell
     ).headOption.foreach { td =>
-      println(s"xxx selecting cell ${td.id}")
       selectCell(td)
     }
   }
@@ -719,29 +718,38 @@ object FormBuilderXPathApi {
           .getOrElse(selectedCell)
           .x
 
-        val otherGridElems =
+        // Instead of using `includeSelf = true` below, since we already have the `GridModel` for the current cell, we
+        // create the initial `LazyList` here. This way we don't have to analyze the grid again. In addition, we start
+        // with a different position when we are in the current grid.
+        val currentGridModelWithStartY: LazyList[(GridModel[NodeInfo], Int)] =
+          LazyList((currentGridModel, selectedCell.y))
+
+        def otherGridElems: LazyList[NodeInfo] =
           if (direction == Direction.Up)
             FormRunner.precedingOrSelfContainers(currentGridElem, includeSelf = false).filter(FormRunner.IsGrid)
           else
             FormRunner.followingOrSelfContainers(currentGridElem, includeSelf = false).filter(FormRunner.IsGrid)
 
-        val gridModelsWithStartY =
-          LazyList((currentGridModel, selectedCell.y)) ++ {
-            otherGridElems.map { gridElem =>
-              val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
-              (gridModel, if (direction == Direction.Up) gridModel.height + 1 else 0)
-            }
+        def otherGridModelWithStartY: LazyList[(GridModel[NodeInfo], Int)] =
+          otherGridElems.map { gridElem =>
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
+            (gridModel, if (direction == Direction.Up) gridModel.height else 1)
           }
 
-        def findInGridModel(gridModel: GridModel[NodeInfo], startY: Int): Option[Cell[NodeInfo]] =
-          if (direction == Direction.Up)
-            (startY > 1) option
-              gridModel.originalCellAt(startCellX, startY - 1)
-          else
-            (startY < currentGridModel.height) option
-              gridModel.originalCellAt(startCellX, startY + 1)
+        def findInGridModel(gridModel: GridModel[NodeInfo], startY: Int): List[Cell[NodeInfo]] =
+          (
+            if (direction == Direction.Up)
+              (1 to startY).reverse
+            else
+              startY to gridModel.height
+          )
+          .map(gridModel.originalCellAt(startCellX, _))
+          .keepDistinctBy(_.td) // due to rowspans, multiple rows might point to the same origin cell; only keep one
 
-        gridModelsWithStartY.flatMap((findInGridModel _).tupled).map(_.td).headOption.toList
+        (currentGridModelWithStartY ++ otherGridModelWithStartY)
+          .flatMap((findInGridModel _).tupled)
+          .drop(1) // drop the current cell
+          .map(_.td)
     }
 
   //@XPathFunction
@@ -772,7 +780,7 @@ object FormBuilderXPathApi {
     bindingElem: NodeInfo
   ): QNameValue = {
 
-    import org.orbeon.scaxon.SimplePath._
+    import org.orbeon.scaxon.SimplePath.*
 
     val selectors =
       CSSSelectorParser.parseSelectors(bindingElem.attValue(XFormsNames.ELEMENT_QNAME))

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.CollectionUtils.ListOps
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.model.Types

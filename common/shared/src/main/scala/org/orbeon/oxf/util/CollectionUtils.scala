@@ -89,10 +89,7 @@ object CollectionUtils {
   // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
   def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T => t }
 
-  // 2020-09-02: For 2.13 compat, make these only operations on `List` as we are getting errors when
-  // trying to make this apply to any collection type. Once we migrate to 2.13, we can try to make
-  // this general again.
-  implicit class ListOps[A](private val t: List[A]) extends AnyVal {
+  implicit class IterableOnceOps[A](private val t: IterableOnce[A]) extends AnyVal {
 
     def groupByKeepOrder[K](f: A => K): List[(K, List[A])] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, List[A]]]
@@ -120,7 +117,7 @@ object CollectionUtils {
         }
       }
 
-      result.to(List)
+      result.toList
     }
 
     // Return duplicate values in the order in which they appear
@@ -134,7 +131,7 @@ object CollectionUtils {
         else
           seen += x
       }
-      result.to(List)
+      result.toList
     }
   }
 

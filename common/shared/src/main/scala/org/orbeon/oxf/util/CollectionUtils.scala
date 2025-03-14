@@ -93,7 +93,7 @@ object CollectionUtils {
 
     def groupByKeepOrder[K](f: A => K): List[(K, List[A])] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, List[A]]]
-      for (elem <- t) {
+      t.iterator.foreach { elem =>
         val key = f(elem)
         val bldr = m.getOrElseUpdate(key, List.newBuilder[A])
         bldr += elem
@@ -109,7 +109,7 @@ object CollectionUtils {
       val result = mutable.ListBuffer[A]()
       val seen   = mutable.Set[K]()
 
-      for (x <- t) {
+      t.iterator.foreach { x =>
         val k = key(x)
         if (! seen(k)) {
           result += x
@@ -125,7 +125,7 @@ object CollectionUtils {
     def findDuplicates: List[A] = {
       val result = mutable.LinkedHashSet[A]()
       val seen   = mutable.HashSet[A]()
-      for (x <- t) {
+      t.iterator.foreach { x =>
         if (seen(x))
           result += x
         else

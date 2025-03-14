@@ -149,18 +149,17 @@
 
 
             // =============================================================================================================
-            // Hide LHH when needed
+            // In single-row repeats, hide LHH when needed
+            // - Wide layout: hide LHH
+            // - Narrow layout: is there more than one column?
+            //     - Yes: show LHH
+            //     - No: hide LHH
             // =============================================================================================================
             .fr-grid.fr-repeat {
-                // Don't show LHH for controls inside a repeated table which repeats over a single row only (they are shown
-                // in the column header). But only do this for the top-level control within a cell. Also, we now only do
-                // this in wide layout, as in narrow layout we need to show again the LHH on each individual control.
-                // https://github.com/orbeon/orbeon-forms/issues/4491
-
                 // Use a mixin because Less CSS doesn't parse `@media` correctly
-                .hide-lhh() {
+                .hide-lhh(@selector) {
                     &.fr-repeat-single-row {
-                        .fr-grid-body .fr-grid-td {
+                        @{selector} {
                             & > .xforms-control, & > .xbl-component, & > .xforms-group {
                                 & > .xforms-label,
                                 & > .xforms-help,
@@ -171,12 +170,20 @@
                         }
                     }
                 }
+
+                // Wide layout: hide LHH
                 @media not (max-width: 640px) {
-                    .hide-lhh();
+                    .hide-lhh(~".fr-grid-body .fr-grid-td");
                 }
-                // For the PDF renderer which doesn't support `@media` queries properly
+
+                // Narrow layout: show LHH if there is more than one column
+                @media (max-width: 640px) {
+                    .hide-lhh(~".fr-grid-body:not(:has(.fr-grid-td:not(:empty) ~ .fr-grid-td:not(:empty))) .fr-grid-td:not(:empty)");
+                }
+
+                // PDF: do as in wide layout, it the renderer doesn't properly support `@media` queries
                 @media print {
-                    .hide-lhh();
+                    .hide-lhh(~".fr-grid-body .fr-grid-td");
                 }
             }
 
@@ -194,9 +201,11 @@
                         display: none;
                     }
 
-                    // We never show the content of the header row
-                    .fr-grid-repeat-top-row .fr-grid-head, .fr-grid-th,   // CSS
-                    .fr-grid-head .fr-grid-master-row      .fr-grid-th {  // Table
+                    // Hide the content of the header row with multiple headings
+                    // - CSS
+                    .fr-grid-repeat-top-row .fr-grid-head:has(.fr-grid-th:not(:empty) ~ .fr-grid-th:not(:empty)),
+                    // - Table
+                    .fr-grid-head .fr-grid-master-row:has(.fr-grid-th:not(:empty) ~ .fr-grid-th:not(:empty)) .fr-grid-th {
                         display: none;
                     }
 

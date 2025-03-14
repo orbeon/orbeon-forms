@@ -342,6 +342,9 @@
                                                 <xf:action type="xpath">
                                                     toolboxOps:insertNewControl($binding)
                                                 </xf:action>
+                                                <xf:setvalue
+                                                    ref="xxf:get-variable('fr-form-model', 'starting-cell')"
+                                                    value="fbf:getCurrentlySelectedCell()/@id"/>
                                                 <xf:var
                                                     name="namespaced-id"
                                                     value="fbf:buildFormBuilderControlNamespacedIdOrEmpty($selected-cell)"/>

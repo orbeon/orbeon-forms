@@ -30,7 +30,6 @@ import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFBindTest, XFSendTest}
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
@@ -307,11 +306,11 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def getCurrentlySelectedCell(): NodeInfo =
+  def getCurrentlySelectedCell: NodeInfo =
     findSelectedCell(FormBuilderDocContext()).orNull
 
   //@XPathFunction
-  def getStartingCell(): NodeInfo =
+  def getStartingCell: NodeInfo =
     findStartingCell(FormBuilderDocContext()).orNull
 
   // Write back everything
@@ -655,108 +654,21 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def selectNextOrPreviousCell(
-    currentCell   : NodeInfo,
-    startCellElem : NodeInfo,
-    leftOrRight   : String,
-    allowEmptyCell: Boolean
+    currentCellElem: NodeInfo,
+    startCellElem  : NodeInfo,
+    direction      : String,
+    allowEmptyCell : Boolean
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
     findCellsByDirection(
-      currentCell,
+      currentCellElem,
       Option(startCellElem),
-      Direction.withName(leftOrRight),
+      Direction.withName(direction),
       allowEmptyCell
     ).headOption.foreach { td =>
       selectCell(td)
     }
   }
-
-  private def findCellsByDirection(
-    currentCellElem : NodeInfo,
-    startCellElemOpt: Option[NodeInfo],
-    direction       : Direction,
-    allowEmptyCell  : Boolean
-  )(implicit
-    ctx             : FormBuilderDocContext
-  ): Seq[NodeInfo] =
-    direction match {
-      case Direction.Left | Direction.Right =>
-
-        val prevOrNextCells =
-          if (direction == Direction.Left)
-            currentCellElem preceding CellTest
-          else
-            currentCellElem following CellTest
-
-        // Make sure we don't go outside the body when looking for cells
-        // https://github.com/orbeon/orbeon-forms/issues/5073
-        val prevOrNextCellsInBody =
-          prevOrNextCells takeWhile (_ ancestor * exists (_ isSameNodeInfo ctx.bodyElem))
-
-        if (allowEmptyCell)
-          prevOrNextCellsInBody
-        else
-          prevOrNextCellsInBody filter (_.hasChildElement)
-
-      case Direction.Up | Direction.Down =>
-
-        val currentGridElem  = FormRunner.findAncestorContainersLeafToRoot(currentCellElem).head // there must be one
-        val currentGridModel = Cell.analyze12ColumnGridAndFillHoles(currentGridElem, simplify = false, transpose = false)
-
-        val selectedCell =
-          Cell.findOriginCell(currentGridModel, currentCellElem)
-            .getOrElse(throw new IllegalStateException("Selected cell not found"))
-
-        def normalizedCellX24(m: GridModel[NodeInfo], c: Cell[NodeInfo]): Int =
-          (c.x - 1) * 24 / m.maxGridWidth + 1
-
-        // The id of the grid cell that should be used as a starting point is passed to us. We analyze the grid in which
-        // it is found in order to find its `x` coordinate. If we don't find the starting cell for some reason, we use
-        // the selected cell.
-        val startCellX24 =
-          startCellElemOpt.flatMap { startCellElem =>
-
-            val startCellGridElem  = FormRunner.findAncestorContainersLeafToRoot(startCellElem).head // there must be one
-            val startCellGridModel = Cell.analyze12ColumnGridAndFillHoles(startCellGridElem, simplify = false, transpose = false)
-
-            Cell.findOriginCell(startCellGridModel, startCellElem)
-              .map(normalizedCellX24(startCellGridModel, _))
-          }
-          .getOrElse(normalizedCellX24(currentGridModel, selectedCell))
-
-        // Instead of using `includeSelf = true` below, since we already have the `GridModel` for the current cell, we
-        // create the initial `LazyList` here. This way we don't have to analyze the grid again. In addition, we start
-        // with a different position when we are in the current grid.
-        val currentGridModelWithStartY: LazyList[(GridModel[NodeInfo], Int)] =
-          LazyList((currentGridModel, selectedCell.y))
-
-        def otherGridElems: LazyList[NodeInfo] =
-          if (direction == Direction.Up)
-            FormRunner.precedingOrSelfContainers(currentGridElem, includeSelf = false).filter(FormRunner.IsGrid)
-          else
-            FormRunner.followingOrSelfContainers(currentGridElem, includeSelf = false).filter(FormRunner.IsGrid)
-
-        def otherGridModelWithStartY: LazyList[(GridModel[NodeInfo], Int)] =
-          otherGridElems.map { gridElem =>
-            val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
-            (gridModel, if (direction == Direction.Up) gridModel.height else 1)
-          }
-
-        def findInGridModel(gridModel: GridModel[NodeInfo], startY: Int): List[Cell[NodeInfo]] =
-          (
-            if (direction == Direction.Up)
-              (1 to startY).reverse
-            else
-              startY to gridModel.height
-          )
-          .map(gridModel.originalCellAt((startCellX24 - 1) * gridModel.maxGridWidth / 24 + 1, _))
-          .keepDistinctBy(_.td) // due to rowspans, multiple rows might point to the same origin cell; only keep one
-
-        (currentGridModelWithStartY ++ otherGridModelWithStartY)
-          .flatMap((findInGridModel _).tupled)
-          .drop(1) // drop the current cell
-          .map(_.td)
-    }
 
   //@XPathFunction
   def formInstanceRoot: NodeInfo =

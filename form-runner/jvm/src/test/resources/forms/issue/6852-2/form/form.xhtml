@@ -1,0 +1,250 @@
+
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <row24-12>12</row24-12>
+                            <row24-6>6</row24-6>
+                            <row24-3>3</row24-3>
+                            <row24-2>2</row24-2>
+                            <row24-1>1</row24-1>
+                        </grid-1>
+                        <grid-2>
+                            <row12-6>6</row12-6>
+                            <row12-3>3</row12-3>
+                            <row12-2>2</row12-2>
+                            <row12-1>1</row12-1>
+                        </grid-2>
+
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="row24-12-bind" ref="row24-12" name="row24-12" xxf:whitespace="trim"/>
+                        <xf:bind id="row24-6-bind" ref="row24-6" name="row24-6" xxf:whitespace="trim"/>
+                        <xf:bind id="row24-3-bind" ref="row24-3" name="row24-3" xxf:whitespace="trim"/>
+                        <xf:bind id="row24-2-bind" ref="row24-2" name="row24-2" xxf:whitespace="trim"/>
+                        <xf:bind id="row24-1-bind" ref="row24-1" name="row24-1" xxf:whitespace="trim"/>
+                    </xf:bind>
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="row12-6-bind" ref="row12-6" name="row12-6" xxf:whitespace="trim"/>
+                        <xf:bind id="row12-3-bind" ref="row12-3" name="row12-3" xxf:whitespace="trim"/>
+                        <xf:bind id="row12-2-bind" ref="row12-2" name="row12-2" xxf:whitespace="trim"/>
+                        <xf:bind id="row12-1-bind" ref="row12-1" name="row12-1" xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6852-2</form-name>
+                    <title xml:lang="en">FB: Ability to navigate cells using cursor up/down #6852</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <html-page-layout>fluid</html-page-layout>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <row12-6>
+                            <label/>
+                            <hint/>
+                        </row12-6>
+                        <row12-3>
+                            <label/>
+                            <hint/>
+                        </row12-3>
+                        <row12-2>
+                            <label/>
+                            <hint/>
+                        </row12-2>
+                        <row12-1>
+                            <label/>
+                            <hint/>
+                        </row12-1>
+                        <row24-12>
+                            <label/>
+                            <hint/>
+                        </row24-12>
+                        <row24-6>
+                            <label/>
+                            <hint/>
+                        </row24-6>
+                        <row24-3>
+                            <label/>
+                            <hint/>
+                        </row24-3>
+                        <row24-2>
+                            <label/>
+                            <hint/>
+                        </row24-2>
+                        <row24-1>
+                            <label/>
+                            <hint/>
+                        </row24-1>
+                        <section-1>
+                            <label/>
+                        </section-1>
+                        <grid-1/>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind" columns="24">
+                        <fr:c y="1" x="1" w="12">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row24-12-control"
+                                      bind="row24-12-bind">
+                                <xf:label ref="$form-resources/row24-12/label"/>
+                                <xf:hint ref="$form-resources/row24-12/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+
+                            </fr:c>
+                        <fr:c y="1" x="13" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row24-6-control"
+                                      bind="row24-6-bind">
+                                <xf:label ref="$form-resources/row24-6/label"/>
+                                <xf:hint ref="$form-resources/row24-6/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="19" y="1" w="3" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row24-3-control"
+                                      bind="row24-3-bind">
+                                <xf:label ref="$form-resources/row24-3/label"/>
+                                <xf:hint ref="$form-resources/row24-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="22" y="1" w="2" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row24-2-control"
+                                      bind="row24-2-bind">
+                                <xf:label ref="$form-resources/row24-2/label"/>
+                                <xf:hint ref="$form-resources/row24-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="24" y="1" w="1" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row24-1-control"
+                                      bind="row24-1-bind">
+                                <xf:label ref="$form-resources/row24-1/label"/>
+                                <xf:hint ref="$form-resources/row24-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row12-6-control"
+                                      bind="row12-6-bind">
+                                <xf:label ref="$form-resources/row12-6/label"/>
+                                <xf:hint ref="$form-resources/row12-6/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="3">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row12-3-control"
+                                      bind="row12-3-bind">
+                                <xf:label ref="$form-resources/row12-3/label"/>
+                                <xf:hint ref="$form-resources/row12-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="2" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row12-2-control"
+                                      bind="row12-2-bind">
+                                <xf:label ref="$form-resources/row12-2/label"/>
+                                <xf:hint ref="$form-resources/row12-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="12" y="1" w="1" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="row12-1-control"
+                                      bind="row12-1-bind">
+                                <xf:label ref="$form-resources/row12-1/label"/>
+                                <xf:hint ref="$form-resources/row12-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

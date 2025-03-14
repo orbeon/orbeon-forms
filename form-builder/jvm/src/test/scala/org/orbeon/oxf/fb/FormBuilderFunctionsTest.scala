@@ -14,11 +14,13 @@
 package org.orbeon.oxf.fb
 
 import cats.syntax.option.*
+import org.orbeon.datatypes.Direction
+import org.orbeon.datatypes.Direction.mirror
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.ToolboxOps.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xml.TransformerUtils
@@ -511,9 +513,9 @@ class FormBuilderFunctionsTest
 
   describe("Renaming of variable references in formulas") {
 
-    import org.orbeon.oxf.fb.XMLNames._
-    import org.orbeon.oxf.fr.XMLNames._
-    import org.orbeon.xforms.XFormsNames._
+    import org.orbeon.oxf.fb.XMLNames.*
+    import org.orbeon.oxf.fr.XMLNames.*
+    import org.orbeon.xforms.XFormsNames.*
 
     describe("Variable and LHHA references") {
       withActionAndFBDoc(FormulasDoc) { implicit ctx =>
@@ -852,6 +854,173 @@ class FormBuilderFunctionsTest
             right = ctx.modelElem descendant * filter (_.id == "echo-submission") head
           )
         }
+      }
+    }
+  }
+
+  describe("Cursor up/down for cell selection") {
+
+    def assertOne(
+      direction: Direction,
+      valueOpt : Option[String]
+    )(implicit
+      ctx      : FormBuilderDocContext
+    ): Unit = {
+      FormBuilder.findCellsByDirection(
+        currentCellElem  = FormBuilder.findSelectedCell.get,
+        startCellElemOpt = FormBuilder.findStartingCell,
+        direction        = direction,
+        allowEmptyCell   = true
+      ).headOption.foreach { td =>
+        selectCell(td)
+      }
+      assert(FormBuilder.findSelectedCell.flatMap(_.firstChildOpt(*)).map(_.id).map(FormRunner.controlNameFromId) == valueOpt)
+    }
+
+    def testSeries(
+      expected: List[(String, Direction, List[Option[String]])]
+    )(implicit
+      ctx     : FormBuilderDocContext
+    ): Unit =
+      for ((startControlName, direction, values) <- expected) {
+        it(s"must pass starting with `$startControlName` going $direction") {
+
+          FormBuilder.selectCellForControlName(startControlName)
+          FormBuilder.selectStartCellForControlName(startControlName)
+
+          for (value <- values)
+            assertOne(direction, value)
+        }
+        it(s"must pass starting with `$startControlName` going $direction in reverse") {
+          for (value <- values.reverse.tail ::: Some(startControlName) :: Nil)
+            assertOne(Direction.mirror(direction), value)
+        }
+      }
+
+    describe("using 12-column grids only") {
+      withActionAndFBDoc("oxf:/forms/issue/6852-1/form/form.xhtml") { implicit ctx =>
+
+        // Using the "Orbeon Demo: Building Permit Application" form
+        testSeries(
+          List(
+            // Go down the leftmost column
+            (
+              "project-type",
+              Direction.Down,
+              List(
+                Some("project-scope"),
+                Some("property-owner-name"),
+                Some("property-management-tenant-name"),
+                Some("type-of-contractor"),
+                Some("contractor-state-license-number"),
+                Some("company-owner-builders-name"),
+                Some("email-address"),
+                Some("applicant-authorized-agents-name"),
+                Some("type-1"),
+                Some("name-1"),
+                Some("license-number-1"),
+                Some("certification-explanation"),
+                Some("licensed-contractor-authorized-agent-name"),
+                None,
+                Some("agreement-explanation"),
+                Some("licensed-contractor-authorized-agent-name-2"),
+                Some("declarations-explanation"),
+                Some("licensed-contractor-authorized-agent-name-3"),
+                Some("wc-explanation"),
+                Some("wc-radio-1"),
+                Some("wc-radio-2"),
+                Some("wc-radio-3"),
+                Some("licensed-contractor-authorized-agent-name-4"),
+                Some("warning-explanation"),
+                Some("notes"),
+              )
+            ),
+            // Go up from a rightmost cell of size 3 (no narrower cells)
+            (
+              "property-owner-phone",
+              Direction.Up,
+              List(
+                Some("project-scope"),
+                Some("project-job-valuation"),
+              )
+            ),
+            // Go down from a rightmost cell of size 3 (only one narrower cells, "expires-2")
+            (
+              "property-owner-phone",
+              Direction.Down,
+              List(
+                None,
+                None,
+                Some("expires"),
+                None,
+                None,
+                Some("phone-1"),
+                None,
+                Some("company-name"),
+                Some("phone-2"),
+                Some("certification-explanation"),
+                Some("signature-1"),
+                Some("agreement-explanation"),
+                Some("signature-2"),
+                Some("declarations-explanation"),
+                Some("signature-3"),
+                Some("wc-explanation"),
+                Some("wc-explanation-1"),
+                None,
+                Some("wc-explanation-2"),
+                Some("policy-number-2"),
+                Some("wc-explanation-3"),
+                Some("signature-4"),
+                Some("warning-explanation"),
+                Some("notes"),
+              )
+            ),
+          )
+        )
+      }
+    }
+
+    describe("using a mix of 12-column and 24-column grids") {
+      withActionAndFBDoc("oxf:/forms/issue/6852-2/form/form.xhtml") { implicit ctx =>
+        testSeries(
+          List(
+            (
+              "row24-12",
+              Direction.Down,
+              List(
+                Some("row12-6"),
+              )
+            ),
+            (
+              "row24-6",
+              Direction.Down,
+              List(
+                Some("row12-3"),
+              )
+            ),
+            (
+              "row24-3",
+              Direction.Down,
+              List(
+                Some("row12-2"),
+              )
+            ),
+            (
+              "row24-2",
+              Direction.Down,
+              List(
+                Some("row12-2"),
+              )
+            ),
+            (
+              "row24-1",
+              Direction.Down,
+              List(
+                Some("row12-1"),
+              )
+            ),
+          )
+        )
       }
     }
   }

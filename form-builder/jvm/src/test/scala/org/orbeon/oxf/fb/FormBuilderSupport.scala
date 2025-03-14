@@ -77,11 +77,13 @@ trait FormBuilderSupport extends XFormsSupport {
             <xf:instance id="fb-variables">
               <variables>
                 <selected-cell/>
+                <starting-cell/>
               </variables>
             </xf:instance>
 
             <xf:var name="variables"     value="instance('fb-variables')"/>
             <xf:var name="selected-cell" value="$variables/selected-cell"/>
+            <xf:var name="starting-cell" value="$variables/starting-cell"/>
 
             <xf:instance id="fb-undo-instance">
                 <_>

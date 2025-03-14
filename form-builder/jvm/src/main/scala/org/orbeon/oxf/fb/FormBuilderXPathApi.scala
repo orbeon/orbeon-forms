@@ -707,16 +707,22 @@ object FormBuilderXPathApi {
           Cell.findOriginCell(currentGridModel, currentCellElem)
             .getOrElse(throw new IllegalStateException("Selected cell not found"))
 
-        val startCellX =
+        def normalizedCellX24(m: GridModel[NodeInfo], c: Cell[NodeInfo]): Int =
+          (c.x - 1) * 24 / m.maxGridWidth + 1
+
+        // The id of the grid cell that should be used as a starting point is passed to us. We analyze the grid in which
+        // it is found in order to find its `x` coordinate. If we don't find the starting cell for some reason, we use
+        // the selected cell.
+        val startCellX24 =
           startCellElemOpt.flatMap { startCellElem =>
 
             val startCellGridElem  = FormRunner.findAncestorContainersLeafToRoot(startCellElem).head // there must be one
             val startCellGridModel = Cell.analyze12ColumnGridAndFillHoles(startCellGridElem, simplify = false, transpose = false)
 
             Cell.findOriginCell(startCellGridModel, startCellElem)
+              .map(normalizedCellX24(startCellGridModel, _))
           }
-          .getOrElse(selectedCell)
-          .x
+          .getOrElse(normalizedCellX24(currentGridModel, selectedCell))
 
         // Instead of using `includeSelf = true` below, since we already have the `GridModel` for the current cell, we
         // create the initial `LazyList` here. This way we don't have to analyze the grid again. In addition, we start
@@ -743,7 +749,7 @@ object FormBuilderXPathApi {
             else
               startY to gridModel.height
           )
-          .map(gridModel.originalCellAt(startCellX, _))
+          .map(gridModel.originalCellAt((startCellX24 - 1) * gridModel.maxGridWidth / 24 + 1, _))
           .keepDistinctBy(_.td) // due to rowspans, multiple rows might point to the same origin cell; only keep one
 
         (currentGridModelWithStartY ++ otherGridModelWithStartY)

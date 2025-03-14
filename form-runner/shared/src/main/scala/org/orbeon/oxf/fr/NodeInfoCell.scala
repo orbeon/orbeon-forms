@@ -93,7 +93,7 @@ object NodeInfoCell {
   }
 
   //
-  // This function is used to analyze a grid in `<fr:c>` format. It is used by `grid.xbl` at runtime and by tests.
+  // This function is used to analyze a grid in `<fr:c>` format. It is used by `grid-common.xsl` at runtime and by tests.
   //
   // Return `array(map(xs:string, *)*)`.
   //

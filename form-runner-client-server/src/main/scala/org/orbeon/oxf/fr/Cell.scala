@@ -30,7 +30,7 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
   def missing: Boolean = origin.isDefined
 }
 
-case class GridModel[Underlying](cells: List[List[Cell[Underlying]]]) {
+case class GridModel[Underlying](cells: List[List[Cell[Underlying]]], maxGridWidth: Int) {
   def height: Int = cells.size
   def cellAt(x: Int, y: Int): Cell[Underlying] = cells(y - 1)(x - 1)
   def originalCellAt(x: Int, y: Int): Cell[Underlying] = {
@@ -156,7 +156,7 @@ object Cell {
 
   def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
     grid      : Underlying,
-    simplify  : Boolean,
+    simplify  : Boolean, // used by tests and for producing HTML tables from `grid-common.xsl`
     transpose : Boolean
   ): GridModel[Underlying] = {
 
@@ -400,7 +400,7 @@ object Cell {
     }
 
     def xyToList[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): GridModel[Underlying] =
-      GridModel(xy.map(_.take(width).toList).toList)
+      GridModel(xy.map(_.take(width).toList).toList, width)
 
      // Fill holes with cells that can span columns (but not rows, to make things simpler)
     def fillHoles[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): Unit =
@@ -440,14 +440,14 @@ object Cell {
         }
       }
 
+    private val Divisors = List(24, 12, 8, 6, 4, 3, 2)
+
     // Create a simplified grid if positions and widths have a gcd
     // NOTE: The resulting grid will then not necessarily have `StandardGridWidth` cells on each row,
     // but 1, 2, 3, 4, 6, or 12 cells.
     def simplify[Underlying](xy: Array[Array[Cell[Underlying]]], maxGridWidth: Int): GridModel[Underlying] = {
 
       val gcd = {
-
-        val Divisors = List(24, 12, 8, 6, 4, 3, 2)
 
         def gcd2(v1: Int, v2: Int): Int =
           Divisors find (d => v1 % d == 0 && v2 % d == 0) getOrElse 1
@@ -466,18 +466,20 @@ object Cell {
           distinctValues.reduce(gcd2)
       }
 
-      if (gcd > 1)
+      if (gcd > 1) {
+        val newMaxGridWidth = maxGridWidth / gcd
         GridModel(
           xy
             .map(
               _.grouped(gcd)
                 .map(x => x.head)
-                .map(c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)(maxGridWidth))
+                .map(c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)(newMaxGridWidth))
                 .toList
             )
-            .toList
+            .toList,
+          newMaxGridWidth
         )
-      else
+      } else
         xyToList(xy, maxGridWidth)
     }
 

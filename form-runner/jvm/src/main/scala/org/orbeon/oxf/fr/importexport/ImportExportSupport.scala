@@ -102,7 +102,9 @@ object ImportExportSupport {
 
   def deleteRow(gridModel: GridModel[om.NodeInfo], index: Int): GridModel[om.NodeInfo] = {
 
-    GridModel(gridModel.cells.take(index) ::: gridModel.cells.drop(index + 1).map(row => row.map(cell => cell.copy(y = cell.y - 1)(12)))) // TODO: 24
+    val gridWidth = 12 // TODO: 24
+
+    GridModel(gridModel.cells.take(index) ::: gridModel.cells.drop(index + 1).map(row => row.map(cell => cell.copy(y = cell.y - 1)(gridWidth))), gridWidth)
 
     // TODO: adjust h and y
 //    // Reduce height of cells which start on a previous row
@@ -171,7 +173,7 @@ object ImportExportSupport {
           )
       }
 
-    GridModel(List(cells.toList))
+    GridModel(List(cells.toList), Int.MaxValue)
   }
 
   // A named range can be up to 255 characters long and can contain letters, numbers, periods and underscores (no spaces or special punctuation characters).

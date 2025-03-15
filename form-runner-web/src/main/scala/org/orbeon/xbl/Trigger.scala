@@ -43,7 +43,7 @@ object Trigger {
       containerElem.querySelectorOpt("kbd[data-orbeon-keyboard-shortcut]")
         .foreach { kbd =>
           registered = KeyboardShortcuts.bindShortcutFromKbd(
-            clickElem     = kbd,
+            clickElem     = kbd.closestT("a, button"),
             rawShortcut   = kbd.dataset("orbeonKeyboardShortcut"),
             updateDisplay = updateDisplay(_, kbd),
             condition     = kbd.dataset.get("orbeonKeyboardShortcutCondition")

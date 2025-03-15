@@ -46,7 +46,7 @@ object DropTrigger {
         containerElem.querySelectorAllT("kbd[data-orbeon-keyboard-shortcut]")
           .flatMap { kbd =>
             KeyboardShortcuts.bindShortcutFromKbd(
-              clickElem     = kbd,
+              clickElem     = kbd.closestT("a, button"),
               rawShortcut   = kbd.dataset("orbeonKeyboardShortcut"),
               updateDisplay = shortcut => kbd.innerHTML = shortcut
             )

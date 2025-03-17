@@ -47,6 +47,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.scaxon.SimplePath.AnyTest.except
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
@@ -557,7 +558,6 @@ trait FormRunnerPersistence {
       .map(_.holder)
       .flatMap { holder =>
         val path = holder.ancestorOrSelf(*).init.map(n => PathElem(n.name)).toList
-
         if (possiblePathsLeafToRoot.contains(path))
           Option(holder -> path.head.value)
         else if (possiblePathsLeafToRoot.contains(path.tail))
@@ -566,13 +566,21 @@ trait FormRunnerPersistence {
           None
       }
       .map { case (holder, controlName) =>
+        val relevantAttOpt =
+          holder
+            .ancestorOrSelf(*)
+            .iterator
+            .map(_.attOpt(XMLNames.FRRelevantQName))
+            .collectFirst{case Some(x) => x}
         NodeInfoFactory.elementInfo(
-          QName("attachment"),
-          (holder /@ @*) ++: (
-            NodeInfoFactory.attributeInfo("name", controlName) ::
-            StringValue.makeStringValue(holder.stringValue)    ::
-            Nil
-          )
+          qName   = QName("attachment"),
+          content =
+            relevantAttOpt ++:
+            holder /@ @*.except(XMLNames.FRRelevantQName) ++: (
+              NodeInfoFactory.attributeInfo("name", controlName) ::
+              StringValue.makeStringValue(holder.stringValue)    ::
+              Nil
+            )
         )
       }
       .asJava

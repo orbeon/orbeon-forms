@@ -275,10 +275,10 @@ trait FormRunnerEmailBackend {
           formVersionOpt = Left(FormDefinitionVersion.Specific(formRunnerParams.formVersion)).some
         )
 
-        S3.write(key, connectionResult.content.stream, connectionResult.content.contentLength)
+        S3.write(key, connectionResult.content.stream, connectionResult.content.contentLength, attachment.contentType.some)
       case Right(byteArray) =>
         // Attachment given as byte array, store it to S3 directly
-        S3.write(key, byteArray)
+        S3.write(key, byteArray, attachment.contentType.some)
     }
   }
 }

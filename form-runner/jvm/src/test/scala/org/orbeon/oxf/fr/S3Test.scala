@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
+import org.apache.commons.io.FilenameUtils
 import org.orbeon.oxf.fr.Names.ResourcesModel
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -235,6 +236,12 @@ class S3Test
       XFormsAPI.setvalue(Seq(topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo(variable)), lang)
     }
 
+  protected val expectedContentTypesByExtension: Map[String, String] = Map(
+    "pdf" -> "application/pdf",
+    "txt" -> "text/plain",
+    "xml" -> "application/xml; charset=UTF-8"
+  )
+
   // The following method will list the S3 objects in a path and try to find matching email templates, based on the
   // files attached.
   //
@@ -265,10 +272,19 @@ class S3Test
 
         val dateTime :: filename :: Nil = s3Object.key.split("/").takeRight(2).toList
 
-        if (filename.endsWith(".txt")) {
+        val extension           = FilenameUtils.getExtension(filename)
+        val expectedContentType = expectedContentTypesByExtension(extension)
+        val actualContentType   = S3.objectMetadata(s3Config.bucket, s3Object.key).get.contentType()
+
+        assert(
+          expectedContentType == actualContentType,
+          s"Unexpected content type found for $filename: expected=$expectedContentType, actual=$actualContentType"
+        )
+
+        if (extension == "txt") {
           // We have 1 in 1.txt, 2 in 2.txt, etc.
           val expectedContent = filename.stripSuffix(".txt")
-          val actualContent   = S3.objectAsString(s3Config.bucket, s3Object.key)
+          val actualContent   = S3.objectAsString(s3Config.bucket, s3Object.key).get
 
           assert(
             expectedContent == actualContent,

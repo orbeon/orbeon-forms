@@ -40,7 +40,9 @@ object S3 {
   }
 
   def write(
-    key: String, bytes: Array[Byte]
+    key             : String,
+    bytes           : Array[Byte],
+    contentTypeOpt  : Option[String]
   )(implicit
     s3Config        : S3Config,
     s3Client        : S3Client
@@ -48,7 +50,7 @@ object S3 {
     val inputStream = new ByteArrayInputStream(bytes)
 
     try {
-      write(key, inputStream, bytes.length.toLong.some)
+      write(key, inputStream, bytes.length.toLong.some, contentTypeOpt)
     } finally {
       runQuietly(inputStream.close())
     }
@@ -57,13 +59,19 @@ object S3 {
   def write(
     key             : String,
     inputStream     : InputStream,
-    contentLengthOpt: Option[Long]
+    contentLengthOpt: Option[Long],
+    contentTypeOpt  : Option[String]
   )(implicit
     s3Config        : S3Config,
     s3Client        : S3Client
   ): Try[PutObjectResponse] = Try {
 
-    val putObjectRequest = PutObjectRequest.builder().bucket(s3Config.bucket).key(key).build()
+    val putObjectRequestBuilder = PutObjectRequest.builder().bucket(s3Config.bucket).key(key)
+
+    val putObjectRequest = contentTypeOpt match {
+      case Some(contentType) => putObjectRequestBuilder.contentType(contentType).build()
+      case None              => putObjectRequestBuilder.build()
+    }
 
     // If we know the content length, we can pass the input stream to the AWS S3 SDK directly; if not, we'll download
     // the stream into a byte array and pass that to the SDK
@@ -84,13 +92,13 @@ object S3 {
     key     : String
   )(implicit
     s3Client: S3Client
-  ): String = {
+  ): Try[String] = {
     val getObjectRequest = GetObjectRequest.builder()
       .bucket(bucket)
       .key(key)
       .build()
 
-    IOUtils.readStreamAsStringAndClose(s3Client.getObject(getObjectRequest), charset = None)
+    Try(IOUtils.readStreamAsStringAndClose(s3Client.getObject(getObjectRequest), charset = None))
   }
 
   def headBucket(bucketName: String)(implicit s3Client: S3Client): Try[HeadBucketResponse] = {
@@ -117,9 +125,14 @@ object S3 {
 
   // No streaming for now
   def objects(bucketName: String, prefix: String = "")(implicit s3Client: S3Client): Try[List[S3Object]] = {
-    val listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build()
+    val listObjectsRequest  = ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build()
     val listObjectsResponse = s3Client.listObjects(listObjectsRequest)
     Try(listObjectsResponse.contents().asScala.toList)
+  }
+
+  def objectMetadata(bucketName: String, key: String)(implicit s3Client: S3Client): Try[HeadObjectResponse] = {
+    val headObjectRequest = HeadObjectRequest.builder().bucket(bucketName).key(key).build()
+    Try(s3Client.headObject(headObjectRequest))
   }
 
   def deleteObject(bucketName: String, key: String)(implicit s3Client: S3Client): Try[DeleteObjectResponse] = {

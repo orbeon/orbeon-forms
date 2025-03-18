@@ -91,6 +91,7 @@
                                         let $visible-opt :=
                                                 xs:boolean(
                                                     xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                        xxf:instance('fr-form-instance'),
                                                         string-join(
                                                             ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
                                                             '.'
@@ -101,6 +102,7 @@
                                             $enabled-opt :=
                                                 xs:boolean(
                                                     xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                        xxf:instance('fr-form-instance'),
                                                         string-join(
                                                             ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
                                                             '.'

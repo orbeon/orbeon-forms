@@ -149,7 +149,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("evaluate-from-property", classOf[FREvaluateFromProperty], op = saxon.functions.Evaluate.EVALUATE, min = 2, max = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+    Fun("evaluate-from-property", classOf[FREvaluateFromProperty], op = saxon.functions.Evaluate.EVALUATE, min = 2, max = 3, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
@@ -426,8 +427,10 @@ private object FormRunnerFunctions {
       implicit val xfc   : XFormsFunction.Context = XFormsFunction.context
       implicit val logger: IndentedLogger         = FormRunner.newIndentedLogger
 
+      val contextItem = itemArgument(0)
+
       FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsExpr(
-        propertyName    = stringArgument(0),
+        propertyName    = stringArgument(1),
         avt             = false,
         libraryName     = None,
         norewrite       = Set.empty,
@@ -436,9 +439,9 @@ private object FormRunnerFunctions {
       .map { rewrittenXPathExpr =>
         EvaluateSupport.evaluateInContextFromXPathExpr(
           rewrittenXPathExpr,
-          stringArgument(1),
+          stringArgument(2),
           xfc.containingDocument,
-          xpc.getContextItem
+          contextItem
         )
       }
     }

@@ -15,6 +15,7 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, ResourceResolver, StaticXPath, Whitespace, XPath}
 import org.orbeon.oxf.xforms.analysis.*
+import org.orbeon.oxf.xforms.analysis.EventHandler.{isMessageAction, isValueAction}
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.model.*
@@ -771,7 +772,7 @@ object XFormsStaticStateDeserializer {
                   } yield {
                     // NOTE: See comment in `MessageActionBuilder` about the duplication, etc.
                     val eh =
-                      if (EventHandler.isContainerAction(element.getQName)) {
+                      if (EventHandler.isContainerAction(element.getQName))
                         new EventHandler(
                           index,
                           element,
@@ -795,7 +796,7 @@ object XFormsStaticStateDeserializer {
                           isIfNonRelevant,
                           isXBLHandler
                         ) with WithChildrenTrait
-                      } else if (element.getQName == XFORMS_MESSAGE_QNAME || element.getQName == XXFORMS_LOG_QNAME)
+                      else if (isMessageAction(element.getQName) || isValueAction(element.getQName))
                         new EventHandler(
                           index,
                           element,
@@ -856,7 +857,7 @@ object XFormsStaticStateDeserializer {
               } else {
                 if (EventHandler.isContainerAction(element.getQName))
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithChildrenTrait
-                else if (element.getQName == XFORMS_MESSAGE_QNAME || element.getQName == XXFORMS_LOG_QNAME)
+                else if (isMessageAction(element.getQName) || isValueAction(element.getQName))
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithExpressionOrConstantTrait {
                     val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").getOrElse(throw new NoSuchElementException) // XXX TODO
                   }

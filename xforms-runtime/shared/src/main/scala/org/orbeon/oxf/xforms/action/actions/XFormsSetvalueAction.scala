@@ -17,10 +17,11 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsNames
+import shapeless.syntax.typeable.typeableOps
 
 import scala.util.{Failure, Success, Try}
 
@@ -37,13 +38,17 @@ class XFormsSetvalueAction extends XFormsAction {
 
     implicit val containingDocument: XFormsContainingDocument = actionInterpreter.containingDocument
 
-    val valueExpression = Option(actionElement.attributeValue(XFormsNames.VALUE_QNAME))
+    val expressionOrConstant =
+      actionContext
+        .analysis
+        .cast[WithExpressionOrConstantTrait]
+        .getOrElse(throw new IllegalStateException)
+        .expressionOrConstant
 
     // Determine value to set
     def evaluateValueToSet =
-      valueExpression match {
-        case Some(valueExpression) =>
-          // Value to set is computed with an XPath expression
+      expressionOrConstant match {
+        case Left(valueExpression) =>
           actionInterpreter.evaluateAsString(
             actionContext.analysis,
             actionElement,
@@ -51,9 +56,8 @@ class XFormsSetvalueAction extends XFormsAction {
             contextStack.getCurrentBindingContext.position,
             valueExpression
           )
-        case None =>
-          // Value to set is static content
-          actionElement.getStringValue
+        case Right(constant) =>
+          constant
       }
 
     // Set the value on target node if possible

@@ -620,7 +620,7 @@ object XFormsStaticStateSerializer {
           c.cast[WithExpressionOrConstantTrait] foreach { v =>
             b += "expressionOrConstant" -> v.expressionOrConstant.asJson
           }
-        case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message` action
+        case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message`/`xxf:log` action
           b += "expressionOrConstant" -> c.expressionOrConstant.asJson
         case c: UploadControl          =>
           b += "multiple" -> c.multiple.asJson

@@ -77,6 +77,7 @@ class XFormsStaticElementValueTest extends AnyFunSpec {
             containerPrefix = "prefix$",
             isWithinRepeat  = isWithinRepeat,
             acceptHTML      = true,
+            valueOnly       = false,
             makeString      = StaticXPath.makeStringExpression
           )
 

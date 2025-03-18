@@ -463,6 +463,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                     containerPrefix = "",    // won't be used
                     isWithinRepeat  = false, // won't be used
                     acceptHTML      = true,
+                    valueOnly       = false,
                     makeString      = StaticXPath.makeStringExpression
                   )
 

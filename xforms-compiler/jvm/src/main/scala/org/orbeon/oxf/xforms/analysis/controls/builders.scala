@@ -126,6 +126,7 @@ object LHHAAnalysisBuilder {
         containerPrefix = containerScope.fullPrefix,
         isWithinRepeat  = parent.exists(_.isWithinRepeat),
         acceptHTML      = true,
+        valueOnly       = false,
         makeString      = StaticXPath.makeStringExpression
       )
 
@@ -898,6 +899,7 @@ object EventHandlerBuilder {
     scope                    : Scope,
     containerScope           : Scope,
     withChildren             : Boolean,
+    valueOnly                : Boolean,
     withExpressionOrConstant : Boolean // see comment in `MessageActionBuilder.apply`
   ): ElementAnalysis = {
 
@@ -1012,12 +1014,14 @@ object EventHandlerBuilder {
         isIfNonRelevant,
         isXBLHandler
       ) with WithExpressionOrConstantTrait {
+
         val (expressionOrConstant, _) =
           XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
             outerElem       = this.element,
             containerPrefix = this.containerScope.fullPrefix,
             isWithinRepeat  = this.parent.exists(_.isWithinRepeat),
             acceptHTML      = false,
+            valueOnly       = valueOnly,
             makeString      = StaticXPath.makeStringExpression
           )
       }
@@ -1114,6 +1118,7 @@ object NestedNameOrValueControlBuilder {
         containerPrefix = containerScope.fullPrefix,
         isWithinRepeat  = parent.exists(_.isWithinRepeat),
         acceptHTML      = false,
+        valueOnly       = false,
         makeString      = StaticXPath.makeStringOptExpression
       )
 
@@ -1132,7 +1137,7 @@ object NestedNameOrValueControlBuilder {
   }
 }
 
-object MessageActionBuilder {
+object ValueActionBuilder {
 
   // NOTE: It's not great how we create actions which are also `EventHandler`. Here we need a mixin
   // of `EventHandler` and `WithExpressionOrConstantTrait` just to create the special case of
@@ -1148,7 +1153,8 @@ object MessageActionBuilder {
     namespaceMapping : NamespaceMapping,
     scope            : Scope,
     containerScope   : Scope,
-    isEventHandler   : Boolean
+    isEventHandler   : Boolean,
+    valueOnly        : Boolean
   ): ElementAnalysis = {
 
     if (isEventHandler)
@@ -1163,6 +1169,7 @@ object MessageActionBuilder {
         scope,
         containerScope,
         withChildren             = false,
+        valueOnly                = valueOnly,
         withExpressionOrConstant = true
       )
     else
@@ -1185,6 +1192,7 @@ object MessageActionBuilder {
             containerPrefix = this.containerScope.fullPrefix,
             isWithinRepeat  = this.parent.exists(_.isWithinRepeat),
             acceptHTML      = false,
+            valueOnly       = valueOnly,
             makeString      = StaticXPath.makeStringExpression
           )
       }

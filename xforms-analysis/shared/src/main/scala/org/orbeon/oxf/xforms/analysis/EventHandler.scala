@@ -207,10 +207,23 @@ object EventHandler {
   def isAction          (qName: QName): Boolean = Actions(qName)
   def isContainerAction (qName: QName): Boolean = ContainerActions(qName)
   def isPropertiesAction(qName: QName): Boolean = PropertiesActions(qName)
+  def isMessageAction   (qName: QName): Boolean = MessageActions(qName)
+  def isValueAction     (qName: QName): Boolean = ValueActions(qName)
 
   private object Private {
 
     val DispatchAction = xformsQName("dispatch")
+
+    val MessageActions =
+      Set(
+        XFORMS_MESSAGE_QNAME,
+        XXFORMS_LOG_QNAME,
+      )
+
+    val ValueActions =
+      Set(
+        xformsQName("setvalue"),
+      )
 
     // For nested `<xf:property>`
     val PropertiesActions =

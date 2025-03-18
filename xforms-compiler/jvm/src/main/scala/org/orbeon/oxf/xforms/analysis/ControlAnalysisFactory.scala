@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option.*
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.xforms.analysis.EventHandler.{isAction, isContainerAction, isEventHandler}
+import org.orbeon.oxf.xforms.analysis.EventHandler.*
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
 import org.orbeon.oxf.xml.dom.Extensions.*
@@ -106,11 +106,12 @@ object ControlAnalysisFactory {
     { case e: Element if byQNameFactory.isDefinedAt(e.getQName) => byQNameFactory(e.getQName) }
 
   private val ActionFactoryPf: PartialFunction[Element, ControlFactory] = {
-    case e if isContainerAction(e.getQName) && isEventHandler(e)                    => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = true, withExpressionOrConstant = false)
-    case e if isContainerAction(e.getQName)                                         => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait with WithChildrenTrait
-    case e if e.getQName == XFORMS_MESSAGE_QNAME || e.getQName == XXFORMS_LOG_QNAME => MessageActionBuilder(_, _, _, _, _, _, _, _, _, isEventHandler = isEventHandler(e))
-    case e if isAction(e.getQName) && isEventHandler(e)                             => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = false, withExpressionOrConstant = false)
-    case e if isAction(e.getQName)                                                  => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait
+    case e if isContainerAction(e.getQName) && isEventHandler(e) => EventHandlerBuilder (_, _, _, _, _, _, _, _, _, withChildren = true, withExpressionOrConstant = false, valueOnly = false)
+    case e if isContainerAction(e.getQName)                      => new ElementAnalysis (_, _, _, _, _, _, _, _, _) with ActionTrait with WithChildrenTrait
+    case e if isValueAction(e.getQName)                          => ValueActionBuilder(_, _, _, _, _, _, _, _, _, isEventHandler = isEventHandler(e), valueOnly = true)
+    case e if isMessageAction(e.getQName)                        => ValueActionBuilder(_, _, _, _, _, _, _, _, _, isEventHandler = isEventHandler(e), valueOnly = false)
+    case e if isAction(e.getQName) && isEventHandler(e)          => EventHandlerBuilder (_, _, _, _, _, _, _, _, _, withChildren = false, withExpressionOrConstant = false, valueOnly = false)
+    case e if isAction(e.getQName)                               => new ElementAnalysis (_, _, _, _, _, _, _, _, _) with ActionTrait
   }
 
   private val ControlOrActionFactory = ControlFactoryPf orElse ActionFactoryPf lift

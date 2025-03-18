@@ -179,10 +179,10 @@ object FRComponentParamSupport {
       )
       .map { rewrittenXPathExpr =>
         EvaluateSupport.evaluateInContextFromXPathExpr(
-          rewrittenXPathExpr,
-          Names.FormModel,
-          xfcd,
-          xfcd.getDefaultModel.getDefaultInstance.rootElement
+          expr               = rewrittenXPathExpr,
+          exprVarEffectiveId = Names.FormModel,
+          xfcd               = xfcd,
+          exprContextItem    = xfcd.getDefaultModel.getDefaultInstance.rootElement
         )
       }
       .map(_.collect { case v: AtomicValue => v }) // we know this returns only a `StringValue` since it is an AVT

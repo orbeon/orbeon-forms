@@ -427,8 +427,6 @@ private object FormRunnerFunctions {
       implicit val xfc   : XFormsFunction.Context = XFormsFunction.context
       implicit val logger: IndentedLogger         = FormRunner.newIndentedLogger
 
-      val contextItem = itemArgument(0)
-
       FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsExpr(
         propertyName    = stringArgument(1),
         avt             = false,
@@ -438,10 +436,10 @@ private object FormRunnerFunctions {
       )
       .map { rewrittenXPathExpr =>
         EvaluateSupport.evaluateInContextFromXPathExpr(
-          rewrittenXPathExpr,
-          stringArgument(2),
-          xfc.containingDocument,
-          contextItem
+          expr               = rewrittenXPathExpr,
+          exprVarEffectiveId = stringArgument(2),
+          exprContextItem    = itemArgument(0),
+          xfcd               = xfc.containingDocument
         )
       }
     }

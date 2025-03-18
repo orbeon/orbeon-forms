@@ -108,7 +108,7 @@ case class BindingContext(
 
   def getInScopeVariables: ju.Map[String, ValueRepresentationType] = getInScopeVariables(scopeModelVariables = true)
 
-  def getInScopeVariables(scopeModelVariables: Boolean): ju.Map[String, ValueRepresentationType] = {
+  def getInScopeVariables(scopeModelVariables: Boolean = true): ju.Map[String, ValueRepresentationType] = {
 
     val tempVariablesMap = new ju.HashMap[String, ValueRepresentationType]
 

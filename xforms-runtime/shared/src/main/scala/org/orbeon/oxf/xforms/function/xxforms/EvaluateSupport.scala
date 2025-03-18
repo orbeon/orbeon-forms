@@ -44,31 +44,38 @@ object EvaluateSupport {
   }
 
   def evaluateInContextFromXPathExpr(
-    expr       : CompiledExpression,
-    effectiveId: String,
-    xfcd       : XFormsContainingDocument,
-    contextItem: om.Item
+    expr              : CompiledExpression,
+    exprContextItem   : om.Item,
+    exprVarEffectiveId: String,                   // top-level XForms object used to resolve XPath variables
+    xfcd              : XFormsContainingDocument
   ): LazyList[om.Item] = {
 
-    val contextObject =
-      xfcd.findObjectByEffectiveId(effectiveId)
-        .getOrElse(throw new IllegalArgumentException(effectiveId))
-
-    val newXPc = XFormsFunction.Context(contextObject)
+    val varFunctionContext =
+      XFormsFunction.Context( // this will have an empty `BindingContext`
+        xfcd.findObjectByEffectiveId(exprVarEffectiveId)
+          .getOrElse(throw new IllegalArgumentException(exprVarEffectiveId))
+      )
 
     val variableResolver: VariableResolver = {
-      val inScopeVariables = newXPc.bindingContext.getInScopeVariables
+
+      // `varFunctionContext.bindingContext` is empty so `varFunctionContext.bindingContext.getInScopeVariables`
+      // only returns model variables. We make this explicit here.
+      val inScopeModelVariables = varFunctionContext.modelOpt.map(_.getTopLevelVariables).getOrElse(Map.empty)
+
       (variableQName: om.StructuredQName, _: XPathContext) => {
-        Option(inScopeVariables.get(SaxonUtils.getStructuredQNameLocalPart(variableQName)))
-          .getOrElse(throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, null))
+        inScopeModelVariables
+          .getOrElse(
+            SaxonUtils.getStructuredQNameLocalPart(variableQName),
+            throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, null)
+          )
       }
     }
 
     XPath.evaluateKeepItems(
-      contextItems       = List(contextItem).asJava,
+      contextItems       = List(exprContextItem).asJava,
       contextPosition    = 1,
       compiledExpression = expr,
-      functionContext    = newXPc,
+      functionContext    = varFunctionContext,
       variableResolver   = variableResolver
     )(
       reporter           = null

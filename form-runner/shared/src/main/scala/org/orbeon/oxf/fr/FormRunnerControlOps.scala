@@ -149,9 +149,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     bind.hasIdValue(bindId(name)) || bindRefOpt(bind).contains(name) // also check ref/nodeset in case id is not present
 
   // Canonical way: use the `name` attribute
-  def getBindNameOrEmpty(bind: NodeInfo): String =
-    findBindName(bind).orNull
-
   def findBindName(bind: NodeInfo): Option[String] =
     bind attValueOpt "name"
 

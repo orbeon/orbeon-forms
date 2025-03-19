@@ -155,8 +155,9 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       if controlRequiresNestedIterationElement(control)
       bind          <- control attValueOpt XFormsNames.BIND_QNAME flatMap findInBindsTryIndex
       iterationBind <- (bind / XFBindTest).headOption // there should be only a single nested bind
+      iterationName <- findBindName(iterationBind)
     } yield
-      getBindNameOrEmpty(iterationBind)
+      iterationName
 
   def findNestedControls(containerElem: NodeInfo): NodeColl =
     containerElem descendant (NodeInfoCell.CellTest || NodeInfoCell.TdTest) flatMap findCellNestedControl

@@ -59,7 +59,7 @@ private val AttributeRe = "@(.+)".r
 
     def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
 
-      val controlName    = getBindNameOrEmpty(bind)
+      val controlName    = findBindName(bind).getOrElse(throw new IllegalStateException(s"Control name not found for bind: ${bind.uriQualifiedName}"))
       val controlElemOpt = allControlsByName.get(controlName)
 
       // Handle non-standard cases, see https://github.com/orbeon/orbeon-forms/issues/2470

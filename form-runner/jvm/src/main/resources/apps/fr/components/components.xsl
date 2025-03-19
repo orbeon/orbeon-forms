@@ -1614,4 +1614,18 @@
         </xsl:choose>
     </xsl:template>
 
+    <!--
+        Fix forms that have a missing `name` attribute for section or grid `<xf:bind>`.
+        These are unlikely to be binds that are in the `filter-mips augment-mips` modes.
+        https://github.com/orbeon/orbeon-forms/issues/6860
+    -->
+    <xsl:template
+        match="xf:bind[empty(@name) and exists(@id) and exists(@ref) and @id = concat(@ref, '-bind')]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:attribute name="name" select="@ref"/>
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+    </xsl:template>
+
 </xsl:stylesheet>

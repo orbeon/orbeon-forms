@@ -18,6 +18,47 @@
     <p:param type="input"  name="bindings"/>
     <p:param type="output" name="data"/>
 
+    <!--
+        Fix forms that have a missing `name` attribute for section or grid `<xf:bind>`.
+        These are unlikely to be binds that are in the `filter-mips augment-mips` modes.
+        https://github.com/orbeon/orbeon-forms/issues/6860
+    -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="config">
+            <xsl:stylesheet version="2.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xf="http://www.w3.org/2002/xforms">
+
+                <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
+
+                <xsl:variable
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                    name="model-id"
+                    select="generate-id(fbf:findModelElem(/))"/>
+
+                <xsl:template match="xf:model[generate-id() = $model-id]">
+
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*  | node()" mode="within-model"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template
+                    match="xf:bind[empty(@name) and exists(@id) and exists(@ref) and @id = concat(@ref, '-bind')]"
+                    mode="within-model">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:attribute name="name" select="@ref"/>
+                        <xsl:apply-templates select="node()" mode="#current"/>
+                    </xsl:copy>
+                </xsl:template>
+
+            </xsl:stylesheet>
+        </p:input>
+        <p:input name="data" href="#data"/>
+        <p:output name="data" id="with-updated-names"/>
+    </p:processor>
+
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config">
             <xsl:stylesheet version="2.0"
@@ -33,7 +74,7 @@
 
             </xsl:stylesheet>
         </p:input>
-        <p:input name="data" href="#data"/>
+        <p:input name="data" href="#with-updated-names"/>
         <p:output name="data" id="with-native-migrations"/>
     </p:processor>
 

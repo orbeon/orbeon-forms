@@ -1132,6 +1132,7 @@ lazy val xformsCompilerJVM = xformsCompiler.jvm
     core % "test->test;compile->compile",
     coreCrossPlatformJVM // implied
   )
+  .settings(scala2CommonSettings: _*)
   .settings(jUnitTestOptions: _*)
   .settings(
 //    libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" % Test cross CrossVersion.full)

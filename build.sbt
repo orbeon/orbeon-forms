@@ -1061,7 +1061,6 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % mainScalaVersion,
-//      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
     )
   )
 
@@ -1134,9 +1133,6 @@ lazy val xformsCompilerJVM = xformsCompiler.jvm
   )
   .settings(scala2CommonSettings: _*)
   .settings(jUnitTestOptions: _*)
-  .settings(
-//    libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" % Test cross CrossVersion.full)
-  )
 
 lazy val xformsCompilerJS = xformsCompiler.js
   .dependsOn(
@@ -1183,7 +1179,6 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % mainScalaVersion,
-//      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
     )
   )
 
@@ -1290,7 +1285,6 @@ lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(Cr
     libraryDependencies ++= Seq(
       "org.parboiled"   %%% "parboiled"     % Parboiled2Version,
       "org.scala-lang"  %   "scala-reflect" % mainScalaVersion,
-//      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
     ),
 
     libraryDependencies ++= Seq(

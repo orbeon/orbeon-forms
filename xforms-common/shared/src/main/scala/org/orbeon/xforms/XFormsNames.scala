@@ -231,8 +231,8 @@ object XFormsNames {
   val XXFORMS_STATIC_STATE_QNAME          = xxformsQName("static-state")
   val XXFORMS_DYNAMIC_STATE_QNAME         = xxformsQName("dynamic-state")
   val XXFORMS_INITIAL_DYNAMIC_STATE_QNAME = xxformsQName("initial-dynamic-state")
+
   val XXFORMS_ACTION_QNAME                = xxformsQName("action")
-  val XXFORMS_SERVER_EVENTS_QNAME         = xxformsQName("server-events")
 
   val XFORMS_PARAM_QNAME                  = xformsQName("param")
   val XFORMS_BODY_QNAME                   = xformsQName("body")

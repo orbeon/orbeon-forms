@@ -301,13 +301,12 @@
             </xf:bind>
 
             <xf:submission
-                    id="fr-reindex-submission"
-                    method="get"
-                    resource="/fr/service/persistence/reindex"
-                    serialization="none"
-                    replace="none"
-                    mode="asynchronous">
-            </xf:submission>
+                id="fr-reindex-submission"
+                method="get"
+                resource="/fr/service/persistence/reindex"
+                serialization="none"
+                replace="none"
+                mode="asynchronous"/>
 
             <!-- Refresh page every 2s, as long as we either have a re-index or re-encryption in progress -->
             <xf:action event="xforms-ready" if="$is-admin">
@@ -337,7 +336,6 @@
                                 .
                             "/>
 
-                <xf:setvalue ref="instance('fr-reindex-instance')/provider-token"   value="index:getProviderToken()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-token"   value="index:getProviderToken()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-current" value="index:getProviderCurrent()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-total"   value="index:getProviderTotal()"/>

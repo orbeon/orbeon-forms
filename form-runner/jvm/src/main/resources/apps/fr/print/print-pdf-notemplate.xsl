@@ -159,7 +159,6 @@
                                                 padding-bottom: 10px;
                                                 margin-bottom: 0;
                                                 vertical-align: bottom;
-                                                border-bottom: 1px solid gray;
                                             </xsl:text>
                                         </xsl:when>
                                         <xsl:otherwise>
@@ -167,7 +166,6 @@
                                                 padding-top: 10px;
                                                 margin-top: 0;
                                                 vertical-align: top;
-                                                border-top: 1px solid gray;
                                             </xsl:text>
                                         </xsl:otherwise>
                                     </xsl:choose>

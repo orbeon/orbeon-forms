@@ -32,7 +32,7 @@ object Backend {
         if (StatusStore.getStatus != Status.Stopping) {
           StatusStore.setStatus(Status.Indexing(
             provider      = provider,
-            providerCount = Count(index + 1, providers.length),
+            providerCount = Count(current = index + 1, total = providers.length),
             documentCount = None
           ))
           indexProvider(provider)
@@ -42,18 +42,18 @@ object Backend {
   }
 
   def setProviderDocumentTotal(total: Int)(implicit indentedLogger: IndentedLogger): Unit =
-    setIndexing(i => Some(i.copy(documentCount = Some(Count(total = total, current = 0)))))
+    updateIndexingStatus(i => Some(i.copy(documentCount = Some(Count(total = total, current = 0)))))
 
   def setProviderDocumentNext()(implicit indentedLogger: IndentedLogger): Unit =
     setDocumentCount(c => c.copy(current = c.current + 1))
 
-  private def setIndexing(setter: Status.Indexing => Option[Status.Indexing])(implicit indentedLogger: IndentedLogger): Unit =
+  private def updateIndexingStatus(setter: Status.Indexing => Option[Status.Indexing])(implicit indentedLogger: IndentedLogger): Unit =
     Some(StatusStore.getStatus).collect { case status: Status.Indexing =>
       setter(status).foreach(StatusStore.setStatus)
     }
 
   private def setDocumentCount(setter: Count => Count)(implicit indentedLogger: IndentedLogger): Unit =
-    setIndexing(indexing =>
+    updateIndexingStatus(indexing =>
       indexing.documentCount.map { dc =>
         indexing.copy(documentCount = Some(setter(dc)))
       }

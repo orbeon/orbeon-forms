@@ -74,6 +74,46 @@ class XFormsStaticElementValueTest
         true,
         false,
       ),
+      (
+        "`<xf:message>` action with ignored inline text",
+        <xf:message
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          ref="my-message">false</xf:message>.toDocument,
+        false,
+        Left("""string((my-message)[1])"""),
+        false,
+        false,
+      ),
+      (
+        "`<xf:message>` action with `value` attribute",
+        <xf:message
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          ref="." value="'false'"/>.toDocument,
+        false,
+        Left("""string(('false')[1])"""),
+        false,
+        false,
+      ),
+      (
+        "`<xf:setvalue>` action with inline text",
+        <xf:setvalue
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          ref=".">false</xf:setvalue>.toDocument,
+        false,
+        Right("""false"""),
+        false,
+        true,
+      ),
+      (
+        "`<xf:setvalue>` action with `value` attribute",
+        <xf:setvalue
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          ref="." value="'false'"/>.toDocument,
+        false,
+        Left("""string(('false')[1])"""),
+        false,
+        true,
+      ),
     )
 
     for ((desc, doc, isWithinRepeat, expectedExprOrConst, expectedContainsHTML, valuesOnly) <- Expected)

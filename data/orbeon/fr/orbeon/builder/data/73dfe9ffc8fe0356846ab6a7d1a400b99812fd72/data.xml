@@ -1,0 +1,1767 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <project-information-section>
+                        <grid-1>
+                            <project-type/>
+                            <project-job-valuation/>
+                            <project-scope/>
+                        </grid-1>
+                        <project-information-address-section>
+                            <grid-3>
+                                <us-address-street-1/>
+                                <us-address-city/>
+
+
+                                <us-address-street-2/>
+                                <us-address-state/>
+                                <us-address-zip/>
+
+
+                                <us-address-urbanization/>
+
+                            </grid-3>
+
+
+
+
+
+
+
+                        </project-information-address-section>
+
+                    </project-information-section>
+                    <project-contact-section>
+                        <property-owner-section>
+                            <grid-2>
+                                <property-owner-name/>
+                                <property-owner-email-address/>
+                                <property-owner-phone/>
+                                <property-management-tenant-name/>
+                            </grid-2>
+                            <property-owner-address>
+                                <grid-3>
+                                    <us-address-street-1/>
+                                    <us-address-city/>
+
+
+                                    <us-address-street-2/>
+                                    <us-address-state/>
+                                    <us-address-zip/>
+
+
+                                    <us-address-urbanization/>
+
+                                </grid-3>
+
+
+
+
+
+
+
+                            </property-owner-address>
+                        </property-owner-section>
+                        <contractor-section>
+                            <grid-3>
+                                <contractor-type/>
+                                <contractor-state-license-number/>
+                                <contractor-license-class/>
+                                <contractor-expires/>
+                                <contractor-company-owner-builders-name/>
+                                <contractor-business-license-number/>
+                                <contractor-email-address/>
+                                <contractor-phone/>
+                            </grid-3>
+                            <grid-6>
+                                <contractor-applicant-authorized-agents-name/>
+                                <contractor-applicant-email-address/>
+                                <contractor-applicant-phone/>
+                            </grid-6>
+                            <contractor-address-section>
+                                <grid-3>
+                                    <us-address-street-1/>
+                                    <us-address-city/>
+
+
+                                    <us-address-street-2/>
+                                    <us-address-state/>
+                                    <us-address-zip/>
+
+
+                                    <us-address-urbanization/>
+
+                                </grid-3>
+
+
+
+
+
+
+
+                            </contractor-address-section>
+                        </contractor-section>
+                        <architect-section>
+                            <grid-4>
+                                <architect-type/>
+                                <architect-name/>
+                                <architect-company-name/>
+                                <architect-license-number/>
+                                <architect-email-address/>
+                                <architect-phone/>
+                            </grid-4>
+                            <architect-address-section>
+                                <grid-3>
+                                    <us-address-street-1/>
+                                    <us-address-city/>
+
+
+                                    <us-address-street-2/>
+                                    <us-address-state/>
+                                    <us-address-zip/>
+
+
+                                    <us-address-urbanization/>
+
+                                </grid-3>
+
+
+
+
+
+
+
+                            </architect-address-section>
+                        </architect-section>
+                    </project-contact-section>
+                    <certification-section>
+                        <grid-5>
+                            <certification-explanation/>
+                            <certification-licensed-contractor-authorized-agent-name/>
+                            <certification-date/>
+                            <certification-signature/>
+                        </grid-5>
+                    </certification-section>
+                    <agreement-section>
+                        <grid-7>
+                            <agreement-explanation/>
+                            <agreement-licensed-contractor-authorized-agent-name/>
+                            <agreement-date/>
+                            <agreement-signature/>
+                        </grid-7>
+                    </agreement-section>
+                    <declarations-section>
+                        <grid-8>
+                            <declarations-explanation/>
+                            <declarations-licensed-contractor-authorized-agent-name/>
+                            <declarations-date/>
+                            <declarations-signature/>
+                            <wc-explanation/>
+                            <wc-radio-1/>
+                            <wc-explanation-1/>
+                            <wc-policy-number-1/>
+                            <wc-radio-2/>
+                            <wc-explanation-2/>
+                            <wc-carrier/>
+                            <wc-policy-number-2/>
+                            <wc-expires/>
+                            <wc-radio-3/>
+                            <wc-explanation-3/>
+                            <wc-licensed-contractor-authorized-agent-name/>
+
+                            <wc-date/>
+                            <wc-signature/>
+                            <warning-explanation/>
+                            <notes/>
+                        </grid-8>
+                    </declarations-section>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="project-information-section-bind" name="project-information-section"
+                         ref="project-information-section">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="project-job-valuation-bind" ref="project-job-valuation"
+                                 name="project-job-valuation"
+                                 type="xs:decimal"
+                                 constraint="xxf:fraction-digits(2)"
+                                 required="true()"/>
+                        <xf:bind id="project-type-bind" ref="project-type" name="project-type" required="true()"/>
+                        <xf:bind id="project-scope-bind" ref="project-scope" name="project-scope"
+                                 required="true()"/>
+                    </xf:bind>
+                    <xf:bind id="project-information-address-section-bind"
+                             ref="project-information-address-section"
+                             name="project-information-address-section"/>
+
+                </xf:bind>
+                <xf:bind id="project-contact-section-bind" ref="project-contact-section"
+                         name="project-contact-section">
+                    <xf:bind id="property-owner-section-bind" ref="property-owner-section"
+                             name="property-owner-section">
+                        <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                            <xf:bind id="property-owner-name-bind" ref="property-owner-name"
+                                     name="property-owner-name"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="property-owner-email-address-bind" ref="property-owner-email-address"
+                                     name="property-owner-email-address"
+                                     type="xf:email"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="property-owner-phone-bind" ref="property-owner-phone"
+                                     name="property-owner-phone"
+                                     constraint=". = '' or matches(., '^\d{10}$')"
+                                     required="true()"/>
+                            <xf:bind id="property-management-tenant-name-bind" ref="property-management-tenant-name"
+                                     name="property-management-tenant-name"
+                                     xxf:whitespace="trim"/>
+                        </xf:bind>
+                        <xf:bind id="property-owner-address-bind" ref="property-owner-address"
+                                 name="property-owner-address"/>
+                    </xf:bind>
+                    <xf:bind id="contractor-section-bind" ref="contractor-section" name="contractor-section">
+                        <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                            <xf:bind id="contractor-type-bind" ref="contractor-type" name="contractor-type"
+                                     required="true()"/>
+                            <xf:bind id="contractor-state-license-number-bind" ref="contractor-state-license-number"
+                                     name="contractor-state-license-number"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-license-class-bind" ref="contractor-license-class"
+                                     name="contractor-license-class"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-expires-bind" ref="contractor-expires" name="contractor-expires"
+                                     type="xs:date"
+                                     required="true()"/>
+                            <xf:bind id="contractor-company-owner-builders-name-bind"
+                                     ref="contractor-company-owner-builders-name"
+                                     name="contractor-company-owner-builders-name"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-business-license-number-bind"
+                                     ref="contractor-business-license-number"
+                                     name="contractor-business-license-number"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-email-address-bind" ref="contractor-email-address"
+                                     name="contractor-email-address"
+                                     type="xf:email"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-phone-bind" ref="contractor-phone" name="contractor-phone"
+                                     constraint=". = '' or matches(., '^\d{10}$')"
+                                     required="true()"/>
+                        </xf:bind>
+                        <xf:bind id="contractor-address-section-bind" ref="contractor-address-section"
+                                 name="contractor-address-section"/>
+                        <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
+                            <xf:bind id="contractor-applicant-authorized-agents-name-bind"
+                                     ref="contractor-applicant-authorized-agents-name"
+                                     name="contractor-applicant-authorized-agents-name"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-applicant-email-address-bind"
+                                     ref="contractor-applicant-email-address"
+                                     name="contractor-applicant-email-address"
+                                     type="xf:email"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="contractor-applicant-phone-bind" ref="contractor-applicant-phone"
+                                     name="contractor-applicant-phone"
+                                     constraint=". = '' or matches(., '^\d{10}$')"
+                                     required="true()"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="architect-section-bind" ref="architect-section" name="architect-section">
+                        <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+                            <xf:bind id="architect-type-bind" ref="architect-type" name="architect-type"
+                                     required="true()"/>
+                            <xf:bind id="architect-name-bind" ref="architect-name" name="architect-name"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="architect-company-name-bind" ref="architect-company-name"
+                                     name="architect-company-name"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="architect-license-number-bind" ref="architect-license-number"
+                                     name="architect-license-number"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="architect-email-address-bind" ref="architect-email-address"
+                                     name="architect-email-address"
+                                     type="xf:email"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="architect-phone-bind" ref="architect-phone" name="architect-phone"
+                                     constraint=". = '' or matches(., '^\d{10}$')"
+                                     required="true()"/>
+                        </xf:bind>
+                        <xf:bind id="architect-address-section-bind" ref="architect-address-section"
+                                 name="architect-address-section"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="certification-section-bind" ref="certification-section"
+                         name="certification-section">
+                    <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                        <xf:bind id="certification-explanation-bind" ref="certification-explanation"
+                                 name="certification-explanation"/>
+                        <xf:bind id="certification-licensed-contractor-authorized-agent-name-bind"
+                                 ref="certification-licensed-contractor-authorized-agent-name"
+                                 name="certification-licensed-contractor-authorized-agent-name"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="certification-signature-bind" ref="certification-signature"
+                                 name="certification-signature"
+                                 type="xs:anyURI"
+                                 required="true()"/>
+                        <xf:bind id="certification-date-bind" ref="certification-date" name="certification-date"
+                                 type="xs:date"
+                                 required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="agreement-section-bind" ref="agreement-section" name="agreement-section">
+                    <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
+                        <xf:bind id="agreement-explanation-bind" ref="agreement-explanation"
+                                 name="agreement-explanation"/>
+                        <xf:bind id="agreement-licensed-contractor-authorized-agent-name-bind"
+                                 ref="agreement-licensed-contractor-authorized-agent-name"
+                                 name="agreement-licensed-contractor-authorized-agent-name"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="agreement-date-bind" ref="agreement-date" name="agreement-date"
+                                 type="xs:date"
+                                 required="true()"/>
+                        <xf:bind id="agreement-signature-bind" ref="agreement-signature"
+                                 name="agreement-signature"
+                                 type="xs:anyURI"
+                                 required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="declarations-section-bind" ref="declarations-section"
+                         name="declarations-section">
+                    <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
+                        <xf:bind id="declarations-explanation-bind" ref="declarations-explanation"
+                                 name="declarations-explanation"/>
+                        <xf:bind id="declarations-licensed-contractor-authorized-agent-name-bind"
+                                 ref="declarations-licensed-contractor-authorized-agent-name"
+                                 name="declarations-licensed-contractor-authorized-agent-name"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="declarations-date-bind" ref="declarations-date" name="declarations-date"
+                                 type="xs:date"
+                                 required="true()"/>
+                        <xf:bind id="declarations-signature-bind" ref="declarations-signature"
+                                 name="declarations-signature"
+                                 type="xs:anyURI"
+                                 required="true()"/>
+                        <xf:bind id="wc-explanation-1-bind" ref="wc-explanation-1" name="wc-explanation-1"/>
+                        <xf:bind id="wc-explanation-bind" ref="wc-explanation" name="wc-explanation"/>
+                        <xf:bind id="wc-radio-1-bind" ref="wc-radio-1" name="wc-radio-1"/>
+                        <xf:bind id="wc-radio-2-bind" ref="wc-radio-2" name="wc-radio-2"/>
+                        <xf:bind id="wc-explanation-2-bind" ref="wc-explanation-2" name="wc-explanation-2"/>
+                        <xf:bind id="wc-policy-number-1-bind" ref="wc-policy-number-1" name="wc-policy-number-1"
+                                 xxf:whitespace="trim"
+                                 readonly="not($wc-radio-1/string() = 'true')"
+                                 required="$wc-radio-1/string() = 'true'"/>
+                        <xf:bind id="wc-policy-number-2-bind" ref="wc-policy-number-2" name="wc-policy-number-2"
+                                 xxf:whitespace="trim"
+                                 readonly="not($wc-radio-2/string() = 'true')"
+                                 required="$wc-radio-2/string() = 'true'"/>
+                        <xf:bind id="wc-expires-bind" ref="wc-expires" name="wc-expires" type="xf:date"
+                                 readonly="not($wc-radio-2/string() = 'true')"
+                                 required="$wc-radio-2/string() = 'true'"/>
+                        <xf:bind id="wc-carrier-bind" ref="wc-carrier" name="wc-carrier" xxf:whitespace="trim"
+                                 readonly="not($wc-radio-2/string() = 'true')"
+                                 required="$wc-radio-2/string() = 'true'"/>
+                        <xf:bind id="wc-radio-3-bind" ref="wc-radio-3" name="wc-radio-3"/>
+                        <xf:bind id="wc-explanation-3-bind" ref="wc-explanation-3" name="wc-explanation-3"/>
+
+                        <xf:bind id="wc-date-bind" ref="wc-date" name="wc-date" type="xs:date" required="true()"/>
+                        <xf:bind id="wc-signature-bind" ref="wc-signature" name="wc-signature" type="xs:anyURI"
+                                 required="true()"/>
+                        <xf:bind id="warning-explanation-bind" ref="warning-explanation"
+                                 name="warning-explanation"/>
+                        <xf:bind id="notes-bind" ref="notes" name="notes"/>
+                        <xf:bind id="wc-licensed-contractor-authorized-agent-name-bind"
+                                 ref="wc-licensed-contractor-authorized-agent-name"
+                                 name="wc-licensed-contractor-authorized-agent-name"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>building-permit</form-name>
+                    <title xml:lang="en">Orbeon Demo: Building Permit Application</title>
+                    <description xml:lang="en" mediatype="text/html">&lt;div&gt;This form is inspired by real-life building permit application forms. It shows:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;&lt;li&gt;a sophisticated layout of form controls on wide screens&lt;/li&gt;&lt;li&gt;an automatic vertical layout on narrow screens such as phones&lt;/li&gt;&lt;li&gt;explanatory texts&lt;/li&gt;&lt;li&gt;&lt;a href="https://doc.orbeon.com/form-builder/advanced/section-templates"&gt;section templates&lt;/a&gt;&lt;/li&gt;&lt;li&gt;nested grids and sections (subsections)&lt;/li&gt;&lt;li&gt;email, date, and phone number fields&lt;/li&gt;&lt;li&gt;the &lt;a href="https://doc.orbeon.com/form-runner/component/handwritten-signature"&gt;Handwritten Signature form control&lt;/a&gt;&lt;/li&gt;&lt;li&gt;conditional validation&lt;/li&gt;&lt;li&gt;about 80 form controls, grids and sections&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</description>
+
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+
+
+
+
+
+
+
+
+
+                    <density>comfortable</density>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <declarations-explanation>
+                            <text>&lt;div&gt;&lt;strong&gt;Licensed Contractor Declaration: &lt;/strong&gt;I hereby affirm under penalty of perjury that I am licensed under the provisions of Chapter 9 (commencing with Section 7000) of Division 3 of the Business and Professions Code, and my license is in full force and effect.&lt;/div&gt;</text>
+
+                        </declarations-explanation>
+                        <declarations-licensed-contractor-authorized-agent-name>
+                            <label>Name (licensed contractor/authorized agent)</label>
+                            <hint/>
+
+
+
+
+                        </declarations-licensed-contractor-authorized-agent-name>
+                        <declarations-date>
+                            <label>Date</label>
+                            <hint/>
+
+
+
+
+                        </declarations-date>
+                        <declarations-signature>
+                            <label>Signature</label>
+                            <hint/>
+
+
+
+
+                        </declarations-signature>
+                        <wc-explanation>
+                            <text>&lt;div&gt;&lt;strong&gt;Workers’ Compensation Declaration:&lt;/strong&gt; I hereby affirm under penalty of perjury one of the following declarations:&lt;/div&gt;</text>
+
+                        </wc-explanation>
+                        <wc-radio-1>
+                            <label/>
+                            <hint/>
+
+
+                            <item>
+                                <label/>
+                                <hint/>
+                                <value>true</value>
+                            </item>
+                        </wc-radio-1>
+                        <wc-explanation-1>
+                            <text>&lt;div&gt;I have and will maintain a certificate of consent to self-insure for workers' compensation, as provided for by Section 3700 of the Labor Code, for the performance of the work for which this permit is issued. My policy number is:&lt;/div&gt;</text>
+
+                        </wc-explanation-1>
+                        <wc-policy-number-1>
+                            <label>Policy number</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-policy-number-1>
+                        <wc-radio-2>
+                            <label/>
+                            <hint/>
+
+
+
+
+
+
+                            <item>
+                                <label/>
+                                <hint/>
+                                <value>true</value>
+                            </item>
+                        </wc-radio-2>
+                        <wc-explanation-2>
+                            <text>&lt;div&gt;I have and will maintain workers' compensation insurance, as required by Section 3700 of the Labor Code, for the performance of the work for which this permit is issued. My workers' compensation insurance is:
+&lt;/div&gt;</text>
+
+
+
+                        </wc-explanation-2>
+                        <wc-carrier>
+                            <label>Carrier</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-carrier>
+                        <wc-policy-number-2>
+                            <label>Policy number</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-policy-number-2>
+                        <wc-expires>
+                            <label>Expires</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-expires>
+                        <wc-radio-3>
+                            <label/>
+                            <hint/>
+
+
+
+
+
+
+                            <item>
+                                <label/>
+                                <hint/>
+                                <value>true</value>
+                            </item>
+                        </wc-radio-3>
+                        <wc-explanation-3>
+                            <text>I certify that in the performance of the work for which this permit is issued, I shall not employ any person in any manner so as to become subject to the workers' compensation laws of California and agree that, if I should become subject to the workers' compensation provisions of Section 3700 of the Labor Code, I shall forthwith comply with those provisions.</text>
+
+
+
+                        </wc-explanation-3>
+                        <wc-licensed-contractor-authorized-agent-name>
+                            <label>Name (licensed contractor/authorized agent)</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-licensed-contractor-authorized-agent-name>
+
+                        <wc-date>
+                            <label>Date</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-date>
+                        <wc-signature>
+                            <label>Signature</label>
+                            <hint/>
+
+
+
+
+
+
+                        </wc-signature>
+                        <warning-explanation>
+                            <text>&lt;div&gt;&lt;strong&gt;Warning: &lt;/strong&gt;Failure to secure workers' compensation coverage is unlawful and shall subject an employer to criminal penalties and civil fines up to $100,000, in addition to the cost of compensation, and damages as provided for in Section 306 of the Labor Code, interest, and attorney's fees.&lt;/div&gt;</text>
+
+
+                        </warning-explanation>
+                        <notes>
+                            <label>Notes</label>
+                            <hint/>
+
+
+                        </notes>
+                        <agreement-explanation>
+                            <text>&lt;div&gt;[Specific terms here.] I have read the above information and understand it. This information will be passed along to the property owner in a timely manner by the contractor if the property owner is not the person signing this form.&lt;/div&gt;</text>
+
+
+                        </agreement-explanation>
+                        <agreement-licensed-contractor-authorized-agent-name>
+                            <label>Name (licensed contractor/authorized agent)</label>
+                            <hint/>
+
+
+
+
+                        </agreement-licensed-contractor-authorized-agent-name>
+                        <agreement-date>
+                            <label>Date</label>
+                            <hint/>
+
+
+
+
+                        </agreement-date>
+                        <agreement-signature>
+                            <label>Signature</label>
+                            <hint/>
+
+
+
+
+                        </agreement-signature>
+                        <contractor-applicant-authorized-agents-name>
+                            <label>Applicant/authorized agent's name</label>
+                            <hint/>
+
+
+
+
+                        </contractor-applicant-authorized-agents-name>
+                        <contractor-applicant-email-address>
+                            <label>Email address</label>
+                            <hint/>
+
+
+
+
+                        </contractor-applicant-email-address>
+                        <contractor-applicant-phone>
+                            <label>Phone</label>
+                            <hint/>
+
+
+
+
+                        </contractor-applicant-phone>
+                        <certification-explanation>
+                            <text>&lt;div&gt;I certify that I have read this application and state that the above information is correct. I agree to comply with all city ordinances and state laws relating to building construction and hereby authorize representatives of this city to enter upon the above-mentioned property for inspection purposes.&lt;/div&gt;</text>
+
+                        </certification-explanation>
+                        <certification-licensed-contractor-authorized-agent-name>
+                            <label>Name (licensed contractor/authorized agent)</label>
+                            <hint/>
+
+
+
+
+                        </certification-licensed-contractor-authorized-agent-name>
+                        <certification-date>
+                            <label>Date</label>
+                            <hint/>
+
+
+
+
+                        </certification-date>
+                        <certification-signature>
+                            <label>Signature</label>
+                            <hint/>
+
+
+
+
+                        </certification-signature>
+                        <architect-type>
+                            <label>Type</label>
+                            <hint/>
+
+
+
+
+                            <item>
+                                <label>Architect</label>
+                                <hint/>
+                                <value>architect</value>
+                            </item>
+                            <item>
+                                <label>Engineer</label>
+                                <hint/>
+                                <value>engineer</value>
+                            </item>
+                            <item>
+                                <label>Designer</label>
+                                <hint/>
+                                <value>designer</value>
+                            </item>
+                        </architect-type>
+                        <architect-name>
+                            <label>Name</label>
+                            <hint/>
+
+
+
+
+                        </architect-name>
+                        <architect-company-name>
+                            <label>Company name</label>
+                            <hint/>
+
+
+
+
+                        </architect-company-name>
+                        <architect-license-number>
+                            <label>License #</label>
+                            <hint/>
+
+
+
+
+                        </architect-license-number>
+                        <architect-email-address>
+                            <label>Email address</label>
+                            <hint/>
+
+
+
+
+                        </architect-email-address>
+                        <architect-phone>
+                            <label>Phone</label>
+                            <hint/>
+
+
+
+
+                        </architect-phone>
+                        <architect-address-section>
+                            <label>Mailing address</label>
+
+                        </architect-address-section>
+                        <contractor-type>
+                            <label>Type of contractor</label>
+                            <hint/>
+
+
+
+
+                            <item>
+                                <label>Contractor</label>
+                                <hint/>
+                                <value>contractor</value>
+                            </item>
+                            <item>
+                                <label>Owner-builder</label>
+                                <hint/>
+                                <value>owner-builder</value>
+                            </item>
+                        </contractor-type>
+                        <contractor-state-license-number>
+                            <label>Contractor state license #</label>
+                            <hint/>
+
+
+
+
+                        </contractor-state-license-number>
+                        <contractor-license-class>
+                            <label>License class</label>
+                            <hint/>
+
+
+
+
+                        </contractor-license-class>
+                        <contractor-expires>
+                            <label>Expires</label>
+                            <hint/>
+
+
+
+
+                        </contractor-expires>
+                        <contractor-company-owner-builders-name>
+                            <label>Company/owner-builder's name</label>
+                            <hint/>
+
+
+
+
+                        </contractor-company-owner-builders-name>
+                        <contractor-business-license-number>
+                            <label>Business license #</label>
+                            <hint/>
+
+
+
+
+                        </contractor-business-license-number>
+                        <contractor-email-address>
+                            <label>Email address</label>
+                            <hint/>
+
+
+
+
+                        </contractor-email-address>
+                        <contractor-phone>
+                            <label>Phone</label>
+                            <hint/>
+
+
+
+
+                        </contractor-phone>
+                        <contractor-address-section>
+                            <label>Mailing address</label>
+
+                        </contractor-address-section>
+                        <property-owner-name>
+                            <label>Property owner name</label>
+                            <hint/>
+
+
+
+
+                        </property-owner-name>
+                        <property-owner-email-address>
+                            <label>Property owner email</label>
+                            <hint/>
+
+
+
+
+                        </property-owner-email-address>
+                        <property-owner-phone>
+                            <label>Property owner phone</label>
+                            <hint/>
+
+
+
+
+                        </property-owner-phone>
+                        <property-management-tenant-name>
+                            <label>Property management/tenant name</label>
+                            <hint/>
+
+
+                        </property-management-tenant-name>
+                        <property-owner-address>
+                            <label>Property owner mailing address</label>
+
+                        </property-owner-address>
+                        <property-owner-section>
+                            <label>Property owner</label>
+
+                        </property-owner-section>
+                        <contractor-section>
+                            <label>Contractor/owner-builder</label>
+
+                        </contractor-section>
+                        <architect-section>
+                            <label>Architect/engineer/designer</label>
+
+                        </architect-section>
+                        <certification-section>
+                            <label>Certification</label>
+
+                        </certification-section>
+                        <agreement-section>
+                            <label>Agreement</label>
+
+                        </agreement-section>
+                        <declarations-section>
+                            <label>Declarations</label>
+
+                        </declarations-section>
+                        <project-type>
+                            <label>Type of project</label>
+                            <hint/>
+
+
+
+
+                            <item>
+                                <label>Residential</label>
+                                <hint/>
+                                <value>residential</value>
+                            </item>
+                            <item>
+                                <label>Commercial</label>
+                                <hint/>
+                                <value>commercial</value>
+                            </item>
+                        </project-type>
+                        <project-job-valuation>
+                            <label>Job Valuation</label>
+                            <hint>Cost of labor and materials</hint>
+
+
+
+
+                        </project-job-valuation>
+                        <project-scope>
+                            <label>Scope of work</label>
+                            <hint/>
+
+
+                        </project-scope>
+                        <project-information-section>
+                            <label>Project information</label>
+                        </project-information-section>
+                        <project-contact-section>
+                            <label>Project contact</label>
+
+                        </project-contact-section>
+                        <project-information-address-section>
+                            <label>Project address</label>
+
+                        </project-information-address-section>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="project-information-section-section"
+                            bind="project-information-section-bind">
+                    <xf:label ref="$form-resources/project-information-section/label"/>
+
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+
+                        <fr:c x="1" y="1" w="6">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="project-type-control"
+                                        appearance="full xxf:horizontal"
+                                        bind="project-type-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/project-type/label"/>
+                                <xf:hint ref="$form-resources/project-type/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="$form-resources/project-type/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
+                                         id="project-job-valuation-control"
+                                         bind="project-job-valuation-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/project-job-valuation/label"/>
+                                <xf:hint ref="$form-resources/project-job-valuation/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="12">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="project-scope-control"
+                                         bind="project-scope-bind">
+                                <xf:label ref="$form-resources/project-scope/label"/>
+                                <xf:hint ref="$form-resources/project-scope/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:section collapsible="false" id="project-information-address-section-section"
+                                bind="project-information-address-section-bind">
+                        <xf:label ref="$form-resources/project-information-address-section/label"/>
+
+
+                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                              xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                              xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                              id="project-information-address-section-content-control"
+                                              bind="project-information-address-section-content-bind"/>
+                    </fr:section>
+                </fr:section>
+                <fr:section id="project-contact-section-section" bind="project-contact-section-bind">
+                    <xf:label ref="$form-resources/project-contact-section/label"/>
+
+                    <fr:section collapsible="false" id="property-owner-section-section"
+                                bind="property-owner-section-bind">
+                        <xf:label ref="$form-resources/property-owner-section/label"/>
+
+
+                        <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="property-owner-name-control"
+                                          bind="property-owner-name-bind">
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                    </fr:index>
+                                    <xf:label ref="$form-resources/property-owner-name/label"/>
+                                    <xf:hint ref="$form-resources/property-owner-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="3">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="property-owner-email-address-control"
+                                          bind="property-owner-email-address-bind">
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                    </fr:index>
+                                    <xf:label ref="$form-resources/property-owner-email-address/label"/>
+                                    <xf:hint ref="$form-resources/property-owner-email-address/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="10" y="1" w="3" h="1">
+                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             id="property-owner-phone-control"
+                                             bind="property-owner-phone-bind">
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                    </fr:index>
+                                    <xf:label ref="$form-resources/property-owner-phone/label"/>
+                                    <xf:hint ref="$form-resources/property-owner-phone/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:us-phone>
+                            </fr:c>
+                            <fr:c x="1" y="2" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="property-management-tenant-name-control"
+                                          bind="property-management-tenant-name-bind">
+                                    <xf:label ref="$form-resources/property-management-tenant-name/label"/>
+                                    <xf:hint ref="$form-resources/property-management-tenant-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="3"/>
+                            <fr:c x="10" y="2" w="3"/>
+                        </fr:grid>
+                        <fr:section collapsible="false" id="property-owner-address-section"
+                                    bind="property-owner-address-bind">
+                            <xf:label ref="$form-resources/property-owner-address/label"/>
+
+
+                            <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                  xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                                  id="property-owner-address-content-control"
+                                                  bind="property-owner-address-content-bind"/>
+                        </fr:section>
+                    </fr:section>
+                    <fr:section collapsible="false" id="contractor-section-section"
+                                bind="contractor-section-bind">
+                        <xf:label ref="$form-resources/contractor-section/label"/>
+
+
+                        <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="contractor-type-control"
+                                            appearance="full xxf:horizontal"
+                                            bind="contractor-type-bind">
+                                    <xf:label ref="$form-resources/contractor-type/label"/>
+                                    <xf:hint ref="$form-resources/contractor-type/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                    <xf:itemset ref="$form-resources/contractor-type/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                        <xf:hint ref="hint"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6"/>
+                            <fr:c x="1" y="2" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-state-license-number-control"
+                                          bind="contractor-state-license-number-bind">
+                                    <xf:label ref="$form-resources/contractor-state-license-number/label"/>
+                                    <xf:hint ref="$form-resources/contractor-state-license-number/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="3">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-license-class-control"
+                                          bind="contractor-license-class-bind">
+                                    <xf:label ref="$form-resources/contractor-license-class/label"/>
+                                    <xf:hint ref="$form-resources/contractor-license-class/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="10" y="2" w="3" h="1">
+                                <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                         id="contractor-expires-control"
+                                         bind="contractor-expires-bind">
+                                    <xf:label ref="$form-resources/contractor-expires/label"/>
+                                    <xf:hint ref="$form-resources/contractor-expires/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:date>
+                            </fr:c>
+                            <fr:c x="1" y="3" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-company-owner-builders-name-control"
+                                          bind="contractor-company-owner-builders-name-bind">
+                                    <xf:label ref="$form-resources/contractor-company-owner-builders-name/label"/>
+                                    <xf:hint ref="$form-resources/contractor-company-owner-builders-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="3" w="3">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-business-license-number-control"
+                                          bind="contractor-business-license-number-bind">
+                                    <xf:label ref="$form-resources/contractor-business-license-number/label"/>
+                                    <xf:hint ref="$form-resources/contractor-business-license-number/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="10" y="3" w="3"/>
+                            <fr:c x="1" y="4" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-email-address-control"
+                                          bind="contractor-email-address-bind">
+                                    <xf:label ref="$form-resources/contractor-email-address/label"/>
+                                    <xf:hint ref="$form-resources/contractor-email-address/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="4" w="3">
+                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             id="contractor-phone-control"
+                                             bind="contractor-phone-bind">
+                                    <xf:label ref="$form-resources/contractor-phone/label"/>
+                                    <xf:hint ref="$form-resources/contractor-phone/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:us-phone>
+                            </fr:c>
+                            <fr:c x="10" y="4" w="3"/>
+                        </fr:grid>
+                        <fr:grid id="grid-6-grid" bind="grid-6-bind">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-applicant-authorized-agents-name-control"
+                                          bind="contractor-applicant-authorized-agents-name-bind">
+                                    <xf:label ref="$form-resources/contractor-applicant-authorized-agents-name/label"/>
+                                    <xf:hint ref="$form-resources/contractor-applicant-authorized-agents-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="3">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="contractor-applicant-email-address-control"
+                                          bind="contractor-applicant-email-address-bind">
+                                    <xf:label ref="$form-resources/contractor-applicant-email-address/label"/>
+                                    <xf:hint ref="$form-resources/contractor-applicant-email-address/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="10" y="1" w="3" h="1">
+                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             id="contractor-applicant-phone-control"
+                                             bind="contractor-applicant-phone-bind">
+                                    <xf:label ref="$form-resources/contractor-applicant-phone/label"/>
+                                    <xf:hint ref="$form-resources/contractor-applicant-phone/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:us-phone>
+                            </fr:c>
+                        </fr:grid>
+                        <fr:section collapsible="false" id="contractor-address-section-section"
+                                    bind="contractor-address-section-bind">
+                            <xf:label ref="$form-resources/contractor-address-section/label"/>
+
+
+                            <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                  xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                                  id="contractor-address-section-content-control"
+                                                  bind="contractor-address-section-content-bind"/>
+                        </fr:section>
+                    </fr:section>
+                    <fr:section collapsible="false" id="architect-section-section"
+                                bind="architect-section-bind">
+                        <xf:label ref="$form-resources/architect-section/label"/>
+
+
+                        <fr:grid id="grid-4-grid" bind="grid-4-bind">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="architect-type-control"
+                                            appearance="full xxf:horizontal"
+                                            bind="architect-type-bind">
+                                    <xf:label ref="$form-resources/architect-type/label"/>
+                                    <xf:hint ref="$form-resources/architect-type/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                    <xf:itemset ref="$form-resources/architect-type/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                        <xf:hint ref="hint"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6"/>
+                            <fr:c x="1" y="2" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="architect-name-control"
+                                          bind="architect-name-bind">
+                                    <xf:label ref="$form-resources/architect-name/label"/>
+                                    <xf:hint ref="$form-resources/architect-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="architect-company-name-control"
+                                          bind="architect-company-name-bind">
+                                    <xf:label ref="$form-resources/architect-company-name/label"/>
+                                    <xf:hint ref="$form-resources/architect-company-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="1" y="3" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="architect-license-number-control"
+                                          bind="architect-license-number-bind">
+                                    <xf:label ref="$form-resources/architect-license-number/label"/>
+                                    <xf:hint ref="$form-resources/architect-license-number/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="3" w="3">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          id="architect-email-address-control"
+                                          bind="architect-email-address-bind">
+                                    <xf:label ref="$form-resources/architect-email-address/label"/>
+                                    <xf:hint ref="$form-resources/architect-email-address/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="10" y="3" w="3" h="1">
+                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             id="architect-phone-control"
+                                             bind="architect-phone-bind">
+                                    <xf:label ref="$form-resources/architect-phone/label"/>
+                                    <xf:hint ref="$form-resources/architect-phone/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:us-phone>
+                            </fr:c>
+                        </fr:grid>
+                        <fr:section collapsible="false" id="architect-address-section-section"
+                                    bind="architect-address-section-bind">
+                            <xf:label ref="$form-resources/architect-address-section/label"/>
+
+
+                            <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                  xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                                  id="architect-address-section-content-control"
+                                                  bind="architect-address-section-content-bind"/>
+                        </fr:section>
+                    </fr:section>
+                </fr:section>
+                <fr:section id="certification-section-section" bind="certification-section-bind">
+                    <xf:label ref="$form-resources/certification-section/label"/>
+
+                    <fr:grid id="grid-5-grid" bind="grid-5-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="certification-explanation-control"
+                                            bind="certification-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/certification-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      id="certification-licensed-contractor-authorized-agent-name-control"
+                                      bind="certification-licensed-contractor-authorized-agent-name-bind">
+                                <xf:label ref="$form-resources/certification-licensed-contractor-authorized-agent-name/label"/>
+                                <xf:hint ref="$form-resources/certification-licensed-contractor-authorized-agent-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3" h="2">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="certification-date-control"
+                                     bind="certification-date-bind">
+                                <xf:label ref="$form-resources/certification-date/label"/>
+                                <xf:hint ref="$form-resources/certification-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3" h="2">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="certification-signature-control"
+                                                      bind="certification-signature-bind">
+                                <xf:label ref="$form-resources/certification-signature/label"/>
+                                <xf:hint ref="$form-resources/certification-signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="agreement-section-section" bind="agreement-section-bind">
+                    <xf:label ref="$form-resources/agreement-section/label"/>
+
+                    <fr:grid id="grid-7-grid" bind="grid-7-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="agreement-explanation-control"
+                                            bind="agreement-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/agreement-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      id="agreement-licensed-contractor-authorized-agent-name-control"
+                                      bind="agreement-licensed-contractor-authorized-agent-name-bind">
+                                <xf:label ref="$form-resources/agreement-licensed-contractor-authorized-agent-name/label"/>
+                                <xf:hint ref="$form-resources/agreement-licensed-contractor-authorized-agent-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3" h="1">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="agreement-date-control"
+                                     bind="agreement-date-bind">
+                                <xf:label ref="$form-resources/agreement-date/label"/>
+                                <xf:hint ref="$form-resources/agreement-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3" h="1">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="agreement-signature-control"
+                                                      bind="agreement-signature-bind">
+                                <xf:label ref="$form-resources/agreement-signature/label"/>
+                                <xf:hint ref="$form-resources/agreement-signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:handwritten-signature>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="declarations-section-section" bind="declarations-section-bind">
+                    <xf:label ref="$form-resources/declarations-section/label"/>
+
+                    <fr:grid id="grid-8-grid" bind="grid-8-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="declarations-explanation-control"
+                                            bind="declarations-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/declarations-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      id="declarations-licensed-contractor-authorized-agent-name-control"
+                                      bind="declarations-licensed-contractor-authorized-agent-name-bind">
+                                <xf:label ref="$form-resources/declarations-licensed-contractor-authorized-agent-name/label"/>
+                                <xf:hint ref="$form-resources/declarations-licensed-contractor-authorized-agent-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3" h="1">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="declarations-date-control"
+                                     bind="declarations-date-bind">
+                                <xf:label ref="$form-resources/declarations-date/label"/>
+                                <xf:hint ref="$form-resources/declarations-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3" h="1">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="declarations-signature-control"
+                                                      bind="declarations-signature-bind">
+                                <xf:label ref="$form-resources/declarations-signature/label"/>
+                                <xf:hint ref="$form-resources/declarations-signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="wc-explanation-control"
+                                            bind="wc-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/wc-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="1" h="2">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="wc-radio-1-control"
+                                        appearance="full"
+                                        xxf:group="wc-radio-group"
+                                        bind="wc-radio-1-bind">
+                                <xf:label ref="$form-resources/wc-radio-1/label"/>
+                                <xf:hint ref="$form-resources/wc-radio-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="$form-resources/wc-radio-1/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="2" y="4" w="11" h="1">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="wc-explanation-1-control"
+                                            bind="wc-explanation-1-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/wc-explanation-1/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+
+                        <fr:c x="2" y="5" w="3">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="wc-policy-number-1-control"
+                                      bind="wc-policy-number-1-bind">
+                                <xf:label ref="$form-resources/wc-policy-number-1/label"/>
+                                <xf:hint ref="$form-resources/wc-policy-number-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="5" w="3" h="1"/>
+                        <fr:c x="8" y="5" w="5" h="1"/>
+                        <fr:c x="1" y="6" w="1" h="2">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="wc-radio-2-control"
+                                        appearance="full"
+                                        xxf:group="wc-radio-group"
+                                        bind="wc-radio-2-bind">
+                                <xf:label ref="$form-resources/wc-radio-2/label"/>
+                                <xf:hint ref="$form-resources/wc-radio-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+                                <xf:itemset ref="$form-resources/wc-radio-2/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="2" y="6" w="11">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="wc-explanation-2-control"
+                                            bind="wc-explanation-2-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <fr:text ref="$form-resources/wc-explanation-2/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+
+                        <fr:c x="2" y="7" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="wc-carrier-control"
+                                      bind="wc-carrier-bind">
+                                <xf:label ref="$form-resources/wc-carrier/label"/>
+                                <xf:hint ref="$form-resources/wc-carrier/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="8" y="7" w="3" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="wc-policy-number-2-control"
+                                      bind="wc-policy-number-2-bind">
+                                <xf:label ref="$form-resources/wc-policy-number-2/label"/>
+                                <xf:hint ref="$form-resources/wc-policy-number-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="11" y="7" w="2" h="1">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="wc-expires-control"
+                                     bind="wc-expires-bind">
+                                <xf:label ref="$form-resources/wc-expires/label"/>
+                                <xf:hint ref="$form-resources/wc-expires/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+                            </fr:date>
+                        </fr:c>
+
+
+                        <fr:c x="1" y="8" w="1">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="wc-radio-3-control"
+                                        appearance="full"
+                                        xxf:group="wc-radio-group"
+                                        bind="wc-radio-3-bind">
+                                <xf:label ref="$form-resources/wc-radio-3/label"/>
+                                <xf:hint ref="$form-resources/wc-radio-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+                                <xf:itemset ref="$form-resources/wc-radio-3/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="2" y="8" w="11">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="wc-explanation-3-control"
+                                            bind="wc-explanation-3-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <fr:text ref="$form-resources/wc-explanation-3/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="9" w="6" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      id="wc-licensed-contractor-authorized-agent-name-control"
+                                      bind="wc-licensed-contractor-authorized-agent-name-bind">
+                                <xf:label ref="$form-resources/wc-licensed-contractor-authorized-agent-name/label"/>
+                                <xf:hint ref="$form-resources/wc-licensed-contractor-authorized-agent-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:input>
+                        </fr:c>
+
+                        <fr:c x="7" y="9" w="3" h="1">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="wc-date-control"
+                                     bind="wc-date-bind">
+                                <xf:label ref="$form-resources/wc-date/label"/>
+                                <xf:hint ref="$form-resources/wc-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="10" y="9" w="3" h="1">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="wc-signature-control"
+                                                      bind="wc-signature-bind">
+                                <xf:label ref="$form-resources/wc-signature/label"/>
+                                <xf:hint ref="$form-resources/wc-signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        <fr:c x="1" y="10" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="warning-explanation-control"
+                                            bind="warning-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/warning-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="11" w="12">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="notes-control"
+                                         bind="notes-bind">
+                                <xf:label ref="$form-resources/notes/label"/>
+                                <xf:hint ref="$form-resources/notes/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

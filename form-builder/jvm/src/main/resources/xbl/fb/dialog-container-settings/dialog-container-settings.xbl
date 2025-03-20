@@ -587,6 +587,20 @@
                 <!-- Bindings specified on control -->
                 <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
+                <!-- TODO: This is almost identical to what's in dialog-control-settings.xbl, but we don't handle the language
+                      here, as we don't have the language switcher in the dialog. -->
+                <xf:var
+                    name="stripped-label-opt"
+                    value="
+                        for $label-elem in $i/label[@supported = 'true']
+                        return
+                            for $label-value in $label-elem/value/string()[xxf:non-blank(.)]
+                            return
+                                if ($label-elem/@isHTML = 'true') then
+                                    frf:removeHtmlTags($label-value)
+                                else
+                                    $label-value"/>
+
                 <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-dialog-container-settings">
                     <xf:label
@@ -596,7 +610,7 @@
                                 (
                                     if ($i/container-type = 'section') then 0 else 1,
                                     $i/control-name/string(),
-                                    $i/label/value/string()
+                                    ($stripped-label-opt, '')[1] (: Q: can we pass `()`? :)
                                 )
                             )"/>
 
@@ -614,8 +628,8 @@
                             <xf:var
                                 name="suggestion"
                                 value="
-                                    if ((matches($i/control-name, '^(section|grid)-[\d]+$') or xxf:is-blank($i/control-name)) and xxf:non-blank($i/label/value)) then
-                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $i/label/value)
+                                    if ((matches($i/control-name, '^(section|grid)-[\d]+$') or xxf:is-blank($i/control-name)) and exists($stripped-label-opt)) then
+                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $stripped-label-opt)
                                     else
                                         ()"/>
                             <fr:grid>

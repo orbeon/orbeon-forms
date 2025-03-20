@@ -1075,6 +1075,18 @@
                     <xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/>
                 </xf:var>
 
+                <xf:var
+                    name="stripped-label-opt"
+                    value="
+                        for $label-elem in $i/label[@supported = 'true']
+                        return
+                            for $label-value in $label-elem/value[@lang = $li/lang]/string()[xxf:non-blank(.)]
+                            return
+                                if ($label-elem/@isHTML = 'true') then
+                                    frf:removeHtmlTags($label-value)
+                                else
+                                    $label-value"/>
+
                 <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-settings">
                     <xf:label
                         ref="
@@ -1082,12 +1094,7 @@
                                 $resources/dialog-control-settings/label,
                                 (
                                     $i/control-name/string(),
-                                    let $label := $i/label[@supported = 'true']
-                                    return
-                                        if (exists($label)) then
-                                            $label/value[@lang = $li/lang]/string()
-                                        else
-                                            '',
+                                    ($stripped-label-opt, '')[1], (: Q: can we pass `()`? :)
                                     (
                                         let $appearances := $i/appearances,
                                             $selection   := $appearances/@selection/string()
@@ -1132,8 +1139,8 @@
                             <xf:var
                                 name="suggestion"
                                 value="
-                                    if ((matches($i/control-name, '^control-[\d]+$') or xxf:is-blank($i/control-name)) and xxf:non-blank($i/label/value)) then
-                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $i/label/value)
+                                    if ((matches($i/control-name, '^control-[\d]+$') or xxf:is-blank($i/control-name)) and exists($stripped-label-opt)) then
+                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $stripped-label-opt)
                                     else
                                         ()"/>
                             <xh:div class="fb-base-tab-div">

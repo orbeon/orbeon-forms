@@ -259,16 +259,38 @@
                         <xf:var name="form"  value="xxf:binding('fb-dialog-http-services')"/>
                         <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
 
-                        <!-- Rename legacy service calls -->
-                        <xf:setvalue
-                            iterate="
+                        <xf:var
+                            name="legacy-actions"
+                            value="
                                 $model/fb:action[
                                     ends-with(@id, '-binding')
-                                ]//xf:send/@submission[
+                                ]"/>
+
+                        <!-- Rename legacy service calls -->
+                        <xf:setvalue
+                            xmlns:ev="http://www.w3.org/2001/xml-events"
+                            iterate="
+                                $legacy-actions//(
+                                    xf:send/@submission |
+                                    @ev:observer        |
+                                    @observer
+                                )[
                                     . = $existing-submission-id-opt
-                                ]"
+                                ]
+                            "
                             ref="."
                             value="$new-submission-id"/>
+
+                        <xf:setvalue
+                            iterate="
+                                $legacy-actions//(
+                                    xf:var[@name = 'request-instance-name']
+                                )/@value[
+                                    . = concat('''', $existing-instance-id-opt, '''')
+                                ]
+                            "
+                            ref="."
+                            value="concat('''', $new-instance-id, '''')"/>
 
                         <!-- Rename new action syntax service calls -->
                         <xf:setvalue

@@ -1627,11 +1627,11 @@
         </form-name>
         <title>
             <label>Titre du formulaire</label>
-            <hint>cliquer pour entrer le titre du formulaire</hint>
+            <hint>Cliquer pour entrer le titre du formulaire</hint>
         </title>
         <description>
             <label>Description du formulaire</label>
-            <hint>cliquer pour entrer une description du formulaire</hint>
+            <hint>Cliquer pour entrer une description du formulaire</hint>
         </description>
         <logo>
             <label>Logo</label>

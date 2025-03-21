@@ -779,6 +779,7 @@
                     <xxf:control-values>
                         <xxf:control id="my-date≡xf-5" class="input-append fr-field-width-natural fr-native-picker-ios fr-today-highlight-true"/>
                         <xxf:attribute for="my-date≡input" name="placeholder">MM/DD/YYYY</xxf:attribute>
+                        <xxf:attribute for="my-date≡xf-6" name="aria-label"/>
                         <xxf:init id="my-date">
                             <xxf:value>{"isoOrUnrecognizedValue":{"Left":{"value":{"year":2010,"month":1,"day":13}}},"format":{"firstComponent":{"Month":{}},"separator":"/","isPadDayMonthDigits":false},"excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>

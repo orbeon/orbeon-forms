@@ -351,6 +351,7 @@ object Date {
       def onIconKeypress(event: dom.KeyboardEvent): Unit =
         if (event.key == " " || event.key == "Enter") {
           event.preventDefault()
+          event.stopPropagation()
           datePickerOpt.foreach(_.showDatepicker())
         }
     }

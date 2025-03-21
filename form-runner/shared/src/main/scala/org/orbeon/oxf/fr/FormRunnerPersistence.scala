@@ -566,16 +566,19 @@ trait FormRunnerPersistence {
           None
       }
       .map { case (holder, controlName) =>
-        val relevantAttOpt =
+
+        // Consider we are non-relevant if any ancestor-or-self `fr:relevant` attribute is set to `false`. This matches
+        // the XForms logic. We are not supposed to have any nested `fr:relevant` attributes, or any set to `true`, but
+        // if that was the case we would be correct with this logic.
+        val nonRelevantAttOpt =
           holder
             .ancestorOrSelf(*)
-            .iterator
-            .map(_.attOpt(XMLNames.FRRelevantQName))
-            .collectFirst{case Some(x) => x}
+            .find(_.attValueOpt(XMLNames.FRRelevantQName).contains(false.toString))
+
         NodeInfoFactory.elementInfo(
           qName   = QName("attachment"),
           content =
-            relevantAttOpt ++:
+            nonRelevantAttOpt ++:
             holder /@ @*.except(XMLNames.FRRelevantQName) ++: (
               NodeInfoFactory.attributeInfo("name", controlName) ::
               StringValue.makeStringValue(holder.stringValue)    ::

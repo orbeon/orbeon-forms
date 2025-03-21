@@ -123,6 +123,7 @@
             <year>年</year>
             <month>月</month>
             <day>日</day>
+            <select-date>选择日期</select-date>
         </date-time>
         <wizard>
             <errors>错误</errors>

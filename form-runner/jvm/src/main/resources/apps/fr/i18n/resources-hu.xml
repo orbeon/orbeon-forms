@@ -128,6 +128,7 @@
             <year>Év</year>
             <month>Hónap</month>
             <day>Nap</day>
+            <select-date>Dátum kiválasztása</select-date>
         </date-time>
         <wizard>
             <errors>Hibák</errors>

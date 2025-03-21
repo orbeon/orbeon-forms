@@ -128,6 +128,7 @@
             <year>Anno</year>
             <month>Mese</month>
             <day>Giorno</day>
+            <select-date>Seleziona data</select-date>
         </date-time>
         <wizard>
             <errors todo="true">[Errors]</errors>

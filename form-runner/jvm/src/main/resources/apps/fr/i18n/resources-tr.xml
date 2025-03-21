@@ -128,6 +128,7 @@
             <year>Yıl</year>
             <month>Ay</month>
             <day>Gün</day>
+            <select-date>Tarih seç</select-date>
         </date-time>
         <wizard>
             <errors>Hatalar</errors>

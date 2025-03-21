@@ -128,6 +128,7 @@
             <year>Rok</year>
             <month>Miesiąc</month>
             <day>Dzień</day>
+            <select-date>Wybierz datę</select-date>
         </date-time>
         <wizard>
             <errors>Błędy</errors>

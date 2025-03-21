@@ -128,6 +128,7 @@
             <year todo="true">Year</year>
             <month todo="true">Month</month>
             <day todo="true">Day</day>
+            <select-date>Выбрать дату</select-date>
         </date-time>
         <wizard>
             <errors todo="true">[Errors]</errors>

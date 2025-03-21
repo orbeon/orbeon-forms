@@ -426,7 +426,12 @@
                     }"
                     xxf:control="true"
                     xbl:attr="autocomplete"/>
-                <xh:span class="add-on" tabindex="0">
+                <xh:span
+                    class="add-on"
+                    tabindex="0"
+                    role="button"
+                    aria-label="{xxf:r('components.date-time.select-date', '|fr-fr-resources|')}"
+                    aria-haspopup="dialog">
                     <xh:i class="fa fa-fw fa-calendar"/>
                 </xh:span>
             </xf:group>

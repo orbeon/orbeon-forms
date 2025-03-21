@@ -84,7 +84,7 @@
                 <xf:var name="resources"                             value="frf:currentFormResources()"/>
 
                 <xf:var name="standard-classes"                      value="$resources/dialog-container-settings/options/item/value/string()"/>
-                <xf:var name="control-classes"                       value="xxf:split($control/@class)"/>
+                <xf:var name="control-classes"                       value="xxf:split($control/@fb:class)"/>
 
                 <xf:setvalue ref="$i/standard-classes"               value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"                 value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
@@ -229,8 +229,8 @@
                     <xf:var name="control" value="fbf:findControlByNameOrEmpty($new-name)"/>
 
                     <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
-                    <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                    <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
+                    <xf:delete if="count($classes) = 0" ref="$control/@fb:class"/>
+                    <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('fb:class', string-join($classes, ' '))"/>
 
                     <xf:action if="$i/container-type = 'section'">
                         <!-- Initially open -->

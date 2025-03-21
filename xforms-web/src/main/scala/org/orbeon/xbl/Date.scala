@@ -297,10 +297,10 @@ object Date {
         }
       }
 
-      def enableDatePickerChangeListener(datePicker: DatePicker): Unit =
+      private def enableDatePickerChangeListener(datePicker: DatePicker): Unit =
         datePicker.onChangeDate(() => onDateSelectedUpdateStateAndSendValueToServer())
 
-      def disableDatePickerChangeListener(datePicker: DatePicker): Unit =
+      private def disableDatePickerChangeListener(datePicker: DatePicker): Unit =
         datePicker.offChangeDate()
 
       // Send the new value to the server when it changes
@@ -348,7 +348,7 @@ object Date {
 //            datePicker.clearDates()
 //        }
 
-      def onIconKeypress(event: dom.KeyboardEvent): Unit =
+      private def onIconKeypress(event: dom.KeyboardEvent): Unit =
         if (event.key == " " || event.key == "Enter") {
           event.preventDefault()
           event.stopPropagation()

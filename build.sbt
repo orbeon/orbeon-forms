@@ -741,7 +741,7 @@ lazy val formRunnerJVM = formRunner.jvm
     libraryDependencies += "javax.servlet"        % "javax.servlet-api"         % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"      % "jakarta.servlet-api"       % JakartaServletApiVersion % Provided,
     libraryDependencies += "javax.portlet"        % "portlet-api"               % PortletApiVersion        % Provided,
-    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % "2.6.1.Final"            % Provided,
+    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % "2.6.2.Final"            % Provided,
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 

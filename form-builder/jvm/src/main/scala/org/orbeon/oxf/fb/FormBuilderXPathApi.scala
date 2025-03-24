@@ -205,6 +205,16 @@ object FormBuilderXPathApi {
       Undo.pushUserUndoAction
   }
 
+  //@XPathFunction
+  def renameServiceIfNeeded(oldNameOrBlank: String, newName: String): Unit =
+    Option(oldNameOrBlank)
+      .flatMap(_.trimAllToOpt)
+      .filter(_ != newName)
+      .foreach { oldName =>
+      implicit val ctx = FormBuilderDocContext()
+      FormBuilder.renameServiceReferences(oldName, newName)
+    }
+
   // Get the normalized value of a computed MIP for the given control name and computed MIP name
   // If `controlName` is `null`, try the top-level bind (`fr-form-binds`).
   //@XPathFunction

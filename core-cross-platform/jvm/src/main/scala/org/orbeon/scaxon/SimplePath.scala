@@ -158,6 +158,7 @@ object SimplePath {
     def attTokens(attName: QName)  = attValue(attName).tokenizeToSet
     def attClasses = attTokens("class")
     def id = attValue("id")
+    def idAtt = att("id")
     def hasId = att("id").nonEmpty && attValue("id").nonAllBlank
     def hasAtt(attName: String) = att(attName).nonEmpty
     def hasAtt(attName: QName) = att(attName).nonEmpty

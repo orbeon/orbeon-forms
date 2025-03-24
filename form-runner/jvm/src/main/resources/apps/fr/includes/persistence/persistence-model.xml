@@ -148,9 +148,14 @@
 
             </xf:action>
 
-            <!-- Set `new` permissions if we won't 1. navigate or 2. ask the user what to do -->
+            <!-- We don't check permissions for `/new` if this is a singleton form, and we have existing form data,
+                 as users might be allowed to access `/edit/123` or `/summary` but not `/new` -->
             <xf:setvalue
-                if="not($is-singleton) and xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
+                if="
+                    not(
+                        $is-singleton and
+                        count(instance('fr-search-response')/document) > 0
+                    )"
                 ref="instance('fr-authorized-operations')"
                 value="
                     frf:authorizedOperationsForDetailModeOrThrow(

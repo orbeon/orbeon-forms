@@ -53,20 +53,6 @@ object XPathCompletion {
         val details = event.detail.asInstanceOf[TextExpanderValueEventDetail]
         details.value = s"$$${details.item.getAttribute("data-value")}"
       })
-
-      EventSupport.addListener(expander, "text-expander-committed", (event: CustomEvent) => {
-        val details = event.detail.asInstanceOf[TextExpanderCommittedEventDetail]
-        DocumentAPI.setValue(
-          details.input match { // hopefully better with Scala 3's native union types
-            case e: dom.html.Input    => e.parentElement
-            case e: dom.html.TextArea => e.parentElement
-          },
-          details.input match {
-            case e: dom.html.Input    => e.value
-            case e: dom.html.TextArea => e.value
-          }
-        )
-      })
     }
 
     override def destroy(): Unit =

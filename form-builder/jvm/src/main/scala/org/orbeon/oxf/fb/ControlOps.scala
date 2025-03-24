@@ -180,7 +180,8 @@ trait ControlOps extends ResourcesOps {
 
   def deleteControlWithinCell(
     cellElem        : NodeInfo,
-    updateTemplates : Boolean = false)(implicit
+    updateTemplates : Boolean = false
+  )(implicit
     ctx             : FormBuilderDocContext
   ): Option[UndoAction] =
     cellElem firstChildOpt * flatMap { controlElem =>

@@ -67,7 +67,8 @@ trait ResourcesOps extends BaseOps {
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
   def getControlResources(
     controlName  : String,
-    resourceName : String)(implicit
+    resourceName : String
+  )(implicit
     ctx          : FormBuilderDocContext
   ): List[NodeInfo] =
     findCurrentResourceHolder(controlName).toList flatMap
@@ -77,7 +78,8 @@ trait ResourcesOps extends BaseOps {
   def getControlResourcesWithLang(
     controlName  : String,
     resourceName : String,
-    langs        : Iterable[String])(implicit
+    langs        : Iterable[String]
+  )(implicit
     ctx          : FormBuilderDocContext
   ): collection.Seq[(String, collection.Seq[NodeInfo])] = {
     val langsSet = langs.toSet
@@ -96,7 +98,8 @@ trait ResourcesOps extends BaseOps {
   def setControlResourcesWithLang(
     controlName  : String,
     resourceName : String,
-    langValues   : collection.Seq[(String, Seq[String])])(implicit
+    langValues   : collection.Seq[(String, Seq[String])]
+  )(implicit
     ctx          : FormBuilderDocContext
   ): Unit = {
 
@@ -292,7 +295,8 @@ trait ResourcesOps extends BaseOps {
   def holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(
     controlName  : String,
     lhhaElements : Iterable[NodeInfo],
-    lhhaName     : String)(implicit
+    lhhaName     : String
+  )(implicit
     ctx          : FormBuilderDocContext
   ): (Boolean, collection.Seq[NodeInfo]) = {
 

@@ -137,7 +137,7 @@ object EmailMetadataParsing {
       ): List[String] =
         container.descendant(*)
           .filter(_.attClasses(s"fr-email-${formFieldRole.entryName}"))
-          .map(_.attValue("id").substringBefore("-control"))
+          .map(_.id.substringBefore("-control"))
           .toList
 
       val sectionTemplateFields =

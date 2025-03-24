@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.util
 
-import java.lang as jl
-import javax.xml.transform.stream.StreamResult
-import javax.xml.transform.{OutputKeys, Result, Source}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
@@ -34,6 +31,10 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.{Configuration, Controller, TransformerFactoryImpl, om}
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.{SAXParseException, XMLReader}
+
+import java.lang as jl
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.{OutputKeys, Result, Source}
 
 
 object StaticXPath extends StaticXPathTrait {

@@ -104,7 +104,7 @@
 
                 <!-- List of controls computed once, as this is an expensive operation for large forms -->
                 <xf:instance id="controls-label-value-itemset">
-                    <itemset/>
+                    <_/>
                 </xf:instance>
 
                 <!-- Delay computing the list of controls until we need it -->

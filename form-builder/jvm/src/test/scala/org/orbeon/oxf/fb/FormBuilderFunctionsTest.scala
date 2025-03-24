@@ -15,7 +15,6 @@ package org.orbeon.oxf.fb
 
 import cats.syntax.option.*
 import org.orbeon.datatypes.Direction
-import org.orbeon.datatypes.Direction.mirror
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.ToolboxOps.*
 import org.orbeon.oxf.fr.*
@@ -27,7 +26,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.saxon.om.*
 import org.orbeon.scaxon.NodeConversions.*
-import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.scaxon.SimplePath.{NodeInfoOps, *}
 import org.orbeon.xforms.Namespaces
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -1020,6 +1019,29 @@ class FormBuilderFunctionsTest
               )
             ),
           )
+        )
+      }
+    }
+  }
+
+  describe("#6880: rename legacy HTTP service references") {
+    withActionAndFBDoc("oxf:/forms/issue/6880/form/form.xhtml") { implicit ctx =>
+
+      def findValuesContaining(s: String): LazyList[String] =
+        findLegacyActions.descendant(*).att(@*).filter(_.stringValue.contains(s)).map(_.stringValue)
+
+      it("must contain non-renamed values") {
+        assert(
+          findValuesContaining("echo") ==
+            List("echo-submission", "echo-submission", "'echo-instance'", "echo-submission")
+        )
+      }
+
+      it("must contain renamed attributes") {
+        FormBuilder.renameServiceReferences("echo", "gaga")
+         assert(
+          findValuesContaining("gaga") ==
+            List("gaga-submission", "gaga-submission", "'gaga-instance'", "gaga-submission")
         )
       }
     }

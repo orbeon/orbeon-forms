@@ -66,6 +66,11 @@
         <xf:setvalue ref="$instance/parameter-names"/>
         <xf:delete   ref="$instance/fb:action"/>
 
+        <!-- Update items -->
+        <xf:insert
+            context="instance('controls-label-value-itemset')"
+            origin="fbf:getControlsLabelValueItemset()"/>
+
         <!-- Empty binding if no binding id passed -->
         <xf:action if="not($binding-name)">
             <xf:insert ref="$instance/*" origin="instance('fb-binding-template')"/>
@@ -228,24 +233,9 @@
                             </xf:select1>
 
                             <xf:select1 ref="$observer[. != 'fr-form-model']" appearance="search" class="fb-action-control">
-                                <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
-                                    <!-- Try to build a reasonably user-friendly label -->
-                                    <xf:label
-                                        value="
-                                            utils:truncateWithEllipsis(
-                                                for $name in frf:controlNameFromId(@id)
-                                                return
-                                                    concat(
-                                                        $current-resources/*[name() = $name]/label,
-                                                        ' (',
-                                                        $name,
-                                                        ')'
-                                                    ),
-                                                60,
-                                                6
-                                            )"/>
-                                    <xf:value value="@id"/>
+                                <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                    <xf:label value="@label"/>
+                                    <xf:value value="@value"/>
                                 </xf:itemset>
                                 <xf:alert/>
                             </xf:select1>
@@ -883,6 +873,11 @@
     <!-- Model for the bindings editor -->
     <xf:model id="fb-actions-editor-model">
 
+        <!-- Clean-up internal instance upon dialog close -->
+        <xf:action event="xxforms-dialog-close" observer="fb-action-dialog">
+            <xf:delete ref="instance('controls-label-value-itemset')/*"/>
+        </xf:action>
+
         <xf:var name="fb-lang"           value="xxf:instance('fb-language-instance')"/>
         <xf:var name="model"             value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
         <xf:var name="resources"         value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
@@ -1051,6 +1046,10 @@
                     <xf:var name="dataset-name"/>
                 </xf:action>
             </action>
+        </xf:instance>
+
+        <xf:instance id="controls-label-value-itemset">
+            <_/>
         </xf:instance>
 
     </xf:model>

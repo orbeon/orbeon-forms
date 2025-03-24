@@ -792,27 +792,30 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllControlsWithIds: Iterable[NodeInfo] =
-    FormRunner.getAllControlsWithIds(FormBuilderDocContext()) filterNot { elem =>
-      // https://github.com/orbeon/orbeon-forms/issues/4786
-      FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
-    }
+    FormBuilder.getAllControlsWithIds(FormBuilderDocContext())
 
   //@XPathFunction
-  def getControlsLabelValueItemset: Iterable[NodeInfo] = {
-    val resourceMap = currentResources.child(*).map(r => r.localname -> r).toMap
-    getAllControlsWithIds.map { control =>
-      val controlId    = control.attValue("id")
-      val controlName  = FormRunner.controlNameFromId(controlId)
+  def getControlsLabelValueItemset(): Iterable[NodeInfo] = {
 
+    implicit val ctx = FormBuilderDocContext()
+
+    val someResourcesMap =
+      Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap) // accelerate resources lookups
+
+    FormBuilder.getAllControlsWithIds.map { controlElem =>
+      val controlId    = controlElem.id
+      val controlName  = FormRunner.controlNameFromId(controlId)
       val controlLabel =
-        resourceMap(controlName)
-          .firstChildOpt("label")
-          .map(_.getStringValue)
-          .getOrElse("")
+        FormBuilder.getControlResourceOrEmpty(
+          controlName,
+          "label",
+          removeHtmlTags  = true,
+          resourcesMapOpt = someResourcesMap
+        )
       <item
         label={s"$controlLabel ($controlName)"}
         value={controlName}
-        local-name={control.localname}/>
+        local-name={controlElem.localname}/>
     }.map(elemToNodeInfo)
   }
 
@@ -1272,7 +1275,13 @@ object FormBuilderXPathApi {
         .map { name =>
           Json.obj(
             "v" -> Json.fromString(name),
-            "l" -> Json.fromString(FormBuilder.getControlResourceOrEmpty(if (toAdd.contains(name)) toRemove.head else name, "label"))
+            "l" -> Json.fromString(
+              FormBuilder.getControlResourceOrEmpty(
+                if (toAdd.contains(name)) toRemove.head else name,
+                "label",
+                removeHtmlTags = true
+              )
+            )
           )
         }
         .toList

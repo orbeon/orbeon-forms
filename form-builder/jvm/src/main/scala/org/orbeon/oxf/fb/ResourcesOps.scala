@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -45,12 +46,23 @@ trait ResourcesOps extends BaseOps {
 
   // Get the control's resource value or blank
   def getControlResourceOrEmpty(
-    controlName  : String,
-    resourceName : String)(implicit
+    controlName    : String,
+    resourceName   : String,
+    removeHtmlTags : Boolean                       = false,
+    resourcesMapOpt: Option[Map[String, NodeInfo]] = None
+  )(implicit
     ctx          : FormBuilderDocContext
   ): String =
-    findCurrentResourceHolder(controlName) flatMap
-      (_ elemValueOpt resourceName) getOrElse ""
+    resourcesMapOpt.flatMap(_.get(controlName))
+      .orElse(findCurrentResourceHolder(controlName))
+      .flatMap(_ elemValueOpt resourceName)
+      .map(v =>
+        if (removeHtmlTags && FormBuilder.isControlLhhatHtmlMediatype(controlName, resourceName))
+          FormRunner.removeHtmlTags(v)
+        else
+          v
+      )
+      .getOrElse("")
 
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
   def getControlResources(
@@ -304,4 +316,10 @@ trait ResourcesOps extends BaseOps {
       )
     }
   }
+
+  def getAllControlsWithIds(implicit ctx: FormBuilderDocContext): Iterable[NodeInfo] =
+    FormRunner.getAllControlsWithIds filterNot { elem =>
+      // https://github.com/orbeon/orbeon-forms/issues/4786
+      FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
+    }
 }

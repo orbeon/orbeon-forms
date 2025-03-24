@@ -18,9 +18,7 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
@@ -321,7 +319,7 @@ trait ResourcesOps extends BaseOps {
     }
   }
 
-  def getAllControlsWithIds(implicit ctx: FormBuilderDocContext): Iterable[NodeInfo] =
+  def getAllControlsWithIds(implicit ctx: FormBuilderDocContext): NodeColl =
     FormRunner.getAllControlsWithIds filterNot { elem =>
       // https://github.com/orbeon/orbeon-forms/issues/4786
       FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)

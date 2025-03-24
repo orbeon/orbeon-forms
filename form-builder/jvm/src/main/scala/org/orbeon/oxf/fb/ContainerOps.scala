@@ -14,11 +14,12 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.oxf.fb.XMLNames.{FBInitialIterations, _}
+import org.orbeon.oxf.fb.XMLNames.*
 import org.orbeon.oxf.fr.FormRunner.*
-import org.orbeon.oxf.fr.{FormRunnerDocContext, FormRunnerTemplatesOps}
+import org.orbeon.oxf.fr.FormRunnerTemplatesOps
 import org.orbeon.oxf.fr.NodeInfoCell.*
 import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
@@ -26,7 +27,6 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
-import org.orbeon.oxf.util.CoreUtils.*
 
 
 
@@ -54,8 +54,8 @@ trait ContainerOps extends ControlOps {
       (_ == element)
 
   // Return all the container controls in the view
-  def getAllContainerControlsWithIds(implicit ctx: FormRunnerDocContext): NodeColl =
-    getAllControlsWithIds filter IsContainer
+  def getAllContainerControlsWithIds(implicit ctx: FormBuilderDocContext): NodeColl =
+    FormBuilder.getAllControlsWithIds filter IsContainer
 
   def getAllContainerControls(inDoc: NodeInfo): NodeColl = getFormRunnerBodyElem(inDoc) descendant * filter IsContainer
 

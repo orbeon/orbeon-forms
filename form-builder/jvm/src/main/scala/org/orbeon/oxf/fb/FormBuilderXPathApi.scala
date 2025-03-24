@@ -567,7 +567,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val allContainersWithSettings = getAllContainerControlsWithIds filter FormRunner.hasContainerSettings
+    val allContainersWithSettings = FormBuilder.getAllContainerControlsWithIds filter FormRunner.hasContainerSettings
 
     previousOrNext match {
       case "previous" => allContainersWithSettings takeWhile (n => FormRunner.getControlName(n) != controlName) lastOption

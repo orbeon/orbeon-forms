@@ -367,24 +367,9 @@
                                             appearance="search"
                                             ref="*:var[@name = ('control-name', 'source-path')]/(@value | @select)"
                                             class="fb-action-option-3-col-span-1">
-                                            <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                            <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                                <!-- Try to build a reasonably user-friendly label -->
-                                                <xf:label
-                                                    value="
-                                                        utils:truncateWithEllipsis(
-                                                            for $name in frf:controlNameFromId(@id)
-                                                            return
-                                                                concat(
-                                                                    $current-resources/*[name() = $name]/label,
-                                                                    ' (',
-                                                                    $name,
-                                                                    ')'
-                                                                ),
-                                                            60,
-                                                            6
-                                                        )"/>
-                                                <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
+                                            <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                                <xf:label value="@label"/>
+                                                <xf:value value="@value"/>
                                             </xf:itemset>
                                         </xf:select1>
                                     </xf:case>
@@ -506,24 +491,9 @@
                                             appearance="search"
                                             ref="*:var[@name[. != 'path']]/(@value | @select)"
                                             class="fb-action-option-3-col-span-1">
-                                            <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                            <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                                <!-- Try to build a reasonably user-friendly label -->
-                                                <xf:label
-                                                    value="
-                                                        utils:truncateWithEllipsis(
-                                                            for $name in frf:controlNameFromId(@id)
-                                                            return
-                                                                concat(
-                                                                    $current-resources/*[name() = $name]/label,
-                                                                    ' (',
-                                                                    $name,
-                                                                    ')'
-                                                                ),
-                                                            60,
-                                                            6
-                                                        )"/>
-                                                <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
+                                            <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                                <xf:label value="@label"/>
+                                                <xf:value value="@value"/>
                                             </xf:itemset>
                                         </xf:select1>
                                     </xf:case>
@@ -576,10 +546,21 @@
         <fr:tab>
             <xf:label ref="$form-resources/dialog-actions/service-response-actions"/>
 
-            <!-- Q: Should be consistent with actions.xsl to identify selection controls based on name? -->
+            <!--
+                2025-03-24: Consistent with `actions.xsl`:
+
+                - include single and multiple selection controls
+                - don't exclude open selection controls since we want them as source/destination of actions
+                - don't include boolean selection controls, which don't have an external itemset
+            -->
             <xf:var
-                name="controls-with-itemset"
-                value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]"/>
+                name="selection-controls"
+                value="
+                    instance('controls-label-value-itemset')/item[
+                        frf:isMultipleSelectionControl(@local-name) or
+                        frf:isSingleSelectionControl(@local-name)   or
+                        @local-name = 'autocomplete'
+                    ]"/>
 
             <xf:var
                 name="response-actions-container"
@@ -633,7 +614,7 @@
                                 </xf:itemset>
                                 <xf:itemset
                                     ref=".[
-                                        exists($controls-with-itemset) and (
+                                        exists($selection-controls) and (
                                             context() = 'fr-itemset-action' or
                                             $event-not-before-controls-ready
                                         )
@@ -664,18 +645,9 @@
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/destination-control/label" class="xforms-hidden"/>
-                                        <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                        <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xf:label
-                                                value="
-                                                    utils:truncateWithEllipsis(
-                                                        for $name in frf:controlNameFromId(@id)
-                                                            return concat($current-resources/*[name() = $name]/label, ' (', $name, ')'),
-                                                        60,
-                                                        6
-                                                    )"/>
-                                            <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
+                                        <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                            <xf:label value="@label"/>
+                                            <xf:value value="@value"/>
                                         </xf:itemset>
                                     </xf:select1>
                                     <xf:textarea
@@ -695,10 +667,9 @@
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/destination-selection-control/label" class="xforms-hidden"/>
-                                        <xf:itemset ref="$controls-with-itemset">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xf:label value="for $name in frf:controlNameFromId(@id) return concat($current-resources/*[name() = $name]/label, ' (', $name, ')')"/>
-                                            <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
+                                        <xf:itemset ref="$selection-controls">
+                                            <xf:label value="@label"/>
+                                            <xf:value value="@value"/>
                                         </xf:itemset>
                                     </xf:select1>
                                     <xh:div class="fb-action-option-3-col-span-1">

@@ -283,14 +283,14 @@
 
                 <xh:div class="fb-action-options">
                     <xh:div class="fb-action-option-3-col-span-2">
-                        <xh:label>
-                            <xf:output ref="$form-resources/dialog-actions/source/label"/>
-                        </xh:label>
+                        <xf:label
+                            for="fb-choose-request-source-type"
+                            ref="$form-resources/dialog-actions/source/label"/>
                     </xh:div>
                     <xh:div class="fb-action-option-3-col-span-1">
-                        <xh:label>
-                            <xf:output ref="$form-resources/dialog-actions/destination/label"/>
-                        </xh:label>
+                        <xf:label
+                            for="fb-request-destination-path"
+                            ref="$form-resources/dialog-actions/destination/label"/>
                     </xh:div>
                 </xh:div>
 
@@ -345,6 +345,7 @@
                             <xh:div class="fb-action-options">
 
                                 <xf:select1
+                                    id="fb-choose-request-source-type"
                                     ref="*:var/@name[. = ('control-name', 'source-path')]"
                                     class="fb-action-option-3-col-span-1">
                                     <xf:item>
@@ -385,7 +386,9 @@
                                 </xf:switch>
 
                                 <!-- Dropdown to select request parameter -->
-                                <fr:dropdown-select1 ref="xf:var[@name = 'parameter-name']/@value" class="fb-action-option-3-col-span-1">
+                                <fr:dropdown-select1
+                                    ref="xf:var[@name = 'parameter-name']/@value"
+                                    class="fb-action-option-3-col-span-1">
                                     <xf:itemset ref="xxf:split($instance/parameter-names)">
                                         <xf:label ref="."/>
                                         <xf:value ref="concat('''', ., '''')"/>
@@ -394,6 +397,7 @@
 
                                 <!-- Input for XPath expression to request body -->
                                 <xf:input
+                                    id="fb-request-destination-path"
                                     ref="xf:var[@name = 'path']/@value"
                                     appearance="xpath-completion"
                                     incremental="true"

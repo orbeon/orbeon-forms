@@ -1126,10 +1126,15 @@ body.orbeon {
             .fb-action-option-3-col-span-1 { width: @3colWidth }
             .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }
 
-            // We use `appearance="minimal"` on labels
-            label {
-                border-bottom: 1px solid #e5e5e5;
-                margin-bottom: 10px;
+            // Copied from grid.less, as we are not in a grid
+            // https://github.com/orbeon/orbeon-forms/issues/6893
+            // TODO: Remove code duplication.
+            .xforms-label {
+                font-weight: 600;
+                margin-top: 2px;
+                margin-bottom: @frGridCellPadding;
+                overflow: hidden;
+                display: table;
             }
         }
 

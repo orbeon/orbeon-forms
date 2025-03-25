@@ -679,7 +679,7 @@
                                                 incremental="true"
                                                 class="fb-action-xpath"
                                                 appearance="xpath-completion">
-                                            <xf:label ref="$form-resources/dialog-actions/items/label" appearance="minimal"/>
+                                            <xf:label ref="$form-resources/dialog-actions/items/label" appearance="full"/>
                                             <xf:hint ref="$form-resources/dialog-actions/items/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:textarea>
@@ -689,7 +689,7 @@
                                                 incremental="true"
                                                 class="fb-action-xpath"
                                                 appearance="xpath-completion">
-                                            <xf:label ref="$form-resources/dialog-actions/item-label/label" appearance="minimal"/>
+                                            <xf:label ref="$form-resources/dialog-actions/item-label/label" appearance="full"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-label/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
@@ -699,7 +699,7 @@
                                                 incremental="true"
                                                 class="fb-action-xpath"
                                                 appearance="xpath-completion">
-                                            <xf:label ref="$form-resources/dialog-actions/item-value/label" appearance="minimal"/>
+                                            <xf:label ref="$form-resources/dialog-actions/item-value/label" appearance="full"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-value/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
@@ -709,7 +709,7 @@
                                                 incremental="true"
                                                 class="fb-action-xpath"
                                                 appearance="xpath-completion">
-                                            <xf:label ref="$form-resources/dialog-actions/item-hint/label" appearance="minimal"/>
+                                            <xf:label ref="$form-resources/dialog-actions/item-hint/label" appearance="full"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-hint/hint"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>

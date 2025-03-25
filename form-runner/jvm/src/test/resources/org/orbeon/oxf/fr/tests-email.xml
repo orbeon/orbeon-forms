@@ -127,9 +127,9 @@
                        <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                        <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                        <part name="attachment-1" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-1" fr:uri="file:/tmp/attachment-13.bin"/>
-                       <part name="attachment-2" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-2" fr:uri="http://example.org/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin"/>
-                       <part name="attachment-3" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-3" fr:uri="http://example.org/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-10.bin"/>
-                       <part name="attachment-4" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-4" fr:uri="http://example.org/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-11.bin"/>
+                       <part name="attachment-2" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-2" fr:uri="http://localhost:8080/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin"/>
+                       <part name="attachment-3" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-3" fr:uri="http://localhost:8080/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-10.bin"/>
+                       <part name="attachment-4" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-4" fr:uri="http://localhost:8080/orbeon/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-11.bin"/>
                    </body>
                 </message>
             </messages>

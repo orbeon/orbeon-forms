@@ -32,7 +32,6 @@
     <property as="xs:string"  name="oxf.schemas.urn://address-book"                         value="oxf:/ops/unit-tests/address-book-schema.xml"/>
     <property as="xs:string"  name="oxf.crypto.password"                                    value="ForTestsOnly!T42mMw*pgH9.EfTZx!4r"/>
     <property as="xs:string"  name="oxf.fr.access-token.password"                           value="ForTestsOnly!rVmBiyH8df.Ct72Zapen"/>
-    <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"                     value="http://example.org/orbeon"/>
     <property as="xs:QName"   processor-name="oxf:xml-converter"  name="default-method"     value="xml"/>
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                               value="smart"/>

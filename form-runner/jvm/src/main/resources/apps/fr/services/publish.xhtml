@@ -309,6 +309,12 @@
                 frf:sendError(500)
             </xf:action>
 
+            <!-- https://github.com/orbeon/orbeon-forms/issues/6892 -->
+            <!-- We still need this for `fr-send-submission` which can be used by `before-publish`. -->
+            <xi:include
+                href="../components/universal-submission.xml"
+                xpointer="xpath(/*/*)"
+                xxi:omit-xml-base="true"/>
         </xf:model>
     </xh:head>
 </xh:html>

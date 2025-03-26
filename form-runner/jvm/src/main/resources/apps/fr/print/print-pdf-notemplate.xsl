@@ -293,9 +293,7 @@
                 p:has-class('xforms-field')
             ]"
        >
-
         <xsl:element name="{local-name()}">
-
             <xsl:variable name="new-content" select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))"/>
             <xsl:variable name="is-long-content" select="string-length($new-content) > $long-content-threshold"/>
             <xsl:apply-templates select="@* except @class"/>
@@ -303,14 +301,39 @@
                 <xsl:attribute name="class" select="
                     string-join(
                         (
-                            if ($is-long-content) then 'fr-long-content' else (),
+                            'fr-long-content'[$is-long-content],
                             @class
                         ),
                         ' '
                     )"/>
             </xsl:if>
             <xsl:apply-templates select="$new-content"/>
+        </xsl:element>
+    </xsl:template>
 
+    <!-- Adds a class `fr-long-content` on some other fields.
+         https://github.com/orbeon/orbeon-forms/issues/6903 -->
+    <xsl:template
+        match="
+            *:div[
+                p:has-class('xbl-fr-explanation') or
+                p:has-class('xbl-fr-tinymce')
+            ]"
+       >
+        <xsl:element name="{local-name()}">
+            <xsl:variable name="is-long-content" select="string-length(string()) > $long-content-threshold"/>
+            <xsl:apply-templates select="@* except @class"/>
+            <xsl:if test="$is-long-content or exists(@class)">
+                <xsl:attribute name="class" select="
+                    string-join(
+                        (
+                            'fr-long-content'[$is-long-content],
+                            @class
+                        ),
+                        ' '
+                    )"/>
+            </xsl:if>
+            <xsl:apply-templates select="node()"/>
         </xsl:element>
     </xsl:template>
 

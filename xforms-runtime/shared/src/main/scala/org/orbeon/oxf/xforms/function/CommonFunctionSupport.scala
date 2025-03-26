@@ -4,12 +4,12 @@ import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{FunctionContext, XPath}
-import org.orbeon.oxf.xforms.{BindingContext, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsLangSupport
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{Expression, XPathContext}
 import org.orbeon.saxon.om
@@ -172,7 +172,7 @@ trait CommonFunctionSupport {
       { case control: XFormsControl if control.isRelevant => control }
 
   def currentLangOpt(implicit xpc: XPathContext, xfc: Context): Option[String] =
-    elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
+    elementAnalysisForSource flatMap (XXFormsLangSupport.resolveXMLangHandleAVTs(getContainingDocument, _))
 
   def getContainingDocument(implicit xpc: XPathContext): XFormsContainingDocument =
     Option(context).map(_.container.containingDocument).orNull

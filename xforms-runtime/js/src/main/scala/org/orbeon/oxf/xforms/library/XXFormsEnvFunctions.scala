@@ -13,7 +13,6 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.*
 import org.orbeon.oxf.xforms.function.xxforms.*
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
@@ -342,7 +341,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def lang()(implicit xfc: XFormsFunction.Context): Option[String] =
-    elementAnalysisForSource flatMap (resolveXMLangHandleAVTs(xfc.containingDocument, _))
+    elementAnalysisForSource flatMap (XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, _))
 
   // TODO: last arg is`map(*)`
   @XPathFunction
@@ -381,7 +380,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       for {
         elementAnalysis <- elementAnalysisForSource
         resources       <- findResourcesElement
-        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis)
+        requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis)
         resourceRoot    <- findResourceElementForLang(resources, requestedLang)
         leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKey)).headOption
       } yield
@@ -403,7 +402,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     for {
       elementAnalysis <- elementAnalysisForSource.iterator
       resources       <- findResourcesElement.iterator
-      requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis).iterator
+      requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis).iterator
       resourceRoot    <- findResourceElementForLang(resources, requestedLang).iterator
       leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).iterator
     } yield

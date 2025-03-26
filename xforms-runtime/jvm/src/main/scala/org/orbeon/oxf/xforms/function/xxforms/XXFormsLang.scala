@@ -14,23 +14,21 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import cats.syntax.option.*
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LangRef, PathMapXPathAnalysis}
-import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.analysis.{LangRef, PathMapXPathAnalysis}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 
+
 class XXFormsLang extends XFormsFunction {
 
-  import XXFormsLang._
+  import XXFormsLang.*
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
     implicit val ctx = xpathContext
     implicit val xfc = XFormsFunction.context
-    XFormsFunction.elementAnalysisForSource flatMap (resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, _))
+    XFormsFunction.elementAnalysisForSource flatMap (XXFormsLangSupport.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, _))
   }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
@@ -40,18 +38,6 @@ class XXFormsLang extends XFormsFunction {
 }
 
 object XXFormsLang {
-
-  def resolveXMLangHandleAVTs(containingDocument: XFormsContainingDocument, element: ElementAnalysis): Option[String] =
-    element.getLangUpdateIfUndefined match {
-      case LangRef.Literal(value) =>
-        Some(value)
-      case LangRef.AVT(att) =>
-        // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
-        val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
-        Option(attributeControl.getExternalValue(EventCollector.Throw))
-      case _ =>
-        None
-    }
 
   def addXMLLangDependency(pathMap: PathMap): Unit = {
 

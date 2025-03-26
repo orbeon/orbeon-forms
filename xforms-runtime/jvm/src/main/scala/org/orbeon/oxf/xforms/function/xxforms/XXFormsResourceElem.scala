@@ -22,7 +22,7 @@ import org.orbeon.scaxon.Implicits.*
 
 class XXFormsResourceElem extends XFormsFunction {
 
-  import XXFormsResourceSupport._
+  import XXFormsResourceSupport.*
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
@@ -40,7 +40,7 @@ class XXFormsResourceElem extends XFormsFunction {
       for {
         elementAnalysis <- XFormsFunction.elementAnalysisForSource
         resources       <- findResourcesElement
-        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
+        requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
         resourceRoot    <- findResourceElementForLang(resources, requestedLang)
       } yield
         resourceRoot

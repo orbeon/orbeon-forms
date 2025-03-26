@@ -6,13 +6,14 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.event.EventCollector
 
 
-object XXFormsLang {
+object XXFormsLangSupport {
+
   def resolveXMLangHandleAVTs(containingDocument: XFormsContainingDocument, element: ElementAnalysis): Option[String] =
     element.getLangUpdateIfUndefined match {
       case LangRef.Literal(value) =>
         Some(value)
       case LangRef.AVT(att) =>
-        // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
+        // TODO: resolve concrete ancestor `XXFormsAttributeControl` instead of just using static id
         val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
         Option(attributeControl.getExternalValue(EventCollector.Throw))
       case _ =>

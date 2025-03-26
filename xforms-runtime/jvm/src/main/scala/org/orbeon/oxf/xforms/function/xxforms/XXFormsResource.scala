@@ -70,7 +70,7 @@ class XXFormsResource extends XFormsFunction {
       for {
         elementAnalysis <- XFormsFunction.elementAnalysisForSource
         resources       <- findResourcesElement
-        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
+        requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
         resourceRoot    <- findResourceElementForLang(resources, requestedLang)
         leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).headOption
       } yield

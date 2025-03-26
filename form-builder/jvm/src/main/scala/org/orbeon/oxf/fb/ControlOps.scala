@@ -759,13 +759,21 @@ trait ControlOps extends ResourcesOps {
         (renameNodeContent(_, avt = false))
     }
 
+    val emailTemplates = ctx.metadataRootElem / "email" / "templates" / "template"
+
     // Update email headers
     // https://github.com/orbeon/orbeon-forms/issues/6741
     locally {
-      (ctx.metadataRootElem / "email" / "templates" / "template" / "headers" / "header")
+      (emailTemplates / "headers" / "header")
         .filter(_.attValueOpt("type").contains("control-value"))
         .filter(_.stringValue == oldName)
         .foreach(updateNode(newName))
+    }
+
+    // Update 'enable-if-true' expressions in email templates
+    // https://github.com/orbeon/orbeon-forms/issues/6897
+    locally {
+      (emailTemplates / "enable-if-true").foreach(renameNodeContent(_, avt = false))
     }
 
     // Update new actions

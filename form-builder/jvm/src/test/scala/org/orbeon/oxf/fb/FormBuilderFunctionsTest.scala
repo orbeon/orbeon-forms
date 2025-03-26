@@ -585,6 +585,7 @@ class FormBuilderFunctionsTest
             <templates>
               <template name="default" xml:lang="en">
                 <headers/>
+                <enable-if-true>$qux = 'value'</enable-if-true>
                 <subject>Subject: {{$my-foo}} with {{$my-bar}}</subject>
                 <body mediatype="text/html">&lt;div&gt;Body: {{$her-foo}} with {{$her-bar}}&lt;/div&gt;</body>
                 <exclude-from-all-control-values/>

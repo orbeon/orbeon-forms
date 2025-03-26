@@ -35,7 +35,7 @@ class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSup
     }
   }
 
-  describe("Form Runner client tests") {
+  describe("Form Runner API client tests") {
     it("must find form controls by name") { _ =>
       withFormReady("control-names") { case FormRunnerWindow(_, formRunnerApi) =>
         async {

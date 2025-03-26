@@ -89,7 +89,7 @@ object ElementAnalysisTreeBuilder {
           }
     }
 
-  def setModelAndLangOnAllDescendants(partAnalysisCtx : PartAnalysisContextAfterTree, parentElem: WithChildrenTrait): Unit =
+  def setModelAndLangOnAllDescendants(partAnalysisCtx: PartAnalysisContextAfterTree, parentElem: WithChildrenTrait): Unit =
     parentElem.descendants foreach { e =>
       setModelOnElement(partAnalysisCtx, e)
       PartAnalysisSupport.setLangOnElement(partAnalysisCtx.getAttributeControl, e)

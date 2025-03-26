@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
 import org.orbeon.oxf.xml.*
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -460,27 +459,10 @@ object PartAnalysisBuilder {
 
       // Language on the root element is handled differently, but it must be done after the tree has been built
       // as we need access to attribute controls
-      rootControlAnalysis.lang = {
-
-        // Assign a top-level lang based on the first `xml:lang` found on a top-level control. This allows
-        // `xxbl:global` controls to inherit that `xml:lang`. All other top-level controls already have an `xml:lang`
-        // placed by `XFormsExtractor`.
-        def fromChildElements =
-          rootControlAnalysis.element.elements collectFirst {
-            case e if e.hasAttribute(XML_LANG_QNAME) =>
-              PartAnalysisSupport.extractXMLLang(
-                getAttributeControl = partAnalysisCtx.getAttributeControl,
-                elementAnalysis     = rootControlAnalysis,
-                lang                = e.attributeValue(XML_LANG_QNAME)
-              )
-          }
-
-        // Ask the parent part
-        def fromParentPart =
-          elementInParentPartOpt map (_.getLangUpdateIfUndefined)
-
-        fromChildElements orElse fromParentPart getOrElse LangRef.None
-      }
+      rootControlAnalysis.lang =
+        PartAnalysisSupport.findLangRefFromChildren(partAnalysisCtx.getAttributeControl, rootControlAnalysis)
+          .orElse(elementInParentPartOpt.map(_.getLangUpdateIfUndefined))
+          .getOrElse(LangRef.None)
 
       ElementAnalysisTreeBuilder.setModelOnElement(partAnalysisCtx, rootControlAnalysis)
       ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, rootControlAnalysis)

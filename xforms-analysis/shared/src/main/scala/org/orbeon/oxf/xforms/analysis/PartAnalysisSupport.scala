@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.FOR_QNAME
@@ -126,4 +126,19 @@ object PartAnalysisSupport {
         case Some(v) => extractXMLLang(getAttributeControl, elementAnalysis, v)
         case None    => LangRef.Undefined
       }
+
+  // Assign a top-level lang based on the first `xml:lang` found on a top-level control. This allows `xxbl:global`
+  // controls to inherit that `xml:lang`.
+  def findLangRefFromChildren(
+    getAttributeControl: (String, String) => AttributeControl,
+    rootControlAnalysis: RootControl
+  ): Option[LangRef] =
+    rootControlAnalysis.children.collectFirst {
+      case e if e.element.hasAttribute(XML_LANG_QNAME) =>
+        PartAnalysisSupport.extractXMLLang(
+          getAttributeControl = getAttributeControl,
+          elementAnalysis     = rootControlAnalysis,
+          lang                = e.element.attributeValue(XML_LANG_QNAME)
+        )
+    }
 }

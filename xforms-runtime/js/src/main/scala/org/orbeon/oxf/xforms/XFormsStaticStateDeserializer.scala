@@ -1036,6 +1036,17 @@ object XFormsStaticStateDeserializer {
           PartAnalysisSupport.setLangOnElement(topLevelPart.getAttributeControl, elem)
         }
 
+        // Set language on root element
+        // https://github.com/orbeon/orbeon-forms/issues/6879
+        topLevelPart
+          .getTopLevelControls
+          .collectFirst { case r: RootControl => r }
+          .foreach { rootControlAnalysis =>
+            rootControlAnalysis.lang =
+              PartAnalysisSupport.findLangRefFromChildren(topLevelPart.getAttributeControl, rootControlAnalysis)
+                .getOrElse(LangRef.None)
+          }
+
         // Set collected `Model` orderings
         for {
           (modelRef, (recalculateOrder, defaultValueOrder)) <- collectedModelOrderings

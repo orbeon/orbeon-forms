@@ -13,70 +13,44 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.CollectionUtils.*
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
-import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.*
-import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.{StringValue, Value}
 import org.orbeon.scaxon.Implicits.*
-import org.orbeon.scaxon.SimplePath.*
 
-import scala.annotation.tailrec
 
 class XXFormsResource extends XFormsFunction {
 
-  import XXFormsResource._
-  import XXFormsResourceSupport._
+  import XXFormsResource.*
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
     implicit val ctx = xpathContext
     implicit val xfc = XFormsFunction.context
 
-    val resourceKeyArgument = stringArgument(0)
-    val instanceArgumentOpt = stringArgumentOpt(1)
-    val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
+    val resourceKey       = stringArgument(0)
+    val instanceOpt       = stringArgumentOpt(1)
+    val templateParamsOpt = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
 
-    def findInstance = instanceArgumentOpt match {
-      case Some(instanceName) => XFormsFunction.resolveOrFindByStaticOrAbsoluteId(instanceName)
-      case None               => XFormsFunction.resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse XFormsFunction.resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
-    }
-
-    def findResourcesElement = findInstance collect { case instance: XFormsInstance => instance.rootElement }
-
-    def processResourceString(resourceOrTemplate: String): String =
-      templateParamsOpt match {
-        case Some(params) =>
-
-          val javaNamedParamsIt = params.iterator map {
-            case (key, value) =>
-              val javaParamOpt = (asScalaIterator(Value.asIterator(value)) map Value.convertToJava).nextOption()
-              key.getStringValue -> javaParamOpt.orNull
-          }
-
-          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List))
-
-        case None =>
-          resourceOrTemplate
+    def javaNamedParamsOpt: Option[List[(String, Any)]] =
+      templateParamsOpt.map { params =>
+        params.iterator.map {
+          case (key, value) =>
+            val javaParamOpt = (asScalaIterator(Value.asIterator(value)) map Value.convertToJava).nextOption()
+            key.getStringValue -> javaParamOpt.orNull
+        }
+        .toList
       }
 
-    val resultOpt =
-      for {
-        elementAnalysis <- XFormsFunction.elementAnalysisForSource
-        resources       <- findResourcesElement
-        requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
-        resourceRoot    <- findResourceElementForLang(resources, requestedLang)
-        leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).headOption
-      } yield
-        stringToStringValue(processResourceString(leaf.stringValue))
-
-    resultOpt.orNull
+    XXFormsLangSupport.r(
+      resourceKey        = resourceKey,
+      instanceOpt        = instanceOpt,
+      javaNamedParamsOpt = javaNamedParamsOpt
+    )
   }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
@@ -95,7 +69,7 @@ class XXFormsResource extends XFormsFunction {
 
 object XXFormsResource {
 
-  import XXFormsResourceSupport._
+  import XXFormsResourceSupport.*
 
   def updatePathMap(
     namePool       : NamePool,

@@ -8,7 +8,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.*
@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport, ProcessTemplateSupport}
+import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport}
 import org.orbeon.saxon.ma.map.MapItem
 import org.orbeon.saxon.model.BuiltInAtomicType
 import org.orbeon.saxon.om
@@ -343,48 +343,34 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def lang()(implicit xfc: XFormsFunction.Context): Option[String] =
     elementAnalysisForSource flatMap (XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, _))
 
-  // TODO: last arg is`map(*)`
   @XPathFunction
   def r(
-    resourceKey         : String,
-    instanceArgumentOpt : Option[String]  = None,
-    templateParamsOpt   : Option[om.Item] = None)(implicit // must be a `MapItem`
-    xpc                 : XPathContext,
-    xfc                 : XFormsFunction.Context
+    resourceKey      : String,
+    instanceOpt      : Option[String]  = None,
+    templateParamsOpt: Option[om.Item] = None // TODO: must be a `MapItem` (`map(*)`)
+  )(implicit
+    xpc                : XPathContext,
+    xfc                : XFormsFunction.Context
   ): Option[String] = {
 
-    def findInstance = instanceArgumentOpt match {
-      case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)
-      case None               => resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
-    }
+    def javaNamedParamsOpt: Option[List[(String, Any)]] =
+      templateParamsOpt.collect {
+        case params: MapItem =>
 
-    def findResourcesElement = findInstance collect { case instance: XFormsInstance => instance.rootElement }
-
-    def processResourceString(resourceOrTemplate: String): String =
-      templateParamsOpt match {
-        case Some(params: MapItem) =>
-
-          val javaNamedParamsIt = params.keyValuePairs.iterator.asScala map {
+          val javaNamedParamsIt = params.keyValuePairs.iterator.asScala.map {
             case org.orbeon.saxon.ma.map.KeyValuePair(key, value) =>
-
               val javaParamOpt = (value.asIterable.iterator.asScala map SequenceTool.convertToJava).nextOption()
               key.getStringValue -> javaParamOpt.orNull
           }
 
-          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.toList)
-
-        case _ =>
-          resourceOrTemplate
+          javaNamedParamsIt.toList
       }
 
-      for {
-        elementAnalysis <- elementAnalysisForSource
-        resources       <- findResourcesElement
-        requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis)
-        resourceRoot    <- findResourceElementForLang(resources, requestedLang)
-        leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKey)).headOption
-      } yield
-        processResourceString(leaf.getStringValue)
+    XXFormsLangSupport.r(
+      resourceKey        = resourceKey,
+      instanceOpt        = instanceOpt,
+      javaNamedParamsOpt = javaNamedParamsOpt
+    )
   }
 
   @XPathFunction

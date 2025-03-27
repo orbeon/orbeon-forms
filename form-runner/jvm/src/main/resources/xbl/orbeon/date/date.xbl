@@ -442,6 +442,7 @@
         id="fr-date-output"
         element="
             fr|date[fr|static-readonly = true],
+            fr|date[fr|pdf-template = true],
             fr|dropdown-date[fr|static-readonly = true],
             fr|fields-date[fr|static-readonly = true]"
         xxbl:mode="lhha binding value"

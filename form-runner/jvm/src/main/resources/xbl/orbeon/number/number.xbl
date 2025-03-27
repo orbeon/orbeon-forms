@@ -460,7 +460,9 @@
         id="fr-number-output"
         element="
             fr|number[fr|static-readonly = true],
-            fr|currency[fr|static-readonly = true]"
+            fr|currency[fr|static-readonly = true],
+            fr|number[fr|pdf-template = true],
+            fr|currency[fr|pdf-template = true]"
         xxbl:mode="lhha binding value allow-minimal-label-hint"
         xxbl:label-for="input"
         xxbl:format="

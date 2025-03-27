@@ -66,9 +66,14 @@
                     ]
                 )">
                 <fr:date>
-                    <xsl:if test="$is-static-readonly and ($is-pdf-mode or not($date-native-picker = 'always'))">
-                        <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$is-static-readonly and ($is-pdf-mode or not($date-native-picker = 'always'))">
+                            <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$use-pdf-template">
+                            <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                        </xsl:when>
+                    </xsl:choose>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                     <!-- See other comment further "Q: Do we really need this?" -->
                     <xsl:if test="empty(xf:alert)">
@@ -84,9 +89,14 @@
                     ]
                 )">
                 <fr:time>
-                    <xsl:if test="$is-static-readonly and ($is-pdf-mode or not($time-native-picker = 'always'))">
-                        <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$is-static-readonly and ($is-pdf-mode or not($time-native-picker = 'always'))">
+                            <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$use-pdf-template">
+                            <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                        </xsl:when>
+                    </xsl:choose>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                     <!-- See other comment further "Q: Do we really need this?" -->
                     <xsl:if test="empty(xf:alert)">
@@ -109,9 +119,14 @@
         mode="within-grid">
         <!-- For now this only applies to controls that have an `xf:select1` binding -->
         <xsl:element name="xf:select1">
-            <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:apply-templates select="@* except (@appearance, @fr:pdf-appearance)" mode="#current"/>
             <xsl:attribute name="appearance" select="(@fr:pdf-appearance, map:get($select1-pdf-appearances, fr:direct-name-for-select1-element(.)))[1]"/>
             <xsl:apply-templates select="node()" mode="#current"/>
@@ -146,9 +161,14 @@
         <xsl:choose>
             <xsl:when test="frf:controlNameFromId(@id) = $choice-validation-selection-control-names">
                 <xsl:copy>
-                    <xsl:if test="$is-static-readonly">
-                        <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$is-static-readonly">
+                            <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$use-pdf-template">
+                            <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                        </xsl:when>
+                    </xsl:choose>
                     <xsl:apply-templates select="@* | node()" mode="#current"/>
                         <xf:alert
                             ref="
@@ -201,9 +221,14 @@
         match="xf:output[exists(xf:label) and empty(@appearance)]"
         mode="within-grid">
         <xsl:copy>
-            <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
                 <xsl:attribute name="appearance" select="."/>
             </xsl:for-each>
@@ -217,9 +242,14 @@
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
-            <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:for-each select="@prefix | @suffix">
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
             </xsl:for-each>
@@ -233,9 +263,14 @@
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
-            <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:if test="exists(@resource | @selection)">
                 <!-- As calls below can generate `frf:controlVariableValue()` -->
                 <xsl:namespace name="frf" select="'java:org.orbeon.oxf.fr.FormRunner'"/>
@@ -357,19 +392,24 @@
         match="*[parent::fr:c or parent::xh:td]"
         priority="-10">
         <xsl:copy>
-            <xsl:if test="
-                $is-static-readonly and (
-                    $is-pdf-mode or (
-                        (: `view` mode :)
-                        not(
-                            (exists(self::fr:date) and (@native-picker/string(), $date-native-picker)[1] = 'always') or
-                            (exists(self::fr:time) and (@native-picker/string(), $time-native-picker)[1] = 'always')
+            <xsl:choose>
+                <xsl:when test="
+                    $is-static-readonly and (
+                        $is-pdf-mode or (
+                            (: `view` mode :)
+                            not(
+                                (exists(self::fr:date) and (@native-picker/string(), $date-native-picker)[1] = 'always') or
+                                (exists(self::fr:time) and (@native-picker/string(), $time-native-picker)[1] = 'always')
+                            )
                         )
                     )
-                )
-            ">
-                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-            </xsl:if>
+                ">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:apply-templates select="@* | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
@@ -382,9 +422,14 @@
         match="xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
         priority="-20">
         <xsl:copy>
-            <xsl:if test="$is-static-readonly">
-                <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
             <xsl:apply-templates select="@* | node()" mode="#current"/>
             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
         </xsl:copy>

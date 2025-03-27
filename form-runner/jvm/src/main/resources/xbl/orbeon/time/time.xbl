@@ -386,7 +386,9 @@
 
     <xbl:binding
         id="fr-time-output"
-        element="fr|time[fr|static-readonly = true]"
+        element="
+            fr|time[fr|static-readonly = true],
+            fr|time[fr|pdf-template = true]"
         xxbl:mode="lhha binding value"
         xxbl:label-for="input"
     >

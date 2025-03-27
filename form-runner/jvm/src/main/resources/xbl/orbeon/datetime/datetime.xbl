@@ -216,7 +216,7 @@
     <xbl:binding
         id="fr-datetime-output"
         element="
-            fr|datetime[fr|static-readonly = true]
+            fr|datetime[fr|static-readonly = true],
             fr|datetime[fr|pdf-template = true]"
         xxbl:mode="lhha binding value"
         xxbl:label-for="input">

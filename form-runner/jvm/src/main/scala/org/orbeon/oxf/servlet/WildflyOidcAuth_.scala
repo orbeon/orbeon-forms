@@ -18,13 +18,14 @@ import org.wildfly.security.http.oidc.{JsonWebToken, OidcSecurityContext}
 
 import scala.jdk.CollectionConverters.*
 
-object WildflyOidcAuth {
+object WildFlyOidcAuth {
 
   private val OidcSecurityContextClassName = "org.wildfly.security.http.oidc.OidcSecurityContext"
   private val ObjectIDClaimName            = "oid"
+  private val SubjectClaimName             = "sub"
   private val RolesClaimName               = "roles"
 
-  def hasWildflyOidcAuth(getAttribute: String => AnyRef): Boolean =
+  def hasWildFlyOidcAuth(getAttribute: String => AnyRef): Boolean =
     Option(getAttribute(OidcSecurityContextClassName)).isDefined
 
   def credentialsOpt(getAttribute: String => AnyRef): Option[Credentials] = {
@@ -46,18 +47,27 @@ object WildflyOidcAuth {
       Option(oidcSecurityContext.getToken  ).flatMap(getStringListClaimValueFromToken(_, claimName)) orElse
       Option(oidcSecurityContext.getIDToken).flatMap(getStringListClaimValueFromToken(_, claimName))
 
-    Option(getAttribute(OidcSecurityContextClassName)) collect {
+    Option(getAttribute(OidcSecurityContextClassName)).collect {
       case oidcSecurityContext: OidcSecurityContext =>
 
-        val objectIdOpt = getClaimValue(oidcSecurityContext, ObjectIDClaimName)
-        val objectId    = objectIdOpt.getOrElse(throw new RuntimeException(s"Claim '$ObjectIDClaimName' not found in OIDC token"))
-        val roleIds     = getStringListClaimValue(oidcSecurityContext, RolesClaimName).getOrElse(Nil)
+        // Try to retrieve a principal/user identifier from the tokens
+        val principalOpt =
+          LazyList(
+            ObjectIDClaimName, // This is Entra ID specific, trying first
+            SubjectClaimName   // General case
+          ).flatMap(getClaimValue(oidcSecurityContext, _)).headOption
 
-        Credentials(
-          userAndGroup  = UserAndGroup(username = objectId, groupname = None),
-          roles         = roleIds.map(SimpleRole.apply),
-          organizations = Nil
-        )
-    }
+        principalOpt.map { principal =>
+
+          // Try to retrieve roles from the tokens
+          val roleIds = getStringListClaimValue(oidcSecurityContext, RolesClaimName).getOrElse(Nil)
+
+          Credentials(
+            userAndGroup  = UserAndGroup(username = principal, groupname = None),
+            roles         = roleIds.map(SimpleRole.apply),
+            organizations = Nil
+          )
+        }
+    }.flatten
   }
 }

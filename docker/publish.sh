@@ -65,10 +65,10 @@ main() {
   # Build Orbeon Forms image (Tomcat, including PostgreSQL JDBC driver)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat.postgres_driver --build-arg base_image="$ORBEON_FORMS_TOMCAT_BASE_IMAGE" -t "$ORBEON_FORMS_TOMCAT_IMAGE" .
 
-  # Build Orbeon Forms image (Wildfly, base image)
+  # Build Orbeon Forms image (WildFly, base image)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
 
-  # Build Orbeon Forms image (Wildfly, including PostgreSQL JDBC driver)
+  # Build Orbeon Forms image (WildFly, including PostgreSQL JDBC driver)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .
 
   # Do not import demo forms into PostgreSQL, just use SQLite

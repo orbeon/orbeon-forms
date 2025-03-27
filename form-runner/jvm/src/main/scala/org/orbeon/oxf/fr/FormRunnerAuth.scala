@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.servlet.WildflyOidcAuth
+import org.orbeon.oxf.servlet.WildFlyOidcAuth
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -195,9 +195,12 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          if (WildflyOidcAuth.hasWildflyOidcAuth(getAttribute)) {
-            Logger.debug(s"using Wildfly OIDC credentials")
-            WildflyOidcAuth.credentialsOpt(getAttribute)
+          if (WildFlyOidcAuth.hasWildFlyOidcAuth(getAttribute)) {
+            Logger.debug(s"using WildFly OIDC credentials")
+            WildFlyOidcAuth.credentialsOpt(getAttribute) orElse {
+              Logger.debug(s"WildFly OIDC credentials not found, falling back to regular container credentials")
+              containerCredentialsOpt(userRoles, propertySet)
+            }
           } else {
             Logger.debug(s"using regular container credentials")
             containerCredentialsOpt(userRoles, propertySet)

@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import java.io.{InputStream, Reader, StringReader}
-import java.util as ju
-import javax.xml.parsers.*
 import org.orbeon.apache.xerces.impl.{Constants, XMLEntityManager, XMLErrorReporter}
 import org.orbeon.apache.xerces.xni.parser.XMLInputSource
 import org.orbeon.io.IOUtils.useAndClose
@@ -30,7 +27,9 @@ import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl
 import org.w3c.dom.Document
 import org.xml.sax.*
 
-import java.net.URL
+import java.io.{InputStream, Reader, StringReader}
+import java.util as ju
+import javax.xml.parsers.*
 import scala.util.Try
 
 
@@ -38,7 +37,7 @@ import scala.util.Try
 // conversion functions.
 object XMLParsing {
 
-  import Private._
+  import Private.*
 
   val EntityResolver = new XMLParsing.EntityResolver
   val ErrorHandler   = new XMLParsing.ErrorHandler

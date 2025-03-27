@@ -1748,7 +1748,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:fields-date>
                         </fr:c>
                         <fr:c x="9" y="2" w="4">
-                            <fr:date bind="native-date-bind" id="native-date-control" ref="">
+                            <fr:date bind="native-date-bind" id="native-date-control" ref="" native-picker="always">
                                 <xf:label ref="$form-resources/native-date/label"/>
                                 <xf:hint ref="$form-resources/native-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>

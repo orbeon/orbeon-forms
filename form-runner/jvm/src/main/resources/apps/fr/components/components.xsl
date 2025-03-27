@@ -44,20 +44,20 @@
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
     <xsl:variable
+        name="is-pdf-mode"
+        select="$mode = ('pdf', 'tiff', 'test-pdf', 'email')"
+        as="xs:boolean"/>
+
+    <xsl:variable
         name="is-readonly-mode"
         as="xs:boolean"
-        select="$mode = ('view', 'pdf', 'tiff', 'test-pdf', 'email', 'controls')"/>
+        select="$is-pdf-mode or $mode = ('view', 'controls')"/>
 
     <!-- Same logic as `fr:is-service-path()` -->
     <xsl:variable
         name="is-service-path"
         as="xs:boolean"
         select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"/>
-
-    <xsl:variable
-        name="is-pdf-mode"
-        select="$mode = ('pdf', 'test-pdf', 'email')"
-        as="xs:boolean"/>
 
 <!--    not(-->
 <!--        (-->
@@ -265,7 +265,7 @@
         as="xs:string?"
         select="
             (: Normalize TOC position for PDF :)
-            if (exists($toc-position-raw-opt) and $mode = ('pdf', 'tiff', 'test-pdf')) then
+            if (exists($toc-position-raw-opt) and $is-pdf-mode) then
                 'top'
             else
                 $toc-position-raw-opt"/>
@@ -679,7 +679,7 @@
     <xsl:variable
         name="select1-pdf-appearances"
         select="
-            if ($mode = ('pdf', 'test-pdf')) then
+            if ($is-pdf-mode) then
                 map:merge(
                     for $name in (
                         (: Use direct names :)

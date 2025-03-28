@@ -48,8 +48,8 @@ object FRComponentParamSupport {
         FRComponentParamSupport.fromMetadataAndProperties(
           partAnalysis  = sourceComponent.container.partAnalysis,
           directNameOpt = staticControl.commonBinding.directName.orElse(staticControl.element.getQName.some), // https://github.com/orbeon/orbeon-forms/issues/6707
-          paramName     = paramName,
-          property      = property
+          paramName     = paramName,                                                                          // Ideally, we should know which selector picked the binding
+          property      = property                                                                            // and use the element name from that.
         )
 
       fromAttributes orElse fromMetadataAndProperties flatMap {

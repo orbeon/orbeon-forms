@@ -89,13 +89,12 @@
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                             <li><a href="?form=bookshelf">Bookshelf</a></li>
+                            <li><a href="?form=building-permit">Building Permit</a></li>
+                            <li><a href="?form=emergency-medical-consent">Medical Treatment</a></li>
+                            <li><a href="?form=feedback">Feedback</a></li>
                             <li><a href="?form=dmv-14">DMV-14</a></li>
                             <li><a href="?form=w9">W-9</a></li>
-                            <li><a href="?form=controls">Controls</a></li>
-                            <li><a href="?form=contact">Contact</a></li>
-                            <% if (isEmbeddingApiJava) { %>
                             <li><a href="?form=builder">Form Builder</a></li>
-                            <% } %>
                         </ul>
                         <ul class="nav pull-right">
                             <li class="dropdown">

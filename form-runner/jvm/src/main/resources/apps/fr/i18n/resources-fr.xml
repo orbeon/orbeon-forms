@@ -367,9 +367,10 @@
             </title>
             <message>
                 <expiring>Votre session va expirer bientôt. Activez le bouton ci-dessous si vous désirez continuer à utiliser cette page.</expiring>
-                <expired>Votre session a expiré.</expired>
+                <expired>Ce formulaire doit être rechargé. Cela pourrait vous rediriger vers la page de connexion. Si vous pensez que vous ne devriez pas voir ce message et que le problème persiste, veuillez contacter le support.</expired>
             </message>
             <renew-button>Renouveler la session</renew-button>
+            <reload-button>Recharger</reload-button>
         </session-expiration>
         <available-from>
             <message>Ce formulaire n'est pas encore disponible</message>

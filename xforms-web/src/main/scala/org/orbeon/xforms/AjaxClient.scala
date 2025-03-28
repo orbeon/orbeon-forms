@@ -152,39 +152,42 @@ object AjaxClient {
   }
 
   def showLoginDetectedDialog(formId: String): Unit = {
-    // It seems we got a login page back, so display dialog and reload form
-    // The dialog is declared in `error-dialog.xml`
-    val dialogEl = dom.document.querySelectorT(s"#$formId .xforms-login-detected-dialog")
+    // Inform listeners so Form Runner can show its own dialog
+    Session.sessionHasExpired()
 
-    def getUniqueId(prefix: String): String = {
-      var i = 0
-      var r: String = null
-      do {
-        r = prefix + i
-        i += 1
-      } while (dom.document.getElementById(r) ne null)
-      r
+    // Show dialog in `error-dialog.xml`
+    dom.document.querySelectorOpt(s"#$formId .xforms-login-detected-dialog").foreach { dialogEl: html.Element =>
+
+      def getUniqueId(prefix: String): String = {
+        var i = 0
+        var r: String = null
+        do {
+          r = prefix + i
+          i += 1
+        } while (dom.document.getElementById(r) ne null)
+        r
+      }
+
+      // Link dialog with title for ARIA
+      val title = dialogEl.querySelectorT(".xxforms-dialog-head")
+      if (title.id.isAllBlank) {
+        val titleId = getUniqueId("xf-aria-dialog-title-")
+        title.id = titleId
+        dialogEl.setAttribute("aria-labelledby", titleId)
+      }
+
+      dialogEl.querySelectorOpt("button").foreach((el: dom.Element) =>
+        el.addEventListener(
+          `type` = "click",
+          listener = (_: dom.Event) =>
+            // Reloading the page will redirect us to the login page if necessary
+            dom.window.location.href = dom.window.location.href,
+          options  = new EventListenerOptions { once = true })
+        )
+
+      // Show the dialog
+      dialogEl.asInstanceOf[js.Dynamic].showModal()
     }
-
-    // Link dialog with title for ARIA
-    val title = dialogEl.querySelectorT(".xxforms-dialog-head")
-    if (title.id.isAllBlank) {
-      val titleId = getUniqueId("xf-aria-dialog-title-")
-      title.id = titleId
-      dialogEl.setAttribute("aria-labelledby", titleId)
-    }
-
-    dialogEl.querySelectorOpt("button").foreach((el: dom.Element) =>
-      el.addEventListener(
-        `type` = "click",
-        listener = (_: dom.Event) =>
-          // Reloading the page will redirect us to the login page if necessary
-          dom.window.location.href = dom.window.location.href,
-        options  = new EventListenerOptions { once = true })
-      )
-
-    // Show the dialog
-    dialogEl.asInstanceOf[js.Dynamic].showModal()
   }
 
   @JSExport

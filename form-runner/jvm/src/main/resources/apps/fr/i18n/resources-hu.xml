@@ -364,9 +364,10 @@
             </title>
             <message>
                 <expiring>A munkamenete hamarosan lejár. Kattintson az alábbi gombra, ha folytatni szeretné az oldal használatát.</expiring>
-                <expired>A munkamenete lejárt.</expired>
+                <expired>Ezt az űrlapot újra kell tölteni. Ez a bejelentkezési oldalra irányíthat. Ha úgy gondolja, hogy nem kellene látnia ezt az üzenetet, és a probléma továbbra is fennáll, kérjük, vegye fel a kapcsolatot az ügyfélszolgálattal.</expired>
             </message>
             <renew-button>Munkamenet megújítása</renew-button>
+            <reload-button>Újratöltés</reload-button>
         </session-expiration>
         <available-from>
             <message>Ez az űrlap még nem érhető el</message>

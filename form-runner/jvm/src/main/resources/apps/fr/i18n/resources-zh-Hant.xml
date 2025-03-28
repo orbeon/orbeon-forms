@@ -364,9 +364,10 @@
             </title>
             <message>
                 <expiring>您的會話即將過期。如果您希望繼續使用此頁面，請點擊下面的按鈕。</expiring>
-                <expired>您的會話已過期。</expired>
+                <expired>此表單需要重新載入。這可能會將您帶到登入頁面。如果您認為不應該看到此訊息，且問題仍然存在，請聯繫支援。</expired>
             </message>
             <renew-button>更新會話</renew-button>
+            <reload-button>重新載入</reload-button>
         </session-expiration>
         <available-from>
             <message>此表單尚未可用</message>

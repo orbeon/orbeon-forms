@@ -358,9 +358,10 @@
             </title>
             <message>
                 <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
-                <expired todo="true">[Your session has expired.]</expired>
+                <expired>Denne formular skal genindlæses. Dette kan føre dig til login-siden. Hvis du mener, at du ikke burde se denne meddelelse, og at problemet fortsætter, bedes du kontakte support.</expired>
             </message>
             <renew-button todo="true">[Renew Session]</renew-button>
+            <reload-button>Genindlæs</reload-button>
         </session-expiration>
         <available-from>
             <message todo="true">[This form isn't available yet]</message>

@@ -364,9 +364,10 @@
             </title>
             <message>
                 <expiring>Oturumunuzun süresi dolmak üzere. Bu sayfayı kullanmaya devam etmek istiyorsanız aşağıdaki düğmeye tıklayın.</expiring>
-                <expired>Oturumunuzun süresi doldu.</expired>
+                <expired>Bu formun yeniden yüklenmesi gerekiyor. Bu sizi giriş sayfasına yönlendirebilir. Bu mesajı görmemeniz gerektiğini düşünüyorsanız ve sorun devam ediyorsa, lütfen destek ile iletişime geçin.</expired>
             </message>
             <renew-button>Oturumu Yenile</renew-button>
+            <reload-button>Yeniden yükle</reload-button>
         </session-expiration>
         <available-from>
             <message>Bu form henüz kullanılabilir değil</message>

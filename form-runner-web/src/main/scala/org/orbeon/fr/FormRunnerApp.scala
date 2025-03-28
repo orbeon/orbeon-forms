@@ -109,14 +109,23 @@ object FormRunnerApp extends App {
       var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
 
       if (dialog.classList.contains("fr-feature-enabled")) {
-        val renewSessionButton = dialog.querySelectorT("button")
-        GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.EventTarget) => {
-          renewSession()
+        // Remove XForms-level dialog we're replacing
+        dom.document.querySelectorAllT(s".xforms-login-detected-dialog").foreach(_.remove())
 
+        val renewButton = dialog.querySelectorT(".fr-renew-button")
+        GlobalEventListenerSupport.addListener(renewButton, DomEventNames.Click, (_: dom.EventTarget) => {
+          renewSession()
           // Since we sent a heartbeat when the session was renewed, the local newest event time has been updated and
           // will be broadcast to other pages.
           Session.updateWithLocalNewestEventTime()
         })
+
+        val reloadButton = dialog.querySelectorT(".fr-reload-button")
+        GlobalEventListenerSupport.addListener(
+          target = reloadButton,
+          name   = DomEventNames.Click,
+          fn     = (_: dom.EventTarget) => dom.window.location.href = dom.window.location.href
+        )
 
         Session.addSessionUpdateListener(sessionUpdate)
       }
@@ -164,11 +173,11 @@ object FormRunnerApp extends App {
       def updateDialog(): Unit = {
         val headerContent = dialog.querySelectorAllT(".xxforms-dialog-head .xforms-output")
         val bodyContent   = dialog.querySelectorAllT(".xxforms-dialog-body .xforms-mediatype-text-html")
-        val buttons       = dialog.querySelectorT   (".fr-dialog-buttons")
+        val renewButton   = dialog.querySelectorT   (".fr-renew-button")
+        val reloadButton  = dialog.querySelectorT   (".fr-reload-button")
 
-        org.scalajs.dom.console.log(headerContent.toArray, bodyContent.toArray, buttons)
-        val visibleWhenExpiring = List(headerContent.head, bodyContent.head, buttons)
-        val visibleWhenExpired  = List(headerContent.last, bodyContent.last)
+        val visibleWhenExpiring = List(headerContent.head, bodyContent.head, renewButton)
+        val visibleWhenExpired  = List(headerContent.last, bodyContent.last, reloadButton)
 
         def setDisplay(elements: List[html.Element], display: String): Unit =
           elements.foreach(_.style.display = display)
@@ -177,7 +186,7 @@ object FormRunnerApp extends App {
           (visibleWhenExpired , visibleWhenExpiring) else
           (visibleWhenExpiring, visibleWhenExpired )
 
-        setDisplay(toShow, "block")
+        setDisplay(toShow, "")
         setDisplay(toHide, "none")
       }
 

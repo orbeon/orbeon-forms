@@ -358,9 +358,10 @@
             </title>
             <message>
                 <expiring>您的会话即将过期。如果您希望继续使用此页面，请点击下方的按钮。</expiring>
-                <expired>您的会话已过期。</expired>
+                <expired>此表单需要重新加载。这可能会将您带到登录页面。如果您认为不应该看到此消息，并且问题仍然存在，请联系支持。</expired>
             </message>
             <renew-button>续期会话</renew-button>
+            <reload-button>重新加载</reload-button>
         </session-expiration>
         <available-from>
             <message>此表单尚未开放</message>

@@ -1271,8 +1271,11 @@
                 <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/>
                 <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/>
                 <xh:div class="fr-dialog-buttons">
-                    <xh:button class="btn btn-primary">
+                    <xh:button class="btn btn-primary fr-renew-button">
                         <xf:output value="$fr-resources/detail/session-expiration/renew-button"/>
+                    </xh:button>
+                    <xh:button class="btn btn-primary fr-reload-button">
+                        <xf:output value="$fr-resources/detail/session-expiration/reload-button"/>
                     </xh:button>
                 </xh:div>
             </xh:div>

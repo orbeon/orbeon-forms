@@ -13,7 +13,7 @@
  */
 package org.orbeon.fr
 
-import org.orbeon.facades.ResizeObserver
+import org.orbeon.facades.{Ladda, ResizeObserver}
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl
@@ -121,10 +121,14 @@ object FormRunnerApp extends App {
         })
 
         val reloadButton = dialog.querySelectorT(".fr-reload-button")
+        val laddaReloadButton = Ladda.create(reloadButton)
         GlobalEventListenerSupport.addListener(
           target = reloadButton,
           name   = DomEventNames.Click,
-          fn     = (_: dom.EventTarget) => dom.window.location.href = dom.window.location.href
+          fn     = (_: dom.EventTarget) => {
+            laddaReloadButton.start()
+            dom.window.location.href = dom.window.location.href
+          }
         )
 
         Session.addSessionUpdateListener(sessionUpdate)

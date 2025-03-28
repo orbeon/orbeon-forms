@@ -17,9 +17,9 @@ import cats.data.NonEmptyList
 import enumeratum.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.fr.auth.RolesProviderFactory
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.servlet.WildFlyOidcAuth
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -195,16 +195,12 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          if (WildFlyOidcAuth.hasWildFlyOidcAuth(getAttribute)) {
-            Logger.debug(s"using WildFly OIDC credentials")
-            WildFlyOidcAuth.credentialsOpt(getAttribute) orElse {
-              Logger.debug(s"WildFly OIDC credentials not found, falling back to regular container credentials")
-              containerCredentialsOpt(userRoles, propertySet)
-            }
-          } else {
-            Logger.debug(s"using regular container credentials")
-            containerCredentialsOpt(userRoles, propertySet)
-          }
+           containerCredentialsOpt(userRoles, propertySet).map { credentials =>
+
+             // Merge roles from container credentials and roles providers
+             val rolesFromProvider = RolesProviderFactory.getRoles(getAttribute)
+             credentials.copy(roles = (credentials.roles ++ rolesFromProvider).distinct)
+           }
 
         case Some(authMethod @ AuthMethod.Header) =>
 

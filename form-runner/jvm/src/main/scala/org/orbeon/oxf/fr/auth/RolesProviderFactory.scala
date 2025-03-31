@@ -27,7 +27,10 @@ object RolesProviderFactory {
   private lazy val providers: List[RolesProvider] = {
     try {
       val loader              = ServiceLoader.load(classOf[RolesProvider])
-      val applicableProviders = loader.asScala.toList.filter(_.isApplicable)
+      val applicableProviders = loader.asScala.toList.filter { provider =>
+        // If a roles provider throws an exception, it will be considered non-applicable
+        catchAndLogExceptions(provider, ifException = false)(provider.isApplicable)
+      }
 
       logger.debug(
         s"Roles providers loaded (${applicableProviders.size}): ${applicableProviders.map(_.getClass.getName).mkString(", ")}"
@@ -43,23 +46,26 @@ object RolesProviderFactory {
 
   def getRoles(getAttribute: String => AnyRef): List[SimpleRole] = {
     val allRoles = providers.flatMap { provider =>
-      try {
-        provider.getRoles(getAttribute)
-      } catch {
-        case e: NoClassDefFoundError =>
-          logger.debug(s"Roles provider ${provider.getClass.getName} missing dependencies: ${e.getMessage}")
-          List.empty
-        case e: ClassNotFoundException =>
-          logger.debug(s"Roles provider ${provider.getClass.getName} missing classes: ${e.getMessage}")
-          List.empty
-        case e: Exception =>
-          logger.error(s"Error in roles provider ${provider.getClass.getName}: ${e.getMessage}")
-          List.empty
-      }
+      catchAndLogExceptions(provider, ifException = List.empty[SimpleRole])(provider.getRoles(getAttribute))
     }.distinct
 
     logger.debug(s"Roles found in roles providers (${allRoles.size}): ${allRoles.map(_.roleName).mkString(", ")}")
 
     allRoles
   }
+
+  private def catchAndLogExceptions[T](rolesProvider: RolesProvider, ifException: => T)(body: => T): T =
+    try {
+      body
+    } catch {
+      case e: NoClassDefFoundError =>
+        logger.debug(s"Roles provider ${rolesProvider.getClass.getName} missing dependencies: ${e.getMessage}")
+        ifException
+      case e: ClassNotFoundException =>
+        logger.debug(s"Roles provider ${rolesProvider.getClass.getName} missing classes: ${e.getMessage}")
+        ifException
+      case e: Exception =>
+        logger.error(s"Error in roles provider ${rolesProvider.getClass.getName}: ${e.getMessage}")
+        ifException
+    }
 }

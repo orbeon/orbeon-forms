@@ -37,7 +37,6 @@
                     select="generate-id(fbf:findModelElem(/))"/>
 
                 <xsl:template match="xf:model[generate-id() = $model-id]">
-
                     <xsl:copy>
                         <xsl:apply-templates select="@*  | node()" mode="within-model"/>
                     </xsl:copy>

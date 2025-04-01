@@ -433,6 +433,10 @@ body.orbeon { background-color: @frBackground }
                 color: @frNavBarTextColor;
                 a, button.btn-link { color: @navbarInverseLinkColor }
             }
+            
+            .brand, .nav > li > a {
+                text-shadow: none; // remove Bootstrap text shadow
+            }
         }
 
         .fr-language-choice .dropdown-menu {

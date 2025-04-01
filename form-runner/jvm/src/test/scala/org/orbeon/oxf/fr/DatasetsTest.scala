@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.Constants
 import org.scalatest.funspec.AnyFunSpecLike
 
+
 class DatasetsTest
   extends DocumentTestBase
      with ResourceManagerSupport
@@ -31,7 +32,7 @@ class DatasetsTest
     it("must call services and actions and return expected dataset values") {
 
       val (processorService, Some(doc), _) =
-        runFormRunner("tests", "datasets", "new", document = "", initialize = true)
+        runFormRunner("tests", "datasets", "new", initialize = true)
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {

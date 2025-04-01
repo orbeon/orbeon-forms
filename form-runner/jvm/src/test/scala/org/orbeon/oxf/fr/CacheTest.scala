@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.connection.{BufferedContent, StreamedContent}
-import org.orbeon.oxf.http.HttpMethod
+import cats.syntax.option.*
+import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.test.TestHttpClient.{CacheEvent, StaticState}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
 import org.scalatest.funspec.AnyFunSpecLike
-import org.orbeon.oxf.util.*
 
 
 class CacheTest
@@ -53,7 +52,7 @@ class CacheTest
           .map(_._1.template.isDefined)
 
       // First time may or may not pass
-      val (_, _, events1) = runFormRunner("tests", form, mode, document = Id1, query = query, content = content,  initialize = true)
+      val (_, _, events1) = runFormRunner("tests", form, mode, documentId = Id1.some, query = query, content = content,  initialize = true)
 
       it(s"initial hit `$expectedInitialHit` for $form/$mode/${PathUtils.encodeSimpleQuery(query)}") {
         assert(staticStateFoundOpt(events1).contains(expectedInitialHit))
@@ -61,7 +60,7 @@ class CacheTest
       }
 
       // Second time with different document must always pass
-      val (_, _, events2) = runFormRunner("tests", form, mode, document = Id2, query = query, content = content, initialize = true)
+      val (_, _, events2) = runFormRunner("tests", form, mode, documentId = Id2.some, query = query, content = content, initialize = true)
 
       it(s"second hit `true` for $form/$mode/${PathUtils.encodeSimpleQuery(query)}") {
         assert(staticStateFoundOpt(events2).contains(true))

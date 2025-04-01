@@ -152,7 +152,7 @@ class SendTest
       it(s"""must pass with `$DataFormatVersionName = "${dataFormatVersion.entryName}"`, `prune = "$prune"` and `$PruneMetadataName = "$pruneMetadata"`""") {
 
         val (processorService, docOpt, _) =
-          runFormRunner("tests", "send-action", "new", document = "", initialize = true)
+          runFormRunner("tests", "send-action", "new", initialize = true)
 
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, docOpt.get) {
@@ -210,7 +210,7 @@ class SendTest
         </metadata>
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "send-action", "new", document = "", initialize = true)
+        runFormRunner("tests", "send-action", "new", initialize = true)
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, docOpt.get) {

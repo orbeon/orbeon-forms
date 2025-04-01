@@ -55,7 +55,7 @@ class SimpleDataMigrationTest
         app        = appName,
         form       = formName,
         mode       = "new",
-        document   = "",
+        documentId   = None,
         query      = List(
                        FormRunnerPersistence.DataFormatVersionName     -> incomingData._2.entryName,
                        FormRunnerPersistence.DataMigrationBehaviorName -> dataMigrationBehavior.entryName,

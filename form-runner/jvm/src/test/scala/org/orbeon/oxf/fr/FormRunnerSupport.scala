@@ -61,20 +61,20 @@ trait FormRunnerSupport extends DocumentTestBase {
     setControlValueWithEventSearchNested("fr-language-selector-select", lang)
 
   def runFormRunner(
-    app         : String,
-    form        : String,
-    mode        : String,
-    formVersion : String  = "", // not used yet
-    document    : String  = "", // not used yet
-    query       : IterableOnce[(String, String)] = Nil,
-    initialize  : Boolean = true,
-    content     : Option[StreamedContent] = None,
-    attributes  : Map[String, AnyRef]     = Map.empty
+    app        : String,
+    form       : String,
+    mode       : String,
+    formVersion: String  = "", // not used yet
+    documentId : Option[String] = None,
+    query      : IterableOnce[(String, String)] = Nil,
+    initialize : Boolean = true,
+    content    : Option[StreamedContent] = None,
+    attributes : Map[String, AnyRef]     = Map.empty
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
     val (processorService, response, _, events) =
       TestHttpClient.connect(
-        url        = PathUtils.recombineQuery(s"/fr/$app/$form/$mode", query),
+        url        = PathUtils.recombineQuery(s"/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}", query),
         method     = if (content.isDefined) POST else GET,
         headers    = Map.empty,
         content    = content,
@@ -103,7 +103,7 @@ trait FormRunnerSupport extends DocumentTestBase {
 
     val (processorService, response, _, _) =
       TestHttpClient.connect(
-        url     = PathUtils.recombineQuery(s"/fr/${if (background) "service/"}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query),
+        url     = PathUtils.recombineQuery(s"/fr/${if (background) "service/" else ""}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query),
         method  = if (content.isDefined) POST else GET,
         headers = Map.empty,
         content = content

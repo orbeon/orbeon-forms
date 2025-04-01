@@ -29,7 +29,7 @@ class SynchronizeRepeatedContentTest
   describe("Form Runner `<fr:synchronize-repeated-content>` component") {
 
     val (processorService, docOpt, _) =
-      runFormRunner("issue", "3833", "new", document = "", initialize = true)
+      runFormRunner("issue", "3833", "new", initialize = true)
 
     val doc = docOpt.get
 

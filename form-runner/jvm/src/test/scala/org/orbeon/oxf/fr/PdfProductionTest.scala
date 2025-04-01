@@ -17,45 +17,83 @@ class PdfProductionTest
 
   describe("Form Runner PDF production") {
 
-    val MetadataWords = List(
-      "Orbeon Demo: Feedback Form",
-      "First Name",
-      "Last Name",
-      "Email",
-      "Phone Number",
-      "Order Number",
-      "Topic",
-      "Questions and Comments",
-      "Orbeon Demo: Feedback Form 1 / 1"
-    )
+    it("automatic PDF must contain metadata and data text") {
 
-    val DataWords = List(
-      "Homer",
-      "Simpson",
-      "chunkylover53@aol.com",
-      "(939) 555-0113",
-      "O888",
-      "Returns",
-      "D'oh!",
-    )
+      val MetadataWords = List(
+        "Orbeon Demo: Feedback Form",
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone Number",
+        "Order Number",
+        "Topic",
+        "Questions and Comments",
+        "Orbeon Demo: Feedback Form 1 / 1"
+      )
 
-    val (_, content, _) =
-      runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = "9eff349bfd95aab8d4d5e048bd25a815".some)
+      val DataWords = List(
+        "Homer",
+        "Simpson",
+        "chunkylover53@aol.com",
+        "(939) 555-0113",
+        "O888",
+        "Returns",
+        "D'oh!",
+      )
 
-      it("must contain metadata and data text") {
-        withTestExternalContext { _ =>
+      val (_, content, _) =
+        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = "9eff349bfd95aab8d4d5e048bd25a815".some)
 
-          val extractedText =
-            useAndClose(PDDocument.load(content.stream)) { pdd =>
-              val stripper = new PDFTextStripper |!>
-                (_.setSortByPosition(true))
-              stripper.getText(pdd)
-            }
+      withTestExternalContext { _ =>
 
-          MetadataWords.iterator ++ DataWords.iterator foreach { word =>
-            assert(extractedText.contains(word))
+        val extractedText =
+          useAndClose(PDDocument.load(content.stream)) { pdd =>
+            val stripper = new PDFTextStripper |!>
+              (_.setSortByPosition(true))
+            stripper.getText(pdd)
           }
+
+        MetadataWords.iterator ++ DataWords.iterator foreach { word =>
+          assert(extractedText.contains(word))
         }
       }
+    }
+
+    it("PDF template must contain data text") {
+
+      val DataWords = List(
+        "Name of PTA Unit: Springfield PTA",
+        "Address of Unit: 742 Evergreen Terrace",
+        "Unit Number: 12345",
+        "Submitted by: Homer Simpson",
+        "Phone: (939) 555-0113",
+        "Position: Parent",
+        "Date submitted: 1/1/2023",
+        "Email: chunkylover53@aol.com",
+        "Check #: 1",
+        "Per Capita Dues for: 12 Members",
+        "$ 57.00",
+        "$ 125.00",
+        "$ 1.00",
+        "$ 183.00",
+      )
+
+      val (_, content, _) =
+        runFormRunnerReturnContent("issue", "6900", "pdf", documentId = "aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5".some)
+
+      withTestExternalContext { _ =>
+
+        val extractedText =
+          useAndClose(PDDocument.load(content.stream)) { pdd =>
+            val stripper = new PDFTextStripper |!>
+              (_.setSortByPosition(true))
+            stripper.getText(pdd)
+          }
+
+        DataWords.iterator foreach { word =>
+          assert(extractedText.contains(word))
+        }
+      }
+    }
   }
 }

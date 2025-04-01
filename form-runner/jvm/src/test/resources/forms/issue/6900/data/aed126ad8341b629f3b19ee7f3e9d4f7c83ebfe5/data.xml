@@ -1,0 +1,29 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <unit-details>
+        <pta-unit-name>Springfield PTA</pta-unit-name>
+        <unit-number>12345</unit-number>
+        <unit-address>742 Evergreen Terrace</unit-address>
+    </unit-details>
+    <submission-details>
+        <submitter-name>Homer Simpson</submitter-name>
+        <submitter-phone>9395550113</submitter-phone>
+        <submitter-pta-position>Parent</submitter-pta-position>
+        <submitter-email>chunkylover53@aol.com</submitter-email>
+        <date-submitted>2023-01-01</date-submitted>
+        <check-number>1</check-number>
+        <comment>D'oh!</comment>
+    </submission-details>
+    <dues>
+        <control-4/>
+        <members-count>12</members-count>
+        <per-capita-dues>4.75</per-capita-dues>
+        <member-dues>57</member-dues>
+        <control-3/>
+        <include-annual-dues>true</include-annual-dues>
+        <annual-dues>125</annual-dues>
+        <annual-council-dues>125</annual-council-dues>
+        <control-9/>
+        <parent-education-donation>1</parent-education-donation>
+        <total-check-amount>183</total-check-amount>
+    </dues>
+</form>

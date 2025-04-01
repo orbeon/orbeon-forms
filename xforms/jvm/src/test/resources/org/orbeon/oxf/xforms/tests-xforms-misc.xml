@@ -761,9 +761,9 @@
                             <xh:dialog class="xforms-login-detected-dialog xforms-dialog" tabindex="-1">
                                 <xh:div class="xxforms-dialog-head">Reloading form</xh:div>
                                 <xh:div class="xxforms-dialog-body">
-                                    <xh:p>This form has to be reloaded. This most likely happened because your session has expired, which might take you to the login page. (If you think that you shouldn't see this message and that the problem persists, please contact support.)</xh:p>
+                                    <xh:p>This form has to be reloaded. This might take you to the login page. If you think that you shouldn't see this message and that the problem persists, please contact support.</xh:p>
                                     <xh:div class="fr-dialog-buttons">
-                                        <xh:button class="btn btn-primary">OK</xh:button>
+                                        <xh:button class="btn btn-primary">Reload</xh:button>
                                     </xh:div>
                                 </xh:div>
                             </xh:dialog>

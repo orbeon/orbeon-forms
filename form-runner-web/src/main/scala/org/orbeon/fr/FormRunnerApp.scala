@@ -14,7 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.facades.{Ladda, ResizeObserver}
-import org.orbeon.web.DomEventNames
+import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl
 import org.orbeon.xforms.*
@@ -26,6 +26,7 @@ import org.scalajs.dom.*
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.timers
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
 // Scala.js starting point for Form Runner
@@ -76,141 +77,139 @@ object FormRunnerApp extends App {
     xbl.ClipboardCopy
     xbl.Trigger
 
-    // TODO: with embedding, unobserve when the form is destroyed
-    Events.orbeonLoadedEvent.subscribe(() => {
-
-      // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
-      def addScrollPadding(htmlElement: html.Element, cssClass: String): Unit = {
-        val position    = window.getComputedStyle(htmlElement).position
-        if (position == "fixed" || position == "sticky") {
-          val resizeObserver = new ResizeObserver(() => {
-            val documentElement = document.documentElementT
-            val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
-            documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
-          })
-          resizeObserver.observe(htmlElement)
-        }
-      }
-
-      document.querySelectorOpt(".orbeon .navbar-fixed-top").foreach(addScrollPadding(_, "scroll-padding-top"))
-      document.querySelectorOpt(".orbeon .fr-buttons"      ).foreach(addScrollPadding(_, "scroll-padding-bottom"))
-
-      initSessionExpirationDialog()
-    })
+    DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar-fixed-top"            , addScrollPadding(_, "scroll-padding-top"))
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                  , addScrollPadding(_, "scroll-padding-bottom"))
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog", initSessionExpirationDialog)
+    }
   }
 
-  private def initSessionExpirationDialog(): Unit = {
-    document.querySelectorOpt(".fr-session-expiration-dialog").collect { case dialog: HTMLDialogElement =>
+  // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being
+  // below the top navbar or button bar
+  private def addScrollPadding(htmlElement: html.Element, cssClass: String): Unit = {
+    val position = window.getComputedStyle(htmlElement).position
+    if (position == "fixed" || position == "sticky") {
+      val resizeObserver = new ResizeObserver(() => {
+        val documentElement = document.documentElementT
+        val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
+        documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
+      })
+      resizeObserver.observe(htmlElement)
+    }
+  }
 
-      // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
-      // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
-      // of it ourselves.
-      var dialogShown: Boolean = false
-      var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
+  private def initSessionExpirationDialog(dialogElem: html.Element): Unit = {
+    val dialog = dialogElem.asInstanceOf[HTMLDialogElement]
+    org.scalajs.dom.console.log(dialog)
 
-      if (dialog.classList.contains("fr-feature-enabled")) {
-        // Remove XForms-level dialog we're replacing
-        dom.document.querySelectorAllT(s".xforms-login-detected-dialog").foreach(_.remove())
+    // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
+    // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
+    // of it ourselves.
+    var dialogShown: Boolean = false
+    var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
 
-        val renewButton = dialog.querySelectorT(".fr-renew-button")
-        GlobalEventListenerSupport.addListener(renewButton, DomEventNames.Click, (_: dom.EventTarget) => {
-          renewSession()
-          // Since we sent a heartbeat when the session was renewed, the local newest event time has been updated and
-          // will be broadcast to other pages.
-          Session.updateWithLocalNewestEventTime()
-        })
+    if (dialog.classList.contains("fr-feature-enabled")) {
+      // Remove XForms-level dialog we're replacing
+      dom.document.querySelectorAllT(s".xforms-login-detected-dialog").foreach(_.remove())
 
-        val reloadButton = dialog.querySelectorT(".fr-reload-button")
-        val laddaReloadButton = Ladda.create(reloadButton)
-        GlobalEventListenerSupport.addListener(
-          target = reloadButton,
-          name   = DomEventNames.Click,
-          fn     = (_: dom.EventTarget) => {
-            laddaReloadButton.start()
-            dom.window.location.href = dom.window.location.href
-          }
-        )
+      val renewButton = dialog.querySelectorT(".fr-renew-button")
+      GlobalEventListenerSupport.addListener(renewButton, DomEventNames.Click, (_: dom.EventTarget) => {
+        renewSession()
+        // Since we sent a heartbeat when the session was renewed, the local newest event time has been updated and
+        // will be broadcast to other pages.
+        Session.updateWithLocalNewestEventTime()
+      })
 
-        Session.addSessionUpdateListener(sessionUpdate)
+      val reloadButton = dialog.querySelectorT(".fr-reload-button")
+      val laddaReloadButton = Ladda.create(reloadButton)
+      GlobalEventListenerSupport.addListener(
+        target = reloadButton,
+        name   = DomEventNames.Click,
+        fn     = (_: dom.EventTarget) => {
+          laddaReloadButton.start()
+          dom.window.location.href = dom.window.location.href
+        }
+      )
+
+      Session.addSessionUpdateListener(sessionUpdate)
+    }
+
+    def sessionUpdate(sessionUpdate: SessionUpdate): Unit =
+      if (! sessionUpdate.sessionHeartbeatEnabled) {
+        sessionUpdate.sessionStatus match {
+          case Session.SessionActive if dialogShown && ! Session.expired =>
+            renewSession()
+
+          case Session.SessionAboutToExpire =>
+            aboutToExpire(sessionUpdate.approxSessionExpiredTimeMillis)
+
+          case Session.SessionExpired =>
+            sessionExpired()
+
+          case _ =>
+            // Nothing to do
+        }
       }
 
-      def sessionUpdate(sessionUpdate: SessionUpdate): Unit =
-        if (! sessionUpdate.sessionHeartbeatEnabled) {
-          sessionUpdate.sessionStatus match {
-            case Session.SessionActive if dialogShown && ! Session.expired =>
-              renewSession()
+    def aboutToExpire(approxSessionExpiredTimeMillis: Long): Unit =
+      if (! dialogShown) {
+        AjaxClient.pause()
+        updateDialog()
+        showDialog()
 
-            case Session.SessionAboutToExpire =>
-              aboutToExpire(sessionUpdate.approxSessionExpiredTimeMillis)
-
-            case Session.SessionExpired =>
-              sessionExpired()
-
-            case _ =>
-              // Nothing to do
-          }
-        }
-
-      def aboutToExpire(approxSessionExpiredTimeMillis: Long): Unit =
-        if (! dialogShown) {
-          AjaxClient.pause()
-          updateDialog()
-          showDialog()
-
-          val timeToExpiration = approxSessionExpiredTimeMillis - System.currentTimeMillis()
-          didExpireTimerOpt.foreach(timers.clearTimeout)
-          didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration.toDouble) {
-            Session.sessionHasExpired()
-            updateDialog()
-          })
-        }
-
-      def sessionExpired(): Unit =
-        if (! dialogShown) {
-          AjaxClient.pause()
-          updateDialog()
-          showDialog()
-        } else {
-          updateDialog()
-        }
-
-      def updateDialog(): Unit = {
-        val headerContent = dialog.querySelectorAllT(".xxforms-dialog-head .xforms-output")
-        val bodyContent   = dialog.querySelectorAllT(".xxforms-dialog-body .xforms-mediatype-text-html")
-        val renewButton   = dialog.querySelectorT   (".fr-renew-button")
-        val reloadButton  = dialog.querySelectorT   (".fr-reload-button")
-
-        val visibleWhenExpiring = List(headerContent.head, bodyContent.head, renewButton)
-        val visibleWhenExpired  = List(headerContent.last, bodyContent.last, reloadButton)
-
-        def setDisplay(elements: List[html.Element], display: String): Unit =
-          elements.foreach(_.style.display = display)
-
-        val (toShow, toHide) = if (Session.expired)
-          (visibleWhenExpired , visibleWhenExpiring) else
-          (visibleWhenExpiring, visibleWhenExpired )
-
-        setDisplay(toShow, "")
-        setDisplay(toHide, "none")
-      }
-
-      def renewSession(): Unit = {
+        val timeToExpiration = approxSessionExpiredTimeMillis - System.currentTimeMillis()
         didExpireTimerOpt.foreach(timers.clearTimeout)
-        didExpireTimerOpt = None
-        AjaxClient.sendHeartBeat()
-        AjaxClient.unpause()
-        hideDialog()
+        didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration.toDouble) {
+          Session.sessionHasExpired()
+          updateDialog()
+        })
       }
 
-      def showDialog(): Unit = {
-        dialog.showModal()
-        dialogShown = true
+    def sessionExpired(): Unit =
+      if (! dialogShown) {
+        AjaxClient.pause()
+        updateDialog()
+        showDialog()
+      } else {
+        updateDialog()
       }
 
-      def hideDialog(): Unit = {
-        dialog.close()
-        dialogShown = false
-      }
+    def updateDialog(): Unit = {
+      val headerContent = dialog.querySelectorAllT(".xxforms-dialog-head .xforms-output")
+      val bodyContent   = dialog.querySelectorAllT(".xxforms-dialog-body .xforms-mediatype-text-html")
+      val renewButton   = dialog.querySelectorT   (".fr-renew-button")
+      val reloadButton  = dialog.querySelectorT   (".fr-reload-button")
+
+      val visibleWhenExpiring = List(headerContent.head, bodyContent.head, renewButton)
+      val visibleWhenExpired  = List(headerContent.last, bodyContent.last, reloadButton)
+
+      def setDisplay(elements: List[html.Element], display: String): Unit =
+        elements.foreach(_.style.display = display)
+
+      val (toShow, toHide) = if (Session.expired)
+        (visibleWhenExpired , visibleWhenExpiring) else
+        (visibleWhenExpiring, visibleWhenExpired )
+
+      setDisplay(toShow, "")
+      setDisplay(toHide, "none")
+    }
+
+    def renewSession(): Unit = {
+      didExpireTimerOpt.foreach(timers.clearTimeout)
+      didExpireTimerOpt = None
+      AjaxClient.sendHeartBeat()
+      AjaxClient.unpause()
+      hideDialog()
+    }
+
+    def showDialog(): Unit = {
+      dialog.showModal()
+      dialogShown = true
+    }
+
+    def hideDialog(): Unit = {
+      dialog.close()
+      dialogShown = false
     }
   }
 

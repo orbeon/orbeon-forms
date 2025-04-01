@@ -100,7 +100,6 @@ object FormRunnerApp extends App {
 
   private def initSessionExpirationDialog(dialogElem: html.Element): Unit = {
     val dialog = dialogElem.asInstanceOf[HTMLDialogElement]
-    org.scalajs.dom.console.log(dialog)
 
     // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
     // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track

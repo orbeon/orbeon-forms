@@ -12,7 +12,7 @@ import scala.scalajs.js
 
 object DomSupport {
 
-  implicit class DomElemOps[T <: dom.Element](private val elem: T) extends AnyVal {
+  implicit class DomElemOps[T >: html.Element <: dom.Element](private val elem: T) extends AnyVal {
 
     def querySelectorAllT(selectors: String): collection.Seq[T] =
       elem.querySelectorAll(selectors).asInstanceOf[dom.NodeList[T]]

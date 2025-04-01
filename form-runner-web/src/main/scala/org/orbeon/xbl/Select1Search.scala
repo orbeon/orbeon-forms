@@ -126,23 +126,20 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           )
 
         // Make the clear button accessible with the keyboard
-        def makeClearAccessible(): Unit = {
-          val clearElementOpt = Option(containerElem.querySelector(".select2-selection__clear"))
-          clearElementOpt.foreach { clearElement =>
-            clearElement.setAttribute("tabindex", "0")
-            clearElement.setAttribute("role", "button")
-            EventSupport.addListener(
-              clearElement,
-              "keydown", // Instead of `keyup`, so our listeners runs before Select2's
-              (event: dom.KeyboardEvent) =>
-                if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
-                  event.stopPropagation() // Prevent Select2 from opening the dropdown
-                  jSelect.value("").trigger("change")
-                  onChangeDispatchFrChange()
-                  xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
-                }
-            )
-          }
+        def makeClearAccessible(clearElement: html.Element): Unit = {
+          clearElement.setAttribute("tabindex", "0")
+          clearElement.setAttribute("role", "button")
+          EventSupport.addListener(
+            clearElement,
+            "keydown", // Instead of `keyup`, so our listeners runs before Select2's
+            (event: dom.KeyboardEvent) =>
+              if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
+                event.stopPropagation() // Prevent Select2 from opening the dropdown
+                jSelect.value("").trigger("change")
+                onChangeDispatchFrChange()
+                xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
+              }
+          )
         }
 
         if (isDatabound) {
@@ -158,9 +155,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           Controls.afterValueChange.subscribe(listener)
         }
 
-        mutationObservers = DomSupport.onAttributeChange(elementWithData, DataPlaceholder, updatePlaceholder)          :: mutationObservers
-        mutationObservers = DomSupport.onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible) :: mutationObservers
-        makeClearAccessible()
+        mutationObservers = DomSupport.onAttributeChange    (elementWithData, DataPlaceholder, updatePlaceholder            ) :: mutationObservers
+        mutationObservers = DomSupport.onElementFoundOrAdded(containerElem, ".select2-selection__clear", makeClearAccessible) :: mutationObservers
 
         // Workaround for Select2 not closing itself on click below the `<body>`
         EventSupport.addListener(

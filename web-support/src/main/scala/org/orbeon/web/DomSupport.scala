@@ -245,24 +245,25 @@ object DomSupport {
     observer
   }
 
-  def onElementAdded(
-    container : dom.Element,
+  def onElementFoundOrAdded(
+    container : html.Element,
     selector  : String,
-    listener  : () => Unit
+    listener  : html.Element => Unit
   ): MutationObserver = {
+    container.querySelectorAllT(selector).foreach(listener)
     val observer = new MutationObserver((mutations, _) => {
       mutations.foreach { mutation =>
         mutation.addedNodes.foreach { node =>
-          if (node.nodeType == dom.Node.ELEMENT_NODE && node.asInstanceOf[dom.Element].matches(selector)) {
-            listener()
+          if (node.nodeType == dom.Node.ELEMENT_NODE) {
+            val element = node.asInstanceOf[html.Element]
+            if (element.matches(selector))
+              listener(element)
           }
         }
       }
     })
-
     val config = new MutationObserverInit { childList = true ; subtree = true }
     observer.observe(container, config)
-
     observer
   }
 }

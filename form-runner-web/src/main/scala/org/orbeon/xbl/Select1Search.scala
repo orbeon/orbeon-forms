@@ -148,9 +148,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         if (isDatabound) {
           updateValueLabel()
           updateOpenSelection()
-          onAttributeChange(elementWithData, DataValue          , updateValueLabel)
-          onAttributeChange(elementWithData, DataLabel          , updateValueLabel)
-          onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection)
+          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataValue          , updateValueLabel)    :: mutationObservers
+          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataLabel          , updateValueLabel)    :: mutationObservers
+          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection) :: mutationObservers
         } else {
           // Register and remember listener on value change
           val listener: js.Function = onXFormsSelect1ValueChange _
@@ -158,9 +158,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           Controls.afterValueChange.subscribe(listener)
         }
 
-        onAttributeChange(elementWithData, DataPlaceholder, updatePlaceholder)
+        mutationObservers = DomSupport.onAttributeChange(elementWithData, DataPlaceholder, updatePlaceholder)          :: mutationObservers
+        mutationObservers = DomSupport.onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible) :: mutationObservers
         makeClearAccessible()
-        onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible)
 
         // Workaround for Select2 not closing itself on click below the `<body>`
         EventSupport.addListener(
@@ -280,34 +280,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private def queryElementWithData  = containerElem.querySelector(s":scope > [$DataPlaceholder]")
   private def querySelect           = containerElem.querySelector("select").asInstanceOf[html.Select]
   private def servicePerformsSearch = Option(queryElementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
-
-  // TODO: not specific to the autocomplete, should be moved to a utility class
-  private def onAttributeChange(element: dom.Element, attributeName: String, listener: () => Unit): Unit = {
-    val observer = new MutationObserver((_, _) => listener())
-    mutationObservers = observer :: mutationObservers
-
-    observer.observe(element, new MutationObserverInit {
-      attributes      = true
-      attributeFilter = js.Array(attributeName)
-    })
-  }
-
-  private def onElementAdded(container: dom.Element, selector: String, listener: () => Unit): Unit = {
-    val observer = new MutationObserver((mutations, _) => {
-      mutations.foreach { mutation =>
-        mutation.addedNodes.foreach { node =>
-          if (node.nodeType == dom.Node.ELEMENT_NODE && node.asInstanceOf[dom.Element].matches(selector)) {
-            listener()
-          }
-        }
-      }
-    })
-    mutationObservers = observer :: mutationObservers
-
-    val config = new MutationObserverInit { childList = true ; subtree = true }
-    observer.observe(container, config)
-  }
-
 
   // For the non-databound case, when the value of the underlying dropdown changed, typically because it set based
   // on that the server tells the client, tell the Select2 component that the value has changed

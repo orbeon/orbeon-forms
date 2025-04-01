@@ -3,7 +3,7 @@ package org.orbeon.web
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
-import org.scalajs.dom.{DocumentReadyState, Event, HTMLCollection, document, html}
+import org.scalajs.dom.{DocumentReadyState, Event, HTMLCollection, MutationObserver, MutationObserverInit, document, html}
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
@@ -230,5 +230,39 @@ object DomSupport {
         js.Dynamic.literal(top = scrollTop, behavior = "smooth")
       )
     }
+  }
+
+  def onAttributeChange(
+    element       : dom.Element,
+    attributeName : String,
+    listener      : () => Unit
+  ): MutationObserver = {
+    val observer = new MutationObserver((_, _) => listener())
+    observer.observe(element, new MutationObserverInit {
+      attributes      = true
+      attributeFilter = js.Array(attributeName)
+    })
+    observer
+  }
+
+  def onElementAdded(
+    container : dom.Element,
+    selector  : String,
+    listener  : () => Unit
+  ): MutationObserver = {
+    val observer = new MutationObserver((mutations, _) => {
+      mutations.foreach { mutation =>
+        mutation.addedNodes.foreach { node =>
+          if (node.nodeType == dom.Node.ELEMENT_NODE && node.asInstanceOf[dom.Element].matches(selector)) {
+            listener()
+          }
+        }
+      }
+    })
+
+    val config = new MutationObserverInit { childList = true ; subtree = true }
+    observer.observe(container, config)
+
+    observer
   }
 }

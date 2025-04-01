@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport
 import org.orbeon.xforms.Constants.HtmlLangAttr
 import org.scalajs.dom
 import org.scalajs.dom.{Element, MutationObserver, MutationRecord}
@@ -39,16 +40,7 @@ object Language {
 
   def onLangChange(listenerId: String, listener: String => Unit): Unit =
     langElement.foreach { elem =>
-      val callback =
-        (_: js.Array[MutationRecord], _: MutationObserver) => listener(getLang())
-      val mutationObserver = new MutationObserver(callback)
-      mutationObserver.observe(
-        target  = elem,
-        options = new dom.MutationObserverInit {
-          attributes      = true
-          attributeFilter = js.Array(HtmlLangAttr)
-        }
-      )
+      val mutationObserver = DomSupport.onAttributeChange(elem, HtmlLangAttr, () => listener(getLang()))
       langListeners.put(listenerId, mutationObserver)
     }
 

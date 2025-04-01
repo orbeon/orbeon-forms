@@ -40,6 +40,7 @@ object TinyMCE {
       "tox-tinymce-aux"     // Dialog, e.g. link editor
     )
 
+    // TODO: see if we can use the `MutationObserver` code in `DomSupport.scala`
     val observer = new MutationObserver({ (mutations, _) =>
       mutations.foreach { mutation =>
           mutation.addedNodes.foreach {

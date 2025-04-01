@@ -184,7 +184,7 @@ trait GridSectionMenus {
       event.targetT.closestT(s".fr-$componentName-repeat-iteration")
 
     def findIterationForElemWithId(elemWithId: html.Element): Option[Int] =
-      $(elemWithId).attr("id") map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
+      Utils.getRepeatIndexes(elemWithId.id).lastOption.map(_.toInt)
 
     private def componentElem(event: dom.Event): Option[html.Element] =
       event.targetT.closestOpt(s".xbl-fr-$componentName")

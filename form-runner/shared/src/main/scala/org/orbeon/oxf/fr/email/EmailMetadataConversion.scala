@@ -59,14 +59,14 @@ object EmailMetadataConversion {
                 case p @ EmailMetadata.Param.ControlValueParam     (_, _) => p.copy(name = newName)
                 case p @ EmailMetadata.Param.ExpressionParam       (_, _) => p.copy(name = newName)
                 case p @ EmailMetadata.Param.AllControlValuesParam (_)    => p.copy(name = newName)
-                case p @ EmailMetadata.Param.LinkToEditPageParam   (_)    => p.copy(name = newName)
-                case p @ EmailMetadata.Param.LinkToViewPageParam   (_)    => p.copy(name = newName)
+                case p @ EmailMetadata.Param.LinkToEditPageParam   (_, _) => p.copy(name = newName)
+                case p @ EmailMetadata.Param.LinkToViewPageParam   (_, _) => p.copy(name = newName)
                 case p @ EmailMetadata.Param.LinkToNewPageParam    (_)    => p.copy(name = newName)
                 case p @ EmailMetadata.Param.LinkToSummaryPageParam(_)    => p.copy(name = newName)
                 case p @ EmailMetadata.Param.LinkToHomePageParam   (_)    => p.copy(name = newName)
                 case p @ EmailMetadata.Param.LinkToFormsPageParam  (_)    => p.copy(name = newName)
                 case p @ EmailMetadata.Param.LinkToAdminPageParam  (_)    => p.copy(name = newName)
-                case p @ EmailMetadata.Param.LinkToPdfParam        (_)    => p.copy(name = newName)
+                case p @ EmailMetadata.Param.LinkToPdfParam        (_, _) => p.copy(name = newName)
               }
             } else
               param

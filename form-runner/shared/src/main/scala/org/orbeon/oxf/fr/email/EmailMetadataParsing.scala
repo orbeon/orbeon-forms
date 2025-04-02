@@ -219,18 +219,20 @@ object EmailMetadataParsing {
     val paramTypeSource = paramNodeInfo.attValue("type")
     // Fix possible incorrect serialization on migration, done between 2022.1 and 2022.1.4 (fixed in 2022.1.5 per #5923)
     val paramTypeFixed  = paramTypeSource.split("\\(")(0)
+    def hasToken        = paramNodeInfo.child("token").exists(_.stringValue == "true")
+
     paramTypeFixed match {
       case "ControlValueParam"      => EmailMetadata.Param.ControlValueParam     (name, paramNodeInfo.child("controlName").stringValue)
       case "ExpressionParam"        => EmailMetadata.Param.ExpressionParam       (name, paramNodeInfo.child("expr"       ).stringValue)
       case "AllControlValuesParam"  => EmailMetadata.Param.AllControlValuesParam (name)
-      case "LinkToEditPageParam"    => EmailMetadata.Param.LinkToEditPageParam   (name)
-      case "LinkToViewPageParam"    => EmailMetadata.Param.LinkToViewPageParam   (name)
+      case "LinkToEditPageParam"    => EmailMetadata.Param.LinkToEditPageParam   (name, hasToken)
+      case "LinkToViewPageParam"    => EmailMetadata.Param.LinkToViewPageParam   (name, hasToken)
       case "LinkToNewPageParam"     => EmailMetadata.Param.LinkToNewPageParam    (name)
       case "LinkToSummaryPageParam" => EmailMetadata.Param.LinkToSummaryPageParam(name)
       case "LinkToHomePageParam"    => EmailMetadata.Param.LinkToHomePageParam   (name)
       case "LinkToFormsPageParam"   => EmailMetadata.Param.LinkToFormsPageParam  (name)
       case "LinkToAdminPageParam"   => EmailMetadata.Param.LinkToAdminPageParam  (name)
-      case "LinkToPdfParam"         => EmailMetadata.Param.LinkToPdfParam        (name)
+      case "LinkToPdfParam"         => EmailMetadata.Param.LinkToPdfParam        (name, hasToken)
     }
   }
 

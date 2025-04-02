@@ -132,6 +132,9 @@ object EmailMetadataSerialization {
             NodeInfoFactory.elementInfo  (QName("expr"), List(StringValue.makeStringValue(expression))),
           )
         )
+      case EmailMetadata.Param.LinkToEditPageParam(name, token) => serializeParamWithToken(param.entryName, name, token)
+      case EmailMetadata.Param.LinkToViewPageParam(name, token) => serializeParamWithToken(param.entryName, name, token)
+      case EmailMetadata.Param.LinkToPdfParam     (name, token) => serializeParamWithToken(param.entryName, name, token)
       case _ =>
         NodeInfoFactory.elementInfo(
           QName("param"),
@@ -141,4 +144,15 @@ object EmailMetadataSerialization {
           )
         )
     }
+
+  private def serializeParamWithToken(paramType: String, name: String, token: Boolean): NodeInfo =
+    NodeInfoFactory.elementInfo(
+      QName("param"),
+      List(
+        NodeInfoFactory.attributeInfo(QName("type"), paramType),
+        NodeInfoFactory.elementInfo  (QName("name"), List(StringValue.makeStringValue(name))),
+      ) ::: (if (token)
+             List(NodeInfoFactory.elementInfo(QName("token"), List(StringValue.makeStringValue("true"))))
+             else Nil)
+    )
 }

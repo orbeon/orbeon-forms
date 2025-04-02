@@ -20,8 +20,8 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
-import org.orbeon.oxf.fr.email.EmailMetadata
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
+import org.orbeon.oxf.fr.email.{EmailContent, SMTP}
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
@@ -39,7 +39,6 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
 import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.submission.ReplaceType
 import org.orbeon.saxon.functions.EscapeURI
-import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
@@ -110,8 +109,8 @@ trait FormRunnerActions
 
   def trySendEmail(params: ActionParams): ActionResult =
     ActionResult.trySync {
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                 = CoreCrossPlatformSupport
-      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+      implicit val formRunnerParams: FormRunnerParams                      = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 
@@ -149,61 +148,50 @@ trait FormRunnerActions
         } yield
           renderedFormat -> uri).toMap
 
-      val templateParams      = paramByNameUseAvt(params, "template").map("fr-template" -> _).toList
-      val templateMatchParam  = paramByNameUseAvt(params, "match").getOrElse("first")
-      val templateMatchParams = Seq("fr-match" -> templateMatchParam).toList
-      val pdfTiffParams       = urisByRenderedFormat.toList.map(kv => kv._1.entryName -> kv._2.toString)
-
       // https://github.com/orbeon/orbeon-forms/issues/5911
       val emailDataFormatVersion =
-        paramByNameUseAvt(params, DataFormatVersionName).map(DataFormatVersion.withName).getOrElse(DataFormatVersion.V400)
+        paramByNameUseAvt(params, DataFormatVersionName)
+          .map(DataFormatVersion.withName)
+          .getOrElse(DataFormatVersion.V400)
 
-      val emailParam =
-        (s"email-$DataFormatVersionName" -> emailDataFormatVersion.entryName)
+      // Match first or all templates
+      val templateMatch =
+        paramByNameUseAvt(params, "match")
+          .map(TemplateMatch.withName)
+          .getOrElse(TemplateMatch.First)
 
-      val path =
-        recombineQuery(
-          s"/fr/service/$app/$form/email/$document",
-          emailParam          ::
-          templateParams      :::
-          templateMatchParams :::
-          pdfTiffParams       :::
-          createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
+      val emailContentsFromTemplates =
+        emailContents(
+          formDefinition         = formDefinition,
+          emailMetadata          = emailMetadata,
+          urisByRenderedFormat   = urisByRenderedFormat,
+          emailDataFormatVersion = emailDataFormatVersion,
+          templateMatch          = templateMatch,
+          language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
+          templateNameOpt        = paramByNameUseAvt(params, "template")
         )
-
-      val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
-
-      if (s3Store) {
-        val templateMatch = templateMatchParam.trimAllToOpt.map(TemplateMatch.withName).getOrElse(TemplateMatch.First)
-
-        storeEmailContentsToS3(
-          formDefinition,
-          emailMetadata,
-          params,
-          urisByRenderedFormat,
-          emailDataFormatVersion,
-          templateMatch
-        ).get
-      }
 
       // S3 tests disable the actual sending of email (this parameter is not documented)
       val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
 
       if (sendEmail) {
-        tryChangeMode(ReplaceType.None, path, sourceModeType = formRunnerParams.modeType)
+        val serverConfig = SMTP.ServerConfig.fromProperties()
+        emailContentsFromTemplates.headOption.foreach(SMTP.send(serverConfig, _).get)
+      }
+
+      val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
+
+      if (s3Store) {
+        // Only store email contents to S3 if enabled by parameter
+        storeEmailContentsToS3(params, emailContentsFromTemplates).get
       }
     }
 
   private def storeEmailContentsToS3(
-    formDefinition          : om.DocumentInfo,
-    emailMetadata           : EmailMetadata.Metadata,
-    params                  : ActionParams,
-    urisByRenderedFormat    : Map[RenderedFormat, URI],
-    emailDataFormatVersion  : DataFormatVersion,
-    templateMatch           : TemplateMatch
+    params                    : ActionParams,
+    emailContentsFromTemplates: List[EmailContent],
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    formRunnerParams        : FormRunnerParams
+    formRunnerParams          : FormRunnerParams
   ): Try[Unit] = {
 
     val formData = frc.formInstance.root
@@ -230,16 +218,6 @@ trait FormRunnerActions
         .map(_.appendSlash)
         .getOrElse("")
     }
-
-    val emailContentsFromTemplates = emailContents(
-      formDefinition         = formDefinition,
-      emailMetadata          = emailMetadata,
-      urisByRenderedFormat   = urisByRenderedFormat,
-      emailDataFormatVersion = emailDataFormatVersion,
-      templateMatch          = templateMatch,
-      language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang), // Logic from createPdfOrTiffParams
-      templateNameOpt        = paramByNameUseAvt(params, "template")
-    )
 
     for {
       s3Config      <- S3Config.fromProperties(s3ConfigName)

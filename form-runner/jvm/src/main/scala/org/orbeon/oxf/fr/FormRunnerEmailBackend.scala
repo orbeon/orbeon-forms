@@ -8,16 +8,14 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
 import org.orbeon.oxf.fr.email.EmailMetadata.{TemplateMatch, TemplateValue}
 import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadata, EmailMetadataParsing}
-import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
-import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, TryUtils, XPathCache}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -32,7 +30,7 @@ import scala.util.Try
 
 trait FormRunnerEmailBackend {
 
-  // Only used from `email-form.xsl` and not needed offline.
+  // Only used from `email-form.xsl`/EmailContent and not needed offline.
   //@XPathFunction
   def emailAttachmentFilename(
     data           : NodeInfo,
@@ -81,7 +79,7 @@ trait FormRunnerEmailBackend {
     val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
     val templateValues   = emailTemplateOpt.toList.flatMap(_.headers.filter(_._1.entryName == headerName).map(_._2))
 
-    values(formDefinition, formData, templateValues)
+    evaluatedTemplateValues(formDefinition, formData, templateValues)
   }
 
   //@XPathFunction
@@ -93,43 +91,64 @@ trait FormRunnerEmailBackend {
     val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
     val templateValues   = emailTemplateOpt.toList.flatMap(_.controlsToAttach)
 
-    values(formDefinition, formData, templateValues)
+    evaluatedTemplateValues(formDefinition, formData, templateValues)
   }
 
-  def values(
-    formDefinition      : NodeInfo,
-    formData            : NodeInfo,
-    templateValues      : List[TemplateValue]
-  ): SequenceIterator = {
+  def evaluatedTemplateValues(
+    formDefinition: NodeInfo,
+    formData      : NodeInfo,
+    templateValues: List[TemplateValue]
+  ): SequenceIterator =
+    templateValues.flatMap(evaluatedTemplateValue(formDefinition, formData, _))
 
-    val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
-
-    templateValues.flatMap {
-      // Control not in section template
-      case TemplateValue.Control(controlName, None) =>
-        frc.searchControlsTopLevelOnly(
-          data      = Some(formData),
-          predicate = FormRunnerCommon.frc.getControlName(_) == controlName)(
-          ctx       = formDefinitionCtx
-        ).flatMap(_.holders).flatten
-
-      // Control in section template
-      case TemplateValue.Control(controlName, Some(sectionTemplate)) =>
-        frc.searchControlsUnderSectionTemplates(
-          head             = formDefinition.rootElement.child("*:head").head,
-          data             = Some(formData),
-          controlPredicate = FormRunnerCommon.frc.getControlName(_) == controlName,
-          sectionPredicate = frc.getControlNameOpt(_).contains(sectionTemplate))(
-          ctx              = formDefinitionCtx
-        ).flatMap(_.holders).flatten
+  def evaluatedTemplateValue(
+    formDefinition: NodeInfo,
+    formData      : NodeInfo,
+    templateValue : TemplateValue
+  ): List[Item] =
+    templateValue match {
+      case TemplateValue.Control(controlName, sectionOpt) =>
+        controlValue(formDefinition, formData, controlName, sectionOpt)
 
       case TemplateValue.Expression(expression) =>
-        evaluatedExpressionAsStrings(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression))
+        expressionValue(formDefinition, expression)
 
       case TemplateValue.Text(text) =>
         List(StringValue.makeStringValue(text))
     }
+
+  def controlValue(
+    formDefinition: NodeInfo,
+    formData      : NodeInfo,
+    controlName   : String,
+    sectionOpt    : Option[String]
+  ): List[NodeInfo] = {
+
+    val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
+
+    sectionOpt match {
+      case None =>
+        // Control not in section template
+        frc.searchControlsTopLevelOnly(
+          data      = Some(formData),
+          predicate = FormRunnerCommon.frc.getControlName(_) == controlName)(
+          ctx       = formDefinitionCtx
+        ).toList.flatMap(_.holders).flatten
+
+      case Some(section) =>
+        // Control in section template
+        frc.searchControlsUnderSectionTemplates(
+          head             = formDefinition.rootElement.child("*:head").head,
+          data             = Some(formData),
+          controlPredicate = FormRunnerCommon.frc.getControlName(_) == controlName,
+          sectionPredicate = frc.getControlNameOpt(_).contains(section))(
+          ctx              = formDefinitionCtx
+        ).toList.flatMap(_.holders).flatten
+    }
   }
+
+  def expressionValue(formDefinition: NodeInfo, expression: String): List[StringValue] =
+    evaluatedExpressionAsStrings(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression))
 
   private def expressionWithProcessedVarReferences(formDefinition: NodeInfo, expression: String): String = {
     val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
@@ -205,6 +224,8 @@ trait FormRunnerEmailBackend {
     language                : String,
     templateNameOpt         : Option[String]
   )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams
   ): List[EmailContent] = {
 
@@ -243,42 +264,24 @@ trait FormRunnerEmailBackend {
     emailContent            : EmailContent,
     s3PathPrefix            : String
   )(implicit
-    logger                  : IndentedLogger,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    formRunnerParams        : FormRunnerParams,
     s3Config                : S3Config,
     s3Client                : S3Client
   ): Try[Unit] = {
     // TODO: store email body and headers as well
-    TryUtils.sequenceLazily(emailContent.allAttachments)(storeAttachmentToS3(_, s3PathPrefix)).map(_ => ())
+    TryUtils.sequenceLazily(emailContent.attachments)(storeAttachmentToS3(_, s3PathPrefix)).map(_ => ())
   }
 
   private def storeAttachmentToS3(
-    attachment              : Attachment,
-    s3PathPrefix            : String
+    attachment  : Attachment,
+    s3PathPrefix: String
   )(implicit
-    logger                  : IndentedLogger,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    formRunnerParams        : FormRunnerParams,
-    s3Config                : S3Config,
-    s3Client                : S3Client
+    s3Config    : S3Config,
+    s3Client    : S3Client
   ): Try[PutObjectResponse] = {
 
-    val key = s3PathPrefix + attachment.filename
+    val key     = s3PathPrefix + attachment.filename
+    val content = attachment.data.content()
 
-    attachment.data match {
-      case Left(uri)        =>
-        // Attachment given as URI, stream/download it to S3
-        val connectionResult = PersistenceApi.connectPersistence(
-          method         = HttpMethod.GET,
-          pathQuery      = uri.toString,
-          formVersionOpt = Left(FormDefinitionVersion.Specific(formRunnerParams.formVersion)).some
-        )
-
-        S3.write(key, connectionResult.content.stream, connectionResult.content.contentLength, attachment.contentType.some)
-      case Right(byteArray) =>
-        // Attachment given as byte array, store it to S3 directly
-        S3.write(key, byteArray, attachment.contentType.some)
-    }
+    S3.write(key, content.stream, content.contentLength, attachment.contentType.some)
   }
 }

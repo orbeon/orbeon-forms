@@ -23,7 +23,7 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.InputStream
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.{Failure, Success, Try}
 
@@ -36,23 +36,6 @@ object S3 {
       body(client)
     } finally {
       runQuietly(client.close())
-    }
-  }
-
-  def write(
-    key             : String,
-    bytes           : Array[Byte],
-    contentTypeOpt  : Option[String]
-  )(implicit
-    s3Config        : S3Config,
-    s3Client        : S3Client
-  ): Try[PutObjectResponse] = {
-    val inputStream = new ByteArrayInputStream(bytes)
-
-    try {
-      write(key, inputStream, bytes.length.toLong.some, contentTypeOpt)
-    } finally {
-      runQuietly(inputStream.close())
     }
   }
 

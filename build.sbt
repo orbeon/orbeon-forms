@@ -137,6 +137,7 @@ val CoreLibraryDependencies = Seq(
   "com.google.code.gson"        % "gson"                            % GsonVersionForTink,
   "com.google.protobuf"         % "protobuf-java"                   % ProtobufJavaVersionForTink,
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
+  "com.icegreen"                % "greenmail"                       % "2.1.3"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.9.0"           % Test,
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,

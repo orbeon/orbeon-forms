@@ -13,9 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
+import com.icegreen.greenmail.util.{GreenMail, ServerSetup}
+import jakarta.mail.Message
+import jakarta.mail.internet.InternetAddress
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.email.EmailMetadata
+import org.orbeon.oxf.fr.email.*
+import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.TransformerUtils
@@ -24,8 +28,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
-import java.net.URI
-import jakarta.mail.internet.InternetAddress
+import java.net.{ServerSocket, URI}
 
 class EmailTest
   extends DocumentTestBase
@@ -308,20 +311,85 @@ class EmailTest
       assert(param.entryName === "AllControlValuesParam")
     }
 
-//    describe("serialize metadata") {
-//
-//      def prettyPrint(nodeInfo: NodeInfo): String =
-//        TransformerUtils.tinyTreeToOrbeonDom(nodeInfo).getRootElement.serializeToString(XMLWriter.PrettyFormat)
-//
-//      val originalMetadata            = MetadataCurrent.pipe(prettyPrint)
-//      val parsedAndSerializedMetadata = MetadataCurrentOpt
-//        .pipe(FormRunnerEmail.parseEmailMetadata(_, formDoc))
-//        .pipe(FormRunnerEmail.serializeEmailMetadata)
-//        .pipe(NodeConversions.elemToNodeInfo)
-//        .pipe(prettyPrint)
-//
-//      assert(parsedAndSerializedMetadata === originalMetadata)
-//    }
+    //    describe("serialize metadata") {
+    //
+    //      def prettyPrint(nodeInfo: NodeInfo): String =
+    //        TransformerUtils.tinyTreeToOrbeonDom(nodeInfo).getRootElement.serializeToString(XMLWriter.PrettyFormat)
+    //
+    //      val originalMetadata            = MetadataCurrent.pipe(prettyPrint)
+    //      val parsedAndSerializedMetadata = MetadataCurrentOpt
+    //        .pipe(FormRunnerEmail.parseEmailMetadata(_, formDoc))
+    //        .pipe(FormRunnerEmail.serializeEmailMetadata)
+    //        .pipe(NodeConversions.elemToNodeInfo)
+    //        .pipe(prettyPrint)
+    //
+    //      assert(parsedAndSerializedMetadata === originalMetadata)
+    //    }
+  }
 
+  private case class TestMailConfig(
+    greenMail: GreenMail,
+    host     : String,
+    port     : Int,
+    username : String,
+    password : String
+  )
+
+  private def withEmailServer[T](f: TestMailConfig => T): T = {
+    val socket      = new ServerSocket(0)
+    val freePort    = try socket.getLocalPort finally socket.close()
+    val serverSetup = new ServerSetup(freePort, "localhost", ServerSetup.PROTOCOL_SMTP)
+    val greenMail   = new GreenMail(serverSetup)
+
+    val testMailConfig = TestMailConfig(
+      greenMail = greenMail,
+      host      = serverSetup.getBindAddress,
+      port      = serverSetup.getPort,
+      username  = "test@localhost",
+      password  = "password"
+    )
+
+    greenMail.setUser(testMailConfig.username, testMailConfig.password)
+
+    greenMail.start()
+
+    try f(testMailConfig) finally greenMail.stop()
+  }
+
+  describe("Email sending") {
+
+    describe("with a simple text message content") {
+
+      withEmailServer { testMailConfig =>
+
+        val smtpCredentials = SMTP.Credentials(testMailConfig.username, testMailConfig.password)
+
+        val smtpConfig = SMTP.ServerConfig(
+          host                      = testMailConfig.host,
+          port                      = testMailConfig.port,
+          encryptionWithCredentials = SMTP.EncryptionWithCredentials.TLS(smtpCredentials)
+        )
+
+        val emailContent = EmailContent(
+          headers        = List(HeaderName.From -> "from@localhost", HeaderName.To -> "to@localhost"),
+          subject        = "Test subject",
+          messageContent = MessageContent("Test body", html = false),
+          attachments    = Nil
+        )
+
+        SMTP.send(smtpConfig, emailContent).get
+
+        assert(testMailConfig.greenMail.getReceivedMessages.length == 1)
+
+        val mail = testMailConfig.greenMail.getReceivedMessages.head
+
+        mail.getContent
+
+        assert(mail.getFrom.map(_.toString).mkString == "from@localhost")
+        assert(mail.getRecipients(Message.RecipientType.TO).map(_.toString).mkString == "to@localhost")
+        assert(mail.getSubject == "Test subject")
+        assert(List(mail.getContent).collect { case s: String => s} == List("Test body"))
+      }
+    }
   }
 }

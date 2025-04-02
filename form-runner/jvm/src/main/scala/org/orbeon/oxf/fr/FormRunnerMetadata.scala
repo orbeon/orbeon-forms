@@ -70,7 +70,10 @@ object FormRunnerMetadata {
   val DeselectedCheckboxString = "☐"
 
   //@XPathFunction
-  def findAllControlsWithValues(html: Boolean, controlsToExclude: List[NodeInfo]): String = {
+  def findAllControlsWithValues(html: Boolean, controlsToExclude: List[NodeInfo]): String =
+    findAllControlsWithValuesExcludingNamedControls(html, controlsToExclude.map(_.stringValue))
+
+  def findAllControlsWithValuesExcludingNamedControls(html: Boolean, controlsToExclude: List[String]): String = {
 
     val collector: ErrorEventCollector = EventCollector.Throw
 
@@ -86,7 +89,7 @@ object FormRunnerMetadata {
       gatherRelevantControls(
         doc                   = XFormsAPI.inScopeContainingDocument,
         currentLang           = Lang(FormRunnerLang.currentFRLang),
-        controlNamesToExclude = controlsToExclude.map(_.stringValue).toSet,
+        controlNamesToExclude = controlsToExclude.toSet,
         collector             = collector
       )
 

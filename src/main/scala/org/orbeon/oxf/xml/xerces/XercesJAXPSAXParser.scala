@@ -210,6 +210,7 @@ extends javax.xml.parsers.SAXParser {
 
   private var schemaLanguage: String = null // null means DTD
 
+  @deprecated("The Parser interface is deprecated, use getXMLReader instead", "1.5")
   def getParser: Parser = {
     // Xerces2 AbstractSAXParser implements SAX1 Parser
     // assert(xmlReader instanceof Parser);

@@ -95,13 +95,12 @@ object Page {
         case formElem: html.Form =>
           Some(formElem)
         case elem: html.Element =>
-          elem.asInstanceOf[js.Dynamic].form match {
-            case formElem: html.Form =>
-              // TODO: `fruitless type test: a value of type scala.scalajs.js.Dynamic cannot also be a org.scalajs.dom.HTMLFormElement`
-              //  But is that warning correct? Do we ever take this branch?
-              Some(formElem)
-            case _ =>
-              elem.closestOpt(s"form.$FormClass[id]").map(_.asInstanceOf[html.Form])
+          val elemFormProperty = elem.asInstanceOf[js.Dynamic]
+            .form.asInstanceOf[js.UndefOr[html.Form]]
+            .toOption
+          elemFormProperty match {
+            case Some(_) => elemFormProperty
+            case None    => elem.closestOpt(s"form.$FormClass[id]").map(_.asInstanceOf[html.Form])
           }
       }
 

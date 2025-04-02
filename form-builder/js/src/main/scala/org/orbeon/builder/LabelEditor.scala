@@ -133,7 +133,7 @@ object LabelEditor {
         Offset.offset(labelInput, inputOffset)
         Offset.offset(labelInput, inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
         labelInput.width(clickInterceptor.width() - 10)
-        labelInput.focus()
+        labelInput.trigger("focus")
       }
 
     // Update highlight of section title, as a hint users can click to edit

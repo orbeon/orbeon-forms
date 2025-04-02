@@ -72,7 +72,7 @@ object WPaint {
           colorOpt.map("#" + _).orUndefined
         }
         wpaintElC.asInstanceOf[Dynamic].wPaint(new js.Object {
-          val drawDown: js.Function = () => wpaintElC.focus()
+          val drawDown: js.Function = () => wpaintElC.trigger("focus")
           val imageBg               = imageEl.attr("src")
           val image                 = if (annotation == "") null else annotation
           val strokeStyle           = startStrokeColor

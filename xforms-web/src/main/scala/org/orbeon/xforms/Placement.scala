@@ -15,11 +15,11 @@ object Placement {
   val RequiredSpaceHorizontal = 420
   val RequiredSpaceVertical   = 300
 
-  case object Top    extends { val entryName = "top"    } with Placement
-  case object Right  extends { val entryName = "right"  } with Placement
-  case object Bottom extends { val entryName = "bottom" } with Placement
-  case object Left   extends { val entryName = "left"   } with Placement
-  case object Over   extends { val entryName = "over"   } with Placement
+  case object Top    extends Placement { val entryName = "top"    }
+  case object Right  extends Placement { val entryName = "right"  }
+  case object Bottom extends Placement { val entryName = "bottom" }
+  case object Left   extends Placement { val entryName = "left"   }
+  case object Over   extends Placement { val entryName = "over"   }
 
   case class Margins(
     top    : Double,

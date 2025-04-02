@@ -156,7 +156,7 @@ object AjaxClient {
     Session.sessionHasExpired()
 
     // Show dialog in `error-dialog.xml`
-    dom.document.querySelectorOpt(s"#$formId .xforms-login-detected-dialog").foreach { dialogEl: html.Element =>
+    dom.document.querySelectorOpt(s"#$formId .xforms-login-detected-dialog").foreach { (dialogEl: html.Element) =>
 
       def getUniqueId(prefix: String): String = {
         var i = 0

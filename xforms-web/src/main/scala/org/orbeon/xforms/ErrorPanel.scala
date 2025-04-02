@@ -112,7 +112,7 @@ object ErrorPanel {
     formErrorPanel.center()
 
     // Focus within the dialog so that screen readers handle aria attributes
-    jErrorPanelElem.find(".container-close").focus()
+    jErrorPanelElem.find(".container-close").trigger("focus")
   }
 
   private object Private {

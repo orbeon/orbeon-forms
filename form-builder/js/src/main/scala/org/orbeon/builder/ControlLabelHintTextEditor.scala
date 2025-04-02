@@ -219,7 +219,7 @@ object ControlLabelHintTextEditor {
         }))
         checkboxInput.get(0).foreach(_.addEventListener(DomEventNames.Click, (_: dom.Event) => {
           // When checkbox clicked, set focus back on the text field, where it was before
-          textInput.focus()
+          textInput.trigger("focus")
         }))
       }
 
@@ -326,7 +326,7 @@ object ControlLabelHintTextEditor {
             }
           case EditorType.Label | EditorType.Hint =>
             textInput.value(newValue)
-            textInput.focus()
+            textInput.trigger("focus")
         }
 
       def isHTML: Boolean = getEditorType == EditorType.Text || checkboxInput.is(":checked")

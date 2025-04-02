@@ -93,7 +93,7 @@ trait GridSectionMenus {
     moveMenu(e)
 
     // NOTE: Don't use dropdown("toggle") as that registers a new handler further down the DOM!
-    $(globalMenuElem).find(".dropdown-toggle").trigger("click")
+    globalMenuElem.querySelectorT(".dropdown-toggle").click()
 
     // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
     // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent

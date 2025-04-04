@@ -225,7 +225,7 @@ case object SMTP {
 
     val dataSource = new DataSource {
       def getContentType: String        = attachment.contentType
-      def getInputStream: InputStream   = attachment.data.content().stream
+      def getInputStream: InputStream   = attachment.contentFactory().stream
       def getName: String               = attachment.filename
       def getOutputStream: OutputStream = throw new UnsupportedOperationException("Not implemented")
     }

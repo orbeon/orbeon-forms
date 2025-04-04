@@ -14,7 +14,7 @@
 
 package org.orbeon.oxf.fr.s3
 
-import cats.implicits.catsSyntaxOptionId
+import org.orbeon.connection.Content
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.oxf.util.NetUtils
@@ -23,7 +23,6 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 
-import java.io.InputStream
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.{Failure, Success, Try}
 
@@ -40,33 +39,32 @@ object S3 {
   }
 
   def write(
-    key             : String,
-    inputStream     : InputStream,
-    contentLengthOpt: Option[Long],
-    contentTypeOpt  : Option[String]
+    key     : String,
+    content : Content
   )(implicit
-    s3Config        : S3Config,
-    s3Client        : S3Client
+    s3Config: S3Config,
+    s3Client: S3Client
   ): Try[PutObjectResponse] = Try {
 
     val putObjectRequestBuilder = PutObjectRequest.builder().bucket(s3Config.bucket).key(key)
 
-    val putObjectRequest = contentTypeOpt match {
+    val putObjectRequest = content.contentType match {
       case Some(contentType) => putObjectRequestBuilder.contentType(contentType).build()
       case None              => putObjectRequestBuilder.build()
     }
 
     // If we know the content length, we can pass the input stream to the AWS S3 SDK directly; if not, we'll download
     // the stream into a byte array and pass that to the SDK
-    val (requestBody, inputStreamToCloseOpt) = contentLengthOpt match {
-      case Some(contentLength) => (RequestBody.fromInputStream(inputStream, contentLength),             inputStream.some)
-      case None                => (RequestBody.fromBytes(NetUtils.inputStreamToByteArray(inputStream)), None)
+    val requestBody = content.contentLength match {
+      case Some(contentLength) => RequestBody.fromInputStream(content.stream, contentLength)
+      case None                => RequestBody.fromBytes(NetUtils.inputStreamToByteArray(content.stream))
     }
 
     try {
       s3Client.putObject(putObjectRequest, requestBody)
     } finally {
-      inputStreamToCloseOpt.foreach(_.close())
+      // We have to close the input stream in both cases above (not closed neither by AWS SDK nor by NetUtils)
+      content.stream.close()
     }
   }
 

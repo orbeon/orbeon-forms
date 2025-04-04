@@ -1,0 +1,329 @@
+<xh:html
+	xmlns:xh="http://www.w3.org/1999/xhtml"
+	xmlns:xf="http://www.w3.org/2002/xforms"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+	xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+	xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+	xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+	xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+	xmlns:exf="http://www.exforms.org/exf/1-0"
+	xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+	xmlns:saxon="http://saxon.sf.net/"
+	xmlns:sql="http://orbeon.org/oxf/xml/sql"
+	xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+	<xh:head>
+		<xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+			<!-- Main instance -->
+			<xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+				<form>
+					<section-1>
+						<grid-1>
+							<email-1>email1@from.control</email-1>
+							<email-2>email2@from.control</email-2>
+							<email-3>email3@from.control</email-3>
+							<email-4>email4@from.control</email-4>
+							<email-5>email5@from.control</email-5>
+							<custom-1>Control: custom1</custom-1>
+							<custom-2>Control: custom2</custom-2>
+							<param-1>Control: param1</param-1>
+							<param-2>Control: param2</param-2>
+						</grid-1>
+					</section-1>
+				</form>
+			</xf:instance>
+			<!-- Bindings -->
+			<xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+				<xf:bind id="section-1-bind" name="section-1" ref="section-1">
+					<xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+						<xf:bind id="email-1-bind" ref="email-1" name="email-1" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="email-2-bind" ref="email-2" name="email-2" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="email-3-bind" ref="email-3" name="email-3" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="email-4-bind" ref="email-4" name="email-4" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="email-5-bind" ref="email-5" name="email-5" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="param-2-bind" ref="param-2" name="param-2" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="param-1-bind" ref="param-1" name="param-1" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="custom-1-bind" ref="custom-1" name="custom-1" xxf:whitespace="trim"></xf:bind>
+						<xf:bind id="custom-2-bind" ref="custom-2" name="custom-2" xxf:whitespace="trim"></xf:bind>
+					</xf:bind>
+				</xf:bind>
+			</xf:bind>
+			<!-- Metadata -->
+			<xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+				<metadata>
+					<application-name>issue</application-name>
+					<form-name>6848</form-name>
+					<title xml:lang="en">Issue #6848</title>
+					<description xml:lang="en"></description>
+					<grid-tab-order>default</grid-tab-order>
+					<created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+					<email>
+						<templates>
+							<template name="1">
+								<headers>
+									<header name="from" type="control-value">email-1</header>
+									<header name="to" type="control-value">email-2</header>
+									<header name="cc" type="control-value">email-3</header>
+									<header name="bcc" type="control-value">email-4</header>
+									<header name="reply-to" type="control-value">email-5</header>
+									<header name="X-Custom-1st" type="control-value">custom-1</header>
+									<header name="X-Custom-2nd" type="control-value">custom-2</header>
+								</headers>
+								<exclude-from-all-control-values></exclude-from-all-control-values>
+							</template>
+							<template name="2">
+								<headers>
+									<header name="from" type="expression">concat($email-1, '-suffix')</header>
+									<header name="to" type="expression">concat($email-2, '-suffix')</header>
+									<header name="cc" type="expression">concat($email-3, '-suffix')</header>
+									<header name="bcc" type="expression">concat($email-4, '-suffix')</header>
+									<header name="reply-to" type="expression">concat($email-5, '-suffix')</header>
+									<header name="X-Custom-1st" type="expression">concat($custom-1, '-suffix')</header>
+									<header name="X-Custom-2nd" type="expression">concat($custom-2, '-suffix')</header>
+								</headers>
+								<subject>Email subject</subject>
+								<body>Email body</body>
+								<exclude-from-all-control-values></exclude-from-all-control-values>
+							</template>
+							<template name="3">
+								<headers>
+									<header name="from" type="text">Text: sender</header>
+									<header name="to" type="text">Text: recipient</header>
+									<header name="cc" type="text">Text: cc</header>
+									<header name="bcc" type="text">Text: bcc</header>
+									<header name="reply-to" type="text">Text: reply to</header>
+									<header name="X-Custom-1st" type="text">Text: x-custom-1st</header>
+									<header name="X-Custom-2nd" type="text">Text: x-custom-2nd</header>
+								</headers>
+								<subject>Email subject: {$param1}</subject>
+								<body>Email body:
+param1: {$param1}
+param2: {$param2}
+param3: {$param3}
+param4: {$param4}
+param5: {$param5}
+param6: {$param6}
+param7: {$param7}
+param8: {$param8}
+param9: {$param9}
+param10: {$param10}
+param11: {$param11}
+param12: {$param12}
+param13: {$param13}
+param14: {$param14}</body>
+								<exclude-from-all-control-values></exclude-from-all-control-values>
+							</template>
+							<template name="4">
+								<headers>
+									<header name="from" type="control-value">email-1</header>
+									<header name="to" type="control-value">email-2</header>
+								</headers>
+								<body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email body&lt;/div&gt;</body>
+								<exclude-from-all-control-values></exclude-from-all-control-values>
+							</template>
+							<template name="5">
+								<headers>
+									<header name="from" type="control-value">email-1</header>
+									<header name="to" type="control-value">email-2</header>
+								</headers>
+								<body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email bodyparam1: {$param1}&lt;br&gt;param2: {$param2}&lt;br&gt;param3: {$param3}&lt;br&gt;param4: {$param4}&lt;br&gt;param5: {$param5}&lt;br&gt;param6: {$param6}&lt;br&gt;param7: {$param7}&lt;br&gt;param8: {$param8}&lt;br&gt;param9: {$param9}&lt;br&gt;param10: {$param10}&lt;br&gt;param11: {$param11}&lt;br&gt;param12: {$param12}&lt;br&gt;param13: {$param13}&lt;br&gt;param14: {$param14}&lt;/div&gt;</body>
+								<exclude-from-all-control-values></exclude-from-all-control-values>
+							</template>
+						</templates>
+						<parameters>
+							<param type="ControlValueParam">
+								<name>param1</name>
+								<controlName>param-1</controlName>
+							</param>
+							<param type="ExpressionParam">
+								<name>param2</name>
+								<expr>concat($param-2, '-suffix')</expr>
+							</param>
+							<param type="AllControlValuesParam">
+								<name>param3</name>
+							</param>
+							<param type="LinkToEditPageParam">
+								<name>param4</name>
+							</param>
+							<param type="LinkToEditPageParam">
+								<name>param5</name>
+								<token>true</token>
+							</param>
+							<param type="LinkToViewPageParam">
+								<name>param6</name>
+							</param>
+							<param type="LinkToViewPageParam">
+								<name>param7</name>
+								<token>true</token>
+							</param>
+							<param type="LinkToNewPageParam">
+								<name>param8</name>
+							</param>
+							<param type="LinkToSummaryPageParam">
+								<name>param9</name>
+							</param>
+							<param type="LinkToHomePageParam">
+								<name>param10</name>
+							</param>
+							<param type="LinkToFormsPageParam">
+								<name>param11</name>
+							</param>
+							<param type="LinkToAdminPageParam">
+								<name>param12</name>
+							</param>
+							<param type="LinkToPdfParam">
+								<name>param13</name>
+							</param>
+							<param type="LinkToPdfParam">
+								<name>param14</name>
+								<token>true</token>
+							</param>
+						</parameters>
+					</email>
+					<updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+					<migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"email-1"},{"value":"email-2"},{"value":"email-3"},{"value":"email-4"},{"value":"email-5"},{"value":"custom-1"},{"value":"custom-2"},{"value":"param-1"},{"value":"param-2"}],"topLevel":true}]}</migration>
+				</metadata>
+			</xf:instance>
+			<!-- Attachments -->
+			<xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+				<attachments></attachments>
+			</xf:instance>
+			<!-- All form resources -->
+			<xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+				<resources>
+					<resource xml:lang="en">
+						<email-1>
+							<label>Email 1</label>
+							<hint></hint>
+						</email-1>
+						<email-2>
+							<label>Email 2</label>
+							<hint></hint>
+						</email-2>
+						<email-3>
+							<label>Email 3</label>
+							<hint></hint>
+						</email-3>
+						<email-4>
+							<label>Email 4</label>
+							<hint></hint>
+						</email-4>
+						<email-5>
+							<label>Email 5</label>
+							<hint></hint>
+						</email-5>
+						<custom-1>
+							<label>Custom 1</label>
+							<hint></hint>
+						</custom-1>
+						<custom-2>
+							<label>Custom 2</label>
+							<hint></hint>
+						</custom-2>
+						<param-1>
+							<label>Param 1</label>
+							<hint></hint>
+						</param-1>
+						<param-2>
+							<label>Param 2</label>
+							<hint></hint>
+						</param-2>
+						<section-1>
+							<label></label>
+						</section-1>
+					</resource>
+				</resources>
+			</xf:instance>
+		</xf:model>
+	</xh:head>
+	<xh:body>
+		<fr:view>
+			<fr:body
+				xmlns:p="http://www.orbeon.com/oxf/pipeline"
+				xmlns:xbl="http://www.w3.org/ns/xbl"
+				xmlns:oxf="http://www.orbeon.com/oxf/processors">
+				<fr:section id="section-1-section" bind="section-1-bind">
+					<fr:grid id="grid-1-grid" bind="grid-1-bind">
+						<fr:c y="1" x="1" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-1-control" bind="email-1-bind">
+								<xf:label ref="$form-resources/email-1/label"></xf:label>
+								<xf:hint ref="$form-resources/email-1/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c y="1" x="7" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-2-control" bind="email-2-bind">
+								<xf:label ref="$form-resources/email-2/label"></xf:label>
+								<xf:hint ref="$form-resources/email-2/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="1" y="2" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-3-control" bind="email-3-bind">
+								<xf:label ref="$form-resources/email-3/label"></xf:label>
+								<xf:hint ref="$form-resources/email-3/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="7" y="2" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-4-control" bind="email-4-bind">
+								<xf:label ref="$form-resources/email-4/label"></xf:label>
+								<xf:hint ref="$form-resources/email-4/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="1" y="3" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-5-control" bind="email-5-bind">
+								<xf:label ref="$form-resources/email-5/label"></xf:label>
+								<xf:hint ref="$form-resources/email-5/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="7" y="3" w="6"></fr:c>
+						<fr:c x="1" y="4" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="custom-1-control" bind="custom-1-bind">
+								<xf:label ref="$form-resources/custom-1/label"></xf:label>
+								<xf:hint ref="$form-resources/custom-1/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="7" y="4" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="custom-2-control" bind="custom-2-bind">
+								<xf:label ref="$form-resources/custom-2/label"></xf:label>
+								<xf:hint ref="$form-resources/custom-2/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="1" y="5" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="param-1-control" bind="param-1-bind">
+								<xf:label ref="$form-resources/param-1/label"></xf:label>
+								<xf:hint ref="$form-resources/param-1/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+						<fr:c x="7" y="5" w="6">
+							<xf:input
+								xmlns="http://orbeon.org/oxf/xml/form-builder" id="param-2-control" bind="param-2-bind">
+								<xf:label ref="$form-resources/param-2/label"></xf:label>
+								<xf:hint ref="$form-resources/param-2/hint"></xf:hint>
+								<xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+							</xf:input>
+						</fr:c>
+					</fr:grid>
+				</fr:section>
+			</fr:body>
+		</fr:view>
+	</xh:body>
+</xh:html>

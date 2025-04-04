@@ -16,10 +16,9 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.email.{EmailMetadata, EmailMetadataConversion, EmailMetadataParsing, EmailMetadataSerialization}
 import org.orbeon.oxf.fr.permission.Operation
-import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 
@@ -27,68 +26,6 @@ import scala.collection.mutable
 
 
 trait FormRunnerEmail {
-
-  private def emailMetadataFromFormDefinition(formDefinition: NodeInfo): EmailMetadata.Metadata = {
-    val emailMetadataNode  = frc.metadataInstanceRootOpt(formDefinition).flatMap(_.firstChildOpt("email"))
-    parseEmailMetadata(emailMetadataNode, formDefinition)
-  }
-
-  // Given a form body and instance data:
-  //
-  // - find all controls with the given conjunction of class names
-  // - for each control, find the associated bind
-  // - return all data holders in the instance data to which the bind would apply
-  //
-  // The use case is, for example, to find all data holders pointed to by controls with the class
-  // `fr-email-recipient` and, optionally, `fr-email-attachment`.
-  //
-  //@XPathFunction
-  def searchHoldersForClassTopLevelOnly(
-    body: NodeInfo,
-    data: NodeInfo,
-    classNames: String
-  ): SequenceIterator =
-    frc.searchControlsTopLevelOnly(
-      data      = Option(data),
-      predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
-    )(
-      new InDocFormRunnerDocContext(body)
-    ) flatMap {
-      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
-      case ControlBindPathHoldersResources(_, _, _, None, _) => Nil
-    }
-
-  // Given a form head, form body and instance data:
-  //
-  // - find all section templates in use
-  // - for each section
-  //   - determine the associated data holder in instance data
-  //   - find the inline binding associated with the section template
-  //   - find all controls with the given conjunction of class names in the section template
-  //   - for each control, find the associated bind in the section template
-  //   - return all data holders in the instance data to which the bind would apply
-  //
-  // The use case is, for example, to find all data holders pointed to by controls with the class
-  // `fr-email-recipient` and, optionally, `fr-email-attachment`, which appear within section templates.
-  //
-  //@XPathFunction
-  def searchHoldersForClassUseSectionTemplates(
-    head: NodeInfo,
-    body: NodeInfo,
-    data: NodeInfo,
-    classNames: String
-  ): SequenceIterator =
-    frc.searchControlsUnderSectionTemplates(
-      head             = head,
-      data             = Option(data),
-      sectionPredicate = _ => true,
-      controlPredicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
-    )(
-      new InDocFormRunnerDocContext(body)
-    ) flatMap {
-      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
-      case ControlBindPathHoldersResources(_, _, _, None, _) => Nil
-    }
 
   //@XPathFunction
   def buildCustomCssClassToControlNamesMapDocument(body: NodeInfo): NodeInfo = {
@@ -113,7 +50,7 @@ trait FormRunnerEmail {
         }
     }
 
-    import org.orbeon.oxf.xforms.NodeInfoFactory._
+    import org.orbeon.oxf.xforms.NodeInfoFactory.*
 
     elementInfo(
       "_",
@@ -180,27 +117,20 @@ trait FormRunnerEmail {
       )
 
     // Would be good not to have to hardcode these constants
+    // TODO: use existing enum instead of String
     linkType match {
-      case "LinkToEditPageParam"    | "link-to-edit-page" if includeToken => build("edit", documentOpt, buildTokenParam(Set(Operation.Read, Operation.Update)).toList)
-      case "LinkToViewPageParam"    | "link-to-view-page" if includeToken => build("view", documentOpt, buildTokenParam(Set(Operation.Read)).toList)
-      case "LinkToPdfParam"         | "link-to-pdf"       if includeToken => build("pdf",  documentOpt, buildTokenParam(Set(Operation.Read)).toList)
-      case otherLinkType                                  if includeToken => throw new IllegalArgumentException(s"Token not supported for link type: $otherLinkType")
-      case "LinkToEditPageParam"    | "link-to-edit-page"                 => build("edit", documentOpt)
-      case "LinkToViewPageParam"    | "link-to-view-page"                 => build("view", documentOpt)
-      case "LinkToNewPageParam"     | "link-to-new-page"                  => build("new", None)
-      case "LinkToSummaryPageParam" | "link-to-summary-page"              => build("summary", None)
-      case "LinkToHomePageParam"    | "link-to-home-page"                 => s"$baseUrlNoSlash/fr/"
-      case "LinkToFormsPageParam"   | "link-to-forms-page"                => s"$baseUrlNoSlash/fr/forms"
-      case "LinkToAdminPageParam"   | "link-to-admin-page"                => s"$baseUrlNoSlash/fr/admin"
-      case "LinkToPdfParam"         | "link-to-pdf"                       => build("pdf", documentOpt)
-      case otherLinkType                                                  => throw new IllegalArgumentException(otherLinkType)
+      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt, if (! includeToken) Nil else buildTokenParam(Set(Operation.Read, Operation.Update)).toList)
+      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt, if (! includeToken) Nil else buildTokenParam(Set(Operation.Read                  )).toList)
+      case "LinkToPdfParam"         | "link-to-pdf"          => build("pdf",  documentOpt, if (! includeToken) Nil else buildTokenParam(Set(Operation.Read                  )).toList)
+      case otherLinkType if includeToken                     => throw new IllegalArgumentException(s"Token not supported for link type: $otherLinkType")
+      case "LinkToNewPageParam"     | "link-to-new-page"     => build("new", None)
+      case "LinkToSummaryPageParam" | "link-to-summary-page" => build("summary", None)
+      case "LinkToHomePageParam"    | "link-to-home-page"    => s"$baseUrlNoSlash/fr/"
+      case "LinkToFormsPageParam"   | "link-to-forms-page"   => s"$baseUrlNoSlash/fr/forms"
+      case "LinkToAdminPageParam"   | "link-to-admin-page"   => s"$baseUrlNoSlash/fr/admin"
+      case otherLinkType                                     => throw new IllegalArgumentException(otherLinkType)
     }
   }
-
-  //@XPathFunction
-  def isLegacyEmailMetadata(emailMetadataOpt: Option[NodeInfo]): Boolean =
-    isLegacy2021EmailMetadata(emailMetadataOpt) ||
-    isLegacy2022EmailMetadata(emailMetadataOpt)
 
   // TODO: also take the form definition as parameter, to be more discriminate, and avoid returning `true` if we don't have any `fr-email-…` controls
   def isLegacy2021EmailMetadata(emailMetadataOpt: Option[NodeInfo]): Boolean =
@@ -215,6 +145,7 @@ trait FormRunnerEmail {
       case None                => false
     }
 
+  //@XPathFunction
   def parseEmailMetadata(
     emailMetadata  : Option[NodeInfo],
     formDefinition : NodeInfo
@@ -229,6 +160,7 @@ trait FormRunnerEmail {
       EmailMetadataParsing.parseCurrentMetadata(emailMetadata, formDefinition)
     }
 
+  //@XPathFunction
   def serializeEmailMetadata(metadata: EmailMetadata.Metadata): NodeInfo =
     EmailMetadataSerialization.serializeMetadata(metadata)
 }

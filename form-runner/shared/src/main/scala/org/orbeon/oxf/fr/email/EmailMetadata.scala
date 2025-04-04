@@ -72,18 +72,25 @@ object EmailMetadata {
       }
   }
 
+  sealed trait LinkParam extends Param
+
+  sealed trait TokenLinkParam extends LinkParam {
+    def token: Boolean
+  }
+
   object Param extends Enum[Param] {
     case class ControlValueParam     (name: String, controlName: String) extends Param
     case class ExpressionParam       (name: String, expression : String) extends Param
     case class AllControlValuesParam (name: String                     ) extends Param
-    case class LinkToEditPageParam   (name: String, token: Boolean     ) extends Param
-    case class LinkToViewPageParam   (name: String, token: Boolean     ) extends Param
-    case class LinkToNewPageParam    (name: String                     ) extends Param
-    case class LinkToSummaryPageParam(name: String                     ) extends Param
-    case class LinkToHomePageParam   (name: String                     ) extends Param
-    case class LinkToFormsPageParam  (name: String                     ) extends Param
-    case class LinkToAdminPageParam  (name: String                     ) extends Param
-    case class LinkToPdfParam        (name: String, token: Boolean     ) extends Param
+    case class LinkToEditPageParam   (name: String, token: Boolean     ) extends TokenLinkParam
+    case class LinkToViewPageParam   (name: String, token: Boolean     ) extends TokenLinkParam
+    case class LinkToPdfParam        (name: String, token: Boolean     ) extends TokenLinkParam
+    case class LinkToNewPageParam    (name: String                     ) extends LinkParam
+    case class LinkToSummaryPageParam(name: String                     ) extends LinkParam
+    case class LinkToHomePageParam   (name: String                     ) extends LinkParam
+    case class LinkToFormsPageParam  (name: String                     ) extends LinkParam
+    case class LinkToAdminPageParam  (name: String                     ) extends LinkParam
+
     override def values: immutable.IndexedSeq[Param] = super.findValues
   }
 

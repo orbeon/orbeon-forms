@@ -2,159 +2,124 @@ package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom.{Element, Text}
-import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.fr.FormRunner.*
-import org.orbeon.oxf.fr.FormRunnerCommon.frc
-import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
-import org.orbeon.oxf.fr.email.EmailMetadata.{TemplateMatch, TemplateValue}
-import org.orbeon.oxf.fr.email.{Attachment, EmailContent, EmailMetadata, EmailMetadataParsing}
-import org.orbeon.oxf.fr.process.RenderedFormat
-import org.orbeon.oxf.fr.s3.{S3, S3Config}
+import org.orbeon.oxf.fr.FormRunnerCommon.{ControlBindPathHoldersResources, frc}
+import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, TryUtils, XPathCache}
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.om
-import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
-import org.orbeon.saxon.value.{BooleanValue, StringValue}
-import org.orbeon.scaxon.Implicits.*
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
-import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.PutObjectResponse
 
-import java.net.URI
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
 
 
+// Only used for emails and not needed offline.
 trait FormRunnerEmailBackend {
 
-  // Only used from `email-form.xsl`/EmailContent and not needed offline.
-  //@XPathFunction
-  def emailAttachmentFilename(
-    data           : NodeInfo,
-    attachmentType : String,
-    app            : String,
-    form           : String
-  ): Option[String] = {
-
-    // NOTE: We don't use `FormRunnerParams()` for that this works in tests.
-    // Callees only require, as of 2018-05-31, `app` and `form`.
-    implicit val params = FormRunnerParams(AppForm(app, form), "email")
-
-    for {
-      (expr, mapping) <- formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
-      trimmedExpr     <- expr.trimAllToOpt
-      name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping)
-    } yield {
-      // This appears necessary for non-ASCII characters to make it through.
-      // Verified that this works with GMail.
-      jakarta.mail.internet.MimeUtility.encodeText(name, CharsetNames.Utf8, null)
+  // Given a form body and instance data:
+  //
+  // - find all controls with the given conjunction of class names
+  // - for each control, find the associated bind
+  // - return all data holders in the instance data to which the bind would apply
+  //
+  // The use case is, for example, to find all data holders pointed to by controls with the class
+  // `fr-email-recipient` and, optionally, `fr-email-attachment`.
+  //
+  def searchHoldersForClassTopLevelOnly(
+    body      : NodeInfo,
+    data      : NodeInfo,
+    classNames: String
+  ): List[NodeInfo] =
+    frc.searchControlsTopLevelOnly(
+      data      = Option(data),
+      predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
+    )(
+      new InDocFormRunnerDocContext(body)
+    ).toList.flatMap {
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
+      case ControlBindPathHoldersResources(_, _, _, None, _)          => Nil
     }
-  }
 
-
-  //@XPathFunction
-  def customHeaderNames(
-    formDefinition      : NodeInfo,
-    emailTemplateElemOpt: Option[NodeInfo]
-  ): SequenceIterator = {
-
-    val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
-    emailTemplateOpt.toSeq.flatMap(_.headers).collect { case (Custom(headerName), _) => headerName }
-  }
-
-  // Returns the values of email headers, e.g. "to" or "bcc". The source of the values is defined in the form metadata,
-  // part of the form definition. At the moment, the following sources are supported: form controls, expressions, and
-  // static text.
-
-  //@XPathFunction
-  def headerValues(
-    formDefinition      : NodeInfo,
-    emailTemplateElemOpt: Option[NodeInfo],
-    formData            : NodeInfo,
-    headerName          : String
-  ): SequenceIterator = {
-    val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
-    val templateValues   = emailTemplateOpt.toList.flatMap(_.headers.filter(_._1.entryName == headerName).map(_._2))
-
-    evaluatedTemplateValues(formDefinition, formData, templateValues)
-  }
-
-  //@XPathFunction
-  def attachments(
-    formDefinition      : NodeInfo,
-    emailTemplateElemOpt: Option[NodeInfo],
-    formData            : NodeInfo
-  ): SequenceIterator = {
-    val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
-    val templateValues   = emailTemplateOpt.toList.flatMap(_.controlsToAttach)
-
-    evaluatedTemplateValues(formDefinition, formData, templateValues)
-  }
-
-  def evaluatedTemplateValues(
-    formDefinition: NodeInfo,
-    formData      : NodeInfo,
-    templateValues: List[TemplateValue]
-  ): SequenceIterator =
-    templateValues.flatMap(evaluatedTemplateValue(formDefinition, formData, _))
+  // Given a form head, form body and instance data:
+  //
+  // - find all section templates in use
+  // - for each section
+  //   - determine the associated data holder in instance data
+  //   - find the inline binding associated with the section template
+  //   - find all controls with the given conjunction of class names in the section template
+  //   - for each control, find the associated bind in the section template
+  //   - return all data holders in the instance data to which the bind would apply
+  //
+  // The use case is, for example, to find all data holders pointed to by controls with the class
+  // `fr-email-recipient` and, optionally, `fr-email-attachment`, which appear within section templates.
+  //
+  def searchHoldersForClassUseSectionTemplates(
+    head      : NodeInfo,
+    body      : NodeInfo,
+    data      : NodeInfo,
+    classNames: String
+  ): List[NodeInfo] =
+    frc.searchControlsUnderSectionTemplates(
+      head             = head,
+      data             = Option(data),
+      sectionPredicate = _ => true,
+      controlPredicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
+    )(
+      new InDocFormRunnerDocContext(body)
+    ).toList.flatMap {
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
+      case ControlBindPathHoldersResources(_, _, _, None, _)          => Nil
+    }
 
   def evaluatedTemplateValue(
-    formDefinition: NodeInfo,
-    formData      : NodeInfo,
-    templateValue : TemplateValue
-  ): List[Item] =
+    templateValue: TemplateValue)(implicit
+    ctx          : InDocFormRunnerDocContext
+  ): List[String] =
     templateValue match {
-      case TemplateValue.Control(controlName, sectionOpt) =>
-        controlValue(formDefinition, formData, controlName, sectionOpt)
-
-      case TemplateValue.Expression(expression) =>
-        expressionValue(formDefinition, expression)
-
-      case TemplateValue.Text(text) =>
-        List(StringValue.makeStringValue(text))
+      case TemplateValue.Control(controlName, sectionOpt) => controlValueAsStrings(controlName, sectionOpt)
+      case TemplateValue.Expression(expression)           => evaluatedExpressionAsStrings(expression)
+      case TemplateValue.Text(text)                       => List(text)
     }
 
-  def controlValue(
-    formDefinition: NodeInfo,
-    formData      : NodeInfo,
-    controlName   : String,
-    sectionOpt    : Option[String]
-  ): List[NodeInfo] = {
+  def controlValueAsStrings(
+    controlName: String,
+    sectionOpt : Option[String])(implicit
+    ctx        : InDocFormRunnerDocContext
+  ): List[String] =
+    controlValueAsNodeInfos(controlName, sectionOpt).map(_.getStringValue)
 
-    val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
-
+  def controlValueAsNodeInfos(
+    controlName: String,
+    sectionOpt : Option[String])(implicit
+    ctx        : InDocFormRunnerDocContext
+  ): List[NodeInfo] =
     sectionOpt match {
       case None =>
         // Control not in section template
         frc.searchControlsTopLevelOnly(
-          data      = Some(formData),
-          predicate = FormRunnerCommon.frc.getControlName(_) == controlName)(
-          ctx       = formDefinitionCtx
+          data      = frc.formInstance.root.some,
+          predicate = FormRunnerCommon.frc.getControlName(_) == controlName
         ).toList.flatMap(_.holders).flatten
 
       case Some(section) =>
         // Control in section template
         frc.searchControlsUnderSectionTemplates(
-          head             = formDefinition.rootElement.child("*:head").head,
-          data             = Some(formData),
+          head             = ctx.formDefinitionRootElem.child("*:head").head,
+          data             = frc.formInstance.root.some,
           controlPredicate = FormRunnerCommon.frc.getControlName(_) == controlName,
-          sectionPredicate = frc.getControlNameOpt(_).contains(section))(
-          ctx              = formDefinitionCtx
+          sectionPredicate = frc.getControlNameOpt(_).contains(section)
         ).toList.flatMap(_.holders).flatten
     }
-  }
 
-  def expressionValue(formDefinition: NodeInfo, expression: String): List[StringValue] =
-    evaluatedExpressionAsStrings(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression))
-
-  private def expressionWithProcessedVarReferences(formDefinition: NodeInfo, expression: String): String = {
-    val formDefinitionCtx = new InDocFormRunnerDocContext(formDefinition)
+  private def expressionWithProcessedVarReferences(
+    expression: String)(implicit
+    ctx       : InDocFormRunnerDocContext
+  ): String = {
 
     FormRunner.replaceVarReferencesWithFunctionCallsFromString(
-      elemOrAtt   = formDefinitionCtx.modelElem,
+      elemOrAtt   = ctx.modelElem,
       xpathString = expression,
       avt         = false,
       libraryName = "",
@@ -162,8 +127,10 @@ trait FormRunnerEmailBackend {
     )
   }
 
-  def evaluatedExpression(formDefinition: NodeInfo, expression: String): List[Any] = {
-    val ctx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+  private def evaluatedExpression(
+    expression: String)(implicit
+    ctx       : InDocFormRunnerDocContext
+  ): List[Any] = {
 
     // TODO: check if another namespace is defined for "frf" and prevent namespace collision (renaming, etc.)
     val namespaceMapping = NamespaceMapping(
@@ -194,94 +161,26 @@ trait FormRunnerEmailBackend {
     ).asScala.toList
   }
 
-  //@XPathFunction
-  def evaluatedExpressionAsBoolean(formDefinition: NodeInfo, expression: String): BooleanValue =
-    evaluatedExpression(formDefinition, expression).flatMap {
-      case b: java.lang.Boolean => Some(BooleanValue.get(b))
+  def evaluatedExpressionAsBoolean(
+    expression: String)(implicit
+    ctx       : InDocFormRunnerDocContext
+  ): Boolean =
+    evaluatedExpression(expressionWithProcessedVarReferences(expression)).flatMap {
+      case b: java.lang.Boolean => Some(b)
       case                    _ => None // TODO: should we try and convert string values ("false"/"true") to boolean?
     }.headOption.getOrElse {
       throw new IllegalArgumentException(s"Expression '$expression' did not evaluate to a boolean")
     }
 
-  //@XPathFunction
-  def evaluatedExpressionAsStrings(formDefinition: NodeInfo, expression: String): List[StringValue] =
-    evaluatedExpression(formDefinition, expression).map {
+  def evaluatedExpressionAsStrings(
+    expression: String)(implicit
+    ctx       : InDocFormRunnerDocContext
+  ): List[String] =
+    evaluatedExpression(expressionWithProcessedVarReferences(expression)).map {
       case string: String     => string
       case element: Element   => element.getStringValue
       case text: Text         => text.getStringValue
       case nodeInfo: NodeInfo => nodeInfo.stringValue
       case any: Any           => any.toString // TODO: should we throw instead?
-    }.map {
-      StringValue.makeStringValue
     }
-
-  def emailContents(
-    formDefinition          : om.DocumentInfo,
-    emailMetadata           : EmailMetadata.Metadata,
-    urisByRenderedFormat    : Map[RenderedFormat, URI],
-    emailDataFormatVersion  : DataFormatVersion,
-    templateMatch           : TemplateMatch,
-    language                : String,
-    templateNameOpt         : Option[String]
-  )(implicit
-    logger                  : IndentedLogger,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    formRunnerParams        : FormRunnerParams
-  ): List[EmailContent] = {
-
-    // 1) Filter templates by language and name
-    val templatesFilteredByLanguageAndName = emailMetadata.templates.filter { template =>
-      (template.lang.isEmpty || template.lang.contains(language)) && templateNameOpt.forall(template.name == _)
-    }
-
-    // 2) Consider only templates with enableIfTrue expression, if any, evaluating to true
-    val enabledTemplates = templatesFilteredByLanguageAndName.filter { template =>
-      template.enableIfTrue.forall { expression =>
-        evaluatedExpressionAsBoolean(formDefinition, expressionWithProcessedVarReferences(formDefinition, expression)).getBooleanValue
-      }
-    }
-
-    // 3) Consider first template or all templates
-    val firstOrAllTemplates = templateMatch match {
-      case TemplateMatch.First => enabledTemplates.take(1)
-      case TemplateMatch.All   => enabledTemplates
-    }
-
-    // For each email template, generate email content
-    firstOrAllTemplates.map { template =>
-      EmailContent(
-        formDefinition         = formDefinition.rootElement,
-        formData               = frc.formInstance.root,
-        emailDataFormatVersion = emailDataFormatVersion,
-        urisByRenderedFormat   = urisByRenderedFormat,
-        template               = template,
-        parameters             = emailMetadata.params
-      )
-    }
-  }
-
-  def storeEmailContentToS3(
-    emailContent            : EmailContent,
-    s3PathPrefix            : String
-  )(implicit
-    s3Config                : S3Config,
-    s3Client                : S3Client
-  ): Try[Unit] = {
-    // TODO: store email body and headers as well
-    TryUtils.sequenceLazily(emailContent.attachments)(storeAttachmentToS3(_, s3PathPrefix)).map(_ => ())
-  }
-
-  private def storeAttachmentToS3(
-    attachment  : Attachment,
-    s3PathPrefix: String
-  )(implicit
-    s3Config    : S3Config,
-    s3Client    : S3Client
-  ): Try[PutObjectResponse] = {
-
-    val key     = s3PathPrefix + attachment.filename
-    val content = attachment.data.content()
-
-    S3.write(key, content.stream, content.contentLength, attachment.contentType.some)
-  }
 }

@@ -71,4 +71,6 @@
 
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.issue.6751" value="false"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-xml.issue.6751" value="true"/>
+
+    <property as="xs:string" name="oxf.fb.email.custom-headers.issue.6848" value="X-Custom-1st X-Custom-2nd"/>
 </properties>

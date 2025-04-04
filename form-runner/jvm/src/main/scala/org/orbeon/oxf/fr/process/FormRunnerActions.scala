@@ -109,44 +109,8 @@ trait FormRunnerActions
 
   def trySendEmail(params: ActionParams): ActionResult =
     ActionResult.trySync {
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-      implicit val formRunnerParams: FormRunnerParams                      = FormRunnerParams()
 
-      ensureDataCalculationsAreUpToDate()
-
-      val formDefinition = PersistenceApi.readPublishedFormDefinition(
-        appName  = formRunnerParams.app,
-        formName = formRunnerParams.form,
-        version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
-      ).get._1._2
-
-      val emailMetadataNodeOpt = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
-      val emailMetadata        = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
-
-      val pdfRequiredByTemplate = emailMetadata.templates.exists(_.attachPdf.contains(true))
-
-      val selectedRenderFormats =
-        RenderedFormat.values filter { format =>
-          booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}") ||
-          (format == RenderedFormat.Pdf && pdfRequiredByTemplate)
-        }
-
-      selectedRenderFormats foreach
-        (tryCreateRenderedFormatIfNeeded(params, _).get)
-
-      val currentFormLang = FormRunner.currentLang
-
-      val urisByRenderedFormat =
-        (for {
-          renderedFormat <- RenderedFormat.values.toList
-          (uri, _)       <- renderedFormatPathOpt(
-              urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
-              renderedFormat       = renderedFormat,
-              pdfTemplateOpt       = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
-              defaultLang          = currentFormLang
-            )
-        } yield
-          renderedFormat -> uri).toMap
+      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
 
       // https://github.com/orbeon/orbeon-forms/issues/5911
       val emailDataFormatVersion =
@@ -160,16 +124,13 @@ trait FormRunnerActions
           .map(TemplateMatch.withName)
           .getOrElse(TemplateMatch.First)
 
-      val emailContentsFromTemplates =
-        emailContents(
-          formDefinition         = formDefinition,
-          emailMetadata          = emailMetadata,
-          urisByRenderedFormat   = urisByRenderedFormat,
-          emailDataFormatVersion = emailDataFormatVersion,
-          templateMatch          = templateMatch,
-          language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
-          templateNameOpt        = paramByNameUseAvt(params, "template")
-        )
+      val emailContentsFromTemplates = emailsToSend(
+        emailDataFormatVersion = emailDataFormatVersion,
+        templateMatch          = templateMatch,
+        language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
+        templateNameOpt        = paramByNameUseAvt(params, "template"),
+        pdfParams              = params // TODO: it would be cleaner to have a proper case class here instead of a Map
+      )
 
       // S3 tests disable the actual sending of email (this parameter is not documented)
       val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
@@ -186,6 +147,64 @@ trait FormRunnerActions
         storeEmailContentsToS3(params, emailContentsFromTemplates).get
       }
     }
+
+  def emailsToSend(
+    emailDataFormatVersion  : DataFormatVersion,
+    templateMatch           : TemplateMatch,
+    language                : String,
+    templateNameOpt         : Option[String],
+    pdfParams               : ActionParams)(implicit
+    formRunnerParams        : FormRunnerParams
+  ): List[EmailContent] = {
+
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+
+    ensureDataCalculationsAreUpToDate()
+
+    val formDefinition = PersistenceApi.readPublishedFormDefinition(
+      appName  = formRunnerParams.app,
+      formName = formRunnerParams.form,
+      version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
+    ).get._1._2
+
+    implicit val ctx: InDocFormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+
+    val emailMetadataNodeOpt  = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
+    val emailMetadata         = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
+    val pdfRequiredByTemplate = emailMetadata.templates.exists(_.attachPdf.contains(true))
+
+    val selectedRenderFormats =
+      RenderedFormat.values filter { format =>
+        booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}") ||
+        (format == RenderedFormat.Pdf && pdfRequiredByTemplate)
+      }
+
+    selectedRenderFormats foreach
+      (tryCreateRenderedFormatIfNeeded(pdfParams, _).get)
+
+    val currentFormLang = FormRunner.currentLang
+
+    val urisByRenderedFormat =
+      (for {
+        renderedFormat <- RenderedFormat.values.toList
+        (uri, _)       <- renderedFormatPathOpt(
+            urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
+            renderedFormat       = renderedFormat,
+            pdfTemplateOpt       = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, pdfParams, Some(currentFormLang)),
+            defaultLang          = currentFormLang
+          )
+      } yield
+        renderedFormat -> uri).toMap
+
+    EmailContent.emailContents(
+      emailMetadata          = emailMetadata,
+      urisByRenderedFormat   = urisByRenderedFormat,
+      emailDataFormatVersion = emailDataFormatVersion,
+      templateMatch          = templateMatch,
+      language               = language,
+      templateNameOpt        = templateNameOpt
+    )
+  }
 
   private def storeEmailContentsToS3(
     params                    : ActionParams,
@@ -231,7 +250,7 @@ trait FormRunnerActions
               // Evaluate the s3-path parameter/property for each email, as the evaluation might return a different
               // value for each call (e.g. date/time function)
               s3PathPrefix <- s3PathPrefixTry
-              _            <- storeEmailContentToS3(emailContent, s3PathPrefix)
+              _            <- emailContent.storeToS3(s3PathPrefix)
             } yield ()
           }
         }

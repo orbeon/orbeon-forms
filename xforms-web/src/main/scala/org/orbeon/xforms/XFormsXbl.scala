@@ -11,8 +11,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object XFormsXbl {
 
   def isObjectWithMethod(obj: js.Any, method: String): Boolean =
-    obj.isInstanceOf[js.Object] &&                                                 // `obj instanceof Object`
-      obj.asInstanceOf[js.Dynamic].selectDynamic(method).isInstanceOf[js.Function] // `obj[method] instanceof Function`
+    obj.isInstanceOf[js.Object] && {
+      val methodField = obj.asInstanceOf[js.Dynamic].selectDynamic(method).asInstanceOf[js.Any]
+      methodField.isInstanceOf[js.Function]
+    }
 
   @JSExport
   def isComponent(control: html.Element): Boolean =
@@ -70,7 +72,7 @@ object XFormsXbl {
       override def init(): Unit =
         if (! initCalled) {
           initCalled = true
-          if (superPrototypeAsDynamic.init.isInstanceOf[js.Function])
+          if (superPrototypeAsDynamic.init.asInstanceOf[js.Any].isInstanceOf[js.Function])
             super.init()
           if (! isJavaScriptLifecycle(containerElem))
             XBL.componentInitialized.fire(new js.Object {
@@ -82,7 +84,7 @@ object XFormsXbl {
       override def destroy(): Unit = {
         if (! destroyCalled) {
           destroyCalled = true
-          if (superPrototypeAsDynamic.destroy.isInstanceOf[js.Function])
+          if (superPrototypeAsDynamic.destroy.asInstanceOf[js.Any].isInstanceOf[js.Function])
             super.destroy()
           // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
           // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.

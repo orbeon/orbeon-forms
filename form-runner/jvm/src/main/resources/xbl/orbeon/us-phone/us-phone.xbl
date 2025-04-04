@@ -135,10 +135,7 @@
 
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">
-                <xf:var
-                    name="field-width"
-                    value="fr:component-param-value('field-width')"/>
-                <xh:span class="input-append fr-field-width-{$field-width}">
+                <xh:span class="input-append fr-field-width-{fr:component-param-value('field-width')}">
                     <xf:input
                         id="input"
                         xbl:attr="navindex navindex=tabindex autocomplete"
@@ -146,7 +143,8 @@
                         xxf:maxlength="14"
                         xxf:format="xxf:formatted-value('fr-us-phone')"
                         xxf:unformat="
-                            for $t in translate(xxf:trim(), '()*-[].#/'': ', '') return
+                            for $t in translate(xxf:trim(), '()*-[].#/'': ', '')
+                            return
                                 if (matches($t, '^\d+$')) then
                                     $t
                                 else

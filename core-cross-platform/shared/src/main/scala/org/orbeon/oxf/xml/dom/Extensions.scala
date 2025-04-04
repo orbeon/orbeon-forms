@@ -50,10 +50,10 @@ object Extensions {
         (throw new IllegalArgumentException)
 
     def resolveAttValueQName(attName: QName, unprefixedIsNoNamespace: Boolean): Option[QName] =
-      resolveStringQName(e.attributeValue(attName), unprefixedIsNoNamespace)
+      e.attributeValueOpt(attName).flatMap(resolveStringQName(_, unprefixedIsNoNamespace))
 
     def resolveAttValueQName(attName: String, unprefixedIsNoNamespace: Boolean): Option[QName] =
-      resolveStringQName(e.attributeValue(attName), unprefixedIsNoNamespace)
+      e.attributeValueOpt(attName).flatMap(resolveStringQName(_, unprefixedIsNoNamespace))
 
     def copyMissingNamespacesByPrefix(sourceElem: Option[Element], prefixesToFilter: Set[String] = Set.empty): Element = {
 

@@ -2,11 +2,10 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.dom.*
-import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.Whitespace.*
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.*
-import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -47,8 +46,7 @@ class StaticBind(
   staticBind =>
 
   val dataType: Option[QName] =
-    typeMIPOpt map (_.datatype) flatMap
-      (Extensions.resolveQName(namespaceMapping.mapping.get, _, unprefixedIsNoNamespace = true))
+    typeMIPOpt.map(_.datatype)
 
   // All XPath MIPs
   val allMipNamesToXPathMIP: Map[MipName.XPath, List[XPathMIP]] = Map.empty[MipName.XPath, List[XPathMIP]] ++ customMipNameToXPathMIP ++ mipNameToXPathMIP
@@ -184,40 +182,57 @@ object StaticBind {
 
   // Represent an XPath MIP
   class XPathMIP(
-    override val id     : String,
-    override val name   : MipName.XPath,
-    override val level  : ValidationLevel,
-    val expression      : String, // public for serialization and debugging
-    namespaceMapping    : NamespaceMapping,
-    locationData        : ExtendedLocationData,
-    functionLibrary     : FunctionLibrary
-  ) extends MIP {
+    override val id       : String,
+    override val name     : MipName.XPath,
+    override val level    : ValidationLevel,
+    val compiledExpression: StaticXPath.CompiledExpression,
+    var analysis          : XPathAnalysis
+  ) extends MIP
 
-    // Compile the expression right away
-    lazy val compiledExpression: StaticXPath.CompiledExpression = {
-      val booleanOrStringExpression =
-        if (MipName.BooleanXPathMipNames(name))
-          StaticXPath.makeBooleanExpression(expression)
-        else
-          StaticXPath.makeStringExpression(expression)
+  object XPathMIP {
 
-      StaticXPath.compileExpression(
-        xpathString      = booleanOrStringExpression,
-        namespaceMapping = namespaceMapping,
-        locationData     = locationData,
-        functionLibrary  = functionLibrary,
-        avt              = false
-      )(null) // TODO: pass a logger? Is passed down to `ShareableXPathStaticContext` for warnings only.
+    def apply(
+      id              : String,
+      name            : MipName.XPath,
+      level           : ValidationLevel,
+      expression      : String,
+      namespaceMapping: NamespaceMapping,
+      locationData    : ExtendedLocationData,
+      functionLibrary : FunctionLibrary
+    )(implicit
+      indentedLogger  : IndentedLogger
+    ): XPathMIP = {
+
+      val compiledExpression: StaticXPath.CompiledExpression = {
+        val booleanOrStringExpression =
+          if (MipName.BooleanXPathMipNames(name))
+            StaticXPath.makeBooleanExpression(expression)
+          else
+            StaticXPath.makeStringExpression(expression)
+
+        StaticXPath.compileExpression(
+          xpathString      = booleanOrStringExpression,
+          namespaceMapping = namespaceMapping,
+          locationData     = locationData,
+          functionLibrary  = functionLibrary,
+          avt              = false
+        )
+      }
+
+      new XPathMIP(
+        id,
+        name,
+        level,
+        compiledExpression,
+        new NegativeAnalysis(expression) // default to `NegativeAnalysis`, `analyzeXPath()` can change that
+      )
     }
-
-    // Default to `NegativeAnalysis`, `analyzeXPath()` can change that
-    var analysis: XPathAnalysis = new NegativeAnalysis(expression)
   }
 
   // The type MIP is not an XPath expression
   class TypeMIP(
     override val id       : String,
-             val datatype : String
+             val datatype : QName
   ) extends MIP {
     override val name     : MipName         = MipName.Type
     override val level    : ValidationLevel = ValidationLevel.ErrorLevel

@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
-import org.orbeon.dom.{Namespace, QName}
+import org.orbeon.dom.QName
 import org.orbeon.facades.HTMLDialogElement
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
@@ -1164,8 +1164,8 @@ object XFormsUI {
           .foreach(documentElement.classList.remove)
 
         // Add new CSS `xforms-type-*` class
-        newSchemaTypeQName match { case QName(localName, Namespace(_, uri)) =>
-          val isBuiltIn = uri == Namespaces.XS || uri == Namespaces.XF
+        newSchemaTypeQName match { case qName @ QName(localName, _) =>
+          val isBuiltIn = Namespaces.isForBuiltinType(qName)
           val newClass = s"$TypePrefix${if (isBuiltIn) "" else "custom-"}$localName"
           documentElement.classList.add(newClass)
         }

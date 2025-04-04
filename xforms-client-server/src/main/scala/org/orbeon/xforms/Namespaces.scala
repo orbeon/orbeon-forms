@@ -13,6 +13,8 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.dom.QName
+
 
 object Namespaces {
   val XF   = "http://www.w3.org/2002/xforms"
@@ -20,4 +22,7 @@ object Namespaces {
   val XBL  = "http://www.w3.org/ns/xbl"
   val XXBL = "http://orbeon.org/oxf/xml/xbl"
   val XS   = "http://www.w3.org/2001/XMLSchema"
+
+  def isForBuiltinType(datatype: QName): Boolean =
+    datatype.namespace.uri == Namespaces.XS || datatype.namespace.uri == Namespaces.XF
 }

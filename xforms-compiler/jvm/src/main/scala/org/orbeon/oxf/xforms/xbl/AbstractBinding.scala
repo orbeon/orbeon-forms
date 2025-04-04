@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.{InstanceMetadataBuilder, LHHA}
@@ -40,13 +41,17 @@ trait IndexableBinding {
   def namespaceMapping : NamespaceMapping
   def path             : Option[String]
   def lastModified     : Long
+  def datatypeOpt      : Option[QName]
+  def constraintOpt    : Option[String]
 }
 
 // Inline binding details, which cannot be shared between forms
 case class InlineBindingRef(
   bindingPrefixedId : String,
   selectors         : List[Selector],
-  namespaceMapping  : NamespaceMapping
+  namespaceMapping  : NamespaceMapping,
+  datatypeOpt       : Option[QName],
+  constraintOpt     : Option[String]
 ) extends IndexableBinding {
   val path         = None
   val lastModified = -1L
@@ -134,7 +139,9 @@ object CommonBindingBuilder {
       deserializeExternalValueOpt = bindingElem.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME),
       cssClasses                  = cssClasses,
       allowedExternalEvents       = allowedExternalEvents,
-      constantInstances           = constantInstances
+      constantInstances           = constantInstances,
+      datatypeOpt                 = bindingElem.resolveAttValueQName(XXBL_TYPE_QNAME, unprefixedIsNoNamespace = true),
+      constraintOpt               = bindingElem.attributeValueOpt(XXBL_CONSTRAINT_QNAME).flatMap(_.trimAllToOpt)
     )
   }
 }
@@ -152,6 +159,9 @@ case class AbstractBinding(
   namespaceMapping : NamespaceMapping,
   commonBinding    : CommonBinding
 ) extends IndexableBinding {
+
+  def datatypeOpt      : Option[QName]  = commonBinding.datatypeOpt
+  def constraintOpt    : Option[String] = commonBinding.constraintOpt
 
   private val xblMode         = attSet(bindingElement, XXBL_MODE_QNAME)
   val modeValue               = xblMode("value")

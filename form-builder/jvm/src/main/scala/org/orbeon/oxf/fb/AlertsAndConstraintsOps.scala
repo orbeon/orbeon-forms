@@ -33,6 +33,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
@@ -281,7 +282,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     alert    : Option[AlertDetails]
   ) extends Validation {
 
-    import RequiredValidation._
+    import RequiredValidation.*
 
     def level      : ValidationLevel = ValidationLevel.ErrorLevel
     def stringValue: String          = eitherToXPath(required)
@@ -408,10 +409,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
       val bind = findBindByName(controlName).get // require the bind
 
       def builtinOrSchemaType(typ: String): Either[(QName, Boolean), QName] = {
-        val qName         = bind.resolveQName(typ)
-        val isBuiltinType = Set(XF, XS)(qName.namespace.uri)
-
-        if (isBuiltinType)
+        val qName = bind.resolveQName(typ)
+        if (Namespaces.isForBuiltinType(qName))
           Left(qName -> (qName != XMLConstants.XS_STRING_QNAME && qName.namespace.uri == XS)) // see `DefaultDataTypeValidation`
         else
           Right(qName)

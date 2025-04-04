@@ -378,9 +378,11 @@ object PartAnalysisBuilder {
 
   // Analyze the entire tree of controls
   private def analyze(
-    partAnalysisCtx : PartAnalysisContextAfterTree,
-    rootElem        : Element
-  )(implicit logger : IndentedLogger): Unit =
+    partAnalysisCtx: PartAnalysisContextAfterTree,
+    rootElem       : Element
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): Unit =
     withDebug("performing static analysis") {
 
       partAnalysisCtx.initializeScopes()
@@ -521,12 +523,14 @@ object PartAnalysisBuilder {
 
   // Builder that produces an `ElementAnalysis` for a known incoming Element
   private def buildOne(
-    partAnalysisCtx : PartAnalysisContextForTree,
-    parent          : ElementAnalysis,
-    preceding       : Option[ElementAnalysis],
-    controlElement  : Element,
-    containerScope  : Scope,
-    index           : ElementAnalysis => Unit
+    partAnalysisCtx: PartAnalysisContextForTree,
+    parent         : ElementAnalysis,
+    preceding      : Option[ElementAnalysis],
+    controlElement : Element,
+    containerScope : Scope,
+    index          : ElementAnalysis => Unit
+  )(implicit
+    indentedLogger : IndentedLogger
   ): ElementAnalysis = {
 
     assert(containerScope ne null)

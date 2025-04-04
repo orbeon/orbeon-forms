@@ -19,7 +19,10 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsAssets
+import org.orbeon.oxf.xml.SaxSupport.EmptyAttributes
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.xforms.XFormsNames.{XXBL_CONSTRAINT_QNAME, XXBL_TYPE_QNAME}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
@@ -73,12 +76,15 @@ trait BindingMetadata extends Logging {
     }
 
   def registerInlineBinding(
-    ns               : NamespaceMapping,
-    elementAtt       : String,
+    namespaces       : NamespaceMapping,
+    attributes       : Attributes,
     bindingPrefixedId: String
   )(implicit
     indentedLogger   : IndentedLogger
   ): Unit = {
+
+    val elementAtt = attributes.getValue("element")
+
     debug(
       "registering inline binding",
       List(
@@ -87,11 +93,17 @@ trait BindingMetadata extends Logging {
         "prefixed id" -> bindingPrefixedId
       )
     )
-    val newBindingRef = InlineBindingRef(
-      bindingPrefixedId,
-      CSSSelectorParser.parseSelectors(elementAtt),
-      ns
-    )
+
+    val newBindingRef =
+      InlineBindingRef(
+        bindingPrefixedId = bindingPrefixedId,
+        selectors         = CSSSelectorParser.parseSelectors(elementAtt),
+        namespaceMapping  = namespaces,
+        datatypeOpt       = Option(attributes.getValue(XXBL_TYPE_QNAME.namespace.uri, XXBL_TYPE_QNAME.localName))
+          .flatMap(Extensions.resolveQName(namespaces.mapping.get, _, unprefixedIsNoNamespace = true)),
+        constraintOpt     = Option(attributes.getValue(XXBL_CONSTRAINT_QNAME.namespace.uri, XXBL_CONSTRAINT_QNAME.localName)),
+      )
+
     _xblIndex match {
       case Some(index) =>
         // Case of restore, where `initializeBindingLibraryIfNeeded()` is called first
@@ -132,6 +144,31 @@ trait BindingMetadata extends Logging {
 
     bindingOpt
   }
+
+  def findBindingForQName(
+    qName: QName,
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): Option[IndexableBinding] =
+    _xblIndex flatMap { index =>
+
+    val (newIndex, newPaths, bindingOpt) =
+      BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), qName.namespace.uri, qName.localName, EmptyAttributes)
+
+    if (index ne newIndex)
+      _xblIndex = Some(newIndex)
+
+    _checkedPaths = newPaths
+
+    ifDebug {
+      bindingOpt foreach { _ =>
+        debug("found binding for", List("element" -> qName.uriQualifiedName))
+      }
+    }
+
+    bindingOpt
+  }
+
 
   // Used by `XFormsAnnotator`
   def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding): Unit = {
@@ -186,7 +223,7 @@ trait BindingMetadata extends Logging {
           val bindingPrefixedId = scope.fullPrefix + newBinding.bindingElement.idOrNull
 
           currentMappings foreach {
-            case (controlPrefixedId, InlineBindingRef(`bindingPrefixedId`, _, _)) =>
+            case (controlPrefixedId, InlineBindingRef(`bindingPrefixedId`, _, _, _, _)) =>
               currentMappings += controlPrefixedId -> newBinding
             case _ =>
           }

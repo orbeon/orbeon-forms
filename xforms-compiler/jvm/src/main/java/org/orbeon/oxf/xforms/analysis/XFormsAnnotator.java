@@ -158,7 +158,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 if (elementAtt != null)
                     metadata.registerInlineBinding(
                         NamespaceMapping.apply(namespaceContext.current().mappings()),
-                        elementAtt,
+                        attributes,
                         rewriteId(reusableStringArray[0]),
                         indentedLogger
                     );

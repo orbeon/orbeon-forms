@@ -258,6 +258,9 @@ object XFormsStaticStateSerializer {
           e.allMipNamesToXPathMIP.valuesIterator.flatten foreach { xpathMip =>
             collectForXPathAnalysis(xpathMip.analysis)
           }
+          e.typeMIPOpt.foreach { mip =>
+            distinct += mip.datatype
+          }
         case e =>
           updateDistinctCommon(e)
       }
@@ -352,6 +355,7 @@ object XFormsStaticStateSerializer {
           b += "allowedExternalEvents"       -> a.allowedExternalEvents.asJson
         if (a.constantInstances.nonEmpty)
           b += "constantInstances"           -> (a.constantInstances: Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]).asJson // `Iterable[?]` to trigger right encoder
+        // We don't need to serialize `datatypeOpt` and `constraintOpt` as they are processed at compilation time
 
       Json.fromFields(b)
     }
@@ -497,7 +501,7 @@ object XFormsStaticStateSerializer {
 
           implicit val encodeTypeMIP: Encoder[StaticBind.TypeMIP] = (a: StaticBind.TypeMIP) => Json.obj(
             "id"         -> Json.fromString(a.id),
-            "datatype"   -> Json.fromString(a.datatype)
+            "datatype"   -> Json.fromInt(collectedQNamesWithPositions(a.datatype))
           )
 
           implicit val encodeWhitespaceMIP: Encoder[StaticBind.WhitespaceMIP] = (a: StaticBind.WhitespaceMIP) => Json.obj(
@@ -518,7 +522,7 @@ object XFormsStaticStateSerializer {
             b += "name"       -> a.name.asJson
             if (a.level != ValidationLevel.ErrorLevel)
               b += "level"      -> a.level.asJson
-            b += "expression" -> Json.fromString(a.expression)
+            b += "expression" -> Json.fromString(a.compiledExpression.string)
             if (a.analysis.figuredOutDependencies)
               b += "analysis" -> a.analysis.some.asJson
 

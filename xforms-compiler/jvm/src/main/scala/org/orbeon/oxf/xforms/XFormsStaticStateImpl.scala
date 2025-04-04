@@ -92,7 +92,8 @@ class XFormsStaticStateImpl(
   val nonDefaultProperties        : Map[String, (String, Boolean)], // for serialization
   staticProperties                : XFormsStaticStateStaticProperties,
   dynamicProperties               : XFormsStaticStateDynamicProperties,
-  val staticStateDocumentForTests : StaticStateDocument)(implicit
+  val staticStateDocumentForTests : StaticStateDocument
+)(implicit
   val getIndentedLogger           : IndentedLogger
 ) extends XFormsStaticState
   with XFormsStaticStateStaticProperties

@@ -178,7 +178,7 @@ object DependencyAnalyzer {
         val vertex = Vertex(
           staticId,
           refs map allBindsByName map (b => verticesByIds(b.staticId)),
-          staticBind.firstXPathMipByName(mip).map(_.expression),
+          staticBind.firstXPathMipByName(mip).map(_.compiledExpression.string),
           staticBind.firstXPathMipByName(mip).map(_.analysis)
         )
         verticesByIds += staticId -> vertex

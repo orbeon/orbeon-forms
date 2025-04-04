@@ -31,7 +31,9 @@ case class CommonBinding(
   deserializeExternalValueOpt : Option[String],
   cssClasses                  : String,
   allowedExternalEvents       : Set[String],
-  constantInstances           : Map[(Int, Int), StaticXPath.DocumentNodeInfoType]
+  constantInstances           : Map[(Int, Int), StaticXPath.DocumentNodeInfoType],
+  datatypeOpt                 : Option[QName],
+  constraintOpt               : Option[String]
 ) {
   val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.toSet
 }

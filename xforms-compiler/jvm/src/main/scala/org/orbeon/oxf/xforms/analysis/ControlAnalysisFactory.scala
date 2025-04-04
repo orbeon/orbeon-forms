@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option.*
 import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.EventHandler.*
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
@@ -33,6 +34,9 @@ object ControlAnalysisFactory {
   type ControlFactoryWithPart =
     (PartAnalysisContextForTree, Int, Element,  Option[ElementAnalysis], Option[ElementAnalysis], String, String, NamespaceMapping, Scope, Scope) => ElementAnalysis
 
+  type ControlFactoryWithPartAndLogger =
+    (PartAnalysisContextForTree, Int, Element,  Option[ElementAnalysis], Option[ElementAnalysis], String, String, NamespaceMapping, Scope, Scope, IndentedLogger) => ElementAnalysis
+
   private val VariableControlFactory: ControlFactory         = VariableAnalysisBuilder(_, _, _, _, _, _, _, _, _, forModel = false)
   private val LHHAControlFactory    : ControlFactoryWithPart = LHHAAnalysisBuilder(_, _, _, _, _, _, _, _, _, _)
 
@@ -41,6 +45,10 @@ object ControlAnalysisFactory {
   private val VariableFactory =
     VariableAnalysis.VariableQNames.iterator map
       (qName => qName -> VariableControlFactory) toMap
+
+  private val byQNameFactoryWithPartAndLogger = Map[QName, ControlFactoryWithPartAndLogger](
+    XFORMS_BIND_QNAME             -> (StaticBindBuilder(_, _, _, _, _, _, _, _, _, _)(_)),
+  )
 
   private val byQNameFactoryWithPart = Map[QName, ControlFactoryWithPart](
     // Core value controls
@@ -57,7 +65,6 @@ object ControlAnalysisFactory {
     ALERT_QNAME                   -> LHHAControlFactory,
     // Model
     XFORMS_INSTANCE_QNAME         -> (InstanceBuilder(_, _, _, _, _, _, _, _, _, _)),
-    XFORMS_BIND_QNAME             -> (StaticBindBuilder(_, _, _, _, _, _, _, _, _, _)),
     // Container controls
     XFORMS_CASE_QNAME             -> (CaseControlBuilder(_, _, _, _, _, _, _, _, _, _)),
   )
@@ -127,6 +134,8 @@ object ControlAnalysisFactory {
     namespaceMapping  : NamespaceMapping,
     scope             : Scope,
     containerScope    : Scope
+  )(implicit
+    indentedLogger : IndentedLogger
   ): Option[ElementAnalysis] = {
 
     require(controlElement ne null)
@@ -164,7 +173,7 @@ object ControlAnalysisFactory {
             forModel = true
           ).some
         else {
-          byQNameFactoryWithPart.get(controlElement.getQName) map {
+          byQNameFactoryWithPartAndLogger.get(controlElement.getQName).map(
             _.apply(
               partAnalysisCtx,
               index,
@@ -175,11 +184,13 @@ object ControlAnalysisFactory {
               controlPrefixedId,
               namespaceMapping,
               scope,
-              containerScope
+              containerScope,
+              indentedLogger
             )
-          } orElse {
-            ControlOrActionFactory(controlElement) map {
+          ) orElse
+            byQNameFactoryWithPart.get(controlElement.getQName).map(
               _.apply(
+                partAnalysisCtx,
                 index,
                 controlElement,
                 parent,
@@ -190,8 +201,20 @@ object ControlAnalysisFactory {
                 scope,
                 containerScope
               )
-            }
-          }
+            ) orElse
+              ControlOrActionFactory(controlElement).map(
+                _.apply(
+                  index,
+                  controlElement,
+                  parent,
+                  preceding,
+                  controlStaticId,
+                  controlPrefixedId,
+                  namespaceMapping,
+                  scope,
+                  containerScope
+                )
+              )
         }
     }
   }

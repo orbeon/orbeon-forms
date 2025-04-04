@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.orbeon.xml.NamespaceMapping
@@ -28,8 +28,10 @@ class BindingIndexTest extends AnyFunSpec {
     selectors        : List[Selector],
     namespaceMapping : NamespaceMapping
   ) extends IndexableBinding {
-    val path: Option[String] = None
-    val lastModified: Long = -1L
+    val path         : Option[String] = None
+    val lastModified : Long           = -1L
+    val datatypeOpt  : Option[QName]  = None
+    val constraintOpt: Option[String] = None
   }
 
   val FooURI     = "http://orbeon.org/oxf/xml/foo"

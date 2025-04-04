@@ -55,7 +55,7 @@ object MipName {
   val AllXPathMipsByName     : Map[String, XPath]    = AllMipNames.collect { case m: XPath    => m.name -> m } .toMap
 
   // Should be all except `Type` and `Whitespace` (and of course `Custom(_)`)
-  val QNameToXPathMIP        : Map[QName, XPath]     =
+  val QNameToXPathMipName    : Map[QName, XPath]     =
     AllMipNames
       .collect {
         case m: XPath with Computed => m.aName -> m

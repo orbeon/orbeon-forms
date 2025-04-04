@@ -254,6 +254,8 @@ object XFormsStaticStateDeserializer {
           cssClasses,
           allowedExternalEvents,
           constantInstances.toMap,
+          None, // processed at compilation time
+          None  // processed at compilation time
         )
 
     // This is only used by `decodeScope`, with the assumption that we
@@ -609,10 +611,10 @@ object XFormsStaticStateDeserializer {
 
               implicit val decodeTypeMIP: Decoder[StaticBind.TypeMIP] = (c: HCursor) =>
                 for {
-                  id         <- c.get[String]("id")
-                  datatype   <- c.get[String]("datatype")
+                  id            <- c.get[String]("id")
+                  datatypeIndex <- c.get[Int]("datatype")
                 } yield
-                  new StaticBind.TypeMIP(id, datatype)
+                  new StaticBind.TypeMIP(id, collectedQNames(datatypeIndex))
 
               implicit val decodeWhitespaceMIP: Decoder[StaticBind.WhitespaceMIP] = (c: HCursor) =>
                 for {
@@ -632,7 +634,7 @@ object XFormsStaticStateDeserializer {
                   expression <- c.get[String]("expression")
                   analysis   <- c.getOrElse[Option[XPathAnalysis]]("analysis")(None)
                 } yield
-                  new StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, functionLibrary) |!>
+                  StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, null, functionLibrary) |!>
                     (_.analysis = analysis.getOrElse(new NegativeAnalysis(expression)))
 
               // This will lose the prefix, is that ok?

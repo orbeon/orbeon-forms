@@ -295,7 +295,7 @@ object Connection extends ConnectionTrait {
       fs2.Stream.emits(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte])
 
     // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
-    val responseStream: Option[(fs2.Stream[IO, Byte], Option[Long])] = response.body.toOption map {
+    val responseStream: Option[(fs2.Stream[IO, Byte], Option[Long])] = response.body.toOption.asInstanceOf[Option[js.Any]] map {
       case v: js.Array[_] => streamFromJsIterable(v)          -> Some(v.length)
       case v: Uint8Array  => streamFromJsIterable(v)          -> Some(v.length)
       case v: js.Object   => // matching on `sjsdom.ReadableStream[_]` doesn't compile

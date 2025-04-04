@@ -259,8 +259,10 @@ object Connection extends ConnectionTrait {
       StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
 
     // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
-    val responseBody = response.body.toOption match {
-      case Some(v: js.Array[_]) => contentFromJsIterable(v)
+    // `asInstanceOf[Option[js.Any]]` to avoid incorrect "fruitless type test":
+    // `Array` and `Uint8Array` are different, the produced `instanceof` is correct
+    val responseBody = response.body.toOption.asInstanceOf[Option[js.Any]] match {
+      case Some(v: js.Array[_]) => contentFromJsIterable(v);
       case Some(v: Uint8Array)  => contentFromJsIterable(v)
       case _                    => warn("unrecognized response body type, considering empty body"); StreamedContent.Empty
     }

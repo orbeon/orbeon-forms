@@ -71,7 +71,7 @@
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
-                <xf:instance id="i">
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <local>
                         <pdfs/>
                     </local>
@@ -125,7 +125,7 @@
 
                 <xf:var name="i" value="instance()"/>
 
-                <xf:instance id="pdf-template" xxf:readonly="true">
+                <xf:instance id="pdf-template" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <pdf mediatype="" filename="" size="" name="" lang=""/>
                 </xf:instance>
 
@@ -141,7 +141,6 @@
             <xf:group id="container" appearance="xxf:internal">
 
                 <!-- Bindings specified on control -->
-                <xf:var name="form"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
                 <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-pdf-dialog">

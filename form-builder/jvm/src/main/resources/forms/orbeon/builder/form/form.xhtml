@@ -921,7 +921,34 @@
                 resources-ref="$form-resources"
                 fr-resources-ref="$fr-resources"/>
 
-            <fb:dialog-control-settings   id="dialog-control-settings"   ref="$form"      resources-ref="$form-resources"/>
+            <fb:dialog-control-settings
+                id="dialog-control-settings"
+                ref="$form"
+                resources-ref="$form-resources">
+                <!-- Load PDF templates field names when asked -->
+                <!-- https://github.com/orbeon/orbeon-forms/issues/6932 -->
+                <xf:action
+                    event="fb-process-pdf-template-field-names"
+                    if="empty(instance('pdf-field-names-instance')/*)">
+
+                    <xf:action iterate="bind('attachments-bind')/pdf">
+                        <xf:var name="name" value="@filename"/><!-- xxx also name, lang? -->
+                        <xf:var name="url"  value="string(.)"/>
+                        <xf:insert
+                            context="instance('pdf-field-names-instance')"
+                            ref="*"
+                            origin="
+                                xf:element(
+                                    '_',
+                                    (
+                                        xf:attribute('label', $name),
+                                        fbf:findPdfFields($url)/*
+                                    )
+                                )"/>
+                    </xf:action>
+                </xf:action>
+            </fb:dialog-control-settings>
+
             <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>
             <fb:dialog-itemsets           id="dialog-itemsets"                            resources-ref="$form-resources"/>
             <fb:dialog-edit-source        id="dialog-edit-source"        ref="$form"      resources-ref="$form-resources"/>
@@ -966,6 +993,9 @@
                         context="bind('attachments-bind')"
                         ref="*"
                         origin="event('pdf-attachments')"/>
+                    <!-- Clear list of PDF field names when there is a possible change of PDF templates -->
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/6932 -->
+                    <xf:delete ref="instance('pdf-field-names-instance')/*"/>
                 </xf:action>
             </fb:dialog-pdf>
 

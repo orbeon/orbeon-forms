@@ -54,6 +54,9 @@
                 <xf:var name="control"                        value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                      value="frf:currentFormResources()"/>
 
+                <xf:setvalue ref="$i/pdf-field-name/@type"    value="if (xxf:non-blank($control/@fr:pdf-template-field-name)) then 'custom' else 'automatic'"/>
+                <xf:setvalue ref="$i/pdf-field-name"          value="$control/@fr:pdf-template-field-name"/>
+
                 <!-- Split out classes -->
                 <xf:var name="standard-classes"               value="'fr-attachment', 'fr-static-attachment'"/>
                 <xf:var name="control-classes"                value="xxf:split($control/@fb:class)"/>
@@ -458,6 +461,14 @@
                         <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                         <xf:delete if="count($classes) = 0" ref="$control/@fb:class"/>
                         <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('fb:class', string-join($classes, ' '))"/>
+                        <!-- Write custom PDF field name -->
+                        <xf:delete
+                            if="$i/pdf-field-name/@type = 'automatic' or xxf:is-blank($i/pdf-field-name)"
+                            ref="$control/@fr:pdf-template-field-name"/>
+                        <xf:insert
+                            context="$control"
+                            if="$i/pdf-field-name/@type = 'custom' and xxf:non-blank($i/pdf-field-name)"
+                            origin="xf:attribute('fr:pdf-template-field-name', $i/pdf-field-name)"/>
                         <!-- Write autocomplete attribute -->
                         <xf:var name="autocomplete" value="xxf:trim($i/autocomplete-attribute)"/>
                         <xf:delete if="$autocomplete  = ''" ref="$control/@autocomplete"/>
@@ -756,6 +767,7 @@
                         <control-local-name/>
                         <control-mediatype/>
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
+                        <pdf-field-name type="automatic"/>
 
                         <fr-index           enabled=""/>
                         <fr-summary-show    enabled="" role-required="" require-role-constraint="" legacy="">
@@ -1431,9 +1443,36 @@
                                     <fr:grid>
                                         <xh:tr>
                                             <xh:td>
-                                                <xf:output value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
+                                                <xf:select1 ref="pdf-field-name/@type" appearance="full xxf:horizontal">
                                                     <xf:label ref="$resources/dialog-control-settings/pdf-field-name/label"/>
+                                                    <xf:itemset ref="$resources/dialog-control-settings/pdf-field-name/item">
+                                                        <xf:label ref="."/>
+                                                        <xf:value ref="if (@id = 0) then 'automatic' else if (@id = 1) then 'custom' else error()"/>
+                                                    </xf:itemset>
+                                                </xf:select1>
+                                                <xf:output ref="pdf-field-name[@type = 'automatic']" value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
+                                                    <xf:label appearance="minimal">automatic</xf:label>
                                                 </xf:output>
+                                                <fr:open-select1 appearance="minimal" ref="$i/pdf-field-name[@type = 'custom']">
+                                                    <xf:label appearance="minimal">custom</xf:label>
+                                                    <xf:itemset ref="xxf:instance('pdf-field-names-instance')//(_ | field)">
+                                                        <xf:label
+                                                            ref="
+                                                                (
+                                                                    @label,
+                                                                    if (empty(@alternate-field-name)) then
+                                                                         @fully-qualified-name
+                                                                    else
+                                                                       concat(@alternate-field-name, ' (', @fully-qualified-name, ')')
+                                                                )[1]"/>
+                                                        <xf:value ref="@fully-qualified-name"/>
+                                                    </xf:itemset>
+                                                    <!-- https://github.com/orbeon/orbeon-forms/issues/6932 -->
+                                                    <xf:dispatch
+                                                        event="xforms-enabled"
+                                                        name="fb-process-pdf-template-field-names"
+                                                        targetid="fb-dialog-control-settings"/>
+                                                </fr:open-select1>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>

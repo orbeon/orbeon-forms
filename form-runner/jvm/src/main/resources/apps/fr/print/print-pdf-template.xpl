@@ -81,14 +81,6 @@
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
-    <!-- Create mapping file -->
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#xhtml-data"/>
-        <p:input name="parameters" href="#parameters"/>
-        <p:input name="config" href="print-pdf-template.xsl"/>
-        <p:output name="data" id="mapping"/>
-    </p:processor>
-
     <!-- Obtain original form document -->
     <p:processor name="oxf:scope-generator">
         <p:input name="config">
@@ -98,6 +90,15 @@
             </config>
         </p:input>
         <p:output name="data" id="form-document"/>
+    </p:processor>
+
+    <!-- Create mapping file -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="data"       href="#xhtml-data"/>
+        <p:input  name="form"       href="#form-document"/>
+        <p:input  name="parameters" href="#parameters"/>
+        <p:input  name="config"     href="print-pdf-template.xsl"/>
+        <p:output name="data"       id="mapping"/>
     </p:processor>
 
     <!-- Call up persistence layer to obtain the PDF file -->

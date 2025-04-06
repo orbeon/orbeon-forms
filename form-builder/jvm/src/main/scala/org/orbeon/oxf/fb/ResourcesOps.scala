@@ -27,6 +27,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 
+
 trait ResourcesOps extends BaseOps {
 
   val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
@@ -320,8 +321,5 @@ trait ResourcesOps extends BaseOps {
   }
 
   def getAllControlsWithIds(implicit ctx: FormBuilderDocContext): NodeColl =
-    FormRunner.getAllControlsWithIds filterNot { elem =>
-      // https://github.com/orbeon/orbeon-forms/issues/4786
-      FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
-    }
+    FormRunner.getAllControlsWithIdsExcludeContainers
 }

@@ -22,3 +22,4 @@ object FormBuilder
     with AlertsAndConstraintsOps
     with BindingOps
     with ActionsOps
+    with PdfOps

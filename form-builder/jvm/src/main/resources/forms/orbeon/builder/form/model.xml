@@ -1225,4 +1225,10 @@
         <xf:bind ref="redo-trigger" readonly="$dialog-opened or empty($undo/redos/*)"/>
     </xf:bind>
 
+    <!-- List of PDF templates field names -->
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6932 -->
+    <xf:instance id="pdf-field-names-instance">
+        <_/>
+    </xf:instance>
+
 </xf:model>

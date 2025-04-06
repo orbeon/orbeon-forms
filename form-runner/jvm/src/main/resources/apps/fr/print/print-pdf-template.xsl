@@ -29,7 +29,10 @@
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="data"       select="/*" as="element()"/>
+    <xsl:variable name="form"       select="doc('input:form')/*" as="element()"/>
     <xsl:variable name="parameters" select="doc('input:parameters')/*" as="element()"/>
+
+    <xsl:variable name="control-name-to-field-name-map"  select="frf:getControlsMap($form)"/>
 
     <xsl:variable
         name="is-not-a-control-classes"
@@ -119,7 +122,7 @@
 
                 <xsl:variable
                     name="pdf-field-name"
-                    select="frf:buildPDFFieldNameFromHTML($control)"/>
+                    select="frf:buildPDFFieldNameFromHTML($control, $control-name-to-field-name-map)"/>
 
                 <xsl:if test="$pdf-field-name">
 

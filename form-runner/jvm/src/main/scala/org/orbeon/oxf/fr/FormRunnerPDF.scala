@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.fr
 
-import java.util as ju
+import org.orbeon.oxf.fr.XMLNames.FR
 
+import java.util as ju
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.URLFinder
 import org.orbeon.saxon.function.{PropertiesStartsWith, Property}
@@ -68,29 +69,58 @@ trait FormRunnerPDF {
     expressionOpt.orNull
   }
 
-  // Build a PDF control id from the given HTML control
+  // Return a map of control names to their custom PDF field name, if present
+  //@XPathFunction
+  def getControlsMap(inDoc: NodeInfo): ju.Map[String, String] = {
+
+    implicit val ctx: FormRunnerDocContext = new InDocFormRunnerDocContext(inDoc)
+
+    val mapping =
+      for {
+        control      <- FormRunner.getAllControlsWithIdsExcludeContainers
+        pdfFieldName <- control.attValueOpt(FR -> "pdf-template-field-name").flatMap(_.trimAllToOpt)
+        controlName  = FormRunner.controlNameFromId(control.id)
+      } yield {
+        controlName -> pdfFieldName
+      }
+
+    mapping.toMap.asJava
+  }
+
+  // Build a PDF control id from the given HTML control.
   // See also `findPdfFieldName`.
   //@XPathFunction
-  def buildPDFFieldNameFromHTML(control: NodeInfo): String = {
+  def buildPDFFieldNameFromHTML(
+     htmlControlElem: NodeInfo,
+     controlsMap    : ju.Map[String, String]
+  ): String = {
+
+    def findControlName(e: NodeInfo): Option[String] =
+      XFormsId.getStaticIdFromId(e.id).trimAllToOpt.flatMap(FormRunner.controlNameFromIdOpt)
+
+    val htmlControlName = findControlName(htmlControlElem)
+
+    def fromControlMap: Option[String] =
+      htmlControlName.flatMap(name => Option(controlsMap.get(name)))
 
     def isContainer(e: NodeInfo) = {
       val classes = e.attClasses
       classes("xbl-fr-section") || (classes("xbl-fr-grid") && (e descendant "table" exists (_.attClasses("fr-repeat"))))
     }
 
-    def findControlName(e: NodeInfo) =
-      XFormsId.getStaticIdFromId(e.id).trimAllToOpt flatMap FormRunner.controlNameFromIdOpt
-
     def ancestorContainers(e: NodeInfo) =
-      control ancestor * filter isContainer reverse
+      htmlControlElem ancestor * filter isContainer reverse
 
     def suffixAsList(id: String) =
       XFormsId.getEffectiveIdSuffix(id).trimAllToOpt.toList
 
     // This only makes sense if we are passed a control with a name
-    findControlName(control) map { controlName =>
-      ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString PdfFieldSeparator
-     } orNull
+    def fromControlName: Option[String] =
+      htmlControlName map { controlName =>
+        ((ancestorContainers(htmlControlElem) flatMap findControlName) :+ controlName) ++ suffixAsList(htmlControlElem.id) mkString PdfFieldSeparator
+      }
+
+    fromControlMap.orElse(fromControlName).orNull
   }
 
   // Used by:

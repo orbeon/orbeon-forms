@@ -757,7 +757,7 @@ object FormBuilderXPathApi {
   def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant *                   count FormRunner.isSectionTemplateContent
 
   def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count (! FormRunner.IsContainer(_))
+  def countAllNonContainers(inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIdsExcludeContainers(new InDocFormRunnerDocContext(inDoc)).size
   def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
@@ -1247,6 +1247,10 @@ object FormBuilderXPathApi {
 
     countOfUpdatedValues
   }
+
+  //@XPathFunction
+  def findPdfFields(pathOrTmpFileUri: String): NodeInfo =
+    FormBuilder.findPdfFields(pathOrTmpFileUri)
 
   //@XPathFunction
   def controlNameCompletionsJson(text: String, limit: Int, updates: String): String = {

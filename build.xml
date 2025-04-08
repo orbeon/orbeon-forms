@@ -142,7 +142,7 @@
             <rule pattern="org.relaxng.datatype.**" result="org.orbeon.msv.relaxng.datatype.@1"/>
         </jarjar>
     </target>
-
+    
     <target name="xforms-filter-jar" depends="war-common">
 <!--    <target name="xforms-filter-jar" depends="prepare">-->
 
@@ -183,6 +183,11 @@
             -dontwarn com.google.errorprone.**
             -dontwarn org.jspecify.annotations.**
             -dontwarn scala.runtime.Statics
+            <!--
+                FIXME: ProGuard complains about this since the upgrade of fs2-core, fs2-io to 3.12.0:
+                 `Warning: cats.effect.IOFiberConstants: can't find referenced method 'boolean invokeExact(java.lang.Thread)' in library class java.lang.invoke.MethodHandle`
+             -->
+            -dontwarn java.lang.invoke.MethodHandle
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
@@ -299,6 +304,11 @@
             -dontwarn com.google.errorprone.**
             -dontwarn org.jspecify.annotations.**
             -dontwarn scala.runtime.Statics
+            <!--
+                FIXME: ProGuard complains about this since the upgrade of fs2-core, fs2-io to 3.12.0:
+                 `Warning: cats.effect.IOFiberConstants: can't find referenced method 'boolean invokeExact(java.lang.Thread)' in library class java.lang.invoke.MethodHandle`
+             -->
+            -dontwarn java.lang.invoke.MethodHandle
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 

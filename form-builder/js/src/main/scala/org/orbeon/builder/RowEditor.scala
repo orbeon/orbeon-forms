@@ -65,7 +65,7 @@ object RowEditor {
   )
 
   // Position row editor
-  Position.onUnderPointerChange {
+  Position.onUnderPointerChange(() => {
     withCurrentGridBody { currentGridBody =>
 
       case class TopBottom(top: Double, bottom: Double)
@@ -132,7 +132,7 @@ object RowEditor {
         positionElWithClass(RowEditor.InsertBelow.className, e => rowBottom - e.height())
       })
     }
-  }
+  })
 
   BlockCache.onExitFbMainOrOffsetMayHaveChanged { () =>
     rowEditorContainer.hide()

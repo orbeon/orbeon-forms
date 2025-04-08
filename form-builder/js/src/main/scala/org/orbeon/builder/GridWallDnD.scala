@@ -249,7 +249,7 @@ object GridWallDnD {
         dndShadowOpt = None
       }
 
-      Position.onUnderPointerChange {
+      Position.onUnderPointerChange(() => {
         dndShadowOpt.foreach { dndShadow =>
           startCellOpt.foreach { case StartCell(_, startSide, _) =>
             DndWall.wallOrientation(startSide) match {
@@ -266,7 +266,7 @@ object GridWallDnD {
             }
           }
         }
-      }
+      })
     }
 
     // Handle D&D

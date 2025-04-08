@@ -21,8 +21,10 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.AjaxClient.AjaxResponseDetails
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.Events
-import org.scalajs.dom.{document, window}
+import org.scalajs.dom.{DocumentReadyState, document, html, window}
 import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.orbeon.web.DomSupport
+import org.orbeon.web.DomSupport.DomReadyState
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -55,11 +57,9 @@ object Position {
   }
 
   // Calls listener when what is under the pointer has potentially changed
-  def onUnderPointerChange(fn: => Unit): Unit = {
-    dom.document.addEventListener("mousemove", (_: dom.Event) => fn)
-    // Resizing the window might change what is under the pointer the last time we saw it in the window
-    dom.window.addEventListener("resize", (_: dom.Event) => fn)
-    AjaxClient.ajaxResponseProcessed.add(_ => fn)
+  def onUnderPointerChange(fn: () => Unit): Unit = {
+    dom.document.addEventListener("mousemove", (_: dom.Event) => fn())
+    onOffsetMayHaveChanged(fn)
   }
 
   // Call listener when anything on the page that could change element positions happened
@@ -70,6 +70,18 @@ object Position {
 
     // Can be removed once we only support Safari 14, which implements the `ResizeObserver`
     dom.window.addEventListener("resize", (_: dom.Event) => fn)
+
+    DomSupport.onElementFoundOrAdded(document.body, "img", (elem: html.Element) => {
+      val image = elem.asInstanceOf[html.Image]
+      // Calling the listener before all the CSS has been loaded can cause errors
+      val fnIfComplete = () => if (document.readyState == DocumentReadyState.complete) fn()
+      if (image.complete) {
+        fnIfComplete()
+      } else {
+        image.addEventListener("load",  (_: dom.Event) => fnIfComplete())
+        image.addEventListener("error", (_: dom.Event) => fnIfComplete())
+      }
+    })
 
     // `ResizeObserver` catches window resizes, but also Form Builder being moved or resized by the embedding app
     Events.orbeonLoadedEvent.subscribe(() => {
@@ -102,7 +114,7 @@ object Position {
   ): Unit = {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
-    onUnderPointerChange {
+    onUnderPointerChange(() => {
       val top  = pointerPos.top  + Position.scrollTop()
       val left = pointerPos.left + Position.scrollLeft()
       val dialogVisible = document.querySelectorAll("dialog[open]").length > 0
@@ -113,7 +125,7 @@ object Position {
         else
           findInCache(containerCache, top, left)
       notifyChange(newContainer)
-    }
+    })
   }
 
   // Returns a function, which is expected to be called every time the value changes passing the new value, and which

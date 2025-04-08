@@ -180,11 +180,13 @@
                                     <xf:label appearance="minimal">Name</xf:label>
                                     <xf:itemset ref="$i/pdf-templates/pdf">
                                         <xf:label ref="
-                                            let $name := @name[xxf:non-blank()],
-                                                $lang := @lang[xxf:non-blank()],
+                                            let $filename  := @filename[xxf:non-blank()],
+                                                $name      := @name[xxf:non-blank()],
+                                                $lang      := @lang[xxf:non-blank()],
+                                                $name-part := if (exists($name)) then concat('(', name, ')') else (),
                                                 $lang-part := if (exists($lang)) then concat('(', $lang, ')') else ()
                                             return
-                                                string-join(($name, $lang-part), ' ')"/>
+                                                string-join(($filename, $name-part, $lang-part), ' ')"/>
                                         <xf:copy ref="."/>
                                     </xf:itemset>
                                 </xf:select1>

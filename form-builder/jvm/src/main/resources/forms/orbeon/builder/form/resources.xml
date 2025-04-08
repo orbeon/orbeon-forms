@@ -1861,7 +1861,7 @@
             <label>Editer</label>
         </edit>
         <classes>
-            <label>Classes CSS personalisées</label>
+            <label>Classes CSS personnalisées</label>
         </classes>
         <autocomplete>
             <label>Attribut autocomplete</label>
@@ -2500,11 +2500,11 @@
                 <hint/>
             </use-paging>
             <custom-iteration-name>
-                <label>Activer un nom de répétition personalisé</label>
+                <label>Activer un nom de répétition personnalisé</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>Nom de répétition personalisé</label>
+                <label>Nom de répétition personnalisé</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint/>
             </iteration-name>
@@ -3036,10 +3036,10 @@
         <dialog-workflow>
             <label>Workflow et Permissions</label>
 
-            <custom-operations>Personaliser les opérations pour le formulaire courant</custom-operations>
+            <custom-operations>Personnaliser les opérations pour le formulaire courant</custom-operations>
             <operation-label>Libellé</operation-label>
             <predefined-label>Prédéfini</predefined-label>
-            <custom-label>Personalisé</custom-label>
+            <custom-label>Personnalisé</custom-label>
             <available-to>Disponible à</available-to>
             <availability-to-anyone>Toute personne</availability-to-anyone>
             <availability-to-no-one>Personne</availability-to-no-one>

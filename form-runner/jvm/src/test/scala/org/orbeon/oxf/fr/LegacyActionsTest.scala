@@ -14,7 +14,7 @@ class LegacyActionsTest
 
   describe("Form Runner actions in legacy format") {
 
-    describe("#6544: Legacy action causes error with $fr-mode variable") {
+    describe("#6544: Legacy action causes error with `$fr-mode` variable") {
 
       val (processorService, docOpt, _) =
         runFormRunner("issue", "6544", "new", initialize = true)

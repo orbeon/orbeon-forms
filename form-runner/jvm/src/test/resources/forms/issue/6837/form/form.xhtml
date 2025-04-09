@@ -17,12 +17,14 @@
     <xh:head>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
+            <xf:var name="my-model-var" value="42"/>
+
             <fr:listener version="2018.2" events="activated" controls="navigate"
                          actions="navigate-to-url"/>
 
             <fr:action name="navigate-to-url" version="2018.2">
                 <fr:alert message="Navigating to URL: {$url}"/>
-                <fr:control-setvalue control="out" value="$url"/>
+                <fr:control-setvalue control="out" value="concat($url, '?p=', $my-model-var)"/>
                 <fr:navigate location="{$url}"/>
             </fr:action>
 

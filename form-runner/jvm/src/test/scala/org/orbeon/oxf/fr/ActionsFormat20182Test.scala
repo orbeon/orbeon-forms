@@ -205,7 +205,7 @@ class ActionsFormat20182Test
       }
     }
 
-    describe("#6837: control resolution using variables") {
+    describe("#6837/#6943: control resolution using variables") {
 
       val (processorService, docOpt, _) =
         runFormRunner("issue", "6837", "new", initialize = true)
@@ -219,8 +219,8 @@ class ActionsFormat20182Test
             activateControlWithEvent(resolveObject[XFormsControl]("navigate-control", indexes = List(1)).get.effectiveId)
             activateControlWithEvent(resolveObject[XFormsControl]("navigate-control", indexes = List(2)).get.effectiveId)
 
-            assert("https://www.orbeon.com/" == resolveObject[XFormsValueControl]("out-control", indexes = List(1)).get.getValue(EventCollector.Throw))
-            assert("https://doc.orbeon.com/" == resolveObject[XFormsValueControl]("out-control", indexes = List(2)).get.getValue(EventCollector.Throw))
+            assert("https://www.orbeon.com/?p=42" == resolveObject[XFormsValueControl]("out-control", indexes = List(1)).get.getValue(EventCollector.Throw))
+            assert("https://doc.orbeon.com/?p=42" == resolveObject[XFormsValueControl]("out-control", indexes = List(2)).get.getValue(EventCollector.Throw))
           }
         }
       }

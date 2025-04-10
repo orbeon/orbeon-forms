@@ -11,6 +11,7 @@ import org.scalajs.dom.html.Element
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichIterableOnce, JSRichOption}
+import scala.scalajs.js.|
 
 
 // Form Runner-specific facade as we don't want to expose internal `xforms.Form` members
@@ -52,32 +53,26 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   // - returns `undefined` if
   //   - the control is not found
   //   - the index is not in range
-  //   - the control is an XBL component that doesn't support the JavaScript lifecycle
+  //   - the control is an XBL component which doesn't support the JavaScript lifecycle
   // - returns a `Promise` that resolves when the server has processed the value change
-  def setControlValue(controlName: String, controlValue: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]] = {
-
-    val elemOpt =
-      findControlsByName(controlName).lift(index.getOrElse(0)).flatMap {
-        case e if e.classList.contains("xbl-fr-dropdown-select1") =>
-          e.querySelectorOpt(".xforms-select1")
-        case e if XFormsXbl.isJavaScriptLifecycle(e) =>
-          Some(e)
-        case e if XFormsXbl.isComponent(e) =>
-          // NOP, as the server will reject the value anyway in this case
-          None
-        case e =>
-          Some(e)
-      }
-
-    elemOpt.map(DocumentAPI.setValue(_, controlValue, form.elem, waitForServer = true)).orUndefined
-  }
+  def setControlValue(
+    controlName : String,
+    controlValue: String | Int | Boolean,
+    index       : js.UndefOr[Int] = js.undefined
+  ): js.UndefOr[js.Promise[Unit]] =
+    findControlMaybeNested(controlName, index)
+      .map(DocumentAPI.setValue(_, controlValue.toString, form.elem, waitForServer = true))
+      .orUndefined
 
   // - returns `undefined` if
   //   - the control is not found
   //   - the index is not in range
   //   - the control is not a trigger or input control
   // - returns a `Promise` that resolves when the server has processed the activation
-  def activateControl(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]] =
+  def activateControl(
+    controlName: String,
+    index      : js.UndefOr[Int] = js.undefined
+  ): js.UndefOr[js.Promise[Unit]] =
     findControlsByName(controlName).lift(index.getOrElse(0)).map { e =>
 
       val elemToClickOpt =
@@ -90,7 +85,8 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
 
       elemToClickOpt.foreach(_.click())
       AjaxClient.allEventsProcessedF("activateControl").toJSPromise
-    } .orUndefined
+    }
+    .orUndefined
 
   // - returns `undefined` if
   //   - the control is not found
@@ -98,7 +94,23 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   //   - the control doesn't support returning a value
   // - TODO: Array[String] for multiple selection controls
   def getControlValue(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[String] =
-    findControlsByName(controlName).lift(index.getOrElse(0)).orUndefined.flatMap { e =>
-      DocumentAPI.getValue(e, form.elem)
+    findControlMaybeNested(controlName, index)
+      .flatMap(DocumentAPI.getValue(_, form.elem).toOption)
+      .orUndefined
+
+  private def findControlMaybeNested(
+    controlName: String,
+    index      : js.UndefOr[Int] = js.undefined
+  ): Option[Element] =
+    findControlsByName(controlName).lift(index.getOrElse(0)).flatMap {
+      case e if e.classList.contains("xbl-fr-dropdown-select1") =>
+        e.querySelectorOpt(".xforms-select1")
+      case e if XFormsXbl.isJavaScriptLifecycle(e) =>
+        Some(e)
+      case e if XFormsXbl.isComponent(e) =>
+        // NOP, as the server will reject the value anyway in this case
+        None
+      case e =>
+        Some(e)
     }
 }

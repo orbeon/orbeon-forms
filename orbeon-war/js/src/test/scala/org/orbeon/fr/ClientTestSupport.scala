@@ -59,7 +59,7 @@ trait FormRunnerFormTrait extends js.Object {
   def isFormDataSafe(): Boolean
   def activateProcessButton(buttonName: String): Unit
   def findControlsByName(controlName: String): js.Array[html.Element]
-  def setControlValue(controlName: String, controlValue: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]]
+  def setControlValue(controlName: String, controlValue: String | Int, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]]
   def activateControl(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]]
   def getControlValue(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[String]
 }

@@ -36,7 +36,7 @@ class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSup
   }
 
   describe("Form Runner API client tests") {
-    it("must find form controls by name") { _ =>
+    it("must find form controls by name, set values, get values, and activate") { _ =>
       withFormReady("control-names") { case FormRunnerWindow(_, formRunnerApi) =>
         async {
 
@@ -70,6 +70,11 @@ class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSup
           assert(form.getControlValue("comments", 1).contains("Hello world, again!"))
 
           assert(form.findControlsByName("comments").map(_.id).sameElements(List("message-section≡grid-3-grid≡comments-control⊙1", "message-section≡grid-3-grid≡comments-control⊙2")))
+
+          // Single selection control with `Int`
+          assert(form.getControlValue("topic").contains("0"))
+          await(form.setControlValue("topic", 3).map(_.toFuture).get)
+          assert(form.getControlValue("topic").contains("3"))
         }
       }
     }

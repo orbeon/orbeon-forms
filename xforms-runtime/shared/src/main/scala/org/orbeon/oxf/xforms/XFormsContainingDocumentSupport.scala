@@ -74,7 +74,7 @@ object XFormsContainingDocumentSupport {
 
     implicit val ec: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
-    LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
+    LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid, "sequence" -> params.sequenceOpt.toString))
 
     XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
       case LockResponse.Success(lock) =>
@@ -84,8 +84,9 @@ object XFormsContainingDocumentSupport {
           "got document lock",
           LifecycleLogger.basicRequestDetailsAssumingRequest(
             List(
-              "uuid" -> params.uuid,
-              "wait" -> LifecycleLogger.formatDelay(System.currentTimeMillis)
+              "uuid"     -> params.uuid,
+              "sequence" -> params.sequenceOpt.toString,
+              "wait"     -> LifecycleLogger.formatDelay(System.currentTimeMillis)
             )
           )
         )
@@ -109,10 +110,10 @@ object XFormsContainingDocumentSupport {
             Failure(SessionExpiredException("Document not found in store. Unable to process incoming request."))
         }
       case LockResponse.Busy =>
-        LifecycleLogger.eventAssumingRequest("xforms", "document lock busy (zero timeout)", List("uuid" -> params.uuid))
+        LifecycleLogger.eventAssumingRequest("xforms", "document lock busy (zero timeout)", List("uuid" -> params.uuid, "sequence" -> params.sequenceOpt.toString))
         Success(block(None))
       case LockResponse.Timeout =>
-        LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" -> params.uuid))
+        LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" -> params.uuid, "sequence" -> params.sequenceOpt.toString))
         Success(block(None))
       case LockResponse.Failure(t) =>
         Failure(t)

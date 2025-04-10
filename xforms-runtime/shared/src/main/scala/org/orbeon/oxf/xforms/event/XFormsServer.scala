@@ -264,7 +264,7 @@ object XFormsServer {
           } else {
             // This is not allowed to happen
             // Keep the document around but return an `Failure`
-            Failure(throw new OXFException("Got unexpected request sequence number"))
+            Failure(throw new OXFException(s"Got unexpected request sequence number. Expected `$expectedSequenceNumber`, got `${requestParameters.sequenceOpt}`"))
           }
         case None =>
           // This is most likely the case of a retry if the initial request was long-running

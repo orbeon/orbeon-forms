@@ -134,7 +134,8 @@ param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-ver
             subject               = "Orbeon Forms Confirmation",
             messageContentAsRegex = MessageContent(
               content =
-                """^<html><body><div><strong>HTML</strong> email bodyparam1: Control: param1<br>""" +
+                """^<html><body><div><strong>HTML</strong> email body:<br>""" +
+                """param1: Control: param1<br>""" +
                 """param2: Control: param2-suffix<br>""" +
                 """param3: <ul><li>Email 1: email1@from\.control</li><li>Email 2: email2@from\.control</li>""" +
                 """<li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li>""" +
@@ -155,7 +156,21 @@ param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-ver
               html    = true
             )
           )
-        )
+        ),
+        "6" -> List(
+          ExpectedEmailContent(
+            headers               = Set(
+              (HeaderName.From, "email1@from.control"),
+              (HeaderName.To,   "email2@from.control")
+            ),
+            subject               = "Orbeon Forms Confirmation",
+            messageContentAsRegex = MessageContent(
+              content = """^Email body:
+param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li><li>Email 5: email5@from\.control</li><li>Custom 1: Control: custom1</li><li>Param 2: Control: param2</li></ul>$""",
+              html    = false
+            )
+          )
+        ),
       )
 
       withTestExternalContext { implicit ec =>

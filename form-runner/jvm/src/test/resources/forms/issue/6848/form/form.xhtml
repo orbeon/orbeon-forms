@@ -130,8 +130,21 @@ param14: {$param14}</body>
 									<header name="from" type="control-value">email-1</header>
 									<header name="to" type="control-value">email-2</header>
 								</headers>
-								<body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email bodyparam1: {$param1}&lt;br&gt;param2: {$param2}&lt;br&gt;param3: {$param3}&lt;br&gt;param4: {$param4}&lt;br&gt;param5: {$param5}&lt;br&gt;param6: {$param6}&lt;br&gt;param7: {$param7}&lt;br&gt;param8: {$param8}&lt;br&gt;param9: {$param9}&lt;br&gt;param10: {$param10}&lt;br&gt;param11: {$param11}&lt;br&gt;param12: {$param12}&lt;br&gt;param13: {$param13}&lt;br&gt;param14: {$param14}&lt;/div&gt;</body>
+								<body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email body:&lt;br&gt;param1: {$param1}&lt;br&gt;param2: {$param2}&lt;br&gt;param3: {$param3}&lt;br&gt;param4: {$param4}&lt;br&gt;param5: {$param5}&lt;br&gt;param6: {$param6}&lt;br&gt;param7: {$param7}&lt;br&gt;param8: {$param8}&lt;br&gt;param9: {$param9}&lt;br&gt;param10: {$param10}&lt;br&gt;param11: {$param11}&lt;br&gt;param12: {$param12}&lt;br&gt;param13: {$param13}&lt;br&gt;param14: {$param14}&lt;/div&gt;</body>
 								<exclude-from-all-control-values></exclude-from-all-control-values>
+							</template>
+							<template name="6">
+								<headers>
+									<header name="from" type="control-value">email-1</header>
+									<header name="to" type="control-value">email-2</header>
+								</headers>
+								<body>Email body:
+param3: {$param3}</body>
+								<exclude-from-all-control-values>
+									<control type="control-value">email-2</control>
+									<control type="control-value">custom-2</control>
+									<control type="control-value">param-1</control>
+								</exclude-from-all-control-values>
 							</template>
 						</templates>
 						<parameters>
@@ -243,8 +256,8 @@ param14: {$param14}</body>
 	<xh:body>
 		<fr:view>
 			<fr:body
-				xmlns:p="http://www.orbeon.com/oxf/pipeline"
 				xmlns:xbl="http://www.w3.org/ns/xbl"
+				xmlns:p="http://www.orbeon.com/oxf/pipeline"
 				xmlns:oxf="http://www.orbeon.com/oxf/processors">
 				<fr:section id="section-1-section" bind="section-1-bind">
 					<fr:grid id="grid-1-grid" bind="grid-1-bind">

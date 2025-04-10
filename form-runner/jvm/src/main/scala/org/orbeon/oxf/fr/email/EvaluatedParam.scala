@@ -51,10 +51,12 @@ object EvaluatedParam {
       case EmailMetadata.Param.ControlValueParam(_, controlName) =>
         // Value is not formatted at all. Would need to be formatted properly like we should do with #3627.
         // TODO: add way to configure values separator
+        // TODO: add support for section templates in Email Settings UI (Control Value dropdown)
         EvaluatedParam(FormRunner.controlValueAsStrings(controlName, sectionOpt = None).mkString(", "))
 
       case EmailMetadata.Param.AllControlValuesParam(_) =>
-        // TODO: add support for section templates
+        // Control values from section templates will be included
+        // TODO: add support for section templates in Email Settings UI (Exclude from All Control Values dropdown)
         AllControls(controlsToExclude = template.controlsToExcludeFromAllControlValues.map(_.controlName))
 
       case param: EmailMetadata.TokenLinkParam =>

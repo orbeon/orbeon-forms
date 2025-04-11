@@ -309,6 +309,9 @@
     <property as="xs:string"  name="oxf.fr.pdf.format.output-string">
         .//*[tokenize(@class, '\s+') = 'xforms-output-output']/string()
     </property>
+    <property as="xs:string"  name="oxf.fr.pdf.format.output-field">
+        .//*[tokenize(@class, '\s+') = 'xforms-field']/string()
+    </property>
     <property as="xs:string"  name="oxf.fr.pdf.format.textarea">
         .//textarea/string()
     </property>
@@ -364,7 +367,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                 value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.dateTime"             value="input-dateTime"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.boolean"              value="select-value"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-output.*"                   value="output-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-output.*"                   value="output-field"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-textarea.*"                 value="textarea"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                   value="select-labels-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                  value="select-label"/>

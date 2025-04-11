@@ -153,9 +153,9 @@ trait ClientTestSupport {
         |${network.map(n => s"--network=$n ").getOrElse("")}-it
         |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon:delegated
         |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
-        |-v $$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml:$ImageTomcatDir/webapps/orbeon/META-INF/context.xml:delegated
-        |-v $LocalOrbeonResourcesDir:/usr/local/tomcat/webapps/orbeon/WEB-INF/test-resources:delegated
-        |-v $LocalOrbeonResourcesDir/config/$ehcacheFilename:/usr/local/tomcat/webapps/orbeon/WEB-INF/test-resources/config/ehcache.xml:delegated
+        |-v $$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml:$ImageTomcatDir/conf/Catalina/localhost/orbeon.xml:delegated
+        |-v $LocalOrbeonResourcesDir:$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources:delegated
+        |-v $LocalOrbeonResourcesDir/config/$ehcacheFilename:$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/config/ehcache.xml:delegated
         |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml:delegated
         |-v $LocalResourcesDir/tomcat/setenv.sh:$ImageTomcatDir/bin/setenv.sh:delegated
         |-p $port:8080""".stripMargin,

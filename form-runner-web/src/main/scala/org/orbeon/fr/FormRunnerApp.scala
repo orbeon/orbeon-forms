@@ -89,12 +89,14 @@ object FormRunnerApp extends App {
   private def addScrollPadding(htmlElement: html.Element, cssClass: String): Unit = {
     val position = window.getComputedStyle(htmlElement).position
     if (position == "fixed" || position == "sticky") {
-      val resizeObserver = new ResizeObserver(() => {
-        val documentElement = document.documentElementT
-        val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
-        documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
-      })
-      resizeObserver.observe(htmlElement)
+      if (js.typeOf(g.ResizeObserver) != "undefined") { // ResizeObserver isn't implemented in jsdom, used in tests
+        val resizeObserver = new ResizeObserver(() => {
+          val documentElement = document.documentElementT
+          val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
+          documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
+        })
+        resizeObserver.observe(htmlElement)
+      }
     }
   }
 

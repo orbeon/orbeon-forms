@@ -79,7 +79,7 @@ class PdfProductionTest
       )
 
       val (_, content, _) =
-        runFormRunnerReturnContent("issue", "6900", "pdf", documentId = "aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5".some)
+        runFormRunnerReturnContent("orbeon", "pta-remittance", "pdf", documentId = "aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5".some)
 
       withTestExternalContext { _ =>
 

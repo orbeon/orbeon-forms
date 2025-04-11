@@ -19,7 +19,7 @@ class PdfProductionTest
 
     it("automatic PDF must contain metadata and data text") {
 
-      val MetadataWords = List(
+      val ExpectedMetadataMatches = List(
         "Orbeon Demo: Feedback Form",
         "First Name",
         "Last Name",
@@ -31,7 +31,7 @@ class PdfProductionTest
         "Orbeon Demo: Feedback Form 1 / 1"
       )
 
-      val DataWords = List(
+      val ExpectedDataMatches = List(
         "Homer",
         "Simpson",
         "chunkylover53@aol.com",
@@ -53,15 +53,15 @@ class PdfProductionTest
             stripper.getText(pdd)
           }
 
-        MetadataWords.iterator ++ DataWords.iterator foreach { word =>
+        ExpectedMetadataMatches.iterator ++ ExpectedDataMatches.iterator foreach { word =>
           assert(extractedText.contains(word))
         }
       }
     }
 
-    it("PDF template must contain data text") {
+    it("PDF template for PTA form must contain data text") {
 
-      val DataWords = List(
+      val ExpectedMatches = List(
         "Name of PTA Unit: Springfield PTA",
         "Address of Unit: 742 Evergreen Terrace",
         "Unit Number: 12345",
@@ -90,7 +90,7 @@ class PdfProductionTest
             stripper.getText(pdd)
           }
 
-        DataWords.iterator foreach { word =>
+        ExpectedMatches.iterator foreach { word =>
           assert(extractedText.contains(word))
         }
       }

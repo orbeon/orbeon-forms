@@ -64,7 +64,7 @@ object Position {
 
   // Call listener when anything on the page that could change element positions happened
   def onOffsetMayHaveChanged(fn: () => Unit): Unit = {
-    Events.orbeonLoadedEvent.subscribe(fn)
+    Events.orbeonLoadedEvent.subscribe(fn) // TODO: not great for nth embedding of Form Builder
     AjaxClient.ajaxResponseProcessed.add(_ => fn())
     Events.componentChangedLayoutEvent.subscribe(fn)
 

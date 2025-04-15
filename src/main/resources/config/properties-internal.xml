@@ -296,6 +296,9 @@
     <!-- PDF template formatting -->
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
     <!-- NOTE: Can't use xxf:split() in these expressions yet (saxon:evaluate() doesn't find the functions). -->
+    <property as="xs:string"  name="oxf.fr.pdf.format.input-field">
+        (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-input']/input)[1]/@value/string()
+    </property>
     <property as="xs:string"  name="oxf.fr.pdf.format.input-string">
         (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-input']/input)[1]/@value/string()
     </property>
@@ -362,6 +365,7 @@
         .//*[tokenize(@class, '\s+') = 'fr-autocomplete-external-value']/input/@value/string()
     </property>
 
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-pdf-template-field.*"           value="input-field"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.*"                    value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.date"                 value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                 value="input-string"/>

@@ -1,0 +1,28 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xbl:binding
+            id="fr-pdf-template-field"
+            element="
+                fr|pdf-template-field,
+                xf|input[fr|pdf-template = true],
+                xf|input[appearance ~= character-counter][fr|pdf-template = true],
+                xf|textarea[appearance ~= character-counter][fr|pdf-template = true],
+                xf|textarea[appearance ~= 'xxf:autosize'][fr|pdf-template = true],
+                xf|textarea[appearance ~= clipboard-copy][fr|pdf-template = true],
+                xf|output[appearance ~= clipboard-copy][fr|pdf-template = true],
+                fr|us-ein[fr|pdf-template = true]"
+            xxbl:mode="binding"
+            xxbl:container="span">
+        <xbl:template>
+            <!-- Use `xf:input` so that we get default formatting depending on type -->
+            <xf:input ref="xxf:binding('fr-pdf-template-field')"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

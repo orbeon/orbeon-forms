@@ -100,27 +100,53 @@ class PdfProductionTest
     it("PDF template output for most form controls must contain data text") {
 
       val ExpectedMatches = List(
-        "For #5670: test PDF template output",
-        "Michelle",
-        // TODO: Text field with Character Counter
-        // TODO: Text field with Clipboard Copy
-        "Music is an art form whose medium is sound.",
-        "Common elements of music are pitch (which",
-        "Greek µ (mousike)",
-        "From Wikipedia",
-        // TODO: Plain text Area with Resizing
-        // TODO: Plain text Area with Character Counter
-        // TODO: Plain text Area with Clipboard Copy
+        // Text Field
+        "a23599e2da5cd2afca30670a801e465c7993f0ae",
+        // Text Field with Character Counter
+        "1a7f1efa91c4835191b6551376c2ceef93f1b36e",
+        // Text Field with Clipboard Copy
+        "85c20808a5e73558375b86e2ea4ce4e1b3e4c642",
+        // Plain Text Area
+        "Lorem ipsum dolor sit amet, consectetur",
+        "adipiscing elit. Nam condimentum quam ut orci",
+        "efficitur, sit amet elementum nunc lobortis.",
+        "Sed consequat viverra varius. In at turpis",
+        "rutrum, ultricies lorem sed, scelerisque justo.",
+        // Plain Text Area with Character Counter
+        "Nulla pretium, justo at gravida suscipit, mi felis",
+        "malesuada ligula, nec placerat libero felis a",
+        "nibh. Pellentesque fermentum rutrum aliquam.",
+        "Ut eleifend velit id tellus tempor mollis.",
+        // Plain Text Area with Resizing
+        "Pellentesque orci ex, venenatis id nunc non,",
+        "commodo imperdiet magna. Sed faucibus",
+        "enim in nunc laoreet, vitae aliquam neque",
+        "mattis. Duis a nibh et magna auctor maximus",
+        "aliquam nec enim. Nunc convallis laoreet",
+        // Plain Text Area with Clipboard Copy
+        "Sed consectetur ante ut mauris dictum,",
+        "tincidunt tincidunt sapien feugiat. Maecenas",
+        "fermentum sagittis nisl et fringilla. Sed at",
+        "cursus turpis. Aliquam erat volutpat. Aliquam",
+        "erat volutpat. Pellentesque tristique euismod",
+        "sem sed commodo.",
+//        "Music is an art form whose medium is sound.",
+//        "Common elements of music are pitch (which",
+//        "Greek µ (mousike)",
+//        "From Wikipedia",
         // TODO: Formatted Text Area
         // TODO: Explanatory Text
-        "Michelle:info@orbeon.com",
+        // Calculated value
+        "686614dd52e678010d2ad24a5ff04e0160b1fb02",
+        // Calculated value with Clipboard Copy
+        "3dbf71213d81e2e21a15fbdb2426abd650ffb5d5",
         "299,792,458 m/s",
         "$ 10.99",
         "info@orbeon.com",
         "(555) 555-5555",
         "CA - California",
         // TODO: US SSN
-        // TODO: US EIN
+        "00-1234567",
         "4/11/2025",
         "6:29:45 pm",
         // TODO: Date and Time
@@ -131,7 +157,6 @@ class PdfProductionTest
         // TODO: Dropdown with Search
         "Antarctica",
         // TODO: Dynamic Dropdown with Search
-        "For #5670: test PDF template output 1 / 2",
         // TODO: Radio Buttons
         // TODO: Radio Buttons with "Other"
         // TODO: Checkboxes
@@ -140,7 +165,6 @@ class PdfProductionTest
         // TODO: Yes/No Answer
         // TODO: Image Attachment
         // TODO: Handwritten Signature
-        "For #5670: test PDF template output 2 / 2",
       )
 
       val (_, content, _) =

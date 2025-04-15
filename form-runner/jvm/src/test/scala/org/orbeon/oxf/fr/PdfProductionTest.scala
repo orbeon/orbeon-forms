@@ -1,12 +1,13 @@
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.CoreUtils._
 import org.scalatest.funspec.AnyFunSpecLike
+
+import scala.util.chaining.*
 
 
 class PdfProductionTest
@@ -48,9 +49,9 @@ class PdfProductionTest
 
         val extractedText =
           useAndClose(PDDocument.load(content.stream)) { pdd =>
-            val stripper = new PDFTextStripper |!>
-              (_.setSortByPosition(true))
-            stripper.getText(pdd)
+            (new PDFTextStripper)
+              .tap(_.setSortByPosition(true))
+              .pipe(_.getText(pdd))
           }
 
         ExpectedMetadataMatches.iterator ++ ExpectedDataMatches.iterator foreach { word =>
@@ -85,9 +86,73 @@ class PdfProductionTest
 
         val extractedText =
           useAndClose(PDDocument.load(content.stream)) { pdd =>
-            val stripper = new PDFTextStripper |!>
-              (_.setSortByPosition(true))
-            stripper.getText(pdd)
+            (new PDFTextStripper)
+              .tap(_.setSortByPosition(true))
+              .pipe(_.getText(pdd))
+          }
+
+        ExpectedMatches.iterator foreach { word =>
+          assert(extractedText.contains(word))
+        }
+      }
+    }
+
+    it("PDF template output for most form controls must contain data text") {
+
+      val ExpectedMatches = List(
+        "For #5670: test PDF template output",
+        "Michelle",
+        // TODO: Text field with Character Counter
+        // TODO: Text field with Clipboard Copy
+        "Music is an art form whose medium is sound.",
+        "Common elements of music are pitch (which",
+        "Greek µ (mousike)",
+        "From Wikipedia",
+        // TODO: Plain text Area with Resizing
+        // TODO: Plain text Area with Character Counter
+        // TODO: Plain text Area with Clipboard Copy
+        // TODO: Formatted Text Area
+        // TODO: Explanatory Text
+        "Michelle:info@orbeon.com",
+        "299,792,458 m/s",
+        "$ 10.99",
+        "info@orbeon.com",
+        "(555) 555-5555",
+        "CA - California",
+        // TODO: US SSN
+        // TODO: US EIN
+        "4/11/2025",
+        "6:29:45 pm",
+        // TODO: Date and Time
+        // TODO: Dropdown Date
+        // TODO: Fields Date
+        // TODO: Dropdown
+        // TODO: Dropdown with "Other"
+        // TODO: Dropdown with Search
+        "Antarctica",
+        // TODO: Dynamic Dropdown with Search
+        "For #5670: test PDF template output 1 / 2",
+        // TODO: Radio Buttons
+        // TODO: Radio Buttons with "Other"
+        // TODO: Checkboxes
+        // TODO: Scrollable Checkboxes
+        // TODO: Single Checkbox
+        // TODO: Yes/No Answer
+        // TODO: Image Attachment
+        // TODO: Handwritten Signature
+        "For #5670: test PDF template output 2 / 2",
+      )
+
+      val (_, content, _) =
+        runFormRunnerReturnContent("issue", "5670-1", "pdf", documentId = "4d07137a0f4f0f5c70ce68053fe8b8e93e78c7fe".some)
+
+      withTestExternalContext { _ =>
+
+        val extractedText =
+          useAndClose(PDDocument.load(content.stream)) { pdd =>
+            (new PDFTextStripper)
+              .tap(_.setSortByPosition(true))
+              .pipe(_.getText(pdd))
           }
 
         ExpectedMatches.iterator foreach { word =>

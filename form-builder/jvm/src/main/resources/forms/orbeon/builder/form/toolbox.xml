@@ -46,7 +46,6 @@
                         <xxf:show dialog="dialog-form-settings">
                             <xf:property name="for-button-name"                           value="event('for-button-name')"/>
                             <xf:property name="lang"                                      value="$fb-lang"/>
-                            <xf:property name="langs"                                     value="$resources/resource/@xml:lang/string()"/>
                             <xf:property name="mode"                                      value="(event('mode'), 'form-settings')[1]"/>
                             <xf:property name="app"                                       value="bind('application-name-bind')"/>
                             <xf:property name="form"                                      value="bind('form-name-bind')"/>
@@ -419,7 +418,6 @@
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
                                     <xf:property name="lang"  value="$fb-lang"/>
-                                    <xf:property name="langs" value="$resources/resource/@xml:lang/string()"/>
                                     <xf:property name="email" value="bind('email-bind')"/>
                                 </xf:dispatch>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />

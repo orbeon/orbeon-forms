@@ -451,46 +451,11 @@
                     if="not($valid-app-form-params)"
                     dialog="dialog-form-settings">
                 <xf:property name="lang"                                      value="$fb-lang"/>
-                <xf:property name="langs"                                     value="$resources/resource/@xml:lang/string()"/>
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="($requested-app,         bind('application-name-bind'))[1]"/>
                 <xf:property name="form"                                      value="($requested-form,        bind('form-name-bind'))[1]"/>
                 <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $fb-resources/template/untitled-form/string())[1]))"/>
                 <xf:property name="description"                               value="xf:element('description', (xf:attribute('xml:lang', $fb-lang), $requested-description))"/>
-
-                <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>
-                <xf:property name="thumbnail-filename"                        value="bind('thumbnail-bind')/@filename"/>
-                <xf:property name="thumbnail-mediatype"                       value="bind('thumbnail-bind')/@mediatype"/>
-                <xf:property name="thumbnail-size"                            value="bind('thumbnail-bind')/@size"/>
-                <xf:property name="allow-template-use"                        value="bind('allow-template-use-bind')"/>
-                <xf:property name="created-with-version"                      value="bind('created-with-version-bind')"/>
-                <xf:property name="updated-with-versions"                     value="bind('metadata-bind')/updated-with-version/string()"/>
-                <xf:property name="singleton"                                 value="bind('singleton-bind')"/>
-                <xf:property name="attachment-max-size-per-file"              value="bind('attachment-max-size-per-file-bind')"/>
-                <xf:property name="attachment-max-size-aggregate-per-control" value="bind('attachment-max-size-aggregate-per-control-bind')"/>
-                <xf:property name="attachment-max-size-aggregate-per-form"    value="bind('attachment-max-size-aggregate-per-form-bind')"/>
-                <xf:property name="attachment-mediatypes"                     value="bind('attachment-mediatypes-bind')"/>
-                <xf:property name="wizard"                                    value="bind('wizard-bind')"/>
-                <xf:property name="wizard-mode"                               value="bind('wizard-mode-bind')"/>
-                <xf:property name="wizard-subsections-nav"                    value="bind('wizard-subsections-nav-bind')"/>
-                <xf:property name="wizard-subsections-toc"                    value="bind('wizard-subsections-toc-bind')"/>
-                <xf:property name="wizard-separate-toc"                       value="bind('wizard-separate-toc-bind')"/>
-                <xf:property name="wizard-section-status"                     value="bind('wizard-section-status-bind')"/>
-                <xf:property name="labels"                                    value="bind('labels-bind')"/>
-                <xf:property name="hints"                                     value="bind('hints-bind')"/>
-                <xf:property name="data-migration"                            value="bind('data-migration-bind')"/>
-                <xf:property name="grid-tab-order"                            value="bind('grid-tab-order-bind')"/>
-                <xf:property name="rendered-page-orientation"                 value="bind('rendered-page-orientation-bind')"/>
-                <xf:property name="rendered-page-size"                        value="bind('rendered-page-size-bind')"/>
-                <xf:property name="readonly-disable-calculate"                value="bind('readonly-disable-calculate-bind')"/>
-                <xf:property name="relevant"                                  value="()"/>
-                <xf:property name="readonly"                                  value="()"/>
-                <xf:property name="html-page-layout"                          value="bind('html-page-layout-bind')"/>
-                <xf:property name="density"                                   value="bind('density-bind')"/>
-                <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>
-                <xf:property name="email"                                     value="bind('email-bind')"/>
-                <xf:property name="xbl"                                       value="bind('xbl-bind')"/>
-                <xf:property name="component-bindings"                        value="$component-bindings"/>
             </xxf:show>
         </xf:action>
     </xf:action>

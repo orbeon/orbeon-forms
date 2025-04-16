@@ -363,8 +363,10 @@
                                     <xf:var name="current-item"        value="$items[xxf:evaluate(instance('local')/value-ref) = $binding]"/>
                                     <xf:var name="current-impossible"  value="not($is-open-selection) and xxf:non-blank($binding) and empty($current-item)"/>
                                     <xf:var name="current-label"       value="$current-item/xxf:evaluate(instance('local')/label-ref)"/>
-                                    <xf:var name="unique-choice"       value="count($items) = 1 and $auto-select-unique-choice and
-                                                                              (not($is-open-selection) or xxf:is-blank($binding))"/>
+                                    <xf:var name="unique-choice"       value="count($items) = 1 and
+                                                                              $auto-select-unique-choice and
+                                                                              (not($is-open-selection) or xxf:is-blank($binding))
+                                                                              and not(xxf:readonly($binding))"/>
                                     <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
                                     <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
                                     <xf:setvalue if="$label-from = 'service'" ref="instance('local')/label" value="$current-label"/>

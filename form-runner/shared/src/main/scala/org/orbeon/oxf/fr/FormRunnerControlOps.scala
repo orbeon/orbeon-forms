@@ -164,7 +164,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // If `contextItemOpt` is `None`, don't search for holders.
   def findBindPathHoldersInDocument(
     controlName    : String,
-    contextItemOpt : Option[Item])(implicit
+    contextItemOpt : Option[Item]
+  )(implicit
     ctx            : FormRunnerDocContext
   ): Option[BindPathHolders] =
     findBindAndPathStatically(controlName) map { case BindPath(bind, path) =>
@@ -313,7 +314,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   def searchControlsTopLevelOnly(
     data      : Option[NodeInfo],
-    predicate : NodeInfo => Boolean)(implicit
+    predicate : NodeInfo => Boolean
+  )(implicit
     ctx       : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
@@ -326,7 +328,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     head             : NodeInfo,
     data             : Option[NodeInfo],
     sectionPredicate : NodeInfo => Boolean,
-    controlPredicate : NodeInfo => Boolean)(implicit
+    controlPredicate : NodeInfo => Boolean
+  )(implicit
     ctx              : FormRunnerDocContext
   ): collection.Seq[ControlBindPathHoldersResources] =
     for {
@@ -365,7 +368,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def searchControlBindPathHoldersInDoc(
     controlElems   : Seq[NodeInfo],
     contextItemOpt : Option[NodeInfo],
-    predicate      : NodeInfo => Boolean)(implicit
+    predicate      : NodeInfo => Boolean
+  )(implicit
     ctx            : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     for {
@@ -386,7 +390,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // Return None if no namespace mapping is required OR none can be created
   def valueNamespaceMappingScopeIfNeeded(
     bind       : NodeInfo,
-    qNameValue : String)(implicit
+    qNameValue : String
+  )(implicit
     ctx        : FormRunnerDocContext
   ): Option[(String, String)] = {
 
@@ -421,7 +426,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def readDenormalizedCalculatedMip(
     bindElem    : NodeInfo,
     mip         : MipName.Computed,
-    mipAttQName : QName)(implicit // pass `mipAttQName` separately for Form Builder
+    mipAttQName : QName // pass `mipAttQName` separately for Form Builder
+  )(implicit
     ctx         : FormRunnerDocContext
   ): String =
     denormalizeMipValue(
@@ -496,7 +502,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // expressions and types could use it. So for now the mapping is never garbage collected.
   def isTypeStringUpdateNsIfNeeded(
     bindElem : NodeInfo,
-    value    : String)(implicit
+    value    : String
+  )(implicit
     ctx      : FormRunnerDocContext
   ): Boolean =
     valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&

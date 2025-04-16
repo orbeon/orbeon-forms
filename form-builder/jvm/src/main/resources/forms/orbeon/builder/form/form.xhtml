@@ -188,7 +188,7 @@
                                     )[xxf:non-blank()]">
                                 <xh:img src="{.}" alt=""/>
                             </xf:group>
-                            <fr:title ref="bind('title-bind')"/>
+                            <fr:title ref="bind('title-bind')[@xml:lang = $fb-lang]"/>
 
                             <!-- Language selector -->
                             <xh:div class="fr-language-choice">
@@ -627,14 +627,21 @@
                         event="fb-update-metadata"
                         if="not(event('mode') = 'new')">
 
-                    <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
-                    <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
-
-                    <xf:delete ref="bind('description-bind')/@mediatype"/>
-                    <xf:insert
-                        if="event('description-mediatype') = 'text/html'"
-                        context="bind('description-bind')"
-                        origin="xf:attribute('mediatype', 'text/html')"/>
+                    <xf:action iterate="event('title')">
+                        <xf:var name="c" value="."/>
+                        <xf:var name="l" value="@xml:lang"/>
+                        <xf:setvalue
+                            ref="bind('title-bind')[@xml:lang = $l]"
+                            value="$c"/>
+                    </xf:action>
+                    <xf:action iterate="event('description')">
+                        <xf:var name="c" value="."/>
+                        <xf:var name="l" value="$c/@xml:lang/string()"/>
+                        <xf:var name="d" value="bind('description-bind')[@xml:lang = $l]"/>
+                        <xf:setvalue ref="$d" value="$c"/>
+                        <xf:delete ref="$d/@mediatype"/>
+                        <xf:insert context="$d" origin="$c/@mediatype"/>
+                    </xf:action>
 
                     <xf:delete
                         bind="thumbnail-bind"/>

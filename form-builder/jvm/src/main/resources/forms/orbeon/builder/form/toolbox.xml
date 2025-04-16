@@ -52,7 +52,6 @@
                             <xf:property name="form"                                      value="bind('form-name-bind')"/>
                             <xf:property name="title"                                     value="bind('title-bind')"/>
                             <xf:property name="description"                               value="bind('description-bind')"/>
-                            <xf:property name="description-mediatype"                     value="bind('description-bind')/@mediatype/string()"/>
                             <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>
                             <xf:property name="thumbnail-filename"                        value="bind('thumbnail-bind')/@filename"/>
                             <xf:property name="thumbnail-mediatype"                       value="bind('thumbnail-bind')/@mediatype"/>

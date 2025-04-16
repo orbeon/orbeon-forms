@@ -241,6 +241,11 @@
             ref="$metadata/description"
             value="event('description')"/>
 
+        <xf:insert
+            if="exists(event('description'))"
+            context="$metadata/description"
+            origin="event('description')/@mediatype"/>
+
         <!-- Annotate data -->
         <!-- NOTE: RRR done by fr-annotate-data -->
         <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
@@ -438,9 +443,8 @@
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="$requested-app"/>
                 <xf:property name="form"                                      value="$requested-form"/>
-                <xf:property name="title"                                     value="($requested-title,       $fb-resources/template/untitled-form)[1]"/>
-                <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
-                <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
+                <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $fb-resources/template/untitled-form/string())[1]))"/>
+                <xf:property name="description"                               value="xf:element('description', (xf:attribute('xml:lang', $fb-lang), $requested-description))"/>
             </xf:dispatch>
 
             <xxf:show
@@ -451,9 +455,9 @@
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="($requested-app,         bind('application-name-bind'))[1]"/>
                 <xf:property name="form"                                      value="($requested-form,        bind('form-name-bind'))[1]"/>
-                <xf:property name="title"                                     value="($requested-title,       $fb-resources/template/untitled-form)[1]"/>
-                <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
-                <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
+                <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $fb-resources/template/untitled-form/string())[1]))"/>
+                <xf:property name="description"                               value="xf:element('description', (xf:attribute('xml:lang', $fb-lang), $requested-description))"/>
+
                 <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>
                 <xf:property name="thumbnail-filename"                        value="bind('thumbnail-bind')/@filename"/>
                 <xf:property name="thumbnail-mediatype"                       value="bind('thumbnail-bind')/@mediatype"/>
@@ -499,8 +503,8 @@
                 <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*" id="metadata-bind">
                     <xf:bind id="application-name-bind"           ref="application-name"/>
                     <xf:bind id="form-name-bind"                  ref="form-name"/>
-                    <xf:bind id="title-bind"                      ref="title[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="description-bind"                ref="description[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="title-bind"                      ref="title"/>
+                    <xf:bind id="description-bind"                ref="description"/>
                     <xf:bind id="thumbnail-bind"                  ref="thumbnail"/>
                     <xf:bind id="allow-template-use-bind"         ref="allow-template-use"/>
                     <xf:bind id="created-with-version-bind"       ref="created-with-version"/>

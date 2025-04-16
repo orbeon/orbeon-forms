@@ -43,10 +43,25 @@
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
                     iterate="
-                        'for-button-name', 'app', 'form', 'title', 'description', 'thumbnail', 'allow-template-use',
+                        'for-button-name', 'app', 'form', 'thumbnail', 'allow-template-use',
                         'singleton', 'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
+
+                <!-- There can be multiple title/descriptions in different languages -->
+                <!-- https://github.com/orbeon/orbeon-forms/issues/3613 -->
+                <xf:delete
+                    ref="$i/(title | description)"/>
+
+                <xf:insert
+                    context="$i"
+                    ref="*"
+                    origin="event('title'), event('description')"/>
+
+                <xf:insert
+                    iterate="$i/description[empty(@mediatype)]"
+                    context="."
+                    origin="xf:attribute('mediatype', 'text/plain')"/>
 
                 <xf:setvalue
                     ref="$i/original-app"
@@ -60,10 +75,6 @@
                 <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
                 <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
                 <xf:var name="is-form-settings" value="not($is-new-form or $is-app-form)"/>
-
-                <xf:setvalue
-                    ref="$i/description/@isHTML"
-                    value="event('description-mediatype') = 'text/html'"/>
 
                 <xf:setvalue
                     ref="$i/updated-with-versions"
@@ -202,11 +213,10 @@
                             value="xxf:mutable-document($control-details)/*"/>
 
                         <!-- Process the LHHA of each details control -->
-                        <xf:var name="current-language" value="fbf:currentLang()"/>
                         <xf:action iterate="$mutable-control-details//(xf:label, xf:hint, xf:help, xf:alert)">
                             <xf:var name="lhha" value="."/>
                             <!-- If it has a lang attribute, only keep if matches the current language -->
-                            <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
+                            <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $i/lang" ref="$lhha"/>
                             <!-- If it has a `ref="$resources/..."`, evaluate it -->
                             <xf:action if="starts-with($lhha/@ref, '$resources/')">
                                 <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
@@ -414,13 +424,16 @@
                         </xf:action>
                     </xf:action>
 
+                    <!-- Normalize `description` elements -->
+                    <xf:delete
+                        ref="$i/description/@mediatype[. = 'text/plain']"/>
+
                     <!-- Dispatch event with result -->
                     <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
                         <xf:property name="app"                                    value="$i/app/string()"/>
                         <xf:property name="form"                                   value="$i/form/string()"/>
-                        <xf:property name="title"                                  value="$i/title/string()"/>
-                        <xf:property name="description"                            value="$i/description/string()"/>
-                        <xf:property name="description-mediatype"                  value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
+                        <xf:property name="title"                                  value="$i/title"/>
+                        <xf:property name="description"                            value="$i/description"/>
                         <xf:property name="thumbnail"                              value="$i/thumbnail/string()"/>
                         <xf:property name="thumbnail-filename"                     value="$i/thumbnail/@filename/string()"/>
                         <xf:property name="thumbnail-mediatype"                    value="$i/thumbnail/@mediatype/string()"/>
@@ -543,8 +556,6 @@
                         <original-app/>
                         <app/>
                         <form/>
-                        <title/>
-                        <description isHTML=""/>
                         <singleton/>
                         <thumbnail filename="" mediatype="" size=""/>
                         <allow-template-use/>
@@ -1071,6 +1082,8 @@
                                  else
                                     ()"/>
 
+                        <fb:language-choice ref="$i/lang[not($is-new-form)]"/>
+
                         <fr:tabbable id="fb-tabbable" class="fb-dialog-form-settings-fields">
                             <fr:tab visible="$is-new-form">
 
@@ -1237,27 +1250,30 @@
                                     </fr:c>
                                     <fr:c x="1" y="3" w="12" h="1">
                                         <!-- Title -->
-                                        <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
+                                        <xf:input ref="title[@xml:lang = $i/lang]" id="fb-title-input" xxf:autocomplete="off">
                                             <xf:label ref="$resources/title/label"/>
                                             <xf:hint ref="$resources/title/hint"/>
                                             <xf:alert ref="$resources/title/alert"/>
                                         </xf:input>
                                     </fr:c>
                                     <fr:c x="1" y="4" w="12" h="1">
-                                        <xf:var name="is-html" value="description/@isHTML = 'true'"/>
-                                        <xf:textarea ref="description[not($is-html)]" id="fb-description-textarea">
+                                        <xf:textarea ref="description[@xml:lang = $i/lang][not(@mediatype = 'text/html')]" id="fb-description-textarea">
                                             <xf:label ref="$resources/description/label"/>
                                             <xf:hint ref="$resources/description/hint"/>
                                             <xf:alert ref="$resources/description/alert"/>
                                         </xf:textarea>
-                                        <xf:textarea mediatype="text/html" ref="description[$is-html]">
+                                        <xf:textarea mediatype="text/html" ref="description[@xml:lang = $i/lang][@mediatype = 'text/html']">
                                             <xf:label ref="$resources/description/label"/>
                                             <xf:hint ref="$resources/description/hint"/>
                                             <xf:alert ref="$resources/description/alert"/>
                                         </xf:textarea>
                                     </fr:c>
                                     <fr:c x="1" y="5" w="12" h="1">
-                                        <fr:checkbox-input ref="description/@isHTML" appearance="full">
+                                        <fr:checkbox-input
+                                            ref="description[@xml:lang = $i/lang]/@mediatype"
+                                            appearance="full"
+                                            selected-value="text/html"
+                                            deselected-value="text/plain">
                                             <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                         </fr:checkbox-input>
                                     </fr:c>

@@ -145,6 +145,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         if (isDatabound) {
           updateValueLabel()
           updateOpenSelection()
+          updateReadonly(containerElem.classList.contains("xforms-readonly"))
           mutationObservers = DomSupport.onAttributeChange(elementWithData, DataValue          , updateValueLabel)    :: mutationObservers
           mutationObservers = DomSupport.onAttributeChange(elementWithData, DataLabel          , updateValueLabel)    :: mutationObservers
           mutationObservers = DomSupport.onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection) :: mutationObservers
@@ -201,6 +202,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     )
   }
 
+  override def xformsUpdateReadonly(readonly: Boolean): Unit =
+    updateReadonly(readonly)
+
   // Keep current item in sync with `data-value`/`data-label`
   private def updateValueLabel(): Unit = {
     val select = querySelect
@@ -235,6 +239,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       }
     }
   }
+
+  private def updateReadonly(readonly: Boolean): Unit =
+    Option(querySelect).foreach { select =>
+      if (readonly) select.setAttribute   ("disabled", "disabled")
+      else          select.removeAttribute("disabled")
+    }
 
   private def updatePlaceholder(): Unit = {
     val newPlaceholder = queryElementWithData.getAttribute(DataPlaceholder)

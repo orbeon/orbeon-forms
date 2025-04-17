@@ -588,6 +588,23 @@ lazy val embeddingWar = (project in file("embedding-war"))
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(scala2CommonSettings: _*)
+  .settings(
+    Compile / packageBin := {
+
+      def runBuildScript(dir: String): Unit = {
+        val scriptPath = baseDirectory.value / "src" / "main" / dir / "build.sh"
+        val exitCode   = scala.sys.process.Process(scriptPath.getAbsolutePath, scriptPath.getParentFile).!
+        if (exitCode != 0) {
+          throw new Exception(s"$dir build script failed with exit code: $exitCode")
+        }
+      }
+
+      runBuildScript("angular")
+      runBuildScript("react")
+
+      (Compile / packageBin).value
+    }
+  )
 
 lazy val xformsFilter = (project in file("xforms-filter"))
   .dependsOn(

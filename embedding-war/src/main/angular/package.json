@@ -1,0 +1,23 @@
+{
+  "name": "angular-orbeon-demo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "ng build"
+  },
+  "dependencies": {
+    "@angular/core": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "@angular/platform-browser-dynamic": "^17.3.0",
+    "@orbeon/angular": "^1.0.1",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.3"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.2",
+    "@angular/compiler": "^17.3.0",
+    "@angular/compiler-cli": "^17.3.0",
+    "typescript": "~5.4.2"
+  }
+}

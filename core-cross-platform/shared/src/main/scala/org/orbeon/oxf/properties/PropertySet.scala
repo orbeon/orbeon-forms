@@ -71,7 +71,6 @@ object PropertySet {
     children    : mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
   )
 
-
   private val SomeXsStringQname   = XMLConstants.XS_STRING_QNAME.some
   private val SomeXsIntegerQname  = XMLConstants.XS_INTEGER_QNAME.some
   private val SomeXsBooleanQname  = XMLConstants.XS_BOOLEAN_QNAME.some

@@ -1,12 +1,11 @@
 package org.orbeon.saxon.function
 
-import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter}
 import java.util.regex.Matcher
 
 object ProcessTemplateSupport {
 
   // Ideally should be the same as a non-qualified XPath variable name
-  private val MatchTemplateKey = """\{\s*\$([A-Za-z0-9\-_]+)\s*""".r
+  private val MatchTemplateKey = """\{\s*\$([A-Za-z0-9\-_]+)\s*\}""".r
 
   // Template processing
   //
@@ -22,30 +21,53 @@ object ProcessTemplateSupport {
     javaNamedParams   : List[(String, Any)]
   ): String = {
 
-    // TODO
-    def formatValue(v: Any) = v match {
+    // Format a value based on its type
+    def formatValue(v: Any): String = v match {
       case null       => ""
-      case v: Byte    => v
-      case v: Short   => v
-      case v: Int     => v
-      case v: Long    => v
-      case v: Float   => v
-      case v: Double  => v
-      case v: Boolean => v
+      case v: Byte    => v.toString
+      case v: Short   => v.toString
+      case v: Int     => v.toString
+      case v: Long    => v.toString
+      case v: Float   => v.toString
+      case v: Double  => v.toString
+      case v: Boolean => v.toString
       case other      => other.toString
     }
 
-    val nameToPos = javaNamedParams.iterator.map(_._1).zipWithIndex.toMap
+    // Extract all template variables and their positions
+    val templateVars = MatchTemplateKey.findAllMatchIn(templateWithNames).map { m =>
+      (m.start, m.end, m.group(1))
+    }.toList.sortBy(_._1)
 
-    val templateWithPositions =
-      MatchTemplateKey.replaceAllIn(templateWithNames, m => {
-        Matcher.quoteReplacement("{" + nameToPos(m.group(1)).toString)
-      }).replace("'", "''")
+    // If no template variables found, return the original string
+    if (templateVars.isEmpty) return templateWithNames
 
-    MessageFormatter.format(
-      MessageFormatCache(templateWithPositions),
-      javaNamedParams.map(v => formatValue(v._2)).toVector
-    )
+    // Build a new string with template variables replaced by their values
+    val sb = new StringBuilder
+    var lastPos = 0
+
+    for ((start, end, varName) <- templateVars) {
+      // Add text before this variable
+      if (start > lastPos) {
+        sb.append(templateWithNames.substring(lastPos, start))
+      }
+
+      // Replace the variable with its value if found in params
+      val valueOpt = javaNamedParams.find(_._1 == varName).map(_._2)
+      valueOpt match {
+        case Some(value) => sb.append(formatValue(value))
+        case None        => sb.append(templateWithNames.substring(start, end)) // Keep original if not found
+      }
+
+      lastPos = end
+    }
+
+    // Add any remaining text
+    if (lastPos < templateWithNames.length) {
+      sb.append(templateWithNames.substring(lastPos))
+    }
+
+    sb.toString
   }
 
   def renameParamInTemplate(

@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.test.ResourceManagerSupport
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.*
@@ -20,7 +21,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpec
 
 
-class XXFormsResourceTest extends AnyFunSpec {
+class XXFormsResourceTest extends AnyFunSpec with ResourceManagerSupport {
 
   describe("The `pathFromTokens()` function") {
 
@@ -70,33 +71,22 @@ class XXFormsResourceTest extends AnyFunSpec {
 
   describe("Template replacement") {
 
-    // NOTE: We don't want to support Java's `MessageFormat` `choice` anymore, see
-    // https://github.com/orbeon/orbeon-forms/issues/3078.
-    val PublishTemplate =
-      """Version {
-        $form-version
-      } with {
-        $attachments,choice,0#no attachments|1#1 attachment|1<{$attachments} attachments}."""
-
-    val Expected = List(
-      (
-        PublishTemplate,
-        List("form-version" -> 42, "attachments" -> 0)
-      ) -> """Version 42 with no attachments.""",
-      (
-        PublishTemplate,
-        List("form-version" -> 42, "attachments" -> 1)
-      ) -> """Version 42 with 1 attachment.""",
-      (
-        PublishTemplate,
-        List("form-version" -> 42, "attachments" -> 3)
-      ) -> """Version 42 with 3 attachments."""
+    val Params = List(
+      "simple"                                      -> "42",
+      "hyphenated-word"                             -> "43"
+    )
+    val TestCases = List(
+      "Thank you {$simple}."                        -> "Thank you 42.",
+      "Thank you {$hyphenated-word}."               -> "Thank you 43.",
+      "Thank you {$simple} and {$hyphenated-word}." -> "Thank you 42 and 43.",
+      "{$simple} div { color: red }"                -> "42 div { color: red }",
+      "{$missing}"                                  -> "{$missing}"
     )
 
-    for (((template, params), expected) <- Expected)
+    for ((template, expected) <- TestCases)
       it(s"must replace template to `$expected`") {
         assert(
-          expected === ProcessTemplateSupport.processTemplateWithNames(template, params)
+          expected === ProcessTemplateSupport.processTemplateWithNames(template, Params)
         )
       }
   }

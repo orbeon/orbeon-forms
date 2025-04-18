@@ -43,8 +43,8 @@ install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
 - npm install
-- nvm install 20
-- nvm use 20
+- nvm install 18
+- nvm use 18
 # update this only when sbt-the-bash-script needs to be updated
 - |
   export SBT_LAUNCHER=1.4.9

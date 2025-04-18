@@ -5,7 +5,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, EventListenerSupport, XFormsUI}
-import org.scalajs.dom.{html, raw}
+import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -16,23 +16,23 @@ object Range {
 
   XBL.declareCompanion("xf|range", js.constructorOf[RangeCompanion])
 
-  private class RangeCompanion(containerElem: html.Element) extends XBLCompanion {
+  private class RangeCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 
     companion =>
 
-    var inputElemOpt: Option[html.Input] = None
+    var inputElemOpt: Option[dom.html.Input] = None
     object EventSupport extends EventListenerSupport
 
     override def init(): Unit = {
 
       logger.debug("init")
 
-      val inputElem = containerElem.querySelector("input[type = range]").asInstanceOf[html.Input]
+      val inputElem = containerElem.querySelector("input[type = range]").asInstanceOf[dom.html.Input]
       companion.inputElemOpt = Some(inputElem)
 
       xformsUpdateReadonly(containerElem.classList.contains("xforms-readonly"))
 
-      EventSupport.addListener[raw.Event](inputElem, DomEventNames.Input, e => {
+      EventSupport.addListener[dom.Event](inputElem, DomEventNames.Input, e => {
         if (XFormsUI.modalProgressPanelShown) {
            e.preventDefault()
         } else {

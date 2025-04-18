@@ -159,7 +159,7 @@ object Utils extends js.Object {
 
 @js.native
 @JSGlobal("BroadcastChannel")
-class BroadcastChannel(name: String) extends js.Object {
+class BroadcastChannel(channelName: String) extends js.Object {
   def name: String = js.native
   def postMessage(message: js.Any): Unit = js.native
   def close(): Unit = js.native

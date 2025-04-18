@@ -3,8 +3,6 @@ sudo: required
 language: java
 jdk:
 - openjdk11
-node_js:
-- node
 env:
   global:
     # See https://docs.google.com/document/d/1MqG8OW2kLGeedzbu6vb9D00tHljVabPA2tYwh3DB9UE/edit
@@ -44,6 +42,8 @@ install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
 - npm install
+- nvm install 20
+- nvm use 20
 # update this only when sbt-the-bash-script needs to be updated
 - |
   export SBT_LAUNCHER=1.4.9

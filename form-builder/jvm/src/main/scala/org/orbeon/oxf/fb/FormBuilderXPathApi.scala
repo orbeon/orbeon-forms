@@ -64,7 +64,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def containerMove(directionString: String): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     findSelectedCell
       .map(FormRunner.findAncestorContainersLeafToRoot(_, includeSelf = false))
@@ -174,7 +174,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def updateTemplatesFromDynamicIterationChange(controlName: String): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     FormRunner.findControlByName(FormRunner.controlNameFromId(controlName)) foreach { controlElem =>
       assert(FormRunner.isRepeat(controlElem))
@@ -199,7 +199,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def renameControlIfNeeded(oldName: String, newName: String, addToUndoStack: Boolean): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     FormBuilder.renameControlIfNeeded(oldName, newName) filter
       (_ => addToUndoStack) foreach
       Undo.pushUserUndoAction
@@ -211,7 +211,7 @@ object FormBuilderXPathApi {
       .flatMap(_.trimAllToOpt)
       .filter(_ != newName)
       .foreach { oldName =>
-      implicit val ctx = FormBuilderDocContext()
+      implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
       FormBuilder.renameServiceReferences(oldName, newName)
     }
 
@@ -227,7 +227,7 @@ object FormBuilderXPathApi {
 
   private def readDenormalizedCalculatedMip(controlName: String, mipName: String, iteration: Boolean): String = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val resultOpt =
       for {
@@ -259,7 +259,7 @@ object FormBuilderXPathApi {
     iteration  : Boolean
   ): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val resultOpt =
       for {
@@ -300,7 +300,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def selectCellForControlId(controlId: String): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     FormRunner.findControlByName(FormRunner.controlNameFromId(controlId)).toList flatMap
       (_ parent CellTest) foreach selectCell
   }
@@ -311,7 +311,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String): String = {
-    implicit val ctx = FormBuilderDocContext(inDoc)
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
     FormRunner.findRepeatIterationName(controlName) getOrElse ""
   }
 
@@ -426,7 +426,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def setItemsetHTMLMediatype(controlName: String, isHTML: Boolean): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     if (isHTML != FormBuilder.isItemsetHTMLMediatype(controlName)) {
       val itemsetEl = FormRunner.findControlByName(controlName).toList child "itemset"
@@ -444,7 +444,7 @@ object FormBuilderXPathApi {
 
     // Create context explicitly based on the document passed, as the node might not be
     // in the main Form Builder instance yet.
-    implicit val ctx = FormBuilderDocContext(doc)
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(doc)
 
     // 1. Annotate all the grid and grid cells of the given document with unique ids,
     // if they don't have them already. We do this so that ids are stable as we move
@@ -481,7 +481,7 @@ object FormBuilderXPathApi {
 
     // Create context explicitly based on the document passed, as the node might not be
     // in the main Form Builder instance yet.
-    implicit val ctx = FormBuilderDocContext(inDoc)
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
 
     // Find data holders for all section templates
     val holdersWithRoots =
@@ -508,7 +508,7 @@ object FormBuilderXPathApi {
 
     // Create context explicitly based on the document passed, as the node might not be
     // in the main Form Builder instance yet.
-    implicit val ctx = FormBuilderDocContext(inDoc)
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
 
     val lhha = LHHA.Help
 
@@ -538,7 +538,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def hasCustomIterationName(controlName: String): Boolean = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     FormRunner.findRepeatIterationName(controlName) exists (isCustomIterationName(controlName, _))
   }
 
@@ -558,14 +558,14 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllNamesInUseAsString: String = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     FormBuilder.getAllNamesInUse.mkString(" ")
   }
 
   //@XPathFunction
   def findNextContainer(controlName: String, previousOrNext: String): Option[NodeInfo] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val allContainersWithSettings = FormBuilder.getAllContainerControlsWithIds filter FormRunner.hasContainerSettings
 
@@ -594,7 +594,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def readDefaultAlertAsXML(controlName: String): NodeInfo = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     AlertDetails.fromForm(controlName)(FormBuilderDocContext())              find
       (_.default)                                                            getOrElse
@@ -647,7 +647,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def findNextControlId(controlName: String, leftOrRight: String): Option[String] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     FormRunner.findControlByName(controlName) flatMap { control =>
 
@@ -669,7 +669,7 @@ object FormBuilderXPathApi {
     direction      : String,
     allowEmptyCell : Boolean
   ): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     findCellsByDirection(
       currentCellElem,
       Option(startCellElem),
@@ -764,7 +764,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def countImpactedActions(inDoc: NodeInfo, serviceName: String): Int = {
 
-    implicit val ctx = FormBuilderDocContext(inDoc)
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
 
     val newServiceCalls =
       findNewActions descendant FRServiceCallTest filter (_.attValue("service") == serviceName)
@@ -797,7 +797,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def getControlsLabelValueItemset(): Iterable[NodeInfo] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val someResourcesMap =
       Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap) // accelerate resources lookups
@@ -840,7 +840,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def gridCanDoClasses(gridId: String): List[String] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val container = containerById(gridId)
 
@@ -1002,7 +1002,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def findPdfFieldName(controlName: String, currentControlName: String): Option[String] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     FormRunner.findControlByName(controlName) map { controlElem =>
 
@@ -1033,7 +1033,7 @@ object FormBuilderXPathApi {
     prefix      : String,
     suffix      : String
   ): SequenceIterator = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     renamingDetailsToXPath(ToolboxOps.namesToRenameForMergingSectionTemplate(containerId, prefix, suffix))
   }
 
@@ -1042,7 +1042,7 @@ object FormBuilderXPathApi {
     prefix      : String,
     suffix      : String
   ): SequenceIterator = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     renamingDetailsToXPath(ToolboxOps.namesToRenameForClipboard(prefix, suffix))
   }
 
@@ -1052,8 +1052,8 @@ object FormBuilderXPathApi {
     prefix      : String,
     suffix      : String
   ): Unit = {
-    implicit val ctx              = FormBuilderDocContext()
-    implicit val formRunnerParams = FormRunnerParams()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     ToolboxOps.containerMerge(containerId, prefix, suffix) foreach Undo.pushUserUndoAction
   }
 
@@ -1062,8 +1062,8 @@ object FormBuilderXPathApi {
     prefix      : String,
     suffix      : String
   ): Unit = {
-    implicit val ctx              = FormBuilderDocContext()
-    implicit val formRunnerParams = FormRunnerParams()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     pasteSectionGridFromClipboardImpl(prefix, suffix)
   }
 
@@ -1080,7 +1080,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def saveControlToUndoStack(oldName: String, newName: String): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     for {
       control <- FormRunner.findControlByName(oldName)
@@ -1104,8 +1104,8 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def redoAction(): Unit = {
-    implicit val ctx              = FormBuilderDocContext()
-    implicit val formRunnerParams = FormRunnerParams()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     for {
       redoAction <- Undo.popRedoAction()
       undoAction <- processUndoRedoAction(redoAction)

@@ -142,14 +142,13 @@ trait ResourcesOps extends BaseOps {
     val allLangs =
       holdersWithLang map (_._1)
 
-    def holderItemForValue(holder: NodeInfo, value: String) =
+    def holderItemForValue(holder: NodeInfo, value: String): Option[NodeInfo] =
       holder / "item" find (_ / "value" === value)
 
-    def lhhaForLangAndValue(lang: String, value: String, lhha: String) = (
+    def lhhaForLangAndValue(lang: String, value: String, lhha: String): String =
       findResourceHolderForLang(controlName, lang, localResourcesRoot)
-      map (holderItemForValue(_, value).toList / lhha stringValue)
-      getOrElse ""
-    )
+        .map(holderItemForValue(_, value).toList / lhha stringValue)
+        .getOrElse("")
 
     val addHints = hasItemHintEditor(controlName)
 

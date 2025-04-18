@@ -62,7 +62,7 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewControl(bindingElem: NodeInfo): Option[String] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     ensureEmptyCell() match {
       case Some(gridTd) =>
@@ -200,7 +200,7 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewSection(withGrid: Boolean, suggestedNameOrNull: String): Some[(NodeInfo, NodeInfo)] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     withDebugGridOperation("insert new section") {
 
@@ -278,7 +278,7 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewGrid(repeated: Boolean): Some[String] = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     withDebugGridOperation(s"insert new ${if (repeated) "repeated " else ""}grid") {
 
@@ -343,7 +343,7 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewSectionTemplate(bindingElem: NodeInfo): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val xblSectionName = bindingFirstURIQualifiedName(bindingElem).localName
 
@@ -511,7 +511,7 @@ object ToolboxOps {
   //@XPathFunction
   def copyToClipboard(cellElem: NodeInfo): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     controlElementsInCellToXcv(cellElem)
       .foreach(writeXcvToClipboard)
@@ -521,7 +521,7 @@ object ToolboxOps {
   //@XPathFunction
   def cutToClipboard(cellElem: NodeInfo): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     copyToClipboard(cellElem)
     deleteControlWithinCell(cellElem, updateTemplates = true) foreach Undo.pushUserUndoAction
@@ -835,8 +835,8 @@ object ToolboxOps {
   // Paste control from the clipboard
   //@XPathFunction
   def pasteFromClipboard(): Unit = {
-    implicit val ctx              = FormBuilderDocContext()
-    implicit val formRunnerParams = FormRunnerParams()
+    implicit val ctx             : FormBuilderDocContext = FormBuilderDocContext()
+    implicit val formRunnerParams: FormRunnerParams      = FormRunnerParams()
     pasteFromClipboardImpl()
   }
 
@@ -870,7 +870,8 @@ object ToolboxOps {
     suffix          : String,
     insertPosition  : Option[ContainerPosition],
     ignore          : Set[String],
-    copyAttachments : Boolean)(implicit
+    copyAttachments : Boolean
+  )(implicit
     ctx             : FormBuilderDocContext,
     formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {
@@ -881,7 +882,7 @@ object ToolboxOps {
 
     // Handle attachments if needed
     if (copyAttachments) {
-      implicit val ec = CoreCrossPlatformSupport.externalContext
+      implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
       updateUnpublishedAttachment(xcvElem / XcvEntry.Holder.entryName / *)
     }
 
@@ -1109,7 +1110,7 @@ object ToolboxOps {
       def resources   = xcvElem / XcvEntry.Resources.entryName / "resource" / *
 
       if (copyAttachments) {
-        implicit val ec = CoreCrossPlatformSupport.externalContext
+        implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
         updateUnpublishedAttachment(dataHolders)
       }
 

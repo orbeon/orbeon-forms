@@ -225,7 +225,8 @@ trait ContainerOps extends ControlOps {
     freeze               : String,
     iterationNameOrEmpty : String,
     applyDefaults        : Boolean,
-    initialIterations    : String)(implicit
+    initialIterations    : String
+  )(implicit
     ctx                  : FormBuilderDocContext
   ): Unit = {
 

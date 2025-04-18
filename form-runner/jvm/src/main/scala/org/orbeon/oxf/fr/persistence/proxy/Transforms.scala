@@ -86,7 +86,8 @@ object Transforms {
 
   def migrateFormDefinition(
     dstVersion      : DataFormatVersion,
-    appForm         : AppForm)(implicit
+    appForm         : AppForm
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): (InputStream, OutputStream) => Unit = {

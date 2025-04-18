@@ -253,7 +253,8 @@ trait ControlOps extends ResourcesOps {
     oldControlName      : String,
     newControlName      : String,
     oldChildElementName : Option[String],
-    newChildElementName : Option[String])(implicit
+    newChildElementName : Option[String]
+  )(implicit
     ctx                 : FormBuilderDocContext
   ): Unit = {
 
@@ -330,7 +331,7 @@ trait ControlOps extends ResourcesOps {
     findBindByName(oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
-  private def ensureContainers(rootElem: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]) = {
+  private def ensureContainers(rootElem: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]): Seq[NodeInfo] = {
 
     @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() => NodeInfo, Option[String])]): Seq[NodeInfo] =
       if (names.hasNext) {
@@ -515,7 +516,7 @@ trait ControlOps extends ResourcesOps {
         val someNode = params.headOption orElse existingParams.headOption get
         val config   = someNode.getConfiguration
 
-        ! SaxonUtils.deepCompare(config, params.iterator, existingParams.iterator, excludeWhitespaceTextNodes = false)
+        !SaxonUtils.deepCompare(config, params.iterator, existingParams.iterator, excludeWhitespaceTextNodes = false)
       }
     }
 

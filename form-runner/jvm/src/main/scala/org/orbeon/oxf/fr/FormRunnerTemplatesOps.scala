@@ -134,9 +134,6 @@ private val AttributeRe = "@(.+)".r
     holderForBind(startBindElem, topLevel = true) getOrElse (throw new IllegalStateException)
   }
 
-  def bindingMetadata(binding: NodeInfo) =
-    binding / FBMetadataTest
-
   def ensureTemplateReplaceContent(
     controlName : String,
     content     : NodeInfo)(implicit
@@ -169,7 +166,7 @@ private val AttributeRe = "@(.+)".r
   // Create a new data holder given the new control name, using the instance template if found
   def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
 
-    val instanceTemplate = bindingMetadata(binding) / FBTemplatesTest / FBInstanceTest
+    val instanceTemplate = binding / FBMetadataTest / FBTemplatesTest / FBInstanceTest
     if (instanceTemplate.nonEmpty) {
       // Because `elementInfo` doesn't support being passed text `NodeInfo`!
       val mutable = NodeInfoConversions.extractAsMutableDocument(instanceTemplate.head).rootElement

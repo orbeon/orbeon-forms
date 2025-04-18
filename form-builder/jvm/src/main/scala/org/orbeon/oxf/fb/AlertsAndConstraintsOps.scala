@@ -208,17 +208,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     val messagesByLangForAllLangs = {
 
-      def messagesForAllLangs(a: AlertDetails) = {
+      def messagesForAllLangs(a: AlertDetails): collection.Seq[(String, String)] = {
         val messagesMap = a.messages.toMap
         allLangs(resourcesRoot) map { lang => lang -> messagesMap.getOrElse(lang, "") }
       }
 
-      val messagesByLang = (
+      val messagesByLang =
         alertsWithResources
-        flatMap messagesForAllLangs
-        groupBy (_._1)
-        map     { case (lang, values) => lang -> (values map (_._2)) }
-      )
+          .flatMap(messagesForAllLangs)
+          .groupBy(_._1)
+          .map { case (lang, values) => lang -> values.map(_._2) }
 
       // Make sure we have a default for all languages if there are no alerts or if some languages are missing
       // from the alerts. We do want to update all languages on write, including removing unneeded <alert>
@@ -346,9 +345,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Rename control element if needed when the datatype changes
     def renameControlIfNeeded(
-      controlName      : String,
-      newAppearanceOpt : Option[String])(implicit
-      ctx              : FormBuilderDocContext
+      controlName     : String,
+      newAppearanceOpt: Option[String]
+    )(implicit
+      ctx             : FormBuilderDocContext
     ): Unit = {
       val newDatatype = datatypeQName
       for {

@@ -79,7 +79,7 @@ class BindingIndexTest extends AnyFunSpec {
 
     // We wrote the attribute bindings above from more specific to least specific, and the index prepends new
     // bindings as we index, so newer bindings are found first. To help with testing matching by attribute, we
-    // index in reverse order, so that e.g. [appearance ~= baz] is found before [appearance *= gaga].
+    // index in reverse order, so that e.g. `[appearance ~= baz]` is found before `[appearance *= gaga]`.
     AllBindings.reverse foreach { binding =>
       currentIndex = BindingIndex.indexBinding(currentIndex, binding)
     }

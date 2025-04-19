@@ -4,8 +4,8 @@ import java.util.regex.Matcher
 
 object ProcessTemplateSupport {
 
-  // Ideally should be the same as a non-qualified XPath variable name
-  private val MatchTemplateKey = """\{\s*\$([A-Za-z0-9\-_]+)\s*\}""".r
+  // Ideally should be the same as an unqualified XPath variable name
+  private val MatchTemplateKey = """\{\s*\$([A-Za-z0-9\-_]+)\s*}""".r
 
   // Template processing
   //
@@ -78,7 +78,7 @@ object ProcessTemplateSupport {
     MatchTemplateKey.replaceAllIn(templateWithNames, m => {
       val matchedName       = m.group(1)
       val foundOriginalName = matchedName == originalName
-      val replacement       = if (foundOriginalName) "{$" + newName else m.group(0)
+      val replacement       = if (foundOriginalName) "{$" + newName + "}" else m.group(0)
       Matcher.quoteReplacement(replacement)
     })
 

@@ -202,7 +202,7 @@ object Tabbable {
       if (tabPosition > allLis.size - 1) return
 
       // Update keyboard shortcuts tooltips
-      if (isOutermostTabbableInDialog) {
+      if (isOutermostTabbable) {
         val isAppleOs            = KeyboardShortcuts.isAppleOs
         def addIcon(kbd: String) = s"$KeyBoardIconCharacter $kbd"
         val nextTabShortcut      = addIcon(if (isAppleOs) "Ctrl + }" else "Ctrl + Tab")
@@ -235,7 +235,7 @@ object Tabbable {
 
     private def onDOMKeydown(event: dom.KeyboardEvent): Unit = {
       // Only handle keyboard shortcuts on the outermost tabbable
-      if (isOutermostTabbableInDialog) {
+      if (isOutermostTabbable) {
         // macOS-like
         if (event.ctrlKey && !event.altKey) {
             event.key match {
@@ -264,8 +264,13 @@ object Tabbable {
       }
     }
 
-    private def isOutermostTabbableInDialog: Boolean =
-      containerElem.matches("dialog .xbl-fr-tabbable:not(.xbl-fr-tabbable .xbl-fr-tabbable)")
+    private def isOutermostTabbable: Boolean =
+      containerElem.matches(
+        // Either no dialog open, or inside an open dialog
+        ":is(:root:not(:has(dialog[open])), dialog[open]) " +
+        // A tabbable that is not inside another tabbable
+        ".xbl-fr-tabbable:not(.xbl-fr-tabbable .xbl-fr-tabbable)"
+      )
 
     private def getCurrentTabIndex: Int =
       getAllLis.indexWhere(_.matches(ActiveSelector))

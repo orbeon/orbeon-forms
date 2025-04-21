@@ -608,7 +608,7 @@
             <zipfileset dir="build/distrib" fullpath="${versioned-name}/orbeon-auth.war">
                 <include name="orbeon-${release.number}-auth.war"/>
             </zipfileset>
-            <zipfileset dir="build/distrib" fullpath="${versioned-name}/orbeon-redis-jars.zip">
+            <zipfileset dir="build" fullpath="${versioned-name}/orbeon-redis-jars.zip">
                 <include name="orbeon-redis-jars.zip"/>
             </zipfileset>
             <zipfileset file="README.md" prefix="${versioned-name}"/>

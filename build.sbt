@@ -1531,7 +1531,7 @@ lazy val orbeonRedisJars = (project in file("redis-jars-project"))
     libraryDependencies ++= RedisLibraryDependencies,
 
     Compile / packageBin := {
-      val redisJarsZipFile = (ThisBuild / baseDirectory).value / "build" / "distrib" / "orbeon-redis-jars.zip"
+      val redisJarsZipFile = (ThisBuild / baseDirectory).value / "build" / "orbeon-redis-jars.zip"
       val classpath        = (Compile / externalDependencyClasspath).value
       val allJars          = classpath.files.filter(_.getName.endsWith(".jar"))
       val filteredJars     = allJars.filter { jar =>

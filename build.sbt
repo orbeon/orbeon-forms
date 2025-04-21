@@ -165,6 +165,12 @@ val CoreLibraryDependencies = Seq(
   (_.exclude("javax.servlet"  , "servlet-api")) map     // because `jcifs` depends on this and we want it provided
   (_.exclude("jakarta.servlet", "jakarta.servlet-api"))
 
+val RedisLibraryDependencies = Seq(
+  "org.redisson"                % "redisson-all"                    % "3.45.1",
+  "org.redisson"                % "redisson-tomcat-9"               % "3.45.1",
+  "org.apache.fury"             % "fury-core"                       % "0.10.1"
+)
+
 val ExplodedWarLibPath            = "build/orbeon-war/WEB-INF/lib"
 val LiferayWarLibPath             = "/Users/ebruchez/OF/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
 
@@ -1518,6 +1524,40 @@ lazy val orbeonWarJS = orbeonWar.js
     }
   )
 
+lazy val orbeonRedisJars = (project in file("redis-jars-project"))
+  .settings(
+    name := "orbeon-redis-jars",
+    scalaVersion := mainScalaVersion,
+    libraryDependencies ++= RedisLibraryDependencies,
+
+    Compile / packageBin := {
+      val redisJarsZipFile = (ThisBuild / baseDirectory).value / "build" / "orbeon-redis-jars.zip"
+      val classpath        = (Compile / externalDependencyClasspath).value
+      val allJars          = classpath.files.filter(_.getName.endsWith(".jar"))
+      val filteredJars     = allJars.filter { jar =>
+        val jarName = jar.getName.toLowerCase
+        jarName.startsWith("redisson-all-") ||
+        jarName.startsWith("redisson-tomcat-") ||
+        jarName.startsWith("guava-") ||
+        jarName.startsWith("failureaccess-") ||
+        jarName.startsWith("fury-core-")
+      }
+
+      val targetDir = redisJarsZipFile.getParentFile
+      if (!targetDir.exists()) {
+        targetDir.mkdirs()
+      }
+
+      IO.zip(
+        filteredJars.map(jar => jar -> jar.getName),
+        redisJarsZipFile,
+        None
+      )
+
+      redisJarsZipFile
+    }
+  )
+
 lazy val root = (project in file("."))
   .aggregate(
     commonJVM,
@@ -1539,7 +1579,8 @@ lazy val root = (project in file("."))
     servletContainerInitializer,
     demoSqliteDatabase,
     orbeonWarJVM,
-    orbeonWarJS
+    orbeonWarJS,
+    orbeonRedisJars
   )
   .settings(
     // TEMP: override so that root project doesn't search under src

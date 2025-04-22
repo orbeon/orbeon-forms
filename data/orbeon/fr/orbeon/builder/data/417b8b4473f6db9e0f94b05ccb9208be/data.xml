@@ -44,19 +44,29 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <explanatory-text/>
                             <calculated-value>Great love and great achievements involve great risk.</calculated-value>
                             <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless>
-                            <hidden-field/>
                             <calculated-value-clipboard>Great love and great achievements involve great risk.</calculated-value-clipboard>
+                            <hidden-field/>
+
+
                         </grid-9>
                     </utility-controls>
                     <typed-controls>
                         <grid-3>
                             <email>info@orbeon.com</email>
-                            <us-phone>5555555555</us-phone>
-                            <us-state>CA</us-state>
                             <currency>10.99</currency>
                             <number>299792458</number>
                             <currency-right>10.99</currency-right>
                             <number-right>299792458</number-right>
+
+
+
+
+
+                            <us-phone>5555555555</us-phone>
+                            <us-state>CA</us-state>
+                            <control-2>00-1234567</control-2>
+                            <us-ssn>078-05-1120</us-ssn>
+                            <ssn-explanation/>
                         </grid-3>
 
 
@@ -337,14 +347,22 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"/>
+
+
+
+
+
+                        <xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/>
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"/>
+                        <xf:bind ref="us-state" id="us-state-bind" type="xf:string" name="us-state"/>
                         <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')"
                                  name="us-phone"/>
-                        <xf:bind ref="us-state" id="us-state-bind" type="xf:string" name="us-state"/>
                         <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
                         <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
                         <xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal"
                                  name="currency-right"/>
                         <xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="fr:us-ein"/>
                     </xf:bind>
 
 
@@ -359,6 +377,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"/>
                         <xf:bind ref="calculated-value-clipboard" id="calculated-value-clipboard-bind"
                                  name="calculated-value-clipboard"/>
+
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="reusable-sections-bind" ref="reusable-sections" name="reusable-sections">
@@ -497,21 +516,25 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <calculated-value>
                             <label>Calculated Value</label>
                             <hint>Standard text output with a label</hint>
+
+
                         </calculated-value>
                         <calculated-value-borderless>
                             <label>Calculated Value without border</label>
                             <hint>Standard text output with a label but no border</hint>
                         </calculated-value-borderless>
-                        <hidden-field>
-                            <label/>
-                            <hint/>
-                        </hidden-field>
                         <calculated-value-clipboard>
                             <label>Calculated Value with Clipboard Copy</label>
                             <hint>Standard text output with a label and copy</hint>
 
 
                         </calculated-value-clipboard>
+                        <hidden-field>
+                            <label/>
+                            <hint/>
+                        </hidden-field>
+
+
                         <dropdown>
                             <label>Dropdown</label>
                             <hint/>
@@ -661,14 +684,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Email Address</label>
                             <hint>Email field with validation</hint>
                         </email>
-                        <us-phone>
-                            <label>US Phone Number</label>
-                            <hint>US phone number field</hint>
-                        </us-phone>
-                        <us-state>
-                            <label>US State</label>
-                            <hint>US state selector</hint>
-                        </us-state>
                         <currency>
                             <label>Currency</label>
                             <hint>Currency field</hint>
@@ -685,6 +700,32 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Number (right-aligned)</label>
                             <hint>Number field with validation</hint>
                         </number-right>
+
+
+
+
+
+                        <us-phone>
+                            <label>US Phone Number</label>
+                            <hint>US phone number field</hint>
+                        </us-phone>
+                        <us-state>
+                            <label>US State</label>
+                            <hint>US state selector</hint>
+                        </us-state>
+                        <control-2>
+                            <label>US EIN</label>
+                            <hint>US Employer Identification Number</hint>
+                        </control-2>
+                        <us-ssn>
+                            <label>US SSN</label>
+                            <hint>US Social Security Number</hint>
+                        </us-ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+                        </ssn-explanation>
                         <standard-button>
                             <label>Standard Button</label>
                             <hint>Standard browser button</hint>
@@ -1017,21 +1058,25 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <calculated-value>
                             <label>Valeur calculée</label>
                             <hint>Sortie texte standard avec libellé</hint>
+
+
                         </calculated-value>
                         <calculated-value-borderless>
                             <label>Valeur calculée sans bord</label>
                             <hint>Sortie texte standard avec libellé mais sans bord</hint>
                         </calculated-value-borderless>
-                        <hidden-field>
-                            <label/>
-                            <hint/>
-                        </hidden-field>
                         <calculated-value-clipboard>
                             <label>Valeur calculée avec copie vers le presse-papiers</label>
                             <hint>Sortie texte standard avec libellé et copie</hint>
 
 
                         </calculated-value-clipboard>
+                        <hidden-field>
+                            <label/>
+                            <hint/>
+                        </hidden-field>
+
+
                         <dropdown>
                             <label>Menu déroulant</label>
                             <hint/>
@@ -1181,14 +1226,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Adresse email</label>
                             <hint>Email field with validation</hint>
                         </email>
-                        <us-phone>
-                            <label>Téléphone US</label>
-                            <hint>US phone number field</hint>
-                        </us-phone>
-                        <us-state>
-                            <label>Etat US</label>
-                            <hint>US state selector</hint>
-                        </us-state>
                         <currency>
                             <label>Devise</label>
                             <hint>Currency field</hint>
@@ -1205,6 +1242,32 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Nombre (alignement à droite)</label>
                             <hint>Number field with validation</hint>
                         </number-right>
+
+
+
+
+
+                        <us-phone>
+                            <label>Téléphone US</label>
+                            <hint>US phone number field</hint>
+                        </us-phone>
+                        <us-state>
+                            <label>Etat US</label>
+                            <hint>US state selector</hint>
+                        </us-state>
+                        <control-2>
+                            <label/>
+                            <hint/>
+                        </control-2>
+                        <us-ssn>
+                            <label/>
+                            <hint/>
+                        </us-ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+                        </ssn-explanation>
                         <standard-button>
                             <label>Bouton standard</label>
                             <hint>Bouton navigateur standard</hint>
@@ -1579,10 +1642,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="2" w="6">
-                            <xf:output bind="calculated-value-bind" id="calculated-value-control">
+                            <xf:output bind="calculated-value-bind" id="calculated-value-control" appearance="full">
                                 <xf:label ref="$form-resources/calculated-value/label"/>
                                 <xf:hint ref="$form-resources/calculated-value/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
 
                             </xf:output>
                         </fr:c>
@@ -1597,16 +1661,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </xf:output>
                         </fr:c>
                         <fr:c x="1" y="3" w="6">
-                            <fr:hidden xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hidden-field-control"
-                                       bind="hidden-field-bind">
-                                <xf:label ref="$form-resources/hidden-field/label"/>
-                                <xf:hint ref="$form-resources/hidden-field/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                            </fr:hidden>
-                        </fr:c>
-                        <fr:c x="7" y="3" w="6">
                             <xf:output bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control"
                                        appearance="clipboard-copy">
                                 <xf:label ref="$form-resources/calculated-value-clipboard/label"/>
@@ -1615,6 +1669,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                             </xf:output>
+
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
+                            <fr:hidden xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hidden-field-control"
+                                       bind="hidden-field-bind">
+                                <xf:label ref="$form-resources/hidden-field/label"/>
+                                <xf:hint ref="$form-resources/hidden-field/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:hidden>
+
                         </fr:c>
                     </fr:grid>
                 </fr:section>
@@ -1628,42 +1694,33 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="5" w="4">
-                            <fr:us-phone bind="us-phone-bind" id="us-phone-control">
-                                <xf:label ref="$form-resources/us-phone/label"/>
-                                <xf:hint ref="$form-resources/us-phone/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </fr:us-phone>
-                        </fr:c>
-                        <fr:c y="1" x="9" w="4">
-                            <fr:us-state bind="us-state-bind" id="us-state-control">
-                                <xf:label ref="$form-resources/us-state/label"/>
-                                <xf:hint ref="$form-resources/us-state/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </fr:us-state>
-                        </fr:c>
-                        <fr:c y="2" x="1" w="4">
                             <fr:currency bind="currency-bind" id="currency-control">
                                 <xf:label ref="$form-resources/currency/label"/>
                                 <xf:hint ref="$form-resources/currency/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:currency>
+
                         </fr:c>
-                        <fr:c y="2" x="5" w="4">
+                        <fr:c y="1" x="9" w="4">
                             <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" suffix="m/s">
                                 <xf:label ref="$form-resources/number/label"/>
                                 <xf:hint ref="$form-resources/number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:number>
+
                         </fr:c>
-                        <fr:c y="2" x="9" w="4"/>
-                        <fr:c x="1" y="3" w="4">
+                        <fr:c y="2" x="1" w="4">
+
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
                             <fr:currency bind="currency-right-bind" id="currency-right-control" field-align="right">
                                 <xf:label ref="$form-resources/currency-right/label"/>
                                 <xf:hint ref="$form-resources/currency-right/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:currency>
+
                         </fr:c>
-                        <fr:c x="5" y="3" w="4">
+                        <fr:c y="2" x="9" w="4">
                             <fr:number id="number-right-control" bind="number-right-bind" digits-after-decimal="0"
                                        suffix="m/s"
                                        field-align="right">
@@ -1672,7 +1729,52 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:number>
                         </fr:c>
-                        <fr:c x="9" y="3" w="4"/>
+
+
+                        <fr:c x="1" y="3" w="4">
+                            <fr:us-phone bind="us-phone-bind" id="us-phone-control">
+                                <xf:label ref="$form-resources/us-phone/label"/>
+                                <xf:hint ref="$form-resources/us-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4">
+                            <fr:us-state bind="us-state-bind" id="us-state-control">
+                                <xf:label ref="$form-resources/us-state/label"/>
+                                <xf:hint ref="$form-resources/us-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4">
+                            <fr:us-ein xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                       id="control-2-control"
+                                       bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-ein>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="4">
+                            <fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                       id="us-ssn-control"
+                                       bind="us-ssn-bind">
+                                <xf:label ref="$form-resources/us-ssn/label"/>
+                                <xf:hint ref="$form-resources/us-ssn/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:us-ssn>
+                        </fr:c>
+                        <fr:c x="5" y="4" w="8">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ssn-explanation-control"
+                                            bind="ssn-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
                     </fr:grid>
 
 

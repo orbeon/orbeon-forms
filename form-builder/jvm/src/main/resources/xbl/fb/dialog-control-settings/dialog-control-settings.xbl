@@ -1684,24 +1684,43 @@
                                                 name="supported"
                                                 value="'string', 'decimal', 'integer', 'double', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
 
-                                            <xf:var name="current-builtin-type" value="builtin-type/string()"/>
+                                            <xf:var
+                                                name="current-builtin-type"
+                                                value="builtin-type/string()"/>
+
+                                            <xf:var
+                                                name="matches-schema-type"
+                                                value="
+                                                    exists($schema)   and
+                                                    schema-type != '' and
+                                                    schema-type = $schema/xs:simpleType/string-join(($schema-prefix, @name), ':')"/>
+
                                             <xf:select1 ref="builtin-type">
                                                 <!-- Only show label if there is a schema -->
                                                 <xf:label ref="$resources/dialog-control-settings/builtin-type/label[exists($schema)]"/>
                                                 <!-- Add placeholder if there is a schema type -->
-                                                <xf:itemset ref=".[../schema-type != '']">
+                                                <xf:itemset ref=".[$matches-schema-type]">
                                                     <xf:label ref="$resources/dialog-control-settings/builtin-type/use-schema-type"/>
                                                     <xf:value/>
                                                 </xf:itemset>
+
+                                                <xf:itemset ref=".[../schema-type != '' and not($matches-schema-type)]">
+                                                    <xf:label ref="$resources/dialog-control-settings/builtin-type/use-component-type"/>
+                                                    <xf:value/>
+                                                </xf:itemset>
+
                                                 <xf:itemset
                                                     ref="
-                                                        $resources/dialog-control-settings/builtin-type/choices//(
-                                                            choices[
-                                                                exists(type[. = $supported])
-                                                            ]
-                                                            |
-                                                            type[. = $supported]
-                                                        )">
+                                                        if (../schema-type != '' and not($matches-schema-type)) then
+                                                            ()
+                                                        else
+                                                            $resources/dialog-control-settings/builtin-type/choices//(
+                                                                choices[
+                                                                    exists(type[. = $supported])
+                                                                ]
+                                                                |
+                                                                type[. = $supported]
+                                                            )">
                                                     <xf:label ref="if (self::choices) then label else if (xxf:non-blank(@label)) then @label else ."/>
                                                     <xf:value ref="if (self::choices) then () else ."/>
                                                 </xf:itemset>

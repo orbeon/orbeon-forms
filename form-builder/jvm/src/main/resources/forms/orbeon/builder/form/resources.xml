@@ -617,6 +617,7 @@
                 <hint>Built-in data type</hint>
 
                 <use-schema-type>Use schema type</use-schema-type>
+                <use-component-type>Use predefined type</use-component-type>
 
                 <choices>
                     <choices>
@@ -2184,7 +2185,8 @@
                 <label>Type de base</label>
                 <hint>Type de donnée de base</hint>
 
-                <use-schema-type>Utiliser le type de schéma</use-schema-type>
+                <use-schema-type>Utiliser le type du schéma</use-schema-type>
+                <use-component-type>Utiliser le type prédéfini</use-component-type>
 
                 <choices>
                     <choices>
@@ -3738,6 +3740,7 @@
                 <hint>Inngebygd datatype</hint>
 
                 <use-schema-type todo="true">[Use schema type]</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -5317,6 +5320,7 @@
                 <hint>Встроенный тип данных</hint>
 
                 <use-schema-type todo="true">[Use schema type]</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -6896,6 +6900,7 @@
                 <hint>Tipi di dati integrati</hint>
 
                 <use-schema-type>Usa tipo di schema</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -8439,6 +8444,7 @@
                 <hint>Eingebauter Datentyp</hint>
 
                 <use-schema-type>Schematyp verwenden</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -9985,6 +9991,7 @@
                 <hint>Sisäänrakennettu datatyyppi</hint>
 
                 <use-schema-type>Käytä skeeman tyyppiä</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -11556,6 +11563,7 @@
                 <hint>Tipos Específicos</hint>
 
                 <use-schema-type>Usar Tipo Esquema</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -13128,6 +13136,7 @@
                 <hint>Built-in data type</hint>
 
                 <use-schema-type>Gebruik schema type</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -14679,6 +14688,7 @@
                 <hint>Tipos de dados embutidos</hint>
 
                 <use-schema-type>Use schema type</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>
@@ -16257,6 +16267,7 @@
                 <hint>Inbyggd datatyp</hint>
 
                 <use-schema-type>Använd schemats datatyp</use-schema-type>
+                <use-component-type todo="true">[Use predefined type]</use-component-type>
 
                 <choices>
                     <choices>

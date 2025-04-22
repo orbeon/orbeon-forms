@@ -374,20 +374,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def toXML(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
-      val builtinTypeString = datatype match {
-        case Left((name, _)) => name.localName
-        case _               => ""
-      }
-
-      val builtinTypeRequired = datatype match {
-        case Left((_, required)) => required.toString
-        case _                   => ""
-      }
+      val (builtinTypeString, builtinTypeRequired, schemaTypeString) =
+        datatype match {
+          case Left((qName, required)) => (qName.localName, required.toString, "")
+          case Right(qName)            => ("", "", qName.qualifiedName)
+        }
 
       <validation type="datatype" id={idOpt.orNull} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <builtin-type>{builtinTypeString}</builtin-type>
         <builtin-type-required>{builtinTypeRequired}</builtin-type-required>
-        <schema-type>{datatype.toOption map (_.qualifiedName) getOrElse ""}</schema-type>
+        <schema-type>{schemaTypeString}</schema-type>
         {alertOrPlaceholder(alert)}
       </validation>
     }

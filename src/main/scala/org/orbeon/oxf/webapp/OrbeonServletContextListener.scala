@@ -30,6 +30,8 @@ class JakartaOrbeonServletContextListener extends JakartaServletContextListener(
  */
 abstract class OrbeonServletContextListenerImpl extends ServletContextListener with WithServletException {
 
+  private var initializationSuccessful: Boolean = false
+
   def newServletException(throwable: Throwable): Exception
 
   private val InitProcessorPrefix     = "oxf.context-initialized-processor."
@@ -45,13 +47,16 @@ abstract class OrbeonServletContextListenerImpl extends ServletContextListener w
   override def contextInitialized(event: ServletContextEvent): Unit =
     withRootException("context creation", newServletException) {
       runWithServletContext(event.getServletContext, None, logPrefix, "Context initialized.", InitProcessorPrefix, InitInputPrefix)
+      initializationSuccessful = true
     }
 
   override def contextDestroyed(event: ServletContextEvent): Unit =
-    withRootException("context destruction", newServletException) {
-      runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
-      // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
-      // TODO: Shouldn't a singleton `WebAppContext` be available instead?
-      ServletWebAppContext(event.getServletContext).webAppDestroyed()
+    if (initializationSuccessful) {
+      withRootException("context destruction", newServletException) {
+        runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
+        // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
+        // TODO: Shouldn't a singleton `WebAppContext` be available instead?
+        ServletWebAppContext(event.getServletContext).webAppDestroyed()
+      }
     }
 }

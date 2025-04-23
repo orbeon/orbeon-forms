@@ -109,31 +109,26 @@ class Properties private {
       if (lastUpdate + Properties.ReloadDelay >= current)
         return
 
-      try {
-        withPipelineContext { pipelineContext =>
+      withPipelineContext { pipelineContext =>
 
-          urlGenerator.reset(pipelineContext)
-          domSerializer.reset(pipelineContext)
+        urlGenerator.reset(pipelineContext)
+        domSerializer.reset(pipelineContext)
 
-          // Find whether we can skip reloading
-          if (propertyStore.isDefined && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
-            Properties.logger.debug("Not reloading properties because they have not changed.")
-            lastUpdate = current
-            return
-          }
-          Properties.logger.debug("Reloading properties because timestamp indicates they may have changed.")
-
-          // Read updated properties document
-          val document = domSerializer.runGetDocument(pipelineContext)
-          if (document == null || document.content.isEmpty)
-            throw new OXFException("Failure to initialize Orbeon Forms properties")
-
-          propertyStore = PropertyStore.parse(document).some
+        // Find whether we can skip reloading
+        if (propertyStore.isDefined && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
+          Properties.logger.debug("Not reloading properties because they have not changed.")
           lastUpdate = current
+          return
         }
-      } catch {
-        case NonFatal(t) =>
-          Properties.logger.error(t)("")
+        Properties.logger.debug("Reloading properties because timestamp indicates they may have changed.")
+
+        // Read updated properties document
+        val document = domSerializer.runGetDocument(pipelineContext)
+        if (document == null || document.content.isEmpty)
+          throw new OXFException("Failure to initialize Orbeon Forms properties")
+
+        propertyStore = PropertyStore.parse(document).some
+        lastUpdate = current
       }
     }
 

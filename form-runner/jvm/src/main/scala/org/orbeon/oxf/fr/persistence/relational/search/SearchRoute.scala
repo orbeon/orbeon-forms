@@ -24,10 +24,7 @@ import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.IndentedLogger
 
 
-object SearchRoute
-  extends XmlNativeRoute
-    with SearchLogic
-    with SearchResult {
+object SearchRoute extends XmlNativeRoute {
 
   self =>
 
@@ -61,9 +58,9 @@ object SearchRoute
           formDefinitionVersion
         )
 
-      val (result, count) = doSearch(request)
+      val (result, count) = SearchLogic.doSearch(request)
 
-      outputResult(request, result, count, getResponseXmlReceiver)
+      SearchResult.outputResult(request, result, count, getResponseXmlReceiver)
     } catch {
       case e: IllegalArgumentException =>
         throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))

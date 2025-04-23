@@ -41,7 +41,7 @@ trait DistinctValuesLogic {
     indentedLogger : IndentedLogger
   ): DistinctValues = {
     // Re-use part of the search API logic (permissions, SQL generation)
-    SearchLogic.doSearch(
+    SearchLogic.runBodyIfHasSomePermissions(
       request           = request,
       queries           = Nil,
       freeTextSearch    = None,

@@ -76,7 +76,7 @@ object SearchLogic {
     )
   }
 
-  def doSearch[T, R <: SearchRequestCommon](
+  def runBodyIfHasSomePermissions[T, R <: SearchRequestCommon](
     request           : R,
     queries           : List[Query],
     freeTextSearch    : Option[String],
@@ -109,9 +109,6 @@ object SearchLogic {
         body(connection, commonAndPermissionsParts, permissions)
       }
     }
-}
-
-trait SearchLogic {
 
   def doSearch(
     request        : SearchRequest
@@ -119,7 +116,7 @@ trait SearchLogic {
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): (List[Document], Int) =
-    SearchLogic.doSearch(
+    SearchLogic.runBodyIfHasSomePermissions(
       request           = request,
       queries           = request.queries,
       freeTextSearch    = request.freeTextSearch,

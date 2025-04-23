@@ -181,6 +181,12 @@
         xxf:cache="true">
 
         <xf:action event="xforms-submit-done">
+
+            <!-- https://github.com/orbeon/orbeon-forms/issues/6972 -->
+            <xf:action type="xpath">
+                xxf:remove-document-attribute('fb', 'binding-index')
+            </xf:action>
+
             <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
                  NOTE: The data in `fr-form-instance` must be up to date! -->
             <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.FormBuilderDocContext.{BindingIndexKey, FormBuilderNs}
 import org.orbeon.oxf.fr.{FormRunnerDocContext, Names}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.model.XFormsModel
@@ -37,14 +38,25 @@ case class FormBuilderDocContext(
 
   lazy val undoRootElem = undoInstance.get.rootElement
 
+  // We cache the index against the form definition document
   lazy implicit val bindingIndex: BindingIndex[BindingDescriptor] =
-    buildIndexFromBindingDescriptors(getAllRelevantDescriptors(componentBindings))
+    formBuilderModel
+      .flatMap(_.containingDocument.getAttribute(FormBuilderNs, BindingIndexKey))
+      .map(_.asInstanceOf[BindingIndex[BindingDescriptor]])
+      .getOrElse {
+        val index = buildIndexFromBindingDescriptors(getAllRelevantDescriptors(componentBindings))
+        formBuilderModel.foreach(_.containingDocument.setAttribute(FormBuilderNs, BindingIndexKey, index))
+        index
+      }
 
   private def componentBindings: Seq[NodeInfo] =
     asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 }
 
 object FormBuilderDocContext {
+
+  private val FormBuilderNs   = "fb"
+  private val BindingIndexKey = "binding-index"
 
   // Create with a specific form definition document, but still pass a model to provide access to variables
   def apply(inDoc: NodeInfo): FormBuilderDocContext =

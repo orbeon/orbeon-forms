@@ -13,21 +13,23 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
-    .xforms-open-select1-appearance-minimal {
+    .xbl-fr-open-select1 {
+        &.xforms-open-select1-appearance-minimal, &.xforms-select1-appearance-minimal {
 
-        .fr-component-group {
-            width: 100%;
-            display: flex;
-            .xforms-select1 { max-width: 50%; margin-right: 10px }
-            .xforms-input   { flex: 1 1 }
+            .fr-component-group {
+                width: 100%;
+                display: flex;
+                .xforms-select1 { max-width: 50%; margin-right: 10px }
+                .xforms-input   { flex: 1 1 }
+            }
         }
-    }
 
-    .xforms-open-select1-appearance-full {
-        .fr-component-group {
-            padding: 4px 6px; // so that this matches the padding when we have `tabindex="0"`
-            .xforms-items {
-                margin-bottom: 5px;
+        &.xforms-open-select1-appearance-full, &.xforms-select1-appearance-full {
+            .fr-component-group {
+                padding: 4px 6px; // so that this matches the padding when we have `tabindex="0"`
+                .xforms-items {
+                    margin-bottom: 5px;
+                }
             }
         }
     }

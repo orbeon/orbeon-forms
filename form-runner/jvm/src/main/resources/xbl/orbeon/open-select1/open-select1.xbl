@@ -29,11 +29,20 @@
         `appearance ~= minimal`. Put the first appearance first but still bind to no appearance. See:
 
         - https://github.com/orbeon/orbeon-forms/issues/5172
+
+        2025-04-23:
+
+        - Order of selectors does not matter as we use a system of priority. Restoring original order.
+        - Adding new selectors, but they are not yet used by Form Builder.
     -->
 
     <xbl:binding
         id="fr-open-select1"
-        element="fr|open-select1[appearance ~= full], fr|open-select1"
+        element="
+            fr|open-select1,
+            fr|open-select1[appearance ~= full],
+            xf|select1[selection = open],
+            xf|select1[selection = open][appearance ~= full]"
         xxbl:container="span"
         xxbl:mode="lhha binding value selection"
         xxbl:label-for="fr-open-select1-elem">

@@ -5,7 +5,9 @@
 
     <xbl:binding
         id="fr-open-select1-minimal"
-        element="fr|open-select1[appearance ~= minimal]"
+        element="
+            fr|open-select1[appearance ~= minimal],
+            xf|select1[selection = open][appearance ~= minimal]"
         xxbl:container="span"
         xxbl:mode="lhha binding value">
 

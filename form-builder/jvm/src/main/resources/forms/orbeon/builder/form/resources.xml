@@ -558,6 +558,7 @@
             </control-name>
             <pdf-field-name>
                 <label>Name of the PDF field</label>
+                <alert>Unknown PDF field name</alert>
                 <item id="0">Automatic</item>
                 <item id="1">Custom</item>
             </pdf-field-name>
@@ -2127,6 +2128,7 @@
             </control-name>
             <pdf-field-name>
                 <label>Nom du champ PDF</label>
+                <alert>Nom de champ PDF inconnu</alert>
                 <item id="0">Automatique</item>
                 <item id="1">Personnalisé</item>
             </pdf-field-name>
@@ -3681,6 +3683,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -5261,6 +5264,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -6841,6 +6845,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -8385,6 +8390,7 @@
             </control-name>
             <pdf-field-name>
                 <label>Name des PDF-Felds</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -9932,6 +9938,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -11504,6 +11511,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -13077,6 +13085,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -14629,6 +14638,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>
@@ -16208,6 +16218,7 @@
             </control-name>
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
+                <alert todo="true">[Unknown PDF field name]</alert>
                 <item id="0" todo="true">Automatic</item>
                 <item id="1" todo="true">Custom</item>
             </pdf-field-name>

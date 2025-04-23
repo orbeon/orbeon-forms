@@ -900,6 +900,19 @@
                             . = $control-names
                         )"/>
 
+                <xf:bind
+                    ref="pdf-field-name"
+                    required="@type = 'custom'">
+                    <xf:constraint
+                        id="unknown-pdf-field-name"
+                        level="info"
+                        value="
+                            if (@type = 'custom') then
+                                . = xxf:instance('pdf-field-names-instance')//field/@fully-qualified-name
+                            else
+                                true()"/>
+                </xf:bind>
+
                 <xf:bind ref="default-alert">
                     <xf:bind
                         ref="alert/@global"
@@ -1458,6 +1471,8 @@
                                                 </xf:output>
                                                 <fr:open-select1 appearance="minimal" ref="$i/pdf-field-name[@type = 'custom']">
                                                     <xf:label appearance="minimal">custom</xf:label>
+                                                    <xf:alert validation="unknown-pdf-field-name" ref="$resources/dialog-control-settings/pdf-field-name/alert"/>
+                                                    <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                     <xf:itemset ref="xxf:instance('pdf-field-names-instance')//(_ | field)">
                                                         <xf:label
                                                             ref="

@@ -357,7 +357,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         oldDatatype = DatatypeValidation.fromForm(controlName).datatypeQName
         oldAtts     = BindingDescriptor.getAtts(controlElem)
         (newElemName, newAppearanceAttOpt) <-
-          BindingDescriptor.newElementName(
+          FormBuilder.newElementName(
             controlElem.uriQualifiedName,
             oldDatatype,
             oldAtts,

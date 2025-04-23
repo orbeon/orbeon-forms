@@ -17,7 +17,7 @@ import cats.effect.unsafe.IORuntime
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
-import org.scalajs.dom.crypto.GlobalCrypto
+import org.scalajs.dom
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.typedarray.Uint8Array
@@ -42,7 +42,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   def randomHexId: String = {
     val values = new Uint8Array(40 / 2)
-    GlobalCrypto.crypto.getRandomValues(values)
+    dom.crypto.getRandomValues(values)
     values.map(v => "" + hexDigits(v >> 4) + hexDigits(v & 0xf)).mkString
   }
 

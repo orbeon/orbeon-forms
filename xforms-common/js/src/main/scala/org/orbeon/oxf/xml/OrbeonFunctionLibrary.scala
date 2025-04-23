@@ -34,7 +34,7 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
     findFunctionItem(symbolicName, new RetainedStaticContext(env)) match {
       case Some(fn) =>
         val f = fn.makeFunctionCall(staticArgs.toIndexedSeq*)
-        f.setRetainedStaticContext(fn.getRetainedStaticContext)
+        f.setRetainedStaticContext(fn.getRetainedStaticContext())
         f
       case None =>
         // Adding information to the `reasons` list is usually unneeded unless we are the last

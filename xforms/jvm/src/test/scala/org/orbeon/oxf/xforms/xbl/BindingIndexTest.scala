@@ -105,12 +105,12 @@ class BindingIndexTest
     IOSupport.readOrbeonDom(encapsulated).getRootElement.elements.head
   }
 
-  def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding): Unit = {
+  def assertElemMatched(xmlElem: String, binding: IndexableBinding)(implicit index: BindingIndex[IndexableBinding]): Unit = {
 
     val elem = parseXMLElemWithNamespaces(xmlElem)
     val atts = elem.attributes map (a => a.getQName -> a.getValue)
 
-    val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, DatatypeMatch.Exclude, atts)
+    val found = BindingDescriptor.findMostSpecificBinding(elem.getQName, DatatypeMatch.Exclude, atts)
 
     it(s"must pass with `$xmlElem`") {
       assert(found.map(_._1).contains(binding))
@@ -119,31 +119,31 @@ class BindingIndexTest
 
   describe("Selector priority") {
 
-    val currentIndex = indexWithAllBindings
+    implicit val currentIndex: BindingIndex[IndexableBinding] = indexWithAllBindings
 
-    assertElemMatched(currentIndex, """<foo:bar/>""",                                   fooBarBinding)
-    assertElemMatched(currentIndex, """<foo:baz/>""",                                   fooBazBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="bar"/>""",                  fooBarBinding)
-    assertElemMatched(currentIndex, """<foo:baz appearance="bar"/>""",                  fooBazBinding)
-    assertElemMatched(currentIndex, """<foo:baz appearance="baz"/>""",                  appearanceTokenBazBinding)
-    assertElemMatched(currentIndex, """<foo:baz appearance="fuzz baz toto"/>""",        appearanceTokenBazBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",                  fooBarAppearanceBazBinding)
-    assertElemMatched(currentIndex, """<foo:bar repeat="content"/>""",                  fooBarRepeatContent)
-    assertElemMatched(currentIndex, """<foo:bar appearance="baz" repeat="content"/>""", fooBarAppearanceAndAtt)
-    assertElemMatched(currentIndex, """<foo:bar repeat="true"/>""",                     fooBarRepeat)
+    assertElemMatched("""<foo:bar/>""",                                   fooBarBinding)
+    assertElemMatched("""<foo:baz/>""",                                   fooBazBinding)
+    assertElemMatched("""<foo:bar appearance="bar"/>""",                  fooBarBinding)
+    assertElemMatched("""<foo:baz appearance="bar"/>""",                  fooBazBinding)
+    assertElemMatched("""<foo:baz appearance="baz"/>""",                  appearanceTokenBazBinding)
+    assertElemMatched("""<foo:baz appearance="fuzz baz toto"/>""",        appearanceTokenBazBinding)
+    assertElemMatched("""<foo:bar appearance="baz"/>""",                  fooBarAppearanceBazBinding)
+    assertElemMatched("""<foo:bar repeat="content"/>""",                  fooBarRepeatContent)
+    assertElemMatched("""<foo:bar appearance="baz" repeat="content"/>""", fooBarAppearanceAndAtt)
+    assertElemMatched("""<foo:bar repeat="true"/>""",                     fooBarRepeat)
   }
 
   describe("Matching by attribute") {
 
-    val currentIndex = indexWithAllBindings
+    implicit val currentIndex: BindingIndex[IndexableBinding] = indexWithAllBindings
 
-    assertElemMatched(currentIndex, """<foo:bar appearance="gaga"/>""",           appearanceIsGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="fuzz gaga toto"/>""", appearanceTokenGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="gaga toto"/>""",      appearanceTokenGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="fuzz gaga"/>""",      appearanceTokenGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="gaga-en"/>""",        appearancePrefixGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="gagaba"/>""",         appearanceStartsWithGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="bagaga"/>""",         appearanceEndsWithGagaBinding)
-    assertElemMatched(currentIndex, """<foo:bar appearance="bagagada"/>""",       appearanceContainsGagaBinding)
+    assertElemMatched("""<foo:bar appearance="gaga"/>""",           appearanceIsGagaBinding)
+    assertElemMatched("""<foo:bar appearance="fuzz gaga toto"/>""", appearanceTokenGagaBinding)
+    assertElemMatched("""<foo:bar appearance="gaga toto"/>""",      appearanceTokenGagaBinding)
+    assertElemMatched("""<foo:bar appearance="fuzz gaga"/>""",      appearanceTokenGagaBinding)
+    assertElemMatched("""<foo:bar appearance="gaga-en"/>""",        appearancePrefixGagaBinding)
+    assertElemMatched("""<foo:bar appearance="gagaba"/>""",         appearanceStartsWithGagaBinding)
+    assertElemMatched("""<foo:bar appearance="bagaga"/>""",         appearanceEndsWithGagaBinding)
+    assertElemMatched("""<foo:bar appearance="bagagada"/>""",       appearanceContainsGagaBinding)
   }
 }

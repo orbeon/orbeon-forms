@@ -966,9 +966,11 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def findNewControlBinding(
-    controlName              : String,
-    newDatatypeValidationElem: NodeInfo,
-    newAppearanceOpt         : Option[String]
+    controlName        : String,
+    builtinTypeOrBlank : String,
+    builtinTypeRequired: Boolean,
+    schemaTypeOrBlank  : String,
+    appearanceOpt      : Option[String]
   ): Option[NodeInfo] = {
 
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
@@ -979,11 +981,11 @@ object FormBuilderXPathApi {
     val oldAtts        = (oldControlElem /@ @*).view.map(attNode => (attNode.qName, attNode.stringValue))
 
     val newDatatype =
-      DatatypeValidation.fromXml(
-        validationElem  = newDatatypeValidationElem,
-        newIds          = nextTmpIds(token = Names.Validation, count = 1).iterator,
-        controlName     = controlName
-      ).datatypeQName
+      DatatypeValidation.datatypeQNameFromStrings(
+        controlName    = controlName,
+        builtinTypeOpt = builtinTypeOrBlank.trimAllToOpt.map(_ -> builtinTypeRequired),
+        schemaTypeOpt  = schemaTypeOrBlank.trimAllToOpt
+      ).fold(_._1, identity)
 
     val (virtualName, _) =
       findVirtualNameAndAppearance(
@@ -994,10 +996,10 @@ object FormBuilderXPathApi {
 
     for {
       descriptor <-
-        findMostSpecificBindingDescriptor(
+        findMostSpecificBindingUseEqualOrToken(
           searchElemName = virtualName,
           datatypeMatch  = DatatypeMatch.makeExcludeStringMatch(newDatatype),
-          searchAtts     = updateAttAppearance(oldAtts, newAppearanceOpt)
+          searchAtts     = updateAttAppearance(oldAtts, appearanceOpt)
         )
       binding    <- descriptor.binding
     } yield

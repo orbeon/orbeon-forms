@@ -161,6 +161,137 @@ object BindingDescriptor {
     }
   }
 
+  private case class Score(nameMatch: Boolean, otherMatches: Int)
+
+  private object ScoreOrdering extends Ordering[Score] {
+    override def compare(x: Score, y: Score): Int =
+      if (x.otherMatches > y.otherMatches)
+        1
+      else if (x.otherMatches < y.otherMatches)
+        -1
+      else if (x.nameMatch && ! y.nameMatch)
+        1
+      else if (! x.nameMatch && y.nameMatch)
+        -1
+      else
+        0
+  }
+
+  // If found return the binding and a Boolean flag indicating if the match was by name only.
+  def findMostSpecificBinding[T](
+    qName           : QName,
+    datatypeMatch   : DatatypeMatch,
+    atts            : Iterable[(QName, String)],
+    filterAppearance: AttributePredicate => Boolean = _ => true
+  )(implicit
+    index           : BindingIndex[T]
+  ): Option[(T, Boolean)] = {
+
+    object AppearanceExtractor extends AppearanceExtractor {
+      def getAtts: Iterable[(QName, String)] = atts
+      def getFilterAppearance: AttributePredicate => Boolean = filterAppearance
+    }
+
+    // Depending on `DatatypeMatch`, match on the datatype. The extractor, if it matches, returns a weight which can
+    // be 0 or 1. The idea is that if the binding doesn't specify a datatype, and we passed a datatype in, the binding
+    // does match, but with a priority less than if the binding specifies a datatype, and it matches the datatype
+    // passed.
+    object TypeExtractor {
+
+      val (datatype1Opt, datatype2Opt) =
+        datatypeMatch match {
+          case DatatypeMatch.Exclude         => (None, None)
+          case DatatypeMatch.Match(datatype) => (Some(datatype), Some(Types.getVariationTypeOrKeep(datatype)))
+        }
+
+      def unapply(bindingDatatypeOpt: Option[QName]): Option[Int] =
+        datatypeMatch match {
+          case DatatypeMatch.Exclude | DatatypeMatch.Match(_)
+            if bindingDatatypeOpt.isEmpty =>
+              Some(0)
+          case DatatypeMatch.Match(_)
+            if bindingDatatypeOpt == datatype1Opt || bindingDatatypeOpt == datatype2Opt =>
+              Some(1)
+          case _ =>
+              None
+        }
+    }
+
+    object FirstAttExtractor extends FirstAttExtractor {
+      def getAtts: Iterable[(QName, String)] = atts
+    }
+
+    // This and `ScoreOrdering` assign a score to a `BindingDescriptor` given the incoming parameters. The idea is that
+    // the more stuff matches, the higher the score. We keep track separately of whether the element name matched, vs.
+    // the other matches.
+    //
+    // Priorities:
+    //
+    //     foo:xxf-type('xs:date')[bar ~= baz][appearance ~= qux]                  >
+    //     foo:xxf-type('xs:date')[bar ~= baz], foo[bar ~= baz][appearance ~= qux] >
+    //     [bar ~= baz][appearance ~= qux]                                         >
+    //     foo:xxf-type('xs:date'), foo[bar ~= baz]                                >
+    //     [bar ~= baz]                                                            >
+    //     foo
+    //
+    // There can be matches with the same priority, in which case we take the first we find. We currently don't have
+    // a deterministic way to break ties, so that kind of matches should be avoided in XBL selectors.
+    //
+    // It doesn't look like the spec specifies that:
+    //
+    //     [bar ~= baz] > [bar]
+    //
+    // But that would be reasonable. We don't handle this yet.
+    //
+    // See also: https://drafts.csswg.org/selectors-4/#specificity
+    def computeScore(bd: BindingDescriptor): Option[Score] = {
+      val nameMatch    =
+        bd.elementName.contains(qName)
+      val otherMatches =
+        bd match {
+          case BindingDescriptor(_, TypeExtractor(w), AppearanceExtractor(_), FirstAttExtractor(_)) => Some(2 + w)
+          case BindingDescriptor(_, TypeExtractor(w), AppearanceExtractor(_), None)                 => Some(1 + w)
+          case BindingDescriptor(_, TypeExtractor(w), None, FirstAttExtractor(_))                   => Some(1 + w)
+          case BindingDescriptor(_, TypeExtractor(w), None, None)                                   => Some(0 + w)
+          case _                                                                                    => None
+        }
+
+      (bd.elementName.isEmpty || nameMatch) && otherMatches.isDefined option
+        Score(
+          nameMatch    = nameMatch,
+          otherMatches = otherMatches.get
+        )
+    }
+
+    def scoreBindings: Option[(Score, T)] = {
+      var bestScoreOpt: Option[(Score, T)] = None
+      index.iterateDescriptors2.foreach { bd =>
+        computeScore(bd._1).foreach { newScore =>
+          if (bestScoreOpt.isEmpty || bestScoreOpt.exists(s => ScoreOrdering.compare(newScore, s._1) == 1)) {
+            bestScoreOpt = Some(newScore, bd._2)
+          }
+        }
+      }
+      bestScoreOpt
+    }
+
+    scoreBindings.map(s => s._2 -> (s._1.nameMatch && s._1.otherMatches == 0))
+  }
+
+  def findMostSpecificBindingUseEqualOrToken(
+    searchElemName: QName,
+    datatypeMatch : DatatypeMatch,
+    searchAtts    : Iterable[(QName, String)],
+  )(implicit
+    index         : BindingIndex[BindingDescriptor]
+  ): Option[BindingDescriptor] =
+    findMostSpecificBinding(
+      qName            = searchElemName,
+      datatypeMatch    = datatypeMatch,
+      atts             = searchAtts,
+      filterAppearance = EqualOrTokenAttributePredicateFilter
+    ).map(_._1)
+
   // Return a new element name and appearance for the control if needed.
   // See `BindingDescriptorTest`'s "New element name" test for examples.
   def newElementName(
@@ -186,7 +317,7 @@ object BindingDescriptor {
 
     val newTupleOpt =
       for {
-        descriptor                <- findMostSpecificBindingDescriptor(virtualName, DatatypeMatch.makeExcludeStringMatch(newDatatype), newAtts)
+        descriptor                <- findMostSpecificBindingUseEqualOrToken(virtualName, DatatypeMatch.makeExcludeStringMatch(newDatatype), newAtts)
         relatedDescriptors        = findRelatedDescriptors(descriptor)
         (elemName, appearanceOpt) <- findStaticBindingInRelated(virtualName, newAtts, relatedDescriptors)
       } yield
@@ -216,7 +347,7 @@ object BindingDescriptor {
     for {
       // Find descriptor as would be found at form compilation time, except with `Equal`/`Token` attribute predicates
       // only.
-      descriptor                                          <-  findMostSpecificBindingDescriptor(searchElemName, DatatypeMatch.Exclude, searchAtts)
+      descriptor                                          <-  findMostSpecificBindingUseEqualOrToken(searchElemName, DatatypeMatch.Exclude, searchAtts)
       _ = assert(descriptor.datatype.isEmpty)
       // See comments in https://github.com/orbeon/orbeon-forms/issues/2479
       if descriptor.attOpt.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding
@@ -386,21 +517,6 @@ object BindingDescriptor {
     descriptors.foldLeft(BindingIndex[BindingDescriptor](Nil, Nil, Nil)) { case (index, binding) =>
       BindingIndex.indexBindingDescriptor(index, binding, binding, includeBindingsWithDatatype = true)
     }
-
-  def findMostSpecificBindingDescriptor(
-    searchElemName: QName,
-    datatypeMatch : DatatypeMatch,
-    searchAtts    : Iterable[(QName, String)],
-  )(implicit
-    index         : BindingIndex[BindingDescriptor]
-  ): Option[BindingDescriptor] =
-    BindingIndex.findMostSpecificBinding(
-      index            = index,
-      qName            = searchElemName,
-      datatypeMatch    = datatypeMatch,
-      atts             = searchAtts,
-      filterAppearance = EqualOrTokenAttributePredicateFilter
-    ).map(_._1)
 
   private object Private {
 

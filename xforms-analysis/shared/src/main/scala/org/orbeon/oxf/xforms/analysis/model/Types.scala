@@ -36,6 +36,9 @@ object Types {
   def qNameForBuiltinTypeName(builtinTypeString: String, required: Boolean): QName =
     QName(builtinTypeString, "", uriForBuiltinTypeName(builtinTypeString, required))
 
+  def isForBuiltinType(datatype: QName): Boolean =
+    datatype.namespace.uri == XSD_URI || datatype.namespace.uri == XFORMS_NAMESPACE_URI
+
   val StringQNames: Set[QName] =
     Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)
 

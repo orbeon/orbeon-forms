@@ -186,13 +186,16 @@
                 <!-- Make sure all alerts have placeholders for all available languages -->
                 <xf:dispatch name="complete-alert-languages" targetid="model"/>
 
-                <!--  Read appearances -->
+                <!-- Read appearances -->
+                <!-- Call 1/3 of `reload-appearances()` -->
                 <xf:dispatch
                     name="reload-appearances"
                     targetid="model">
                     <xf:property name="is-initial-load"       value="true()"/>
                     <xf:property name="previous-builtin-type" value="()"/>
+                    <xf:property name="previous-schema-type"  value="()"/>
                     <xf:property name="new-builtin-type"      value="$i/validations/validation[@type = 'datatype']/builtin-type/string()"/>
+                    <xf:property name="new-schema-type"       value="$i/validations/validation[@type = 'datatype']/schema-type/string()"/>
                 </xf:dispatch>
 
                 <!--
@@ -262,7 +265,9 @@
                 <xf:dispatch
                     name="fb-process-xbl-fb-control-details"
                     targetid="fb-dialog-control-settings">
-                    <xf:property name="datatype-validation" value="$i/validations/validation[@type = 'datatype']"/>
+                    <xf:property name="new-appearance" value="()"/>
+                    <xf:property name="builtin-type"   value="$i/validations/validation[@type = 'datatype']/builtin-type/string()[xxf:non-blank()]"/>
+                    <xf:property name="schema-type"    value="$i/validations/validation[@type = 'datatype']/schema-type/string()[xxf:non-blank()]"/>
                 </xf:dispatch>
 
                 <xxf:show
@@ -286,9 +291,13 @@
 
             </xbl:handler>
 
+            <!-- fb-process-xbl-fb-control-details($new-appearance, $builtin-type, $schema-type) -->
             <xbl:handler event="fb-process-xbl-fb-control-details">
                 <!-- Process `fb:control-details` -->
                 <!-- NOTE: Part of this is duplicated in `dialog-form-settings.xbl`. -->
+                <xf:var
+                    name="new-appearance"
+                    value="event('new-appearance')"/>
 
                 <xf:delete
                     ref="instance('dynamic')/*"/>
@@ -303,19 +312,15 @@
                 <xf:var
                     name="control"
                     value="$control-document/*"/>
-                <xf:var
-                    name="new-appearance"
-                    value="event('new-appearance')"/>
-                <xf:var
-                    name="datatype-validation"
-                    value="event('datatype-validation')"/>
 
                 <xf:var
                     name="xbl-binding"
                     value="
                         fbf:findNewControlBinding(
                             $i/original-control-name,
-                            $datatype-validation,
+                            event('builtin-type'),
+                            false(), (: xxx pass current value?:)
+                            event('schema-type'),
                             ($new-appearance, $i/appearances/@selection/string())[xxf:non-blank()][1]
                         )"/>
 
@@ -656,9 +661,11 @@
 
                 <xf:action event="reload-appearances">
 
-                    <xf:var name="is-initial-load"       value="event('is-initial-load')"/>
-                    <xf:var name="previous-builtin-type" value="event('previous-builtin-type')"/>
-                    <xf:var name="new-builtin-type"      value="event('new-builtin-type')"/>
+                    <xf:var name="is-initial-load"       as="xs:boolean" value="event('is-initial-load')"/>
+                    <xf:var name="previous-builtin-type" as="xs:string?" value="string(event('previous-builtin-type'))[xxf:non-blank()]"/>
+                    <xf:var name="previous-schema-type"  as="xs:string?" value="string(event('previous-schema-type'))[xxf:non-blank()]"/>
+                    <xf:var name="new-builtin-type"      as="xs:string?" value="string(event('new-builtin-type'))[xxf:non-blank()]"/>
+                    <xf:var name="new-schema-type"       as="xs:string?" value="string(event('new-schema-type'))[xxf:non-blank()]"/>
 
                     <xf:var name="appearances"           value="$i/appearances"/>
                     <xf:var name="current-appearance"    value="$appearances/@selection/string()"/>
@@ -671,7 +678,7 @@
                             fbf:possibleAppearancesByControlNameAsXML(
                                 $i/control-name,
                                 $is-initial-load,
-                                $new-builtin-type,
+                                ($new-schema-type, $new-builtin-type)[1],
                                 $current-appearance
                             )"/>
 
@@ -699,34 +706,28 @@
                     -->
                     <xf:action if="not($is-initial-load)">
 
-                        <!-- Create a temporary `validation` element as that's what `findNewControlBinding()` expects -->
-                        <xf:var
-                            name="mutable-datatype-validation"
-                            value="xxf:mutable-document($i/validations/validation[@type = 'datatype'])/*"/>
-
-                        <xf:setvalue
-                            ref="$mutable-datatype-validation/builtin-type"
-                            value="$previous-builtin-type"/>
                         <xf:var
                             name="original-xbl-binding"
                             value="
                                 fbf:findNewControlBinding(
                                     $i/original-control-name,
-                                    $mutable-datatype-validation,
-                                    $current-appearance[xxf:non-blank()]
+                                    $previous-builtin-type,
+                                    false(), (: xxx pass current value?:)
+                                    $previous-schema-type,
+                                    $current-appearance]
                                 )"/>
 
-                        <xf:setvalue
-                            ref="$mutable-datatype-validation/builtin-type"
-                            value="$new-builtin-type"/>
                         <xf:var
                             name="current-xbl-binding"
                             value="
                                 fbf:findNewControlBinding(
                                     $i/original-control-name,
-                                    $mutable-datatype-validation,
+                                    $new-builtin-type,
+                                    false(), (: xxx pass current value?:)
+                                    $new-schema-type,
                                     $current-appearance[xxf:non-blank()]
                                 )"/>
+
                         <xf:var
                             name="binding-changed"
                             value="not($original-xbl-binding is $current-xbl-binding)"/>
@@ -736,7 +737,9 @@
 
                             name="fb-process-xbl-fb-control-details"
                             targetid="fb-dialog-control-settings">
-                            <xf:property name="datatype-validation" value="$mutable-datatype-validation"/>
+                            <xf:property name="new-appearance" value="()"/>
+                            <xf:property name="builtin-type"   value="$new-builtin-type"/>
+                            <xf:property name="schema-type"    value="$new-schema-type"/>
                         </xf:dispatch>
                     </xf:action>
                 </xf:action>
@@ -1522,8 +1525,9 @@
                                                         <xf:dispatch
                                                             name="fb-process-xbl-fb-control-details"
                                                             targetid="fb-dialog-control-settings">
-                                                            <xf:property name="new-appearance"      value="event('xxf:value')"/>
-                                                            <xf:property name="datatype-validation" value="$i/validations/validation[@type = 'datatype']"/>
+                                                            <xf:property name="new-appearance" value="event('xxf:value')"/>
+                                                            <xf:property name="builtin-type"   value="$i/validations/validation[@type = 'datatype']/builtin-type/string()[xxf:non-blank()]"/>
+                                                            <xf:property name="schema-type"    value="$i/validations/validation[@type = 'datatype']/schema-type/string()[xxf:non-blank()]"/>
                                                         </xf:dispatch>
                                                     </xf:action>
                                                     <!-- Propose a choice between multiple items -->
@@ -1689,11 +1693,15 @@
                                                 value="builtin-type/string()"/>
 
                                             <xf:var
+                                                name="current-schema-type"
+                                                value="schema-type/string()"/>
+
+                                            <xf:var
                                                 name="matches-schema-type"
                                                 value="
                                                     exists($schema)   and
-                                                    schema-type != '' and
-                                                    schema-type = $schema/xs:simpleType/string-join(($schema-prefix, @name), ':')"/>
+                                                    $current-schema-type != '' and
+                                                    $current-schema-type = $schema/xs:simpleType/string-join(($schema-prefix, @name), ':')"/>
 
                                             <xf:select1 ref="builtin-type">
                                                 <!-- Only show label if there is a schema -->
@@ -1704,14 +1712,14 @@
                                                     <xf:value/>
                                                 </xf:itemset>
 
-                                                <xf:itemset ref=".[../schema-type != '' and not($matches-schema-type)]">
+                                                <xf:itemset ref=".[$current-schema-type != '' and not($matches-schema-type)]">
                                                     <xf:label ref="$resources/dialog-control-settings/builtin-type/use-component-type"/>
                                                     <xf:value/>
                                                 </xf:itemset>
 
                                                 <xf:itemset
                                                     ref="
-                                                        if (../schema-type != '' and not($matches-schema-type)) then
+                                                        if ($current-schema-type != '' and not($matches-schema-type)) then
                                                             ()
                                                         else
                                                             $resources/dialog-control-settings/builtin-type/choices//(
@@ -1725,14 +1733,18 @@
                                                     <xf:value ref="if (self::choices) then () else ."/>
                                                 </xf:itemset>
                                                 <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                                                <!--  Update available appearances -->
+                                                <!-- Update available appearances -->
+                                                <!-- Call 2/3 of `reload-appearances()` -->
                                                 <xf:dispatch
                                                     event="xforms-select"
+
                                                     name="reload-appearances"
                                                     targetid="model">
                                                     <xf:property name="is-initial-load"       value="false()"/>
                                                     <xf:property name="previous-builtin-type" value="$current-builtin-type"/>
+                                                    <xf:property name="previous-schema-type"  value="$current-schema-type"/>
                                                     <xf:property name="new-builtin-type"      value="event('xxf:item-value')"/>
+                                                    <xf:property name="new-schema-type"       value="$current-schema-type"/>
                                                 </xf:dispatch>
                                             </xf:select1>
                                             <!-- Schema type selection if applicable -->
@@ -1744,6 +1756,19 @@
                                                     <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
                                                 </xf:itemset>
                                                 <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                                <!-- Update available appearances -->
+                                                <!-- Call 3/3 of `reload-appearances()` -->
+                                                <xf:dispatch
+                                                    event="xforms-select"
+
+                                                    name="reload-appearances"
+                                                    targetid="model">
+                                                    <xf:property name="is-initial-load"       value="false()"/>
+                                                    <xf:property name="previous-builtin-type" value="$current-builtin-type"/>
+                                                    <xf:property name="previous-schema-type"  value="$current-schema-type"/>
+                                                    <xf:property name="new-builtin-type"      value="$current-builtin-type"/>
+                                                    <xf:property name="new-schema-type"       value="event('xxf:item-value')"/>
+                                                </xf:dispatch>
                                             </fr:dropdown-select1>
                                         </xf:group>
 

@@ -121,6 +121,12 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|us-ein">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">US Employer Identification Number (EIN)</display-name>
+          </metadata>
+        </xbl:binding>
+
       </xbl:xbl>
     </components>
 
@@ -241,5 +247,8 @@ class BindingDescriptorTest
     assertVaryTypes(FR -> "attachment", XS -> "string" , None, Nil                                     )("Single File Attachment")
     assertVaryTypes(FR -> "attachment", XS -> "string" , None, List(QName("multiple")  -> "false")     )("Single File Attachment")
     assertVaryTypes(FR -> "attachment", XS -> "string" , None, List(QName("multiple")  -> "true")      )("Multiple File Attachments")
+
+    assertVaryTypes(FR -> "us-ein",     XS -> "string" , None, Nil      )("US Employer Identification Number (EIN)")
+    assertVaryTypes(FR -> "us-ein",     FR -> "us-ein" , None, Nil      )("US Employer Identification Number (EIN)")
   }
 }

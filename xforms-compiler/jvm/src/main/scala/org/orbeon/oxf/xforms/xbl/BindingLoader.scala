@@ -171,12 +171,12 @@ trait BindingLoader extends Logging {
   }
 
   def findMostSpecificBinding(
-    index        : BindingIndex[IndexableBinding],
-    checkedPaths : Option[Set[String]],
-    uri          : String,
-    localname    : String,
-    atts         : Attributes
+    checkedPaths  : Option[Set[String]],
+    uri           : String,
+    localname     : String,
+    atts          : Attributes
   )(implicit
+    index         : BindingIndex[IndexableBinding],
     indentedLogger: IndentedLogger
   ): (BindingIndex[IndexableBinding], Set[String], Option[IndexableBinding]) = {
 
@@ -196,7 +196,7 @@ trait BindingLoader extends Logging {
       val qName   = QName(localname, "", uri)
       val attsSeq = convertAttributes(atts)
 
-      BindingIndex.findMostSpecificBinding(currentIndex, qName, DatatypeMatch.Exclude, attsSeq) match {
+      BindingDescriptor.findMostSpecificBinding(qName, DatatypeMatch.Exclude, attsSeq)(currentIndex) match {
         case Some((binding, true)) if mustCheckBindingPath(binding) =>
 
           // We found a binding by name, but we haven't checked if that path is up-to-date yet. So make sure
@@ -210,7 +210,7 @@ trait BindingLoader extends Logging {
 
           // If the binding was updated, try again but only once
           if (bindingUpdated)
-            BindingIndex.findMostSpecificBinding(currentIndex, qName, DatatypeMatch.Exclude, attsSeq) map (_._1)
+            BindingDescriptor.findMostSpecificBinding(qName, DatatypeMatch.Exclude, attsSeq)(currentIndex) map (_._1)
           else
             Some(binding)
 

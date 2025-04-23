@@ -426,50 +426,67 @@ trait AlertsAndConstraintsOps extends ControlOps {
         DefaultDataTypeValidation
     }
 
+    def datatypeQNameFromStrings(
+      controlName   : String,
+      builtinTypeOpt: Option[(String, Boolean)],
+      schemaTypeOpt : Option[String]
+    )(implicit
+      ctx            : FormBuilderDocContext
+    ): Either[(QName, Boolean), QName] = {
+
+      val bind = findBindByName(controlName).get
+
+      def builtinTypeQName(builtinType: (String, Boolean)): (QName, Boolean) = {
+
+        val (builtinTypeString, builtinTypeRequired) = builtinType
+
+        // If a builtin type, we just have a local name
+        val nsURI = Types.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
+
+        // Namespace mapping must be in scope
+        val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
+
+        QName(builtinTypeString, Namespace(prefix, nsURI)) -> builtinTypeRequired
+      }
+
+      def schemaTypeQName(schemaType: String): QName = {
+
+        // Schema type OTOH comes with a prefix if needed
+        val localname = parseQName(schemaType)._2
+        val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
+          { case (prefix, uri) => Namespace(prefix, uri) } getOrElse
+          Namespace.EmptyNamespace
+        QName(localname, namespace)
+      }
+
+      schemaTypeOpt.map(schemaTypeQName).map(Right.apply)
+        .orElse(builtinTypeOpt.map(builtinTypeQName).map(Left.apply))
+        .getOrElse(throw new IllegalArgumentException)
+    }
+
     def fromXml(
       validationElem : NodeInfo,
       newIds         : Iterator[String],
-      controlName    : String)(implicit
+      controlName    : String
+    )(implicit
       ctx            : FormBuilderDocContext
     ): DatatypeValidation = {
-      require(validationElem /@ "type" === "datatype")
+
+      require(validationElem.attValueOpt("type").contains("datatype"))
 
       val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
 
-      val datatype = {
-
-        val bind = findBindByName(controlName).get
+      val datatype: Either[(QName, Boolean), QName] = {
 
         val builtinTypeStringOpt = (validationElem elemValue "builtin-type").trimAllToOpt
         val builtinTypeRequired  = (validationElem elemValue "builtin-type-required").trimAllToOpt contains "true"
         val schemaTypeOpt        = (validationElem elemValue "schema-type").trimAllToOpt
 
-        def builtinTypeQName: (QName, Boolean) = {
-
-          val builtinTypeString = builtinTypeStringOpt.get
-
-          // If a builtin type, we just have a local name
-          val nsURI = Types.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
-
-          // Namespace mapping must be in scope
-          val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
-
-          QName(builtinTypeString, Namespace(prefix, nsURI)) -> builtinTypeRequired
-        }
-
-        def schemaTypeQName: QName = {
-
-          val schemaType = schemaTypeOpt.get
-
-          // Schema type OTOH comes with a prefix if needed
-          val localname = parseQName(schemaType)._2
-          val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
-            { case (prefix, uri) => Namespace(prefix, uri) } getOrElse
-            Namespace.EmptyNamespace
-          QName(localname, namespace)
-        }
-
-        Either.cond(schemaTypeOpt.isDefined, schemaTypeQName, builtinTypeQName)
+        datatypeQNameFromStrings(
+          controlName    = controlName,
+          builtinTypeOpt = builtinTypeStringOpt.map(builtinTypeString => (builtinTypeString, builtinTypeRequired)),
+          schemaTypeOpt  = schemaTypeOpt,
+        )
       }
 
       DatatypeValidation(
@@ -650,21 +667,28 @@ trait AlertsAndConstraintsOps extends ControlOps {
       AlertDetails(forValidationId, messagesElems, isGlobal, params)
     }
 
-    def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext): Option[AlertDetails] = {
+    def fromValidationXML(
+      validationElem : NodeInfo,
+      forValidationId: Option[String]
+    )(implicit
+      ctx            : FormBuilderDocContext
+    ): Option[AlertDetails] = {
 
-      val useDefaultAlert = validationElem /@ "default-alert" === "true"
+      def alertOpt: Option[AlertDetails] =
+        validationElem firstChildOpt "alert" map (AlertDetails.fromXML(_, forValidationId))
 
-      def alertOpt = {
-        val alertElem = validationElem child "alert" headOption
-
-        alertElem map (AlertDetails.fromXML(_, forValidationId))
-      }
+      val useDefaultAlert = validationElem.attValueOpt("default-alert").contains("true")
 
       if (useDefaultAlert) None else alertOpt
     }
   }
 
-  private def findMIPs(controlName: String, mip: MipName)(implicit ctx: FormBuilderDocContext): List[(Option[String], ValidationLevel, String, Option[AlertDetails])] = {
+  private def findMIPs(
+    controlName: String,
+    mip        : MipName
+  )(implicit
+    ctx        : FormBuilderDocContext
+  ): List[(Option[String], ValidationLevel, String, Option[AlertDetails])] = {
 
     val bind            = findBindByName(controlName).get // require the bind
     val supportedAlerts = AlertDetails.fromForm(controlName)

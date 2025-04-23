@@ -126,10 +126,10 @@ trait BindingMetadata extends Logging {
   )(implicit
     indentedLogger: IndentedLogger
   ): Option[IndexableBinding] =
-    _xblIndex flatMap { index =>
+    _xblIndex flatMap { implicit index =>
 
     val (newIndex, newPaths, bindingOpt) =
-      BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), uri, localname, atts)
+      BindingLoader.findMostSpecificBinding(Some(_checkedPaths), uri, localname, atts)
 
     if (index ne newIndex)
       _xblIndex = Some(newIndex)
@@ -150,10 +150,10 @@ trait BindingMetadata extends Logging {
   )(implicit
     indentedLogger: IndentedLogger
   ): Option[IndexableBinding] =
-    _xblIndex flatMap { index =>
+    _xblIndex flatMap { implicit index =>
 
     val (newIndex, newPaths, bindingOpt) =
-      BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), qName.namespace.uri, qName.localName, EmptyAttributes)
+      BindingLoader.findMostSpecificBinding(Some(_checkedPaths), qName.namespace.uri, qName.localName, EmptyAttributes)
 
     if (index ne newIndex)
       _xblIndex = Some(newIndex)

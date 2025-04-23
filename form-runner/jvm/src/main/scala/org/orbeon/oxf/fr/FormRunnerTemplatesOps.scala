@@ -7,7 +7,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor.findMostSpecificBindingDescriptor
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.findMostSpecificBindingUseEqualOrToken
 import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
 import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.saxon.om.NodeInfo
@@ -77,7 +77,7 @@ object FormRunnerTemplatesOps {
         for {
           controlElem <- controlElemOpt
           descriptor  <-
-            findMostSpecificBindingDescriptor(
+            findMostSpecificBindingUseEqualOrToken(
               searchElemName = controlElem.uriQualifiedName,
               datatypeMatch  = DatatypeMatch.Exclude,
               searchAtts     = BindingDescriptor.getAtts(controlElem)

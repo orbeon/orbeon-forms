@@ -211,7 +211,7 @@ class BindingLoaderTest
     val GagaPath = Loader.bindingPathByName("orbeon", "gaga")
     val TotoPath = Loader.bindingPathByName("orbeon", "toto")
 
-    var currentIndex: BindingIndex[IndexableBinding] = GlobalBindingIndex.Empty
+    implicit var currentIndex: BindingIndex[IndexableBinding] = GlobalBindingIndex.Empty
     var checkedPaths: Set[String] = Set.empty
 
     // Initial library load
@@ -232,11 +232,10 @@ class BindingLoaderTest
       def findFrGaga() = {
         val (newIndex, newCheckedPaths, newBinding) =
           Loader.findMostSpecificBinding(
-            currentIndex,
-            Some(checkedPaths),
-            "http://orbeon.org/oxf/xml/form-runner",
-            "gaga",
-            new AttributesImpl
+            checkedPaths = Some(checkedPaths),
+            uri          = "http://orbeon.org/oxf/xml/form-runner",
+            localname    = "gaga",
+            atts         = new AttributesImpl
           )
 
         currentIndex = newIndex
@@ -279,11 +278,10 @@ class BindingLoaderTest
 
       val (newIndex, newCheckedPaths, newBinding) =
         Loader.findMostSpecificBinding(
-          currentIndex,
-          Some(checkedPaths),
-          "http://orbeon.org/oxf/xml/form-runner",
-          "toto",
-          new AttributesImpl
+          checkedPaths = Some(checkedPaths),
+          uri          = "http://orbeon.org/oxf/xml/form-runner",
+          localname    = "toto",
+          atts         = new AttributesImpl
         )
 
       currentIndex = newIndex

@@ -1419,12 +1419,12 @@
                                                                             <!-- Available processes to run -->
                                                                             <xf:switch caseref="count(instance('processes')/*) gt 0">
                                                                                 <xf:case value="true()">
-                                                                                    <fr:open-select1 appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
+                                                                                    <xf:select1 selection="open" appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
                                                                                         <xf:itemset ref="xxf:sort(instance('processes')/*, (string(.)), 'text', 'ascending')">
                                                                                             <xf:label ref="string(.)" />
                                                                                             <xf:value ref="local-name(.)"/>
                                                                                         </xf:itemset>
-                                                                                    </fr:open-select1>
+                                                                                    </xf:select1>
                                                                                 </xf:case>
                                                                                 <xf:case value="false()" class="fb-custom-process">
                                                                                     <xf:input ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']"/>
@@ -1469,7 +1469,7 @@
                                                 <xf:output ref="pdf-field-name[@type = 'automatic']" value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
                                                     <xf:label appearance="minimal">automatic</xf:label>
                                                 </xf:output>
-                                                <fr:open-select1 appearance="minimal" ref="$i/pdf-field-name[@type = 'custom']">
+                                                <xf:select1 selection="open" appearance="minimal" ref="$i/pdf-field-name[@type = 'custom']">
                                                     <xf:label appearance="minimal">custom</xf:label>
                                                     <xf:alert validation="unknown-pdf-field-name" ref="$resources/dialog-control-settings/pdf-field-name/alert"/>
                                                     <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
@@ -1490,7 +1490,7 @@
                                                         event="xforms-enabled"
                                                         name="fb-process-pdf-template-field-names"
                                                         targetid="fb-dialog-control-settings"/>
-                                                </fr:open-select1>
+                                                </xf:select1>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>

@@ -53,8 +53,10 @@
                     <tin>
                         <grid-4>
                             <ssn-or-ein/>
-                            <ssn/>
-                            <ein/>
+
+                            <ssn>078-05-1120</ssn>
+                            <ssn-explanation/>
+                            <ein>00-1234567</ein>
                         </grid-4>
 
 
@@ -123,11 +125,13 @@
                 <xf:bind name="tin" id="tin-bind" ref="tin">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
                         <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
-                        <xf:bind name="ssn" id="ssn-bind" ref="ssn"
-                                 constraint="matches(., '^\d{3}-\d{2}-\d{4}$')"
+
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
+                                 relevant="$ssn-or-ein = 'ssn'"/>
+                        <xf:bind name="ssn" id="ssn-bind" ref="ssn" type="fr:us-ssn"
                                  relevant="$ssn-or-ein = 'ssn'"
                                  xxf:whitespace="trim"/>
-                        <xf:bind name="ein" id="ein-bind" ref="ein" constraint="matches(., '^\d{2}-\d{7}$')"
+                        <xf:bind name="ein" id="ein-bind" ref="ein" type="fr:us-ein"
                                  relevant="$ssn-or-ein = 'ein'"
                                  xxf:whitespace="trim"/>
                     </xf:bind>
@@ -161,11 +165,26 @@
                     <description xml:lang="en">Use this form to provide your correct TIN to the person who is required to file an information return with the IRS to report, for example, income paid to you, real estate transactions, mortgage interest you paid, acquisition or abandonment of secured property, cancellation of debt, or contributions you made to an IRA.</description>
                     <library-versions>
                         <_>1</_>
+                        <orbeon>1</orbeon>
                     </library-versions>
 
 
 
 
+
+
+
+
+
+
+
+                    <thumbnail filename="w9.png" mediatype="image/png" size="80478">/fr/service/persistence/crud/orbeon/builder/data/b9d842b71560cf9278422f88a32bfaf7419a7b01/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <wizard>true</wizard>
+                    <wizard-subsections-nav>false</wizard-subsections-nav>
+                    <wizard-mode>lax</wizard-mode>
+                    <data-migration>enabled</data-migration>
+                    <density>comfortable</density>
                     <email>
                         <templates>
                             <template name="default">
@@ -175,12 +194,6 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <thumbnail filename="w9.png" mediatype="image/png" size="80478">/fr/service/persistence/crud/orbeon/builder/data/b9d842b71560cf9278422f88a32bfaf7419a7b01/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</thumbnail>
-                    <allow-template-use>true</allow-template-use>
-                    <wizard>true</wizard>
-                    <wizard-subsections-nav>false</wizard-subsections-nav>
-                    <wizard-mode>lax</wizard-mode>
-                    <density>comfortable</density>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
@@ -217,17 +230,28 @@
 
                             <alert/>
                         </current-date>
+
                         <ssn>
                             <label>Social security number</label>
-                            <hint>Format: 555-55-5555</hint>
+                            <hint/>
 
-                            <alert/>
+
+
+
                         </ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+
+                        </ssn-explanation>
                         <ein>
                             <label>Employer identification number</label>
-                            <hint>Format: 55-5555555</hint>
+                            <hint/>
 
-                            <alert/>
+
+
+
                         </ein>
 
                         <name>
@@ -481,6 +505,7 @@
                 <fr:section id="tin-control" bind="tin-bind">
                     <xf:label ref="$form-resources/tin/label"/>
 
+
                     <fr:grid id="grid-4-grid" bind="grid-4-bind">
                         <fr:c y="1" x="1" w="4">
                                 <xf:select1 id="ssn-or-ein-control" appearance="full" bind="ssn-or-ein-bind">
@@ -495,21 +520,38 @@
                                 </xf:select1>
                             </fr:c>
                         <fr:c y="1" x="5" w="4">
-                                <xf:input id="ssn-control" bind="ssn-bind">
-                                    <xf:label ref="$form-resources/ssn/label"/>
-                                    <xf:hint ref="$form-resources/ssn/hint"/>
 
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
                             </fr:c>
                         <fr:c y="1" x="9" w="4">
-                                <xf:input id="ein-control" bind="ein-bind">
+
+                            </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:us-ssn id="ssn-control" bind="ssn-bind">
+                                    <xf:label ref="$form-resources/ssn/label"/>
+                                    <xf:hint ref="$form-resources/ssn/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </fr:us-ssn>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="8">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ssn-explanation-control"
+                                            bind="ssn-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:us-ein id="ein-control" bind="ein-bind">
                                     <xf:label ref="$form-resources/ein/label"/>
                                     <xf:hint ref="$form-resources/ein/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </fr:c>
+
+                                </fr:us-ein>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="8"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="certification-control" bind="certification-bind">

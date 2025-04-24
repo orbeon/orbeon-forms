@@ -45,7 +45,8 @@ trait DistinctValuesLogic {
       request           = request,
       queries           = Nil,
       freeTextSearch    = None,
-      noPermissionValue = DistinctValues()
+      noPermissionValue = DistinctValues(),
+      connectionOpt     = None
     ) {
       case (connection: Connection, commonAndPermissionsParts: List[StatementPart], _: SearchPermissions) =>
 

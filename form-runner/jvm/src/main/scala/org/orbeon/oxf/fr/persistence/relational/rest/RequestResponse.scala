@@ -40,19 +40,20 @@ case class LockUnlockRequest(
 )
 
 case class CrudRequest(
-  provider       : Provider,
-  appForm        : AppForm,
-  version        : Option[Int],
-  filename       : Option[String],
-  dataPart       : Option[DataPart],
-  lastModifiedOpt: Option[Instant], // or just plain string?
-  username       : Option[String],
-  groupname      : Option[String],
-  flatView       : Boolean,
-  credentials    : Option[Credentials],
-  workflowStage  : Option[String],
-  ranges         : HttpRanges,
-  existingRow    : Option[ExistingRow]
+  provider        : Provider,
+  appForm         : AppForm,
+  version         : Option[Int],
+  filename        : Option[String],
+  dataPart        : Option[DataPart],
+  lastModifiedOpt : Option[Instant], // or just plain string?
+  username        : Option[String],
+  groupname       : Option[String],
+  flatView        : Boolean,
+  credentials     : Option[Credentials],
+  workflowStage   : Option[String],
+  ranges          : HttpRanges,
+  existingRow     : Option[ExistingRow],
+  singleton       : Option[Boolean]
 ) {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined

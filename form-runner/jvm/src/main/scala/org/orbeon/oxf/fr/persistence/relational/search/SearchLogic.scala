@@ -80,14 +80,14 @@ object SearchLogic {
     request           : R,
     queries           : List[Query],
     freeTextSearch    : Option[String],
-    noPermissionValue : T
+    noPermissionValue : T,
+    connectionOpt     : Option[Connection]
   )(
     body              : (Connection, List[StatementPart], SearchPermissions) => T
   )(implicit
     externalContext   : ExternalContext,
     indentedLogger    : IndentedLogger
   ): T = {
-
     val permissions      = computePermissions(request)
     val hasNoPermissions =
       ! permissions.authorizedBasedOnRoleOptimistic     &&
@@ -98,20 +98,19 @@ object SearchLogic {
     if (hasNoPermissions)
       // There is no chance we can access any data, no need to run any SQL
       noPermissionValue
-    else
-      RelationalUtils.withConnection { connection =>
-
-        val commonAndPermissionsParts = List(
-          commonPart     (request.appForm, request.version, queries, freeTextSearch),
-          permissionsPart(permissions)
-        )
-
-        body(connection, commonAndPermissionsParts, permissions)
+    else {
+      val commonStatementPart = commonPart(request.appForm, request.version, queries, freeTextSearch)
+      val bodyPartial         = body(_, List(commonStatementPart, permissionsPart(permissions)), permissions)
+      connectionOpt match {
+        case Some(connection) => bodyPartial(connection)
+        case None             => RelationalUtils.withConnection(bodyPartial)
       }
     }
+  }
 
   def doSearch(
-    request        : SearchRequest
+    request        : SearchRequest,
+    connectionOpt  : Option[Connection]
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
@@ -120,9 +119,10 @@ object SearchLogic {
       request           = request,
       queries           = request.queries,
       freeTextSearch    = request.freeTextSearch,
-      noPermissionValue = (List[Document](), 0)
+      noPermissionValue = (List[Document](), 0),
+      connectionOpt     = connectionOpt
     ) {
-      case (connection: Connection, commonAndPermissionsParts: List[StatementPart], permissions: SearchPermissions) =>
+      (connection: Connection, commonAndPermissionsParts: List[StatementPart], permissions: SearchPermissions) =>
 
         val statementParts = commonAndPermissionsParts ++ metadataPart(request).toList ++ List(
           columnFilterPart  (request),

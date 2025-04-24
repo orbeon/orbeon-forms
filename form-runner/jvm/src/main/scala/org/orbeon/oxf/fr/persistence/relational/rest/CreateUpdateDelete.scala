@@ -23,7 +23,9 @@ import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
-import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
+import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Drafts, SearchRequest}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util.CoreUtils.*
@@ -404,6 +406,35 @@ trait CreateUpdateDelete {
 
     // Update database
     val lastModifiedOpt = RelationalUtils.withConnection { connection =>
+
+      // For singleton PUT, check that the search is empty
+      val allowCreateOnlyIfSearchEmpty =
+        req.forData             &&
+        !delete                 &&
+        req.existingRow.isEmpty &&
+        req.singleton.getOrElse(false)
+
+      if (allowCreateOnlyIfSearchEmpty) {
+        val (_, count) = SearchLogic.doSearch(
+          request = SearchRequest(
+            provider            = req.provider,
+            appForm             = req.appForm,
+            version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
+            credentials         = req.credentials,
+            isInternalAdminUser = false,
+            pageSize            = 1,
+            pageNumber          = 1,
+            queries             = Nil,
+            drafts              = Drafts.IncludeDrafts,
+            freeTextSearch      = None,
+            anyOfOperations     = None
+          ),
+          connectionOpt = Some(connection)
+        )
+        if (count > 0)
+          throw HttpStatusCodeException(StatusCode.Conflict)
+      }
+
       store(connection, req, reqBodyOpt, delete, versionToSet)
     }
 

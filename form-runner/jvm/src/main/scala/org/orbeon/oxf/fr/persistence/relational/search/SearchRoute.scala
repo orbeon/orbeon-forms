@@ -58,7 +58,7 @@ object SearchRoute extends XmlNativeRoute {
           formDefinitionVersion
         )
 
-      val (result, count) = SearchLogic.doSearch(request)
+      val (result, count) = SearchLogic.doSearch(request, connectionOpt = None)
 
       SearchResult.outputResult(request, result, count, getResponseXmlReceiver)
     } catch {

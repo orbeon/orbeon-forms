@@ -31,6 +31,7 @@ object Headers {
   val OrbeonCredentials            = "Orbeon-Credentials"
   val OrbeonWorkflowStage          = "Orbeon-Workflow-Stage"
   val OrbeonCreateFlatView         = "Orbeon-Create-Flat-View"
+  val OrbeonSingleton              = "Orbeon-Singleton"
 
   val OrbeonCreated                = "Orbeon-Created"
   val OrbeonLastModified           = "Orbeon-Last-Modified"

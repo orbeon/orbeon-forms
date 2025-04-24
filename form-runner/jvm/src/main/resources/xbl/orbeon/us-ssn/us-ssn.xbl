@@ -35,10 +35,10 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">US SSN</display-name>
+            <display-name lang="en">US Social Security Number (SSN)</display-name>
             <display-name lang="es">SSN de EE.UU.</display-name>
             <display-name lang="fi">Yhdysvaltain SSN</display-name>
-            <display-name lang="fr">SSN US</display-name>
+            <display-name lang="fr">Numéro de sécurité sociale US (SSN)</display-name>
             <display-name lang="ru">ССН США</display-name>
             <display-name lang="de">US-SSN</display-name>
             <display-name lang="it">SSN USA</display-name>

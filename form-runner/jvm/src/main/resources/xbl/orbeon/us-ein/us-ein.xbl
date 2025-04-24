@@ -24,7 +24,7 @@
             <display-name lang="en">US Employer Identification Number (EIN)</display-name>
             <display-name lang="es" todo="true"></display-name>
             <display-name lang="fi" todo="true"></display-name>
-            <display-name lang="fr" todo="true"></display-name>
+            <display-name lang="fr">Numéro d'identifiant employeur US (EIN)</display-name>
             <display-name lang="ru" todo="true"></display-name>
             <display-name lang="de" todo="true"></display-name>
             <display-name lang="it" todo="true"></display-name>

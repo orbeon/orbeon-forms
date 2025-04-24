@@ -79,7 +79,20 @@ class Form(
       (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))
 
   // https://github.com/orbeon/orbeon-forms/issues/4286
-  var isFormDataSafe: Boolean = false
+  private var _formDataSafe: Boolean = true
+
+  def formDataSafe_=(safe: Boolean): Unit = {
+    val wasSafe   = _formDataSafe
+    _formDataSafe = safe
+    if (safe && ! wasSafe) {
+      dom.window.removeEventListener(Form.ListenerEvents, Form.ReturnMessage)
+      clearDiscardableTimerIds()
+    } else if (! safe && wasSafe) {
+      dom.window.addEventListener   (Form.ListenerEvents, Form.ReturnMessage)
+    }
+  }
+
+  def formDataSafe: Boolean = _formDataSafe
 
   def addDiscardableTimerId(id: SetTimeoutHandle): Unit =
     discardableTimerIds ::= id
@@ -113,4 +126,10 @@ class Form(
   def helpHandler(): Boolean = configuration.helpHandler
   def helpTooltip(): Boolean = configuration.helpTooltip
   def useARIA    (): Boolean = configuration.useAria
+}
+
+private object Form {
+  private val ListenerEvents = "beforeunload"
+  // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
+  private val ReturnMessage: js.Function1[dom.Event, Boolean] = { event => event.preventDefault(); true }
 }

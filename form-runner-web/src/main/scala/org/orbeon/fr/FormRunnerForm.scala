@@ -24,7 +24,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     form.removeCallback(name, fn)
 
   def isFormDataSafe(): Boolean =
-    form.isFormDataSafe
+    form.formDataSafe
 
   def activateProcessButton(buttonName: String): Unit = {
 

@@ -1423,6 +1423,12 @@ object XFormsUI {
     }
   }
 
+  @JSExport
+  def fieldValueChanged(targetElem: html.Element): Unit =
+    // https://github.com/orbeon/orbeon-forms/issues/6960
+    Page.findXFormsFormFromHtmlElem(targetElem)
+      .foreach(_.formDataSafe = false)
+
   private object Private {
 
     // TODO: This is missing from the version of `scala-js-dom` we use, but present in newer versions. Once we upgrade

@@ -25,21 +25,13 @@ import scala.scalajs.js.JSConverters.*
 
 object FormRunnerPrivateAPI extends js.Object {
 
-  private val ListenerEvents = "beforeunload"
   private val ErrorScrollOffset = -100
 
-  // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
-  private val ReturnMessage: js.Function1[dom.Event, Boolean] = { event => event.preventDefault(); true }
   private val NewEditViewPathRe = """(.*/fr/)([^/]+)/([^/]+)/(new|edit|view)(?:/([^/]+))?$""".r
 
-  def setDataStatus(uuid: String, safe: Boolean): Unit = {
-
+  def setDataStatus(uuid: String, safe: Boolean): Unit =
     // https://github.com/orbeon/orbeon-forms/issues/4286
-    Page.findFormByUuid(uuid) foreach (_.isFormDataSafe = safe)
-
-    if (safe) dom.window.removeEventListener(ListenerEvents, ReturnMessage)
-    else      dom.window.addEventListener   (ListenerEvents, ReturnMessage)
-  }
+    Page.findFormByUuid(uuid).foreach(_.formDataSafe = safe)
 
   def submitLogin(
     username    : String,

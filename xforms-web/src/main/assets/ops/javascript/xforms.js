@@ -1644,6 +1644,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
+                ORBEON.xforms.XFormsUi.fieldValueChanged(target);
                 // Incremental control: treat keypress as a value change event
                 if ($(target).is('.xforms-incremental')) {
                     ORBEON.xforms.AjaxClient.fireEvent(

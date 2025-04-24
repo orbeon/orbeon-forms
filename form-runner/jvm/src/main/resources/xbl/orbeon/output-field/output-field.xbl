@@ -8,6 +8,7 @@
 
     <xbl:binding
             id="fr-output-field"
+            xxbl:label-for="input"
             element="
                 fr|output-field,
                 xf|input[fr|pdf-template = true],
@@ -24,7 +25,7 @@
             xxbl:container="span">
         <xbl:template>
             <!-- Use `xf:input` so that we get default formatting depending on type -->
-            <xf:input ref="xxf:binding('fr-output-field')"/>
+            <xf:input id="input" ref="xxf:binding('fr-output-field')"/>
         </xbl:template>
     </xbl:binding>
 

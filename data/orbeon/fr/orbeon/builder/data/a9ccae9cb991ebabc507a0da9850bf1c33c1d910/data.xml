@@ -1,0 +1,1011 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <main-section>
+                        <grid-1>
+                            <applicant-name/>
+                            <name-of-governing-body/>
+                            <federal-tax-id-or-ssn>ein</federal-tax-id-or-ssn>
+                            <ein/>
+                            <ssn>078-05-1120</ssn>
+                            <ssn-explanation/>
+                        </grid-1>
+                        <mailing-address>
+                            <mailing-grid-3>
+                                <mailing-us-address-street-1/>
+                                <mailing-us-address-city/>
+
+
+                                <mailing-us-address-street-2/>
+                                <mailing-us-address-state/>
+                                <mailing-us-address-zip/>
+                                <mailing-address-combined/>
+
+
+                                <mailing-us-address-urbanization/>
+
+                            </mailing-grid-3>
+                        </mailing-address>
+
+                        <grid-2>
+                            <service-address-same>false</service-address-same>
+                            <service-address-combined/>
+                        </grid-2>
+                        <service-address>
+                            <service-grid-3>
+                                <service-us-address-street-1/>
+                                <service-us-address-city/>
+
+
+                                <service-us-address-street-2/>
+                                <service-us-address-state/>
+                                <service-us-address-zip/>
+
+
+
+                                <service-us-address-urbanization/>
+
+                            </service-grid-3>
+                        </service-address>
+
+                        <grid-3>
+                            <applicant/>
+                            <telephone-number/>
+                            <phone-area-readonly/>
+                            <phone-number-readonly/>
+                            <type-of-service-to-be-provided/>
+                            <facility-capacity/>
+                            <identification-of-the-type-of-consultants/>
+                        </grid-3>
+
+                    </main-section>
+                    <certification-section>
+                        <grid-4>
+                            <certification-explanation/>
+                            <applicant-signature/>
+                            <date/>
+                        </grid-4>
+                    </certification-section>
+                    <section-4>
+                        <grid-5>
+                            <instructions/>
+                        </grid-5>
+                    </section-4>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="main-section-bind" name="main-section" ref="main-section">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="applicant-name-bind" ref="applicant-name" name="applicant-name"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="ssn-bind" ref="ssn" name="ssn" type="fr:us-ssn" xxf:whitespace="trim"
+                                 required="$federal-tax-id-or-ssn = 'ssn'"
+                                 relevant="$federal-tax-id-or-ssn = 'ssn'">
+                            <xf:constraint id="validation-1-validation" level="warning" value=". = '078-05-1120'"/>
+
+
+
+                        </xf:bind>
+                        <xf:bind id="name-of-governing-body-bind" ref="name-of-governing-body"
+                                 name="name-of-governing-body"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="federal-tax-id-or-ssn-bind" ref="federal-tax-id-or-ssn"
+                                 name="federal-tax-id-or-ssn"
+                                 required="true()"/>
+                        <xf:bind id="ein-bind" ref="ein" name="ein" type="fr:us-ein"
+                                 required="$federal-tax-id-or-ssn = 'ein'"
+                                 relevant="$federal-tax-id-or-ssn = 'ein'"/>
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
+                                 relevant="$federal-tax-id-or-ssn = 'ssn'"/>
+                    </xf:bind>
+
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="service-address-same-bind" ref="service-address-same"
+                                 name="service-address-same"
+                                 type="xf:boolean"/>
+                        <xf:bind id="service-address-combined-bind" ref="service-address-combined"
+                                 name="service-address-combined"
+                                 calculate="if ($service-address-same/string() = 'true') then&#xA;  $mailing-address-combined&#xA;else&#xA;  string-join(&#xA;    (&#xA;      $service-us-address-street-1[. != ''],&#xA;      $service-us-address-street-2[. != ''],&#xA;      $service-us-address-city[. != ''],&#xA;      $service-us-address-state[. != ''],&#xA;      $service-us-address-zip[. != '']&#xA;    ),&#xA;    ' / '&#xA;  )"
+                                 readonly="false()"
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+                    </xf:bind>
+
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="applicant-bind" ref="applicant" name="applicant" xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="telephone-number-bind" ref="telephone-number" name="telephone-number"
+                                 constraint=". = '' or matches(., '^\d{10}$')"
+                                 required="true()"/>
+                        <xf:bind id="type-of-service-to-be-provided-bind" ref="type-of-service-to-be-provided"
+                                 name="type-of-service-to-be-provided"
+                                 xxf:whitespace="trim"
+                                 required="true()"/>
+                        <xf:bind id="facility-capacity-bind" ref="facility-capacity" name="facility-capacity"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="identification-of-the-type-of-consultants-bind"
+                                 ref="identification-of-the-type-of-consultants"
+                                 name="identification-of-the-type-of-consultants"
+                                 required="true()"/>
+                        <xf:bind id="phone-area-readonly-bind" ref="phone-area-readonly"
+                                 name="phone-area-readonly"
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"
+                                 calculate="substring($telephone-number, 1, 3)"
+                                 readonly="false()"/>
+                        <xf:bind id="phone-number-readonly-bind" ref="phone-number-readonly"
+                                 name="phone-number-readonly"
+                                 calculate="string-join(&#xA;  (&#xA;    substring($telephone-number, 4, 3)[. != ''],&#xA;    substring($telephone-number, 7)[. != '']&#xA;  ),&#xA;  '-'&#xA;)"
+                                 readonly="false()"
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+                    </xf:bind>
+                    <xf:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
+                        <xf:bind id="mailing-grid-3-bind" ref="mailing-grid-3" name="mailing-grid-3">
+                            <xf:bind id="mailing-us-address-street-1-bind" ref="mailing-us-address-street-1"
+                                     name="mailing-us-address-street-1"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="mailing-us-address-street-2-bind" ref="mailing-us-address-street-2"
+                                     name="mailing-us-address-street-2"
+                                     xxf:whitespace="trim"/>
+
+
+
+                            <xf:bind id="mailing-us-address-urbanization-bind" ref="mailing-us-address-urbanization"
+                                     name="mailing-us-address-urbanization"
+                                     xxf:whitespace="trim"
+                                     relevant="$mailing-us-address-state = 'PR'"/>
+                            <xf:bind id="mailing-us-address-zip-bind" ref="mailing-us-address-zip"
+                                     name="mailing-us-address-zip"
+                                     xxf:whitespace="trim"
+                                     required="true()"
+                                     constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                            <xf:bind id="mailing-us-address-state-bind" ref="mailing-us-address-state"
+                                     name="mailing-us-address-state"
+                                     required="true()"/>
+                            <xf:bind id="mailing-us-address-city-bind" ref="mailing-us-address-city"
+                                     name="mailing-us-address-city"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="mailing-address-combined-bind" ref="mailing-address-combined"
+                                     name="mailing-address-combined"
+                                     calculate="string-join(&#xA;  (&#xA;    $mailing-us-address-street-1[. != ''],&#xA;    $mailing-us-address-street-2[. != ''],&#xA;    $mailing-us-address-city[. != ''],&#xA;    $mailing-us-address-state[. != ''],&#xA;    $mailing-us-address-zip[. != '']&#xA;  ),&#xA;  ' / '&#xA;)"
+                                     readonly="false()"
+                                     relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="service-address-bind" ref="service-address" name="service-address"
+                             relevant="not($service-address-same/string() = 'true')">
+                        <xf:bind id="service-grid-3-bind" ref="service-grid-3" name="service-grid-3">
+                            <xf:bind id="service-us-address-street-1-bind" ref="service-us-address-street-1"
+                                     name="service-us-address-street-1"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="service-us-address-street-2-bind" ref="service-us-address-street-2"
+                                     name="service-us-address-street-2"
+                                     xxf:whitespace="trim"/>
+
+
+
+                            <xf:bind id="service-us-address-urbanization-bind" ref="service-us-address-urbanization"
+                                     name="service-us-address-urbanization"
+                                     xxf:whitespace="trim"
+                                     relevant="$service-us-address-state = 'PR'"/>
+                            <xf:bind id="service-us-address-zip-bind" ref="service-us-address-zip"
+                                     name="service-us-address-zip"
+                                     xxf:whitespace="trim"
+                                     required="true()"
+                                     constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                            <xf:bind id="service-us-address-state-bind" ref="service-us-address-state"
+                                     name="service-us-address-state"
+                                     required="true()"/>
+                            <xf:bind id="service-us-address-city-bind" ref="service-us-address-city"
+                                     name="service-us-address-city"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+
+
+                        </xf:bind>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="certification-section-bind" ref="certification-section"
+                         name="certification-section">
+                    <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+                        <xf:bind id="certification-explanation-bind" ref="certification-explanation"
+                                 name="certification-explanation"/>
+                        <xf:bind id="applicant-signature-bind" ref="applicant-signature"
+                                 name="applicant-signature"
+                                 type="xs:anyURI"
+                                 required="true()"/>
+                        <xf:bind id="date-bind" ref="date" name="date" type="xs:date" required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-4-bind" ref="section-4" name="section-4">
+                    <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                        <xf:bind id="instructions-bind" ref="instructions" name="instructions"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>vendor-application</form-name>
+                    <title xml:lang="en">Orbeon Demo: Vendor Application</title>
+                    <description xml:lang="en">This is an example based on the State of California DS 1890 form.</description>
+
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+
+
+
+                    <data-migration>enabled</data-migration>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <pdf name="" lang="" filename="DS1890.pdf" mediatype="application/pdf" size="121835">/fr/service/persistence/crud/orbeon/builder/data/a9ccae9cb991ebabc507a0da9850bf1c33c1d910/e50b2d506bf352fb7a9f6b5fee4b7154275d58ba.bin</pdf>
+
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <service-address>
+                            <label>Service address</label>
+                        </service-address>
+                        <service-grid-3/>
+                        <service-us-address-street-1>
+                            <label>Street address</label>
+                            <hint/>
+
+
+                        </service-us-address-street-1>
+                        <service-us-address-street-2>
+                            <label>Street address line 2</label>
+                            <hint/>
+                        </service-us-address-street-2>
+                        <service-us-address-urbanization>
+                            <label>Urbanization</label>
+                            <hint/>
+
+
+
+
+                        </service-us-address-urbanization>
+                        <service-us-address-zip>
+                            <label>Zip code</label>
+                            <hint/>
+                        </service-us-address-zip>
+
+                        <service-us-address-state>
+                            <label>State, territory, or military post</label>
+                            <hint/>
+
+
+                        </service-us-address-state>
+                        <service-us-address-city>
+                            <label>City</label>
+                            <hint/>
+                        </service-us-address-city>
+                        <mailing-address>
+                            <label>Mailing address</label>
+                        </mailing-address>
+                        <mailing-grid-3/>
+                        <mailing-us-address-street-1>
+                            <label>Street address</label>
+                            <hint/>
+
+
+
+
+                        </mailing-us-address-street-1>
+                        <mailing-us-address-street-2>
+                            <label>Street address line 2</label>
+                            <hint/>
+                        </mailing-us-address-street-2>
+                        <mailing-us-address-urbanization>
+                            <label>Urbanization</label>
+                            <hint/>
+
+
+                        </mailing-us-address-urbanization>
+                        <mailing-us-address-zip>
+                            <label>Zip code</label>
+                            <hint/>
+                        </mailing-us-address-zip>
+                        <mailing-address-combined>
+                            <label>Mailing address (combined)</label>
+                            <hint/>
+                        </mailing-address-combined>
+                        <mailing-us-address-state>
+                            <label>State, territory, or military post</label>
+                            <hint/>
+
+
+                        </mailing-us-address-state>
+                        <mailing-us-address-city>
+                            <label>City</label>
+                            <hint/>
+                        </mailing-us-address-city>
+                        <instructions>
+                            <text>&lt;div&gt;
+&lt;p class="p1"&gt;&lt;em&gt;Please read the Department of Developmental Services California Code of Regulations, available from the regional centers, prior to &lt;/em&gt;&lt;em&gt;completing this form. Type or print this form. Mail to the regional center serving your area.&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;Attach applicable information outlined in Title 17, Section 54310(a)(10)&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(A) Any license, credential, registration or permit required for the performance of the service or operation of the program, or proof of&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;application for such document;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(B) Any academic degree required for performance or operation of the service;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(C) Any waiver from licensure, registration, certification, credential, or permit from the responsible controlling agency;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(D) The proposed or existing program design as required in Section 56712 and Section 56762, if applicable, for applicants seeking &lt;/em&gt;&lt;em&gt;vendorization as community-based day programs;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(E) The proposed or existing staff qualifications and duty statements as required in Sections 56722 and 56724 for applicants seeking &lt;/em&gt;&lt;em&gt;vendorization as community-based day programs;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(F) The proposed or existing design as required in Section 56780 for applicants seeking vendorization as in-home respite services &lt;/em&gt;&lt;em&gt;agencies;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(G) The proposed or existing staff qualifications and duty statements as required in Section 56792 for applicants seeking &lt;/em&gt;&lt;em&gt;vendorization as in-home respite services agencies;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;(H) The signed Home and Community-Based Services Provider Agreement with the Department of Health Services, if required.&lt;/em&gt;&lt;/p&gt;
+&lt;p class="p1"&gt;&lt;em&gt;Except for the Federal Tax ID or Social Security Number, all information provided by you on this form may be released to a member of the&lt;br&gt;public pursuant to the Public Records Act, Section 6250 et seq. of the California Government Code.&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;</text>
+
+                        </instructions>
+                        <certification-explanation>
+                            <text>&lt;div&gt;
+&lt;p class="p1"&gt;I hereby certify to the best of my knowledge and belief, this information is true, correct, and complies with Title 17, Section 54310(a).&lt;/p&gt;
+&lt;/div&gt;</text>
+
+                        </certification-explanation>
+                        <applicant-signature>
+                            <label>Applicant's Signature</label>
+                            <hint/>
+
+
+                        </applicant-signature>
+                        <date>
+                            <label>Date</label>
+                            <hint/>
+
+
+                        </date>
+                        <applicant>
+                            <label>Applicant (owner or executive director)</label>
+                            <hint/>
+
+
+                        </applicant>
+                        <telephone-number>
+                            <label>Telephone number</label>
+                            <hint/>
+
+
+                        </telephone-number>
+                        <phone-area-readonly>
+                            <label>Phone area (readonly)</label>
+                            <hint/>
+
+
+                        </phone-area-readonly>
+                        <phone-number-readonly>
+                            <label>Phone number (readonly)</label>
+                            <hint/>
+
+
+                        </phone-number-readonly>
+                        <type-of-service-to-be-provided>
+                            <label>Type of Service to be Provided</label>
+                            <hint/>
+
+
+                        </type-of-service-to-be-provided>
+                        <facility-capacity>
+                            <label>Facility Capacity</label>
+                            <hint/>
+
+
+                        </facility-capacity>
+                        <identification-of-the-type-of-consultants>
+                            <label>Identification of the type of consultants, subcontractors and community resources to be used by the vendor as part of its service</label>
+                            <hint/>
+
+
+                        </identification-of-the-type-of-consultants>
+                        <service-address-same>
+                            <label>Service address is the same as the mailing address</label>
+                            <hint/>
+
+
+                        </service-address-same>
+                        <service-address-combined>
+                            <label>Service address (combined)</label>
+                            <hint/>
+
+
+                        </service-address-combined>
+                        <applicant-name>
+                            <label>Applicant Name</label>
+                            <hint/>
+
+
+
+
+                        </applicant-name>
+                        <name-of-governing-body>
+                            <label>Name of Governing Body or Management Organization</label>
+                            <hint/>
+
+
+
+
+                        </name-of-governing-body>
+                        <federal-tax-id-or-ssn>
+                            <label>Federal Tax ID or SSN</label>
+                            <hint/>
+
+
+
+                            <item>
+                                <label>Federal Tax ID</label>
+                                <hint/>
+                                <value>ein</value>
+                            </item>
+                            <item>
+                                <label>SSN</label>
+                                <hint/>
+                                <value>ssn</value>
+                            </item>
+
+
+                        </federal-tax-id-or-ssn>
+                        <ein>
+                            <label>EIN</label>
+                            <hint/>
+
+
+
+
+                        </ein>
+                        <ssn>
+                            <label>SSN</label>
+                            <hint/>
+
+                            <alert>Make sure that you do not enter an actual personal SSN in this demo form.</alert>
+
+
+
+
+
+
+
+                        </ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+
+                        </ssn-explanation>
+
+                        <main-section>
+
+                        </main-section>
+                        <certification-section>
+                            <label>Certification</label>
+                        </certification-section>
+                        <section-4>
+                            <label>Instructions</label>
+                            <help/>
+                        </section-4>
+                        <grid-5/>
+
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="main-section-section" bind="main-section-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="applicant-name-control"
+                                      bind="applicant-name-bind"
+                                      fr:pdf-template-field-name="1">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/applicant-name/label"/>
+                                <xf:hint ref="$form-resources/applicant-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:input>
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      id="name-of-governing-body-control"
+                                      bind="name-of-governing-body-bind"
+                                      fr:pdf-template-field-name="3">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/name-of-governing-body/label"/>
+                                <xf:hint ref="$form-resources/name-of-governing-body/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                        id="federal-tax-id-or-ssn-control"
+                                        appearance="full xxf:horizontal"
+                                        bind="federal-tax-id-or-ssn-bind">
+                                <xf:label ref="$form-resources/federal-tax-id-or-ssn/label"/>
+                                <xf:hint ref="$form-resources/federal-tax-id-or-ssn/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                                <xf:itemset ref="$form-resources/federal-tax-id-or-ssn/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6" h="1"/>
+                        <fr:c x="1" y="3" w="3">
+                            <fr:us-ein xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                       id="ein-control"
+                                       bind="ein-bind"
+                                       fr:pdf-template-field-name="2">
+                                <xf:label ref="$form-resources/ein/label"/>
+                                <xf:hint ref="$form-resources/ein/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </fr:us-ein>
+                        </fr:c>
+                        <fr:c x="4" y="3" w="9" h="1"/>
+
+                        <fr:c x="1" y="4" w="3">
+                            <fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder" id="ssn-control" bind="ssn-bind"
+                                       fr:pdf-template-field-name="2">
+                                <fr:encrypt/>
+
+
+
+                                <xf:label ref="$form-resources/ssn/label"/>
+                                <xf:hint ref="$form-resources/ssn/hint"/>
+                                <xf:alert ref="$form-resources/ssn/alert" validation="validation-1-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+
+
+
+
+                            </fr:us-ssn>
+                        </fr:c>
+                        <fr:c x="4" y="4" w="9" h="1"/>
+                        <fr:c x="1" y="5" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ssn-explanation-control"
+                                            bind="ssn-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:section collapsible="false" id="mailing-address-section" bind="mailing-address-bind">
+                        <xf:label ref="$form-resources/mailing-address/label"/>
+
+                        <fr:grid id="mailing-grid-3-grid" bind="mailing-grid-3-bind" tab-order="columns">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input id="mailing-us-address-street-1-control"
+                                          bind="mailing-us-address-street-1-bind"
+                                          autocomplete="address-line1">
+                                    <xf:label ref="$form-resources/mailing-us-address-street-1/label"/>
+                                    <xf:hint ref="$form-resources/mailing-us-address-street-1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6">
+                                <xf:input id="mailing-us-address-city-control" bind="mailing-us-address-city-bind"
+                                          autocomplete="address-line3">
+                                    <xf:label ref="$form-resources/mailing-us-address-city/label"/>
+                                    <xf:hint ref="$form-resources/mailing-us-address-city/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+
+                            </fr:c>
+
+                            <fr:c x="1" y="2" w="6">
+                                <xf:input id="mailing-us-address-street-2-control"
+                                          bind="mailing-us-address-street-2-bind"
+                                          autocomplete="address-line2">
+                                    <xf:label ref="$form-resources/mailing-us-address-street-2/label"/>
+                                    <xf:hint ref="$form-resources/mailing-us-address-street-2/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="4">
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             id="mailing-us-address-state-control"
+                                             bind="mailing-us-address-state-bind">
+                                    <xf:label ref="$form-resources/mailing-us-address-state/label"/>
+                                    <xf:hint ref="$form-resources/mailing-us-address-state/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:us-state>
+
+
+                            </fr:c>
+                            <fr:c x="11" y="2" w="2" h="1">
+                                <xf:input id="mailing-us-address-zip-control" bind="mailing-us-address-zip-bind"
+                                          autocomplete="postal-code">
+                                    <xf:label ref="$form-resources/mailing-us-address-zip/label"/>
+                                    <xf:hint ref="$form-resources/mailing-us-address-zip/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="1" y="3" w="6">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                           id="mailing-address-combined-control"
+                                           bind="mailing-address-combined-bind"
+                                           fr:pdf-template-field-name="4">
+                                    <xf:label ref="$form-resources/mailing-address-combined/label"/>
+                                    <xf:hint ref="$form-resources/mailing-address-combined/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+
+                            </fr:c>
+                            <fr:c x="7" y="3" w="6">
+                                <xf:input id="mailing-us-address-urbanization-control"
+                                          bind="mailing-us-address-urbanization-bind">
+                                    <xf:label ref="$form-resources/mailing-us-address-urbanization/label"/>
+                                    <xf:hint ref="$form-resources/mailing-us-address-urbanization/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+
+                            </fr:c>
+                        </fr:grid>
+
+                    </fr:section>
+
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                               xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                               id="service-address-same-control"
+                                               bind="service-address-same-bind">
+                                <xf:label ref="$form-resources/service-address-same/label"/>
+                                <xf:hint ref="$form-resources/service-address-same/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:checkbox-input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="service-address-combined-control"
+                                       bind="service-address-combined-bind"
+                                       fr:pdf-template-field-name="5">
+                                    <xf:label ref="$form-resources/service-address-combined/label"/>
+                                    <xf:hint ref="$form-resources/service-address-combined/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:section collapsible="false" id="service-address-section" bind="service-address-bind">
+                        <xf:label ref="$form-resources/service-address/label"/>
+
+                        <fr:grid id="service-grid-3-grid" bind="service-grid-3-bind" tab-order="columns">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input id="service-us-address-street-1-control"
+                                          bind="service-us-address-street-1-bind"
+                                          autocomplete="address-line1">
+                                    <xf:label ref="$form-resources/service-us-address-street-1/label"/>
+                                    <xf:hint ref="$form-resources/service-us-address-street-1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6">
+                                <xf:input id="service-us-address-city-control" bind="service-us-address-city-bind"
+                                          autocomplete="address-line3">
+                                    <xf:label ref="$form-resources/service-us-address-city/label"/>
+                                    <xf:hint ref="$form-resources/service-us-address-city/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+
+                            </fr:c>
+
+                            <fr:c x="1" y="2" w="6">
+                                <xf:input id="service-us-address-street-2-control"
+                                          bind="service-us-address-street-2-bind"
+                                          autocomplete="address-line2">
+                                    <xf:label ref="$form-resources/service-us-address-street-2/label"/>
+                                    <xf:hint ref="$form-resources/service-us-address-street-2/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="4">
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             id="service-us-address-state-control"
+                                             bind="service-us-address-state-bind">
+                                    <xf:label ref="$form-resources/service-us-address-state/label"/>
+                                    <xf:hint ref="$form-resources/service-us-address-state/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </fr:us-state>
+
+
+                            </fr:c>
+                            <fr:c x="11" y="2" w="2" h="1">
+                                <xf:input id="service-us-address-zip-control" bind="service-us-address-zip-bind"
+                                          autocomplete="postal-code">
+                                    <xf:label ref="$form-resources/service-us-address-zip/label"/>
+                                    <xf:hint ref="$form-resources/service-us-address-zip/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="1" y="3" w="6">
+
+
+                            </fr:c>
+                            <fr:c x="7" y="3" w="6">
+                                <xf:input id="service-us-address-urbanization-control"
+                                          bind="service-us-address-urbanization-bind">
+                                    <xf:label ref="$form-resources/service-us-address-urbanization/label"/>
+                                    <xf:hint ref="$form-resources/service-us-address-urbanization/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                                </xf:input>
+
+                            </fr:c>
+                        </fr:grid>
+
+                    </fr:section>
+
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c x="1" y="1" w="8">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="applicant-control"
+                                      bind="applicant-bind"
+                                      fr:pdf-template-field-name="6">
+                                <xf:label ref="$form-resources/applicant/label"/>
+                                <xf:hint ref="$form-resources/applicant/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         id="telephone-number-control"
+                                         bind="telephone-number-bind">
+                                <xf:label ref="$form-resources/telephone-number/label"/>
+                                <xf:hint ref="$form-resources/telephone-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="8"/>
+                        <fr:c x="9" y="2" w="2">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="phone-area-readonly-control"
+                                       bind="phone-area-readonly-bind"
+                                       fr:pdf-template-field-name="phone">
+                                    <xf:label ref="$form-resources/phone-area-readonly/label"/>
+                                    <xf:hint ref="$form-resources/phone-area-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:output>
+                        </fr:c>
+                        <fr:c x="11" y="2" w="2" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="phone-number-readonly-control"
+                                       bind="phone-number-readonly-bind"
+                                       fr:pdf-template-field-name="phone1">
+                                    <xf:label ref="$form-resources/phone-number-readonly/label"/>
+                                    <xf:hint ref="$form-resources/phone-number-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="8">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      id="type-of-service-to-be-provided-control"
+                                      bind="type-of-service-to-be-provided-bind"
+                                      fr:pdf-template-field-name="7">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/type-of-service-to-be-provided/label"/>
+                                <xf:hint ref="$form-resources/type-of-service-to-be-provided/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="facility-capacity-control"
+                                      bind="facility-capacity-bind"
+                                      fr:pdf-template-field-name="8">
+                                <xf:label ref="$form-resources/facility-capacity/label"/>
+                                <xf:hint ref="$form-resources/facility-capacity/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="12">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         id="identification-of-the-type-of-consultants-control"
+                                         bind="identification-of-the-type-of-consultants-bind"
+                                         fr:pdf-template-field-name="9">
+                                <xf:label ref="$form-resources/identification-of-the-type-of-consultants/label"/>
+                                <xf:hint ref="$form-resources/identification-of-the-type-of-consultants/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section collapsible="false" id="certification-section-section"
+                            bind="certification-section-bind">
+                    <xf:label ref="$form-resources/certification-section/label"/>
+
+                    <fr:grid id="grid-4-grid" bind="grid-4-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="certification-explanation-control"
+                                            bind="certification-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/certification-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="3">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="applicant-signature-control"
+                                                      bind="applicant-signature-bind">
+                                <xf:label ref="$form-resources/applicant-signature/label"/>
+                                <xf:hint ref="$form-resources/applicant-signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3" h="1">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="date-control"
+                                     bind="date-bind"
+                                     fr:pdf-template-field-name="date">
+                                <xf:label ref="$form-resources/date/label"/>
+                                <xf:hint ref="$form-resources/date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6" h="1"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-4-section" bind="section-4-bind">
+                    <xf:label ref="$form-resources/section-4/label"/>
+                    <fr:grid id="grid-5-grid" bind="grid-5-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="instructions-control"
+                                            bind="instructions-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/instructions/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

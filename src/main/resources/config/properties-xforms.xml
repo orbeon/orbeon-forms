@@ -253,7 +253,7 @@
         fr:autosize-textarea
         fb:xpath-completion
         <!-- For static readonly output bindings -->
-        fr:pdf-template-field
+        fr:output-field
         fr:date
         fr:time
         fr:datetime

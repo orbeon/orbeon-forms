@@ -386,7 +386,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Annotate remaining (most) controls with `static-readonly` if needed -->
+    <!-- Annotate remaining (most) controls with `fr:static-readonly`/`fr:pdf-template` if needed -->
     <xsl:template
         mode="within-grid"
         match="*[parent::fr:c or parent::xh:td]"

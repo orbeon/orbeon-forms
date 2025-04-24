@@ -7,21 +7,24 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:binding
-            id="fr-pdf-template-field"
+            id="fr-output-field"
             element="
-                fr|pdf-template-field,
+                fr|output-field,
                 xf|input[fr|pdf-template = true],
                 xf|input[appearance ~= character-counter][fr|pdf-template = true],
                 xf|textarea[appearance ~= character-counter][fr|pdf-template = true],
                 xf|textarea[appearance ~= 'xxf:autosize'][fr|pdf-template = true],
                 xf|textarea[appearance ~= clipboard-copy][fr|pdf-template = true],
                 xf|output[appearance ~= clipboard-copy][fr|pdf-template = true],
+                fr|us-ssn[fr|static-readonly = true],
+                fr|us-ssn[fr|pdf-template = true],
+                fr|us-ein[fr|static-readonly = true],
                 fr|us-ein[fr|pdf-template = true]"
             xxbl:mode="binding"
             xxbl:container="span">
         <xbl:template>
             <!-- Use `xf:input` so that we get default formatting depending on type -->
-            <xf:input ref="xxf:binding('fr-pdf-template-field')"/>
+            <xf:input ref="xxf:binding('fr-output-field')"/>
         </xbl:template>
     </xbl:binding>
 

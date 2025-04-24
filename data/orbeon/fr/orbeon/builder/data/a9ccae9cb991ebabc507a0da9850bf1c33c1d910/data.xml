@@ -620,7 +620,6 @@
                         <fr:c x="1" y="4" w="3">
                             <fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder" id="ssn-control" bind="ssn-bind"
                                        fr:pdf-template-field-name="2">
-                                <fr:encrypt/>
 
 
 

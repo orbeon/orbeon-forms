@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?><form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
                     <project-information-section>
                         <project-type>residential</project-type><project-job-valuation>100000</project-job-valuation><project-scope>Redoing kitchen, add laundry area.</project-scope>
-                        <project-information-address-section><us-address-street-1>742 Evergreen Terrace</us-address-street-1><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state/><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
-                            
-                            
-                            
-                            
-                            
+                        <project-information-address-section><us-address-street-1>742 Evergreen Terrace</us-address-street-1><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state>OR</us-address-state><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
+
+
+
+
+
 
 
                         </project-information-address-section>
@@ -15,12 +15,12 @@
                     <project-contact-section>
                         <property-owner-section>
                             <property-owner-name>Homer Simpson</property-owner-name><property-owner-email-address>chunkylover53@aol.com</property-owner-email-address><property-owner-phone>9395550113</property-owner-phone><property-management-tenant-name/>
-                            <property-owner-address><us-address-street-1>742 Evergreen Terrace</us-address-street-1><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state/><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
-                                
-                                
-                                
-                                
-                                
+                            <property-owner-address><us-address-street-1>742 Evergreen Terrace</us-address-street-1><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state>OR</us-address-state><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
+
+
+
+
+
 
 
                             </property-owner-address>
@@ -28,24 +28,24 @@
                         <contractor-section>
                             <contractor-type>contractor</contractor-type><contractor-state-license-number>123456789</contractor-state-license-number><contractor-license-class>AAA</contractor-license-class><contractor-expires>2030-03-07</contractor-expires><contractor-company-owner-builders-name>ACME Constructions, Inc.</contractor-company-owner-builders-name><contractor-business-license-number>123467899</contractor-business-license-number><contractor-email-address>acme@example.org</contractor-email-address><contractor-phone>5555555555</contractor-phone>
                             <contractor-applicant-authorized-agents-name>John Smith</contractor-applicant-authorized-agents-name><contractor-applicant-email-address>jsmith@example.org</contractor-applicant-email-address><contractor-applicant-phone>5555555555</contractor-applicant-phone>
-                            <contractor-address-section><us-address-street-1/><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state/><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
-                                
-                                
-                                
-                                
-                                
+                            <contractor-address-section><us-address-street-1/><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state>OR</us-address-state><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
+
+
+
+
+
 
 
                             </contractor-address-section>
                         </contractor-section>
                         <architect-section>
                             <architect-type>architect</architect-type><architect-name>George Costanza</architect-name><architect-company-name>Vandelay Industries</architect-company-name><architect-license-number>123456789</architect-license-number><architect-email-address>george@example.org</architect-email-address><architect-phone>5555555555</architect-phone>
-                            <architect-address-section><us-address-street-1/><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state/><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
-                                
-                                
-                                
-                                
-                                
+                            <architect-address-section><us-address-street-1/><us-address-city>Springfield</us-address-city><us-address-street-2/><us-address-state>OR</us-address-state><us-address-zip>99999</us-address-zip><us-address-urbanization fr:relevant="false"/>
+
+
+
+
+
 
 
                             </architect-address-section>

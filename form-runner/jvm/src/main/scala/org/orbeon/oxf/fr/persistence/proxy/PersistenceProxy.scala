@@ -26,6 +26,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.ResponseHeaders
 import org.orbeon.oxf.fr.persistence.relational.form.FormProxyLogic
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
@@ -576,11 +577,19 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
         bodyContentOpt
       }
 
+      val passSingletonHeader = isDataXmlRequest && request.getMethod == HttpMethod.PUT
+      val singletonHeaderOpt  = passSingletonHeader.flatOption(getSingletonHeader(appForm, effectiveFormDefinitionVersionOpt))
+      val allHeaders          =
+        outgoingPersistenceHeaders ++
+        outgoingVersionHeaderOpt   ++
+        singletonHeaderOpt         ++
+        existingFormOrDataHeaders
+
       proxyEstablishConnection(
         OutgoingRequest(request),
         outgoingRequestContent,
         serviceUri,
-        outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt ++ existingFormOrDataHeaders
+        allHeaders
       )
     }
 
@@ -624,6 +633,25 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
         None
       )
     }
+
+  private def getSingletonHeader(
+    appForm                 : AppForm,
+    formDefinitionVersionOpt: Option[Int]
+  )(implicit
+    indentedLogger          : IndentedLogger
+  ): Option[(String, String)] = {
+    // Only attempt to check singleton status when we have a form version
+    formDefinitionVersionOpt.flatMap { version =>
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+      // Read the full form definition as `singleton` isn't in the extracted form metadata
+      val formDefinitionTry = PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, FormDefinitionVersion.Specific(version))
+      formDefinitionTry.toOption.flatMap { case ((_, formDefinitionDoc), _) =>
+        val docContext  = new InDocFormRunnerDocContext(formDefinitionDoc)
+        val isSingleton = docContext.metadataRootElemOpt.flatMap(_.firstChildOpt("singleton")).exists(_.stringValue == "true")
+        isSingleton.option(Headers.OrbeonSingleton -> "true")
+      }
+    }
+  }
 
   private def attachmentsProviderCxr(
     isAttachment            : Boolean,

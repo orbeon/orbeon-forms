@@ -140,14 +140,23 @@ class PdfProductionTest
         "686614dd52e678010d2ad24a5ff04e0160b1fb02",
         // Calculated value with Clipboard Copy
         "3dbf71213d81e2e21a15fbdb2426abd650ffb5d5",
+        // Number
         "299,792,458 m/s",
+        // Currency
         "$ 10.99",
+        // Email address
         "info@orbeon.com",
+        // US Phone Number
         "(555) 555-5555",
+        // US State
         "CA - California",
-        // TODO: US SSN
+        // US SSN
+        "078-05-1120",
+        // US EIN
         "00-1234567",
+        // Date
         "4/11/2025",
+        // Time
         "6:29:45 pm",
         // TODO: Date and Time
         // TODO: Dropdown Date
@@ -155,6 +164,7 @@ class PdfProductionTest
         // TODO: Dropdown
         // TODO: Dropdown with "Other"
         // TODO: Dropdown with Search
+        // US State
         "Antarctica",
         // TODO: Dynamic Dropdown with Search
         // TODO: Radio Buttons

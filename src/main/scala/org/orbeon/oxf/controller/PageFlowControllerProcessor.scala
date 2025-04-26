@@ -72,23 +72,25 @@ trait XmlNativeRoute extends NativeRoute {
   final def readRequestBodyAsDomDocument(implicit ec: ExternalContext): Document =
     IOSupport.readOrbeonDom(ec.getRequest.getInputStream)
 
-  final def getResponseXmlReceiver(implicit ec: ExternalContext): DeferredXMLReceiver =
+  final def getResponseXmlReceiverSetContentType(implicit ec: ExternalContext): DeferredXMLReceiver = {
+    ec.getResponse.setContentType(ContentTypes.XmlContentType)
     new DeferredXMLReceiverImpl(
       TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration) |!>
         (t => TransformerUtils.applyOutputProperties(
           t.getTransformer,
-          "xml",
-          null,
-          null,
-          null,
-          null,
-          true,
-          null,
-          true,
+          /* method             = */ "xml",
+          /* version            = */ null,
+          /* publicDoctype      = */ null,
+          /* systemDoctype      = */ null,
+          /* encoding           = */ null,
+          /* omitXMLDeclaration = */ false,
+          /* standalone         = */ null,
+          /* indent             = */ true,
           XmlIndentation
         )) |!>
         (_.setResult(new StreamResult(ec.getResponse.getOutputStream)))
     )
+  }
 
   private val XmlIndentation = 2
 }

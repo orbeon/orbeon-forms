@@ -37,11 +37,9 @@ object HistoryRoute extends XmlNativeRoute {
     try {
       require(httpRequest.getMethod == HttpMethod.GET)
 
-      implicit val receiver: DeferredXMLReceiver = getResponseXmlReceiver
-
       httpRequest.getRequestPath match {
         case ServicePathRe(provider, app, form, documentId, filenameOrNull) =>
-          httpResponse.setContentType(ContentTypes.XmlContentType)
+          implicit val receiver: DeferredXMLReceiver = getResponseXmlReceiverSetContentType
           returnHistory(
             Request(httpRequest.getFirstParamAsString, provider),
             app,

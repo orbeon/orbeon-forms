@@ -36,7 +36,7 @@ object XFormsServerRoute extends XmlNativeRoute {
   ): Unit =
     doIt(
       readRequestBodyAsDomDocument,
-      Some(getResponseXmlReceiver)
+      Some(getResponseXmlReceiverSetContentType)
     )
 
   def doIt(

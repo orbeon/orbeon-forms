@@ -62,7 +62,7 @@ object PublishedFormMetadataRoute extends XmlNativeRoute {
 
       val forms = FormLogic.forms(provider, formRequest)
 
-      NodeConversions.elemToSAX(nodeInfoToElem(forms.toXML), getResponseXmlReceiver)
+      NodeConversions.elemToSAX(nodeInfoToElem(forms.toXML), getResponseXmlReceiverSetContentType)
     } catch {
       case e: IllegalArgumentException =>
         throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))

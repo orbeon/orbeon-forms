@@ -53,6 +53,6 @@ object DistinctValuesRoute
     val request        = parseRequest(Provider.withName(provider), appForm, readRequestBodyAsTinyTree, formDefinitionVersion)
     val distinctValues = queryDistinctValues(request)
 
-    outputResult(distinctValues, getResponseXmlReceiver)
+    outputResult(distinctValues, getResponseXmlReceiverSetContentType)
   }
 }

@@ -60,7 +60,7 @@ object SearchRoute extends XmlNativeRoute {
 
       val (result, count) = SearchLogic.doSearch(request, connectionOpt = None)
 
-      SearchResult.outputResult(request, result, count, getResponseXmlReceiver)
+      SearchResult.outputResult(request, result, count, getResponseXmlReceiverSetContentType)
     } catch {
       case e: IllegalArgumentException =>
         throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))

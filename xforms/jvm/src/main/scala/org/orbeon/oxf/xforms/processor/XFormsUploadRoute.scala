@@ -43,7 +43,6 @@ object XFormsUploadRoute extends XmlNativeRoute {
     def outputResponse(serverEvents: scala.xml.Elem): Unit = {
 
       response.setStatus(StatusCode.Ok)
-      response.setContentType(ContentTypes.XmlContentType)
 
       NodeConversions.elemToSAX(
         <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -58,7 +57,7 @@ object XFormsUploadRoute extends XmlNativeRoute {
             }</xxf:server-events>
           </xxf:action>
         </xxf:event-response>,
-        getResponseXmlReceiver(ec)
+        getResponseXmlReceiverSetContentType(ec)
       )
     }
 

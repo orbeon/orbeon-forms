@@ -293,16 +293,7 @@ object XFormsStaticStateDeserializer {
           Map.empty // replaced later
         )
 
-    implicit val decodeAnnotatedTemplate : Decoder[AnnotatedTemplate] = deriveDecoder
-    implicit val decodeBasicCredentials  : Decoder[BasicCredentials]  = deriveDecoder
     implicit val decodeLHHAValue         : Decoder[LHHAValue]         = deriveDecoder
-    implicit val decodeNamespace         : Decoder[dom.Namespace]     = (c: HCursor) =>
-      for {
-        prefix <- c.get[String]("prefix")
-        uri    <- c.get[String]("uri")
-      } yield {
-        dom.Namespace(prefix, uri)
-      }
 
     implicit lazy val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
       for {

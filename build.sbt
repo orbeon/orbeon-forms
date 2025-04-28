@@ -595,21 +595,10 @@ lazy val embeddingWar = (project in file("embedding-war"))
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(scala2CommonSettings: _*)
   .settings(
-    Compile / packageBin := {
-
-      def runBuildScript(dir: String): Unit = {
-        val scriptPath = baseDirectory.value / "src" / "main" / dir / "build.sh"
-        val exitCode   = scala.sys.process.Process(scriptPath.getAbsolutePath, scriptPath.getParentFile).!
-        if (exitCode != 0) {
-          throw new Exception(s"$dir build script failed with exit code: $exitCode")
-        }
-      }
-
-      runBuildScript("angular")
-      runBuildScript("react")
-
-      (Compile / packageBin).value
-    }
+    Compile / resourceGenerators ++= Seq(
+      EmbeddingAngularGenerator.task.taskValue,
+      EmbeddingReactGenerator.task.taskValue
+    )
   )
 
 lazy val xformsFilter = (project in file("xforms-filter"))
@@ -1420,54 +1409,6 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
     fork := true // Fork so that the Java options are taken into account
   )
 
-root / Compile / resourceGenerators += Def.taskDyn {
-  import java.nio.file.{Files, StandardCopyOption}
-
-  val rootPath               = Path.absolute((root / baseDirectory).value)
-  val inputFilesDirectory    = rootPath / "data" / "orbeon" / "fr"
-  val sqliteDatabaseFilename = "orbeon-demo.sqlite"
-  val generatedFile          = (Compile / resourceManaged).value / sqliteDatabaseFilename
-  val generatedFileInWebInf  = rootPath / "orbeon-war/jvm/target/webapp/WEB-INF" / sqliteDatabaseFilename
-
-  def allFilesIn(directory: File): Seq[File] = {
-    val files = directory.listFiles
-    files.filter(_.isFile) ++ files.filter(_.isDirectory).flatMap(allFilesIn)
-  }
-
-  Def.task {
-    def generateDemoSqliteDatabase(in: Set[File]): Set[File] = {
-      // Running DemoSqliteDatabase here using (demoSqliteDatabase / Compile / runMain).toTask(...).value doesn't work
-
-      (demoSqliteDatabase / Runtime / runner).value.run(
-        "org.orbeon.oxf.util.DemoSqliteDatabase",
-        (demoSqliteDatabase / Runtime / dependencyClasspath).value.files,
-        Seq(inputFilesDirectory.toString, generatedFile.toString),
-        streams.value.log
-      ).get
-
-      // Copy the generated file to WEB-INF
-      Files.createDirectories(generatedFileInWebInf.toPath.getParent)
-      Files.copy(generatedFile.toPath, generatedFileInWebInf.toPath, StandardCopyOption.REPLACE_EXISTING)
-
-      Set(generatedFile)
-    }
-
-    val cacheDirectory = streams.value.cacheDirectory
-
-    // Only generate demo SQLite database when packaging (there must be a cleaner, more idiomatic way to do this)
-    if (state.value.currentCommand.exists(_.commandLine.startsWith("package"))) {
-      // Consider all .xml/.xhtml/.bin files in data/orbeon/fr as input files (do not ignore .DS_Store, etc. for now)
-      val inputFiles = allFilesIn(inputFilesDirectory)
-
-      // Generate the file only if it doesn't exist or if any of the input files has changed
-      val cachedFunction = FileFunction.cached(cacheDirectory / "sqlite-cache")(generateDemoSqliteDatabase)
-      cachedFunction(inputFiles.toSet).toSeq
-    } else {
-      Seq.empty[File]
-    }
-  }
-}.taskValue
-
 lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
   .settings(
     name := "orbeon-war",
@@ -1488,6 +1429,9 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(scala2CommonSettings: _*)
   .settings(
     exportJars := false
+  )
+  .settings(
+    Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue
   )
 
 lazy val orbeonWarJS = orbeonWar.js

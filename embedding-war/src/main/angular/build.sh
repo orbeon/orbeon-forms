@@ -1,7 +1,11 @@
 #!/bin/bash
+
+OUTPUT_PATH="$1"
+
 npm install
 npx ng build
-mkdir -p ../webapp/assets/angular
-cp dist/angular/browser/main.js ../webapp/assets/angular/main.js
-cp dist/angular/browser/polyfills.js ../webapp/assets/angular/polyfills.js
-cp dist/angular/3rdpartylicenses.txt ../webapp/assets/angular/3rdpartylicenses.txt
+
+mkdir -p "$OUTPUT_PATH"
+cp dist/angular/browser/main.js "$OUTPUT_PATH/main.js"
+cp dist/angular/browser/polyfills.js "$OUTPUT_PATH/polyfills.js"
+cp dist/angular/3rdpartylicenses.txt "$OUTPUT_PATH/3rdpartylicenses.txt"

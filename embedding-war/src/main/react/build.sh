@@ -1,5 +1,9 @@
 #!/bin/bash
+
+OUTPUT_PATH="$1"
+
 npm install
 npm run build
-mkdir -p ../webapp/assets/react
-cp dist/main.js ../webapp/assets/react/main.js
+
+mkdir -p "$OUTPUT_PATH"
+cp dist/main.js "$OUTPUT_PATH/main.js"

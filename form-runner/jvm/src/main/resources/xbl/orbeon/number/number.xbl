@@ -106,7 +106,11 @@
                                 ref="$c"
                                 value="instance()/@*[name() = name($c)]"/>
                         </xf:action>
-                        <!-- Special value to indicate that the default must be used -->
+                        <!--
+                            Special values:
+                            &#2261; (≡) represents "use default",  applies to both grouping and decimal separators
+                            &#2262; (≢) represents "no separator", applies only to grouping separator
+                         -->
                         <xf:setvalue
                             ref="instance('local')/grouping-separator"
                             value="
@@ -146,7 +150,14 @@
                         <xf:bind ref="digits-after-decimal" type="xf:integer"         constraint="xxf:is-blank() or xxf:non-negative()"/>
                         <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)" required="true()"/>
                         <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)" required="true()"/>
-                        <!-- TODO: Validate that the two separators should be different. -->
+                        <xf:bind ref="decimal-separator | grouping-separator">
+                            <xf:constraint
+                                id="separators-must-differ"
+                                value="(../decimal-separator  = '&#2261;') or
+                                       (../grouping-separator = '&#2261;') or
+                                       (../grouping-separator = '&#2262;') or
+                                       (../decimal-separator != ../grouping-separator)"/>
+                        </xf:bind>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
@@ -159,6 +170,7 @@
                                 <digits-after-decimal>Digits after decimal</digits-after-decimal>
                                 <round-when-formatting>Round when formatting</round-when-formatting>
                                 <round-when-storing>Round when storing</round-when-storing>
+                                <separators-must-differ>Decimal and grouping separators must be different</separators-must-differ>
                                 <default-yes-no>
                                     <item id="0">Use default</item>
                                     <item id="1">Yes</item>
@@ -186,6 +198,7 @@
                                 <digits-after-decimal>Chiffres après la virgule</digits-after-decimal>
                                 <round-when-formatting>Arrondir au formattage</round-when-formatting>
                                 <round-when-storing>Arrondir au stockage</round-when-storing>
+                                <separators-must-differ>Les séparateurs décimal et de groupe doivent être différents</separators-must-differ>
                                 <default-yes-no>
                                     <item id="0">Utiliser le défaut</item>
                                     <item id="1">Oui</item>
@@ -233,7 +246,7 @@
                         <xh:td colspan="3">
                             <fr:open-select1 ref="instance('local')/decimal-separator" id="decimal-separator-control" appearance="minimal">
                                 <xf:label ref="xxf:r('decimal-separator')"/>
-                                <xf:alert/>
+                                <xf:alert validation="separators-must-differ" ref="xxf:r('separators-must-differ')"/>
                                 <xf:itemset ref="xxf:resource-elements('decimal-separators.item')">
                                     <xf:label ref="."/>
                                     <xf:value ref="
@@ -250,7 +263,7 @@
                         <xh:td colspan="3">
                             <fr:open-select1 ref="instance('local')/grouping-separator" id="grouping-separator-control" appearance="minimal">
                                 <xf:label ref="xxf:r('grouping-separator')"/>
-                                <xf:alert/>
+                                <xf:alert validation="separators-must-differ" ref="xxf:r('separators-must-differ')"/>
                                 <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
                                     <xf:label ref="."/>
                                     <xf:value ref="
@@ -347,8 +360,6 @@
                         field-align-control">
 
                     <xf:var name="name" value="name(event('xxf:binding'))"/>
-
-                    <!-- Special value to indicate that the default must be used -->
                     <xf:var
                         name="new-value"
                         value="

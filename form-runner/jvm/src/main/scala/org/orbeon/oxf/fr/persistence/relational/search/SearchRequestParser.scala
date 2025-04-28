@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.*
-import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
+import org.orbeon.oxf.fr.persistence.relational.{FormStorageDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
@@ -146,8 +146,8 @@ object SearchRequestParser {
       val specificControlsByPath =
         specificControls.map(c => c.path -> c).toMap
 
-      PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, version) match {
-        case Success(EncryptionAndIndexDetails(_, indexedControlsXPaths)) =>
+      PersistenceMetadataSupport.readPublishedFormStorageDetails(appForm, version) match {
+        case Success(FormStorageDetails(_, indexedControlsXPaths, _)) =>
           indexedControlsXPaths.value map { indexedControlXPath =>
             ControlQuery(
               indexedControlXPath,

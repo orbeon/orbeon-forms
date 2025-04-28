@@ -6,7 +6,7 @@ import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.permission.{Operation, Permission, Permissions, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
-import org.orbeon.oxf.fr.persistence.relational.EncryptionAndIndexDetails
+import org.orbeon.oxf.fr.persistence.relational.FormStorageDetails
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.*
@@ -55,18 +55,20 @@ object PersistenceMetadataSupport {
     formMetadataCache  .foreach(cache => cache.remove(cacheKey).kestrel(log(cache)))
   }
 
-  // Retrieves a form definition from the persistence layer
-  def readPublishedFormEncryptionAndIndexDetails(
+  def readPublishedFormStorageDetails(
     appForm : AppForm,
     version : FormDefinitionVersion
   )(implicit
     indentedLogger: IndentedLogger
-  ): Try[EncryptionAndIndexDetails] =
+  ): Try[FormStorageDetails] =
     readMaybeFromCache(appForm, version, formDefinitionCache) {
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
-      withDebug("reading published form for indexing/encryption details") {
+      withDebug("reading published form for storage details") {
         PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _) =>
-          EncryptionAndIndexDetails(
+          val docContext  = new InDocFormRunnerDocContext(formDefinitionDoc)
+          val formIsSingleton = docContext.metadataRootElemOpt.flatMap(_.firstChildOpt("singleton")).exists(_.stringValue == "true")
+
+          FormStorageDetails(
             encryptedControlsPaths = Eval.later(FieldEncryption.getControlsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
             indexedControlsXPaths  = Eval.later(Index.searchableValues(
               formDefinitionDoc,
@@ -74,7 +76,8 @@ object PersistenceMetadataSupport {
               // We only need the controls XPaths, no need to specify the version (used to call the distinct values API)
               searchVersionOpt = None,
               FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
-            ).controls.toList.map(_.xpath))
+            ).controls.toList.map(_.xpath)),
+            isSingleton = formIsSingleton
           )
         }
       }

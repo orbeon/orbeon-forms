@@ -24,9 +24,10 @@ object StageHeader {
 }
 
 // Only keep the information needed, also avoiding to point to underlying `NodeInfo`
-case class EncryptionAndIndexDetails(
+case class FormStorageDetails(
   encryptedControlsPaths: Eval[List[List[PathElem]]],
-  indexedControlsXPaths : Eval[List[String]]
+  indexedControlsXPaths : Eval[List[String]],
+  isSingleton           : Boolean
 )
 
 sealed trait WhatToReindex

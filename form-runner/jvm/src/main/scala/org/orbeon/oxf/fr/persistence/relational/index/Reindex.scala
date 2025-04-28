@@ -194,13 +194,13 @@ trait Reindex extends FormDefinition {
     val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
       distinctForms.map { case appFormVersion@(appForm@AppForm(app, form), version) =>
         val formDetailsTry =
-          PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(
+          PersistenceMetadataSupport.readPublishedFormStorageDetails(
             appForm, FormDefinitionVersion.Specific(version))
         val indexedControlsXPaths = formDetailsTry match {
           case Failure(_) =>
             error(s"Can't index documents for $app/$form as form definition can't be found")
             Nil
-          case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
+          case Success(FormStorageDetails(_, indexedFields, _)) =>
             indexedFields.value
         }
         appFormVersion -> indexedControlsXPaths

@@ -641,14 +641,11 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     indentedLogger          : IndentedLogger
   ): Option[(String, String)] = {
     // Only attempt to check singleton status when we have a form version
-    formDefinitionVersionOpt.flatMap { version =>
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
-      // Read the full form definition as `singleton` isn't in the extracted form metadata
-      val formDefinitionTry = PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, FormDefinitionVersion.Specific(version))
-      formDefinitionTry.toOption.flatMap { case ((_, formDefinitionDoc), _) =>
-        val docContext  = new InDocFormRunnerDocContext(formDefinitionDoc)
-        val isSingleton = docContext.metadataRootElemOpt.flatMap(_.firstChildOpt("singleton")).exists(_.stringValue == "true")
-        isSingleton.option(Headers.OrbeonSingleton -> "true")
+    formDefinitionVersionOpt.flatMap { versionInt =>
+      val version               = FormDefinitionVersion.Specific(versionInt)
+      val formStorageDetailsTry = PersistenceMetadataSupport.readPublishedFormStorageDetails(appForm, version)
+      formStorageDetailsTry.toOption.flatMap { formStorageDetails =>
+        formStorageDetails.isSingleton.option(Headers.OrbeonSingleton -> "true")
       }
     }
   }

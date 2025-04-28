@@ -204,7 +204,7 @@ trait FormDefinition {
               simpleConstraint.satisfiedFor(currentUserRoles)
 
             case None =>
-              // Current user roles not specified (see readPublishedFormEncryptionAndIndexDetails case and tests)
+              // Current user roles not specified (see readPublishedFormStorageDetails case and tests)
               true
           }
 

@@ -230,6 +230,14 @@ object Tabbable {
       }
     }
 
+    // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)
+    def maybeAdjustCurrentTab(): Unit = {
+      val tabsCount       = getAllLis.size
+      val currentTabIndex = getCurrentTabIndex
+      if (currentTabIndex < 0            ) selectTab(0)
+      if (currentTabIndex > tabsCount - 1) selectTab(tabsCount - 1)
+    }
+
     private def getAllLis: collection.Seq[Element] =
       containerElem.querySelectorAllT(s":scope > div > .nav-tabs > $ExcludeNotVisible")
 

@@ -319,7 +319,7 @@
                         fbf:findNewControlBinding(
                             $i/original-control-name,
                             event('builtin-type'),
-                            false(), (: xxx pass current value?:)
+                            false(), (: doesn't matter as datatype matching handles `xs:`/`xf:` identically :)
                             event('schema-type'),
                             ($new-appearance, $i/appearances/@selection/string())[xxf:non-blank()][1]
                         )"/>
@@ -712,7 +712,7 @@
                                 fbf:findNewControlBinding(
                                     $i/original-control-name,
                                     $previous-builtin-type,
-                                    false(), (: xxx pass current value?:)
+                                    false(), (: doesn't matter as datatype matching handles `xs:`/`xf:` identically :)
                                     $previous-schema-type,
                                     $current-appearance]
                                 )"/>
@@ -723,7 +723,7 @@
                                 fbf:findNewControlBinding(
                                     $i/original-control-name,
                                     $new-builtin-type,
-                                    false(), (: xxx pass current value?:)
+                                    false(), (: doesn't matter as datatype matching handles `xs:`/`xf:` identically :)
                                     $new-schema-type,
                                     $current-appearance[xxf:non-blank()]
                                 )"/>

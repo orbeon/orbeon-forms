@@ -359,7 +359,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
           val javaNamedParamsIt = params.keyValuePairs.iterator.asScala.map {
             case org.orbeon.saxon.ma.map.KeyValuePair(key, value) =>
-              val javaParamOpt = (value.asIterable.iterator.asScala map SequenceTool.convertToJava).nextOption()
+              val javaParamOpt = (value.asIterable().iterator.asScala map SequenceTool.convertToJava).nextOption()
               key.getStringValue -> javaParamOpt.orNull
           }
 
@@ -410,7 +410,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def getDocumentAttribute(ns: String, key: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =
     xfc.containingDocument.getAttribute(ns, key) match {
-      case Some(value: om.GroundedValue) => value.asIterable.asScala
+      case Some(value: om.GroundedValue) => value.asIterable().asScala
       case _                             => Nil
     }
 

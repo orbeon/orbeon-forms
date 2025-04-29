@@ -74,13 +74,10 @@ object ClientEvents extends Logging  {
         // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
         // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
         // beforehand.
-        (events ++ DummyEvent).sliding(2).toList flatMap {
-          case List((a, trusted), (b, _)) =>
-            if (a.eventName != EventNames.XXFormsValue || new EventGroupingKey(a) != new EventGroupingKey(b))
-              safelyCreateAndMapEvent(doc, a, trusted)
-            else
-              None
-        }
+        (events ++ DummyEvent).sliding(2).toList.collect {
+          case List((a, trusted), (b, _)) if a.eventName != EventNames.XXFormsValue || new EventGroupingKey(a) != new EventGroupingKey(b) =>
+            safelyCreateAndMapEvent(doc, a, trusted)
+        }.flatten
     }
 
     // Combine and process events

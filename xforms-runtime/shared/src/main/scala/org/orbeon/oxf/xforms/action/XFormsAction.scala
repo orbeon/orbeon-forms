@@ -83,11 +83,12 @@ abstract class XFormsAction extends Logging {
             None
         }
 
-      case None if required =>
-        // This can happen if the attribute is missing or if the AVT cannot be evaluated due to an empty context
-        throw new OXFException("Cannot resolve mandatory '" + attName + "' attribute on " + context.actionName + " action.")
-      case None if ! required =>
-        None
+      case None =>
+        if (required)
+          // This can happen if the attribute is missing or if the AVT cannot be evaluated due to an empty context
+          throw new OXFException("Cannot resolve mandatory '" + attName + "' attribute on " + context.actionName + " action.")
+        else
+          None
     }
   }
 

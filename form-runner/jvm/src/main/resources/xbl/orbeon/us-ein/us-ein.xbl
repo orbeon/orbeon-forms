@@ -22,15 +22,16 @@
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">US Employer Identification Number (EIN)</display-name>
-            <display-name lang="es" todo="true"></display-name>
-            <display-name lang="fi" todo="true"></display-name>
+            <display-name lang="es">Número de Identificación del Empleador de EE. UU. (EIN)</display-name>
+            <display-name lang="fi">Yhdysvaltain työnantajan tunnistenumero (EIN)</display-name>
             <display-name lang="fr">Numéro d'identifiant employeur US (EIN)</display-name>
-            <display-name lang="ru" todo="true"></display-name>
-            <display-name lang="de" todo="true"></display-name>
-            <display-name lang="it" todo="true"></display-name>
-            <display-name lang="nl" todo="true"></display-name>
-            <display-name lang="pt" todo="true"></display-name>
-            <display-name lang="sv" todo="true"></display-name>
+            <display-name lang="ru">Идентификационный номер работодателя США (EIN)</display-name>
+            <display-name lang="de">US-Arbeitgeber-Identifikationsnummer (EIN)</display-name>
+            <display-name lang="it">Numero di identificazione del datore di lavoro degli Stati Uniti (EIN)</display-name>
+            <display-name lang="nl">Amerikaans werkgeversidentificatienummer (EIN)</display-name>
+            <display-name lang="pt">Número de Identificação do Empregador dos EUA (EIN)</display-name>
+            <display-name lang="sv">Amerikanskt arbetsgivaridentifikationsnummer (EIN)</display-name>
+
             <icon>
                 <icon-class>fa fa-fw fa-industry</icon-class>
             </icon>

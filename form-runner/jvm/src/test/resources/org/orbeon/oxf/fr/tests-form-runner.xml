@@ -12,7 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <tests xmlns:xi="http://www.w3.org/2001/XInclude">
-    <xi:include href="tests-xforms-xpath-analysis.xml"/>
+    <xi:include href="tests-form-runner-xpath-analysis.xml"/>
     <xi:include href="tests-form-runner-components.xml"/>
     <xi:include href="tests-form-runner-grids.xml"/>
     <xi:include href="tests-xpath-functions.xml"/>

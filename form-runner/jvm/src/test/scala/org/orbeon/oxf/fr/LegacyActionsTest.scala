@@ -25,7 +25,7 @@ class LegacyActionsTest
       it("must initialize, call the service, and set the correct control value") {
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
-            assert(resolveObject[XFormsValueControl]("title-control").map(_.getValue(EventCollector.Throw)).contains("Wake up to WonderWidgets!"))
+            assert(resolveObject[XFormsValueControl]("title-control").map(_.getValue(EventCollector.Throw)).contains("Reminder"))
           }
         }
       }

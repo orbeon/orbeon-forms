@@ -38,7 +38,7 @@
                     <xforms:bind xmlns:xforms="http://www.w3.org/2002/xforms" id="grid-1-bind" ref="grid-1"
                                  name="grid-1">
                         <xf:bind id="title-bind" ref="title" name="title"
-                                 xxf:default="fr:dataset('my-dataset')//title"/>
+                                 xxf:default="fr:dataset('my-dataset')//heading"/>
 
 
                     </xforms:bind>
@@ -99,7 +99,7 @@
                         <body xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">&lt;params/&gt;</body>
                     </xf:instance>
-            <xf:submission id="my-service-submission" class="fr-service" resource="http://httpbin.org/xml"
+            <xf:submission id="my-service-submission" class="fr-service" resource="http://www.w3schools.com/xml/note.xml"
                            method="get"
                            serialization="none"
                            mediatype=""/>

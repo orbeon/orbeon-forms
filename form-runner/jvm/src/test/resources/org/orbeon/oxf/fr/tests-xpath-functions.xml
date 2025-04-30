@@ -366,4 +366,32 @@
         </output>
     </test>
 
+    <test description="For #6983: `fr:is-readonly-mode()` returns false in plain XForms" name="oxf:pipeline">
+        <input name="config" href="../xforms/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xh:head>
+                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"/>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="output" value="fr:is-readonly-mode()"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

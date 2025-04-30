@@ -178,7 +178,7 @@ private object FormRunnerFunctions {
     "is-pe"                       -> (() => Version.isPE),
     "is-draft"                    -> (() => FormRunnerParams().isDraft.getOrElse(false)),
     "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
-    "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),
+    "is-readonly-mode"            -> (() => FormRunnerParamsOpt().exists(p => FormRunner.isReadonlyMode(p))),
     "is-service-path"             -> (() => FormRunner.isServicePath(XFormsFunction.context)),
     "is-background"               -> (() => FormRunner.isBackground(XFormsFunction.context, FormRunnerParams())),
     "is-noscript"                 -> (() => false),

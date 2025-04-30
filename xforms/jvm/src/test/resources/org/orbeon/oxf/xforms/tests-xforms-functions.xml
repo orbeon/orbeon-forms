@@ -1887,7 +1887,7 @@
                 </xh:head>
                 <xh:body>
                     <xf:output id="output1"
-                                   value="xxf:format-message('{2,time,short} {2,date,long}', ('Mars', 3, xs:dateTime('2010-07-23T19:25:13-07:00')))"/>
+                                   value="xxf:format-message('{2,time,HH:mm} {2,date,long}', ('Mars', 3, xs:dateTime('2010-07-23T19:25:13-07:00')))"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -1900,7 +1900,7 @@
                     <xxf:control-values>
                         <xxf:attribute for="xf-1" name="xml:lang">zh</xxf:attribute>
                         <xxf:control id="output1">
-                            <xxf:value>下午7:25 2010年7月23日</xxf:value>
+                            <xxf:value>19:25 2010年7月23日</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
                 </xxf:action>

@@ -21,7 +21,7 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && mkdir -p $DEPLOYMENT_DIR/orbeon \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon/ \
     && if [ -f $basename/orbeon-redis-jars.zip ]; then \
-       && mkdir -p /tmp/redis-jars \
+       mkdir -p /tmp/redis-jars \
        && unzip $basename/orbeon-redis-jars.zip -d /tmp/redis-jars \
        && cp /tmp/redis-jars/*.jar $TOMCAT_HOME/lib/ \
        && rm -rf /tmp/redis-jars; \

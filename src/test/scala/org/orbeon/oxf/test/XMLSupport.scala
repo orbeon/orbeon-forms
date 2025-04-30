@@ -50,7 +50,7 @@ trait XMLSupport extends AssertionsForJUnit {
 
   def assertXMLElementsIgnoreNamespacesInScopeCollapse(left: JElement, right: JElement): Unit = {
 
-    val result = Comparator.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
+    val result = Comparator.compareElementsIgnoreWhitespacesNamespacesInScope(left, right)
 
     // Produce a nicer message
     if (! result) {

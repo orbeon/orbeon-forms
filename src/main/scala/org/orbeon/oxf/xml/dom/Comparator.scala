@@ -49,13 +49,21 @@ object Comparator {
     )
 
   /**
-   * Same as compareDocumentsIgnoreNamespacesInScope but collapse white space when comparing text.
+   * Same as compareDocumentsIgnoreNamespacesInScope but ignore differences in white spaces.
    */
-  def compareDocumentsIgnoreNamespacesInScopeCollapse(left: Document, right: Document): Boolean =
-    compareElementsIgnoreNamespacesInScopeCollapse(left.getRootElement, right.getRootElement)
+  def compareDocumentsIgnoreWhitespacesNamespacesInScope(left: Document, right: Document): Boolean =
+    compareElementsIgnoreWhitespacesNamespacesInScope(left.getRootElement, right.getRootElement)
 
-  def compareElementsIgnoreNamespacesInScopeCollapse(left: Element, right: Element): Boolean = {
-    val normalizeText = (c: String) => Whitespace.collapseWhitespace(c).toString
+  /**
+   * Compare two elements ignoring namespaces in scope but ignore differences in white spaces.
+   */
+  def compareElementsIgnoreWhitespacesNamespacesInScope(left: Element, right: Element): Boolean = {
+    val normalizeText = (c: String) => {
+      // Replace NBSP (\u00A0) and Narrow NBSP (\u202F) with regular spaces before applying standard whitespace collapsing
+      // This handles differences in spaces around AM/PM in time formatting that changed in Java
+      val withRegularSpaces = c.replace('\u00A0', ' ').replace('\u202F', ' ')
+      Whitespace.collapseWhitespace(withRegularSpaces).toString
+    }
     compareTwoNodes(left.createCopy.normalizeTextNodes, right.createCopy.normalizeTextNodes)(normalizeText)
   }
 

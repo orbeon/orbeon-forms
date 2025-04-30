@@ -108,7 +108,7 @@ abstract class ProcessorTestBase(
               actualDoc         = serializer.runGetDocument(pipelineContext)
             } yield {
               // NOTE: We could make the comparison more configurable, for example to not collapse white space
-              if (Comparator.compareDocumentsIgnoreNamespacesInScopeCollapse(doc, actualDoc))
+              if (Comparator.compareDocumentsIgnoreWhitespacesNamespacesInScope(doc, actualDoc))
                 SuccessTestResult
               else
                 FailedTestResult(doc, actualDoc)

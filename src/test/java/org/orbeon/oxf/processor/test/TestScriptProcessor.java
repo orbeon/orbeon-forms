@@ -174,7 +174,7 @@ public class TestScriptProcessor extends ProcessorImpl {
                 final Document actualDocument = executionContext.outputProcessor.readInputAsOrbeonDom(pipelineContext, outputName);
                 final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
-                if (! Comparator.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
+                if (! Comparator.compareDocumentsIgnoreWhitespacesNamespacesInScope(actualDocument, expectedDocument))
                     throw new OXFException("Assertion failed: output '" + outputName + "' got '" + IOSupport.domToCompactStringJava(actualDocument)
                         +  " ', but expected '" + IOSupport.domToCompactStringJava(expectedDocument) + "'.");
 

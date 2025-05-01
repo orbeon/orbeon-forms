@@ -21,7 +21,7 @@
                 fr|us-ssn[fr|pdf-template = true],
                 fr|us-ein[fr|static-readonly = true],
                 fr|us-ein[fr|pdf-template = true]"
-            xxbl:mode="binding"
+            xxbl:mode="binding lhha"
             xxbl:container="span">
         <xbl:template>
             <!-- Use `xf:input` so that we get default formatting depending on type -->

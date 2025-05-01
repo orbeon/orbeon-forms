@@ -36,8 +36,8 @@ trait XPathDependencies {
   def bindingUpdateStart   ()                  : Unit
   def bindingUpdateDone    ()                  : Unit
 
-  def afterInitialResponse ()                  : Unit
-  def beforeUpdateResponse ()                  : Unit
+  def afterInitialResponse (propertiesSequence: Int): Unit
+  def beforeUpdateResponse (propertiesSequence: Int): Unit
   def afterUpdateResponse  ()                  : Unit
 
   def notifyComputeLHHA    ()                  : Unit

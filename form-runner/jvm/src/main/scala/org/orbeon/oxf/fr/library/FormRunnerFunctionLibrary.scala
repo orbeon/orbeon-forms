@@ -21,16 +21,20 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils, XMLUtils}
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.`type`.Type.ITEM_TYPE
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.function.{AncestorOrganizations, Property, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
@@ -367,6 +371,44 @@ private object FormRunnerFunctions {
         property             = Property.property
       ).orNull
     }
+
+    override def addToPathMap(
+      pathMap        : PathMap,
+      pathMapNodeSet : PathMapNodeSet
+    ): PathMapNodeSet =
+      arguments.head match {
+        case s: StringLiteral =>
+
+          val paramName = s.getStringValue
+
+          val context = getPathMapContext(pathMap)
+
+          val boundElemOpt =
+            ancestorsIterator(context.element, includeSelf = false) collectFirst {
+              case c: ComponentControl => c
+            }
+
+          // The following causes the use of `fr:component-param-value()` to be invalidated only if there is an
+          // attribute and it might be an AVT. If the parameter is a literal, this makes sense, as it will never change.
+          // Any dependency on `fr-form-metadata` does not need to be handled, as that is an immutable instance.
+          //
+          // TODO: handle AVT dependencies
+          val hasAttributeAndIsNotAvt =
+            boundElemOpt.exists(_.element.attributeValueOpt(paramName).exists(v => ! XMLUtils.maybeAVT(v)))
+
+          val doesNotHaveAttribute =
+            boundElemOpt.exists(_.element.attributeValueOpt(paramName).isEmpty)
+
+          if (hasAttributeAndIsNotAvt || doesNotHaveAttribute) {
+            pathMapNodeSet
+          } else {
+            pathMap.setInvalidated(true)
+            null
+          }
+        case _ =>
+          pathMap.setInvalidated(true)
+          null
+      }
   }
 
   class FRComponentParamByType extends FunctionSupport with RuntimeDependentFunction {

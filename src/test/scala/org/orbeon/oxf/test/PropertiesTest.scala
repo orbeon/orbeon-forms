@@ -35,7 +35,7 @@ object PropertiesTest {
       |</properties>""".stripMargin
 
   def newProperties: PropertyStore =
-    PropertyStore.parse(IOSupport.readOrbeonDom(PropertiesXmlString))
+    PropertyStore.parse(IOSupport.readOrbeonDom(PropertiesXmlString), 0)
 }
 
 class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {

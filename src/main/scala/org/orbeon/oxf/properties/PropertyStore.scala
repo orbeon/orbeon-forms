@@ -26,7 +26,7 @@ import org.orbeon.scaxon.SimplePath.*
 import scala.collection.mutable
 
 
-class PropertyStore(globalPropertySet: PropertySet, processorPropertySets: Map[QName, PropertySet]) {
+class PropertyStore(val sequence: Int, globalPropertySet: PropertySet, processorPropertySets: Map[QName, PropertySet]) {
 
   def getGlobalPropertySet: PropertySet =
     globalPropertySet
@@ -38,7 +38,7 @@ class PropertyStore(globalPropertySet: PropertySet, processorPropertySets: Map[Q
 // Construction of a `PropertyStore` currently depends on Saxon classes.
 object PropertyStore {
 
-  def parse(doc: Document): PropertyStore = {
+  def parse(doc: Document, sequence: Int): PropertyStore = {
 
     import PropertySet.PropertyParams
 
@@ -98,8 +98,9 @@ object PropertyStore {
     }
 
     new PropertyStore(
-      PropertySet(globalPropertyDefs),
-      namedPropertySets.iterator map { case (name, defs) => name -> PropertySet(defs) } toMap
+      sequence,
+      PropertySet(globalPropertyDefs, sequence),
+      namedPropertySets.iterator map { case (name, defs) => name -> PropertySet(defs, sequence) } toMap
     )
   }
 }

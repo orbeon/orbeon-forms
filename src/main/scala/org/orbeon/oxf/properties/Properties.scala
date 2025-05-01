@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.{LoggerFactory, PipelineUtils}
 import java.util as ju
 import java.util.concurrent.Semaphore
 import scala.jdk.CollectionConverters.*
-import scala.util.control.NonFatal
 
 
 /**
@@ -127,7 +126,9 @@ class Properties private {
         if (document == null || document.content.isEmpty)
           throw new OXFException("Failure to initialize Orbeon Forms properties")
 
-        propertyStore = PropertyStore.parse(document).some
+        val newSequence = propertyStore.map(_.sequence + 1).getOrElse(0)
+
+        propertyStore = PropertyStore.parse(document, newSequence).some
         lastUpdate = current
       }
     }

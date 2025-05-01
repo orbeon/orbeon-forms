@@ -56,7 +56,7 @@ class ResourcesPatcherTest
             <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.labels.acme"       value="Acme Missing"/>
           </properties>.toDocument
 
-        PropertyStore.parse(properties).getGlobalPropertySet
+        PropertyStore.parse(properties, 0).getGlobalPropertySet
       }
 
       def newDoc =
@@ -147,7 +147,7 @@ class ResourcesPatcherTest
             <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-wildcard-en-meta-wildcard-en" value="prop-wildcard-en-meta-wildcard-en (property, en)"/>
           </properties>.toDocument
 
-        PropertyStore.parse(properties).getGlobalPropertySet
+        PropertyStore.parse(properties, 0).getGlobalPropertySet
       }
 
       val formMetadata =

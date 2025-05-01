@@ -79,11 +79,11 @@ object PropertySet {
   private val SomeXsDatetimeQname = XMLConstants.XS_DATETIME_QNAME.some
   private val SomeXsQnameQname    = XMLConstants.XS_QNAME_QNAME.some
 
-  def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode)
+  def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode, 0)
 
   case class PropertyParams(namespaces: Map[String, String], name: String, typeQName: QName, stringValue: String)
 
-  def apply(globalProperties: Iterable[PropertyParams]): PropertySet = {
+  def apply(globalProperties: Iterable[PropertyParams], sequence: Int = 0): PropertySet = {
 
     var propertiesByName = Map[String, Property]()
     val propertiesTree   = new PropertyNode
@@ -109,7 +109,7 @@ object PropertySet {
       setProperty(namespaces, name, typ, getObjectFromStringValue(stringValue, typ, namespaces))
     }
 
-    new PropertySet(propertiesByName, propertiesTree)
+    new PropertySet(propertiesByName, propertiesTree, sequence)
   }
 
   def isSupportedType(typeQName: QName): Boolean =
@@ -178,7 +178,8 @@ object PropertySet {
 
 class PropertySet private (
   propertiesByName: Map[String, Property],
-  propertiesTree  : PropertyNode // this contains mutable nodes, but they don't mutate after construction
+  propertiesTree  : PropertyNode,  // this contains mutable nodes, but they don't mutate after construction
+  val sequence    : Int
 ) {
 
   def keySet: Set[String] = propertiesByName.keySet

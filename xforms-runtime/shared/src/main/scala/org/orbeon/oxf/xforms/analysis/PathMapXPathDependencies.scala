@@ -40,6 +40,11 @@ class PathMapXPathDependencies(
 
   private implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("dependencies")
 
+  // The idea here is that if the properties change, we want to re-evaluate everything. If the flag is set, we will
+  // re-evaluate everything until the first refresh is done.
+  private var lastPropertiesSequence: Int = 0
+  private var evaluateAllUntilRefreshDone: Boolean = false
+
   // Represent the state of changes to a model
   private class ModelState(val modelKey: ModelOrInstanceKey, val model: XFormsModel) {
 
@@ -148,7 +153,9 @@ class PathMapXPathDependencies(
       } else
         new MapSet[ModelOrInstanceKey, String]
 
-    def refreshDone(): Unit = ()
+    def refreshDone(): Unit = {
+      evaluateAllUntilRefreshDone = false
+    }
 
     def isMIPInitiallyDirty(mip: StaticBind.MIP): Boolean =
       mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
@@ -362,17 +369,19 @@ class PathMapXPathDependencies(
     inRefresh = false
   }
 
-
   def bindingUpdateStart(): Unit =
     inBindingUpdate = true
 
   def bindingUpdateDone(): Unit =
     inBindingUpdate = false
 
-  def afterInitialResponse(): Unit =
+  def afterInitialResponse(propertiesSequence: Int): Unit = {
+    lastPropertiesSequence = propertiesSequence
     outputLHHAItemsetStats()
+  }
 
-  def beforeUpdateResponse(): Unit = {
+  def beforeUpdateResponse(propertiesSequence: Int): Unit = {
+
     lhhaEvaluationCount = 0
     lhhaOptimizedCount = 0
     lhhaUnknownDependencies = 0
@@ -384,6 +393,11 @@ class PathMapXPathDependencies(
     itemsetUnknownDependencies = 0
     itemsetMissCount = 0
     itemsetHitCount = 0
+
+    if (propertiesSequence > lastPropertiesSequence) {
+      evaluateAllUntilRefreshDone = true
+      lastPropertiesSequence = propertiesSequence
+    }
   }
 
   def afterUpdateResponse(): Unit =
@@ -469,6 +483,9 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
+    if (evaluateAllUntilRefreshDone)
+      return true
+
     val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlIndexes)
 
     val cached = resultCacheKey flatMap modifiedBindingCacheForRepeats.get
@@ -523,6 +540,9 @@ class PathMapXPathDependencies(
   def requireValueUpdate(control: ElementAnalysis, controlIndexes: Array[Int]): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
+
+    if (evaluateAllUntilRefreshDone)
+      return true
 
     val resultCacheKey = buildRepeatResultCacheKey(control, control.valueAnalysis.toList, controlIndexes)
 
@@ -584,6 +604,9 @@ class PathMapXPathDependencies(
     // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
     assert(inRefresh || inBindingUpdate)
 
+    if (evaluateAllUntilRefreshDone)
+      return true
+
     val analysesOrEmpty = {
 
       val lhhaControl = {
@@ -630,6 +653,9 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
+    if (evaluateAllUntilRefreshDone)
+      return true
+
     def requireUpdate =
       control.itemsetAnalysis match {
         case None =>
@@ -659,6 +685,9 @@ class PathMapXPathDependencies(
     ! model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
 
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MipName, level: ValidationLevel): Boolean = {
+
+    if (evaluateAllUntilRefreshDone)
+      return true
 
     // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
 

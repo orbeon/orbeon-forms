@@ -27,4 +27,12 @@
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
 
+    <!-- This is necessary so that XForms engine resources can be served appropriately -->
+    <filter-mapping>
+        <filter-name>orbeon-xforms-filter</filter-name>
+        <url-pattern>/orbeon/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
 </web-app>

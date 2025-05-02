@@ -1,6 +1,6 @@
 #!/bin/bash
 
-publish=true
+REMOTE_PUBLISH=true
 
 VERSION=${1:-'2024.1.1-pe'}
 RELEASE_TAG=${2:-'tag-release-2024.1.1-pe-pseudo'}
@@ -55,7 +55,7 @@ main() {
   # context (i.e. the ".." below is problematic)
   cp "../form-runner/jvm/src/main/resources/apps/fr/persistence/relational/ddl/$SQL_FILE" "$SQL_SCHEMA_FILE"
 
-  if $publish; then
+  if $REMOTE_PUBLISH; then
     docker login -u orbeon
   fi
 
@@ -78,7 +78,7 @@ main() {
   # Build PostgreSQL image with demo forms data (as local SQL file)
   docker build --platform="$PLATFORMS" -f Dockerfile.postgres -t "$POSTGRES_IMAGE" .
 
-  if $publish; then
+  if $REMOTE_PUBLISH; then
     docker push "$ORBEON_FORMS_TOMCAT_IMAGE"
     docker push "$ORBEON_FORMS_WILDFLY_IMAGE"
     docker push "$POSTGRES_IMAGE"

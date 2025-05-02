@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# In case of device space issues, make the "Disk usage limit" higher under "Resource Allocation" (Docker Desktop)
+
 REMOTE_PUBLISH=true
 
 VERSION=${1:-'2024.1.1-pe'}

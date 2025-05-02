@@ -46,6 +46,18 @@ private[persistence] object HttpCall {
   case class XML   (doc : Document   ) extends Body
   case class Binary(file: Array[Byte]) extends Body
 
+  sealed trait Check[+T]
+  object Check {
+    case object Ignore         extends Check[Nothing]
+    case object None           extends Check[Nothing]
+    case class  Some[+T](t: T) extends Check[T]
+
+    def fromOption[T](opt: Option[T]): Check[T] = opt match {
+      case scala.None    => Check.None
+      case scala.Some(t) => Check.Some(t)
+    }
+  }
+
   case class SolicitedRequest(
     path              : String,
     method            : HttpMethod,
@@ -59,16 +71,18 @@ private[persistence] object HttpCall {
 
   case class ExpectedResponse(
     code        : Int,
-    operations  : Option[Operations]  = None,
-    formVersion : Option[Int]         = None,
-    body        : Option[Body]        = None
+    operations  : Option[Operations] = None,
+    formVersion : Option[Int]        = None,
+    body        : Option[Body]       = None,
+    contentType : Check[String]      = Check.Ignore
   )
 
   case class Response(
     code        : Int,
     operations  : Operations,
     formVersion : Option[Int],
-    body        : Array[Byte]
+    body        : Array[Byte],
+    contentType : Option[String]
   )
 
   def assertCall(
@@ -91,6 +105,9 @@ private[persistence] object HttpCall {
 
         // Check form version
         assert(actualResponse.formVersion == expectedResponse.formVersion)
+
+        // Check optional content type
+        assert(expectedResponse.contentType == Check.Ignore || Check.fromOption(actualResponse.contentType) == expectedResponse.contentType)
 
         // Check body
         expectedResponse.body.foreach {
@@ -144,7 +161,8 @@ private[persistence] object HttpCall {
           val outputStream = new ByteArrayOutputStream
           IOUtils.copyStreamAndClose(actualResponse.content.stream, outputStream)
           outputStream.toByteArray
-        }
+        },
+        contentType = Headers.firstItemIgnoreCase(actualHeaders, Headers.ContentType)
       )
 
       responseProcessor(response)

@@ -19,6 +19,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, SafeRequestContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
+import org.orbeon.oxf.fr.persistence.http.HttpCall.Check
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
 import org.orbeon.oxf.fr.persistence.relational.form.adt.*
@@ -28,7 +29,7 @@ import org.orbeon.oxf.http.StatusCode.isSuccessCode
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, WithResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.StaticXPath.orbeonDomToTinyTree
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
@@ -180,10 +181,11 @@ class FormMetadataApiTest
   }
 
   def assertCall(
-    searchRequest       : Document,
-    searchResult        : Document,
-    statusCode          : Int = StatusCode.Ok,
-    xmlResponseFilter   : Document => Document = identity
+    searchRequest     : Document,
+    searchResult      : Document,
+    statusCode        : Int                  = StatusCode.Ok,
+    contentType       : Check[String]        = Check.Ignore,
+    xmlResponseFilter : Document => Document = identity
   )(implicit
     safeRequestCtx: SafeRequestContext
   ): Unit =
@@ -195,8 +197,9 @@ class FormMetadataApiTest
         xmlResponseFilter = xmlResponseFilter.some
       ),
       HttpCall.ExpectedResponse(
-        code = statusCode,
-        body = HttpCall.XML(searchResult).some
+        code        = statusCode,
+        contentType = contentType,
+        body        = HttpCall.XML(searchResult).some
       )
     )
 
@@ -390,7 +393,11 @@ class FormMetadataApiTest
         val searchRequest = <search/>.toDocument
         val searchResult  = <forms search-total="0"/>.toDocument
 
-        assertCall(searchRequest, searchResult)
+        assertCall(
+          searchRequest = searchRequest,
+          searchResult  = searchResult,
+          contentType   = Check.Some(ContentTypes.XmlContentType)
+        )
       }
     }
 
@@ -415,7 +422,12 @@ class FormMetadataApiTest
             </form>
           </forms>.toDocument
 
-        assertCall(searchRequest, searchResult, xmlResponseFilter = xmlResponseFilter)
+        assertCall(
+          searchRequest     = searchRequest,
+          searchResult      = searchResult,
+          contentType       = Check.Some(ContentTypes.XmlContentType),
+          xmlResponseFilter = xmlResponseFilter
+        )
       }
     }
 

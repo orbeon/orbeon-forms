@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
+import org.orbeon.datatypes.Mediatype
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
-import org.orbeon.oxf.fr.persistence.http.HttpCall.assertCall
+import org.orbeon.oxf.fr.persistence.http.HttpCall.{Check, assertCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.NodeConversions
@@ -442,9 +443,10 @@ class SearchTest
     }
 
     def expectStatusCode(
-      path                    : String,
-      searchRequest           : Document,
-      code                    : Int
+      path          : String,
+      searchRequest : Document,
+      code          : Int,
+      contentType   : Check[String] = Check.Ignore
     )(implicit
       safeRequestCtx: SafeRequestContext
     ): Unit =
@@ -455,7 +457,7 @@ class SearchTest
           method  = POST,
           body    = Some(HttpCall.XML(searchRequest))
         ),
-        HttpCall.ExpectedResponse(code)
+        HttpCall.ExpectedResponse(code = code, contentType = contentType)
       )
 
     it("returns an error when specifying an invalid metadata attribute") {
@@ -492,17 +494,17 @@ class SearchTest
           val TestString = "string"
 
           for (metadata <- Seq("created-by", "last-modified-by", "workflow-stage")) {
-            expectStatusCode(SearchURL, searchRequest(metadata, "gte",   TestString), StatusCode.BadRequest)
-            expectStatusCode(SearchURL, searchRequest(metadata, "lt",    TestString), StatusCode.BadRequest)
-            expectStatusCode(SearchURL, searchRequest(metadata, "exact", TestString), StatusCode.Ok)
+            expectStatusCode(SearchURL, searchRequest(metadata, "gte",   TestString), code = StatusCode.BadRequest)
+            expectStatusCode(SearchURL, searchRequest(metadata, "lt",    TestString), code = StatusCode.BadRequest)
+            expectStatusCode(SearchURL, searchRequest(metadata, "exact", TestString), code = StatusCode.Ok, contentType = Check.Some(ContentTypes.XmlContentType))
           }
 
           val TestDateTime = "2024-12-31T01:30:00.000Z"
 
           for (metadata <- Seq("created", "last-modified")) {
-            expectStatusCode(SearchURL, searchRequest(metadata, "gte",   TestDateTime), StatusCode.Ok)
-            expectStatusCode(SearchURL, searchRequest(metadata, "lt",    TestDateTime), StatusCode.Ok)
-            expectStatusCode(SearchURL, searchRequest(metadata, "exact", TestDateTime), StatusCode.BadRequest)
+            expectStatusCode(SearchURL, searchRequest(metadata, "gte",   TestDateTime), code = StatusCode.Ok, contentType = Check.Some(ContentTypes.XmlContentType))
+            expectStatusCode(SearchURL, searchRequest(metadata, "lt",    TestDateTime), code = StatusCode.Ok, contentType = Check.Some(ContentTypes.XmlContentType))
+            expectStatusCode(SearchURL, searchRequest(metadata, "exact", TestDateTime), code = StatusCode.BadRequest)
           }
         }
       }
@@ -520,7 +522,7 @@ class SearchTest
                 <query path={controlPath} match="substring" sort="sort">test</query>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequest, StatusCode.BadRequest)
+          expectStatusCode(SearchURL, searchRequest, code = StatusCode.BadRequest)
         }
       }
     }
@@ -538,7 +540,7 @@ class SearchTest
                 <query metadata="created-by" match="exact">test</query>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequestSortByControl, StatusCode.Ok)
+          expectStatusCode(SearchURL, searchRequestSortByControl, code = StatusCode.Ok, contentType = Check.Some(ContentTypes.XmlContentType))
 
           val searchRequestSortByMetadata =
             <search>{
@@ -547,7 +549,7 @@ class SearchTest
                 <query metadata="created-by" match="exact" sort="asc">test</query>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequestSortByMetadata, StatusCode.Ok)
+          expectStatusCode(SearchURL, searchRequestSortByMetadata, code = StatusCode.Ok, contentType = Check.Some(ContentTypes.XmlContentType))
 
           val searchRequestSortByBoth =
             <search>{
@@ -556,7 +558,7 @@ class SearchTest
                 <query metadata="created-by" match="exact" sort="desc">test</query>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequestSortByBoth, StatusCode.BadRequest)
+          expectStatusCode(SearchURL, searchRequestSortByBoth, code = StatusCode.BadRequest)
         }
       }
     }
@@ -574,7 +576,7 @@ class SearchTest
                 <query metadata="created-by" sort="asc"/>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequestSortOnly, StatusCode.Ok)
+          expectStatusCode(SearchURL, searchRequestSortOnly, code = StatusCode.Ok, contentType = Check.Some(ContentTypes.XmlContentType))
 
           val searchRequestValueOnly =
             <search>{
@@ -583,7 +585,7 @@ class SearchTest
                 <query metadata="created-by">test</query>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequestValueOnly, StatusCode.BadRequest)
+          expectStatusCode(SearchURL, searchRequestValueOnly, code = StatusCode.BadRequest)
 
           val searchRequestBoth =
             <search>{
@@ -592,7 +594,7 @@ class SearchTest
                 <query metadata="created-by" sort="desc">test</query>
               }</search>.toDocument
 
-          expectStatusCode(SearchURL, searchRequestBoth, StatusCode.BadRequest)
+          expectStatusCode(SearchURL, searchRequestBoth, code = StatusCode.BadRequest)
         }
       }
     }

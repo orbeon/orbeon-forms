@@ -598,7 +598,18 @@ lazy val embeddingWar = (project in file("embedding-war"))
     Compile / resourceGenerators ++= Seq(
       EmbeddingAngularGenerator.task.taskValue,
       EmbeddingReactGenerator.task.taskValue
-    )
+    ),
+    clean := {
+      clean.value
+
+      // Delete dist/node_modules directories (JS builds)
+      Seq(
+        (Compile / sourceDirectory).value / "angular" / "dist",
+        (Compile / sourceDirectory).value / "angular" / "node_modules",
+        (Compile / sourceDirectory).value / "react" / "dist",
+        (Compile / sourceDirectory).value / "react" / "node_modules"
+      ).foreach(IO.delete)
+    }
   )
 
 lazy val xformsFilter = (project in file("xforms-filter"))

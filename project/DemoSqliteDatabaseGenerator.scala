@@ -3,10 +3,15 @@ import sbt.*
 
 object DemoSqliteDatabaseGenerator extends CachedGenerator {
 
-  override val inputPath: String = "data/orbeon/fr"
+  private def demoFilesToImport(generatorContext: GeneratorContext): File =
+    generatorContext.rootDirectory / "data" / "orbeon" / "fr"
+
   override val cachePath: String = "sqlite-cache"
 
   override val runnerProject: ProjectReference = LocalProject("demoSqliteDatabase")
+
+  override def inputFiles(generatorContext: GeneratorContext): Set[File] =
+    allFilesIn(demoFilesToImport(generatorContext)).toSet
 
   override def generate(inputFiles: Set[File])(implicit generatorContext: GeneratorContext): Set[File] = {
 
@@ -20,7 +25,7 @@ object DemoSqliteDatabaseGenerator extends CachedGenerator {
 
     generatorContext.run(
       mainClass = "org.orbeon.oxf.util.DemoSqliteDatabase",
-      options   = Seq(generatorContext.inputFilesDirectory.toString, generatedFile.toString),
+      options   = Seq(demoFilesToImport(generatorContext).toString, generatedFile.toString),
     )
 
     // Copy .sqlite file from managed resources to target directory

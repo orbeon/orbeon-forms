@@ -3,8 +3,9 @@ import sbt.Keys.*
 
 
 case class GeneratorContext(
-  inputFilesDirectory      : File,
+  rootDirectory            : File,
   baseDirectory            : File,
+  sourceDirectory          : File,
   cacheDirectory           : File,
   managedResourcesDirectory: File,
   targetDirectory          : File,
@@ -19,27 +20,27 @@ case class GeneratorContext(
 
 trait CachedGenerator {
 
-  def inputPath: String
   def cachePath: String
 
   def generateOnlyWhenPackaging: Boolean = true
 
   def runnerProject: ProjectReference = LocalProject("root")
 
+  def inputFiles(generatorContext: GeneratorContext): Set[File]
+
   def generate(inputFiles: Set[File])(implicit generatorContext: GeneratorContext): Set[File]
 
   // Return all files in the given directory (recursive)
-  def allFilesIn(directory: File): Seq[File] = {
-    val files = directory.listFiles
-    files.filter(_.isFile) ++ files.filter(_.isDirectory).flatMap(allFilesIn)
-  }
+  def allFilesIn(directory: File): Seq[File] =
+    (directory ** "*").filter(_.isFile).get
 
   def task: Def.Initialize[Task[Seq[File]]] = Def.taskDyn {
 
     val generatorContext =
       GeneratorContext(
-        inputFilesDirectory       = Path.absolute((LocalRootProject / baseDirectory).value) / inputPath,
+        rootDirectory             = Path.absolute((LocalRootProject / baseDirectory).value),
         baseDirectory             = (Compile / baseDirectory).value,
+        sourceDirectory           = (Compile / sourceDirectory).value,
         cacheDirectory            = streams.value.cacheDirectory,
         managedResourcesDirectory = (Compile / resourceManaged).value,
         targetDirectory           = (Compile / target).value,
@@ -51,11 +52,10 @@ trait CachedGenerator {
     Def.task {
       // There must be a cleaner, more idiomatic way to do this
       if (! generateOnlyWhenPackaging || state.value.currentCommand.exists(_.commandLine.startsWith("package"))) {
-        // Generate the files only if they're missing or if any of the input files has changed
-        val inputFiles     = allFilesIn(generatorContext.inputFilesDirectory).toSet
         val cachedFunction = FileFunction.cached(generatorContext.cacheDirectory / cachePath)(generate(_)(generatorContext))
 
-        cachedFunction(inputFiles).toSeq
+        // Generate the files only if they're missing or if any of the input files has changed
+        cachedFunction(inputFiles(generatorContext)).toSeq
       } else {
         Seq.empty[File]
       }

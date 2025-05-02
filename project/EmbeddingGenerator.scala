@@ -10,12 +10,18 @@ trait EmbeddingGenerator extends CachedGenerator {
   def framework: String
   def outputFilenames: Set[String]
 
-  override lazy val inputPath: String = s"embedding-war/src/main/$framework"
   override lazy val cachePath: String = s"$framework-cache"
+
+  override def inputFiles(generatorContext: GeneratorContext): Set[File] =
+    IO.listFiles(generatorContext.sourceDirectory / framework).filterNot { f =>
+      Set(".angular", "dist", "node_modules", "package-lock.json").contains(f.getName)
+    }.flatMap { f =>
+      if (f.isDirectory) allFilesIn(f) else Set(f)
+    }.toSet
 
   override def generate(inputFiles: Set[File])(implicit generatorContext: GeneratorContext): Set[File] = {
 
-    val scriptPath = generatorContext.baseDirectory / "src" / "main" / framework / "build.sh"
+    val scriptPath = generatorContext.sourceDirectory / framework / "build.sh"
     val outputPath = generatorContext.managedResourcesDirectory / "assets" / framework
     val exitCode   = Process(
       command = Seq(scriptPath.getAbsolutePath, outputPath.getAbsolutePath),

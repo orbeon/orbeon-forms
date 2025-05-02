@@ -82,11 +82,8 @@ object URLRewriterUtils {
    * @param isPlatformPath whether the URL is a platform path
    * @return context path
    */
-  def getClientContextPath(request: ExternalContext.Request, isPlatformPath: Boolean): String =
-    // NOTE: We don't check on `javax.servlet.include.context_path`, because that attribute behaves very differently:
-    // in the case of includes, it represents properties of the included servlet, not the values of the including
-    // servlet.
-    Option(request.getAttributesMap.get("javax.servlet.forward.context_path").asInstanceOf[String]) match {
+  def getClientContextPath(request: ExternalContext.Request, isPlatformPath: Boolean): String = {
+    forwardedContextPathOpt(request) match {
       case Some(forwardedContextPath) if isSeparateDeployment(request) =>
         // This is the case of forwarding in separate deployment
         if (isPlatformPath)
@@ -101,15 +98,21 @@ object URLRewriterUtils {
         // We were not forwarded to or we were forwarded but we are not in separate deployment
         request.getContextPath
     }
+  }
 
   def isSeparateDeployment(request: ExternalContext.Request): Boolean =
     "separate" == request.getAttributesMap.get(OrbeonXFormsFilterImpl.RendererDeploymentAttributeName)
 
-  def isForwarded(request: ExternalContext.Request): Boolean =
+  def isForwarded(request: ExternalContext.Request): Boolean = forwardedContextPathOpt(request).isDefined
+
+  private def forwardedContextPathOpt(request: ExternalContext.Request): Option[String] =
     // NOTE: We don't check on javax.servlet.include.context_path, because that attribute behaves very differently:
     // in the case of includes, it represents properties of the included servlet, not the values of the including
     // servlet.
-    request.getAttributesMap.get("javax.servlet.forward.context_path").asInstanceOf[String] != null
+    request.ForwardContextPathOpt
+      .map(request.getAttributesMap.get)
+      .map(_.asInstanceOf[String])
+      .flatMap(Option(_))
 
   /**
    * Rewrite a resource URL, possibly with version information, based on the incoming request as well as a list of

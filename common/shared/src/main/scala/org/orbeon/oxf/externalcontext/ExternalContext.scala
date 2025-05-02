@@ -95,6 +95,8 @@ object ExternalContext {
 
   trait Request extends RarelyUsedRequest {
 
+    val ForwardContextPathOpt: Option[String]
+
     def getContainerType: String
     def getContainerNamespace: String
 

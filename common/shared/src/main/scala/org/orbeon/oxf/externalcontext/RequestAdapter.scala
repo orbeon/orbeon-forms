@@ -7,6 +7,7 @@ import java.util as ju
 
 
 class RequestAdapter extends ExternalContext.Request {
+  override val ForwardContextPathOpt: Option[String] = None
   def getContainerType: String = null
   def getContainerNamespace: String = null
   def getPathInfo: String = null

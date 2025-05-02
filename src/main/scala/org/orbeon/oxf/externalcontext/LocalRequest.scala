@@ -38,6 +38,7 @@ import scala.jdk.CollectionConverters.*
 //
 class LocalRequest private (
 
+  val ForwardContextPathOpt: Option[String] = None,
   val getContainerType: String,
   val getContainerNamespace: String,
 

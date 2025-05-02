@@ -39,6 +39,7 @@ trait ServletRequest {
   // javax/jakarta.servlet.ServletRequest
   def getNativeServletRequest: AnyRef
 
+  val ForwardContextPath: String
   def getAttribute(name: String): AnyRef
   def getAttributeNames: ju.Enumeration[String]
   def getCharacterEncoding: String
@@ -74,6 +75,7 @@ trait ServletRequest {
 class JavaxServletRequest(servletRequest: javax.servlet.ServletRequest) extends ServletRequest {
   override def getNativeServletRequest: javax.servlet.ServletRequest = servletRequest
 
+  override val ForwardContextPath: String = "javax.servlet.forward.context_path"
   override def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
   override def getCharacterEncoding: String = servletRequest.getCharacterEncoding
@@ -105,6 +107,7 @@ class JavaxServletRequest(servletRequest: javax.servlet.ServletRequest) extends 
 class JakartaServletRequest(servletRequest: jakarta.servlet.ServletRequest) extends ServletRequest {
   override def getNativeServletRequest: jakarta.servlet.ServletRequest = servletRequest
 
+  override val ForwardContextPath: String = "jakarta.servlet.forward.context_path"
   override def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
   override def getCharacterEncoding: String = servletRequest.getCharacterEncoding

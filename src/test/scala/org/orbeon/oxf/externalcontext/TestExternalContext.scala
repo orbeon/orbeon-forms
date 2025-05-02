@@ -69,6 +69,7 @@ class TestExternalContext(
     private var getInputStreamCalled         = false
     private val getReaderCalled              = false
 
+    val ForwardContextPathOpt     : Option[String]    = None
     def incomingCookies: Iterable[(String, String)] = Nil
 
     lazy val getAttributesMap: ju.Map[String, AnyRef] = {

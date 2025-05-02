@@ -70,28 +70,30 @@ class ServletExternalContext(
     private var getInputStreamCalled                   = false
     private var inputStreamCharsetOpt: Option[String]  = None
 
-    // Delegate to underlying request
-    def getPathInfo                = nativeRequest.getPathInfo
-    def getRemoteAddr              = nativeRequest.getRemoteAddr
-    def getAuthType                = nativeRequest.getAuthType
-    def isSecure                   = nativeRequest.isSecure
-    def getContentLength           = nativeRequest.getContentLength
-    def getContentType             = nativeRequest.getContentType
-    def getServerName              = nativeRequest.getServerName
-    def getServerPort              = nativeRequest.getServerPort
-    def getMethod                  = HttpMethod.withNameInsensitive(nativeRequest.getMethod)
-    def getProtocol                = nativeRequest.getProtocol
-    def getRemoteHost              = nativeRequest.getRemoteHost
-    def getScheme                  = nativeRequest.getScheme
-    def getPathTranslated          = nativeRequest.getPathTranslated
-    def getRequestedSessionId      = nativeRequest.getRequestedSessionId
-    def getServletPath             = nativeRequest.getServletPath
-    def getLocale                  = nativeRequest.getLocale
-    def getLocales: util.Enumeration[ju.Locale] = nativeRequest.getLocales
-    def isRequestedSessionIdValid  = nativeRequest.isRequestedSessionIdValid
 
-    def getContainerType           = "servlet"
-    def getContainerNamespace      = getResponse.getNamespacePrefix
+    // Delegate to underlying request
+    val ForwardContextPathOpt: Option[String]   = Some(nativeRequest.ForwardContextPath)
+    def getPathInfo                             = nativeRequest.getPathInfo
+    def getRemoteAddr                           = nativeRequest.getRemoteAddr
+    def getAuthType                             = nativeRequest.getAuthType
+    def isSecure                                = nativeRequest.isSecure
+    def getContentLength                        = nativeRequest.getContentLength
+    def getContentType                          = nativeRequest.getContentType
+    def getServerName                           = nativeRequest.getServerName
+    def getServerPort                           = nativeRequest.getServerPort
+    def getMethod                               = HttpMethod.withNameInsensitive(nativeRequest.getMethod)
+    def getProtocol                             = nativeRequest.getProtocol
+    def getRemoteHost                           = nativeRequest.getRemoteHost
+    def getScheme                               = nativeRequest.getScheme
+    def getPathTranslated                       = nativeRequest.getPathTranslated
+    def getRequestedSessionId                   = nativeRequest.getRequestedSessionId
+    def getServletPath                          = nativeRequest.getServletPath
+    def getLocale                               = nativeRequest.getLocale
+    def getLocales: util.Enumeration[ju.Locale] = nativeRequest.getLocales
+    def isRequestedSessionIdValid               = nativeRequest.isRequestedSessionIdValid
+
+    def getContainerType                        = "servlet"
+    def getContainerNamespace                   = getResponse.getNamespacePrefix
 
     private def servletIncludeAttributeOpt(name: String) =
       Option(nativeRequest.getAttribute(s"javax.servlet.include.$name").asInstanceOf[String])

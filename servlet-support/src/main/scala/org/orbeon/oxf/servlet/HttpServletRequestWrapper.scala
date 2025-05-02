@@ -20,6 +20,7 @@ import java.util as ju
 class HttpServletRequestWrapper(var request: HttpServletRequest) extends HttpServletRequest {
   override def getNativeServletRequest: AnyRef = request.wrappedWith(this)
 
+  override val ForwardContextPath: String = request.ForwardContextPath
   override def getAttribute(name: String): AnyRef = request.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = request.getAttributeNames
   override def getAuthType: String = request.getAuthType

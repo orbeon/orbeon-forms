@@ -174,6 +174,7 @@ class Portlet2ExternalContext(
 
   private class RequestImpl extends ExternalContext.Request with ServletPortletRequest {
 
+    val ForwardContextPathOpt     : Option[String]    = None
     def getContainerType          : String            = "portlet"
     def getContainerNamespace     : String            = getResponse.getNamespacePrefix
     def getRequestPath            : String            = getPathInfo

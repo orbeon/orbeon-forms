@@ -46,11 +46,12 @@ object Exceptions {
   def getRootThrowable(t: Throwable): Throwable =
     causesIterator(t).toList.last
 
-  val Getters = Seq(
+  val Getters: Seq[(String, String)] = Seq(
     "javax.xml.transform.TransformerException"              -> "getException",
     "org.xml.sax.SAXException"                              -> "getException",
     "java.lang.reflect.InvocationTargetException"           -> "getTargetException",
     "javax.servlet.ServletException"                        -> "getRootCause",
+    "jakarta.servlet.ServletException"                      -> "getRootCause",
     "org.apache.batik.transcoder.TranscoderException"       -> "getException",
     "orbeon.apache.xml.utils.WrappedRuntimeException"       -> "getException",
     "org.iso_relax.verifier.VerifierConfigurationException" -> "getCauseException",

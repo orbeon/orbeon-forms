@@ -109,12 +109,12 @@ trait HttpServletRequest extends ServletRequest {
     // first servlet in the chain!
 
     val servletPath =
-      Option(getAttribute("javax.servlet.include.servlet_path").asInstanceOf[String])
+      Option(getAttribute(IncludeServletPath).asInstanceOf[String])
         .orElse(Option(getServletPath))
         .getOrElse("")
 
     val pathInfo =
-      Option(getAttribute("javax.servlet.include.path_info").asInstanceOf[String])
+      Option(getAttribute(IncludePathInfo).asInstanceOf[String])
         .orElse(Option(getPathInfo))
         .getOrElse("")
 

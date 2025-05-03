@@ -40,6 +40,11 @@ trait ServletRequest {
   def getNativeServletRequest: AnyRef
 
   val ForwardContextPath: String
+  val IncludeServletPath: String
+  val IncludePathInfo: String
+  val IncludeContextPath: String
+  val IncludeQueryString: String
+  val IncludeRequestUri: String
   def getAttribute(name: String): AnyRef
   def getAttributeNames: ju.Enumeration[String]
   def getCharacterEncoding: String
@@ -76,6 +81,11 @@ class JavaxServletRequest(servletRequest: javax.servlet.ServletRequest) extends 
   override def getNativeServletRequest: javax.servlet.ServletRequest = servletRequest
 
   override val ForwardContextPath: String = javax.servlet.RequestDispatcher.FORWARD_CONTEXT_PATH
+  override val IncludeServletPath: String = javax.servlet.RequestDispatcher.INCLUDE_SERVLET_PATH
+  override val IncludePathInfo: String = javax.servlet.RequestDispatcher.INCLUDE_PATH_INFO
+  override val IncludeContextPath: String = javax.servlet.RequestDispatcher.INCLUDE_CONTEXT_PATH
+  override val IncludeQueryString: String = javax.servlet.RequestDispatcher.INCLUDE_QUERY_STRING
+  override val IncludeRequestUri: String = javax.servlet.RequestDispatcher.INCLUDE_REQUEST_URI
   override def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
   override def getCharacterEncoding: String = servletRequest.getCharacterEncoding
@@ -108,6 +118,11 @@ class JakartaServletRequest(servletRequest: jakarta.servlet.ServletRequest) exte
   override def getNativeServletRequest: jakarta.servlet.ServletRequest = servletRequest
 
   override val ForwardContextPath: String = jakarta.servlet.RequestDispatcher.FORWARD_CONTEXT_PATH
+  override val IncludeServletPath: String = jakarta.servlet.RequestDispatcher.INCLUDE_SERVLET_PATH
+  override val IncludePathInfo: String = jakarta.servlet.RequestDispatcher.INCLUDE_PATH_INFO
+  override val IncludeContextPath: String = jakarta.servlet.RequestDispatcher.INCLUDE_CONTEXT_PATH
+  override val IncludeQueryString: String = jakarta.servlet.RequestDispatcher.INCLUDE_QUERY_STRING
+  override val IncludeRequestUri: String = jakarta.servlet.RequestDispatcher.INCLUDE_REQUEST_URI
   override def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
   override def getCharacterEncoding: String = servletRequest.getCharacterEncoding

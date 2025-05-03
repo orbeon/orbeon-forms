@@ -73,6 +73,9 @@ class ServletExternalContext(
 
     // Delegate to underlying request
     val ForwardContextPathOpt: Option[String]   = Some(nativeRequest.ForwardContextPath)
+    val IncludeContextPathOpt: Option[String]   = Some(nativeRequest.IncludeContextPath)
+    val IncludeQueryStringOpt: Option[String]   = Some(nativeRequest.IncludeQueryString)
+    val IncludeRequestUriOpt: Option[String]    = Some(nativeRequest.IncludeRequestUri)
     def getPathInfo                             = nativeRequest.getPathInfo
     def getRemoteAddr                           = nativeRequest.getRemoteAddr
     def getAuthType                             = nativeRequest.getAuthType
@@ -95,9 +98,6 @@ class ServletExternalContext(
     def getContainerType                        = "servlet"
     def getContainerNamespace                   = getResponse.getNamespacePrefix
 
-    private def servletIncludeAttributeOpt(name: String) =
-      Option(nativeRequest.getAttribute(s"javax.servlet.include.$name").asInstanceOf[String])
-
     // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
     // included servlet via the getAttribute method on the request object and their values must be equal to
     // the request URI, context path, servlet path, path info, and query string of the included servlet,
@@ -105,7 +105,11 @@ class ServletExternalContext(
     // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
     // first servlet in the chain!
     lazy val getContextPath: String =
-      servletIncludeAttributeOpt("context_path") getOrElse nativeRequest.getContextPath
+      IncludeContextPathOpt
+        .map(nativeRequest.getAttribute)
+        .map(_.asInstanceOf[String])
+        .flatMap(Option(_))
+        .getOrElse(nativeRequest.getContextPath)
 
     // Use included / forwarded servlet's value
     // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
@@ -115,7 +119,11 @@ class ServletExternalContext(
     // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
     // first servlet in the chain!
     lazy val getQueryString: String =
-      servletIncludeAttributeOpt("query_string") getOrElse nativeRequest.getQueryString
+      IncludeQueryStringOpt
+        .map(nativeRequest.getAttribute)
+        .map(_.asInstanceOf[String])
+        .flatMap(Option(_))
+        .getOrElse(nativeRequest.getQueryString)
 
     // Use included / forwarded servlet's value
     // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
@@ -125,7 +133,11 @@ class ServletExternalContext(
     // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
     // first servlet in the chain!
     lazy val getRequestURI: String =
-      servletIncludeAttributeOpt("request_uri") getOrElse nativeRequest.getRequestURI
+      IncludeRequestUriOpt
+        .map(nativeRequest.getAttribute)
+        .map(_.asInstanceOf[String])
+        .flatMap(Option(_))
+        .getOrElse(nativeRequest.getRequestURI)
 
     lazy val getRequestPath = nativeRequest.getRequestPathInfo
 

@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.URLRewriterUtils
 
 import java.io.*
 import java.{util, util as ju}
@@ -105,10 +106,7 @@ class ServletExternalContext(
     // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
     // first servlet in the chain!
     lazy val getContextPath: String =
-      IncludeContextPathOpt
-        .map(nativeRequest.getAttribute)
-        .map(_.asInstanceOf[String])
-        .flatMap(Option(_))
+      getAttributeOpt(IncludeContextPathOpt)
         .getOrElse(nativeRequest.getContextPath)
 
     // Use included / forwarded servlet's value
@@ -119,10 +117,7 @@ class ServletExternalContext(
     // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
     // first servlet in the chain!
     lazy val getQueryString: String =
-      IncludeQueryStringOpt
-        .map(nativeRequest.getAttribute)
-        .map(_.asInstanceOf[String])
-        .flatMap(Option(_))
+      getAttributeOpt(IncludeQueryStringOpt)
         .getOrElse(nativeRequest.getQueryString)
 
     // Use included / forwarded servlet's value
@@ -133,10 +128,7 @@ class ServletExternalContext(
     // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
     // first servlet in the chain!
     lazy val getRequestURI: String =
-      IncludeRequestUriOpt
-        .map(nativeRequest.getAttribute)
-        .map(_.asInstanceOf[String])
-        .flatMap(Option(_))
+      getAttributeOpt(IncludeRequestUriOpt)
         .getOrElse(nativeRequest.getRequestURI)
 
     lazy val getRequestPath = nativeRequest.getRequestPathInfo

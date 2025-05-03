@@ -145,6 +145,12 @@ object ExternalContext {
 
     // For Java callers
     def getUsername: String = credentials.map(_.userAndGroup.username).orNull
+
+    def getAttributeOpt(attributeNameOpt: Option[String]): Option[String] =
+      attributeNameOpt
+        .map(getAttributesMap.get)
+        .map(_.asInstanceOf[String])
+        .flatMap(Option(_))
   }
 
   trait RarelyUsedRequest {

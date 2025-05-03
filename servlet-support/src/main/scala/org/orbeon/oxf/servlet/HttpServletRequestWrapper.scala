@@ -21,6 +21,11 @@ class HttpServletRequestWrapper(var request: HttpServletRequest) extends HttpSer
   override def getNativeServletRequest: AnyRef = request.wrappedWith(this)
 
   override val ForwardContextPath: String = request.ForwardContextPath
+  override val IncludeContextPath: String = request.IncludeContextPath
+  override val IncludePathInfo: String = request.IncludePathInfo
+  override val IncludeQueryString: String = request.IncludeQueryString
+  override val IncludeRequestUri: String = request.IncludeRequestUri
+  override val IncludeServletPath: String = request.IncludeServletPath
   override def getAttribute(name: String): AnyRef = request.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = request.getAttributeNames
   override def getAuthType: String = request.getAuthType

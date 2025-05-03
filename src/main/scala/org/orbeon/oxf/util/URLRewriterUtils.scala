@@ -109,10 +109,7 @@ object URLRewriterUtils {
     // NOTE: We don't check on javax.servlet.include.context_path, because that attribute behaves very differently:
     // in the case of includes, it represents properties of the included servlet, not the values of the including
     // servlet.
-    request.ForwardContextPathOpt
-      .map(request.getAttributesMap.get)
-      .map(_.asInstanceOf[String])
-      .flatMap(Option(_))
+    request.getAttributeOpt(request.ForwardContextPathOpt)
 
   /**
    * Rewrite a resource URL, possibly with version information, based on the incoming request as well as a list of

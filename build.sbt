@@ -166,8 +166,8 @@ val CoreLibraryDependencies = Seq(
   (_.exclude("jakarta.servlet", "jakarta.servlet-api"))
 
 val RedisLibraryDependencies = Seq(
-  "org.redisson"                % "redisson-all"                    % "3.45.1",
-  "org.redisson"                % "redisson-tomcat-9"               % "3.45.1",
+  "org.redisson"                % "redisson-all"                    % "3.46.0",
+  "org.redisson"                % "redisson-tomcat-9"               % "3.46.0",
   "org.apache.fury"             % "fury-core"                       % "0.10.1"
 )
 

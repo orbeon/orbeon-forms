@@ -137,7 +137,6 @@
                             name="view-mode"
                             value="xxf:readonly($repeat-context) or fr:is-readonly-mode()"/>
 
-                        <!-- NOTE: `min="foo"` is taken as no minimum. Dubious but has been like this for a long time. -->
                         <xsl:choose>
                             <xsl:when test="$is-editable">
                                 <xf:var name="min"    as="xs:integer"  value="0"/>
@@ -145,22 +144,22 @@
                                 <xf:var name="max"    as="xs:integer?" value="()"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xf:var name="min"    as="xs:integer"  value="(xs:integer(fr:component-param-value('min')   [. castable as xs:integer])[. ge 0], 0)[1]"/>
-                                <xf:var name="freeze" as="xs:integer"  value="(xs:integer(fr:component-param-value('freeze')[. castable as xs:integer])[. ge 0], 0)[1]"/>
+                                <!-- NOTE: `min="foo"` is taken as no minimum. Dubious but has been like this for a long time. -->
+                                <xf:var name="min"    as="xs:integer"  value="xs:integer(let $p := fr:component-param-value('min')    return if ($p castable as xs:integer and xs:integer($p) ge 0) then $p else 0)"/>
+                                <xf:var name="freeze" as="xs:integer"  value="xs:integer(let $p := fr:component-param-value('freeze') return if ($p castable as xs:integer and xs:integer($p) ge 0) then $p else 0)"/>
 
                                 <xf:var
                                     name="max"
                                     as="xs:integer?"
                                     value="
-                                        let $s := fr:component-param-value('max'),
-                                            $i := xs:integer($s[. castable as xs:integer])
+                                        let $s := fr:component-param-value('max')
                                         return
-                                            if ($s = 'none') then
+                                            if ($s = 'none' or empty($s)) then
                                                 ()
-                                            else if (exists($s) and empty($i)) then
-                                                0
+                                            else if ($s castable as xs:integer) then
+                                                xs:integer($s)
                                             else
-                                                $i
+                                                0
                                 "/>
                             </xsl:otherwise>
                         </xsl:choose>

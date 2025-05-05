@@ -69,7 +69,9 @@ class TestExternalContext(
     private var getInputStreamCalled         = false
     private val getReaderCalled              = false
 
-    val ForwardContextPathOpt     : Option[String]    = None
+    // Tests are setting this attribute, see `url-rewriter-test-request-forward.xml`
+    val ForwardContextPathOpt     : Option[String]    = Some("javax.servlet.forward.context_path")
+
     def incomingCookies: Iterable[(String, String)] = Nil
 
     lazy val getAttributesMap: ju.Map[String, AnyRef] = {

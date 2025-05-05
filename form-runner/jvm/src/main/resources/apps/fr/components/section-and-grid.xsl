@@ -32,8 +32,16 @@
 
         <xsl:param name="section-level"                tunnel="yes" select="1"/>
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:param name="binds-root"                   tunnel="yes"/>
+
+        <xsl:variable name="bind-id-opt" as="xs:string?" select="@bind"/>
 
         <xsl:copy>
+            <xsl:if test="frf:isRepeat(.) and exists($bind-id-opt)">
+                <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">
+                    <xsl:attribute name="iteration-name" select="."/>
+                </xsl:for-each>
+            </xsl:if>
             <xsl:if test="empty(@collapse) and empty(@collapsible)">
                 <xsl:attribute name="collapsible" select="$is-section-collapsible"/>
             </xsl:if>
@@ -101,7 +109,17 @@
 
     <xsl:template match="fr:grid" mode="within-controls within-dialogs">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:param name="binds-root"                   tunnel="yes"/>
+
+        <xsl:variable name="bind-id-opt" as="xs:string?" select="@bind"/>
+
         <xsl:copy>
+
+            <xsl:if test="frf:isRepeat(.) and exists($bind-id-opt)">
+                <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">
+                    <xsl:attribute name="iteration-name" select="."/>
+                </xsl:for-each>
+            </xsl:if>
 
             <xsl:attribute
                 name="markup"

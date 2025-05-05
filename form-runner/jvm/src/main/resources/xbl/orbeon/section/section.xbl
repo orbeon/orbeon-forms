@@ -195,9 +195,20 @@
                                                         name="repeater-id"
                                                         select="concat($root/@id, '-repeater')"/>
 
+                                                    <xsl:variable
+                                                        name="child-path"
+                                                        as="xs:string"
+                                                        select="
+                                                            if (exists($root/@iteration-name)) then
+                                                                $root/@iteration-name/string()
+                                                            else if (exists($root/@bind[ends-with(., '-bind')])) then
+                                                                concat(frf:controlNameFromId($root/@bind), '-iteration')
+                                                            else
+                                                                '*'"/>
+
                                                     <fr:repeater
                                                         id="{$repeater-id}"
-                                                        ref="*"
+                                                        ref="{$child-path}"
                                                         level="{$level}">
 
                                                         <xsl:copy-of select="@template | @origin | @apply-defaults | @appearance | @insert | @readonly | @view-appearance"/>

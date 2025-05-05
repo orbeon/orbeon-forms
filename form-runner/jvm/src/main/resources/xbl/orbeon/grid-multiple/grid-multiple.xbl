@@ -119,7 +119,19 @@
                         </xf:var>
 
                         <xf:var name="repeat-context"  value="$binding"/>
-                        <xf:var name="repeat-sequence" value="$repeat-context/*"/>
+
+                        <xsl:variable
+                            name="child-path"
+                            as="xs:string"
+                            select="
+                                if (exists($root/@iteration-name)) then
+                                    $root/@iteration-name/string()
+                                else if (exists($root/@bind[ends-with(., '-bind')])) then
+                                    concat(frf:controlNameFromId($root/@bind), '-iteration')
+                                else
+                                    '*'"/>
+
+                        <xf:var name="repeat-sequence" value="$repeat-context/{$child-path}"/>
 
                         <!-- NOTE: We can't use `fr:component-param-value()` because that returns an `xs:string`. We should have
                              another function able to handle non-AVT attributes which return arbitrary sequences. -->
@@ -368,7 +380,7 @@
                                                         name="control-bindings-or-empty">
                                                         <xsl:choose>
                                                             <xsl:when test="exists($control/@bind)">
-                                                                <xxf:value value="$binding-outer/*/bind('{$control/@bind}')"/>
+                                                                <xxf:value value="$binding-outer/{$child-path}/bind('{$control/@bind}')"/>
                                                             </xsl:when>
                                                             <xsl:otherwise>
                                                                 <xf:value value=".">
@@ -543,7 +555,7 @@
                             </xsl:variable>
 
                             <!-- Enclose within repeat -->
-                            <xf:repeat ref="$binding-outer/*" id="{$repeat-id}" xxbl:scope="outer">
+                            <xf:repeat ref="$binding-outer/{$child-path}" id="{$repeat-id}" xxbl:scope="outer">
                                 <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
 
                                     <xsl:choose>

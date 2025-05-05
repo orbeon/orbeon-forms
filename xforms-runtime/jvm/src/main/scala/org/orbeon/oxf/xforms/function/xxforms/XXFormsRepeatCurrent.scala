@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
-import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+
 
 /**
- * Return the current node of one of the enclosing xf:repeat iteration, either the closest
+ * Return the current node of one of the enclosing `xf:repeat` iteration, either the closest
  * iteration if no argument is passed, or the iteration for the repeat id passed.
  *
- * This function must be called from within an xf:repeat.
+ * This function must be called from within an `xf:repeat`.
  */
 class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
 
@@ -31,30 +32,20 @@ class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
     bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).getSingleItemOrNull
   }
 
-  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
-
-    // Match on context expression
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet =
     argument.headOption match {
       case Some(repeatIdExpression: StringLiteral) =>
         // Argument is literal and we have a context to ask
-        pathMap.getPathMapContext match {
-          case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
-            // Get PathMap for context id
-            matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
-          case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-        }
+        val context = getPathMapContext(pathMap)
+        // Get PathMap for context id
+        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
       case None =>
-        // Argument is not specified, ask PathMap for the result
-        pathMap.getPathMapContext match {
-          case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
-            // Get PathMap for context id
-            matchSimpleAnalysis(pathMap, context.getInScopeRepeat)
-          case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-        }
+        // Argument is not specified, ask `PathMap` for the result
+        val context = getPathMapContext(pathMap)
+        matchSimpleAnalysis(pathMap, context.getInScopeRepeat)
       case _ =>
         // Argument is not literal so we can't figure it out
         pathMap.setInvalidated(true)
         null
     }
-  }
 }

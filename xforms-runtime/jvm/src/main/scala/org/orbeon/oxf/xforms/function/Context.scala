@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 
@@ -30,11 +31,6 @@ class Context extends XFormsFunction with MatchSimpleAnalysis with DependsOnCont
   override def evaluateItem(xpathContext: XPathContext) =
     bindingContext.contextItem
 
-  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
-    pathMap.getPathMapContext match {
-      case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
-        // Handle context
-        matchSimpleAnalysis(pathMap, context.context)
-      case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-    }
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
+    matchSimpleAnalysis(pathMap, getPathMapContext(pathMap).context)
 }

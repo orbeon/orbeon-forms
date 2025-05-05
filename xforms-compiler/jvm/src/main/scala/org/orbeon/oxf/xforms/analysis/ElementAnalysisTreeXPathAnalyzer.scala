@@ -69,14 +69,14 @@ object ElementAnalysisTreeXPathAnalyzer {
     // Return the analysis for the context in scope
     def context: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(e, e.scope)
 
-    // Return a map of static id => analysis for all the ancestor-or-self in scope.
+    // Return a map of static id => analysis for all the ancestor-or-self in scope
     def getInScopeContexts: collection.Map[String, ElementAnalysis] =
       mutable.LinkedHashMap(
         ElementAnalysis.getAllAncestorsInScope(e, e.scope, includeSelf = true)
           .map(elementAnalysis => elementAnalysis.staticId -> elementAnalysis)*
       )
 
-    // Return analysis for closest ancestor repeat in scope.
+    // Return analysis for the closest ancestor repeat in scope
     def getInScopeRepeat: Option[RepeatControl] = e.ancestorRepeatInScope
   }
 

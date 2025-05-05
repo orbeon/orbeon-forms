@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om.*
@@ -25,8 +25,7 @@ import org.orbeon.saxon.om.*
  */
 class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
 
-  override def iterate(xpathContext: XPathContext): SequenceIterator = {
-    // Match on context expression
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
     argument.lift(0) match {
       case Some(contextIdExpression) =>
         // Get context id by evaluating expression
@@ -40,25 +39,19 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
         // No context id expression
         EmptyIterator.getInstance
     }
-  }
 
-  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
-    // Match on context expression
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
     argument.lift(0) match {
       case Some(contextIdExpression: StringLiteral) =>
         // Argument is literal and we have a context to ask
-        pathMap.getPathMapContext match {
-          case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
-            // Get static context id
-            val contextStaticId = contextIdExpression.getStringValue
-            // Handle context
-            matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
-          case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-        }
+        val context = getPathMapContext(pathMap)
+        // Get static context id
+        val contextStaticId = contextIdExpression.getStringValue
+        // Handle context
+        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
       case _ =>
         // Argument is not literal so we can't figure it out
         pathMap.setInvalidated(true)
         null
     }
-  }
 }

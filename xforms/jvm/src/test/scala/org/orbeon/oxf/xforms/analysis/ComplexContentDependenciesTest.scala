@@ -95,13 +95,13 @@ class ComplexContentDependenciesTest
       assume(Version.isPE)
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(TestDoc)) {
-          assert(getControlValue("input") === "Teddy")
-          assert(getControlValue("output") === "TeddyBear")
+          assert(getControlValue("input") == "Teddy")
+          assert(getControlValue("output") == "TeddyBear")
 
           setControlValue("input", "Theodore")
 
-          assert(getControlValue("input") === "Theodore")
-          assert(getControlValue("output") === "TheodoreBear")
+          assert(getControlValue("input") == "Theodore")
+          assert(getControlValue("output") == "TheodoreBear")
         }
       }
     }

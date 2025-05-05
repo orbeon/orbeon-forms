@@ -431,7 +431,7 @@ public class PathMap implements Cloneable {
 
     public PathMapRoot makeNewRoot(Expression exp) {
         for (int i=0; i<pathMapRoots.size(); i++) {
-            PathMapRoot r = (PathMapRoot)pathMapRoots.get(i);
+            PathMapRoot r = pathMapRoots.get(i);
             if (exp.equals(r.getRootExpression())) {
                 return r;
             }
@@ -447,7 +447,7 @@ public class PathMap implements Cloneable {
      */
 
     public PathMapRoot[] getPathMapRoots() {
-        return (PathMapRoot[])pathMapRoots.toArray(new PathMapRoot[pathMapRoots.size()]);
+        return pathMapRoots.toArray(new PathMapRoot[pathMapRoots.size()]);
     }
 
     /**

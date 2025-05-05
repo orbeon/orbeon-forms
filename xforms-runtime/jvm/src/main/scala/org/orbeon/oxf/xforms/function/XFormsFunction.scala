@@ -18,13 +18,14 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPath.compileExpressionWithStaticContext
 import org.orbeon.oxf.util.{PooledXPathExpression, XPathCache}
 import org.orbeon.oxf.xforms.*
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.DefaultFunctionSupport
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
-import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 
@@ -40,7 +41,7 @@ import scala.jdk.CollectionConverters.*
  */
 abstract class XFormsFunction extends DefaultFunctionSupport {
 
-  import XFormsFunction._
+  import XFormsFunction.*
 
   // Resolve the relevant control by argument expression
   // TODO: Check callers and consider using `relevantControls`.
@@ -252,10 +253,15 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
 object XFormsFunction extends CommonFunctionSupport {
 
+  def getPathMapContext(pathMap: PathMap): SimplePathMapContext =
+    pathMap.getPathMapContext match {
+      case context: SimplePathMapContext =>
+        context
+      case _ =>
+        throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+    }
+
   // Only used at compile time
   def sourceElementAnalysis(pathMap: PathMap): ElementAnalysis =
-    pathMap.getPathMapContext match {
-      case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext => context.element
-      case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-    }
+    getPathMapContext(pathMap).element
 }

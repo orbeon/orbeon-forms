@@ -21,7 +21,7 @@ import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 trait MatchSimpleAnalysis {
 
   def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[ElementAnalysis]): PathMapNodeSet = analysisOption match {
-    case Some(element) if element.bindingAnalysis.isDefined && element.bindingAnalysis.get.figuredOutDependencies =>
+    case Some(element) if element.bindingAnalysis.exists(_.figuredOutDependencies) =>
       // Clone the PathMap first because the nodes returned must belong to this PathMap
       element.bindingAnalysis.get match {
         case bindingAnalysis: PathMapXPathAnalysis =>

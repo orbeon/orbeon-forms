@@ -157,7 +157,7 @@ class Properties private {
         null
     }
 
-  def keySetJava: ju.Set[_] =
+  def keySetJava: ju.Set[?] =
     propertyStore match {
       case Some(propertyStore) =>
         propertyStore.getGlobalPropertySet.keySet.asJava

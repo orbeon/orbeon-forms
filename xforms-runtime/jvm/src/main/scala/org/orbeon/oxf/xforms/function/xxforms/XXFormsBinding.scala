@@ -14,9 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
+import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeXPathAnalyzer, PathMapXPathAnalysis}
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.saxon.expr.{PathMap, StringLiteral, XPathContext}
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.scaxon.Implicits.*
@@ -36,31 +37,25 @@ class XXFormsBinding extends XFormsFunction {
       case s: StringLiteral =>
 
         val staticId = s.getStringValue
+        val context  = getPathMapContext(pathMap)
 
-        pathMap.getPathMapContext match {
-          case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
+        val boundElemOpt =
+          ancestorsIterator(context.element, includeSelf = false) collectFirst {
+            case c: ComponentControl => c
+          } filter { c =>
+            c.commonBinding.modeBinding && c.commonBinding.bindingElemId.contains(staticId)
+          }
 
-            val boundElemOpt =
-              ancestorsIterator(context.element, includeSelf = false) collectFirst {
-                case c: ComponentControl => c
-              } filter { c =>
-                c.commonBinding.modeBinding && c.commonBinding.bindingElemId.contains(staticId)
-              }
-
-            boundElemOpt.flatMap(_.bindingAnalysis) match {
-              case Some(analysis: PathMapXPathAnalysis) =>
-                // TODO: review this!
-                val clonedVariablePathMap = analysis.pathMapOrThrow.clone
-                pathMap.addRoots(clonedVariablePathMap.getPathMapRoots)
-                clonedVariablePathMap.findFinalNodes
-              case _ =>
-                // Invalidate
-                pathMap.setInvalidated(true)
-                null
-            }
-
+        boundElemOpt.flatMap(_.bindingAnalysis) match {
+          case Some(analysis: PathMapXPathAnalysis) =>
+            // TODO: review this!
+            val clonedVariablePathMap = analysis.pathMapOrThrow.clone
+            pathMap.addRoots(clonedVariablePathMap.getPathMapRoots)
+            clonedVariablePathMap.findFinalNodes
           case _ =>
-            throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+            // Invalidate
+            pathMap.setInvalidated(true)
+            null
         }
 
       case _ =>

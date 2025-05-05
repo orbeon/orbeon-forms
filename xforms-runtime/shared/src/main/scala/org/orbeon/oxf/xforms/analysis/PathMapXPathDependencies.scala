@@ -440,16 +440,22 @@ class PathMapXPathDependencies(
           // TODO: This could be cached in the ElementAnalysis. Would need for binding, value, LHHA, itemset.
           val maxDependentModelDepth =
             if (allDependentModelsPrefixedIdsIt.nonEmpty)
-              allDependentModelsPrefixedIdsIt map { modelPrefixedId =>
-                containingDocument.staticOps.getControlAnalysis(modelPrefixedId).ancestorRepeatsAcrossParts.size
-              } max
+              allDependentModelsPrefixedIdsIt
+                .map(modelPrefixedId =>
+                  containingDocument
+                    .staticOps
+                    .getControlAnalysis(modelPrefixedId)
+                    .ancestorRepeatsAcrossParts
+                    .size
+                )
+                .max
             else
               0
 
           Some(
             RepeatCacheKey(
               control.prefixedId,
-              controlIndexes take maxDependentModelDepth toList
+              controlIndexes.take(maxDependentModelDepth).toList
             )
           )
         case _ =>

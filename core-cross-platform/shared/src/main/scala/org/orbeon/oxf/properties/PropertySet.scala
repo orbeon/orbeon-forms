@@ -134,7 +134,7 @@ object PropertySet {
       )
 
     def getObjectFromStringValue(stringValue: String, typ: QName, namespaces: Map[String, String]): AnyRef =
-      SupportedTypes.get(typ) map (_(stringValue, namespaces)) orNull
+      SupportedTypes.get(typ).map(_(stringValue, namespaces)).orNull
 
     def convertString (value: String, namespaces: Map[String, String]) = value
     def convertInteger(value: String, namespaces: Map[String, String]) = jl.Integer.valueOf(value)

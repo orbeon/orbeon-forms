@@ -40,7 +40,7 @@ object Property {
       None
     else {
       CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
-      SaxonUtils.convertJavaObjectToSaxonObject                     flatMap
+      SaxonUtils.convertJavaObjectToSaxonObject                      flatMap
       collectByErasedType[AtomicValue]
     }
 

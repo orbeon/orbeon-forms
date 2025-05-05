@@ -7600,4 +7600,107 @@
         </output>
     </test>
 
+    <test description="#6981: Add dependency support for `xxf:repeat-position()`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m">
+                        <xf:instance id="i">
+                            <_ foo="2">
+                                <_>1</_>
+                                <_>2</_>
+                                <_>3</_>
+                            </_>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="repeat-elems" ref="_">
+                        <xf:output id="output-position-elems" value="xxf:repeat-position()"/>
+                    </xf:repeat>
+                    <xf:repeat id="repeat-numbers" ref="1 to @foo">
+                        <xf:output id="output-position-numbers" value="xxf:repeat-position()"/>
+                        <xf:output id="just-a-number" value="42"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <repeat scope="" prefixed-id="repeat-elems" model-prefixed-id="m" binding="true" value="false">
+                    <binding>
+                        <analysis expression="_" analyzed="true">
+                            <returnable>
+                                <path>instance('i')/_</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <repeat-iteration scope="" prefixed-id="repeat-elems~iteration" model-prefixed-id="m" binding="false" value="false">
+                        <output scope="" prefixed-id="output-position-elems" model-prefixed-id="m" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((xxf:repeat-position())[1])" analyzed="true">
+                                    <dependent-models>
+                                        <model>m</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
+                        </output>
+                    </repeat-iteration>
+                </repeat>
+                <repeat scope="" prefixed-id="repeat-numbers" model-prefixed-id="m" binding="true" value="false">
+                    <binding>
+                        <analysis expression="1 to @foo" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/@foo</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </binding>
+                    <repeat-iteration scope="" prefixed-id="repeat-numbers~iteration" model-prefixed-id="m" binding="false" value="false">
+                        <output scope="" prefixed-id="output-position-numbers" model-prefixed-id="m" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((xxf:repeat-position())[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('i')/@foo</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>m</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
+                        </output>
+                        <output scope="" prefixed-id="just-a-number" model-prefixed-id="m" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((42)[1])" analyzed="true"/>
+                            </value>
+                        </output>
+                    </repeat-iteration>
+                </repeat>
+            </root>
+        </output>
+    </test>
+
 </group>

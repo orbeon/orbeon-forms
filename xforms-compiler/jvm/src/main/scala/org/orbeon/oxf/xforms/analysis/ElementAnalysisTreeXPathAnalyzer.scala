@@ -78,6 +78,8 @@ object ElementAnalysisTreeXPathAnalyzer {
 
     // Return analysis for the closest ancestor repeat in scope
     def getInScopeRepeat: Option[RepeatControl] = e.ancestorRepeatInScope
+
+    def getRepeatIgnoreScope: Option[RepeatControl] = e.ancestorRepeats.headOption
   }
 
   private object Private {

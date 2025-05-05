@@ -8,6 +8,13 @@ ENV CONFIG_DIR=$TOMCAT_HOME/conf
 ENV CONTEXT_DIR=$CONFIG_DIR/Catalina/localhost
 ENV DEPLOYMENT_DIR=$TOMCAT_HOME/webapps
 
+# Add the entrypoint script
+COPY docker-entrypoint-tomcat.sh /
+RUN chmod +x /docker-entrypoint-tomcat.sh
+
+# Create the directory where we'll put optional files, etc.
+RUN mkdir -p /docker-entrypoint-tomcat.d
+
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
@@ -20,6 +27,7 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && rm -rf $DEPLOYMENT_DIR/* \
     && mkdir -p $DEPLOYMENT_DIR/orbeon \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon/ \
+    && mv $basename/orbeon-embedding.war /docker-entrypoint-tomcat.d/ \
     && if [ -f $basename/orbeon-redis-jars.zip ]; then \
          mkdir -p /tmp/redis-jars; \
          pushd /tmp/redis-jars; \
@@ -29,13 +37,17 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
          rm -rf /tmp/redis-jars; \
        fi
 
+# Cleanup
+RUN rm -rf /tmp/orbeon_forms
+
 # Enable compression
 COPY server.gzip.xml $CONFIG_DIR/server.xml
 
 # Create directory for Tomcat context configuration
 RUN mkdir -p $CONTEXT_DIR
 
-# Cleanup
-RUN rm -rf /tmp/orbeon_forms
-
 EXPOSE 8080
+
+# Run the custom initialization script and then Tomcat
+ENTRYPOINT ["/docker-entrypoint-tomcat.sh"]
+CMD ["catalina.sh", "run"]

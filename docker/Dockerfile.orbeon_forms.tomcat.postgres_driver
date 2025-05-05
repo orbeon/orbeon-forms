@@ -1,4 +1,4 @@
-ARG base_image
+ARG base_image=default
 
 FROM $base_image
 

@@ -9,6 +9,14 @@ ENV DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
 
 USER root
 
+# Add the entrypoint script
+COPY docker-entrypoint-wildfly.sh /
+RUN chmod +x /docker-entrypoint-wildfly.sh
+
+# Create the directory where users can place their config
+RUN mkdir -p /docker-entrypoint-wildfly.d \
+    && chown -R jboss:jboss /docker-entrypoint-wildfly.d
+
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
@@ -20,7 +28,8 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && jar xf orbeon.war \
     && rm -rf $DEPLOYMENT_DIR/* \
     && mkdir -p $DEPLOYMENT_DIR/orbeon.war \
-    && mv WEB-INF $DEPLOYMENT_DIR/orbeon.war/
+    && mv WEB-INF $DEPLOYMENT_DIR/orbeon.war/ \
+    && mv $basename/orbeon-embedding.war /docker-entrypoint-wildfly.d/
 
 # Enable compression and auto-deployment of exploded WAR files
 COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
@@ -34,20 +43,13 @@ RUN rm -rf /tmp/orbeon_forms
 RUN mkdir -p /tmp/orbeon \
     && chown -R jboss:jboss /tmp
 
-# Add the entrypoint script
-COPY docker-entrypoint-wildfly.sh /
-RUN chmod +x /docker-entrypoint-wildfly.sh
-
-# Create the directory where users can place their config
-RUN mkdir -p /docker-entrypoint-wildfly.d \
-    && chown -R jboss:jboss /docker-entrypoint-wildfly.d
-
 # Use jboss user at runtime
 RUN chown -R jboss:jboss $WILDFLY_HOME
 USER jboss
 
 EXPOSE 8080
 
-# As of WildFly 34, we need the preview stability level for OIDC scopes
+# Run the custom initialization script and then Wildfly
 ENTRYPOINT ["/docker-entrypoint-wildfly.sh"]
+# As of WildFly 34, we need the preview stability level for OIDC scopes
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "--stability=preview"]

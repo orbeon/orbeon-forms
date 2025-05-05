@@ -21,11 +21,13 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && mkdir -p $DEPLOYMENT_DIR/orbeon \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon/ \
     && if [ -f $basename/orbeon-redis-jars.zip ]; then \
-       mkdir -p /tmp/redis-jars \
-       && jar xf $basename/orbeon-redis-jars.zip -d /tmp/redis-jars \
-       && cp /tmp/redis-jars/*.jar $TOMCAT_HOME/lib/ \
-       && rm -rf /tmp/redis-jars; \
-    fi
+         mkdir -p /tmp/redis-jars; \
+         pushd /tmp/redis-jars; \
+         jar xf /tmp/orbeon_forms/$basename/orbeon-redis-jars.zip; \
+         cp *.jar $TOMCAT_HOME/lib/; \
+         popd; \
+         rm -rf /tmp/redis-jars; \
+       fi
 
 # Enable compression
 COPY server.gzip.xml $CONFIG_DIR/server.xml

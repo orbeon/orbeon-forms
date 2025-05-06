@@ -1378,6 +1378,7 @@
             <set-control-itemset>Set Control Choices</set-control-itemset>
             <save-to-dataset>Save to Dataset</save-to-dataset>
             <dataset-name>Dataset Name</dataset-name>
+            <set-control-value-unavailable>Set Control Value is only available when "after the controls are ready" is selected</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -2947,10 +2948,11 @@
             <service-request-actions>Actions de la requête</service-request-actions>
             <service-response-actions>Actions de la réponse</service-response-actions>
 
-            <set-control-value>Mettre la valeur du contrôle</set-control-value>
-            <set-control-itemset>Mettre la liste de choix du contrôle</set-control-itemset>
+            <set-control-value>Définir la valeur du contrôle</set-control-value>
+            <set-control-itemset>Définir la liste de choix du contrôle</set-control-itemset>
             <save-to-dataset>Sauvegarder dans un dataset</save-to-dataset>
             <dataset-name>Nom du dataset</dataset-name>
+            <set-control-value-unavailable>Définir la valeur du contrôle est uniquement disponible lorsque "après la préparation des contrôles" est sélectionné</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -4528,10 +4530,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Angi kontrollverdi</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Angi kontrollverdi er bare tilgjengelig når "etter at kontrollene er klare" er valgt</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -6108,10 +6111,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Установить значение элемента управления</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Установить значение элемента управления доступно только при выборе «после подготовки элементов управления»</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -7653,10 +7657,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Imposta valore di controllo</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Imposta valore di controllo è disponibile solo quando è selezionato "dopo che i controlli sono pronti"</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -9199,10 +9204,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Kontrollwert festlegen</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Kontrollwert festlegen ist nur verfügbar, wenn "nachdem die Steuerelemente bereit sind" ausgewählt ist</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -10775,10 +10781,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Aseta kontrollin arvo</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Aseta kontrollin arvo on käytettävissä vain, kun "kontrollien valmistumisen jälkeen" on valittu</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -12348,10 +12355,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Establecer valor de control</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Establecer valor de control solo está disponible cuando se selecciona "después de que los controles estén listos"</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -13901,10 +13909,11 @@
             <service-request-actions>Service request acties</service-request-actions>
             <service-response-actions>Service response acties</service-response-actions>
 
-            <set-control-value>Stel control-waarde in</set-control-value>
+            <set-control-value>Bedieningswaarde instellen</set-control-value>
             <set-control-itemset>Stel control-keuzes in</set-control-itemset>
             <save-to-dataset>Bewaar in dataset</save-to-dataset>
             <dataset-name>Dataset naam</dataset-name>
+            <set-control-value-unavailable>Bedieningswaarde instellen is alleen beschikbaar wanneer "nadat de besturingselementen klaar zijn" is geselecteerd</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -15481,10 +15490,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Definir valor de controle</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Definir valor de controle está disponível apenas quando "após os controles estarem prontos" estiver selecionado</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
@@ -17062,10 +17072,11 @@
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 
-            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-value>Ange kontrollvärde</set-control-value>
             <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
             <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
             <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-value-unavailable>Ange kontrollvärde är endast tillgängligt när "efter att kontrollerna är klara" har valts</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>

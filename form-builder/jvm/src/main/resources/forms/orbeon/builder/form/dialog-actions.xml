@@ -609,10 +609,7 @@
 
                             <xf:select1 ref="@class" class="fb-action-option-3-col-span-1">
                                 <xf:itemset
-                                    ref=".[
-                                        context() = 'fr-set-control-value-action' or
-                                        $event-not-before-controls-ready
-                                    ]">
+                                    ref=".">
                                     <xf:label ref="$form-resources/dialog-actions/set-control-value"/>
                                     <xf:value>fr-set-control-value-action</xf:value>
                                 </xf:itemset>
@@ -637,7 +634,7 @@
                                         context="$current-action"
                                         origin="instance('fb-binding-action-template')/xf:action[@class = event('xxf:item-value')]/(@class, *)"/>
                                 </xf:action>
-
+                                <xf:alert ref="$form-resources/dialog-actions/set-control-value-unavailable"/>
                             </xf:select1>
 
                             <!-- `xxf:xforms11-switch="true"` is for dropdowns in hidden cases to be non-relevant -->

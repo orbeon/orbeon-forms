@@ -7703,4 +7703,51 @@
         </output>
     </test>
 
+    <test description="#6998: Add dependency support for `xxf:property()`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m">
+                        <xf:instance id="i">
+                            <_>
+                                <property-name/>
+                            </_>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-property"            value="xxf:property('my.property')"/>
+                    <xf:output id="my-property-with-param" value="xxf:property(property-name)"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="my-property" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:property('my.property'))[1])" analyzed="true"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-property-with-param" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:property(property-name))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/property-name</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
+
 </group>

@@ -13,4 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.saxon.function.AddToPathMap
+
+
 class Aggregate extends org.orbeon.saxon.functions.Aggregate with AddToPathMap

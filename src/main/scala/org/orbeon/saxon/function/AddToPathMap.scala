@@ -11,12 +11,13 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.saxon.function
 
-import org.orbeon.saxon.expr.*
-import scala.jdk.CollectionConverters.*
 import org.orbeon.saxon.`type`.AtomicType
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.functions.SystemFunction
+
+import scala.jdk.CollectionConverters.*
 
 // Rewrite of Saxon addToPathMap in Scala
 trait AddToPathMap {

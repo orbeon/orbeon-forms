@@ -28,7 +28,7 @@ import org.orbeon.xml.NamespaceMapping
 // 2024-11-06: Some of this code is also present in `CoreSupport`, which is currently only on the JS side. It would be
 // good to reduce code duplication. But where to put the common code?
 
-class Property extends DefaultFunctionSupport with RuntimeDependentFunction {
+class Property extends DefaultFunctionSupport with RuntimeDependentFunction with AddToPathMap { // when properties reload, we now recompute all values
   override def evaluateItem(xpathContext: XPathContext): AtomicValue =
     Property.property(stringArgument(0)(xpathContext)).orNull
 }

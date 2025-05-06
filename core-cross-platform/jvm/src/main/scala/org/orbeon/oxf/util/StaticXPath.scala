@@ -19,7 +19,7 @@ import org.orbeon.dom.io.SAXWriter
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReaderProviderRegistry, XMLReceiver}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, ItemType, Type}
 import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}
 import org.orbeon.saxon.expr.*
@@ -73,8 +73,10 @@ object StaticXPath extends StaticXPathTrait {
 
     // See https://github.com/orbeon/orbeon-forms/issues/3468
     // We decide not to use a pool for now as creating a parser is fairly cheap
-    override def getSourceParser: XMLReader = ???
-    override def getStyleParser : XMLReader = ???
+
+    // Used by `doc()`, only provided on the JVM
+    override def getSourceParser: XMLReader = XMLReaderProviderRegistry.get.map(_()).getOrElse(throw new UnsupportedOperationException())
+    override def getStyleParser : XMLReader = getSourceParser
 
     // These are called if the parser came from `getSourceParser` or `getStyleParser`
     override def reuseSourceParser(parser: XMLReader)                             : Unit = ()

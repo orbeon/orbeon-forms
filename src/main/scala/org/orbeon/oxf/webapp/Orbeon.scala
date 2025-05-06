@@ -21,6 +21,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{Log4jSupport, LoggerFactory}
+import org.orbeon.oxf.xml.{ParserConfiguration, XMLReaderProviderRegistry, XMLParsing}
 
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
@@ -104,7 +105,10 @@ object Orbeon {
         logger.error(OrbeonFormatter.format(t))
     }
 
-    // 6. Register processor definitions with the default XML Processor Registry
+    // 6. Register function returning XMLReader, so it can be used from coreCrossPlatformJVM, if available
+    XMLReaderProviderRegistry.register(() => XMLParsing.newSAXParser(ParserConfiguration.Plain).getXMLReader)
+
+    // 7. Register processor definitions with the default XML Processor Registry
     InitUtils.processorDefinitions
   }
 }

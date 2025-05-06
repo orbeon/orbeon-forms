@@ -6,14 +6,17 @@
             <short-date>[D01]/[M01]/[Y01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
+            <incomplete-configuration>La configuración de Orbeon Forms está incompleta. 
+                Para más detalles, comprueba los ficheros de logs y visita &lt;a
+                href="https://doc.orbeon.com/installation/configuration-banner"
+                target="_blank"&gt;la documentación&lt;/a&gt;.</incomplete-configuration>
         </messages>
     </common>
     <buttons>
-        <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
-        <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
-        <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
-        <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Crear</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Ver</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Aprobar</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rechazar</reject>
 
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Inicio</home>
         <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Inicio</landing>
@@ -23,19 +26,19 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Eliminar</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nuevo</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nuevos datos</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save-final>
-        <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
-        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-progress>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar borrador</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
-        <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Probar PDF</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</submit>
@@ -52,9 +55,9 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Minimizar todo</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Maximizar todo</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Actualizar"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previo</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenido</wizard-toc>
@@ -69,13 +72,14 @@
         <validation-dialog-review>Revisar</validation-dialog-review>
         <validation-dialog-continue>Continuar</validation-dialog-continue>
 
-        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testear</test>
-        <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
-        <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-        <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
-        <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
-        <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
-        <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
+        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Validar</test>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspector de formulas (Beta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Probar Offline (Beta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportar a Excel</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt;
+            Exportar a Excel</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportar a XML</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; Exportar a XHTML</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
@@ -93,7 +97,7 @@
             <yes>Sí</yes>
             <no>No</no>
             <other>Otro</other>
-            <clear todo="true">[Clear Value]</clear>
+            <clear>Limpiar valores</clear>
             <please-select>Seleccione por favor:</please-select>
         </labels>
         <grid>
@@ -103,25 +107,25 @@
             <move-up>Mover Arriba</move-up>
             <move-down>Mover Debajo</move-down>
             <clear>
-                <label todo="true">Limpiar fila</label>
+                <label>Limpiar fila</label>
             </clear>
             <remove>
-                <label>Remover</label>
-                <hint>Remover Fila de Grilla Repetible</hint>
+                <label>Eliminar</label>
+                <hint>Eliminar fila de la tabla</hint>
             </remove>
             <add-another>
-                <label>Agregar Otro</label>
-                <hint>Añadir nuevo elemento</hint>
+                <label>Añadir</label>
+                <hint>Añadir una fila a la tabla</hint>
             </add-another>
         </grid>
         <section>
             <remove>
                 <label>Remover</label>
-                <hint>Remover Iteracción de Sección Repetible</hint>
+                <hint>Eliminar fila de sección repetible</hint>
             </remove>
             <add-another>
                 <label>Agregar Otro</label>
-                <hint>Agregar Iteracción a Grilla Repetible</hint>
+                <hint>Agregar fila de sección repetible</hint>
             </add-another>
         </section>
         <date-time>
@@ -142,44 +146,51 @@
             <show-less>Mostrar Menos</show-less>
         </error-summary>
         <revision-history>
-            <label todo="true">Revision History</label>
-            <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+            <label>Historial de revisiones</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Revisión actual)}</date>
             <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
 
-            <named-user todo="true">User {0}</named-user>
-            <anonymous-user todo="true">An anonymous user</anonymous-user>
+            <named-user>Usuario {0}</named-user>
+            <anonymous-user>Usuario anónimo</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
-            <initial-revision todo="true">saved the initial revision.</initial-revision>
-            <no-changes todo="true">saved with no changes detected.</no-changes>
-            <specific-changes todo="true">made the following changes:</specific-changes>
+            <unknown-changes>hay cambios.</unknown-changes>
+            <initial-revision>guardada la revisión inicial.</initial-revision>
+            <no-changes>guardado sin cambios detectados.</no-changes>
+            <specific-changes>tiene los cambios siguientes:</specific-changes>
 
-            <view-data todo="true">View this revision</view-data>
+            <view-data>Ver esta revisión</view-data>
 
-            <value-entered todo="true">"{0}" entered</value-entered>
-            <value-cleared todo="true">"{0}" cleared</value-cleared>
-            <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
-            <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
-            <other-changed todo="true">internal information changed</other-changed>
-            <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+            <value-entered>"{0}" entrado</value-entered>
+            <value-cleared>"{0}" eliminado</value-cleared>
+            <value-changed>cambiado de "{0}" a "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#repetición|1&lt;repeticiones}
+                añadida/s</iteration-added>
+            <iteration-removed>{0,number,integer}
+                {0,choice,1#repetición|1&lt;repeticiones} eliminada/s</iteration-removed>
+            <other-changed>información interna cambiada</other-changed>
+            <workflow-stage-changed>flujo de trabajo cambado de "{0}" a "{1}"</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>Cargar más</load-more>
         </revision-history>
     </components>
     <untitled-form>Formulario sin Título</untitled-form>
     <errors>
         <summary-title>Su formulario {1,choice,
             0#no tiene ningún mensaje|
-            1#tiene el siguiente '{0,choice,0#mensaje de error|1#mensaje de advertencia|2#mensaje de información|3#mensaje}'|
-            1&lt;tiene los siguientes '{0,choice,0#mensajes de error|1#mensajes de advertencia|2#mensajes de información|3#mensajes}'}</summary-title>
+            1#tiene el siguiente '{0,choice,0#mensaje de error|1#mensaje de advertencia|2#mensaje de
+            información|3#mensaje}'|
+            1&lt;tiene los siguientes '{0,choice,0#mensajes de error|1#mensajes de
+            advertencia|2#mensajes de información|3#mensajes}'}</summary-title>
         <form-title>{1,choice,
             0#|
-            1#{1,number,integer} '{0,choice,0#Error|1#Advertencia|2#Mensaje de Información|3#Mensaje}' - |
-            1&lt;{1,number,integer} '{0,choice,0#Errores|1#Advertencias|2#Mensajes de Información|3#Mensajes}' - }{2}</form-title>
+            1#{1,number,integer} '{0,choice,0#Error|1#Advertencia|2#Mensaje de
+            Información|3#Mensaje}' - |
+            1&lt;{1,number,integer} '{0,choice,0#Errores|1#Advertencias|2#Mensajes de
+            Información|3#Mensajes}' - }{2}</form-title>
         <none>No hay errores en el formulario</none>
         <unsaved>Cambios sin guardar</unsaved>
-        <canvas-not-supported>Para realizar anotaciones en imágenes, su explorador tiene que soportar HTML5</canvas-not-supported>
+        <canvas-not-supported>Para realizar anotaciones en imágenes, su explorador tiene que
+            soportar HTML5</canvas-not-supported>
         <search>Error al realizar la búsqueda</search>
     </errors>
     <email>
@@ -200,9 +211,9 @@
         <titles>
             <summary-title>Resumen</summary-title>
             <delete-confirmation>Confirma Eliminación</delete-confirmation>
-            <document-id todo="true">Document Id</document-id>
-            <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-            <created-by todo="true">[Created By]</created-by>
+            <document-id>Id del documento</document-id>
+            <workflow-stage>Estado del flujo</workflow-stage>
+            <created-by>Creado por</created-by>
             <selected>Seleccionado</selected>
             <refresh>Este botón actualizará la página</refresh>
             <toc>Tabla de contenidos</toc>
@@ -212,18 +223,18 @@
             <errors-count>Errores en su formulario</errors-count>
         </titles>
         <buttons>
-            <select-all todo="true">Select all</select-all>
-            <deselect-all todo="true">Deselect all</deselect-all>
-            <select-saved todo="true">Select explicitly saved only</select-saved>
-            <select-drafts todo="true">Select drafts only</select-drafts>
+            <select-all>Seleccionar todo</select-all>
+            <deselect-all>Deseleccionar todo</deselect-all>
+            <select-saved>Seleccionar solo una</select-saved>
+            <select-drafts>Seleccionar solo borradores</select-drafts>
         </buttons>
         <bulk-edit>
-            <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
-            <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
-            <bulk-edit todo="true">[Bulk edit]</bulk-edit>
-            <apply todo="true">[Apply]</apply>
-            <value-required todo="true">[Value is required]</value-required>
-            <submission-error todo="true">[Error while editing form data.]</submission-error>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar edición en bloque</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Ocultar edición en bloque</close-bulk-edit>
+            <bulk-edit>Edición en bloque</bulk-edit>
+            <apply>Aplicar</apply>
+            <value-required>Valor requerido</value-required>
+            <submission-error>Error editando los datos del formulario.</submission-error>
         </bulk-edit>
         <paging>
             <to>al</to>
@@ -231,8 +242,10 @@
         </paging>
         <messages>
             <no-form-data-found>No se encontró el formulario.</no-form-data-found>
-            <delete-confirmation>Esta seguro que desea borrar uno o más formularios? Nota cuando borra un formulario guardado, se borrarán los formularios en estado borrador también.</delete-confirmation>
-            <version todo="true">[Form Version {0,number,integer}]</version>
+            <delete-confirmation>Esta seguro que desea borrar uno o más formularios? Nota cuando
+                borra un formulario guardado, se borrarán los formularios en estado borrador
+                también.</delete-confirmation>
+            <version>Version del formulario {0,number,integer}</version>
         </messages>
         <labels>
             <draft>Borradores</draft>
@@ -240,7 +253,7 @@
             <language-choice>Seleccione Idioma</language-choice>
             <form-choice>Seleccione Formulario</form-choice>
             <free-search>Búsqueda Libre</free-search>
-            <clear-value todo="true">[[Clear value]]</clear-value>
+            <clear-value>Limpiar valor</clear-value>
             <script>Versión Completa</script>
             <refresh>Actualizar</refresh>
             <close-box>Cerrar</close-box>
@@ -254,67 +267,83 @@
             <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label todo="true">Excel Export Options</label>
-            <headings-labels todo="true">Use labels for headings</headings-labels>
-            <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
-            <include-document-id todo="true">Include document id column</include-document-id>
+            <label>Opciones de exportación a Excel</label>
+            <headings-labels>Usar etiquetas para las cabeceras</headings-labels>
+            <selection-controls-labels>Usar etiquetas para los controles de selección</selection-controls-labels>
+            <include-document-id>Incluir columna de identificación del documento</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
             <save-success>Documento guardado correctamente!</save-success>
-            <save-draft-success todo="true">Borrador guardado correctamente!</save-draft-success>
-            <save-progress-success todo="true">Borrador guardado correctamente!</save-progress-success>
+            <save-draft-success>Borrador guardado correctamente!</save-draft-success>
+            <save-progress-success>Borrador guardado correctamente!</save-progress-success>
             <email-success>Email enviado correctamente!</email-success>
-            <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente.</form-validation-error>
-            <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
-            <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
-            <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
-            <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
-            <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
-            <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
-            <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino los guarda.</clear-confirm-message>
+            <form-validation-error>Hay errores de validación. Corrija los errores e intente
+                nuevamente.</form-validation-error>
+            <database-error>Error de comunicación con la base de datos. Contacte al administrador de
+                la aplicación.</database-error>
+            <service-error>Se produjo un error al comunicarse con un servicio backend. Contacte con el administrador de la aplicación.</service-error>
+            <action-error>Se produjo un error al comunicarse con un servicio backend. Contacte con el administrador de la aplicación.</action-error>
+            <process-error>Error ejecutando el proceso. Contacte al administrador de la aplicación.</process-error>
+            <wizard-prev-error>Corrija los errores antes de retroceder</wizard-prev-error>
+            <wizard-next-error>Corrija los errores antes de avanzar.</wizard-next-error>
+            <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos
+                se perderán sino los guarda.</clear-confirm-message>
             <error-dialog-title>Imposible completar la acción</error-dialog-title>
             <confirmation-dialog-title>Confirmación</confirmation-dialog-title>
-            <confirmation-dialog-message>Ésta seguro de continuar ?</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message>Ésta seguro de continuar?</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>Esta acción podría provocar que se sobrescriban algunos datos del formulario. ¿Seguro que desea continuar?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Formulario Enviado</submit-dialog-title>
             <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
             <validation-dialog-title>Revisar mensajes de validación del Formulario</validation-dialog-title>
             <validation-dialog-message>Su formulario {1,choice,
                 0#no tiene ningún mensaje|
-                1#tiene un '{0,choice,0#error|1#warning|2#informational message|3#message}'|
-                1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                1#tiene un '{0,choice,0#error|1#advertencia|2#Mensaje informativo|3#Mensajes}'|
+                1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#advertencia|2#mensaje informativo|3#mensajes}'}.
                 {0,choice,
-                    0#Corrija los errores e intente nuevamente|
-                    0&lt;Pueder optar por revisarlos '{1,choice,1#it|1&lt;them}' primero o ignorar '{1,choice,1#it|1&lt;them}' y continuar la opración}.
+                0#Corrija los errores e intente nuevamente|
+                0&lt;Puede optar por revisarlos '{1,choice,1#it|1&lt;them}' primero o ignorar
+                '{1,choice,1#it|1&lt;them}' y continuar la operación}.
             </validation-dialog-message>
-            <buttons-message/>
-            <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
-            <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
-            <upload-start>Subidad de archivos ha comenzado</upload-start>
-            <upload-cancel>Subidad de archivos cancelada por el usuario</upload-cancel>
-            <upload-done>Subidad de archivos completada</upload-done>
+            <buttons-message />
+            <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada
+                será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
+            <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente
+                cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
+            <upload-start>Subida de archivos ha comenzado</upload-start>
+            <upload-cancel>Subida de archivos cancelada por el usuario</upload-cancel>
+            <upload-done>Subida de archivos completada</upload-done>
             <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
-            <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
-            <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0} y el tamaño del archivo subido es {1}.</upload-error-size>
-            <upload-error-max-files-per-control>Número máximo de archivos excedido. No puede adjuntar más de {0,number,integer} archivos a este control.</upload-error-max-files-per-control>
+            <upload-error-empty-file>El fichero subido está vacío.</upload-error-empty-file>
+            <upload-error-size>El archivo subido es demasiado largo. El largo máximo permitido es
+                {0} y el tamaño del archivo subido es {1}.</upload-error-size>
+            <upload-error-max-files-per-control>Número máximo de archivos excedido. No puede
+                adjuntar más de {0,number,integer} archivos a este control.</upload-error-max-files-per-control>
             <upload-error-mediatype>El archivo subido es de tipo incorrecto: {0}</upload-error-mediatype>
-            <upload-error-file-scan>El archivo subido fue rechazado por el escaner de archivos. Asegurese que el archivo no esta infectado. Este el es mensaje del escaner de archivos: "{0}".</upload-error-file-scan>
-            <lost-attachments>Algunos archivos se perdieron debido a un incidente con el servidor. Verifique todos los adjuntos y subalos nuevamente si es necesario.</lost-attachments>
+            <upload-error-file-scan>El archivo subido fue rechazado por el escáner de archivos.
+                Asegurese que el archivo no esta infectado. Este el es mensaje del escaner de
+                archivos: "{0}".</upload-error-file-scan>
+            <lost-attachments>Algunos archivos se perdieron debido a un incidente con el servidor.
+                Verifique todos los adjuntos y súbalos nuevamente si es necesario.</lost-attachments>
         </messages>
         <draft-singleton>
             <found-draft>Borrador encontrado</found-draft>
             <found-drafts>Borradores encontrados</found-drafts>
-            <found-draft-for-document>Luego que este documento se guardo, un borrador fue auto guardado, y pueden contener una actualización. Desea abrir el documento guardado o abrir el último borrador ?</found-draft-for-document>
-            <found-draft-for-never-saved>Hay un borrador de este formulario. Desea empezar con un formulario en blanco o con el borrador</found-draft-for-never-saved>
-            <found-drafts-for-never-saved>Hay varios borradores de este formulario. Desea empezar con un formulario en blanco o con alguno de los borradores ?</found-drafts-for-never-saved>
+            <found-draft-for-document>Luego que este documento se guardo, un borrador fue auto
+                guardado, y pueden contener una actualización. Desea abrir el documento guardado o
+                abrir el último borrador ?</found-draft-for-document>
+            <found-draft-for-never-saved>Hay un borrador de este formulario. Desea empezar con un
+                formulario en blanco o con el borrador</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>Hay varios borradores de este formulario. Desea empezar
+                con un formulario en blanco o con alguno de los borradores ?</found-drafts-for-never-saved>
             <open-saved>Abrir document guardado</open-saved>
             <open-draft>Abrir borrador auto-guardado</open-draft>
             <view-drafts>Ver borrador auto-guardado</view-drafts>
             <start-new>Empezar con un formulario en blanco</start-new>
             <multiple-docs-title>Se ha encontrado un formulario con estos mismos datos</multiple-docs-title>
-            <multiple-docs-explanation>No se puede crear nuevos datos para este Formulario, de todas forma puede editar los existentes.</multiple-docs-explanation>
+            <multiple-docs-explanation>No se puede crear nuevos datos para este Formulario, de todas
+                forma puede editar los existentes.</multiple-docs-explanation>
             <multiple-docs-view-data>Ver datos existentes</multiple-docs-view-data>
         </draft-singleton>
         <labels>
@@ -324,20 +353,20 @@
             <error-details>Ver detalle de los errores</error-details>
             <confirm>Confirmar</confirm>
             <alert>Valor ausente o incorrecto</alert>
-            <alert-out-of-range todo="true">[Out of range value, please select an available value]</alert-out-of-range>
-            <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
-            <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
+            <alert-out-of-range>Valor fuera del rango, pro favor seleccione un valor disponible</alert-out-of-range>
+            <alert-out-of-range-multiple>Valor fuera de rango</alert-out-of-range-multiple>
+            <clear-out-of-range>Borrar valores fuera de rango</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
-            <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
+            <captcha-alert>El valor ingresado es diferente a la imagen, inténtelo nuevamente</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-size-per-file>Ficheros por debajo de {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>El tamaño total de ficheros en el control tiene que estar por debajo de {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Puede adjuntar hasta {0} archivos.</upload-max-files-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Solo {0} ficheros son aceptados.</upload-mediatypes>
+            <upload-image>imagen</upload-image>
+            <upload-video>video</upload-video>
+            <upload-audio>audio</upload-audio>
         </hints>
         <view>
             <explanation>
@@ -351,32 +380,32 @@
             <current-user-left>Usted posee un bloqueo sobre este documento para otro</current-user-left>
             <current-user-right>.</current-user-right>
             <relinquished>Usted ya no posee un bloqueo sobre este documento.</relinquished>
-            <other-user>Otro usuario con nombre "{0}" posee actualmente un bloqueo sobre este documento</other-user>
-            <relinquish>Libherar Bloqueo</relinquish>
+            <other-user>Otro usuario con nombre "{0}" posee actualmente un bloqueo sobre este
+                documento</other-user>
+            <relinquish>Liberar Bloqueo</relinquish>
             <renew>Renovar Bloqueo</renew>
             <try-acquire>Intentar adquirir Bloqueo</try-acquire>
-            <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
+            <show-in-view-mode>Ver en modo solo-lectura</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>La sesión está apunto de expirar</expiring>
+                <expired>Session expirada</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
-                <expired>Este formulario debe recargarse. Esto podría llevarte a la página de inicio de sesión. Si crees que no deberías ver este mensaje y que el problema persiste, ponte en contacto con soporte.</expired>
+                <expiring>Tu sesión está a punto de expirar. Haz clic en el botón de abajo si deseas continuar usando esta página.</expiring>
+                <expired>Tu sesión ha expirado</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
-            <reload-button>Recargar</reload-button>
+            <renew-button>Renovar sesión</renew-button>
         </session-expiration>
         <available-from>
-            <message todo="true">[This form isn't available yet]</message>
+            <message>Este formulario aún no está disponible</message>
         </available-from>
         <available-to>
-            <message todo="true">[This form isn't available anymore]</message>
+            <message>Este formulario ya no está disponible</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Etapa</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -384,54 +413,56 @@
         <dialog-body>
             <div>
                 <p>
-                    Haga clic en el botón Guardar para guardar los datos en su computadora como un archivo HTML.
+                    Haga clic en el botón Guardar para guardar los datos en su computadora como un
+                    archivo HTML.
                 </p>
                 <p>
                     Para re abrir el formulario:
                 </p>
                 <ul>
-                    <li>Abra el archivo HTML de su computadora (cliqueando en el archivo, o soltandolo en un ventana del Browser).</li>
+                    <li>Abra el archivo HTML de su computadora (clicando en el archivo, o
+                        soltándolo en un ventana del Browser).</li>
                     <li>Haga clic en botón Abrir que será mostrado para confirmar.</li>
                 </ul>
                 <p>
-                    <b>ADVERTENCIA:</b> Ningún dato esta guardado en el servidor y si elimina el archivo los datos guardados se perderán.
-                </p>
+                    <b>ADVERTENCIA:</b> Ningún dato esta guardado en el servidor y si elimina el
+                    archivo los datos guardados se perderán. </p>
             </div>
         </dialog-body>
     </save-locally>
     <share-dialog>
-        <label todo="true">Create link to share</label>
-        <body todo="true">Let anyone with the link view or edit this data.</body>
-        <link todo="true">Link</link>
-        <select-operations todo="true">Select operations</select-operations>
-        <readonly todo="true">Readonly</readonly>
-        <readwrite todo="true">Read-write</readwrite>
+        <label>Crear enlace para compartir</label>
+        <body>Permita que cualquier persona con el enlace vea o edite estos datos.</body>
+        <link>Enlace</link>
+        <select-operations>Seleccione operaciones</select-operations>
+        <readonly>Solo lectura</readonly>
+        <readwrite>Lectura-escritura</readwrite>
     </share-dialog>
     <admin>
-        <title todo="true">[Forms Admin]</title>
+        <title>Administración de formularios</title>
     </admin>
     <landing>
         <title>Landing</title>
         <titles>
-            <published-forms todo="true">Published Forms</published-forms>
-            <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-            <form-builder-new todo="true">New Form Builder Form</form-builder-new>
-            <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
-            <demo-forms todo="true">Demo Forms</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
-            <quick-links todo="true">Quick Links</quick-links>
-            <form-runner-admin todo="true">Forms Admin</form-runner-admin>
+            <published-forms>Formularios publicados</published-forms>
+            <form-builder-forms>Formularios del Form-Builder</form-builder-forms>
+            <form-builder-new>Nuevo formulario Form-Builder</form-builder-new>
+            <form-builder-summary>Formularios del Form-Builder</form-builder-summary>
+            <demo-forms>Formularios de demostración</demo-forms>
+            <demo-features>Demostración de funciones</demo-features>
+            <quick-links>Enlaces rápidos</quick-links>
+            <form-runner-admin>Administración de formularios</form-runner-admin>
         </titles>
         <descriptions>
-            <published-forms todo="true">Access your published forms</published-forms>
-            <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <published-forms>Acceder a tus formularios publicados</published-forms>
+            <form-builder-forms>Ver i editar tus formularios de Form-Builder</form-builder-forms>
+            <demo-forms>Pruebe la colección de formularios de demostración de Orbeon Forms</demo-forms>
+            <demo-features>Pruebe demostraciones de funciones específicas de Orbeon Forms</demo-features>
         </descriptions>
-        <show-more todo="true">Show more…</show-more>
+        <show-more>Mostrar más…</show-more>
     </landing>
     <home>
-        <title todo="true">Inicio Form Runner</title>
+        <title>Inicio Form Runner</title>
         <buttons>
             <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Despublicar</unpublish>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -459,10 +490,10 @@
             <navigate-new>Ir a nuevo</navigate-new>
             <upgrade-local>Actualizar Formularios locales</upgrade-local>
             <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
-            <delete-local todo="true">Delete local forms</delete-local>
-            <delete-remote todo="true">Delete remote forms</delete-remote>
-            <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
-            <reload-resources todo="true">[Reload resources]</reload-resources>
+            <delete-local>Borrar formularios locales</delete-local>
+            <delete-remote>Borrar formularios remotos</delete-remote>
+            <reencrypt>Encriptar definiciones de formularios</reencrypt>
+            <reload-resources>Recargar recursos</reload-resources>
         </buttons>
         <titles>
             <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
@@ -472,198 +503,209 @@
             <new>Nuevo</new>
             <local>Local</local>
             <remote>Remoto</remote>
-            <form-identification>Identificación de Fomulario</form-identification>
+            <form-identification>Identificación de Formulario</form-identification>
             <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
+            <reencrypt-confirmation>Confirmar encriptación</reencrypt-confirmation>
+            <purge-confirmation>Confirmar purga</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[No se encontró ningún formulario desplegado.]</no-form-found>
-            <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
-            <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán disponibles, como ser el Form Runner. Por lo que se recomienda ejecutar la reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la reindexación ?</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
+            <no-form-found>No se encontró ningún formulario desplegado.</no-form-found>
+            <publish-confirmation todo="true">Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete}
+                {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
+            <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán
+                disponibles, como el Form-Runner. Por lo que se recomienda ejecutar la
+                reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la
+                reindexación?</reindexing-confirmation>
+            <reencrypt-confirmation>Le recomendamos que vuelva a encriptar mientras el sistema esté desconectado. ¿Está seguro
+             de que desea continuar con el encriptado?</reencrypt-confirmation>
+            <purge-confirmation>¿Está seguro de que desea purgar los datos seleccionados?</purge-confirmation>
         </messages>
         <labels>
-            <available>Disponibile</available>
-            <unavailable>No Disponibile</unavailable>
+            <available>Disponible</available>
+            <unavailable>No Disponible</unavailable>
             <library>Librería</library>
             <newer>Más Nuevos</newer>
             <remote-server>Servidor Remoto</remote-server>
             <username>Usuario</username>
             <password>Contraseña</password>
-            <reindexing-generic>Reindexando &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+            <reindexing-generic>Reindexando
+                &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
             <reindexing-provider>Reindexando ({1,number}/{2,number}]</reindexing-provider>
-            <reindexing-stopping>La reindexación se esta deteniendo &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+            <reindexing-stopping>La reindexación se esta deteniendo
+                &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
             <reindexing-finished>La reindexación ha finalizado</reindexing-finished>
-            <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
-            <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
-            <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+            <reencrypt-state>Encriptando {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Cifrado iniciado</reencrypt-started>
+            <reencrypt-finished>Cifrado finalizado</reencrypt-finished>
         </labels>
         <export-purge>
-            <export todo="true">[Export]</export>
-            <purge todo="true">[Purge]</purge>
-            <or todo="true">[or]</or>
-            <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
-            <following-forms todo="true">[Following forms:]</following-forms>
-            <application todo="true">[Application:]</application>
-            <form todo="true">[Form:]</form>
-            <version todo="true">[Version:]</version>
-            <all-applications todo="true">[All applications]</all-applications>
-            <all-forms todo="true">[All forms]</all-forms>
-            <all-versions todo="true">[All versions]</all-versions>
-            <latest-version todo="true">[Latest version]</latest-version>
+            <export>Exportar</export>
+            <purge>Purgar</purge>
+            <or>o</or>
+            <selected-forms>Formularios seleccionado ({0,number,integer})</selected-forms>
+            <following-forms>Formularios siguientes:</following-forms>
+            <application>Aplicación:</application>
+            <form>Formulario:</form>
+            <version>Versión:</version>
+            <all-applications>Todas las aplicaciones</all-applications>
+            <all-forms>Todos los formularios</all-forms>
+            <all-versions>Todas las versiones</all-versions>
+            <latest-version>Última versión</latest-version>
             <definitions-data>
-                <label todo="true">[Form definitions / data:]</label>
-                <definitions todo="true">[Definitions only]</definitions>
-                <data todo="true">[Data only]</data>
-                <both todo="true">[Definitions and data]</both>
+                <label>Definiciones / datos del formulario:</label>
+                <definitions>Definiciones solo</definitions>
+                <data>Datos solo</data>
+                <both>Definiciones i datos</both>
             </definitions-data>
             <current-history>
-                <label todo="true">[Current data / revision history:]</label>
-                <current-data todo="true">[Current data only]</current-data>
-                <revision-history todo="true">[Revision history only]</revision-history>
-                <both todo="true">[Current data and revision history]</both>
+                <label>Datos actuales / historial de revisiones:</label>
+                <current-data>Sólo datos actuales</current-data>
+                <revision-history>Solo historial de revisiones</revision-history>
+                <both>Datos actuales e historial de revisiones</both>
             </current-history>
-            <from-date todo="true">[From:]</from-date>
-            <until-date todo="true">[Until:]</until-date>
-            <redundant-values todo="true">[Redundant values]</redundant-values>
-            <invalid-date todo="true">[Invalid date]</invalid-date>
-            <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            <from-date>Desde:</from-date>
+            <until-date>Hasta:</until-date>
+            <redundant-values>Valores redundantes</redundant-values>
+            <invalid-date>Datos inválidos</invalid-date>
+            <wrong-date-order>Orden de fecha incorrecto</wrong-date-order>
         </export-purge>
     </home>
     <import>
         <form-version>
-            <label todo="true">Form Version</label>
-            <alert todo="true">Missing form version</alert>
+            <label>Versión del formulario</label>
+            <alert>Falta la versión del formulario</alert>
         </form-version>
         <application-name>
-            <label todo="true">Application Name</label>
+            <label>Nombre de la aplicación</label>
         </application-name>
         <form-name>
-            <label todo="true">Form Name</label>
+            <label>Nombre del formulario</label>
         </form-name>
         <version-comment>
-            <label todo="true">Version comment</label>
+            <label>Comentario de la versión</label>
         </version-comment>
         <upload>
-            <label todo="true">Upload</label>
+            <label>Subir</label>
         </upload>
         <file>
-            <label todo="true">File to import</label>
-            <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-            <alert todo="true">Missing or unsupported file</alert>
-            <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
-            <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
+            <label>Archivo a importar</label>
+            <hint>El archivo debe estar en formato Excel 2007 (.xlsx) o en formato XML (.xml)</hint>
+            <alert>Archivo faltante o no soportado</alert>
+            <excel-headings-format>Excel 2007 con formato de encabezados con nombre (.xlsx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 con formato de rangos con nombre (.xlsx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Formato de exportación XML de Orbeon (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label todo="true">Validation</label>
-            <alert todo="true">Please start the validation before proceeding to the import</alert>
+            <label>Validación</label>
+            <alert>Por favor, inicie la validación antes de proceder a la importación.</alert>
         </validation>
         <start-validation>
-            <label todo="true">Start Validation</label>
+            <label>Iniciar la validación</label>
         </start-validation>
-        <total todo="true">Total</total>
-        <valid todo="true">Valid</valid>
-        <invalid todo="true">Invalid</invalid>
-        <imported todo="true">[Imported]</imported>
-        <skipped todo="true">[Skipped]</skipped>
+        <total>Total</total>
+        <valid>Valido</valid>
+        <invalid>Invalido</invalid>
+        <imported>Importado</imported>
+        <skipped>Omitido</skipped>
         <eta todo="true">ETA</eta>
         <cancel-validation>
-            <label todo="true">Cancel Validation</label>
+            <label>Cancelar validación</label>
         </cancel-validation>
-        <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+        <validation-canceled>Validación cancelada.</validation-canceled>
         <import>
-            <label todo="true">Import</label>
+            <label>Importar</label>
         </import>
         <existing-records>
-            <label todo="true">Existing database records</label>
-            <item id="0" todo="true">Keep</item>
-            <item id="1" todo="true">Delete</item>
+            <label>Registros de bases de datos existentes</label>
+            <item id="0">Mantener</item>
+            <item id="1">Borrar</item>
         </existing-records>
         <invalid-data>
-            <label todo="true">Records with invalid data</label>
-            <item id="0" todo="true">Skip</item>
-            <item id="1" todo="true">Import</item>
+            <label>Registros con datos inválidos</label>
+            <item id="0">Omitir</item>
+            <item id="1">Importar</item>
         </invalid-data>
         <start-import>
-            <label todo="true">Start Import</label>
+            <label>Comenzar importación</label>
         </start-import>
         <cancel-import>
-            <label todo="true">Cancel Import</label>
+            <label>Cancelar importación</label>
         </cancel-import>
-        <import-canceled todo="true">Import was canceled.</import-canceled>
+        <import-canceled>Importación cancelada.</import-canceled>
         <start-over>
-            <label todo="true">Start Over</label>
+            <label>Empezar de nuevo</label>
         </start-over>
         <review-data>
-            <label todo="true">Review Data</label>
+            <label>Revisar datos</label>
         </review-data>
         <existing-records-message todo="true">
-            There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+            El {0,choice,1#is|1&lt;are} {0,number,integer} tiene
+            {0,choice,1#documento|1&lt;documentos} en la BD para la versión {3} del formulario {1}/{2}.
         </existing-records-message>
-        <eta-message todo="true">
-            {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} horas} {1,choice,0#|0&lt;{1, number, integer}
+            minutos} {2,choice,0#|0&lt;{2, number, integer} segundos}
         </eta-message>
-        <invalid-records-message todo="true">
-            {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+        <invalid-records-message>
+            {0,number,integer} fuera de {1,number,integer} {1,choice,1#documento|1&lt;documentos}
+            {0,choice,1#es|1&lt;son} invalido/s.
         </invalid-records-message>
-        <valid-records-message todo="true">
-            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+        <valid-records-message>
+            {0,number,integer} {0,choice,1#documento|1&lt;documentos} {0,choice,1#tiene|1&lt;tienen} validación y se importaran.
         </valid-records-message>
-        <invalid-document-message todo="true">
-            The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+        <invalid-document-message>
+            El documento cargado contiene errores de validación. Utilice el botón "Revisar datos" para revisarlos y corregirlos antes de guardarlos.
         </invalid-document-message>
-        <valid-document-message todo="true">
-            The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+        <valid-document-message>
+           El documento cargado contiene datos válidos. Utilice el botón "Revisar datos" para revisar los datos del formulario antes de guardarlo.
         </valid-document-message>
-        <import-complete-message todo="true">
-            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+        <import-complete-message>
+            La importación de {0,number,integer} {0,choice,1#documento|1&lt;documentos} está completa.
+            {1,number,integer} invalido {1,choice,1#documento se ha|1&lt;documentos se han} omitido.
         </import-complete-message>
         <na todo="true">N/A</na>
-        <fields-found todo="true">Fields Found</fields-found>
-        <values-found todo="true">Values Found</values-found>
-        <errors todo="true">Errors</errors>
-        <warnings todo="true">Warnings</warnings>
+        <fields-found>Campos encontrados</fields-found>
+        <values-found>Valores encontrados</values-found>
+        <errors>Errores</errors>
+        <warnings>Advertencias</warnings>
         <error-messages>
-            <validating todo="true">[An error occurred while validating the data.]</validating>
-            <importing todo="true">[An error occurred while importing the data.]</importing>
-            <deleting todo="true">[An error occurred while deleting the data.]</deleting>
-            <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
-            <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
-            <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
-            <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            <validating>Se produjo un error al validar los datos.</validating>
+            <importing>Se produjo un error al importar los datos.</importing>
+            <deleting>Se produjo un error al eliminar los datos.</deleting>
+            <unauthorized>No está autorizado a acceder a estos datos.</unauthorized>
+            <reading-form-data>Se produjo un error al recuperar los datos del formulario.</reading-form-data>
+            <reading-form-metadata>Se produjo un error al leer los metadatos del formulario.</reading-form-metadata>
+            <reading-form-definition>Se produjo un error al leer la definición del formulario.</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
         <menu>
-            <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
-            <logout todo="true">[Logout]</logout>
-            <login todo="true">[Login]</login>
-            <register todo="true">[Register]</register>
+            <logged-in-as>Identificado como {0}</logged-in-as>
+            <logout>Salir</logout>
+            <login>Identificarse</login>
+            <register>Registrarse</register>
         </menu>
         <login>
-            <title todo="true">[Form Runner Login]</title>
-            <username todo="true">[Username]</username>
-            <password todo="true">[Password]</password>
-            <login todo="true">[Login]</login>
+            <title>Identificarse en el Form-Runner</title>
+            <username>Usuario</username>
+            <password>Contraseña</password>
+            <login>Identificarse</login>
         </login>
         <logout-done>
-            <title todo="true">[Form Runner Logout]</title>
-            <message todo="true">[You're logged out.]</message>
+            <title>Salir del Form-Runner</title>
+            <message>Has salido.</message>
         </logout-done>
         <login-error>
-            <title todo="true">[Form Runner Login Error]</title>
-            <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
-            <try-again todo="true">[Please try again.]</try-again>
+            <title>Error al identificarse en Form-Runner</title>
+            <unrecognized>El usuario o contraseña no son validos.</unrecognized>
+            <try-again>Por favor pruebe otra vez.</try-again>
         </login-error>
     </authentication>
     <home-summary>
         <titles>
             <created>Creado</created>
             <last-modified>Modificado</last-modified>
-            <last-modified-by todo="true">[Modified By]</last-modified-by>
+            <last-modified-by>Modificado por</last-modified-by>
             <application-name>Aplicación</application-name>
             <form-name>Formulario</form-name>
             <version>Versión</version>
@@ -678,32 +720,32 @@
             <any>[Cualquiera]</any>
             <dates>
                 <item>
-                    <label todo="true">[Today]</label>
+                    <label>Hoy</label>
                     <value>today</value>
                 </item>
                 <item>
-                    <label todo="true">[Yesterday]</label>
+                    <label>Ayer</label>
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 7 days]</label>
+                    <label>Últimos 7 días</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 30 days]</label>
+                    <label>Últimos 30 días</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 90 days]</label>
+                    <label>Últimos 90 días</label>
                     <value>last-90-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Custom...]</label>
+                    <label>Personalizado…</label>
                     <value>custom</value>
                 </item>
             </dates>
-            <date-after todo="true">[After]</date-after>
-            <date-before todo="true">[Before]</date-before>
+            <date-after>Después</date-after>
+            <date-before>Antes</date-before>
         </search>
     </home-summary>
 </resource>

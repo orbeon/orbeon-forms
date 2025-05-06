@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.test.ProcessorTestBase
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xml.{EncodeDecode, TransformerUtils}
+import org.orbeon.oxf.xml.{EncodeDecode, ParserConfiguration, TransformerUtils, XMLParsing, XMLReaderProviderRegistry}
 
 import javax.xml.transform.TransformerException
 
@@ -26,7 +26,10 @@ class XFormsProcessorTest
     "oxf:/org/orbeon/oxf/xforms/tests-xforms.xml",
     XFormsStateManager.sessionCreated,
     XFormsStateManager.sessionDestroyed
-  )
+  ) {
+  // Register function returning XMLReader, so it can be used from coreCrossPlatformJVM, if available
+  XMLReaderProviderRegistry.register(() => XMLParsing.newSAXParser(ParserConfiguration.Plain).getXMLReader)
+}
 
 object XFormsProcessorTest {
   //@XPathFunction

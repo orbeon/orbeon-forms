@@ -1908,6 +1908,49 @@
         </output>
     </test>
 
+    <test description="count() function with external document" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                    xmlns:xf="http://www.w3.org/2002/xforms"
+                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <_/>
+                        </xf:instance>
+                        <xf:bind ref="/*" calculate="count(doc('https://www.w3schools.com/xml/cd_catalog.xml')//*)"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="output1" value="."/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <_>183</_>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">
+                            <xxf:value>183</xxf:value>
+                        </xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="xxf:create-document() with insert" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

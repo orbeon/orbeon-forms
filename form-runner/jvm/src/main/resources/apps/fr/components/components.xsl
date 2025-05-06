@@ -1539,7 +1539,7 @@
                             xxf:is-blank() or (
                                 let $values :=
                                     if (empty(@fr:itemsetid)) then
-                                        instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
+                                        instance('fr-form-resources')/resource[1]/{$itemset-resource-name}/item/value/string()
                                     else
                                         id(@fr:itemsetid)[1]/choices[1]/item/value/string()
                                 return
@@ -1569,7 +1569,7 @@
                         value="
                             xxf:is-blank() or (
                                 let $values :=
-                                    instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
+                                    instance('fr-form-resources')/resource[1]/{$itemset-resource-name}/item/value/string()
                                 return
                                     string(.) = $values
                             )"/>
@@ -1585,7 +1585,7 @@
                             xxf:is-blank() or (
                                 let $values :=
                                     if (empty(@fr:itemsetid)) then
-                                        instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
+                                        instance('fr-form-resources')/resource[1]/{$itemset-resource-name}/item/value/string()
                                     else
                                         id(@fr:itemsetid)[1]/choices[1]/item/value/string()
                                 return
@@ -1602,7 +1602,7 @@
                         value="
                             xxf:is-blank() or (
                                 let $values :=
-                                    instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
+                                    instance('fr-form-resources')/resource[1]/{$itemset-resource-name}/item/value/string()
                                 return
                                     (every $v in xxf:split(string(.)) satisfies $v = $values)
                             )"/>

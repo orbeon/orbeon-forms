@@ -14,19 +14,21 @@
 package org.orbeon.oxf.http
 
 import org.apache.http.auth.*
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.*
-import org.apache.http.client.protocol.{ClientContext, RequestAcceptEncoding, ResponseContentEncoding}
+import org.apache.http.client.protocol.{HttpClientContext, RequestAcceptEncoding, ResponseContentEncoding}
 import org.apache.http.client.{CookieStore, CredentialsProvider}
-import org.apache.http.conn.ClientConnectionManager
+import org.apache.http.config.RegistryBuilder
+import org.apache.http.conn.HttpClientConnectionManager
 import org.apache.http.conn.routing.{HttpRoute, HttpRoutePlanner}
-import org.apache.http.conn.scheme.{PlainSocketFactory, Scheme, SchemeRegistry}
-import org.apache.http.conn.ssl.SSLSocketFactory
+import org.apache.http.conn.socket.ConnectionSocketFactory
+import org.apache.http.conn.ssl.{DefaultHostnameVerifier, NoopHostnameVerifier, SSLConnectionSocketFactory}
 import org.apache.http.entity.{ContentType, InputStreamEntity}
 import org.apache.http.impl.auth.{BasicScheme, NTLMScheme}
-import org.apache.http.impl.client.{BasicCredentialsProvider, DefaultHttpClient}
-import org.apache.http.impl.conn.PoolingClientConnectionManager
-import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
-import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
+import org.apache.http.impl.client.{BasicCredentialsProvider, HttpClientBuilder}
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
+import org.apache.http.protocol.{BasicHttpContext, HttpContext, HttpCoreContext}
+import org.apache.http.ssl.SSLContexts
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException as _, *}
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
@@ -44,7 +46,7 @@ import javax.net.ssl.SSLContext
 abstract class ApacheHttpClient(settings: HttpClientSettings)
   extends HttpClient[CookieStore] {
 
-  import Private._
+  import Private.*
 
   def createURL(urlString: String): URL
 
@@ -60,48 +62,59 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
     connectionCtx: Option[ConnectionContextSupport.ConnectionContext] // unused for external HTTP connections
   ): org.orbeon.oxf.http.HttpResponse = {
 
-    val uri = URI.create(url)
+    val uri               = URI.create(url)
+    val httpContext       = new BasicHttpContext
+    val httpClientBuilder = HttpClientBuilder.create()
 
-    val httpClient  = new DefaultHttpClient(connectionManager, newHttpParams)
-    val httpContext = new BasicHttpContext
+    locally {
+      val requestConfig = RequestConfig.custom()
+          .setSocketTimeout(settings.soTimeout)
+          .build()
+      httpClientBuilder
+        .setConnectionManager(connectionManager)
+        .setDefaultRequestConfig(requestConfig)
 
-    newProxyAuthState foreach
-      (httpContext.setAttribute(ClientContext.PROXY_AUTH_STATE, _)) // Set proxy and host authentication
+      // Handle deflate/gzip transparently
+      httpClientBuilder.addInterceptorFirst(new RequestAcceptEncoding)
+      httpClientBuilder.addInterceptorLast(new ResponseContentEncoding)
 
-    // Handle deflate/gzip transparently
-    httpClient.addRequestInterceptor(new RequestAcceptEncoding)
-    httpClient.addResponseInterceptor(new ResponseContentEncoding)
+      // Assign route planner for dynamic exclusion of hostnames from proxying
+      routePlanner.foreach(httpClientBuilder.setRoutePlanner)
 
-    // Assign route planner for dynamic exclusion of hostnames from proxying
-    routePlanner foreach
-      httpClient.setRoutePlanner
 
-    credentials foreach { actualCredentials =>
+      newProxyAuthState foreach
+        (httpContext.setAttribute(HttpClientContext.PROXY_AUTH_STATE, _)) // Set proxy and host authentication
 
-      // Make authentication preemptive when needed. Interceptor is added first, as the Authentication header
-      // is added by HttpClient's RequestTargetAuthentication which is itself an interceptor, so our
-      // interceptor needs to run before RequestTargetAuthentication, otherwise RequestTargetAuthentication
-      // won't find the appropriate AuthState/AuthScheme/Credentials in the HttpContext.
+      credentials foreach { actualCredentials =>
 
-      if (actualCredentials.preemptiveAuth)
-        httpClient.addRequestInterceptor(PreemptiveAuthHttpRequestInterceptor, 0)
+        // Make authentication preemptive when needed. Interceptor is added first, as the Authentication header
+        // is added by HttpClient's RequestTargetAuthentication which is itself an interceptor, so our
+        // interceptor needs to run before RequestTargetAuthentication, otherwise RequestTargetAuthentication
+        // won't find the appropriate AuthState/AuthScheme/Credentials in the HttpContext.
 
-      val credentialsProvider = new BasicCredentialsProvider
-      httpContext.setAttribute(ClientContext.CREDS_PROVIDER, credentialsProvider)
+        if (actualCredentials.preemptiveAuth)
+          httpClientBuilder.addInterceptorFirst(PreemptiveAuthHttpRequestInterceptor)
 
-      credentialsProvider.setCredentials(
-        new AuthScope(uri.getHost, uri.getPort),
-        actualCredentials match {
-          case BasicCredentials(username, passwordOpt, _, None) =>
-            new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
-          case BasicCredentials(username, passwordOpt, _, Some(domain)) =>
-            new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
-        }
-      )
+        val credentialsProvider = new BasicCredentialsProvider
+        httpContext.setAttribute(HttpClientContext.CREDS_PROVIDER, credentialsProvider)
+
+        credentialsProvider.setCredentials(
+          new AuthScope(uri.getHost, uri.getPort),
+          actualCredentials match {
+            case BasicCredentials(username, passwordOpt, _, None) =>
+              new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
+            case BasicCredentials(username, passwordOpt, _, Some(domain)) =>
+              new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
+          }
+        )
+      }
+
+      // Set the cookie store
+      httpClientBuilder.setDefaultCookieStore(cookieStore)
+
     }
 
-    httpClient.setCookieStore(cookieStore)
-
+    val httpClient    = httpClientBuilder.build()
     val requestMethod =
       method match {
         case GET     => new HttpGet(uri)
@@ -195,16 +208,14 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
     connectionManager.shutdown()
   }
 
-  def usingProxy: Boolean = proxyHost.isDefined
-
   private object Private {
 
-    val Logger = LoggerFactory.getLogger(List("org", "orbeon", "http") mkString ".") // so JARJAR doesn't touch this!
+    private val Logger = LoggerFactory.getLogger(List("org", "orbeon", "http") mkString ".") // so Jar Jar doesn't touch this!
 
-    import scala.concurrent.duration._
+    import scala.concurrent.duration.*
 
     class IdleConnectionMonitorThread(
-      manager              : ClientConnectionManager,
+      manager              : HttpClientConnectionManager,
       pollingDelay         : FiniteDuration,        // for example  5.seconds
       idleConnectionsDelay : Option[FiniteDuration] // for example 30.seconds
     ) extends Thread("Orbeon HTTP connection monitor") {
@@ -252,21 +263,16 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
       }
     }
 
-    // BasicHttpParams is not thread-safe per the doc
-    def newHttpParams =
-      new BasicHttpParams |!>
-      (HttpConnectionParams.setStaleCheckingEnabled(_, settings.staleCheckingEnabled)) |!>
-      (HttpConnectionParams.setSoTimeout(_, settings.soTimeout))
-
     // It seems that credentials and state are not thread-safe, so create every time
-    def newProxyAuthState = proxyCredentials map {
-      case c: NTCredentials               => new AuthState |!> (_.update(new NTLMScheme, c))
-      case c: UsernamePasswordCredentials => new AuthState |!> (_.update(new BasicScheme, c))
-      case _                              => throw new IllegalStateException
-    }
+    def newProxyAuthState: Option[AuthState] =
+      proxyCredentials map {
+        case c: NTCredentials               => new AuthState |!> (_.update(new NTLMScheme, c))
+        case c: UsernamePasswordCredentials => new AuthState |!> (_.update(new BasicScheme, c))
+        case _                              => throw new IllegalStateException
+      }
 
     // The single ConnectionManager
-    val connectionManager: PoolingClientConnectionManager = {
+    val connectionManager: PoolingHttpClientConnectionManager = {
 
       // Create SSL context, based on a custom key store if specified
       val keyStore =
@@ -289,23 +295,19 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
 
       // Create SSL hostname verifier
       val hostnameVerifier = settings.sslHostnameVerifier match {
-        case "browser-compatible" => SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
-        case "allow-all"          => SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
-        case _                    => SSLSocketFactory.STRICT_HOSTNAME_VERIFIER
+        case "browser-compatible" => new DefaultHostnameVerifier()
+        case "allow-all"          => NoopHostnameVerifier.INSTANCE
+        case _                    => new DefaultHostnameVerifier()
       }
 
-      // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
-      val schemeRegistry = new SchemeRegistry
-      schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
-
+      // Create SSL socket factory
       val sslSocketFactory = keyStore match {
-        case Some(keyStore) =>
+        case Some((store, password)) =>
           // Calling full constructor
-          new SSLSocketFactory(
-            SSLSocketFactory.TLS,
-            keyStore._1,
-            keyStore._2,
-            null,
+          new SSLConnectionSocketFactory(
+            SSLContexts.custom()
+              .loadKeyMaterial(store, password.toCharArray)
+              .build(),
             null,
             null,
             hostnameVerifier
@@ -319,18 +321,29 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
           // (The actual implementation will be as specified in Customizing the Default Key and Trust
           // Managers.) If no such system property is specified, then the keystore managed by the KeyManager
           // will be a new empty keystore."
-          new SSLSocketFactory(SSLContext.getInstance("Default"), hostnameVerifier)
+          new SSLConnectionSocketFactory(
+            SSLContext.getInstance("Default"),
+            null,
+            null,
+            hostnameVerifier
+          )
       }
 
-      schemeRegistry.register(new Scheme("https", 443, sslSocketFactory))
+      // Create registry for connection socket factories
+      val registry = RegistryBuilder.create[ConnectionSocketFactory]()
+        .register("https", sslSocketFactory)
+        .build()
 
       // Pooling connection manager with limits removed
-      new PoolingClientConnectionManager(schemeRegistry) |!>
-        (_.setMaxTotal(Integer.MAX_VALUE))               |!>
-        (_.setDefaultMaxPerRoute(Integer.MAX_VALUE))
+      new PoolingHttpClientConnectionManager(registry) |!>
+        (_.setMaxTotal(Integer.MAX_VALUE))             |!>
+        (_.setDefaultMaxPerRoute(Integer.MAX_VALUE))   |!>
+        // We used to always check for stale connections, which is now deprecated
+        // Use 200 ms, overriding the default of 2 seconds, per https://stackoverflow.com/a/49734118/5295
+        (_.setValidateAfterInactivity(200))
     }
 
-    val (proxyHost, proxyExclude, proxyCredentials) = {
+    private val (proxyHost, proxyExclude, proxyCredentials) = {
       // Set proxy if defined in properties
       (settings.proxyHost, settings.proxyPort) match {
         case (Some(proxyHost), Some(proxyPort)) =>
@@ -358,15 +371,12 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
       }
     }
 
-    val routePlanner = proxyHost map { proxyHost =>
-      new HttpRoutePlanner {
-        def determineRoute(target: HttpHost, request: HttpRequest, context: HttpContext) =
-          proxyExclude match {
-            case Some(proxyExclude) if (target ne null) && target.getHostName.matches(proxyExclude) =>
-              new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName))
-            case _ =>
-              new HttpRoute(target, null, proxyHost, "https".equalsIgnoreCase(target.getSchemeName))
-          }
+    val routePlanner: Option[HttpRoutePlanner] = proxyHost map { proxyHost =>
+      (target: HttpHost, _: HttpRequest, _: HttpContext) => proxyExclude match {
+        case Some(proxyExclude) if (target ne null) && target.getHostName.matches(proxyExclude) =>
+          new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName))
+        case _ =>
+          new HttpRoute(target, null, proxyHost, "https".equalsIgnoreCase(target.getSchemeName))
       }
     }
 
@@ -379,16 +389,16 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
         ) |!> (_.start())
       }
 
-    // The Apache folks are afraid we misuse preemptive authentication, and so force us to copy paste some code
+    // The Apache folks are afraid we misuse preemptive authentication, and so force us to copy and paste some code
     // rather than providing a simple configuration flag. See:
     // http://hc.apache.org/httpcomponents-client-ga/tutorial/html/authentication.html#d4e950
 
     object PreemptiveAuthHttpRequestInterceptor extends HttpRequestInterceptor {
       def process(request: HttpRequest, context: HttpContext): Unit = {
 
-        val authState           = context.getAttribute(ClientContext.TARGET_AUTH_STATE).asInstanceOf[AuthState]
-        val credentialsProvider = context.getAttribute(ClientContext.CREDS_PROVIDER).asInstanceOf[CredentialsProvider]
-        val targetHost          = context.getAttribute(ExecutionContext.HTTP_TARGET_HOST).asInstanceOf[HttpHost]
+        val authState           = context.getAttribute(HttpClientContext.TARGET_AUTH_STATE).asInstanceOf[AuthState]
+        val credentialsProvider = context.getAttribute(HttpClientContext.CREDS_PROVIDER).asInstanceOf[CredentialsProvider]
+        val targetHost          = context.getAttribute(HttpCoreContext.HTTP_TARGET_HOST).asInstanceOf[HttpHost]
 
         // If not auth scheme has been initialized yet
         if (authState.getAuthScheme eq null) {

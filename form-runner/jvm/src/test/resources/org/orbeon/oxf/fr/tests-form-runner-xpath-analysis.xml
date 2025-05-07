@@ -160,5 +160,93 @@
 
         </output>
     </test>
-
+    <test description="#7000: Add dependency support for `fr:app-name()`, etc." name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model
+                         xxf:xpath-analysis="true"
+                         id="m"
+                         xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                        <xf:instance id="fr-parameters-instance">
+                            <_/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-mode"        value="fr:mode()"/>
+                    <xf:output id="my-app-name"    value="fr:app-name()"/>
+                    <xf:output id="my-form-name"   value="fr:form-name()"/>
+                    <xf:output id="my-document-id" value="fr:document-id()"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="fr-parameters-instance" analyzed-binds="true">
+                    <instance scope="" prefixed-id="fr-parameters-instance" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="my-mode" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:mode())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-parameters-instance')/mode</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-parameters-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-app-name" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:app-name())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-parameters-instance')/app</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-parameters-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-form-name" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:form-name())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-parameters-instance')/form</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-parameters-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-document-id" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:document-id())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-parameters-instance')/document</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-parameters-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
 </group>

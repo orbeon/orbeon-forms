@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.function
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -36,9 +36,10 @@ import org.orbeon.saxon.`type`.Type.ITEM_TYPE
 import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.StaticProperty.*
-import org.orbeon.saxon.function.{AncestorOrganizations, Property, UserOrganizations, UserRoles}
+import org.orbeon.saxon.function.{AddToPathMap, AncestorOrganizations, Property, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.*
+import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.*
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits.*
@@ -81,6 +82,12 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     } locally {
       Fun(name, classOf[DateTimeFunction], index, 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
     }
+
+    // Form runner parameter functions
+    Fun("mode",                        classOf[FRMode],                 op = 0, min = 0, STRING, EXACTLY_ONE)
+    Fun("app-name",                    classOf[FRAppName],              op = 0, min = 0, STRING, EXACTLY_ONE)
+    Fun("form-name",                   classOf[FRFormName],             op = 0, min = 0, STRING, EXACTLY_ONE)
+    Fun("document-id",                 classOf[FRDocumentId],           op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
 
     // Other functions
     Fun("user-roles",                  classOf[UserRoles],             op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
@@ -164,10 +171,6 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 private object FormRunnerFunctions {
 
   val StringGettersByName: Seq[(String, () => Option[String])] = List(
-    "mode"                        -> (() => FormRunnerParamsOpt().map(_.mode)),
-    "app-name"                    -> (() => Some(FormRunnerParams().app)),
-    "form-name"                   -> (() => Some(FormRunnerParams().form)),
-    "document-id"                 -> (() => FormRunnerParams().document),
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata),
     "lang"                        -> (() => Some(FormRunner.currentLang)),
     "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage),
@@ -485,5 +488,60 @@ private object FormRunnerFunctions {
         )
       }
     }
+  }
+
+  trait FRParamsFunction extends FunctionSupport with RuntimeDependentFunction {
+    val elemName: String
+    def fromParams(params: FormRunnerParams): Option[String]
+
+    override def evaluateItem(context: XPathContext): StringValue =
+      FormRunnerParamsOpt().flatMap(fromParams)
+
+    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
+
+      def newInstanceExpression: Instance = {
+        val instanceExpression = new Instance
+
+        instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
+        instanceExpression.setArguments(Array(new StringLiteral("fr-parameters-instance")))
+
+        instanceExpression.setContainer(getContainer)
+
+        instanceExpression
+      }
+
+      new AxisExpression(
+        Axis.CHILD,
+        new NameTest(Type.ELEMENT, "", elemName, getExecutable.getConfiguration.getNamePool)
+      )
+      .addToPathMap(
+        pathMap,
+        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
+      )
+      .setAtomized()
+
+
+      null
+    }
+  }
+
+  class FRMode extends FRParamsFunction {
+    override val elemName: String = "mode"
+    override def fromParams(params: FormRunnerParams): Option[String] = Some(params.mode)
+  }
+
+  class FRAppName extends FRParamsFunction {
+    override val elemName: String = "app"
+    override def fromParams(params: FormRunnerParams): Option[String] = Some(params.app)
+  }
+
+  class FRFormName extends FRParamsFunction {
+    override val elemName: String = "form"
+    override def fromParams(params: FormRunnerParams): Option[String] = Some(params.form)
+  }
+
+  class FRDocumentId extends FRParamsFunction {
+    override val elemName: String = "document"
+    override def fromParams(params: FormRunnerParams): Option[String] = params.document
   }
 }

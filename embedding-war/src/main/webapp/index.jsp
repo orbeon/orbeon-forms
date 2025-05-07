@@ -1,6 +1,12 @@
 <%@ page pageEncoding="utf-8" contentType="text/html; charset=UTF-8" import="org.orbeon.oxf.fr.embedding.servlet.API" %>
+<%@ page import="java.util.Objects" %>
+<%@ page import="java.util.stream.Collectors" %>
 <!DOCTYPE HTML>
 <%
+    // Where Orbeon Forms is deployed (used by JS API and Angular/React components). Use orbeon-forms-context context
+    // parameter from web.xml if available, use /orbeon by default if not.
+    String orbeonFormsContext = Objects.requireNonNullElse(application.getInitParameter("orbeon-forms-context"), "/orbeon");
+
     String ApiCookieName = "orbeon-embedding-api";
     Cookie[] cookies     = request.getCookies();
     String embeddingApi  = "java";
@@ -10,6 +16,7 @@
             if (cookie.getName().equals(ApiCookieName))
                 embeddingApi = cookie.getValue();
         }
+
     boolean isEmbeddingApiJava    = embeddingApi.equals("java");
     boolean isEmbeddingApiJS      = embeddingApi.equals("js");
     boolean isEmbeddingApiAngular = embeddingApi.equals("angular");
@@ -95,7 +102,7 @@
         window.addEventListener('DOMContentLoaded', function() {
             ORBEON.fr.API.embedForm(
                 document.getElementById("my-form"),
-                "/orbeon",
+                "<%= orbeonFormsContext %>",
                 "orbeon",
                 "<%= selectedForm %>",
                 "new"
@@ -113,7 +120,7 @@
             app          : "orbeon",
             form         : "<%= selectedForm %>",
             mode         : "new",
-            orbeonContext: "/orbeon"
+            orbeonContext: "<%= orbeonFormsContext %>"
         };
 
         window.addEventListener('DOMContentLoaded', function() {
@@ -126,7 +133,7 @@
             app          : "orbeon",
             form         : "<%= selectedForm %>",
             mode         : "new",
-            orbeonContext: "/orbeon"
+            orbeonContext: "<%= orbeonFormsContext %>"
         };
 
         window.addEventListener('DOMContentLoaded', function() {

@@ -278,33 +278,55 @@ object BindingDescriptor {
   )(implicit
     index            : BindingIndex[BindingDescriptor]
   ): (QName, Option[String]) = {
-    for {
-      // Find descriptor as would be found at form compilation time, except with `Equal`/`Token` attribute predicates
-      // only.
-      descriptor                                          <-  findMostSpecificBindingUseEqualOrToken(searchElemName, DatatypeMatch.Exclude, searchAtts)
-      _ = assert(descriptor.datatype.isEmpty)
-      // See comments in https://github.com/orbeon/orbeon-forms/issues/2479
-      if descriptor.attOpt.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding
-      relatedDescriptors                                  = findRelatedDescriptors(descriptor).filterNot(_ == descriptor)
-      BindingDescriptor(elemNameOpt, _, appearanceOpt, _) <- findRelatedVaryNameAndAppearance(searchDatatype, searchAtts, relatedDescriptors)
-      elemName                                            <- elemNameOpt
-    } yield
+
+    val mostSpecificDescriptorOpt =
+      findMostSpecificBindingUseEqualOrToken(searchElemName, DatatypeMatch.Exclude, searchAtts)
+
+    def fromRelatedDescriptors: Option[(QName, Option[String])] =
+      for {
+        // Find descriptor as would be found at form compilation time, except with `Equal`/`Token` attribute predicates
+        // only.
+        descriptor <- mostSpecificDescriptorOpt
+        _ = assert(descriptor.datatype.isEmpty)
+        // See comments in https://github.com/orbeon/orbeon-forms/issues/2479
+        if descriptor.attOpt.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding
+        relatedDescriptors = findRelatedDescriptors(descriptor).filterNot(_ == descriptor)
+        BindingDescriptor(elemNameOpt, _, appearanceOpt, _) <- findRelatedVaryNameAndAppearance(searchDatatype, searchAtts, relatedDescriptors)
+        elemName <- elemNameOpt
+      } yield
+        (
+          elemName,
+          appearanceOpt.collect {
+            case AttributePredicate.Equal(value) => value
+            case AttributePredicate.Token(value) => value
+          }
+        )
+
+    def fromMostSpecificDescriptor: Option[(QName, Option[String])] =
+      for {
+        descriptor <- mostSpecificDescriptorOpt
+        elemName   <- descriptor.elementName
+      } yield
+        (
+          elemName,
+          descriptor.appearanceOpt.collect {
+            case AttributePredicate.Equal(value) => value
+            case AttributePredicate.Token(value) => value
+          }
+        )
+
+    def fromSearchParams: (QName, Option[String]) =
       (
-        elemName,
-        appearanceOpt.collect {
-          case AttributePredicate.Equal(value) => value
-          case AttributePredicate.Token(value) => value
-        }
+        searchElemName,
+        searchAtts
+          .collectFirst { case (APPEARANCE_QNAME, appearance) => appearance.tokenizeToSet.headOption }
+          .flatten
       )
+
+    fromRelatedDescriptors
+      .orElse(fromMostSpecificDescriptor)
+      .getOrElse(fromSearchParams)
   }
-  .getOrElse(
-    (
-      searchElemName,
-      searchAtts
-        .collectFirst { case (APPEARANCE_QNAME, appearance) => appearance.tokenizeToSet.headOption }
-        .flatten
-    )
-  )
 
   // Example: `fr|number`, `xf|textarea`
   def directBindingPF(

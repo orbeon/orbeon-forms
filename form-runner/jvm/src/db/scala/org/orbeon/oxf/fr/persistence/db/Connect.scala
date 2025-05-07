@@ -156,6 +156,19 @@ object Connect {
     }
   }
 
+  // For `TABLESPACE` and `BUFFERPOOL`, Db2 does not support `IF EXISTS` in the `DROP` statement
+  private def db2DropIfExists(
+    connection    : Connection,
+    dropStatement : String
+  ): Unit = {
+    try {
+      runStatements(connection, List(dropStatement))
+    } catch {
+      case e: java.sql.SQLException if e.getSQLState == "42704" => // NOP
+      case e: Exception                                         => throw e
+    }
+  }
+
   def getTableNames(provider: Provider, connection: Connection): List[String] = {
     val query = provider match {
       case MySQL =>

@@ -17,6 +17,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -346,6 +347,33 @@
             ]//xf:action/@*:event[. = 'xforms-ready']"
         mode="within-model">
         <xsl:attribute name="fb:{local-name()}" select="'fr-run-form-load-action-after-controls'"/>
+    </xsl:template>
+
+    <!-- Fix regression in 2024.1.1, see https://github.com/orbeon/orbeon-forms/issues/6959 -->
+    <xsl:template
+        match="
+            xf:model/xf:action[
+                ends-with(@id, '-binding')
+            ]/xf:action[
+                p:split(@*:event) =
+                ('xforms-value-changed', 'xforms-enabled', 'xforms-disabled', 'DOMActivate')
+            ]/@ev:observer[not(ends-with(., '-control'))]"
+        mode="within-model">
+        <xsl:attribute name="ev:observer" select="concat(., '-control')"/>
+    </xsl:template>
+    <xsl:template
+        match="
+            xf:model/xf:action[
+                ends-with(@id, '-binding')
+            ]//xf:action[
+                p:has-class('fr-set-service-value-action') or
+                p:has-class('fr-set-control-value-action')
+            ]/xf:var[
+                @name = 'control-name' and
+                not(starts-with(@value, '''') and ends-with(@value, ''''))
+            ]/@value"
+        mode="within-model">
+        <xsl:attribute name="value" select="concat('''', ., '''')"/>
     </xsl:template>
 
     <!-- Remove service instances, comment, and newlines in the middle -->

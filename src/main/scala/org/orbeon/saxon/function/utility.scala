@@ -24,29 +24,29 @@ import org.orbeon.scaxon.Implicits.*
 
 
 
-class IsBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class IsBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing with AddToPathMap {
   override def evaluateItem(context: XPathContext): BooleanValue =
     ! (stringArgumentOrContextOpt(0)(context) exists (_.trimAllToEmpty.nonEmpty))
 }
 
-class NonBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class NonBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing with AddToPathMap {
   override def evaluateItem(context: XPathContext): BooleanValue =
     stringArgumentOrContextOpt(0)(context) exists (_.trimAllToEmpty.nonEmpty)
 }
 
-class Split extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class Split extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing with AddToPathMap {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
     val separator = stringArgumentOpt(1)(xpathContext)
     stringArgumentOrContextOpt(0)(xpathContext) map (_.splitTo[List](separator.orNull))
   }
 }
 
-class Trim extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class Trim extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing with AddToPathMap {
   override def evaluateItem(context: XPathContext): StringValue =
     stringArgumentOrContextOpt(0)(context) map (_.trimAllToEmpty)
 }
 
-class EscapeXmlMinimal extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class EscapeXmlMinimal extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing with AddToPathMap {
   override def evaluateItem(context: XPathContext): StringValue =
     stringArgumentOrContextOpt(0)(context) map (_.escapeXmlMinimal)
 }

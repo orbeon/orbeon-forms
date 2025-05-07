@@ -7750,4 +7750,131 @@
         </output>
     </test>
 
+    <test description="#6999: Add dependency support for pure functions" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m">
+                        <xf:instance id="i">
+                            <_>
+                                <value/>
+                            </_>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="xxf-is-blank"           value="xxf:is-blank(value)"/>
+                    <xf:output id="xxf-non-blank"          value="xxf:non-blank(value)"/>
+                    <xf:output id="xxf-split"              value="xxf:split(value)"/>
+                    <xf:output id="xxf-trim"               value="xxf:trim(value)"/>
+                    <xf:output id="xxf-escape-xml-minimal" value="xxf:escape-xml-minimal(value)"/>
+                    <xf:output id="xxf-json-to-xml"        value="xxf:json-to-xml(value)"/>
+                    <xf:output id="xxf-xml-to-json"        value="xxf:xml-to-json(value)"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="xxf-is-blank" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:is-blank(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-non-blank" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:non-blank(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-split" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:split(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-trim" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:trim(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-escape-xml-minimal" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:escape-xml-minimal(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-json-to-xml" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:json-to-xml(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-xml-to-json" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:xml-to-json(value))[1])" analyzed="false"/>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
+
 </group>

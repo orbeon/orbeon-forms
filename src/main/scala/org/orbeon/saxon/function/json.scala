@@ -22,7 +22,7 @@ import org.orbeon.scaxon.Implicits.*
 
 import scala.util.Try
 
-class JsonStringToXml extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class JsonStringToXml extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing with AddToPathMap {
   override def evaluateItem(xpathContext: XPathContext): DocumentInfo = {
     val stringOpt   = stringArgumentOrContextOpt(0)(xpathContext)
     val documentOpt = stringOpt.flatMap(s => Try(Converter.jsonStringToXmlDoc(s)).toOption)
@@ -30,7 +30,7 @@ class JsonStringToXml extends DefaultFunctionSupport with DependsOnContextItemIf
   }
 }
 
-class XmlToJsonString extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+class XmlToJsonString extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     itemArgumentOrContextOpt(0)(xpathContext) map (i => Converter.xmlToJsonString(i.asInstanceOf[NodeInfo], strict = false))
 }

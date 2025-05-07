@@ -21,7 +21,7 @@ import org.apache.http.client.{CookieStore, CredentialsProvider}
 import org.apache.http.config.RegistryBuilder
 import org.apache.http.conn.HttpClientConnectionManager
 import org.apache.http.conn.routing.{HttpRoute, HttpRoutePlanner}
-import org.apache.http.conn.socket.ConnectionSocketFactory
+import org.apache.http.conn.socket.{ConnectionSocketFactory, PlainConnectionSocketFactory}
 import org.apache.http.conn.ssl.{DefaultHostnameVerifier, NoopHostnameVerifier, SSLConnectionSocketFactory}
 import org.apache.http.entity.{ContentType, InputStreamEntity}
 import org.apache.http.impl.auth.{BasicScheme, NTLMScheme}
@@ -331,6 +331,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
 
       // Create registry for connection socket factories
       val registry = RegistryBuilder.create[ConnectionSocketFactory]()
+        .register("http" , PlainConnectionSocketFactory.getSocketFactory)
         .register("https", sslSocketFactory)
         .build()
 

@@ -13,25 +13,41 @@
  */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.oxf.util.PathUtils.*
 import cats.data.NonEmptyList
+import org.orbeon.oxf.util.PathUtils.*
 
 import java.io.BufferedReader
-import java.net.URI
 import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 
 object HttpServletRequest {
-  def fromAnyRef(httpServletRequest: AnyRef): HttpServletRequest =
-    httpServletRequest match {
-      case httpServletRequest: javax.servlet.http.HttpServletRequest   =>
-        HttpServletRequest(httpServletRequest)
-      case httpServletRequest: jakarta.servlet.http.HttpServletRequest =>
-        HttpServletRequest(httpServletRequest)
-      case _ =>
-        throw new IllegalArgumentException(s"Unsupported HTTP servlet request: ${httpServletRequest.getClass.getName}")
+  def fromAnyRef(httpServletRequest: AnyRef): HttpServletRequest = {
+
+    // Use try/catch instead of Try as NoClassDefFoundError/ClassNotFoundException are *not* NonFatal exceptions
+
+    def fromJavax(): Option[HttpServletRequest] = try {
+      httpServletRequest match {
+        case httpServletRequest: javax.servlet.http.HttpServletRequest => Some(HttpServletRequest(httpServletRequest))
+        case _                                                         => None
+      }
+    } catch {
+      case _: Throwable                                                => None
     }
+
+    def fromJakarta(): Option[HttpServletRequest] = try {
+      httpServletRequest match {
+        case httpServletRequest: jakarta.servlet.http.HttpServletRequest => Some(HttpServletRequest(httpServletRequest))
+        case _                                                           => None
+      }
+    } catch {
+      case _: Throwable                                                  => None
+    }
+
+    fromJavax() orElse fromJakarta() getOrElse  {
+      throw new IllegalArgumentException(s"Unsupported HTTP servlet request: ${httpServletRequest.getClass.getName}")
+    }
+  }
 
   def apply(httpServletRequest: javax.servlet.http.HttpServletRequest): JavaxHttpServletRequest     = new JavaxHttpServletRequest(httpServletRequest)
   def apply(httpServletRequest: jakarta.servlet.http.HttpServletRequest): JakartaHttpServletRequest = new JakartaHttpServletRequest(httpServletRequest)

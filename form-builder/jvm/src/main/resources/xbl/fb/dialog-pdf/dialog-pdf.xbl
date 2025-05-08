@@ -153,6 +153,7 @@
                     <xh:div><!-- TODO: needed element? -->
 
                         <fr:grid id="pdfs-grid" bind="pdfs-bind" repeat="content" min="1" template="instance('pdf-template')"
+                             iteration-name="pdf"
                              apply-defaults="true"
                              fb:initial-iterations="first">
                             <fr:c x="1" y="1" w="6">

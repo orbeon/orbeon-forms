@@ -37,7 +37,7 @@
         <xsl:variable name="bind-id-opt" as="xs:string?" select="@bind"/>
 
         <xsl:copy>
-            <xsl:if test="frf:isRepeat(.) and exists($bind-id-opt)">
+            <xsl:if test="frf:isRepeat(.) and empty(@iteration-name) and exists($bind-id-opt)">
                 <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">
                     <xsl:attribute name="iteration-name" select="."/>
                 </xsl:for-each>
@@ -115,7 +115,7 @@
 
         <xsl:copy>
 
-            <xsl:if test="frf:isRepeat(.) and exists($bind-id-opt)">
+            <xsl:if test="frf:isRepeat(.) and empty(@iteration-name) and exists($bind-id-opt)">
                 <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">
                     <xsl:attribute name="iteration-name" select="."/>
                 </xsl:for-each>

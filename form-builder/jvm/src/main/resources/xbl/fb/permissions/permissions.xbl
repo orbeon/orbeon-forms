@@ -231,6 +231,7 @@
                                 repeat="content"
                                 bind="permissions-bind"
                                 template="instance('permission-with-role-template')"
+                                iteration-name="permission"
                                 freeze="{
                                     2 +                                                     (: Anyone, Any authenticated user :)
                                     (if ($show-token-permissions)       then 1 else 0) +    (: Maybe token :)

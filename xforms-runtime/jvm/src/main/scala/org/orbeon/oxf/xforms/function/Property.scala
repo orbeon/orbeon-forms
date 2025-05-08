@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.function
 
 import java.util as ju
-
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.function.AddToPathMap
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.scaxon.Implicits.*
@@ -40,7 +40,7 @@ private object Property {
   val ConformanceLevelProperty = "conformance-level"
 }
 
-class Property extends XFormsFunction with RuntimeDependentFunction {
+class Property extends XFormsFunction with RuntimeDependentFunction with AddToPathMap {
 
   import Property._
 

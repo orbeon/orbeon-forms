@@ -2,8 +2,8 @@
 
 set -e
 
-ENV WILDFLY_HOME=/opt/jboss/wildfly
-ENV DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
+WILDFLY_HOME=/opt/jboss/wildfly
+DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
 
 if [ "$EMBEDDING_WAR" = "1" ] || [ "${EMBEDDING_WAR,,}" = "true" ]; then
     if [ -f /docker-entrypoint-wildfly.d/orbeon-embedding.war ]; then

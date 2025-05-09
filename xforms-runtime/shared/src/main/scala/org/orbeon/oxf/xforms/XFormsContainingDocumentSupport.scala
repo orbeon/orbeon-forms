@@ -94,13 +94,18 @@ object XFormsContainingDocumentSupport {
         XFormsStateManager.beforeUpdate(params, disableDocumentCache = false) match {
           case some @ Some(containingDocument) =>
             try {
-              var keepDocument = false
+              def afterUpdate(keepDocument: Boolean): Unit =
+                XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
               try {
                 val result = block(some)
-                keepDocument = true
+                afterUpdate(keepDocument = true)
                 Success(result)
-              } finally {
-                XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
+              } catch {
+                // On failure, remove document from the session unless caused by an unexpected sequence number
+                // For UnexpectedSequenceNumberException, we keep the document's sequence number unchanged
+                // but still need to call afterUpdate to put the document back in the cache
+                case e: UnexpectedSequenceNumberException => afterUpdate(keepDocument = true) ; Failure(e)
+                case t: Throwable                         => afterUpdate(keepDocument = false); Failure(t)
               }
             } finally {
               XFormsStateManager.releaseDocumentLock(lock)

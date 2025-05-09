@@ -262,9 +262,9 @@ object XFormsServer {
               None
             }
           } else {
-            // This is not allowed to happen
-            // Keep the document around but return an `Failure`
-            Failure(throw new OXFException(s"Got unexpected request sequence number. Expected `$expectedSequenceNumber`, got `${requestParameters.sequenceOpt}`"))
+            // Invalid sequence number: keep the document around but return a `Failure`
+            val actualSequence = requestParameters.sequenceOpt
+            Failure(throw new UnexpectedSequenceNumberException(expectedSequenceNumber, actualSequence))
           }
         case None =>
           // This is most likely the case of a retry if the initial request was long-running

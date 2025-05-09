@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.*
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
@@ -23,7 +24,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, bi
 import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils}
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, SecureUtils}
 
 import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
@@ -141,6 +142,15 @@ trait Read {
       // Also provide this with in ISO format with millisecond precision for compatibility with Search and History APIs
       httpResponse.setHeader(Headers.OrbeonCreated,      DateUtils.formatIsoDateTimeUtc(fromDatabase.createdDateTime))
       httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime))
+      if (req.forDataNotAttachment) {
+        fromDatabase.idOpt.foreach { id =>
+          val tableName  = SqlSupport.tableName(req)
+          val etagPlain  = s"$tableName:$id"
+          val etagHashed = SecureUtils.hmacStringToHexShort(SecureUtils.KeyUsage.General, etagPlain)
+          httpResponse.setHeader(Headers.ETag, etagHashed)
+        }
+      }
+
       if (!req.forAttachment)
         httpResponse.setHeader(Headers.ContentType,      ContentTypes.XmlContentType)
 
@@ -176,6 +186,7 @@ trait Read {
 
   // Holds the data we will read from the database
   private case class FromDatabase(
+   idOpt               : Option[Int],
    dataUserOpt         : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
    lastModifiedByOpt   : Option[UserAndGroup],
    formVersion         : Int,
@@ -245,23 +256,25 @@ trait Read {
           s"""|SELECT  t.last_modified_time, t.created, t.last_modified_by
               |        $body
               |        $totalAttachmentSize
-              |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
-              |        ${if (hasStage)          ", t.stage"                                    else ""}
+              |        ${if (req.forDataNotAttachment) ", t.id" else ""}
+              |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
+              |        ${if (hasStage)                 ", t.stage"                                    else ""}
               |        , t.form_version, t.deleted
               |FROM    $table t
               |WHERE   t.app  = ?
               |        and t.form = ?
               |        and t.last_modified_time = ?
-              |        ${if (req.forForm)       "and t.form_version = ?"                else ""}
-              |        ${if (req.forData)       "and t.document_id = ? and t.draft = ?" else ""}
-              |        ${if (req.forAttachment) "and t.file_name = ?"                   else ""}
+              |        ${if (req.forForm)       "and t.form_version = ?"                              else ""}
+              |        ${if (req.forData)       "and t.document_id = ? and t.draft = ?"               else ""}
+              |        ${if (req.forAttachment) "and t.file_name = ?"                                 else ""}
               |""".stripMargin
         case None =>
           s"""|SELECT  t.last_modified_time, t.created, t.last_modified_by
               |        $body
               |        $totalAttachmentSize
-              |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
-              |        ${if (hasStage)          ", t.stage"                                    else ""}
+              |        ${if (req.forDataNotAttachment) ", t.id" else ""}
+              |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
+              |        ${if (hasStage)                 ", t.stage"                                    else ""}
               |        , t.form_version, t.deleted
               |FROM    $table t,
               |        (
@@ -269,9 +282,9 @@ trait Read {
               |              FROM   $table
               |             WHERE   app  = ?
               |                     and form = ?
-              |                     ${if (req.forForm)       "and form_version = ?"              else ""}
-              |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
-              |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
+              |                     ${if (req.forForm)       "and form_version = ?"                   else ""}
+              |                     ${if (req.forData)       "and document_id = ? and draft = ?"      else ""}
+              |                     ${if (req.forAttachment) "and file_name = ?"                      else ""}
               |            GROUP BY ${idCols.mkString(", ")}
               |        ) m
               |WHERE   ${SqlSupport.joinColumns(maxColumn +: idCols, "t", "m")}
@@ -338,6 +351,7 @@ trait Read {
           }
 
           FromDatabase(
+            idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
             dataUserOpt          = dataUser,
             lastModifiedByOpt    = lastModifiedByOpt,
             formVersion          = dbFormVersion,

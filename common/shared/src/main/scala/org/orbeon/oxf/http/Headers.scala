@@ -53,6 +53,7 @@ object Headers {
   val SOAPAction                   = "SOAPAction"
   val Timeout                      = "Timeout"
   val TimeoutValuePrefix           = "Second-"
+  val ETag                         = "ETag"
 
   val IfModifiedSince              = "If-Modified-Since"
 
@@ -77,6 +78,7 @@ object Headers {
   val AcceptLanguageLower          = AcceptLanguage.toLowerCase
   val CreatedLower                 = Created.toLowerCase
   val TimeoutLower                 = Timeout.toLowerCase
+  val ETagLower                    = ETag.toLowerCase
 
   val GeneralEmbeddedClient         = "embedded"
   val PortletEmbeddingClient        = "portlet"

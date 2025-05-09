@@ -29,7 +29,13 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && rm -rf $DEPLOYMENT_DIR/* \
     && mkdir -p $DEPLOYMENT_DIR/orbeon.war \
     && mv WEB-INF $DEPLOYMENT_DIR/orbeon.war/ \
-    && mv $basename/orbeon-embedding.war /docker-entrypoint-wildfly.d/
+    && mkdir -p /docker-entrypoint-wildfly.d/orbeon-embedding.war \
+    && mv $basename/orbeon-embedding.war /docker-entrypoint-wildfly.d/orbeon-embedding.war/ \
+    && pushd /docker-entrypoint-wildfly.d/orbeon-embedding.war \
+    && jar xf orbeon-embedding.war \
+    && sed -i 's|<filter-class>org.orbeon.oxf.fr.embedding.servlet.ServletFilter</filter-class>|<filter-class>org.orbeon.oxf.fr.embedding.servlet.JakartaServletFilter</filter-class>|g' /docker-entrypoint-wildfly.d/orbeon-embedding.war/WEB-INF/web.xml \
+    && rm orbeon-embedding.war \
+    && popd
 
 # Enable compression and auto-deployment of exploded WAR files
 COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
@@ -45,6 +51,8 @@ RUN mkdir -p /tmp/orbeon \
 
 # Use jboss user at runtime
 RUN chown -R jboss:jboss $WILDFLY_HOME
+RUN chown -R jboss:jboss /docker-entrypoint-wildfly.d
+RUN chown jboss:jboss /docker-entrypoint-wildfly.sh
 USER jboss
 
 EXPOSE 8080

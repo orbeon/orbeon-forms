@@ -6,7 +6,7 @@ WILDFLY_HOME=/opt/jboss/wildfly
 DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
 
 if [ "$EMBEDDING_WAR" = "1" ] || [ "${EMBEDDING_WAR,,}" = "true" ]; then
-    if [ -f /docker-entrypoint-wildfly.d/orbeon-embedding.war ]; then
+    if [ -e /docker-entrypoint-wildfly.d/orbeon-embedding.war ]; then
         mv /docker-entrypoint-wildfly.d/orbeon-embedding.war $DEPLOYMENT_DIR/
     fi
 fi

@@ -43,14 +43,13 @@ object FormBuilderApp extends App {
     }
 
     builderPrivateDyn.API = FormBuilderPrivateAPI
-
-    // Other initializations
-    BlockCache
   }
 
   def onPageContainsFormsMarkup(): Unit = {
 
     FormRunnerApp.onPageContainsFormsMarkup()
+
+    BlockCache
 
     DialogItemset
     ControlDnD

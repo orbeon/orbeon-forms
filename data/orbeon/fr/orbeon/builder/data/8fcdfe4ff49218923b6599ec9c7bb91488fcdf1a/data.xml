@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xh:head>
+        <xh:title>PTA Payment Authorization/Request for Reimbursement</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <school-section><grid-6><school/><treasurer-email-address/></grid-6></school-section><payee><grid-1><payee-name/><pta-position/><payee-address/><payee-city/><payee-zip/><payee-phone/><payee-email/></grid-1>
+
+                    </payee><expenditure><grid-2><expenditure-for/></grid-2><grid-3><grid-3-iteration><expenditure-description/><expenditure-amount/></grid-3-iteration></grid-3><grid-4><expenditure-total-expense/><expenditure-total-claimed/><expenditure-advance-received>0</expenditure-advance-received><expenditure-reimbursement-claimed>0</expenditure-reimbursement-claimed><expenditure-not-claimed>0</expenditure-not-claimed><expenditure-refund>0</expenditure-refund><attachments/><payee-signature/><chairman-signature/><request-date/></grid-4></expenditure><treasurer><grid-5><treasurer-checks/><treasurer-check-number/><treasurer-category/><treasurer-advanced/><treasurer-expenses/><treasurer-amount-owed-or-due/><president-signature/><secretary-signature/><president-signature-date/><treasurer-date-approved-in-minutes/></grid-5></treasurer>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="school-section-bind" ref="school-section" name="school-section"><xf:bind id="grid-6-bind" ref="grid-6" name="grid-6"><xf:bind id="school-bind" ref="school" name="school" xxf:whitespace="trim" required="true()"/><xf:bind id="treasurer-email-address-bind" ref="treasurer-email-address" name="treasurer-email-address" type="xf:email" xxf:whitespace="trim" required="true()"/></xf:bind></xf:bind><xf:bind id="payee-bind" name="payee" ref="payee"><xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="payee-name-bind" name="payee-name" ref="payee-name" xxf:whitespace="trim" required="true()"/><xf:bind id="payee-address-bind" ref="payee-address" name="payee-address" xxf:whitespace="trim" required="true()"/><xf:bind id="payee-phone-bind" ref="payee-phone" name="payee-phone" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="payee-city-bind" ref="payee-city" name="payee-city" xxf:whitespace="trim" required="true()"/><xf:bind id="pta-position-bind" ref="pta-position" name="pta-position" xxf:whitespace="trim" required="true()"/><xf:bind id="payee-zip-bind" ref="payee-zip" name="payee-zip" type="xs:decimal" required="true()"/><xf:bind id="payee-email-bind" ref="payee-email" name="payee-email" type="xf:email" xxf:whitespace="trim" required="true()"/></xf:bind>
+
+                </xf:bind><xf:bind id="expenditure-bind" ref="expenditure" name="expenditure"><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="expenditure-for-bind" ref="expenditure-for" name="expenditure-for" xxf:whitespace="trim" required="true()"/></xf:bind><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="grid-3-iteration-bind" ref="grid-3-iteration" name="grid-3-iteration"><xf:bind id="expenditure-description-bind" ref="expenditure-description" name="expenditure-description" xxf:whitespace="trim" required="true()"/><xf:bind id="expenditure-amount-bind" ref="expenditure-amount" name="expenditure-amount" type="xs:decimal" required="true()"><xf:constraint id="validation-6-validation" value="xxf:fraction-digits(2)"/><xf:constraint id="validation-7-validation" value="xxf:positive()"/></xf:bind></xf:bind></xf:bind><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="payee-signature-bind" ref="payee-signature" name="payee-signature" type="xs:anyURI" required="true()"/><xf:bind id="request-date-bind" ref="request-date" name="request-date" type="xs:date" required="true()" xxf:default="current-date()"/><xf:bind id="attachments-bind" ref="attachments" name="attachments"/><xf:bind id="expenditure-total-expense-bind" ref="expenditure-total-expense" name="expenditure-total-expense" type="xf:decimal" calculate="sum($expenditure-amount)"><xf:constraint id="validation-12-validation" value="xxf:fraction-digits(2)"/><xf:constraint id="validation-13-validation" value="xxf:non-negative()"/></xf:bind><xf:bind id="expenditure-total-claimed-bind" ref="expenditure-total-claimed" name="expenditure-total-claimed" type="xs:decimal" required="true()"><xf:constraint id="validation-3-validation" value="xxf:fraction-digits(2)"/><xf:constraint id="validation-4-validation" value="xxf:non-negative()"/><xf:constraint id="validation-5-validation" value=". le $expenditure-total-expense"/></xf:bind><xf:bind id="expenditure-advance-received-bind" ref="expenditure-advance-received" name="expenditure-advance-received" type="xf:decimal"><xf:constraint id="validation-8-validation" value="xxf:fraction-digits(2)"/><xf:constraint id="validation-9-validation" value="xxf:non-negative()"/></xf:bind><xf:bind id="expenditure-reimbursement-claimed-bind" ref="expenditure-reimbursement-claimed" name="expenditure-reimbursement-claimed" type="xf:decimal" calculate="$expenditure-total-claimed - $expenditure-advance-received" constraint="xxf:fraction-digits(2)"/><xf:bind id="expenditure-not-claimed-bind" ref="expenditure-not-claimed" name="expenditure-not-claimed" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="expenditure-refund-bind" ref="expenditure-refund" name="expenditure-refund" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="chairman-signature-bind" ref="chairman-signature" name="chairman-signature" type="xf:anyURI"/></xf:bind></xf:bind><xf:bind id="treasurer-bind" ref="treasurer" name="treasurer"><xf:bind id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="treasurer-checks-bind" ref="treasurer-checks" name="treasurer-checks"/><xf:bind id="treasurer-check-number-bind" ref="treasurer-check-number" name="treasurer-check-number" type="xf:decimal"/><xf:bind id="treasurer-category-bind" ref="treasurer-category" name="treasurer-category" xxf:whitespace="trim"/><xf:bind id="treasurer-advanced-bind" ref="treasurer-advanced" name="treasurer-advanced" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="treasurer-expenses-bind" ref="treasurer-expenses" name="treasurer-expenses" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="treasurer-amount-owed-or-due-bind" ref="treasurer-amount-owed-or-due" name="treasurer-amount-owed-or-due" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="secretary-signature-bind" ref="secretary-signature" name="secretary-signature" type="xf:anyURI"/><xf:bind id="treasurer-date-approved-in-minutes-bind" ref="treasurer-date-approved-in-minutes" name="treasurer-date-approved-in-minutes" type="xf:date"/><xf:bind id="president-signature-date-bind" ref="president-signature-date" name="president-signature-date" type="xf:date"/><xf:bind id="president-signature-bind" ref="president-signature" name="president-signature" type="xf:anyURI"/></xf:bind></xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>pta-payment-authorization</form-name>
+                    <title xml:lang="en">PTA Payment Authorization/Request for Reimbursement</title>
+                    <description xml:lang="en" mediatype="text/html">&lt;div&gt;This demo forms shows:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;&lt;li&gt;the use of a PDF template&lt;/li&gt;&lt;li&gt;setting checkboxes in a PDF template&lt;/li&gt;&lt;li&gt;handwritten signatures&lt;/li&gt;&lt;li&gt;the use of the Multiple Attachments form control&lt;/li&gt;&lt;li&gt;a closed-by-default section, which could be entirely hidden if you add permissions to this form&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</description>
+                    <created-with-version>2019.2.2.202003311635 PE</created-with-version>
+                    <updated-with-version>2019.2.2.202003311635 PE</updated-with-version>
+                    <updated-with-version>2021.1.4.202208011854 PE</updated-with-version>
+                    <updated-with-version>2021.1.6.202211071741 PE</updated-with-version><updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+
+                    <library-versions><_>1</_><orbeon>1</orbeon></library-versions>
+
+                <thumbnail filename="screenshot.webp" mediatype="image/webp" size="78406">/fr/service/persistence/crud/orbeon/builder/data/8fcdfe4ff49218923b6599ec9c7bb91488fcdf1a/9337d06aa456ea8ffa32b35544e56a084eab0f94.bin</thumbnail><data-migration>enabled</data-migration><email><templates><template name="default" xml:lang="en"><headers><header name="to" type="control-value">treasurer-email-address</header><header name="cc" type="control-value">payee-email</header></headers><subject>Payment authorization/request for reimbursement</subject><body mediatype="text/html">&lt;div&gt;Please find attached the PDF of the
+                                request. Make sure to check with the requester that the request is legitimate, and to
+                                obtain the documentation such as invoices and receipts. You can &lt;a href="{$link}"&gt;view
+                                the request online&lt;/a&gt;.&lt;/div&gt;
+                            </body><exclude-from-all-control-values/></template></templates><parameters><param type="LinkToViewPageParam"><name>link</name></param></parameters></email></metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments><pdf name="" lang="" filename="PaymentAuthorizationRequestforReimbursement+(fields).pdf" mediatype="application/pdf" size="84031">/fr/service/persistence/crud/orbeon/builder/data/8fcdfe4ff49218923b6599ec9c7bb91488fcdf1a/ca77424849f35b10f15b15051abdf785d877e3f2.bin</pdf></attachments>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><expenditure-total-expense><label>Total Expense</label><hint/><alert>The amount must not be negative</alert></expenditure-total-expense><school><label>School</label><hint/></school><treasurer-email-address><label>Treasurer email address</label><hint>An email will be sent to the organization's treasurer</hint></treasurer-email-address><treasurer-checks><label>Checks</label><hint/><item>
+            <label>Membership-approved activity</label>
+            <hint/>
+            <value>membership-approved-activity</value>
+          </item><item>
+            <label>Funds released by membership</label>
+            <hint/>
+            <value>funds-released-by-membership</value>
+          </item><item>
+            <label>Executive Board-approved expenditure</label>
+            <hint/>
+            <value>executive-board-approved-expenditure</value>
+          </item></treasurer-checks><treasurer-check-number><label>Check Number</label><hint/></treasurer-check-number><treasurer-category><label>Category</label><hint/></treasurer-category><treasurer-advanced><label>Amount Advanced</label><hint/></treasurer-advanced><treasurer-expenses><label>Expenses</label><hint/></treasurer-expenses><treasurer-amount-owed-or-due><label>Amount owed or due</label><hint/></treasurer-amount-owed-or-due><president-signature><label>President's Signature</label><hint/></president-signature><secretary-signature><label>Secretary's Signature</label><hint/></secretary-signature><president-signature-date><label>Date</label><hint/></president-signature-date><treasurer-date-approved-in-minutes><label>Date approved in minutes</label><hint/></treasurer-date-approved-in-minutes><expenditure-total-claimed><label>Total Amount Claimed</label><hint/><alert>The amount must not be negative</alert><alert>The amount must be at most the amount of expenditures</alert></expenditure-total-claimed><expenditure-advance-received><label>Minus Advance Received</label><hint/><alert>The amount must not be negative</alert></expenditure-advance-received><expenditure-reimbursement-claimed><label>Reimbursement Claimed</label><hint/></expenditure-reimbursement-claimed><expenditure-not-claimed><label>Not Claimed - donate to PTA</label><hint/></expenditure-not-claimed><expenditure-refund><label>Refund to PTA (Enclose Check)</label><hint/></expenditure-refund><attachments><label>Attachments/receipts</label><hint/></attachments><payee-signature><label>Signature</label><hint/></payee-signature><chairman-signature><label>Signature of VP/Chairman for Program/Event</label><hint/></chairman-signature><request-date><label>Date</label><hint/></request-date><expenditure-description><label>Expenditure Description</label><hint/></expenditure-description><expenditure-amount><label>Expenditure Amount</label><hint/><alert>The amount must not be negative</alert></expenditure-amount><expenditure-for><label>Expenditure was for</label><hint/></expenditure-for>
+                        <payee>
+                            <label>Payee</label>
+                        </payee><school-section><label>School</label></school-section><expenditure><label>Expenditure</label></expenditure><treasurer><label>For PTA Treasurer Use</label></treasurer>
+                        <payee-name><label>Name of Payee</label><hint/>
+
+
+
+                        </payee-name><pta-position><label>PTA Position</label><hint/></pta-position><payee-address><label>Address</label><hint/></payee-address><payee-city><label>City</label><hint/></payee-city><payee-zip><label>Zip</label><hint/></payee-zip><payee-phone><label>Phone</label><hint/></payee-phone><payee-email><label>Email</label><hint>An email will be sent to the payee</hint></payee-email><grid-3/>
+                    </resource>
+                </resources>
+            </xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-3-template"><grid-3-iteration><expenditure-description/><expenditure-amount/></grid-3-iteration></xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">
+                <fr:section id="school-section-section" bind="school-section-bind"><xf:label ref="$form-resources/school-section/label"/>
+          <fr:grid id="grid-6-grid" bind="grid-6-bind">
+              <fr:c x="1" y="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="school-control" bind="school-bind"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/school/label"/>
+                        <xf:hint ref="$form-resources/school/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="7" y="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="treasurer-email-address-control" bind="treasurer-email-address-bind"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/treasurer-email-address/label"/>
+                        <xf:hint ref="$form-resources/treasurer-email-address/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c>
+            </fr:grid></fr:section><fr:section id="payee-section" bind="payee-bind">
+                    <xf:label ref="$form-resources/payee/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind"><fr:c y="1" x="1" w="6">
+                                <xf:input id="payee-name-control" bind="payee-name-bind"><fr:index><fr:summary-show/></fr:index>
+                                    <xf:label ref="$form-resources/payee-name/label"/>
+                                    <xf:hint ref="$form-resources/payee-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c><fr:c y="1" x="7" w="6"><xf:input id="pta-position-control" bind="pta-position-bind"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/pta-position/label"/>
+                        <xf:hint ref="$form-resources/pta-position/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="1" y="2" w="6"><xf:input id="payee-address-control" bind="payee-address-bind">
+                        <xf:label ref="$form-resources/payee-address/label"/>
+                        <xf:hint ref="$form-resources/payee-address/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="7" y="2" w="3"><xf:input id="payee-city-control" bind="payee-city-bind">
+                        <xf:label ref="$form-resources/payee-city/label"/>
+                        <xf:hint ref="$form-resources/payee-city/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="10" y="2" w="3" h="1"><fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="payee-zip-control" bind="payee-zip-bind" round-when-formatting="false" round-when-storing="false" digits-after-decimal="0" grouping-separator="">
+                        <xf:label ref="$form-resources/payee-zip/label"/>
+                        <xf:hint ref="$form-resources/payee-zip/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:number></fr:c><fr:c x="1" y="3" w="3"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="payee-phone-control" bind="payee-phone-bind">
+                        <xf:label ref="$form-resources/payee-phone/label"/>
+                        <xf:hint ref="$form-resources/payee-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:us-phone></fr:c><fr:c x="4" y="3" w="3" h="1"/><fr:c x="7" y="3" w="6"><xf:input id="payee-email-control" bind="payee-email-bind">
+                        <xf:label ref="$form-resources/payee-email/label"/>
+                        <xf:hint ref="$form-resources/payee-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c></fr:grid>
+                </fr:section><fr:section id="expenditure-section" bind="expenditure-bind">
+          <xf:label ref="$form-resources/expenditure/label"/><fr:grid id="grid-2-grid" bind="grid-2-bind">
+              <fr:c x="1" y="1" w="12"><xf:input id="expenditure-for-control" bind="expenditure-for-bind">
+                        <xf:label ref="$form-resources/expenditure-for/label"/>
+                        <xf:hint ref="$form-resources/expenditure-for/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    <fr:index><fr:summary-show/></fr:index></xf:input></fr:c>
+            </fr:grid><fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="content" min="1" template="instance('grid-3-template')" apply-defaults="true" fb:initial-iterations="first">
+          <fr:c x="1" y="1" w="9"><xf:input id="expenditure-description-control" bind="expenditure-description-bind">
+                        <xf:label ref="$form-resources/expenditure-description/label"/>
+                        <xf:hint ref="$form-resources/expenditure-description/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="10" y="1" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-amount-control" bind="expenditure-amount-bind">
+                        <xf:label ref="$form-resources/expenditure-amount/label"/>
+                        <xf:hint ref="$form-resources/expenditure-amount/hint"/><xf:alert ref="$form-resources/expenditure-amount/alert" validation="validation-7-validation"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c>
+        </fr:grid><fr:grid id="grid-4-grid" bind="grid-4-bind">
+          <fr:c x="1" y="1" w="3"/><fr:c x="4" y="1" w="3"/><fr:c x="7" y="1" w="3"/><fr:c x="10" y="1" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-total-expense-control" bind="expenditure-total-expense-bind" field-align="right"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/expenditure-total-expense/label"/>
+                        <xf:hint ref="$form-resources/expenditure-total-expense/hint"/><xf:alert ref="$form-resources/expenditure-total-expense/alert" validation="validation-13-validation"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="1" y="2" w="3"/><fr:c x="4" y="2" w="3" h="1"/><fr:c x="7" y="2" w="3" h="1"/><fr:c x="10" y="2" w="3" h="1"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-total-claimed-control" bind="expenditure-total-claimed-bind" field-align="right">
+                        <xf:label ref="$form-resources/expenditure-total-claimed/label"/>
+                        <xf:hint ref="$form-resources/expenditure-total-claimed/hint"/><xf:alert ref="$form-resources/expenditure-total-claimed/alert[1]" validation="validation-4-validation"/><xf:alert ref="$form-resources/expenditure-total-claimed/alert[2]" validation="validation-5-validation"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="1" y="3" w="3"/><fr:c x="4" y="3" w="3"/><fr:c x="7" y="3" w="3"/><fr:c x="10" y="3" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-advance-received-control" bind="expenditure-advance-received-bind" field-align="right">
+                        <xf:label ref="$form-resources/expenditure-advance-received/label"/>
+                        <xf:hint ref="$form-resources/expenditure-advance-received/hint"/><xf:alert ref="$form-resources/expenditure-advance-received/alert" validation="validation-9-validation"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="1" y="4" w="3"/><fr:c x="4" y="4" w="3"/><fr:c x="7" y="4" w="3"/><fr:c x="10" y="4" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-reimbursement-claimed-control" bind="expenditure-reimbursement-claimed-bind" field-align="right"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/expenditure-reimbursement-claimed/label"/>
+                        <xf:hint ref="$form-resources/expenditure-reimbursement-claimed/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="1" y="5" w="3"/><fr:c x="4" y="5" w="3"/><fr:c x="7" y="5" w="3"/><fr:c x="10" y="5" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-not-claimed-control" bind="expenditure-not-claimed-bind" field-align="right">
+                        <xf:label ref="$form-resources/expenditure-not-claimed/label"/>
+                        <xf:hint ref="$form-resources/expenditure-not-claimed/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="1" y="6" w="3"/><fr:c x="4" y="6" w="3" h="1"/><fr:c x="7" y="6" w="3" h="1"/><fr:c x="10" y="6" w="3" h="1"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="expenditure-refund-control" bind="expenditure-refund-bind" field-align="right">
+                        <xf:label ref="$form-resources/expenditure-refund/label"/>
+                        <xf:hint ref="$form-resources/expenditure-refund/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="1" y="7" w="12"><fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" multiple="true" id="attachments-control" bind="attachments-bind" class="fr-attachment">
+                        <xf:label ref="$form-resources/attachments/label"/>
+                        <xf:hint ref="$form-resources/attachments/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:attachment></fr:c><fr:c x="1" y="8" w="5"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="payee-signature-control" bind="payee-signature-bind">
+                        <xf:label ref="$form-resources/payee-signature/label"/>
+                        <xf:hint ref="$form-resources/payee-signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:handwritten-signature></fr:c><fr:c x="6" y="8" w="1"/><fr:c x="7" y="8" w="5" h="1"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="chairman-signature-control" bind="chairman-signature-bind">
+                        <xf:label ref="$form-resources/chairman-signature/label"/>
+                        <xf:hint ref="$form-resources/chairman-signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:handwritten-signature></fr:c><fr:c x="12" y="8" w="1" h="1"/><fr:c x="1" y="9" w="3"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="request-date-control" bind="request-date-bind">
+                        <xf:label ref="$form-resources/request-date/label"/>
+                        <xf:hint ref="$form-resources/request-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:date></fr:c><fr:c x="4" y="9" w="9"/>
+        </fr:grid></fr:section><fr:section open="false" collapsible="true" id="treasurer-section" bind="treasurer-bind"><xf:label ref="$form-resources/treasurer/label"/>
+          <fr:grid id="grid-5-grid" bind="grid-5-bind">
+              <fr:c x="1" y="1" w="6"><xf:select id="treasurer-checks-control" appearance="full" bind="treasurer-checks-bind">
+                        <xf:label ref="$form-resources/treasurer-checks/label"/>
+                        <xf:hint ref="$form-resources/treasurer-checks/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                        <xf:itemset ref="$form-resources/treasurer-checks/item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select></fr:c><fr:c x="7" y="1" w="6"/><fr:c x="1" y="2" w="2"><fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="treasurer-check-number-control" bind="treasurer-check-number-bind" grouping-separator="">
+                        <xf:label ref="$form-resources/treasurer-check-number/label"/>
+                        <xf:hint ref="$form-resources/treasurer-check-number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    <fr:index><fr:summary-show/></fr:index></fr:number></fr:c><fr:c x="3" y="2" w="4" h="1"><xf:input id="treasurer-category-control" bind="treasurer-category-bind">
+                        <xf:label ref="$form-resources/treasurer-category/label"/>
+                        <xf:hint ref="$form-resources/treasurer-category/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="7" y="2" w="3"/><fr:c x="10" y="2" w="3" h="1"/><fr:c x="1" y="3" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="treasurer-advanced-control" bind="treasurer-advanced-bind">
+                        <xf:label ref="$form-resources/treasurer-advanced/label"/>
+                        <xf:hint ref="$form-resources/treasurer-advanced/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="4" y="3" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="treasurer-expenses-control" bind="treasurer-expenses-bind">
+                        <xf:label ref="$form-resources/treasurer-expenses/label"/>
+                        <xf:hint ref="$form-resources/treasurer-expenses/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="7" y="3" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="treasurer-amount-owed-or-due-control" bind="treasurer-amount-owed-or-due-bind">
+                        <xf:label ref="$form-resources/treasurer-amount-owed-or-due/label"/>
+                        <xf:hint ref="$form-resources/treasurer-amount-owed-or-due/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:currency></fr:c><fr:c x="10" y="3" w="3"/><fr:c x="1" y="4" w="5"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="president-signature-control" bind="president-signature-bind">
+                        <xf:label ref="$form-resources/president-signature/label"/>
+                        <xf:hint ref="$form-resources/president-signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:handwritten-signature></fr:c><fr:c x="6" y="4" w="1" h="1"/><fr:c x="7" y="4" w="5"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="secretary-signature-control" bind="secretary-signature-bind">
+                        <xf:label ref="$form-resources/secretary-signature/label"/>
+                        <xf:hint ref="$form-resources/secretary-signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:handwritten-signature></fr:c><fr:c x="12" y="4" w="1" h="1"/><fr:c x="1" y="5" w="3"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="president-signature-date-control" bind="president-signature-date-bind">
+                        <xf:label ref="$form-resources/president-signature-date/label"/>
+                        <xf:hint ref="$form-resources/president-signature-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:date></fr:c><fr:c x="4" y="5" w="3"/><fr:c x="7" y="5" w="3"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="treasurer-date-approved-in-minutes-control" bind="treasurer-date-approved-in-minutes-bind">
+                        <xf:label ref="$form-resources/treasurer-date-approved-in-minutes/label"/>
+                        <xf:hint ref="$form-resources/treasurer-date-approved-in-minutes/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:date></fr:c><fr:c x="10" y="5" w="3"/>
+            </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

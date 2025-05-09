@@ -41,7 +41,7 @@ trait Read {
     indentedLogger : IndentedLogger
   ): Unit = {
 
-    val hasStage = req.forData && ! req.forAttachment
+    val hasStage = req.forDataNotAttachment
     val readBody = method == HttpMethod.GET
 
     // Determine what kind of body we need to read, if any
@@ -203,7 +203,7 @@ trait Read {
     val sql = {
       val table  = SqlSupport.tableName(req)
       val idCols = SqlSupport.idColumns(req)
-      val maxColumn = if (req.forData && ! req.forAttachment) "id" else "last_modified_time"
+      val maxColumn = if (req.forDataNotAttachment) "id" else "last_modified_time"
 
       val body = bodyContentOpt match {
         case None =>

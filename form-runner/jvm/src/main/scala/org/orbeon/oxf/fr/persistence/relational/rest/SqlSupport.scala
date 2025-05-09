@@ -97,7 +97,7 @@ object SqlSupport {
 
     (
       Provider.idColGetter(req.provider) match {
-        case Some(getter) if req.forData && ! req.forAttachment =>
+        case Some(getter) if req.forDataNotAttachment =>
           List(
             Col(
               name          = "id",

@@ -55,7 +55,8 @@ case class CrudRequest(
   existingRow     : Option[ExistingRow],
   singleton       : Option[Boolean]
 ) {
-  def forForm       : Boolean = dataPart.isEmpty
-  def forData       : Boolean = dataPart.isDefined
-  def forAttachment : Boolean = filename.isDefined
+  def forForm              : Boolean = dataPart.isEmpty
+  def forData              : Boolean = dataPart.isDefined
+  def forAttachment        : Boolean = filename.isDefined
+  def forDataNotAttachment : Boolean = forData && ! forAttachment
 }

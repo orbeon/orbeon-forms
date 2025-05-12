@@ -88,6 +88,7 @@
                     <xf:var name="control" value="."/>
                     <xf:bind
                         ref="@service-performs-search"
+                        name="service-performs-search"
                         type="xs:boolean"/>
                     <xf:bind
                         ref="@service-supports-paging"
@@ -113,6 +114,10 @@
                             readonly="$control/@selection != ''"
                             calculate="if ($control/@selection != '') then ../../xf:value/@ref else ."/>
                     </xf:bind>
+                    <xf:bind
+                        ref="@store-label"
+                        type="xs:boolean"
+                        readonly="$service-performs-search = 'true()'"/>
                 </xf:model>
                 <fr:grid>
                     <xh:tr>
@@ -245,6 +250,23 @@
                                 </xf:action>
                             </fr:yesno-input>
                         </xh:td>
+                        <xh:td>
+                            <fr:yesno-input ref="
+                                    if (@service-performs-search/string() = 'true')
+                                    then 'true'
+                                    else xf:element('_', (@store-label/string(), 'false')[1])">
+                                <xf:label ref="xxf:r('dialog-control-settings.store-label.label', '|fr-form-resources|')"/>
+                                <xf:action event="xforms-select">
+                                    <xf:insert
+                                        if="event('xxf:item-value') = 'true'"
+                                        context="$control"
+                                        origin="xf:attribute('store-label', 'true')"/>
+                                    <xf:delete
+                                        if="event('xxf:item-value') = 'false'"
+                                        ref="$control/@store-label"/>
+                                </xf:action>
+                            </fr:yesno-input>
+                        </xh:td>
                     </xh:tr>
                 </fr:grid>
             </control-details>
@@ -285,14 +307,14 @@
 
             <!-- Adjust `label` attribute if needed (not in readonly mode) -->
             <xbl:handler event="xforms-enabled" if="not(fr:is-readonly-mode())">
-                <xf:var name="service-performs-search" value="xxf:component-param-value('service-performs-search') = 'true'"/>
-                <xf:var name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
+                <xf:var name="use-label-attribute" value="xxf:component-param-value('service-performs-search') = 'true' or xxf:component-param-value('store-label') = 'true'"/>
+                <xf:var name="binding"             value="xxf:binding('fr-databound-select1-search')"/>
                 <xf:insert
-                    if="$service-performs-search and empty($binding/@label)"
+                    if="$use-label-attribute and empty($binding/@label)"
                     context="$binding"
                     origin="xf:attribute('label')"/>
                 <xf:delete
-                    if="not($service-performs-search) and exists($binding/@label)"
+                    if="not($use-label-attribute) and exists($binding/@label)"
                     ref="$binding/@label"/>
             </xbl:handler>
 

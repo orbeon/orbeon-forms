@@ -867,6 +867,10 @@
                 <label>Open selection</label>
                 <hint>If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)</hint>
             </open-selection>
+            <store-label>
+                <label>Store label</label>
+                <hint>If enabled, the selected label is stored alongside the data</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0">Use default</item>
                 <item id="1">Yes</item>
@@ -2440,6 +2444,10 @@
                 <label>Sélection libre</label>
                 <hint>Si cette option est activée, les utilisateurs peuvent saisir leur propre valeur, et la valeur (texte stocké dans les données) est également utilisée comme libellé (texte affiché dans la liste déroulante)</hint>
             </open-selection>
+            <store-label>
+                <label>Stocker le libellé</label>
+                <hint>Si cette option est activée, le libellé sélectionné est stocké avec les données</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0">Utiliser le défaut</item>
                 <item id="1">Oui</item>
@@ -3995,6 +4003,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -5576,6 +5588,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -7158,6 +7174,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -8704,6 +8724,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -10253,6 +10277,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -11827,6 +11855,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -13402,6 +13434,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -14956,6 +14992,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -16537,6 +16577,10 @@
                 <label todo="true">[Open selection]</label>
                 <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
             </open-selection>
+            <store-label>
+                <label todo="true">[Store label]</label>
+                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            </store-label>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>

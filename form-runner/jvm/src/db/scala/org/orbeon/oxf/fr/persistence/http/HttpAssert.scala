@@ -125,12 +125,13 @@ private[persistence] object HttpAssert extends XMLSupport {
     body          : HttpCall.Body,
     expectedCode  : Int,
     credentials   : Option[Credentials] = None,
-    stage         : Option[Stage]       = None
+    stage         : Option[Stage]       = None,
+    ifMatch       : Option[String]      = None
   )(implicit
     logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Unit = {
-    val actualCode = HttpCall.put(url, version, stage, body, credentials).statusCode
+    val actualCode = HttpCall.put(url, version, stage, body, credentials, ifMatch).statusCode
     assert(actualCode == expectedCode)
   }
 

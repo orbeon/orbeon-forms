@@ -635,7 +635,8 @@ class RestApiTest
   }
 
   describe("ETag and If-Match") {
-    it("must return an ETag when reading a document") {
+
+    it("must return different `ETag`, support `If-Match`") {
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("etag") { (_, provider) =>
 
@@ -649,14 +650,22 @@ class RestApiTest
             headers(Headers.ETag).head
           }
 
+          // We get an ETag
           HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some("*")))
+
+          // The ETag is different after a subsequent PUT
           val firstETag = getETag
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some(firstETag)))
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some("*")))
           val secondETag = getETag
           assert(firstETag != secondETag)
+
+          // If-Match with a non-matching (fails), matching (succeeds), and wildcard "*" ETag (succeeds)
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.PreconditionFailed, ifMatch = Some("123"))
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some(secondETag))
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some("*"))
         }
       }
     }

@@ -335,7 +335,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                 throw400ForUnsupportedVersion(v.version)
 
               val responseHeadersOpt =
-                connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+                connectToObtainHeadersAndCheckPreconditionsPutOrDelete(
                   request                     = OutgoingRequest(request),
                   serviceUri                  = serviceUri,
                   outgoingPersistenceHeaders  = outgoingPersistenceHeaders,
@@ -355,7 +355,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                 }
 
               val (cxrOpt, effectiveFormDefinitionVersion, responseHeadersOpt) =
-                connectToObtainResponseHeadersAndCheckVersion(
+                connectToObtainHeadersAndCheckPreconditions(
                   request                    = OutgoingRequest(request),
                   serviceUri                 = serviceUri,
                   outgoingPersistenceHeaders = outgoingPersistenceHeaders,
@@ -689,7 +689,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     versionFromProvider
   }
 
-  private def connectToObtainResponseHeadersAndCheckVersion(
+  private def connectToObtainHeadersAndCheckPreconditions(
     request                    : OutgoingRequest,
     serviceUri                 : String,
     outgoingPersistenceHeaders : Map[String, String],
@@ -713,7 +713,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       case HttpMethod.PUT | HttpMethod.DELETE =>
 
         val (versionForPutOrDelete, responseHeadersOpt) =
-          connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+          connectToObtainHeadersAndCheckPreconditionsPutOrDelete(
             request                     = request,
             serviceUri                  = serviceUri,
             outgoingPersistenceHeaders  = outgoingPersistenceHeaders,
@@ -747,7 +747,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     (cxr, versionFromProvider, responseHeaders)
   }
 
-  private def connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+  private def connectToObtainHeadersAndCheckPreconditionsPutOrDelete(
     request                    : OutgoingRequest,
     serviceUri                 : String,
     outgoingPersistenceHeaders : Map[String, String],
@@ -770,6 +770,17 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       ) match {
         case Success(responseHeaders) =>
           // Existing data
+
+          // Check If-Match header against ETag
+          request.headers.get(Headers.IfMatchLower).flatMap(_.headOption).foreach { ifMatch =>
+            responseHeaders.etag.foreach { etag =>
+              if (ifMatch != etag && ifMatch != "*") {
+                indentedLogger.logInfo("", s"412 Precondition Failed: ${Headers.IfMatch} header ($ifMatch) doesn't match ${Headers.ETag} ($etag)")
+                throw HttpStatusCodeException(StatusCode.PreconditionFailed)
+              }
+            }
+          }
+
           val versionFromProvider = compareVersionAgainstIncomingIfNeeded(indentedLogger, specificIncomingVersionOpt, responseHeaders)
           // NOTE: If we get here, we have already passed successful permissions checks for `GET`/`HEAD` AKA
           // `Read` and we must have the allowed operations. However here we are doing a `PUT`/`DELETE` AKA

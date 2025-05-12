@@ -98,11 +98,11 @@ object CRUDRoute
     // The persistence proxy must pass a specific version when needed. It is not always needed. For example a `GET` of
     // data doesn't require a version, but a `GET` or a form definition does, and a `PUT` of data does as well as the
     // version is stored.
-    val incomingVersion  = headerValueIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
-    val requestUsername  = headerValueIgnoreCase(Headers.OrbeonUsername)
-    val requestGroup     = headerValueIgnoreCase(Headers.OrbeonGroup)
-    val requestFlatView  = headerValueIgnoreCase(Headers.OrbeonCreateFlatView).contains("true")
-    val singleton        = headerValueIgnoreCase(Headers.OrbeonSingleton).map(_.toBoolean)
+    val incomingVersion = headerValueIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
+    val requestUsername = headerValueIgnoreCase(Headers.OrbeonUsername)
+    val requestGroup    = headerValueIgnoreCase(Headers.OrbeonGroup)
+    val requestFlatView = headerValueIgnoreCase(Headers.OrbeonCreateFlatView).contains("true")
+    val singleton       = headerValueIgnoreCase(Headers.OrbeonSingleton).map(_.toBoolean)
 
     val ranges = HttpRanges(httpRequest) match {
       case Success(ranges) => ranges

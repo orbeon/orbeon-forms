@@ -56,6 +56,8 @@ object Headers {
   val ETag                         = "ETag"
 
   val IfModifiedSince              = "If-Modified-Since"
+  val IfMatch                      = "If-Match"
+  val IfMatchLower                 = IfMatch.toLowerCase
 
   val Range                        = "Range"
   val IfRange                      = "If-Range"

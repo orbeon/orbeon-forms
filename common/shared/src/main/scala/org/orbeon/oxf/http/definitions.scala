@@ -171,6 +171,7 @@ object StatusCode {
   val MethodNotAllowed             = 405
   val Conflict                     = 409
   val Gone                         = 410
+  val PreconditionFailed           = 412
   val RequestEntityTooLarge        = 413
   val RequestedRangeNotSatisfiable = 416
   val Locked                       = 423

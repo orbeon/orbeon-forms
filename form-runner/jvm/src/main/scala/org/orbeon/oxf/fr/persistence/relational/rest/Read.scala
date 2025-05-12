@@ -144,10 +144,11 @@ trait Read {
       httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime))
       if (req.forDataNotAttachment) {
         fromDatabase.idOpt.foreach { id =>
-          val tableName  = SqlSupport.tableName(req)
-          val etagPlain  = s"$tableName:$id"
-          val etagHashed = SecureUtils.hmacStringToHexShort(SecureUtils.KeyUsage.General, etagPlain)
-          httpResponse.setHeader(Headers.ETag, etagHashed)
+          val tableName    = SqlSupport.tableName(req)
+          val lastModified = fromDatabase.lastModifiedDateTime.toString
+          val etagPlain    = s"$tableName:$id:$lastModified"
+          val etag         = SecureUtils.digestStringToHexShort(etagPlain)
+          httpResponse.setHeader(Headers.ETag, etag)
         }
       }
 

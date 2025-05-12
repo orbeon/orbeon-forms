@@ -23,7 +23,8 @@ object PersistenceProxyPermissions {
     createdTime  : Option[Instant],
     organization : Option[(Int, Organization)],
     formVersion  : Option[Int],
-    stage        : Option[String]
+    stage        : Option[String],
+    etag         : Option[String]
   )
 
   object ResponseHeaders {
@@ -40,7 +41,8 @@ object PersistenceProxyPermissions {
         createdTime  = getHeaderIgnoreCase(Headers.OrbeonCreated).map(Instant.parse),
         organization = None, // TODO
         formVersion  = getHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt),
-        stage        = getHeaderIgnoreCase(StageHeader.HeaderName)
+        stage        = getHeaderIgnoreCase(StageHeader.HeaderName),
+        etag         = getHeaderIgnoreCase(Headers.ETag)
       )
     }
 

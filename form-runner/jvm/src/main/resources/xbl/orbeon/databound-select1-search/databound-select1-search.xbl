@@ -92,15 +92,16 @@
                         type="xs:boolean"/>
                     <xf:bind
                         ref="@service-supports-paging"
+                        name="service-supports-paging"
                         type="xs:boolean"
-                        readonly="../@service-performs-search = false()"
-                        calculate="if (../@service-performs-search = true()) then . else 'false'"/>
+                        readonly="$service-performs-search = false()"
+                        calculate="if ($service-performs-search = true()) then . else 'false'"/>
                     <xf:bind
                         ref="@is-last-page"
                         type="xxf:XPath2"
-                        readonly="../@service-supports-paging = false()"
-                        required="../@service-supports-paging = true()"
-                        calculate="if (../@service-supports-paging = true()) then . else ''"/>
+                        readonly="$service-supports-paging = false()"
+                        required="$service-supports-paging = true()"
+                        calculate="if ($service-supports-paging = true()) then . else ''"/>
                     <xf:bind
                         ref="@resource"
                         required="true()"/>

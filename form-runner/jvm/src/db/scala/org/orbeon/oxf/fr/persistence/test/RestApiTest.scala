@@ -28,7 +28,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
-import org.orbeon.oxf.http.{HttpRange, StatusCode}
+import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
@@ -629,6 +629,34 @@ class RestApiTest
           }
 
           assertXMLDocumentsIgnoreNamespacesInScope(expectedBody, filterResultBody(resultBodyTry.get))
+        }
+      }
+    }
+  }
+
+  describe("ETag and If-Match") {
+    it("must return an ETag when reading a document") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("etag") { (_, provider) =>
+
+          createForm(provider)
+
+          val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+          val data    = HttpCall.XML(<gaga/>.toDocument)
+
+          def getETag: String = {
+            val headers = HttpCall.get(dataURL, Unspecified, None)._2
+            headers(Headers.ETag).head
+          }
+
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some("*")))
+          val firstETag = getETag
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some(firstETag)))
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some("*")))
+          val secondETag = getETag
+          assert(firstETag != secondETag)
         }
       }
     }

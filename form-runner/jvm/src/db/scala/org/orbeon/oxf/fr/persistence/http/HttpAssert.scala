@@ -45,6 +45,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     formVersion       : Option[Int],
     stage             : Option[Stage] = None,
     contentRangeHeader: Option[String] = None,
+    etag              : Option[String] = None,
     statusCode        : Int = StatusCode.Ok
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
@@ -66,7 +67,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     }
 
     expected match {
-      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage, contentRangeHeader, code) =>
+      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage, contentRangeHeader, etag, code) =>
         assert(resultCode == code)
         // Check body
         body match {
@@ -89,6 +90,14 @@ private[persistence] object HttpAssert extends XMLSupport {
         contentRangeHeader.foreach { expectedContentRangeHeader =>
           val resultContentRangeHeader = headers.get(Headers.ContentRange.toLowerCase).map(_.head)
           assert(resultContentRangeHeader.contains(expectedContentRangeHeader))
+        }
+        // Check ETag header if specified
+        etag.foreach { expectedEtag =>
+          val etagHeader = headers.get("etag")
+          expectedEtag match {
+            case "*"   => assert(etagHeader.isDefined)
+            case value => assert(etagHeader.contains(List(value)))
+          }
         }
 
       case ExpectedCode(expectedCode) =>

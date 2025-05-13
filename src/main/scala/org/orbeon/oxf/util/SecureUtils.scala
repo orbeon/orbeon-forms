@@ -19,6 +19,7 @@ import org.log4s.Logger
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.ConfigurationException
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 
 import java.security.{MessageDigest, SecureRandom, Security}
 import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
@@ -29,24 +30,26 @@ object SecureUtils extends SecureUtilsTrait {
 
   sealed trait KeyUsage
   object KeyUsage {
-    case object GeneralNoCheck  extends KeyUsage
-    case object General         extends KeyUsage
-    case object Token           extends KeyUsage
-    case object FieldEncryption extends KeyUsage
+    case object GeneralNoCheck          extends KeyUsage
+    case object General                 extends KeyUsage
+    case object Token                   extends KeyUsage
+    case object FieldEncryption         extends KeyUsage
+    case object FieldEncryptionFallback extends KeyUsage
   }
 
   private implicit val logger: Logger = LoggerFactory.createLogger("org.orbeon.crypto")
 
   // Properties
-  private val DeprecatedXFormsPasswordProperty = "oxf.xforms.password"
-  private val GeneralPasswordProperty          = "oxf.crypto.password"
-  private val TokenPasswordProperty            = "oxf.fr.access-token.password"
-  private val FieldEncryptionPasswordProperty  = "oxf.fr.field-encryption.password"
+  private val DeprecatedXFormsPasswordProperty        = "oxf.xforms.password"
+  private val GeneralPasswordProperty                 = "oxf.crypto.password"
+  private val TokenPasswordProperty                   = "oxf.fr.access-token.password"
+  private val FieldEncryptionPasswordProperty         = "oxf.fr.field-encryption.password"
+  private val FieldEncryptionFallbackPasswordProperty = "oxf.fr.field-encryption.password.read-fallback"
 
-  private val CheckPasswordStrengthProperty    = "oxf.crypto.check-password-strength"
-  private val KeyLengthProperty                = "oxf.crypto.key-length"
-  private val HashAlgorithmProperty            = "oxf.crypto.hash-algorithm"
-  private val PreferredProviderProperty        = "oxf.crypto.preferred-provider"
+  private val CheckPasswordStrengthProperty           = "oxf.crypto.check-password-strength"
+  private val KeyLengthProperty                       = "oxf.crypto.key-length"
+  private val HashAlgorithmProperty                   = "oxf.crypto.hash-algorithm"
+  private val PreferredProviderProperty               = "oxf.crypto.preferred-provider"
 
   private val RandomHexIdBits = 128
   private val RandomHexIdBytes = RandomHexIdBits / 8
@@ -72,10 +75,11 @@ object SecureUtils extends SecureUtilsTrait {
     def getPassword: String = {
 
       val propertyNames = keyUsage match {
-        case KeyUsage.GeneralNoCheck  => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
-        case KeyUsage.General         => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
-        case KeyUsage.Token           => List(TokenPasswordProperty)
-        case KeyUsage.FieldEncryption => List(FieldEncryptionPasswordProperty)
+        case KeyUsage.GeneralNoCheck          => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
+        case KeyUsage.General                 => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
+        case KeyUsage.Token                   => List(TokenPasswordProperty)
+        case KeyUsage.FieldEncryption         => List(FieldEncryptionPasswordProperty)
+        case KeyUsage.FieldEncryptionFallback => List(FieldEncryptionFallbackPasswordProperty)
       }
 
       val propertySet = Properties.instance.getPropertySet
@@ -129,9 +133,9 @@ object SecureUtils extends SecureUtilsTrait {
   // 2023-04-12: Used by `FieldEncryption` only
   object Tink {
 
-    private lazy val aead = {
+    private def createAead(keyUsage: KeyUsage): AesGcmJce = {
       val messageDigest = MessageDigest.getInstance(DigestAlgorithm)
-      messageDigest.update(getOrComputePassword(KeyUsage.FieldEncryption).getBytes(CharsetNames.Utf8))
+      messageDigest.update(getOrComputePassword(keyUsage).getBytes(CharsetNames.Utf8))
       val key256Bit = messageDigest.digest()
       // 128-bit key needed by implementation
       // Shortening is ok https://security.stackexchange.com/a/34797/49208
@@ -139,8 +143,20 @@ object SecureUtils extends SecureUtilsTrait {
       new AesGcmJce(key128Bit)
     }
 
-    def encrypt(plaintext  : Array[Byte]): Array[Byte] = aead.encrypt(plaintext,  null)
-    def decrypt(ciphertext : Array[Byte]): Array[Byte] = aead.decrypt(ciphertext, null)
+    // Primary encryption/decryption object
+    private lazy val hasFallbackPassword = checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback)
+    private lazy val primaryAead         = createAead(KeyUsage.FieldEncryption)
+    private lazy val fallbackAead        = hasFallbackPassword.option(createAead(KeyUsage.FieldEncryptionFallback))
+
+    def encrypt(plaintext  : Array[Byte]): Array[Byte] = primaryAead.encrypt(plaintext,  null)
+    def decrypt(ciphertext : Array[Byte]): Array[Byte] =
+      try {
+        primaryAead.decrypt(ciphertext, null)
+      } catch {
+        case _: java.security.GeneralSecurityException if hasFallbackPassword =>
+          fallbackAead.get.decrypt(ciphertext, null)
+      }
+
     def encrypt(plaintext  : String     ): String      = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
     def decrypt(ciphertext : String     ): String      = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
   }

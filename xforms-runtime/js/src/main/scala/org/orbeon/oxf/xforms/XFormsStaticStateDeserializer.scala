@@ -1022,7 +1022,7 @@ object XFormsStaticStateDeserializer {
         // Do this *after* the top-level template has been deserialized
         topLevelPart.marks = collectedSAXStoreMarks
 
-        CoreCrossPlatformSupport.properties = PropertySet(properties)
+        CoreCrossPlatformSupport.properties = PropertySet(properties, sequence = 0)
 
         // Set collected `Model` information on elements
         for {

@@ -437,7 +437,7 @@ class ResourcesPatcherTest
       val initial = newDoc
 
       val props =
-        PropertySet(
+        PropertySet.forTests(
           List(
             PropertyParams(Map.empty, "oxf.fr.resource.*.*.fr.authentication.login.password", XS_STRING_QNAME, "Mot de passe")
           )

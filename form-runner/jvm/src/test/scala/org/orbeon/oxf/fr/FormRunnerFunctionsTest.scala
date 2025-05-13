@@ -338,7 +338,7 @@ class FormRunnerFunctionsTest
   describe("`getProviders()` function") {
 
     val properties: PropertySet =
-      PropertySet(
+      PropertySet.forTests(
         List(
           PropertyParams(Map.empty, "oxf.fr.persistence.*.active",                       XS_BOOLEAN_QNAME, "true"), // this is the default, not strictly needed here
           PropertyParams(Map.empty, "oxf.fr.persistence.my-inactive-provider.active",    XS_BOOLEAN_QNAME, "false"),
@@ -398,7 +398,7 @@ class FormRunnerFunctionsTest
   describe("`databaseConfigurationPresent()` function") {
 
     val properties: PropertySet =
-      PropertySet(
+      PropertySet.forTests(
         List(
           PropertyParams(Map.empty, "oxf.fr.persistence.*.active",                       XS_BOOLEAN_QNAME, "true"), // this is the default, not strictly needed here
           PropertyParams(Map.empty, "oxf.fr.persistence.my-inactive-provider.active",    XS_BOOLEAN_QNAME, "false"),
@@ -566,7 +566,7 @@ class FormRunnerFunctionsTest
 
     for ((desc, expected, get, properties) <- expected)
       it(s"must return `$expected` for `$desc`") {
-        assert(RelationalUtils.databaseConfigurationPresent(PropertySet(properties), get) == expected)
+        assert(RelationalUtils.databaseConfigurationPresent(PropertySet.forTests(properties), get) == expected)
       }
   }
 

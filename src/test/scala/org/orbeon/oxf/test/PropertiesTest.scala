@@ -105,7 +105,7 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
   describe("Properties matching") {
 
     val propertySetWithXx =
-      PropertySet(
+      PropertySet.forTests(
         List(
           PropertyParams(Map.empty, "x.x", XS_STRING_QNAME,  "00"),
           PropertyParams(Map.empty, "x.*", XS_STRING_QNAME,  "01"),
@@ -115,7 +115,7 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       )
 
     val propertySetWithAb =
-      PropertySet(
+      PropertySet.forTests(
         List(
           PropertyParams(Map.empty, "a.b.form", XS_STRING_QNAME,  "v1"),
           PropertyParams(Map.empty, "d.*.form", XS_STRING_QNAME,  "v2"),

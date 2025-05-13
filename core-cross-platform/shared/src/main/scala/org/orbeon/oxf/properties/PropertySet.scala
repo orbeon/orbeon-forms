@@ -83,7 +83,10 @@ object PropertySet {
 
   case class PropertyParams(namespaces: Map[String, String], name: String, typeQName: QName, stringValue: String)
 
-  def apply(globalProperties: Iterable[PropertyParams], sequence: Int = 0): PropertySet = {
+  def forTests(globalProperties: Iterable[PropertyParams]): PropertySet =
+    apply(globalProperties, sequence = 0) // prefer to keep a non-default parameter and use a special method for tests
+
+  def apply(globalProperties: Iterable[PropertyParams], sequence: Int): PropertySet = {
 
     var propertiesByName = Map[String, Property]()
     val propertiesTree   = new PropertyNode

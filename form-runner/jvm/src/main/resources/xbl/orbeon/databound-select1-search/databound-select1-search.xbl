@@ -379,6 +379,8 @@
 
                                 <xf:action event="xforms-submit-done" if="event('fr-for') = 'enabled-or-changed'">
 
+                                    <!-- The code belows sets or clear the initial value and label if needed upon initial load
+                                         or modification of the resource URL -->
                                     <xf:var name="label-from" value="event('label-from')"/>
 
                                     <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
@@ -392,13 +394,19 @@
                                                                               and not(xxf:readonly($binding))"/>
                                     <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
                                     <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
-                                    <xf:setvalue if="$label-from = 'service'" ref="instance('local')/label" value="$current-label"/>
+
+                                    <xf:action if="$label-from = 'service'">
+                                        <xf:setvalue ref="$binding/@label"         value="$current-label"/>
+                                        <xf:setvalue ref="instance('local')/label" value="$current-label"/>
+                                    </xf:action>
                                     <xf:action if="$current-impossible">
                                         <xf:setvalue ref="$binding"/>
+                                        <xf:setvalue ref="$binding/@label"/>
                                         <xf:setvalue ref="instance('local')/label"/>
                                     </xf:action>
                                     <xf:action if="$unique-choice">
                                         <xf:setvalue ref="$binding"                value="$unique-choice-value"/>
+                                        <xf:setvalue ref="$binding/@label"         value="$unique-choice-label"/>
                                         <xf:setvalue ref="instance('local')/label" value="$unique-choice-label"/>
                                     </xf:action>
                                 </xf:action>
@@ -465,11 +473,16 @@
                                          if ($label-from = 'bound-label') then $binding/@label
                                     else if ($label-from = 'bound-value') then $binding
                                     else                                       ()">
-                                <xf:setvalue
+                                <xf:action
                                     if="exists($bound-label-or-value)"
-                                    event="xforms-value-changed xforms-enabled"
-                                    ref="instance('local')/label"
-                                    value="$bound-label-or-value"/>
+                                    event="xforms-value-changed xforms-enabled">
+                                    <xf:setvalue
+                                        ref="$binding/@label"
+                                        value="$bound-label-or-value"/>
+                                    <xf:setvalue
+                                        ref="instance('local')/label"
+                                        value="$bound-label-or-value"/>
+                                </xf:action>
                             </xf:var>
                             <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                 <xf:var name="fr-search-value"/>
@@ -478,9 +491,10 @@
                                 <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
                                     <xf:action event="xforms-value-changed xforms-enabled">
                                         <xf:action xxbl:scope="inner" if="$label-from = 'service' or $auto-select-unique-choice">
-                                            <xf:setvalue
-                                                if="xxf:is-blank($binding)"
-                                                ref="instance('local')/label"/>
+                                            <action if="xxf:is-blank($binding)">
+                                                <xf:setvalue ref="$binding/@label"/>
+                                                <xf:setvalue ref="instance('local')/label"/>
+                                            </action>
                                             <xf:action if="not(fr:is-design-time()) and (xxf:non-blank($binding) or $auto-select-unique-choice)">
                                                 <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
                                                 <xf:send submission="get-result">

@@ -39,10 +39,10 @@ object ControlEditor {
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
   private var currentCellOpt : Option[Block] = None
-  private lazy val controlEditorLeft         = $(".fb-control-editor-left")
-  private lazy val controlEditorRight        = $(".fb-control-editor-right")
-  private lazy val controlEditorTop          = $(".fb-control-editor-top")
-  private lazy val controlEditors            = controlEditorLeft.get() ++ controlEditorRight.get() ++ controlEditorTop.get()
+  private def controlEditorLeft              = $(".fb-control-editor-left")
+  private def controlEditorRight             = $(".fb-control-editor-right")
+  private def controlEditorTop               = $(".fb-control-editor-top")
+  private def controlEditors                 = controlEditorLeft.get() ++ controlEditorRight.get() ++ controlEditorTop.get()
   private var masked: Boolean                = false
 
   // Show/hide editor
@@ -137,9 +137,6 @@ object ControlEditor {
     controlEditorLeft.hide()
     controlEditorRight.hide()
     controlEditorTop.hide()
-    controlEditorLeft.detach()
-    controlEditorRight.detach()
-    controlEditorTop.detach()
   }
 
   // Control actions

@@ -67,44 +67,38 @@ object SecureUtils extends SecureUtilsTrait {
   private val AESBlockSize = 128
   private val AESIVSize    = AESBlockSize / 8
 
-  private val passwords: java.util.concurrent.ConcurrentHashMap[KeyUsage, String] =
-    new java.util.concurrent.ConcurrentHashMap
+  private def getPassword(keyUsage: KeyUsage): String = {
 
-  private def getOrComputePassword(keyUsage: KeyUsage): String = {
-
-    def getPassword: String = {
-
-      val propertyNames = keyUsage match {
-        case KeyUsage.GeneralNoCheck          => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
-        case KeyUsage.General                 => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
-        case KeyUsage.Token                   => List(TokenPasswordProperty)
-        case KeyUsage.FieldEncryption         => List(FieldEncryptionPasswordProperty)
-        case KeyUsage.FieldEncryptionFallback => List(FieldEncryptionFallbackPasswordProperty)
-      }
-
-      val propertySet = Properties.instance.getPropertySet
-
-      val propertyNameRawPasswordOpt =
-        propertyNames
-          .flatMap(n => propertySet.getNonBlankString(n).map(n ->))
-          .headOption
-
-      (keyUsage, propertyNameRawPasswordOpt) match {
-        case (KeyUsage.GeneralNoCheck, Some((_, rawPassword))) =>
-          rawPassword
-        case (KeyUsage.GeneralNoCheck, None) =>
-          randomHexId
-        case (_, Some((propertyName, rawPassword)))
-          if ! checkPasswordStrengthProperty || PasswordChecker.checkAndLog(propertyName, rawPassword) =>
-          rawPassword
-        case (_, Some((propertyName, _)))  =>
-          throw new ConfigurationException(s"Invalid password for property `$propertyName` property, see log for details")
-        case (_, None) =>
-          throw new ConfigurationException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}")
-      }
+    val propertyNames = keyUsage match {
+      case KeyUsage.GeneralNoCheck          => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
+      case KeyUsage.General                 => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
+      case KeyUsage.Token                   => List(TokenPasswordProperty)
+      case KeyUsage.FieldEncryption         => List(FieldEncryptionPasswordProperty)
+      case KeyUsage.FieldEncryptionFallback => List(FieldEncryptionFallbackPasswordProperty)
     }
 
-    passwords.computeIfAbsent(keyUsage, _ => getPassword)
+    val propertySet = Properties.instance.getPropertySet
+    val propertyOpt =
+      propertyNames
+        .flatMap(n => propertySet.getPropertyOpt(n))
+        .find(_.nonBlankStringValue.isDefined)
+
+    (keyUsage, propertyOpt) match {
+      case (KeyUsage.GeneralNoCheck, Some(property)) =>
+        property.stringValue
+      case (KeyUsage.GeneralNoCheck, None) =>
+        randomHexId
+      case (_, Some(property)) if ! checkPasswordStrengthProperty =>
+        property.stringValue
+      case (_, Some(property)) =>
+        val isValid = property.associatedValue(_ => PasswordChecker.checkAndLog(property.name, property.stringValue))
+        isValid match {
+          case true  => property.stringValue
+          case false => throw new ConfigurationException(s"Invalid password for property `${property.name}` property, see log for details")
+        }
+      case (_, None) =>
+        throw new ConfigurationException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}")
+    }
   }
 
   private lazy val secureRandom = new SecureRandom
@@ -121,7 +115,7 @@ object SecureUtils extends SecureUtilsTrait {
       val salt = new Array[Byte](16)
       secureRandom.nextBytes(salt)
 
-      val spec = new PBEKeySpec(getOrComputePassword(keyUsage).toCharArray, salt, 65536, getKeyLength)
+      val spec = new PBEKeySpec(getPassword(keyUsage).toCharArray, salt, 65536, getKeyLength)
 
       val factory = SecretKeyFactory.getInstance(KeyCipherAlgorithm)
       new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
@@ -135,7 +129,7 @@ object SecureUtils extends SecureUtilsTrait {
 
     private def createAead(keyUsage: KeyUsage): AesGcmJce = {
       val messageDigest = MessageDigest.getInstance(DigestAlgorithm)
-      messageDigest.update(getOrComputePassword(keyUsage).getBytes(CharsetNames.Utf8))
+      messageDigest.update(getPassword(keyUsage).getBytes(CharsetNames.Utf8))
       val key256Bit = messageDigest.digest()
       // 128-bit key needed by implementation
       // Shortening is ok https://security.stackexchange.com/a/34797/49208
@@ -196,7 +190,7 @@ object SecureUtils extends SecureUtilsTrait {
 
   def checkPasswordForKeyUsage(keyUsage: KeyUsage): Boolean =
     try {
-      getOrComputePassword(keyUsage)
+      getPassword(keyUsage)
       true
     } catch {
       case _: ConfigurationException => false
@@ -285,7 +279,7 @@ object SecureUtils extends SecureUtilsTrait {
 
   // Compute an HMAC with the default password and algorithm
   def hmacString(keyUsage: KeyUsage, text: String, encoding: ByteEncoding): String =
-    hmacBytes(getOrComputePassword(keyUsage).getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
+    hmacBytes(getPassword(keyUsage).getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
 
   // Compute an HMAC
   def hmacString(key: String, text: String, algorithm: String, encoding: ByteEncoding): String =

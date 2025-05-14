@@ -189,6 +189,11 @@
              -->
             -dontwarn java.lang.invoke.MethodHandle
 
+            <!-- FIXME: We get this warning with Java 17:
+                 'org.orbeon.oxf.http.EmptyInputStream: can't find referenced method 'void skipNBytes(long)' in program class org.orbeon.oxf.http.EmptyInputStream$'
+            -->
+            -dontwarn org.orbeon.oxf.http.EmptyInputStream
+
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
             -libraryjars xforms-filter-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.17.jar
@@ -309,6 +314,11 @@
                  `Warning: cats.effect.IOFiberConstants: can't find referenced method 'boolean invokeExact(java.lang.Thread)' in library class java.lang.invoke.MethodHandle`
              -->
             -dontwarn java.lang.invoke.MethodHandle
+
+            <!-- FIXME: We get this warning with Java 17:
+                 'org.orbeon.oxf.http.EmptyInputStream: can't find referenced method 'void skipNBytes(long)' in program class org.orbeon.oxf.http.EmptyInputStream$'
+            -->
+            -dontwarn org.orbeon.oxf.http.EmptyInputStream
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 

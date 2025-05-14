@@ -118,7 +118,6 @@ val CoreLibraryDependencies = Seq(
   "org.eclipse.angus"           % "angus-mail"                      % AngusMailVersion,
   "com.sun.activation"          % "jakarta.activation"              % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
-  "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,

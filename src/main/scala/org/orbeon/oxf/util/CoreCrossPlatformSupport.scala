@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 
-import javax.enterprise.concurrent.ManagedExecutorService
+import java.util.concurrent.ExecutorService
 import javax.naming.InitialContext
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
@@ -39,7 +39,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   private val PropertyName    = "oxf.managed-executor-service.jndi-name"
 
   // If we don't make this lazy, things don't work down the line for some reason!
-  private lazy val _runtime = {
+  private lazy val _runtime: IORuntime = {
 
     val buffer = mutable.ListBuffer.empty[String]
 
@@ -56,7 +56,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
     def fromJndi: Try[IORuntime] =
       for {
         jndiName                       <- logTry(Try(CoreCrossPlatformSupport.properties.getString(PropertyName, DefaultJndiName)))("JNDI name")
-        managedExecutorService         <- logTry(Try((new InitialContext).lookup(jndiName).asInstanceOf[ManagedExecutorService]))("`ManagedExecutorService`")
+        managedExecutorService         <- logTry(Try((new InitialContext).lookup(jndiName).asInstanceOf[ExecutorService]))("`ManagedExecutorService`")
         executionContext               = ExecutionContext.fromExecutorService(managedExecutorService)
         (scheduler, schedulerShutdown) = IORuntime.createDefaultScheduler()
       } yield

@@ -34,7 +34,7 @@
 
     String  formParameter = request.getParameter("form");
     String  selectedForm  = formParameter != null &&
-            !((isEmbeddingApiJS || isEmbeddingApiAngular || isEmbeddingApiReact) && formParameter.equals("builder")) ?
+            !((isEmbeddingApiAngular || isEmbeddingApiReact) && formParameter.equals("builder")) ?
             formParameter : "bookshelf";
 %>
 <html>
@@ -48,7 +48,7 @@
     <link rel="stylesheet" href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
 
     <% if (isEmbeddingApiJS) { %>
-    <script type="text/javascript" src="/orbeon/xforms-server/baseline.js?updates=fr"></script>
+    <script type="text/javascript" src="/orbeon/xforms-server/baseline.js?updates=<%= selectedForm.equals("builder") ? "fb" : "fr" %>"></script>
     <% } %>
 
     <% if (isEmbeddingApiAngular) { %>
@@ -160,7 +160,9 @@
                     <li><a href="?form=feedback">Feedback</a></li>
                     <li><a href="?form=dmv-14">DMV-14</a></li>
                     <li><a href="?form=w9">W-9</a></li>
+                    <% if (!isEmbeddingApiAngular && !isEmbeddingApiReact) { %>
                     <li><a href="?form=builder">Form Builder</a></li>
+                    <% } %>
                 </ul>
                 <ul class="nav pull-right">
                     <li class="dropdown">

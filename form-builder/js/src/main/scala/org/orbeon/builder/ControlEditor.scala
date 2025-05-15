@@ -39,10 +39,10 @@ object ControlEditor {
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
   private var currentCellOpt : Option[Block] = None
-  private def controlEditorLeft              = $(".fb-control-editor-left")
-  private def controlEditorRight             = $(".fb-control-editor-right")
-  private def controlEditorTop               = $(".fb-control-editor-top")
-  private def controlEditors                 = controlEditorLeft.get() ++ controlEditorRight.get() ++ controlEditorTop.get()
+  private val controlEditorLeft              = memoizeIfFound(".fb-control-editor-left")
+  private val controlEditorRight             = memoizeIfFound(".fb-control-editor-right")
+  private val controlEditorTop               = memoizeIfFound(".fb-control-editor-top")
+  private def controlEditors                 = controlEditorLeft().get() ++ controlEditorRight().get() ++ controlEditorTop().get()
   private var masked: Boolean                = false
 
   // Show/hide editor
@@ -105,21 +105,21 @@ object ControlEditor {
       val jControlEl = $(controlEl)
 
       // Right editor
-      jControlEl.append(controlEditorRight)
-      positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth().getOrElse(0d))
+      jControlEl.append(controlEditorRight())
+      positionEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth().getOrElse(0d))
 
       // Show/hide itemset icon
-      val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
+      val itemsetIcon = controlEditorRight().find(".fb-control-edit-items")
       itemsetIcon.toggleClass("xforms-disabled", ! controlEl.classList.contains("fb-itemset"))
 
       // Top editor
-      jControlEl.append(controlEditorTop)
-      positionTopEditor(controlEditorTop, 0)
+      jControlEl.append(controlEditorTop())
+      positionTopEditor(controlEditorTop(), 0)
 
-      controlEditorTop.children().get(0).get.textContent = controlName
+      controlEditorTop().children().get(0).get.textContent = controlName
     }
-    firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft)
-    positionEditor(controlEditorLeft, 0)
+    firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft())
+    positionEditor(controlEditorLeft(), 0)
 
     // Enable/disable split/merge icons
     val allowedDirections = {
@@ -128,20 +128,20 @@ object ControlEditor {
     }
     for (((cssClass, direction), _) <- SplitMergeCssClassDirectionOps) {
       val disableIcon = ! allowedDirections.contains(direction)
-      val icon = controlEditorLeft.find(s".$cssClass")
+      val icon = controlEditorLeft().find(s".$cssClass")
       icon.toggleClass("disabled", disableIcon)
     }
   }
 
   private def hideEditors(): Unit = {
-    controlEditorLeft.hide()
-    controlEditorRight.hide()
-    controlEditorTop.hide()
+    controlEditorLeft().hide()
+    controlEditorRight().hide()
+    controlEditorTop().hide()
   }
 
   // Control actions
   ControlActionNames.foreach { actionName =>
-    val actionEl = controlEditorRight.find(s".fb-control-$actionName")
+    val actionEl = controlEditorRight().find(s".fb-control-$actionName")
     actionEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
       currentCellOpt.foreach { currentCell =>
 
@@ -158,7 +158,7 @@ object ControlEditor {
 
   // Expand/shrink actions
   for (((cssClass, _), ops) <- SplitMergeCssClassDirectionOps) {
-    val iconEl = controlEditorLeft.find(s".$cssClass")
+    val iconEl = controlEditorLeft().find(s".$cssClass")
     iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
       if (! iconEl.is(".disabled"))
         currentCellOpt.foreach { currentCell =>
@@ -166,5 +166,16 @@ object ControlEditor {
           ops(cellId)
         }
     }))
+  }
+
+  // Keep a reference when found, as elements can be removed from the DOM, for instance by full updates
+  private def memoizeIfFound(selector: String): () => JQuery = {
+    var memoOpt: Option[JQuery] = None
+    () => {
+      memoOpt match {
+        case Some(memo) if memo.is("*") => memo
+        case _                          => $(selector).kestrel(r => memoOpt = Some(r))
+      }
+    }
   }
 }

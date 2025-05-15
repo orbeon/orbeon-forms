@@ -17,9 +17,7 @@
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xh="http://www.w3.org/1999/xhtml"
           xmlns:xf="http://www.w3.org/2002/xforms"
-          xmlns:ev="http://www.w3.org/2001/xml-events"
           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:saxon="http://saxon.sf.net/"
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:utils="java:org.orbeon.oxf.xml.SaxonUtils">
@@ -70,7 +68,7 @@
                     action="echo:"
                     replace="all"/>
 
-                <xf:action ev:event="xforms-ready" xxf:xpath-analysis="true">
+                <xf:action event="xforms-ready" xxf:xpath-analysis="true">
                     <!-- Remember original empty data -->
 
                     <xf:var

@@ -393,7 +393,11 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-explanation.*"                  value="output-string"/>
 
      <!-- Internal processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value="save"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*">
+        save
+        then xf:dispatch(name = 'fr-save-import-done', targetid = 'fr-batch-import-model')
+        recover xf:dispatch(name = 'fr-save-import-error', targetid = 'fr-batch-import-model')
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"   value="abort"/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*" value="resume"/>
     <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                   value="save(draft = 'true')"/>

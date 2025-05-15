@@ -491,10 +491,10 @@
                                 <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
                                     <xf:action event="xforms-value-changed xforms-enabled">
                                         <xf:action xxbl:scope="inner" if="$label-from = 'service' or $auto-select-unique-choice">
-                                            <action if="xxf:is-blank($binding)">
+                                            <xf:action if="xxf:is-blank($binding)">
                                                 <xf:setvalue ref="$binding/@label"/>
                                                 <xf:setvalue ref="instance('local')/label"/>
-                                            </action>
+                                            </xf:action>
                                             <xf:action if="not(fr:is-design-time()) and (xxf:non-blank($binding) or $auto-select-unique-choice)">
                                                 <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
                                                 <xf:send submission="get-result">

@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, URLRewriterUtils}
 import org.orbeon.oxf.xml.XPathUtils.*
 
 import java.io.OutputStream
+import java.io.IOException
 import java.net.SocketException
 import java.lang as jl
 import scala.collection.mutable
@@ -154,133 +155,126 @@ abstract class HttpSerializerBase protected
 
     val response = externalContext.getResponse
 
-    try {
-      // Send an error if needed and return immediately
-      // 2024-04-08: No uses of this in the codebase.
-      val errorCode = config.errorCode
-      if (errorCode != DefaultErrorCode) {
-        response.sendError(errorCode)
-        return
-      }
+    // Send an error if needed and return immediately
+    // 2024-04-08: No uses of this in the codebase.
+    val errorCode = config.errorCode
+    if (errorCode != DefaultErrorCode) {
+      response.sendError(errorCode)
+      return
+    }
 
-      // Don't output caching headers or new status code if a non-success status code has been set
-      if (! StatusCode.isNonSuccessCode(response.getStatus)) {
+    // Don't output caching headers or new status code if a non-success status code has been set
+    if (! StatusCode.isNonSuccessCode(response.getStatus)) {
 
-        // Get last modification date and compute last modified if possible
-        // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
-        // and use oxf:request-generator default validity".
-        val lastModified = findInputLastModified(pipelineContext, dataInput, false)
+      // Get last modification date and compute last modified if possible
+      // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
+      // and use oxf:request-generator default validity".
+      val lastModified = findInputLastModified(pipelineContext, dataInput, false)
 
-        // Set caching headers and force revalidation
-        val pathTypeOpt = Option(pipelineContext.getAttribute(PageFlowControllerProcessor.PathTypeKey).asInstanceOf[PathType])
-        response.setPageCaching(lastModified, pathTypeOpt.getOrElse(PathType.Page))
+      // Set caching headers and force revalidation
+      val pathTypeOpt = Option(pipelineContext.getAttribute(PageFlowControllerProcessor.PathTypeKey).asInstanceOf[PathType])
+      response.setPageCaching(lastModified, pathTypeOpt.getOrElse(PathType.Page))
 
-        // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
-        if (! URLRewriterUtils.isForwarded(externalContext.getRequest)) {
-          // Check If-Modified-Since (conditional GET) and don't return content if condition is met
-          if (! response.checkIfModifiedSince(externalContext.getRequest, lastModified)) {
-            response.setStatus(StatusCode.NotModified)
-            logger.debug("Sending SC_NOT_MODIFIED")
-            return
-          }
+      // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
+      if (! URLRewriterUtils.isForwarded(externalContext.getRequest)) {
+        // Check If-Modified-Since (conditional GET) and don't return content if condition is met
+        if (! response.checkIfModifiedSince(externalContext.getRequest, lastModified)) {
+          response.setStatus(StatusCode.NotModified)
+          logger.debug("Sending SC_NOT_MODIFIED")
+          return
         }
-        // STATUS CODE: Set status code based on the configuration
-        // An XML processing instruction may override this when the input is being read
-        response.setStatus(config.statusCode)
       }
-      // Set custom headers
-      config.headers.foreach(kv => response.setHeader(kv._1, kv._2))
+      // STATUS CODE: Set status code based on the configuration
+      // An XML processing instruction may override this when the input is being read
+      response.setStatus(config.statusCode)
+    }
+    // Set custom headers
+    config.headers.foreach(kv => response.setHeader(kv._1, kv._2))
 
-      // If we have an empty body, return without reading the data input
-      if (config.empty)
-        return
+    // If we have an empty body, return without reading the data input
+    if (config.empty)
+      return
 
-      val httpOutputStream = response.getOutputStream
+    val httpOutputStream = response.getOutputStream
 
-      // If local caching of the data is enabled and if the configuration status code is a success code, use
-      // the caching API. It doesn't make sense in HTTP to allow caching of non-successful responses.
-      if (
-        config.cacheUseLocalCache &&
-        StatusCode.isSuccessCode(config.statusCode) &&
-        ! StatusCode.isNonSuccessCode(response.getStatus)
-      ) {
-        var wasRead = false
-        val resultStore =
-          readCacheInputAsObject(
-            pipelineContext,
-            dataInput,
-            new CacheableInputReader[ExtendedResultStoreOutputStream] {
+    // If local caching of the data is enabled and if the configuration status code is a success code, use
+    // the caching API. It doesn't make sense in HTTP to allow caching of non-successful responses.
+    if (
+      config.cacheUseLocalCache &&
+      StatusCode.isSuccessCode(config.statusCode) &&
+      ! StatusCode.isNonSuccessCode(response.getStatus)
+    ) {
+      var wasRead = false
+      val resultStore =
+        readCacheInputAsObject(
+          pipelineContext,
+          dataInput,
+          new CacheableInputReader[ExtendedResultStoreOutputStream] {
 
-              private var statusCode = config.statusCode
+            private var statusCode = config.statusCode
 
-              override def read(pipelineContext: PipelineContext, input: ProcessorInput): ExtendedResultStoreOutputStream = {
-                wasRead = true
-                logger.debug("Output not cached")
+            override def read(pipelineContext: PipelineContext, input: ProcessorInput): ExtendedResultStoreOutputStream = {
+              wasRead = true
+              logger.debug("Output not cached")
 
-                  val resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream)
-                  // NOTE: readInput will call response.setContentType() and other methods so we intercept and save the
-                  // values.
-                  readInput(
-                    pipelineContext,
-                    new ResponseWrapper(response) {
+                val resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream)
+                // NOTE: readInput will call response.setContentType() and other methods so we intercept and save the
+                // values.
+                readInput(
+                  pipelineContext,
+                  new ResponseWrapper(response) {
 
-                      override def setContentType(contentType: String): Unit = {
-                        resultStoreOutputStream.contentType = Option(contentType)
-                        super.setContentType(contentType)
-                      }
+                    override def setContentType(contentType: String): Unit = {
+                      resultStoreOutputStream.contentType = Option(contentType)
+                      super.setContentType(contentType)
+                    }
 
-                      override def setHeader(name: String, value: String): Unit = {
-                        resultStoreOutputStream.setHeader(name, value)
-                        super.setHeader(name, value)
-                      }
+                    override def setHeader(name: String, value: String): Unit = {
+                      resultStoreOutputStream.setHeader(name, value)
+                      super.setHeader(name, value)
+                    }
 
-                      override def getOutputStream: OutputStream = resultStoreOutputStream
+                    override def getOutputStream: OutputStream = resultStoreOutputStream
 
-                      override def setStatus(status: Int): Unit = {
-                        // STATUS CODE: This typically is overridden via a processing instruction.
-                        statusCode = status
-                        resultStoreOutputStream.status = Some(status)
-                        super.setStatus(status)
-                      }
-                    },
-                    input,
-                    config
-                  )
-                  resultStoreOutputStream.close()
-                  resultStoreOutputStream
-              }
-
-              // It doesn't make sense in HTTP to allow caching of non-successful responses
-              override def allowCaching: Boolean =
-                StatusCode.isSuccessCode(statusCode) && !StatusCode.isNonSuccessCode(response.getStatus)
+                    override def setStatus(status: Int): Unit = {
+                      // STATUS CODE: This typically is overridden via a processing instruction.
+                      statusCode = status
+                      resultStoreOutputStream.status = Some(status)
+                      super.setStatus(status)
+                    }
+                  },
+                  input,
+                  config
+                )
+                resultStoreOutputStream.close()
+                resultStoreOutputStream
             }
-        )
-        // If the output was obtained from the cache, just write it
-        if (! wasRead) {
-          logger.debug("Serializer output cached")
 
-          resultStore.status
-            .foreach(response.setStatus)
-          resultStore.contentType
-            .foreach(response.setContentType)
-          for ((key, value) <- resultStore.getHeaders)
-            response.setHeader(key, value)
-          // Set length since we know it
-          response.setContentLength(resultStore.length(pipelineContext))
+            // It doesn't make sense in HTTP to allow caching of non-successful responses
+            override def allowCaching: Boolean =
+              StatusCode.isSuccessCode(statusCode) && !StatusCode.isNonSuccessCode(response.getStatus)
+          }
+      )
+      // If the output was obtained from the cache, just write it
+      if (! wasRead) {
+        logger.debug("Serializer output cached")
 
-          // Replay content
-          resultStore.replay(pipelineContext)
-        }
-      } else {
-        // Local caching is not enabled, just read the input
-        readInput(pipelineContext, response, dataInput, config)
-        httpOutputStream.close()
+        resultStore.status
+          .foreach(response.setStatus)
+        resultStore.contentType
+          .foreach(response.setContentType)
+        for ((key, value) <- resultStore.getHeaders)
+          response.setHeader(key, value)
+        // Set length since we know it
+        response.setContentLength(resultStore.length(pipelineContext))
+
+        // Replay content
+        resultStore.replay(pipelineContext)
       }
-    } catch {
-      case _: SocketException =>
-        // In general there is no point doing much with such exceptions. They are thrown in particular when the
-        // client has closed the connection.
-        logger.info("SocketException in serializer")
+    } else {
+      // Local caching is not enabled, just read the input
+      readInput(pipelineContext, response, dataInput, config)
+      httpOutputStream.close()
     }
   }
 

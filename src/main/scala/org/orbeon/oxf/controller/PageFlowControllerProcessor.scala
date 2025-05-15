@@ -147,6 +147,17 @@ class PageFlowControllerProcessor extends ProcessorImpl {
       error(OrbeonFormatter.format(t))
     }
 
+    def isConnectionInterruption(t: Throwable): Boolean = {
+      getRootThrowable(t) match {
+        case _: java.net.SocketException => true
+        case e: java.io.IOException if e.getMessage != null =>
+          e.getMessage.contains("Broken pipe") ||
+          e.getMessage.contains("Connection reset") ||
+          e.getMessage.contains("An established connection was aborted")
+        case _ => false
+      }
+    }
+
     def logNotFound(t: Option[Throwable]): Unit = {
 
       def rootResource = t map getRootThrowable collect {
@@ -260,6 +271,8 @@ class PageFlowControllerProcessor extends ProcessorImpl {
               }
             case _: ResourceNotFoundException =>
               if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+            case _ if isConnectionInterruption(t) =>
+              warn(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
             case _ =>
               if (route.isPage)     runErrorRoute(t)          else sendError(t)
           }

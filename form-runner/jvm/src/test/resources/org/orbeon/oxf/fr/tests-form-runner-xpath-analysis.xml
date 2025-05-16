@@ -174,10 +174,15 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:output id="my-mode"        value="fr:mode()"/>
-                    <xf:output id="my-app-name"    value="fr:app-name()"/>
-                    <xf:output id="my-form-name"   value="fr:form-name()"/>
-                    <xf:output id="my-document-id" value="fr:document-id()"/>
+                    <xf:output id="my-mode"                    value="fr:mode()"/>
+                    <xf:output id="my-app-name"                value="fr:app-name()"/>
+                    <xf:output id="my-form-name"               value="fr:form-name()"/>
+                    <xf:output id="my-document-id"             value="fr:document-id()"/>
+                    <xf:output id="my-is-draft"                value="fr:is-draft()"/>
+                    <xf:output id="my-is-design-time"          value="fr:is-design-time()"/>
+                    <xf:output id="my-is-readonly-mode"        value="fr:is-readonly-mode()"/>
+                    <xf:output id="my-form-version"            value="fr:form-version()"/>
+                    <xf:output id="my-attachment-form-version" value="fr:attachment-form-version()"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -244,6 +249,41 @@
                                 <instance>fr-parameters-instance</instance>
                             </dependent-instances>
                         </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-is-draft" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:is-draft())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-parameters-instance')/draft</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-parameters-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-is-design-time" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:is-design-time())[1])" analyzed="true"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-is-readonly-mode" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:is-readonly-mode())[1])" analyzed="true"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-form-version" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:form-version())[1])" analyzed="true"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-attachment-form-version" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:attachment-form-version())[1])" analyzed="true"/>
                     </value>
                 </output>
             </root>

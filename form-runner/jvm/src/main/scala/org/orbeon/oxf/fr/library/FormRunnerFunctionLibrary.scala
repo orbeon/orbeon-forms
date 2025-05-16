@@ -69,13 +69,6 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Fun(name, classOf[BooleanFunction], index, 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
     }
 
-    // Register simple int functions
-    for {
-      ((name, _), index) <- IntGettersByName.zipWithIndex
-    } locally {
-      Fun(name, classOf[IntFunction], index, 0, INTEGER, ALLOWS_ZERO_OR_ONE)
-    }
-
     // Register simple dateTime functions
     for {
       ((name, _), index) <- DateTimeGettersByName.zipWithIndex
@@ -88,6 +81,13 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("app-name",                    classOf[FRAppName],              op = 0, min = 0, STRING, EXACTLY_ONE)
     Fun("form-name",                   classOf[FRFormName],             op = 0, min = 0, STRING, EXACTLY_ONE)
     Fun("document-id",                 classOf[FRDocumentId],           op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+
+    Fun("is-draft",                    classOf[FRIsDraft],              op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
+    Fun("is-design-time",              classOf[FRIsDesignTime],         op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
+    Fun("is-readonly-mode",            classOf[FRIsReadonlyMode],       op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
+
+    Fun("form-version",                classOf[FRFormVersion],          op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("attachment-form-version",     classOf[FRAttachmentFormVersion], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
 
     // Other functions
     Fun("user-roles",                  classOf[UserRoles],             op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
@@ -183,9 +183,6 @@ private object FormRunnerFunctions {
   val BooleanGettersByName = List(
     "is-browser-environment"      -> (() => CoreCrossPlatformSupport.isJsEnv),
     "is-pe"                       -> (() => Version.isPE),
-    "is-draft"                    -> (() => FormRunnerParams().isDraft.getOrElse(false)),
-    "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
-    "is-readonly-mode"            -> (() => FormRunnerParamsOpt().exists(p => FormRunner.isReadonlyMode(p))),
     "is-service-path"             -> (() => FormRunner.isServicePath(XFormsFunction.context)),
     "is-background"               -> (() => FormRunner.isBackground(XFormsFunction.context, FormRunnerParams())),
     "is-noscript"                 -> (() => false),
@@ -202,11 +199,6 @@ private object FormRunnerFunctions {
     "can-delete"                  -> (() => FormRunner.canDelete),
     "can-list"                    -> (() => FormRunner.canList),
     "owns-lease-or-none-required" -> (() => FormRunner.userOwnsLeaseOrNoneRequired)
-  )
-
-  val IntGettersByName = List(
-    "form-version"                -> (() => FormRunnerParams().formVersion),
-    "attachment-form-version"     -> (() => FRComponentParamSupport.formAttachmentVersion(FormRunnerParams()))
   )
 
   val DateTimeGettersByName = List(
@@ -230,13 +222,6 @@ private object FormRunnerFunctions {
       index -> fun
   ).toMap
 
-  private val IndexedIntFunctions = (
-    for {
-      ((_, fun), index) <- IntGettersByName.zipWithIndex
-    } yield
-      index -> fun
-  ).toMap
-
   private val IndexedDateTimeFunctions = (
     for {
       ((_, fun), index) <- DateTimeGettersByName.zipWithIndex
@@ -252,11 +237,6 @@ private object FormRunnerFunctions {
   class BooleanFunction extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): BooleanValue =
       IndexedBooleanFunctions(operation).apply()
-  }
-
-  class IntFunction extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(xpathContext: XPathContext): IntegerValue =
-      IndexedIntFunctions(operation).apply()
   }
 
   class DateTimeFunction extends FunctionSupport with RuntimeDependentFunction {
@@ -490,12 +470,13 @@ private object FormRunnerFunctions {
     }
   }
 
-  trait FRParamsFunction extends FunctionSupport with RuntimeDependentFunction {
-    val elemName: String
-    def fromParams(params: FormRunnerParams): Option[String]
+  trait FRParamsFunction[R >: Null <: AtomicValue] extends FunctionSupport with RuntimeDependentFunction {
 
-    override def evaluateItem(context: XPathContext): StringValue =
-      FormRunnerParamsOpt().flatMap(fromParams)
+    val elemNames: List[String]
+    def fromParams(params: FormRunnerParams): Option[R]
+
+    override def evaluateItem(context: XPathContext): R =
+      FormRunnerParamsOpt().flatMap(fromParams).orNull
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
 
@@ -510,38 +491,73 @@ private object FormRunnerFunctions {
         instanceExpression
       }
 
-      new AxisExpression(
-        Axis.CHILD,
-        new NameTest(Type.ELEMENT, "", elemName, getExecutable.getConfiguration.getNamePool)
-      )
-      .addToPathMap(
-        pathMap,
-        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
-      )
-      .setAtomized()
-
+      elemNames.foreach { elemName =>
+        new AxisExpression(
+          Axis.CHILD,
+          new NameTest(Type.ELEMENT, "", elemName, getExecutable.getConfiguration.getNamePool)
+        )
+        .addToPathMap(
+          pathMap,
+          new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
+        )
+        .setAtomized()
+      }
 
       null
     }
   }
 
-  class FRMode extends FRParamsFunction {
-    override val elemName: String = "mode"
-    override def fromParams(params: FormRunnerParams): Option[String] = Some(params.mode)
+  // Can change, for example between `new` and `edit`
+  class FRMode extends FRParamsFunction[StringValue] {
+    override val elemNames: List[String] = List("mode")
+    override def fromParams(params: FormRunnerParams): Option[StringValue] = Some(params.mode)
   }
 
-  class FRAppName extends FRParamsFunction {
-    override val elemName: String = "app"
-    override def fromParams(params: FormRunnerParams): Option[String] = Some(params.app)
+  // Probably cannot change over the course of the form's lifetime
+  class FRAppName extends FRParamsFunction[StringValue] {
+    override val elemNames: List[String] = List("app")
+    override def fromParams(params: FormRunnerParams): Option[StringValue] = Some(params.app)
   }
 
-  class FRFormName extends FRParamsFunction {
-    override val elemName: String = "form"
-    override def fromParams(params: FormRunnerParams): Option[String] = Some(params.form)
+  // Probably cannot change over the course of the form's lifetime
+  class FRFormName extends FRParamsFunction[StringValue] {
+    override val elemNames: List[String] = List("form")
+    override def fromParams(params: FormRunnerParams): Option[StringValue] = Some(params.form)
   }
 
-  class FRDocumentId extends FRParamsFunction {
-    override val elemName: String = "document"
-    override def fromParams(params: FormRunnerParams): Option[String] = params.document
+  // Can change when creating a new document id
+  class FRDocumentId extends FRParamsFunction[StringValue] {
+    override val elemNames: List[String] = List("document")
+    override def fromParams(params: FormRunnerParams): Option[StringValue] = params.document.map(stringToStringValue)
+  }
+
+  // Can change between draft and non-draft
+  class FRIsDraft extends FRParamsFunction[BooleanValue] {
+    override val elemNames: List[String] = List("draft")
+    override def fromParams(params: FormRunnerParams): Option[BooleanValue] = Some(booleanToBooleanValue(params.isDraft.getOrElse(false)))
+  }
+
+  // Cannot change between design-time and non-design-time over the course of the form's lifetime
+  class FRIsDesignTime extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      FormRunner.isDesignTime(FormRunnerParams())
+  }
+
+  // Cannot change between readonly and non-readonly mode over the course of the form's lifetime
+  class FRIsReadonlyMode extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      FormRunnerParamsOpt().exists(p => FormRunner.isReadonlyMode(p))
+  }
+
+  // A given form version does not change over the course of the form's lifetime
+  class FRFormVersion extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): IntegerValue =
+      FormRunnerParams().formVersion
+  }
+
+  // A given attachment form version does not change over the course of the form's lifetime
+  class FRAttachmentFormVersion extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): IntegerValue =
+      FRComponentParamSupport.attachmentFormVersion(FormRunnerParams())
   }
 }

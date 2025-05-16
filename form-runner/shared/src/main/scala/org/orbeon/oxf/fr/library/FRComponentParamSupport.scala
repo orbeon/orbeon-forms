@@ -233,7 +233,7 @@ object FRComponentParamSupport {
   // Called by attachments XBL controls from XPath with `fr:attachment-form-version()`, to pass the header
   // `Orbeon-Form-Definition-Version`.
   // https://github.com/orbeon/orbeon-forms/issues/4919
-  def formAttachmentVersion(implicit p: FormRunnerParams): Int =
+  def attachmentFormVersion(implicit p: FormRunnerParams): Int =
     if (frc.isDesignTime || p.mode == "test") {
       // The form definition is not published yet, and we need to figure out the library form version
 

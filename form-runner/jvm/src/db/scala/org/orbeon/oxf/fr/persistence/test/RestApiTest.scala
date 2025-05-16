@@ -467,8 +467,8 @@ class RestApiTest
     }
 
     it("must pass basic operations (filesystem attachments)") {
-      def baseDirectory(appForm: AppForm, formOrData: FormOrData): Path =
-        Paths.get(FilesystemCRUD.providerAndDirectoryProperty(appForm, formOrData).directory)
+      def basePath(appForm: AppForm, formOrData: FormOrData): Path =
+        Paths.get(FilesystemCRUD.config(appForm, formOrData).basePath)
 
       def fileCount(directory: Path): Long =
         Files.walk(directory).filter(Files.isRegularFile(_)).count()
@@ -477,7 +477,7 @@ class RestApiTest
       var fileCountBefore = 0L
 
       def preTest(appForm: AppForm, formOrData: FormOrData): Unit = {
-        val directory = baseDirectory(appForm, formOrData)
+        val directory = basePath(appForm, formOrData)
 
         // Create the attachments base directory if needed, assuming that its parent directory exists
 
@@ -491,7 +491,7 @@ class RestApiTest
       }
 
       def postTest(appForm: AppForm, formOrData: FormOrData): Unit = {
-        val directory = baseDirectory(appForm, formOrData)
+        val directory = basePath(appForm, formOrData)
         val fileCountAfter = fileCount(directory)
 
         // Simple test that checks that files were indeed created
@@ -511,19 +511,19 @@ class RestApiTest
 
     it("must support AVTs in 'directory' base directory property") {
       // No AVT
-      val directory1 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-1"), FormOrData.Data).directory
+      val directory1 = FilesystemCRUD.config(AppForm("fs-app", "fs-form-1"), FormOrData.Data).basePath
       assert(directory1 == "test1")
 
       // Simple AVT (constant string)
-      val directory2 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-2"), FormOrData.Data).directory
+      val directory2 = FilesystemCRUD.config(AppForm("fs-app", "fs-form-2"), FormOrData.Data).basePath
       assert(directory2 == "test2")
 
       // Simple AVT (basic arithmetic operation)
-      val directory3 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-3"), FormOrData.Data).directory
+      val directory3 = FilesystemCRUD.config(AppForm("fs-app", "fs-form-3"), FormOrData.Data).basePath
       assert(directory3 == "3")
 
       // environment-variable function
-      val directory4 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-4"), FormOrData.Data).directory
+      val directory4 = FilesystemCRUD.config(AppForm("fs-app", "fs-form-4"), FormOrData.Data).basePath
       assert(directory4.nonEmpty)
     }
   }

@@ -80,7 +80,11 @@ private[attachments] object CRUD {
     documentId : Option[String],
     version    : Option[Int],
     filename   : String
-  )
+  ) {
+    // Fixed path to the attachment file (same for local filesystem and S3)
+    lazy val pathSegments: List[String] =
+      List(appForm.app, appForm.form, formOrData.entryName) :++ documentId :++ version.map(_.toString) :+ filename
+  }
 
   def providerAndAttachmentInformation(httpRequest: Request): (Provider, AttachmentInformation) = {
     val versionFromHeaders = httpRequest.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)

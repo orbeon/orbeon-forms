@@ -13,9 +13,14 @@
  */
 package org.orbeon.oxf.fr.persistence.attachments
 
+import org.log4s.Logger
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
-import org.orbeon.oxf.http.HttpRanges
+import org.orbeon.oxf.http.{HttpRange, HttpRanges, StatusCode}
+
+import java.io.InputStream
+import scala.util.{Failure, Success}
 
 
 trait CRUDMethods {
@@ -23,4 +28,27 @@ trait CRUDMethods {
   def get   (attachmentInformation: AttachmentInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
   def put   (attachmentInformation: AttachmentInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
   def delete(attachmentInformation: AttachmentInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
+}
+
+object CRUDMethods {
+  def get(
+    httpRanges        : HttpRanges,
+    length            : Long,
+    partialInputStream: HttpRange => InputStream,
+    fullInputStream   : => InputStream)(implicit
+    httpRequest       : Request,
+    httpResponse      : Response,
+    logger            : Logger
+  ): Unit =
+    httpRanges.streamResponse(length, partialInputStream, fullInputStream) match {
+      case Success(streamResponse) =>
+        IOUtils.copyStreamAndClose(streamResponse.inputStream, httpResponse.getOutputStream)
+
+        httpResponse.addHeaders(streamResponse.headers)
+        httpResponse.setStatus(streamResponse.statusCode)
+
+      case Failure(throwable) =>
+        logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+        httpResponse.setStatus(StatusCode.InternalServerError)
+    }
 }

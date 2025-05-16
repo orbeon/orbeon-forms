@@ -17,12 +17,14 @@ package org.orbeon.oxf.fr.s3
 import org.orbeon.connection.Content
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.runQuietly
+import org.orbeon.oxf.http.HttpRange
 import org.orbeon.oxf.util.NetUtils
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 
+import java.io.InputStream
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.{Failure, Success, Try}
 
@@ -66,6 +68,24 @@ object S3 {
       // We have to close the input stream in both cases above (not closed neither by AWS SDK nor by NetUtils)
       content.stream.close()
     }
+  }
+
+  def inputStream(
+    key         : String,
+    httpRangeOpt: Option[HttpRange])(implicit
+    s3Config    : S3Config,
+    s3Client    : S3Client
+  ): Try[InputStream] = Try {
+
+    val getObjectRequestBaseBuilder = GetObjectRequest.builder().bucket(s3Config.bucket).key(key)
+    val httpRangeStringOpt          = httpRangeOpt.map(r => s"bytes=${r.start}-${r.end.map(_.toString).getOrElse("")}")
+
+    val getObjectRequestBuilder = httpRangeStringOpt match {
+      case Some(httpRangeString) => getObjectRequestBaseBuilder.range(httpRangeString)
+      case None                  => getObjectRequestBaseBuilder
+    }
+
+    s3Client.getObject(getObjectRequestBuilder.build)
   }
 
   def objectAsString(

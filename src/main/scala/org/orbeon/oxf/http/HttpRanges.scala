@@ -2,10 +2,10 @@ package org.orbeon.oxf.http
 
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.TryUtils
+import org.orbeon.oxf.util.TryUtils.*
 
-import java.io.{File, InputStream}
+import java.io.InputStream
 import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 
@@ -13,21 +13,24 @@ import scala.util.{Failure, Success, Try}
 case class HttpRanges(ranges: Seq[HttpRange] = Seq(), ifRange: Option[IfRange] = None) {
   val singleRange: Option[HttpRange] = ranges.headOption
 
-  def streamedFile(file: File, newFileInputStream: => InputStream): Try[StreamedFile] = {
-    val fileLength  = file.length()
+  def streamResponse(
+    length            : Long,
+    partialInputStream: HttpRange => InputStream,
+    fullInputStream   : => InputStream
+  ): Try[StreamResponse] = {
 
     // Only support single ranges for now (browsers don't seem to send requests for multiple ranges)
     singleRange match {
       case Some(range) =>
-        val outOfBounds = range.start >= fileLength || range.end.exists(_ >= fileLength)
+        val outOfBounds = range.start >= length || range.end.exists(_ >= length)
 
         if (outOfBounds)
-          Failure(new Exception(s"Range ${range.asString} out of bounds (file size: $fileLength)"))
+          Failure(new Exception(s"Range ${range.asString} out of bounds (total size: $length)"))
         else
-          Try(StreamedFile(file, StatusCode.PartialContent, range.responseHeaders(fileLength), FileRangeInputStream(file, range)))
+          Try(StreamResponse(StatusCode.PartialContent, range.responseHeaders(length), partialInputStream(range)))
 
       case None =>
-        Try(StreamedFile(file, StatusCode.Ok, HttpRanges.acceptRangesHeader(fileLength), newFileInputStream))
+        Try(StreamResponse(StatusCode.Ok, HttpRanges.acceptRangesHeader(length), fullInputStream))
     }
   }
 }
@@ -62,7 +65,7 @@ sealed trait IfRange
 case class IfRangeDate(date: Long)   extends IfRange
 case class IfRangeETag(etag: String) extends IfRange
 
-case class StreamedFile(file: File, statusCode: Int, headers: Map[String, List[String]], inputStream: InputStream)
+case class StreamResponse(statusCode: Int, headers: Map[String, List[String]], inputStream: InputStream)
 
 object HttpRanges {
   private val Units = "bytes"

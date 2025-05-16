@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Orbeon, Inc.
+ * Copyright (C) 2023 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,56 +13,55 @@
  */
 package org.orbeon.oxf.fr.persistence.attachments
 
+import org.log4s.Logger
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
-import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
-import org.orbeon.oxf.http.{HttpRanges, StatusCode}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory}
+import org.orbeon.oxf.fr.{AppForm, FormOrData}
+import org.orbeon.oxf.http.{FileRangeInputStream, HttpRange, HttpRanges, StatusCode}
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.saxon.function.Property.evaluateAsAvt
-import org.orbeon.xml.NamespaceMapping
 
 import java.io.*
 import java.nio.file.{Files, Path, Paths}
-import scala.util.{Failure, Success}
+import scala.util.Try
 
 
 trait FilesystemCRUD extends CRUDMethods {
-  private val logger = LoggerFactory.createLogger(classOf[FilesystemCRUD])
+  private implicit val logger: Logger = LoggerFactory.createLogger(classOf[FilesystemCRUD])
+
+  // We let exceptions propagate up to withFile, which will set the HTTP status code accordingly in case of error
 
   override def head(
     attachmentInformation : AttachmentInformation,
     httpRanges            : HttpRanges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
-  ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
-    if (fileToAccess.exists()) {
-      httpResponse.addHeaders(HttpRanges.acceptRangesHeader(fileToAccess.length()))
-      httpResponse.setStatus(StatusCode.Ok)
-    } else {
-      httpResponse.setStatus(StatusCode.NotFound)
+  ): Unit =
+    withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
+      if (fileToAccess.exists()) {
+        httpResponse.addHeaders(HttpRanges.acceptRangesHeader(fileToAccess.length()))
+        httpResponse.setStatus(StatusCode.Ok)
+      } else {
+        httpResponse.setStatus(StatusCode.NotFound)
+      }
     }
-  }
 
   override def get(
     attachmentInformation : AttachmentInformation,
     httpRanges            : HttpRanges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
-  ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
-    httpRanges.streamedFile(fileToRead, new FileInputStream(fileToRead)) match {
-      case Success(streamedFile) =>
-        IOUtils.copyStreamAndClose(streamedFile.inputStream, httpResponse.getOutputStream)
-
-        httpResponse.addHeaders(streamedFile.headers)
-        httpResponse.setStatus(streamedFile.statusCode)
-
-      case Failure(throwable) =>
-        logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
-        httpResponse.setStatus(StatusCode.InternalServerError)
+  ): Unit =
+    withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
+      CRUDMethods.get(
+        httpRanges         = httpRanges,
+        length             = fileToRead.length(),
+        partialInputStream = (httpRange: HttpRange) => FileRangeInputStream(fileToRead, httpRange),
+        fullInputStream    = new FileInputStream(fileToRead),
+      )
     }
-  }
 
   override def put(
     attachmentInformation : AttachmentInformation)(implicit
@@ -76,6 +75,8 @@ trait FilesystemCRUD extends CRUDMethods {
       val fileOutputStream = new FileOutputStream(fileToWrite)
 
       IOUtils.copyStreamAndClose(inputStream, fileOutputStream)
+
+      httpResponse.setStatus(StatusCode.NoContent)
     }
 
   override def delete(
@@ -84,7 +85,9 @@ trait FilesystemCRUD extends CRUDMethods {
     httpResponse          : Response
   ): Unit =
     withFile(attachmentInformation, httpRequest, httpResponse) { fileToDelete =>
-      if (!fileToDelete.delete()) {
+      if (fileToDelete.delete()) {
+        httpResponse.setStatus(StatusCode.NoContent)
+      } else {
         httpResponse.setStatus(StatusCode.InternalServerError)
       }
     }
@@ -115,64 +118,37 @@ trait FilesystemCRUD extends CRUDMethods {
   }
 
   private def file(attachmentInformation: AttachmentInformation): File = {
-    val baseDirectory = FilesystemCRUD.baseDirectory(attachmentInformation.appForm, attachmentInformation.formOrData)
-
-    val pathSegments = Seq(
-      attachmentInformation.appForm.app,
-      attachmentInformation.appForm.form,
-      attachmentInformation.formOrData.entryName) ++
-      attachmentInformation.documentId.toSeq ++
-      attachmentInformation.version.map(_.toString).toSeq :+
-      attachmentInformation.filename
-
-    val path = Paths.get(baseDirectory.toString, pathSegments*)
+    val basePath = FilesystemCRUD.basePath(attachmentInformation.appForm, attachmentInformation.formOrData)
+    val path     = Paths.get(basePath.toString, attachmentInformation.pathSegments*)
 
     path.toFile
   }
 }
 
-object FilesystemCRUD {
-  case class ProviderAndDirectory(provider: String, directory: String)
+object FilesystemCRUD extends CRUDConfig {
+  case class Config(provider: String, basePath: String)
 
-  def providerAndDirectoryProperty(appForm: AppForm, formOrData: FormOrData): ProviderAndDirectory = {
-    val provider = FormRunnerPersistence.findAttachmentsProvider(
-      appForm,
-      formOrData
-    ).getOrElse {
-      val propertySegment = Seq(
-        appForm.app,
-        appForm.form,
-        formOrData.entryName
-      ).mkString(".")
+  type C = Config
 
-      throw new OXFException(s"Could not find attachments provider for `$propertySegment`")
-    }
+  override def config(appForm: AppForm, formOrData: FormOrData): Config = {
+    val provider = this.provider(appForm, formOrData)
 
-    val DirectoryProperty = "directory"
+    val (rawBasePath, basePathNamespaces) =
+      Try(providerPropertyWithNs(provider, "base-path", defaultOpt = None)).getOrElse {
+        // Compatibility property
+        providerPropertyWithNs(provider, "directory", defaultOpt = None)
+      }
 
-    val rawDirectory = FormRunnerPersistence.providerPropertyAsUrlOpt(
-      provider,
-      DirectoryProperty
-    ).getOrElse {
-      throw new OXFException(s"Could not find directory property for provider `$provider`")
-    }
-
-    val directoryNamespaces = NamespaceMapping(
-      FormRunnerPersistence.providerPropertyOpt(provider, DirectoryProperty, CoreCrossPlatformSupport.properties)
-        .map(_.namespaces)
-        .getOrElse(Map[String, String]())
-    )
-
-    ProviderAndDirectory(provider, evaluateAsAvt(rawDirectory, directoryNamespaces))
+    // Evaluate the base path as an AVT
+    Config(provider, evaluateAsAvt(rawBasePath, basePathNamespaces))
   }
 
-  def baseDirectory(appForm: AppForm, formOrData: FormOrData): Path = {
-    val providerAndDirectory = providerAndDirectoryProperty(appForm, formOrData)
-
-    val path = Paths.get(providerAndDirectory.directory)
+  def basePath(appForm: AppForm, formOrData: FormOrData): Path = {
+    val config = this.config(appForm, formOrData)
+    val path   = Paths.get(config.basePath)
 
     if (!Files.exists(path)) {
-      throw new OXFException(s"Directory `${providerAndDirectory.directory}` does not exist for provider `${providerAndDirectory.provider}`")
+      throw new OXFException(s"Directory `${config.basePath}` does not exist for provider `${config.provider}`")
     }
 
     path.toRealPath()

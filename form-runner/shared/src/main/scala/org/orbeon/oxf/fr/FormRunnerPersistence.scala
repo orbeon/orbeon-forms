@@ -47,9 +47,9 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.scaxon.SimplePath.AnyTest.except
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
+import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
 import java.util as ju
@@ -240,6 +240,15 @@ object FormRunnerPersistence {
 
   def providerPropertyAsUrlOpt(provider: String, property: String): Option[String] =
     properties.getStringOrURIAsStringOpt(providerPropertyName(provider, property))
+
+  def providerPropertyWithNs(
+    provider  : String,
+    property  : String,
+    properties: PropertySet = CoreCrossPlatformSupport.properties
+  ): Option[(String, NamespaceMapping)] =
+    providerPropertyOpt(provider, property, properties).map { p =>
+      (p.stringValue, p.namespaceMapping)
+    }
 
   // https://github.com/orbeon/orbeon-forms/issues/6300
   def isInternalProvider(provider: String, properties: PropertySet): Boolean =

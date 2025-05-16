@@ -22,5 +22,5 @@ object Provider extends Enum[Provider] {
   val values = findValues
 
   case object Filesystem extends Provider with FilesystemCRUD
-  // e.g case object S3  extends Provider with S3CRUD
+  case object S3         extends Provider with S3CRUD
 }

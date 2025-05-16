@@ -450,11 +450,17 @@ object Connection extends ConnectionTrait {
               // Take care of HTTP ranges with local files
               val (statusCode, rangeHeaders, inputStream) =
                 if (scheme == UriScheme.File) { // must be a temp file
-                  val streamedFile =
-                    HttpRanges(headers).get.streamedFile(new File(UriUtils.removeQueryAndFragment(normalizedUrl)), urlConnection.getInputStream).get
-                  (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
+
+                  val tempFile       = new File(UriUtils.removeQueryAndFragment(normalizedUrl))
+                  val streamResponse = HttpRanges(headers).get.streamResponse(
+                      length             = tempFile.length(),
+                      partialInputStream = (httpRange: HttpRange) => FileRangeInputStream(tempFile, httpRange),
+                      fullInputStream    = urlConnection.getInputStream
+                  ).get
+
+                  (streamResponse.statusCode, streamResponse.headers, streamResponse.inputStream)
                 } else {
-                  (StatusCode.Ok,           Map(),                urlConnection.getInputStream)
+                  (StatusCode.Ok,             Map(),                  urlConnection.getInputStream)
                 }
 
               // Create result

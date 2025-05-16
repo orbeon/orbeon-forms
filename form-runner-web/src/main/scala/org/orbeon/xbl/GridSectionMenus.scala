@@ -109,14 +109,19 @@ trait GridSectionMenus {
   // Both callers are in response to  events flowing through `.fr-$componentName-dropdown-button`.
   private def moveMenu(e: dom.Event): Unit = {
 
-    val target    = e.targetT
-    val button    = target.closestT(s".fr-$componentName-dropdown-button")
-    val dropdown  = target.closestT(".dropdown")
+    val target           = e.targetT
+    val button           = target.closestT(s".fr-$componentName-dropdown-button")
+    val buttonContainer  = target.closestT(".dropdown")
 
-    // Move globalMenuElem in the DOM just below the button (for positioning, dialog)
-    dropdown.parentNode.insertBefore(globalMenuElem, dropdown.nextSibling)
+    // Move the menu after the button so it doesn't show behind the dialog (not for positioning)
+    buttonContainer.parentNode.insertBefore(globalMenuElem, buttonContainer.nextSibling)
 
+    // Position the menu just below the button
+    val buttonRect                = button.getBoundingClientRect()
+    val offsetParentRect          = globalMenuElem.offsetParent.asInstanceOf[html.Element].getBoundingClientRect()
     globalMenuElem.style.position = "absolute"
+    globalMenuElem.style.left     = s"${buttonRect.left   - offsetParentRect.left}px"
+    globalMenuElem.style.top      = s"${buttonRect.bottom - offsetParentRect.top }px"
 
     Operation.values foreach { op =>
       val menuItems = globalMenuElem.querySelectorAllT(s".dropdown-menu .fr-${op.entryName}").toList

@@ -306,8 +306,9 @@
                 <xf:setvalue ref="$binding"                value="event('fr-value')"/>
             </xbl:handler>
 
-            <!-- Adjust `label` attribute if needed (not in readonly mode) -->
-            <xbl:handler event="xforms-enabled" if="not(fr:is-readonly-mode())">
+            <!-- Adjust the `label` attribute if needed (not in readonly mode) -->
+            <!-- Q: Should we update attributes if the control *becomes* readwrite? -->
+            <xbl:handler event="xforms-enabled" if="not(xxf:readonly($binding))">
                 <xf:var name="use-label-attribute" value="xxf:component-param-value('service-performs-search') = 'true' or xxf:component-param-value('store-label') = 'true'"/>
                 <xf:var name="binding"             value="xxf:binding('fr-databound-select1-search')"/>
                 <xf:insert
@@ -490,7 +491,12 @@
                                 <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
                                 <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
                                     <xf:action event="xforms-value-changed xforms-enabled">
-                                        <xf:action xxbl:scope="inner" if="$label-from = 'service' or $auto-select-unique-choice">
+                                        <!-- The following, which can update label and value, must not run when the control is readonly -->
+                                        <xf:action
+                                            xxbl:scope="inner"
+                                            if="not(xxf:readonly($binding)) and ($label-from = 'service' or $auto-select-unique-choice)">
+                                            <!-- Clear label if value is blank -->
+                                            <!-- Q: Why do we do this? Can't we have a blank value as a valid item? -->
                                             <xf:action if="xxf:is-blank($binding)">
                                                 <xf:setvalue ref="$binding/@label"/>
                                                 <xf:setvalue ref="instance('local')/label"/>

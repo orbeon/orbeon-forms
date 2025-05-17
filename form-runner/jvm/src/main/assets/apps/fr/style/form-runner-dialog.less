@@ -62,6 +62,11 @@
             padding: 0 10px;
             font-weight: bold;
             color: black;
+
+            // If the title is too long, don't make a "fat" title but let the text overflow
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .xxforms-dialog-body {

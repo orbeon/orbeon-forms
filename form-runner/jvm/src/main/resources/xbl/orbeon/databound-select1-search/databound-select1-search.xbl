@@ -94,14 +94,14 @@
                         ref="@service-supports-paging"
                         name="service-supports-paging"
                         type="xs:boolean"
-                        readonly="$service-performs-search = false()"
-                        calculate="if ($service-performs-search = true()) then . else 'false'"/>
+                        readonly="$service-performs-search/string() = 'false'"
+                        calculate="if ($service-performs-search/string() = 'true') then . else 'false'"/>
                     <xf:bind
                         ref="@is-last-page"
                         type="xxf:XPath2"
-                        readonly="$service-supports-paging = false()"
-                        required="$service-supports-paging = true()"
-                        calculate="if ($service-supports-paging = true()) then . else ''"/>
+                        readonly="$service-supports-paging/string() = 'false'"
+                        required="$service-supports-paging/string() = 'true'"
+                        calculate="if ($service-supports-paging/string() = 'true') then . else ''"/>
                     <xf:bind
                         ref="@resource"
                         required="true()"/>
@@ -118,7 +118,7 @@
                     <xf:bind
                         ref="@store-label"
                         type="xs:boolean"
-                        readonly="$service-performs-search = 'true()'"/>
+                        readonly="$service-performs-search/string() = 'true'"/>
                 </xf:model>
                 <fr:grid>
                     <xh:tr>
@@ -528,7 +528,7 @@
                             </xf:action>
                         </xf:action>
 
-                        <xsl:variable name="service-performs-search" select="@service-performs-search = 'true'"/>
+                        <xsl:variable name="service-performs-search" select="@service-performs-search/string() = 'true'"/>
                         <xf:var       name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
                         <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>

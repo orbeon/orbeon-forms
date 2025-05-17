@@ -188,6 +188,6 @@ object Position {
     cssValueExpanded
       .splitTo[List]()
       .map(w => w.replace("px", ""))
-      .flatMap(v => Try(v.toDouble).toOption) // https://github.com/orbeon/orbeon-forms/issues/3700
+      .flatMap(v => v.toDoubleOption) // https://github.com/orbeon/orbeon-forms/issues/3700
   }
 }

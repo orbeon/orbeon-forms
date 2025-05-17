@@ -13,22 +13,16 @@
  */
 package org.orbeon.builder
 
+import io.udash.wrappers.jquery.JQuery
 import org.orbeon.datatypes.Orientation
 import org.orbeon.facades.ResizeObserver
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.xforms.AjaxClient.AjaxResponseDetails
+import org.orbeon.web.DomSupport
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.Events
-import org.scalajs.dom.{DocumentReadyState, document, html, window}
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
-import org.orbeon.web.DomSupport
-import org.orbeon.web.DomSupport.DomReadyState
 import org.scalajs.dom
-
-import scala.scalajs.js
-import scala.util.Try
+import org.scalajs.dom.{DocumentReadyState, document, html}
 
 object Position {
 
@@ -131,7 +125,7 @@ object Position {
   // Returns a function, which is expected to be called every time the value changes passing the new value, and which
   // will when appropriate notify the listeners `was` and `becomes` of the old and new value
   // TODO: replace `Any` by `Unit` once callers are all in Scala
-  def notifyOnChange[T](
+  private def notifyOnChange(
     was     : Block => Unit,
     becomes : Block => Unit
   ): Option[Block] => Unit = {
@@ -178,7 +172,7 @@ object Position {
 
     // In the value of the CSS property returned by the browser, replace `repeat(X Ypx)` by `X` times `Ypx`
     // Unlike other browsers, Edge 17 returns values that contains `repeat()`
-    val repeatRegex      = "repeat\\(([0-9]+), ([0-9\\.]+px)\\)".r
+    val repeatRegex      = "repeat\\(([0-9]+), ([0-9.]+px)\\)".r
     val cssValueExpanded = repeatRegex.replaceAllIn(cssValue,  m => {
       val count = m.group(1).toInt
       val value = m.group(2)

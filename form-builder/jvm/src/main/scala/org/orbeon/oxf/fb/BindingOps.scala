@@ -168,7 +168,7 @@ trait BindingOps {
     lang       : String
   )(implicit
     index   : BindingIndex[BindingDescriptor]
-  ): Iterable[(Option[String], Option[String], String, Option[String], String)] = {
+  ): Iterable[(Option[String], Option[String], String, Option[String], String, Boolean)] = {
 
     def metadataOpt(bindingOpt: Option[NodeInfo]): Option[NodeInfo] =
       bindingOpt.toList flatMap bindingMetadata headOption
@@ -184,11 +184,12 @@ trait BindingOps {
         val iconClasses              = findMetadata(lang, metadata / FBIconTest / FBIconClassTest).getOrElse("fa fa-fw fa-puzzle-piece")
         val iconPathOpt              = findMetadata(lang, metadata / FBIconTest / FBSmallIconTest)
         val appearanceDisplayNameOpt = findMetadata(lang, metadata / FBAppearanceDisplayNameTest)
+        val isDeprecated             = metadata.firstChildOpt(FBToolboxTest).flatMap(_.attValueOpt("deprecated")).contains(true.toString)
 
-        (appearanceOpt, fullDisplayNameOpt, appearanceDisplayNameOpt orElse fullDisplayNameOpt, iconPathOpt, iconClasses)
+        (appearanceOpt, fullDisplayNameOpt, appearanceDisplayNameOpt orElse fullDisplayNameOpt, iconPathOpt, iconClasses, isDeprecated)
     } collect {
-      case (appearanceOpt, fullDisplayNameOpt, Some(displayName), iconPathOpt, iconClasses) =>
-        (appearanceOpt, fullDisplayNameOpt, displayName, iconPathOpt, iconClasses)
+      case (appearanceOpt, fullDisplayNameOpt, Some(displayName), iconPathOpt, iconClasses, isDeprecated) =>
+        (appearanceOpt, fullDisplayNameOpt, displayName, iconPathOpt, iconClasses, isDeprecated)
     }
   }
 
@@ -396,7 +397,7 @@ trait BindingOps {
 
       val appearancesXML =
         for {
-          (valueOpt, fullLabelOpt, label, iconPathOpt, iconClasses) <-
+          (valueOpt, fullLabelOpt, label, iconPathOpt, iconClasses, isDeprecated) <-
             possibleAppearancesWithLabel(
               virtualName,
               builtinType,
@@ -404,7 +405,7 @@ trait BindingOps {
               lang
             )
         } yield
-          <appearance current={appearanceMatches(valueOpt).toString}>
+          <appearance current={appearanceMatches(valueOpt).toString} deprecated={isDeprecated.toString}>
             <full-label>{fullLabelOpt.getOrElse("")}</full-label>
             <label>{label}</label>
             <value>{valueOpt.getOrElse("")}</value>

@@ -50,6 +50,7 @@ object XMLNames {
   val FBIconTest                  : Test  = FB -> "icon"
   val FBIconClassTest             : Test  = FB -> "icon-class"
   val FBSmallIconTest             : Test  = FB -> "small-icon"
+  val FBToolboxTest               : Test  = FB -> "toolbox"
 
   val FBReadonly                  : QName = QName("readonly",           FBPrefix, FB)
   val FBPageSize                  : QName = QName("page-size",          FBPrefix, FB)

@@ -700,6 +700,11 @@
                                 $appearances/appearance[1]
                             )[1]/value"/>
 
+                    <!-- Delete deprecated appearances if they are not currently selected -->
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/7026 -->
+                    <xf:delete
+                        ref="$appearances/appearance[@deprecated = 'true' and not(value = $appearances/@selection)]"/>
+
                     <!--
                         Reload bindings if needed
                         https://github.com/orbeon/orbeon-forms/issues/4607

@@ -14,7 +14,7 @@
             <display-name lang="pt">Menu Lista de Opções Legado</display-name>
             <display-name lang="sv">Äldre rullgardinsmeny</display-name>
 
-            <toolbox show="false"/>
+            <toolbox show="false" deprecated="true"/>
             <icon>
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>

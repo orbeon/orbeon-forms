@@ -4,7 +4,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, DocumentAPI, EventListenerSupport}
 import org.scalajs.dom
-import org.scalajs.dom.CustomEvent
+import org.scalajs.dom.{CustomEvent, FocusEvent}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scalatags.JsDom.all.*
 
@@ -21,12 +21,15 @@ object XPathCompletion {
   private class XPathCompletionCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 
     private var pendingPromiseOpt: Option[Promise[Completions]] = None
+    private var textExpanderActive = false
+    private var stoppedChangeEvent = false
 
     private object EventSupport extends EventListenerSupport
 
     override def init(): Unit = {
 
-      val expander = containerElem.querySelector("text-expander")
+      val expander   = containerElem.querySelector("text-expander")
+      val inputField = containerElem.querySelector("input, textarea")
 
       EventSupport.addListener(expander, "text-expander-change", (event: CustomEvent) => {
         val details = event.detail.asInstanceOf[TextExpanderChangeEventDetail]
@@ -53,6 +56,38 @@ object XPathCompletion {
         val details = event.detail.asInstanceOf[TextExpanderValueEventDetail]
         details.value = s"$$${details.item.getAttribute("data-value")}"
       })
+
+      EventSupport.addListener(expander, "text-expander-activate"  , (_: CustomEvent) => { textExpanderActive = true  })
+      EventSupport.addListener(expander, "text-expander-deactivate", (_: CustomEvent) => { textExpanderActive = false })
+
+      // Prevent a `xxforms-blur` when users click on a completion
+      EventSupport.addListener(inputField, "focusout",
+        (event: FocusEvent) => {
+          if (textExpanderActive) {
+            event.stopPropagation()
+          } else if (stoppedChangeEvent) {
+            // If we stopped the change event earlier and the field value hasn't changed since then, the browser
+            // dispatch a `change` event on focus out, so we need to dispatch one manually here.
+            inputField.dispatchEvent(new dom.Event("change", new dom.EventInit {
+              bubbles = true
+              cancelable = true
+            }))
+            stoppedChangeEvent = false
+          }
+        },
+        useCapture = true
+      )
+
+      // Prevent a `xxforms-value` when users click on a completion
+      EventSupport.addListener(containerElem, "change",
+        (event: dom.Event) => {
+          if (textExpanderActive) {
+            stoppedChangeEvent = true
+            event.stopPropagation()
+          }
+        },
+        useCapture = true
+      )
     }
 
     override def destroy(): Unit =

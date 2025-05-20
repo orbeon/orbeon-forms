@@ -2549,7 +2549,7 @@ az4K</document>
 
                         <xf:submission
                             id="my-submission"
-                            resource="https://httpbin.org/delay/2?q={event('q')}"
+                            resource="http://localhost:8084/delay/2?q={event('q')}"
                             method="get"
                             serialization="none"
                             mode="asynchronous"

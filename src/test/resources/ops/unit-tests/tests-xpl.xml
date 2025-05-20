@@ -63,7 +63,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>https://postman-echo.com/status/404</url>
+                            <url>http://localhost:8084/status/404</url>
                             <mode>text</mode>
                         </config>
                     </p:input>
@@ -101,7 +101,7 @@
                     <p:input name="data"><_/></p:input>
                     <p:input name="config">
                         <available xsl:version="2.0">
-                            <xsl:copy-of select="doc-available('https://postman-echo.com/status/404')"/>
+                            <xsl:copy-of select="doc-available('http://localhost:8084/status/404')"/>
                         </available>
                     </p:input>
                     <p:output name="data" ref="data"/>

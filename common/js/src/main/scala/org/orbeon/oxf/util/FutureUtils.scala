@@ -31,8 +31,10 @@ object FutureUtils {
 
   def eventually[T](
     interval    : FiniteDuration,
-    timeout     : FiniteDuration)(
-    block       : => Future[T])(implicit
+    timeout     : FiniteDuration
+  )(
+    block       : => Future[T]
+  )(implicit
     execContext : ExecutionContext
   ): Future[T] =
     eventuallyAsTry(interval, timeout)(block) flatMap
@@ -40,8 +42,10 @@ object FutureUtils {
 
   def eventuallyAsTry[T](
     interval    : FiniteDuration,
-    timeout     : FiniteDuration)(
-    block       : => Future[T])(implicit
+    timeout     : FiniteDuration
+  )(
+    block       : => Future[T]
+  )(implicit
     execContext : ExecutionContext
   ): Future[Try[T]] = async {
 

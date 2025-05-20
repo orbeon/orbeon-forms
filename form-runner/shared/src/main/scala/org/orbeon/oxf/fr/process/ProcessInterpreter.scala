@@ -151,8 +151,8 @@ trait ProcessInterpreter extends Logging {
             case r @ ActionResult.Sync(Success(_)) =>
               debugResults(List("result" -> "successful action"))
               r
-            case r @ ActionResult.Sync(Failure(_)) =>
-              debugResults(List("result" -> "failed action"))
+            case r @ ActionResult.Sync(Failure(e)) =>
+              debugResults(List("result" -> s"failed action: ${e.getMessage}"))
               r
             case ActionResult.Async(failure @ Failure(_)) =>
               ActionResult.Sync(failure)

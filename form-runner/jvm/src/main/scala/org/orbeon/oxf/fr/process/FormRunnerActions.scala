@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
-import org.orbeon.oxf.fr.email.{EmailContent, SMTP}
+import org.orbeon.oxf.fr.email.{EmailContent, EmailTransport}
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
@@ -136,8 +136,7 @@ trait FormRunnerActions
       val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
 
       if (sendEmail) {
-        val serverConfig = SMTP.ServerConfig.fromProperties()
-        emailContentsFromTemplates.headOption.foreach(SMTP.send(serverConfig, _).get)
+        emailContentsFromTemplates.headOption.foreach(EmailTransport.send(_).get)
       }
 
       val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)

@@ -18,11 +18,11 @@ import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.web.DomSupport
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
-import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
-import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
+import org.scalajs.dom.{MutationObserver, document, html}
 
 import scala.collection.mutable
 import scala.scalajs.js

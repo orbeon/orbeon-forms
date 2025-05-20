@@ -1,6 +1,8 @@
 package org.orbeon.fr
 
 import org.orbeon.fr.DockerSupport.removeContainerByImage
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.web.DomSupport.*
 import org.scalatest.*
 import org.scalatest.funspec.FixtureAsyncFunSpecLike
 
@@ -37,7 +39,7 @@ class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSup
 
   describe("Form Runner API client tests") {
     it("must find form controls by name, set values, get values, and activate") { _ =>
-      withFormReady("control-names") { case FormRunnerWindow(_, formRunnerApi) =>
+      withFormReady(app = "tests", form = "control-names") { case FormRunnerWindow(_, formRunnerApi) =>
         async {
 
           val form = formRunnerApi.getForm(js.undefined)
@@ -80,7 +82,7 @@ class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSup
     }
 
     it("must pass the strict Wizard focus rules") { _ =>
-      withFormReady("wizard") { case FormRunnerWindow(_, formRunnerApi) =>
+      withFormReady(app = "tests", form = "wizard") { case FormRunnerWindow(_, formRunnerApi) =>
         async {
 
           val form = formRunnerApi.getForm(js.undefined)
@@ -107,6 +109,91 @@ class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSup
 
           // `control-2` is visible
           assert(form.findControlsByName("control-2").nonEmpty)
+        }
+      }
+    }
+  }
+
+  describe("The Dynamic Dropdown With Search control") {
+
+    val ControlPrefix = "dynamic-dropdown-with-search"
+
+    sealed trait OpenClosed
+    case object Open extends OpenClosed
+    case object Closed extends OpenClosed
+
+    case class ControlSetup(
+      openClosed              : OpenClosed,
+      servicePerformsSearch   : Boolean,
+      autoSelectUniqueChoice  : Boolean,
+      storeLabel              : Boolean,
+      serviceReturnsSingleItem: Boolean,
+      readonly                : Boolean,
+      hasInitialValueInData   : Boolean,
+    ) {
+      def controlName: String = {
+        val parts =
+          ControlPrefix ::
+          (if (openClosed == Open) "open" else "closed") ::
+          (if (servicePerformsSearch) "service-yes" else "service-no") ::
+          (if (autoSelectUniqueChoice) "auto-yes" else "auto-no") ::
+          (if (storeLabel) "label-yes" else "label-no") ::
+          (autoSelectUniqueChoice list (if (serviceReturnsSingleItem) "service-1" else "service-all")) :::
+          (hasInitialValueInData list "value-yes") :::
+          (if (readonly) "readonly" else "readwrite") ::
+          Nil
+
+        parts.mkString("-")
+      }
+    }
+
+    val controlSetups = List(
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = false, storeLabel = false, serviceReturnsSingleItem = false, readonly = false, hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = false, storeLabel = true,  serviceReturnsSingleItem = false, readonly = true,  hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = false, storeLabel = true,  serviceReturnsSingleItem = false, readonly = false, hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = false, readonly = true,  hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = false, readonly = false, hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = true,  readonly = true,  hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = true,  readonly = false, hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = true,  serviceReturnsSingleItem = false, readonly = true,  hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = true,  serviceReturnsSingleItem = false, readonly = false, hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = true,  serviceReturnsSingleItem = true,  readonly = true,  hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = true,  serviceReturnsSingleItem = true,  readonly = false, hasInitialValueInData = false),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = false, readonly = false, hasInitialValueInData = true),
+      ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = false, readonly = true,  hasInitialValueInData = true),
+    )
+
+    describe("Initial labels") {
+      controlSetups.foreach { controlSetup =>
+        val controlName = controlSetup.controlName
+
+        val mustHaveAfghanistanDataLabel =
+          ! controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && controlSetup.serviceReturnsSingleItem && ! controlSetup.readonly
+
+        val mustHaveSwitzerlandDataLabel =
+          controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && ! controlSetup.serviceReturnsSingleItem && ! controlSetup.storeLabel
+
+        val labelToFind =
+          if (mustHaveAfghanistanDataLabel)
+            Some("Afghanistan")
+          else if (mustHaveSwitzerlandDataLabel)
+            Some("Switzerland")
+          else
+            None
+
+        it(s"for `$controlName`: must find initial label `$labelToFind`") { _ =>
+          withFormReady(app = "tests", form = "databound-select1") { case FormRunnerWindow(_, formRunnerApi) =>
+
+            val controls = formRunnerApi.getForm(js.undefined).findControlsByName(controlName)
+            assert(controls.nonEmpty)
+
+            assert {
+              labelToFind match {
+                case Some(label) => controls.head.querySelectorT("[data-label]").dataset("label") == label
+                case None        => controls.head.querySelectorT("[data-label]").dataset("label").isEmpty
+              }
+            }
+          }
         }
       }
     }

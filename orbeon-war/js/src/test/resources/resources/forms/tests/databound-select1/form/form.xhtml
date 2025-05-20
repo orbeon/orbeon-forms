@@ -1,0 +1,993 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite label=""/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite label=""/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite label=""/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite/>
+
+
+
+
+                        </grid-1>
+
+                    </section-1>
+                    <section-1-readonly>
+                        <grid-1-readonly>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly label=""/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly label=""/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly label=""/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly/>
+                            <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1/>
+
+
+                        </grid-1-readonly>
+
+                    </section-1-readonly>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite/@label"
+                                 readonly="false()"/>
+
+
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite"
+                                 xxf:default="'sz'"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite"
+                                 xxf:default="'af'"/>
+
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="section-1-readonly-bind" name="section-1-readonly" ref="section-1-readonly">
+                    <xf:bind id="grid-1-readonly-bind" ref="grid-1-readonly" name="grid-1-readonly">
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly/@label"
+                                 readonly="false()"/>
+
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt"
+                                 calculate="$dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly/@label"
+                                 readonly="false()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly"
+                                 xxf:default="'sz'"
+                                 readonly="true()"/>
+                        <xf:bind id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1-bind"
+                                 ref="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1"
+                                 name="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1"
+                                 xxf:default="'af'"
+                                 readonly="true()"/>
+                    </xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>databound-select1</form-name>
+                    <title xml:lang="en">Tests for the Dynamic Dropdown</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                        <app>1</app>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+
+                    <html-page-layout>fluid</html-page-layout>
+
+
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt>
+                            <label>Out</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt>
+                            <label>Out</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite>
+
+
+
+
+                        <section-1>
+                            <label>readwrite</label>
+                        </section-1>
+                        <section-1-readonly>
+                            <label>readonly</label>
+                        </section-1-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt>
+                            <label>Out</label>
+                            <hint/>
+
+
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt>
+                            <label>Out</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt>
+                            <label>Out</label>
+                            <hint/>
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly>
+                        <dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1>
+                            <label>dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1>
+
+
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                            </fr:c>
+                        <fr:c x="4" y="1" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readwrite-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="1"/>
+                        <fr:c x="1" y="2" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  store-label="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readwrite-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"/>
+                        <fr:c x="1" y="3" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="3" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readwrite-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country[1]">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="10" y="3" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readwrite-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true"
+                                                  store-label="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="4" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readwrite-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true"
+                                                  store-label="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country[1]">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="10" y="4" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readwrite-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                        </fr:c>
+                        <fr:c x="4" y="5" w="3" h="1">
+
+                        </fr:c>
+                        <fr:c x="7" y="5" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country[1]">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                        </fr:c>
+                        <fr:c x="10" y="5" w="3">
+
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-1-readonly-section" bind="section-1-readonly-bind">
+                    <xf:label ref="$form-resources/section-1-readonly/label"/>
+                    <fr:grid id="grid-1-readonly-grid" bind="grid-1-readonly-bind">
+                        <fr:c y="1" x="1" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                            </fr:c>
+                        <fr:c x="4" y="1" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-no-readonly-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="1"/>
+                        <fr:c x="1" y="2" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  store-label="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-no-label-yes-readonly-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"/>
+                        <fr:c x="1" y="3" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="3" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-readonly-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country[1]">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="10" y="3" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-readonly-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true"
+                                                  store-label="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="4" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-all-readonly-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true"
+                                                  store-label="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="/countries/country[1]">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="10" y="4" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt-control"
+                                       bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-yes-service-1-readonly-labelatt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-all-value-yes-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="4" y="5" w="3" h="1"/>
+                        <fr:c x="7" y="5" w="3">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1-control"
+                                                  bind="dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page=""
+                                                  auto-select-unique-choice="true">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-closed-service-no-auto-yes-label-no-service-1-value-yes-readwrite-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="/countries/country[1]">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                        </fr:c>
+                        <fr:c x="10" y="5" w="3">
+
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -118,7 +118,7 @@ trait ClientTestSupport {
       await(body)
     }
 
-  def withFormReady[T](formName: String)(body: FormRunnerWindow => Future[T]): Future[T] =
+  def withFormReady[T](app: String, form: String)(body: FormRunnerWindow => Future[T]): Future[T] =
     withFormRunnerSession {
       async {
 
@@ -126,7 +126,7 @@ trait ClientTestSupport {
         assert(sessionCookie.isSuccess)
 
         val window =
-          FormRunnerWindow(await(loadDocumentViaJSDOM(s"/fr/tests/$formName/new", OrbeonServerUrl, sessionCookie.toOption)))
+          FormRunnerWindow(await(loadDocumentViaJSDOM(s"/fr/$app/$form/new", OrbeonServerUrl, sessionCookie.toOption)))
 
         // Wait until there is a form returned by the API
         await {

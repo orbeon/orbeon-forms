@@ -397,15 +397,15 @@
                                     <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
 
                                     <xf:action if="$label-from = 'service'">
-                                        <xf:setvalue ref="$binding/@label"         value="$current-label"/>
+                                        <xf:setvalue ref="$binding/@label"         value="$current-label" if="not(xxf:readonly($binding))"/><!-- don't touch `@label` in readonly mode -->
                                         <xf:setvalue ref="instance('local')/label" value="$current-label"/>
                                     </xf:action>
-                                    <xf:action if="$current-impossible">
+                                    <xf:action if="not(xxf:readonly($binding)) and $current-impossible">
                                         <xf:setvalue ref="$binding"/>
                                         <xf:setvalue ref="$binding/@label"/>
                                         <xf:setvalue ref="instance('local')/label"/>
                                     </xf:action>
-                                    <xf:action if="$unique-choice">
+                                    <xf:action if="$unique-choice"><!-- already includes `not(xxf:readonly($binding))` -->
                                         <xf:setvalue ref="$binding"                value="$unique-choice-value"/>
                                         <xf:setvalue ref="$binding/@label"         value="$unique-choice-label"/>
                                         <xf:setvalue ref="instance('local')/label" value="$unique-choice-label"/>
@@ -465,7 +465,7 @@
                             <xf:var
                                 name="label-from"
                                 value="
-                                         if (exists($binding/@label)) then 'bound-label'
+                                         if (exists($binding/@label)) then 'bound-label' (: means `$service-performs-search or $store-label` :)
                                     else if ($maybe-open-selection)   then 'bound-value'
                                     else                                   'service'"/>
                             <xf:var
@@ -494,14 +494,19 @@
                                         <!-- The following, which can update label and value, must not run when the control is readonly -->
                                         <xf:action
                                             xxbl:scope="inner"
-                                            if="not(xxf:readonly($binding)) and ($label-from = 'service' or $auto-select-unique-choice)">
+                                            if="$label-from = 'service' or $auto-select-unique-choice">
                                             <!-- Clear label if value is blank -->
-                                            <!-- Q: Why do we do this? Can't we have a blank value as a valid item? -->
+                                            <!-- We don't support having an item associated with a blank value. "Blank" means that no value is selected. -->
                                             <xf:action if="xxf:is-blank($binding)">
-                                                <xf:setvalue ref="$binding/@label"/>
+                                                <xf:setvalue ref="$binding/@label" if="not(xxf:readonly($binding))"/><!-- don't touch `@label` in readonly mode -->
                                                 <xf:setvalue ref="instance('local')/label"/>
                                             </xf:action>
-                                            <xf:action if="not(fr:is-design-time()) and (xxf:non-blank($binding) or $auto-select-unique-choice)">
+                                            <xf:action
+                                                if="not(fr:is-design-time()) and
+                                                    (
+                                                        (xxf:non-blank($binding) and exists($binding/@label[xxf:is-blank()])) or (: call service to get the label :)
+                                                        $auto-select-unique-choice
+                                                    )">
                                                 <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
                                                 <xf:send submission="get-result">
                                                     <xf:property name="fr-resource" value="$resource"/>

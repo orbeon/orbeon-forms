@@ -46,7 +46,6 @@ object Exceptions {
   def getRootThrowable(t: Throwable): Throwable =
     causesIterator(t).toList.last
 
-
   def isConnectionInterruption(t: Throwable): Boolean = {
     getRootThrowable(t) match {
       case _: java.net.SocketException => true

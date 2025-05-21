@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom
 import org.orbeon.dom.Document
 import org.orbeon.oxf.common.Version
@@ -21,13 +22,15 @@ import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.persistence.attachments.FilesystemCRUD
+import org.orbeon.oxf.fr.persistence.attachments.S3CRUD.providerProperty
 import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
+import org.orbeon.oxf.fr.s3.S3
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
-import org.orbeon.oxf.fr.{AppForm, FormOrData}
+import org.orbeon.oxf.fr.{AppForm, FormOrData, S3Tag, S3Test}
 import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils.*
@@ -38,6 +41,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
 import java.nio.file.{Files, Path, Paths}
+import scala.jdk.CollectionConverters.*
 import scala.util.Random
 
 
@@ -64,6 +68,7 @@ class RestApiTest
   private val CanCreateReadUpdate = Operations.combine(CanCreateRead, CanUpdate)
 
   private val FilesystemAttachmentsFormName = "filesystem-attachments-form"
+  private val S3AttachmentsFormName         = "s3-attachments-form"
 
   private val AnyoneCanCreateAndRead = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
   private val AnyoneCanCreate        = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Create)))))
@@ -337,12 +342,11 @@ class RestApiTest
     }
   }
 
-  // Try uploading files of 1 KB, 1 MB
   describe("Attachments") {
     def basicOperationsWithForm(
       formName : String,
-      preTest  : (AppForm, FormOrData) => Unit = (_, _) => (),
-      postTest : (AppForm, FormOrData) => Unit = (_, _) => ()
+      preTest  : (AppForm, FormOrData)            => Unit = (_, _)    => (),
+      postTest : (AppForm, FormOrData, List[Int]) => Unit = (_, _, _) => ()
     ): Unit = {
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("attachments") { (_, provider) =>
@@ -359,6 +363,9 @@ class RestApiTest
             if (formName == FilesystemAttachmentsFormName) {
               // Filesystem attachment
               256 * MiB
+            } else if (formName ==  S3AttachmentsFormName) {
+              // S3 attachment
+              1 * MiB
             } else {
               // Database attachment
               provider match {
@@ -372,7 +379,9 @@ class RestApiTest
           // To avoid OutOfMemoryError exceptions without changing the default memory configuration
           val largestSize = math.min(128 * MiB, largestWorkingSize)
 
-          for ((size, position) <- Seq(0, 1, 1024, largestSize).zipWithIndex) {
+          val sizesToTest = List(0, 1, 1024, largestSize)
+
+          for ((size, position) <- sizesToTest.zipWithIndex) {
             val bodyArray = new Array[Byte](size) |!> Random.nextBytes
             val body      = bodyArray |> HttpCall.Binary.apply
             val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
@@ -457,7 +466,7 @@ class RestApiTest
             }
           }
 
-          postTest(appForm, formOrData)
+          postTest(appForm, formOrData, sizesToTest)
         }
       }
     }
@@ -466,15 +475,20 @@ class RestApiTest
       basicOperationsWithForm(formName = DefaultFormName)
     }
 
-    it("must pass basic operations (filesystem attachments)") {
+    it("must pass basic operations (filesystem attachments) (#4146)") {
       def basePath(appForm: AppForm, formOrData: FormOrData): Path =
         Paths.get(FilesystemCRUD.config(appForm, formOrData).basePath)
 
-      def fileCount(directory: Path): Long =
-        Files.walk(directory).filter(Files.isRegularFile(_)).count()
+      def fileSizes(directory: Path): List[Long] =
+        Files
+          .walk(directory)
+          .filter(Files.isRegularFile(_))
+          .map(_.toFile.length())
+          .collect(java.util.stream.Collectors.toList())
+          .asScala
+          .toList
 
       var directoryToCleanAfterTest: Option[Path] = None
-      var fileCountBefore = 0L
 
       def preTest(appForm: AppForm, formOrData: FormOrData): Unit = {
         val directory = basePath(appForm, formOrData)
@@ -485,17 +499,15 @@ class RestApiTest
           Files.createDirectory(directory)
           directoryToCleanAfterTest = Some(directory)
         }
-
-        // Assuming no concurrent test, i.e. no concurrent access to the var
-        fileCountBefore = fileCount(directory)
       }
 
-      def postTest(appForm: AppForm, formOrData: FormOrData): Unit = {
-        val directory = basePath(appForm, formOrData)
-        val fileCountAfter = fileCount(directory)
+      def postTest(appForm: AppForm, formOrData: FormOrData, testSizes: List[Int]): Unit = {
+        val directory     = basePath(appForm, formOrData)
+        val actualSizes   = fileSizes(directory).sorted
+        val expectedSizes = testSizes.map(_.toLong).sorted
 
-        // Simple test that checks that files were indeed created
-        assert(fileCountAfter > fileCountBefore)
+        // Compare local files count and sizes
+        assert(actualSizes == expectedSizes)
       }
 
       try {
@@ -505,6 +517,31 @@ class RestApiTest
         directoryToCleanAfterTest.foreach { directory =>
           // Delete all sub-directories and files in reverse order, so that children are deleted before parents
           Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))
+        }
+      }
+    }
+
+    it("must pass basic operations (S3 attachments) (#6948)", S3Tag) {
+      // Read S3 base path from oxf.fr.persistence.[provider].base-path test property
+      val s3BasePath = providerProperty(provider = "s3", "base-path", defaultOpt = None)
+
+      S3Test.withTestS3ConfigAndPath(
+        configName = "test-s3-config",
+        pathOpt    = s3BasePath.some
+      ) { implicit s3Config => _ =>
+
+        S3.withS3Client { implicit s3Client =>
+
+          def postTest(appForm: AppForm, formOrData: FormOrData, testSizes: List[Int]): Unit = {
+
+            val actualSizes   = S3.objects(bucketName = s3Config.bucket, prefix = s3BasePath).get.map(_.size()).sorted
+            val expectedSizes = testSizes.map(_.toLong).sorted
+
+            // Compare S3 objects count and sizes
+            assert(actualSizes == expectedSizes)
+          }
+
+          basicOperationsWithForm(formName = S3AttachmentsFormName, postTest = postTest)
         }
       }
     }

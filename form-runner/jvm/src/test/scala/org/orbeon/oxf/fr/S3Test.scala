@@ -30,18 +30,18 @@ import java.util.UUID
 // There's apparently no way to tag a "describe" section globally, so we need to tag all "it" statements individually
 object S3Tag extends Tag("S3")
 
-class S3Test
-  extends DocumentTestBase
-    with ResourceManagerSupport
-    with AnyFunSpecLike
-    with FormRunnerSupport {
-
-  def withTestS3ConfigAndPath(configName: String)(body: S3Config => String => Unit): Unit = {
+object S3Test {
+  def withTestS3ConfigAndPath(
+    configName: String,
+    pathOpt   : Option[String] = None)(
+    body      : S3Config => String => Unit
+  ): Unit = {
 
     implicit val s3Config: S3Config = S3Config.fromProperties(configName).get
 
     S3.withS3Client { implicit s3Client =>
-      val s3Path = UUID.randomUUID().toString
+      // Use S3 path used as argument or generate random S3 path
+      val s3Path = pathOpt.getOrElse(UUID.randomUUID().toString)
 
       def emptyPath(): Unit = S3.objects(s3Config.bucket, prefix = s3Path).get foreach { s3Object =>
         S3.deleteObject(s3Config.bucket, s3Object.key).get
@@ -63,6 +63,13 @@ class S3Test
       }
     }
   }
+}
+
+class S3Test
+  extends DocumentTestBase
+    with ResourceManagerSupport
+    with AnyFunSpecLike
+    with FormRunnerSupport {
 
   describe("Form Runner S3 storage") {
 
@@ -76,7 +83,7 @@ class S3Test
           val (processorService, docOpt, _) = runFormRunner("issue", "6751", "new", initialize = true)
 
           withFormRunnerDocument(processorService, doc = docOpt.get) {
-            withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>
+            S3Test.withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>
               S3.withS3Client { implicit s3Client =>
                 body(s3Config)(s3Path)(s3Client)
               }
@@ -91,7 +98,7 @@ class S3Test
         // Include date/time in path so that different templates are stored in different sub-paths
         val s3Params = Map[Option[String], String](
           "s3-store".some  -> "true",
-          "s3-config".some -> "issue-6751"
+          "s3-config".some -> "test-s3-config"
         ) ++ s3PathOpt.map(s3Path => "s3-path".some -> s"concat('$s3Path', '/', current-dateTime())").toMap
 
         process.SimpleProcess.trySendEmail(

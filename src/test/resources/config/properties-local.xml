@@ -20,15 +20,11 @@
     <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.filesystem-attachments-form.*.attachments" value="filesystem"/>
-    <property as="xs:string"  name="oxf.fr.persistence.filesystem.directory"                                 value="{
-      let
-        $travis-job-id := environment-variable('TRAVIS_JOB_ID')
-      return
-        if (string-length($travis-job-id)>0) then
-          concat('/tmp/attachments-', $travis-job-id)
-        else
-          '/tmp/attachments'
-    }"/>
+    <property as="xs:string"  name="oxf.fr.persistence.filesystem.base-path"                                 value="/tmp/attachments"/>
+
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.s3-attachments-form.*.attachments" value="s3"/>
+    <property as="xs:string"  name="oxf.fr.persistence.s3.s3-config"                                 value="test-s3-config"/>
+    <property as="xs:string"  name="oxf.fr.persistence.s3.base-path"                                 value="attachments-tests"/>
 
     <!-- Tests for AVTs in oxf.fr.persistence.*.directory property -->
     <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-1.*.attachments" value="fs-attachments-1"/>
@@ -59,11 +55,11 @@
         resources
     </property>
 
-    <property as="xs:string"  name="oxf.fr.s3.issue-6751.endpoint"        value="s3.amazonaws.com"/>
-    <property as="xs:string"  name="oxf.fr.s3.issue-6751.region"          value="{environment-variable('S3_TEST_REGION')}"/>
-    <property as="xs:string"  name="oxf.fr.s3.issue-6751.bucket"          value="orbeon-test"/>
-    <property as="xs:string"  name="oxf.fr.s3.issue-6751.accesskey"       value="{environment-variable('S3_TEST_ACCESSKEY')}"/>
-    <property as="xs:string"  name="oxf.fr.s3.issue-6751.secretaccesskey" value="{environment-variable('S3_TEST_SECRETACCESSKEY')}"/>
+    <property as="xs:string"  name="oxf.fr.s3.test-s3-config.endpoint"        value="s3.amazonaws.com"/>
+    <property as="xs:string"  name="oxf.fr.s3.test-s3-config.region"          value="{environment-variable('S3_TEST_REGION')}"/>
+    <property as="xs:string"  name="oxf.fr.s3.test-s3-config.bucket"          value="orbeon-test"/>
+    <property as="xs:string"  name="oxf.fr.s3.test-s3-config.accesskey"       value="{environment-variable('S3_TEST_ACCESSKEY')}"/>
+    <property as="xs:string"  name="oxf.fr.s3.test-s3-config.secretaccesskey" value="{environment-variable('S3_TEST_SECRETACCESSKEY')}"/>
 
     <property as="xs:string" name="oxf.fr.email.pdf.filename.issue.6751"  value="concat(fr:form-title(), '.pdf')"/>
     <property as="xs:string" name="oxf.fr.email.tiff.filename.issue.6751" value="concat(fr:form-title(), '.tiff')"/>

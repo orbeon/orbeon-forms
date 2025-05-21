@@ -22,7 +22,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
-import org.scalajs.dom.{MutationObserver, document, html}
+import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 
 import scala.collection.mutable
 import scala.scalajs.js

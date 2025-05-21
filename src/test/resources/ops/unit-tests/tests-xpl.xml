@@ -88,7 +88,7 @@
             </p:config>
         </input>
         <output name="data">
-            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="application/json" status-code="404"/>
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/html" status-code="404"/>
         </output>
     </test>
 

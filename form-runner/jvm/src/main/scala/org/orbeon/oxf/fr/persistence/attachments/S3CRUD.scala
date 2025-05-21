@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{HttpRange, HttpRanges, StatusCode}
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.saxon.function.Property.evaluateAsAvt
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{NoSuchBucketException, NoSuchKeyException, S3Exception}
 
@@ -159,13 +160,12 @@ object S3CRUD extends CRUDConfig {
   }
 
   override def config(appForm: AppForm, formOrData: FormOrData): Config = {
-    val provider     = this.provider(appForm, formOrData)
-    val s3ConfigName = providerProperty(provider, "s3-config", defaultOpt = "default".some)
-    val s3Config     = S3Config.fromProperties(s3ConfigName).get
-    val basePath     = providerProperty(provider, "base-path", defaultOpt = "".some)
+    val provider                          = this.provider(appForm, formOrData)
+    val s3ConfigName                      = providerProperty(provider, "s3-config", defaultOpt = "default".some)
+    val s3Config                          = S3Config.fromProperties(s3ConfigName).get
+    val (rawBasePath, basePathNamespaces) = providerPropertyWithNs(provider, "base-path", defaultOpt = "".some)
 
-    // TODO: should we interpret basePath as AVT (evaluateAsAvt), like with "filesystem" attachments providers?
-
-    Config(provider, s3Config, basePath)
+    // Evaluate the base path as an AVT
+    Config(provider, s3Config, evaluateAsAvt(rawBasePath, basePathNamespaces))
   }
 }

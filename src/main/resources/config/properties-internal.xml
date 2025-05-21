@@ -450,9 +450,6 @@
             appearance = "ephemeral"
         )
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.wizard-prev.*.*">
-        xf:dispatch(name = "fr-prev", targetid = "fr-view-component")
-    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-toc.*.*">
         xf:dispatch(name = "fr-show-toc",  targetid = "fr-view-component")
     </property>

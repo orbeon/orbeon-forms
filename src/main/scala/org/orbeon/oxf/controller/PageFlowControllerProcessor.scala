@@ -22,28 +22,28 @@ import org.orbeon.errorified.Exceptions.*
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.http.{HttpMethod, HttpRedirectException, HttpStatusCodeException, PathType, StatusCode}
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.XPLConstants.{NULL_SERIALIZER_PROCESSOR_QNAME, OXF_PROCESSORS_NAMESPACE}
-import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.pipeline.ast.*
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.ResourceNotFoundException
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.URLRewriterUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
-import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils, XMLReceiver}
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 
-import java.util.regex.Pattern
 import java.util as ju
+import java.util.regex.Pattern
 import javax.xml.transform.stream.StreamResult
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
@@ -98,8 +98,8 @@ trait XmlNativeRoute extends NativeRoute {
 // Orbeon Forms application controller
 class PageFlowControllerProcessor extends ProcessorImpl {
 
-  import PageFlowControllerBuilder._
-  import PageFlowControllerProcessor._
+  import PageFlowControllerBuilder.*
+  import PageFlowControllerProcessor.*
 
   addInputInfo(new ProcessorInputOutputInfo(ControllerInput, ControllerNamespaceURI))
 
@@ -145,17 +145,6 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     def logError(t: Throwable): Unit = {
       error("error caught", logParams)
       error(OrbeonFormatter.format(t))
-    }
-
-    def isConnectionInterruption(t: Throwable): Boolean = {
-      getRootThrowable(t) match {
-        case _: java.net.SocketException => true
-        case e: java.io.IOException if e.getMessage != null =>
-          e.getMessage.contains("Broken pipe") ||
-          e.getMessage.contains("Connection reset") ||
-          e.getMessage.contains("An established connection was aborted")
-        case _ => false
-      }
     }
 
     def logNotFound(t: Option[Throwable]): Unit = {

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor
 
+import org.orbeon.errorified.Exceptions.{getRootThrowable, isConnectionInterruption}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.controller.NativeRoute
@@ -288,7 +289,12 @@ object XFormsAssetServerRoute extends NativeRoute {
 
           IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
         } catch {
-          case NonFatal(t) => warn("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
+          case NonFatal(t) =>
+            if (isConnectionInterruption(t)) {
+              warn(s"connection interrupted: ${getRootThrowable(t).getMessage}")
+            } else {
+              error("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
+            }
         }
 
       case None =>

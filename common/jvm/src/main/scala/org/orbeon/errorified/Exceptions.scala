@@ -46,6 +46,18 @@ object Exceptions {
   def getRootThrowable(t: Throwable): Throwable =
     causesIterator(t).toList.last
 
+
+  def isConnectionInterruption(t: Throwable): Boolean = {
+    getRootThrowable(t) match {
+      case _: java.net.SocketException => true
+      case e: java.io.IOException if e.getMessage != null =>
+        e.getMessage.contains("Broken pipe") ||
+        e.getMessage.contains("Connection reset") ||
+        e.getMessage.contains("An established connection was aborted")
+      case _ => false
+    }
+  }
+
   val Getters: Seq[(String, String)] = Seq(
     "javax.xml.transform.TransformerException"              -> "getException",
     "org.xml.sax.SAXException"                              -> "getException",

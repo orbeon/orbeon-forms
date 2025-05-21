@@ -145,23 +145,22 @@ object Attachment {
     val singleAttachments   = attachmentHolders      .filter(_.hasAtt("filename"))
     val multipleAttachments = (attachmentHolders / *).filter(_.hasAtt("filename"))
 
-    for {
-      attachment <- singleAttachments ++ multipleAttachments
-    } yield {
+    (singleAttachments ++ multipleAttachments).flatMap { attachment =>
       // URL may be absolute or already point to persistence layer
       // Use `@fr:tmp-file` first if present, see https://github.com/orbeon/orbeon-forms/issues/5768
-
       val mediaTypeOpt = (attachment /@ "mediatype") .headOption.map(_.stringValue)
       val contentType  = mediaTypeOpt.getOrElse(ContentTypes.OctetStreamContentType)
       val filenameOpt  = (attachment /@ "filename")  .headOption.map(_.stringValue)
       val tmpFileOpt   = (attachment /@ "*:tmp-file").headOption.map(_.stringValue)
-      val uri          = new URI(tmpFileOpt.flatMap(_.trimAllToOpt).getOrElse(attachment.getStringValue))
-
-      Attachment(
-        filename       = filenameOpt.orElse(uri.getPath.split("/").last.trimAllToOpt).getOrElse("unknown"),
-        contentType    = contentType,
-        contentFactory = uriContentFactory(uri, contentType)
-      )
+      val valueOpt     = tmpFileOpt.flatMap(_.trimAllToOpt).orElse(attachment.getStringValue.trimAllToOpt)
+      valueOpt.map { value =>
+        val uri = new URI(value)
+        Attachment(
+          filename       = filenameOpt.orElse(uri.getPath.split("/").last.trimAllToOpt).getOrElse("unknown"),
+          contentType    = contentType,
+          contentFactory = uriContentFactory(uri, contentType)
+        )
+      }
     }
   }
 

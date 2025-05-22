@@ -491,22 +491,37 @@
                                 <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
                                 <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
                                     <xf:action event="xforms-value-changed xforms-enabled">
-                                        <!-- The following, which can update label and value, must not run when the control is readonly -->
-                                        <xf:action
-                                            xxbl:scope="inner"
-                                            if="$label-from = 'service' or $auto-select-unique-choice">
-                                            <!-- Clear label if value is blank -->
-                                            <!-- We don't support having an item associated with a blank value. "Blank" means that no value is selected. -->
-                                            <xf:action if="xxf:is-blank($binding)">
-                                                <xf:setvalue ref="$binding/@label" if="not(xxf:readonly($binding))"/><!-- don't touch `@label` in readonly mode -->
-                                                <xf:setvalue ref="instance('local')/label"/>
-                                            </xf:action>
-                                            <xf:action
-                                                if="not(fr:is-design-time()) and
-                                                    (
-                                                        (xxf:non-blank($binding) and exists($binding/@label[xxf:is-blank()])) or (: call service to get the label :)
-                                                        $auto-select-unique-choice
-                                                    )">
+
+                                        <!-- We don't support having an item associated with a blank value. "Blank" means that no value is selected.
+                                             So in all cases, start by clearing the label if the value is blank. This can be changed later, specifically
+                                             if the service is called and `$auto-select-unique-choice` is `true()`. This inconsistency should normally
+                                             not happen, but there could be cases where the value was cleared but not the label. -->
+                                        <xf:action xxbl:scope="inner" if="xxf:is-blank($binding)">
+                                            <xf:setvalue ref="$binding/@label" if="not(xxf:readonly($binding))"/><!-- but don't touch `@label` in readonly mode -->
+                                            <xf:setvalue ref="instance('local')/label"/>
+                                        </xf:action>
+
+                                        <!-- Call service upon initialization if needed -->
+                                        <xf:action xxbl:scope="inner">
+
+                                            <xf:var
+                                                name="must-run-service"
+                                                value="
+                                                    not(fr:is-design-time()) and                                             (: never run the service at design time :)
+                                                    not(
+                                                        xxf:non-blank($binding) and exists($binding/@label[xxf:non-blank()]) (: don't run if there is already a value and a stored label:)
+                                                    ) and
+                                                    not(
+                                                        xxf:non-blank($binding) and $label-from = 'bound-value'              (: don't run if there is already a value and the label is the value :)
+                                                    ) and
+                                                    not(
+                                                        xxf:is-blank($binding) and not($auto-select-unique-choice)           (: don't run if the value is blank and we don't auto-select :)
+                                                    ) and
+                                                    not(
+                                                        xxf:is-blank($binding) and xxf:readonly($binding)                    (: don't run if the value is blank and we are readonly :)
+                                                    )"/>
+
+                                            <xf:action if="$must-run-service">
                                                 <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
                                                 <xf:send submission="get-result">
                                                     <xf:property name="fr-resource" value="$resource"/>

@@ -291,7 +291,7 @@ object XFormsAssetServerRoute extends NativeRoute {
         } catch {
           case NonFatal(t) =>
             if (isConnectionInterruption(t)) {
-              warn(s"connection interrupted: ${getRootThrowable(t).getMessage}")
+              info(s"connection interrupted: ${getRootThrowable(t).getMessage}")
             } else {
               error("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
             }

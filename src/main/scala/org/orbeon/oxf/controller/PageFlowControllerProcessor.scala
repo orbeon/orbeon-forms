@@ -261,7 +261,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
             case _: ResourceNotFoundException =>
               if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
             case _ if isConnectionInterruption(t) =>
-              warn(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
+              info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
             case _ =>
               if (route.isPage)     runErrorRoute(t)          else sendError(t)
           }

@@ -109,7 +109,7 @@ class S3Test
       }
 
       it("must leave S3 bucket untouched if S3 storage disabled", S3Tag) {
-        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
           sendEmail(s3Store = false, s3PathOpt = None)
           assert(S3.objects(s3Config.bucket, prefix = s3Path).get.isEmpty)
         }
@@ -134,7 +134,7 @@ class S3Test
           // Try with no match param (defaults to "first) and match=first
           matchParam                            <- List(None, Some("first"))
         } {
-          testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+          testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
             // Select email template by name and match first template only
             val params = List("template" -> templateName) ++ matchParam.map("match" -> _).toList
 
@@ -151,7 +151,7 @@ class S3Test
       }
 
       it("must store expected S3 objects when all email templates are selected", S3Tag) {
-        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
           // Select all email templates (current language is the default one, i.e. "en")
           sendEmail(s3Store = true, s3PathOpt = s3Path.some, "match" -> "all")
 
@@ -166,7 +166,7 @@ class S3Test
       }
 
       it("must store expected S3 objects when non-default language is selected", S3Tag) {
-        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
           // Select a non-default language
           setLang("fr")
 
@@ -190,7 +190,7 @@ class S3Test
           "enabled"  -> List("9")
         )
 
-        testWithS3Config(configName = "issue-6751") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
 
           for ((controlValue, expectedTemplateNames) <- expectedTemplates) {
             // Set the control value to enable or disable the template

@@ -60,7 +60,7 @@
 
     <!-- Create, Read, Update and Delete operations (attachments) -->
     <service
-        path="/fr/service/(filesystem|s3)/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
+        path="/fr/service/(filesystem|s3)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
         class="org.orbeon.oxf.fr.persistence.attachments.CRUDRoute"/>
 
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->

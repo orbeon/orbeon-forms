@@ -24,11 +24,11 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.function
-import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
+import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils, XMLUtils}
+import org.orbeon.oxf.xml.{XMLNames, *}
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
@@ -36,7 +36,7 @@ import org.orbeon.saxon.`type`.Type.ITEM_TYPE
 import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.StaticProperty.*
-import org.orbeon.saxon.function.{AddToPathMap, AncestorOrganizations, Property, UserOrganizations, UserRoles}
+import org.orbeon.saxon.function.*
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.NameTest
@@ -513,16 +513,14 @@ private object FormRunnerFunctions {
     override def fromParams(params: FormRunnerParams): Option[StringValue] = Some(params.mode)
   }
 
-  // Probably cannot change over the course of the form's lifetime
-  class FRAppName extends FRParamsFunction[StringValue] {
-    override val elemNames: List[String] = List("app")
-    override def fromParams(params: FormRunnerParams): Option[StringValue] = Some(params.app)
+  // Cannot change over the course of the form's lifetime
+  class FRAppName extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): StringValue = FormRunnerParams().app
   }
 
-  // Probably cannot change over the course of the form's lifetime
-  class FRFormName extends FRParamsFunction[StringValue] {
-    override val elemNames: List[String] = List("form")
-    override def fromParams(params: FormRunnerParams): Option[StringValue] = Some(params.form)
+  // Cannot change over the course of the form's lifetime
+  class FRFormName extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): StringValue = FormRunnerParams().form
   }
 
   // Can change when creating a new document id

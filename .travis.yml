@@ -11,6 +11,9 @@ env:
     - secure: X+82NUnipRkzqBAt4IOgVuW/kDd/m85MEExAxRAxqZ2R6ALCHRMYKpCSv47dW7qnX89EkkN8vEDQ1/5h8bnGY5i1a6b8mMVLS3tkRUtuqW9bL59TzEyVTS6hsWoNNKWL4rzqnDAXTyy4RB881ZGdkTR3nRjrmEZtbfVWLXQCQ+A=
     - secure: Ufv45EFdy9eKEjZ6Za7DAo7X/cAB16G8a9qNj+qvcCOBiZLTjXO8+1Hqj85R5dopZwYvHt0cVaIiPJ+/7z1DeQ9076g5UTdhnK+agPxMW7WPlf9QqXiIDMZbjBsmPEIjp4jF42QDjoxY/tPTsupW45yXkHCeroUAud2zwvDkb1c=
     - secure: aUeNCaFFahWf6pQGhp4PbkQu20W1trf6lvSaydNV/ktdsPCkqr3nhJoN0M0CpKM9tqIb2ELj5/E4uKgSylbS2vdhVD0ysue6QvcexpRsuD8cpzYHjSDJyNP2z534nyQzKCkYpBn04r9asN/Uh4xV90Ctz1FZNzzqV6BdRK6N4Vc=
+    - secure: JNBlCeooGssOX+bxaxKX54Y4jey6HZZHJ99uY/m4HTfto4mmYotzLwusW0XI442XP4NruxHen0jsrSBII1GdjpfS3RVDE1exwiWrV3n+zTOdDLHR7WoDRkXKRFS10E6eEEDyHZPlukfQ8Dqff3Gt+VvyhCEfKZEd+IROLZPMr9U=
+    - secure: ux2PYcexqnINtSThqHycgS5xZ1qHx6y50jYRkIFX6hM1ji8iYnHNm281e8WUhmWi1xzS+nrY6/DqzEicyYV2ry+P218OVLllWus3A/7X+DAVffWyoe4ezwbBFxFIyxWTro99ALby7boMT/ReAtjYYzjskLBtgudt5mkZzxQHDSM=
+    - secure: SBCUP3cd+W4ELTXz8m0eFwd51F0h69vbdtThJfyU1cDVLnWvhHfREfMJcyYVAbY08Va/5dUQJPkbd5KWzDMktU4UbM4JXfDtyNq7JVcTZwtczCRSRU8LgFbdhATwkX/iTdhCpfH9sRZj/88z2Eyj4zMskWyGg996MsM5BL1sNzE=
   matrix:
     - TARGET=orbeon-dist
     - TARGET=test-unit

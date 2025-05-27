@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.{XMLNames, *}
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils, XMLUtils}
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type

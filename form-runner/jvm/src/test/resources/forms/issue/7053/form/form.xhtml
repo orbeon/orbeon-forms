@@ -1,0 +1,222 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <dynamic-dropdown/>
+                        </grid-1>
+
+                    </section-1>
+                    <section-2>
+                        <grid-2>
+                            <button/>
+                            <regular-dropdown/>
+                        </grid-2>
+                    </section-2>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="dynamic-dropdown-bind" ref="dynamic-dropdown" name="dynamic-dropdown"/>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="section-2-bind" ref="section-2" name="section-2">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="button-bind" ref="button" name="button"/>
+                        <xf:bind id="regular-dropdown-bind" ref="regular-dropdown" name="regular-dropdown"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7053</form-name>
+                    <title xml:lang="en">Simple Actions: ability to call async submission provider #7053</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <button>
+                            <label>Run service</label>
+                            <hint/>
+                        </button>
+                        <regular-dropdown>
+                            <label>Regular dropdown</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </regular-dropdown>
+                        <dynamic-dropdown>
+                            <label>wefewff</label>
+                            <hint/>
+                        </dynamic-dropdown>
+                        <section-1>
+                            <label/>
+                        </section-1>
+                        <section-2>
+                            <label/>
+                            <help/>
+                        </section-2>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <xf:instance id="get-countries-instance" class="fr-service"
+                         xxf:exclude-result-prefixes="#all">
+                        <body xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">&lt;params/&gt;</body>
+                    </xf:instance>
+            <xf:submission id="get-countries-submission" class="fr-service"
+                           resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                           method="get"
+                           serialization="none"
+                           mode="asynchronous"
+                           mediatype=""/>
+            <xf:action id="get-countries-binding">
+                <xf:action event="DOMActivate" ev:observer="button-control" if="true()">
+                    <xf:send submission="get-countries-submission"/>
+                </xf:action>
+                <xf:action event="xforms-submit" ev:observer="get-countries-submission">
+                    <xf:var name="request-instance-name" value="'get-countries-instance'"/>
+                    <xf:action/>
+                </xf:action>
+                <xf:action event="xforms-submit-done" ev:observer="get-countries-submission">
+                    <xf:action class="fr-itemset-action">
+                        <xf:var name="control-name" value="'regular-dropdown'"/>
+                        <xf:var name="response-items" value="/countries/country"/>
+                        <xf:var name="item-label" value="name"/>
+                        <xf:var name="item-value" value="us-code"/>
+                        <xf:var name="item-hint" value=""/>
+                    </xf:action>
+                </xf:action>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-control"
+                                                  appearance="minimal"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="dynamic-dropdown-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown/hint"/>
+
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                    <xf:hint ref="''"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:trigger xmlns="http://orbeon.org/oxf/xml/form-builder" id="button-control"
+                                        bind="button-bind">
+                                <xf:label ref="$form-resources/button/label"/>
+
+                                <xf:hint ref="$form-resources/button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:dropdown-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                 id="regular-dropdown-control"
+                                                 bind="regular-dropdown-bind"
+                                                 ref="">
+                                <xf:label ref="$form-resources/regular-dropdown/label"/>
+                                <xf:hint ref="$form-resources/regular-dropdown/hint"/>
+
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/regular-dropdown/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </fr:dropdown-select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

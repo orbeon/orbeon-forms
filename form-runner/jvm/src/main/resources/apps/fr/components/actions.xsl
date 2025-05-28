@@ -546,6 +546,11 @@
                             select="frf:replaceVarReferencesWithFunctionCallsFromString($action/@if, $action/@if, false(), $library-name, $fr-form-model-vars)"/>
                     </xsl:if>
 
+                    <!-- Create action id compatible with `actions-20182.xsl` -->
+                    <xf:var
+                        name="current-action-id"
+                        value="concat('fr-action-', secure:randomHexId())" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"/>
+
                     <!-- 1. Choose to iterate or not on `$iterate-control-name`.
                          2. Also store the absolute id of the action source in the request.
                             If the action source is passed from the listener via 'action-source' we just use it (also
@@ -554,14 +559,22 @@
                         <xsl:when test="exists($iterate-control-name-var)">
                             <xsl:copy-of select="$iterate-control-name-var"/>
                             <xf:action iterate="frf:findRepeatedControlsForTarget(event('action-source'), event('xxf:absolute-targetid'))[1], $iterate-control-name)">
-                                <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', string(.))</xf:action>
+                                <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', string(.))</xf:action>
                             </xf:action>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', (event('action-source'), event('xxf:absolute-targetid'))[1])</xf:action>
+                            <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', (event('action-source'), event('xxf:absolute-targetid'))[1])</xf:action>
                         </xsl:otherwise>
                     </xsl:choose>
-                    <xsl:copy-of select="$action/* except $iterate-control-name-var"/>
+                    <xsl:for-each select="$action/* except $iterate-control-name-var">
+                        <xsl:copy>
+                            <xsl:copy-of select="@* | node()"/>
+                            <!-- We should only have nested `<xf:send>` children elements, right? -->
+                            <xsl:if test="exists(self::xf:send)">
+                                <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
+                            </xsl:if>
+                        </xsl:copy>
+                    </xsl:for-each>
                 </xsl:copy>
             </xsl:for-each>
 
@@ -575,6 +588,10 @@
                     <xf:insert
                         ref="xxf:instance('fr-service-request-instance')"
                         origin="xf:parse(xxf:instance($request-instance-name))"/>
+
+                    <xf:var
+                        name="current-action-id"
+                        value="event('fr-action-id')"/>
 
                     <xsl:variable
                         name="request-actions"
@@ -595,7 +612,7 @@
                                                     name="value"
                                                     value="
                                                         frf:resolveTargetRelativeToActionSource(
-                                                            xxf:get-request-attribute('fr-action-source'),
+                                                            xxf:get-document-attribute($current-action-id, 'action-source'),
                                                             $control-name,
                                                             true(),
                                                             {if (exists($library-name)) then $library-name/@value else '()'}
@@ -681,6 +698,10 @@
                          https://github.com/orbeon/orbeon-forms/issues/1660 -->
                     <xf:recalculate model="{$model-id}" xxf:deferred="true"/>
 
+                    <xf:var
+                        name="current-action-id"
+                        value="event('fr-action-id')"/>
+
                     <xsl:if test="exists($response-actions)">
                         <xsl:for-each select="$response-actions">
                             <xsl:copy>
@@ -705,7 +726,7 @@
                                         <xf:action
                                             iterate="
                                                 frf:resolveTargetRelativeToActionSource(
-                                                    xxf:get-request-attribute('fr-action-source'),
+                                                    xxf:get-document-attribute($current-action-id, 'action-source'),
                                                     $control-name,
                                                     true(),
                                                     ()
@@ -804,7 +825,7 @@
                                              the problem is the evaluation of `response-items`, 'item-label', and 'item-value', which must take place
                                              in a context where variables are available, so we cannot use `saxon:evaluate()`. -->
                                         <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
-                                            <xf:property name="action-source"      value="xxf:get-request-attribute('fr-action-source')"/>
+                                            <xf:property name="action-source"      value="xxf:get-document-attribute($current-action-id, 'action-source')"/>
                                             <xf:property name="control-name"       value="$control-name"/>
                                             <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
                                             <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>

@@ -498,7 +498,8 @@
                 <xsl:attribute name="mode">{
                     (
                         'asynchronous'[exists(event('fr-async')[. = 'true'])],
-                        'synchronous'
+                        'synchronous'[exists(event('fr-async')[. = 'false'])],
+                        if (fr:is-browser-environment()) then 'asynchronous' else 'synchronous'
                     )[1]
                 }</xsl:attribute>
             </xsl:if>

@@ -208,32 +208,12 @@
                 </output>
                 <output scope="" prefixed-id="my-app-name" model-prefixed-id="m" binding="false" value="true">
                     <value>
-                        <analysis expression="string((fr:app-name())[1])" analyzed="true">
-                            <value-dependent>
-                                <path>instance('fr-parameters-instance')/app</path>
-                            </value-dependent>
-                            <dependent-models>
-                                <model>m</model>
-                            </dependent-models>
-                            <dependent-instances>
-                                <instance>fr-parameters-instance</instance>
-                            </dependent-instances>
-                        </analysis>
+                        <analysis expression="string((fr:app-name())[1])" analyzed="true"/>
                     </value>
                 </output>
                 <output scope="" prefixed-id="my-form-name" model-prefixed-id="m" binding="false" value="true">
                     <value>
-                        <analysis expression="string((fr:form-name())[1])" analyzed="true">
-                            <value-dependent>
-                                <path>instance('fr-parameters-instance')/form</path>
-                            </value-dependent>
-                            <dependent-models>
-                                <model>m</model>
-                            </dependent-models>
-                            <dependent-instances>
-                                <instance>fr-parameters-instance</instance>
-                            </dependent-instances>
-                        </analysis>
+                        <analysis expression="string((fr:form-name())[1])" analyzed="true"/>
                     </value>
                 </output>
                 <output scope="" prefixed-id="my-document-id" model-prefixed-id="m" binding="false" value="true">

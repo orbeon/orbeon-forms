@@ -14,7 +14,8 @@
 package org.orbeon.oxf.http
 
 import enumeratum.*
-import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
+import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
+import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.util.StringUtils.*
 
 import java.io.{InputStream, Reader}
@@ -224,7 +225,7 @@ trait HttpClient[CookieStore] {
     content      : Option[StreamedContent]
   )(implicit
     requestCtx   : Option[RequestCtx],
-    connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
+    connectionCtx: ConnectionContexts
   ): HttpResponse
 
   def shutdown(): Unit

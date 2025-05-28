@@ -31,7 +31,8 @@ import org.apache.http.protocol.{BasicHttpContext, HttpContext, HttpCoreContext}
 import org.apache.http.ssl.SSLContexts
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException as _, *}
-import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
+import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.http.HttpMethod.*
 import org.orbeon.oxf.util.CollectionUtils.*
@@ -59,7 +60,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
     content      : Option[StreamedContent]
   )(implicit
     requestCtx   : Option[RequestCtx],                                // unused
-    connectionCtx: Option[ConnectionContextSupport.ConnectionContext] // unused for external HTTP connections
+    connectionCtx: ConnectionContexts // unused for external HTTP connections
   ): org.orbeon.oxf.http.HttpResponse = {
 
     val uri               = URI.create(url)

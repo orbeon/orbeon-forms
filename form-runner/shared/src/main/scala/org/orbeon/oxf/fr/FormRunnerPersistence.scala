@@ -17,7 +17,8 @@ import cats.effect.IO
 import cats.syntax.option.*
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
-import org.orbeon.connection.{AsyncConnectionResult, ConnectionContextSupport, ConnectionResult, StreamedContent}
+import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
+import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult, StreamedContent}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common
@@ -766,7 +767,7 @@ trait FormRunnerPersistence {
     workflowStage : Option[String]
   )(implicit
     safeRequestCtx          : SafeRequestContext,
-    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
+    connectionContext       : ConnectionContexts,
     xfcd                    : XFormsContainingDocument,
     indentedLogger          : IndentedLogger
   ): IO[AsyncConnectionResult] = {
@@ -816,7 +817,7 @@ trait FormRunnerPersistence {
     beforeUrl        : String
   )(implicit
     safeRequestCtx   : SafeRequestContext,
-    connectionContext: Option[ConnectionContextSupport.ConnectionContext],
+    connectionContext: ConnectionContexts,
     xfcd             : XFormsContainingDocument,
     indentedLogger   : IndentedLogger
   ): IO[AsyncConnectionResult] = {
@@ -844,7 +845,7 @@ trait FormRunnerPersistence {
     credentials      : Option[BasicCredentials]
   )(implicit
     safeRequestCtx   : SafeRequestContext,
-    connectionContext: Option[ConnectionContextSupport.ConnectionContext],
+    connectionContext: ConnectionContexts,
     xfcd             : XFormsContainingDocument,
     indentedLogger   : IndentedLogger
   ): IO[AsyncConnectionResult] = {
@@ -919,7 +920,7 @@ trait FormRunnerPersistence {
     workflowStage     : Option[String] = None
   )(implicit
     safeRequestCtx    : SafeRequestContext,
-    connectionContext : Option[ConnectionContextSupport.ConnectionContext],
+    connectionContext : ConnectionContexts,
     xfcd              : XFormsContainingDocument,
     indentedLogger    : IndentedLogger
   ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
@@ -969,7 +970,7 @@ trait FormRunnerPersistence {
     // xxx xxx close resources
     def saveAllAttachmentsStream(implicit
       xfcd             : XFormsContainingDocument,
-      connectionContext: Option[ConnectionContextSupport.ConnectionContext],
+      connectionContext: ConnectionContexts
     ): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
         AttachmentWithHolder(beforeUrl, migratedHolder)

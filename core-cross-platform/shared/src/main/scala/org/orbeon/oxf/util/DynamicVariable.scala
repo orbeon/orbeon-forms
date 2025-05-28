@@ -33,6 +33,8 @@ class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = 
 
   def value_=(value: T): Unit = threadLocal set Some(value)
 
+  def clear(): Unit = threadLocal.remove()
+
   def withValue[S](value: T)(thunk: => S): S = {
 
     val oldValue = threadLocal.get

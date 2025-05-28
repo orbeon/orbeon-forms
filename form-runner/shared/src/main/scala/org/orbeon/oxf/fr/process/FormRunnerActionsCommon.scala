@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
 import org.orbeon.connection.ConnectionContextSupport
+import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
@@ -146,7 +147,7 @@ trait FormRunnerActionsCommon {
 
       implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
-      implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.findContext(Map.empty)
+      implicit val connectionCtx           : ConnectionContexts = ConnectionContextSupport.findContext(Map.empty)
       implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
 
       val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()

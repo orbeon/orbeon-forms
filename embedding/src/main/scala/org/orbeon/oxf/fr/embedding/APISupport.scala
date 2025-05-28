@@ -17,6 +17,7 @@ import cats.data.NonEmptyList
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
+import org.orbeon.connection.ConnectionContextSupport.EmptyConnectionContexts
 import org.orbeon.connection.{BufferedContent, Content, StreamedContent}
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -419,7 +420,7 @@ object APISupport {
         content       = requestDetails.content
       )(
         requestCtx    = None,
-        connectionCtx = None
+        connectionCtx = EmptyConnectionContexts
       )
 
     private def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =

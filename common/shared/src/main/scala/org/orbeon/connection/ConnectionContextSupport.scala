@@ -8,8 +8,11 @@ import java.net.URI
 trait ConnectionContextSupportTrait {
 
   type ConnectionContext
+  type ConnectionContexts = List[Option[ConnectionContext]]
 
-  def findContext(extension: Map[String, Any]): Option[ConnectionContext]
+  def EmptyConnectionContexts: ConnectionContexts
+
+  def findContext(extension: Map[String, Any]): ConnectionContexts
 
   def withContext[T](
     url      : URI,
@@ -19,8 +22,10 @@ trait ConnectionContextSupportTrait {
   )(
     body     : => T
   )(implicit
-    connectionCtx: Option[ConnectionContext]
+    connectionCtx: ConnectionContexts
   ): T
 }
 
-object ConnectionContextSupport extends ConnectionContextSupportPlatform with ConnectionContextSupportTrait
+object ConnectionContextSupport extends ConnectionContextSupportPlatform with ConnectionContextSupportTrait {
+  val EmptyConnectionContexts: ConnectionContexts = Nil
+}

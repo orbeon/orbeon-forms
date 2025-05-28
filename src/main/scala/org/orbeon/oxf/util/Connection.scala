@@ -19,6 +19,7 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
 import org.orbeon.connection.*
+import org.orbeon.connection.ConnectionContextSupport.{ConnectionContexts, EmptyConnectionContexts}
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{UriScheme, UriUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -74,7 +75,7 @@ object Connection extends ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
 
-    implicit val connectionCtx : Option[ConnectionContextSupport.ConnectionContext] = None
+    implicit val connectionCtx : ConnectionContexts = EmptyConnectionContexts
     implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
     val (cookieStore, cxr) =
@@ -106,7 +107,7 @@ object Connection extends ConnectionTrait {
   )(implicit
     logger          : IndentedLogger,
     safeRequestCtx  : SafeRequestContext,
-    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
+    connectionCtx   : ConnectionContexts,
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
     
@@ -379,7 +380,7 @@ object Connection extends ConnectionTrait {
     )(implicit
       logger        : IndentedLogger,
       safeRequestCtx: SafeRequestContext,
-      connectionCtx : Option[ConnectionContextSupport.ConnectionContext]
+      connectionCtx : ConnectionContexts
     ): (CookieStore, ConnectionResult) = {
 
       def isHttpOrHttps(scheme: UriScheme): Boolean =
@@ -415,7 +416,7 @@ object Connection extends ConnectionTrait {
     )(implicit
       logger        : IndentedLogger,
       safeRequestCtx: SafeRequestContext,
-      connectionCtx : Option[ConnectionContextSupport.ConnectionContext]
+      connectionCtx : ConnectionContexts
     ): ConnectionResult = {
 
       val normalizedUrlString = normalizedUrl.toString

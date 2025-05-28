@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
+import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials as _, *}
@@ -43,7 +44,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
     content      : Option[StreamedContent]
   )(implicit
     requestCtx   : Option[SafeRequestContext],
-    connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
+    connectionCtx: ConnectionContexts
   ): HttpResponse =
     ConnectionContextSupport.withContext(URI.create(url), method, headers, Map.empty) {
 

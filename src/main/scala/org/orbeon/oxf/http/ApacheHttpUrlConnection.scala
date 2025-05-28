@@ -16,6 +16,7 @@ package org.orbeon.oxf.http
 import java.io.OutputStream
 import java.net.{HttpURLConnection, URL, URLDecoder}
 import org.apache.http.impl.client.BasicCookieStore
+import org.orbeon.connection.ConnectionContextSupport.EmptyConnectionContexts
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.StringUtils.*
 
@@ -67,7 +68,7 @@ class ApacheHttpUrlConnection(url: URL)(client: PropertiesApacheHttpClient.type)
             content       = None
           )(
             requestCtx    = None,
-            connectionCtx = None
+            connectionCtx = EmptyConnectionContexts
           )
         )
       }

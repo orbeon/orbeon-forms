@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import cats.effect.IO
 import org.orbeon.connection.*
+import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.Logging.*
@@ -72,7 +73,7 @@ object Connection extends ConnectionTrait {
   )(implicit
     logger          : IndentedLogger,
     safeRequestCtx  : SafeRequestContext,
-    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
+    connectionCtx   : ConnectionContexts,
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
     method match {

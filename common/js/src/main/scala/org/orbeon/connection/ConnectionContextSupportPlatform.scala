@@ -9,7 +9,7 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
 
   type ConnectionContext = Unit
 
-  def findContext(extension: Map[String, Any]): Option[Unit] = None
+  def findContext(extension: Map[String, Any]): ConnectionContexts = Nil
 
   def withContext[T](
     url          : URI,
@@ -19,6 +19,6 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
   )(
     body         : => T
   )(implicit
-    connectionCtx: Option[Unit]
+    connectionCtx: ConnectionContexts
   ): T = body
 }

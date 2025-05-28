@@ -15,8 +15,8 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
   // 2024-10-02: Don't use just a type alias to `AnyRef`, as we use implicits!
   case class ConnectionContext(wrapped: AnyRef)
 
-  def findContext(extension: Map[String, Any]): Option[ConnectionContext] =
-    connectionContextProviderOpt.flatMap(provider => Option(provider.getContext(extension.asJava)).map(ConnectionContext.apply))
+  def findContext(extension: Map[String, Any]): ConnectionContexts =
+    connectionContextProviders.map(provider => Option(provider.getContext(extension.asJava)).map(ConnectionContext.apply))
 
   def withContext[T](
     url          : URI,
@@ -26,19 +26,27 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
   )(
     body         : => T
   )(implicit
-    connectionCtx: Option[ConnectionContext]
+    connectionCtx: ConnectionContexts
   ): T =
-    (connectionContextProviderOpt, connectionCtx) match {
-      case (Some(provider), Some(ConnectionContext(ctx))) =>
-        provider.pushContext(ctx, url, method.entryName, headers.view.mapValues(_.toArray).to(Map).asJava, extension.asJava)
+    connectionContextProviders.zip(connectionCtx) match {
+      case tuples if tuples.nonEmpty =>
+        tuples.foreach {
+          case (provider, Some(ConnectionContext(wrappedCtx))) =>
+            provider.pushContext(wrappedCtx, url, method.entryName, headers.view.mapValues(_.toArray).to(Map).asJava, extension.asJava)
+          case _ =>
+        }
         try
           body
         finally
-          provider.popContext(ctx)
+          tuples.reverse.foreach {
+            case (provider, Some(ConnectionContext(wrappedCtx))) =>
+              provider.popContext(wrappedCtx)
+            case _ =>
+          }
       case _ =>
         body
     }
 
-  private lazy val connectionContextProviderOpt: Option[ConnectionContextProvider[AnyRef]] =
-    ServiceProviderSupport.loadProvider[ConnectionContextProvider[AnyRef]]("connection context")
+  private lazy val connectionContextProviders: List[ConnectionContextProvider[AnyRef]] =
+    ServiceProviderSupport.loadProviders[ConnectionContextProvider[AnyRef]]("connection context")
 }

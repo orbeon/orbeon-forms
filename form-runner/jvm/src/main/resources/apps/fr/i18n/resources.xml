@@ -12,6 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <resources xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="resources-ar.xml"/>
     <xi:include href="resources-ca.xml"/>
     <xi:include href="resources-da.xml"/>
     <xi:include href="resources-de.xml"/>

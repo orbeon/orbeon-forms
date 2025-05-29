@@ -1,0 +1,709 @@
+<resource xml:lang="ar">
+    <common>
+        <formats>
+            <within-day>[h]:[m01] [P,*-2]</within-day>
+            <day-this-year>[MNn,*-3] [D]</day-this-year>
+            <short-date>[M01]/[D01]/[Y01]</short-date>
+        </formats>
+        <messages>
+            <incomplete-configuration>تكوين Orbeon Forms الخاص بك غير مكتمل. لمزيد من التفاصيل، يرجى التحقق من ملف سجل Orbeon Forms وزيارة &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;الوثائق&lt;/a&gt;.</incomplete-configuration>
+        </messages>
+    </common>
+    <buttons>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; إنشاء</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; عرض</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; موافقة</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; رفض</reject>
+
+        <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; الرئيسية</home>
+        <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; الرئيسية</landing>
+        <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; مراجعة</review>
+        <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+        <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+        <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; حذف</delete>
+        <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; استيراد</import>
+        <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; جديد</new>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; إنشاء بيانات جديدة</new-long>
+        <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; نسخ</duplicate>
+
+        <!-- Standard process buttons -->
+        <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; حفظ</save>
+        <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; حفظ</save-final>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; حفظ التقدم</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; حفظ التقدم</save-progress>
+        <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; تعديل</edit>
+        <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; إرسال</send>
+        <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; البريد الإلكتروني</email>
+        <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; تحقق</validate>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; اختبار PDF</test-pdf>
+
+        <!-- Legacy buttons -->
+        <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; إرسال</submit>
+        <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; مراجعة</workflow-review>
+        <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; تعديل</workflow-edit>
+        <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; إرسال</workflow-send>
+
+        <!-- Other standard buttons -->
+        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; ملخص</summary>
+        <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; إغلاق</close>
+        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; مسح</clear>
+        <cancel>إلغاء</cancel>
+        <save-locally>حفظ محليًا</save-locally>
+        <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+        <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="تحديث"&gt;&lt;/i&gt;</refresh>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; طي الكل</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; توسيع الكل</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; تحديث</refresh-full>
+        <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; التالي</wizard-next>
+        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; السابق</wizard-prev>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; المحتوى</wizard-toc>
+
+        <!-- Submit dialog -->
+        <submit-dialog-clear>مسح وإغلاق</submit-dialog-clear>
+        <submit-dialog-keep>الاحتفاظ بالقيم وإغلاق</submit-dialog-keep>
+        <submit-dialog-go>موافق</submit-dialog-go>
+        <submit-dialog-close-window>إغلاق النافذة</submit-dialog-close-window>
+
+        <!-- Warning dialog -->
+        <validation-dialog-review>مراجعة</validation-dialog-review>
+        <validation-dialog-continue>متابعة</validation-dialog-continue>
+
+        <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; اختبار</test>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; فحص الصيغ (تجريبي)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; اختبار بدون اتصال (تجريبي)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; تصدير إلى إكسل</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; تصدير إلى إكسل</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; تصدير XML</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; تصدير XHTML</form-definition-xhtml-export>
+        <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; نشر</publish>
+        <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; نشر</save-publish>
+
+        <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; نعم</yes>
+        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; لا</no>
+        <ok>موافق</ok>
+        <previous>السابق</previous>
+        <next>التالي</next>
+    </buttons>
+    <components>
+        <labels>
+            <open-section>إظهار القسم</open-section>
+            <close-section>إخفاء القسم</close-section>
+            <section-name>اسم القسم</section-name>
+            <yes>نعم</yes>
+            <no>لا</no>
+            <other>أخرى</other>
+            <clear>مسح القيمة</clear>
+            <please-select>يرجى الاختيار:</please-select>
+        </labels>
+        <grid>
+            <menu>القائمة</menu>
+            <insert-above>إدراج فوق</insert-above>
+            <insert-below>إدراج تحت</insert-below>
+            <move-up>تحريك لأعلى</move-up>
+            <move-down>تحريك لأسفل</move-down>
+            <clear>
+                <label>مسح السطر</label>
+            </clear>
+            <remove>
+                <label>إزالة السطر</label>
+                <hint>إزالة السطر من الشبكة المتكررة</hint>
+            </remove>
+            <add-another>
+                <label>إضافة سطر آخر</label>
+                <hint>إضافة سطر آخر إلى الشبكة المتكررة</hint>
+            </add-another>
+        </grid>
+        <section>
+            <remove>
+                <label>إزالة التكرار</label>
+                <hint>إزالة تكرار من القسم المكرر</hint>
+            </remove>
+            <add-another>
+                <label>إضافة تكرار آخر</label>
+                <hint>إضافة تكرار آخر إلى القسم المكرر</hint>
+            </add-another>
+        </section>
+        <date-time>
+            <year>السنة</year>
+            <month>الشهر</month>
+            <day>اليوم</day>
+            <select-date>اختر التاريخ</select-date>
+        </date-time>
+        <wizard>
+            <errors>أخطاء</errors>
+            <incomplete>غير مكتمل</incomplete>
+            <complete>مكتمل</complete>
+            <not-started>لم يبدأ</not-started>
+            <edit>تعديل</edit>
+        </wizard>
+        <error-summary>
+            <show-more>عرض المزيد</show-more>
+            <show-less>عرض أقل</show-less>
+        </error-summary>
+        <revision-history>
+            <label>سجل المراجعات</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (المراجعة الأولية)}'|1# (المراجعة الحالية)}</date>
+            <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] الساعة [h]:[m] [P,*-2]</date-format>
+
+            <named-user>المستخدم {0}</named-user>
+            <anonymous-user>مستخدم مجهول</anonymous-user>
+
+            <unknown-changes>قام ببعض التغييرات.</unknown-changes>
+            <initial-revision>حفظ المراجعة الأولية.</initial-revision>
+            <no-changes>حفظ دون تغييرات ملحوظة.</no-changes>
+            <specific-changes>قام بالتغييرات التالية:</specific-changes>
+
+            <view-data>عرض هذه المراجعة</view-data>
+
+            <value-entered>تم إدخال "{0}"</value-entered>
+            <value-cleared>تم مسح "{0}"</value-cleared>
+            <value-changed>تغير من "{0}" إلى "{1}"</value-changed>
+            <iteration-added>تمت إضافة {0,number,integer} {0,choice,1#تكرار|1&lt;تكرارات}</iteration-added>
+            <iteration-removed>تمت إزالة {0,number,integer} {0,choice,1#تكرار|1&lt;تكرارات}</iteration-removed>
+            <other-changed>تم تغيير معلومات داخلية</other-changed>
+            <workflow-stage-changed>تغيرت مرحلة سير العمل من "{0}" إلى "{1}"</workflow-stage-changed>
+
+            <load-more>تحميل المزيد</load-more>
+        </revision-history>
+    </components>
+    <untitled-form>نموذج بدون عنوان</untitled-form>
+    <errors>
+        <summary-title>النموذج الخاص بك {1,choice,
+            0#لا يحتوي على أي رسائل|
+            1#يحتوي على '{0,choice,0#خطأ|1#تحذير|2#رسالة توضيحية|3#رسالة}'|
+            1&lt;يحتوي على '{0,choice,0#أخطاء|1#تحذيرات|2#رسائل توضيحية|3#رسائل}'}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer} '{0,choice,0#خطأ|1#تحذير|2#رسالة توضيحية|3#رسالة}' - |
+            1&lt;{1,number,integer} '{0,choice,0#أخطاء|1#تحذيرات|2#رسائل توضيحية|3#رسائل}' - }{2}</form-title>
+        <none>لا توجد أخطاء في النموذج</none>
+        <unsaved>تغييرات غير محفوظة</unsaved>
+        <canvas-not-supported>لإجراء تعليقات على الصور، يحتاج متصفحك إلى دعم HTML5 canvas</canvas-not-supported>
+        <search>حدث خطأ أثناء إجراء البحث</search>
+    </errors>
+    <email>
+        <subject>تأكيد نماذج Orbeon</subject>
+        <body>يرجى الاطلاع على النموذج المرفق بصيغة PDF وXML.</body>
+        <na>غير متاح</na>
+        <iteration>التكرار {$iteration}</iteration>
+    </email>
+    <!-- Formats used for PDF template -->
+    <print>
+        <formats>
+            <date>[MNn] [D], [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+        </formats>
+    </print>
+    <summary>
+        <titles>
+            <summary-title>ملخص</summary-title>
+            <delete-confirmation>تأكيد الحذف</delete-confirmation>
+            <document-id>معرّف المستند</document-id>
+            <workflow-stage>مرحلة سير العمل</workflow-stage>
+            <created-by>أنشئ بواسطة</created-by>
+            <selected>محدد</selected>
+            <refresh>ستقوم هذه العملية بتحديث الصفحة</refresh>
+            <toc>جدول المحتويات</toc>
+            <description>الوصف</description>
+            <help>مساعدة</help>
+            <error-count>خطأ في النموذج</error-count>
+            <errors-count>أخطاء في النموذج</errors-count>
+        </titles>
+        <buttons>
+            <select-all>تحديد الكل</select-all>
+            <deselect-all>إلغاء تحديد الكل</deselect-all>
+            <select-saved>تحديد المحفوظ صراحةً فقط</select-saved>
+            <select-drafts>تحديد المحفوظ تلقائيًا فقط</select-drafts>
+        </buttons>
+        <bulk-edit>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; إظهار التحرير الجماعي</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; إخفاء التحرير الجماعي</close-bulk-edit>
+            <bulk-edit>تحرير جماعي</bulk-edit>
+            <apply>تطبيق</apply>
+            <value-required>القيمة مطلوبة</value-required>
+            <submission-error>خطأ أثناء تحرير بيانات النموذج.</submission-error>
+        </bulk-edit>
+        <paging>
+            <to>إلى</to>
+            <of>من</of>
+        </paging>
+        <messages>
+            <no-form-data-found>لم يتم العثور على بيانات النموذج.</no-form-data-found>
+            <delete-confirmation>هل أنت متأكد من أنك تريد حذف نموذج واحد أو أكثر؟ لاحظ أنه عند حذف مستند محفوظ، سيتم أيضًا حذف المستندات المحفوظة تلقائيًا المقابلة.</delete-confirmation>
+            <version>إصدار النموذج {0,number,integer}</version>
+        </messages>
+        <labels>
+            <draft>محفوظ تلقائيًا</draft>
+            <read-only>للقراءة فقط</read-only>
+            <language-choice>اختر اللغة</language-choice>
+            <form-choice>اختر نموذجًا</form-choice>
+            <free-search>بحث حر</free-search>
+            <clear-value>[مسح القيمة]</clear-value>
+            <script>النسخة الكاملة</script>
+            <refresh>تحديث</refresh>
+            <close-box>[إغلاق]</close-box>
+            <help-back>رجوع</help-back>
+            <goto-content>انتقل إلى المحتوى</goto-content>
+        </labels>
+        <formats>
+            <date>[MNn] [D], [Y]</date>
+            <time>[H01]:[m01]:[s01]</time>
+            <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+            <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+        </formats>
+        <export-with-search-dialog>
+            <label>خيارات تصدير إكسل</label>
+            <headings-labels>استخدام التسميات للعناوين</headings-labels>
+            <selection-controls-labels>استخدام التسميات لعناصر التحكم في التحديد</selection-controls-labels>
+            <include-document-id>تضمين عمود معرّف المستند</include-document-id>
+        </export-with-search-dialog>
+    </summary>
+    <detail>
+        <messages>
+            <save-success>تم حفظ المستند بنجاح!</save-success>
+            <save-draft-success>تم حفظ التقدم بنجاح!</save-draft-success>
+            <save-progress-success>تم حفظ التقدم بنجاح!</save-progress-success>
+            <email-success>تم إرسال البريد الإلكتروني بنجاح!</email-success>
+            <form-validation-error>هناك أخطاء في التحقق. يرجى المحاولة مرة أخرى بعد ملء جميع الحقول بشكل صحيح.</form-validation-error>
+            <database-error>حدث خطأ في الاتصال بقاعدة البيانات. يرجى الاتصال بمسؤول التطبيق.</database-error>
+            <service-error>حدث خطأ في الاتصال بخدمة الخلفية. يرجى الاتصال بمسؤول التطبيق.</service-error>
+            <action-error>حدث خطأ في الاتصال بخدمة الخلفية. يرجى الاتصال بمسؤول التطبيق.</action-error>
+            <process-error>حدث خطأ أثناء تشغيل العملية. يرجى الاتصال بمسؤول التطبيق.</process-error>
+            <wizard-prev-error>يرجى إصلاح الأخطاء قبل الانتقال للخلف</wizard-prev-error>
+            <wizard-next-error>يرجى إصلاح الأخطاء قبل الانتقال للأمام</wizard-next-error>
+            <clear-confirm-message>هل أنت متأكد من أنك تريد مسح جميع الحقول في هذه الصفحة؟ سيتم فقدان بياناتك إذا لم تقم بحفظها.</clear-confirm-message>
+            <error-dialog-title>غير قادر على إكمال الإجراء</error-dialog-title>
+            <confirmation-dialog-title>تأكيد</confirmation-dialog-title>
+            <confirmation-dialog-message>هل أنت متأكد من أنك تريد المتابعة؟</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>قد يتسبب هذا الإجراء في استبدال بعض بيانات النموذج. هل أنت متأكد من أنك تريد المتابعة؟</confirmation-dialog-message-overwrite>
+            <submit-dialog-title>تم إرسال النموذج</submit-dialog-title>
+            <submit-dialog-message>تم إرسال معلوماتك، شكرًا لك.</submit-dialog-message>
+            <validation-dialog-title>مراجعة رسائل التحقق من النموذج</validation-dialog-title>
+            <validation-dialog-message>النموذج الخاص بك {1,choice,
+                0#لا يحتوي على أي رسائل|
+                1#يحتوي على '{0,choice,0#خطأ|1#تحذير|2#رسالة توضيحية|3#رسالة}' واحدة|
+                1&lt;يحتوي على {1,number,integer} '{0,choice,0#أخطاء|1#تحذيرات|2#رسائل توضيحية|3#رسائل}'}.
+                {0,choice,
+                0#يرجى المحاولة مرة أخرى بعد ملء جميع الحقول بشكل صحيح|
+                0&lt;يمكنك اختيار مراجعة '{1,choice,1#ها|1&lt;هم}' أولاً أو تجاهل '{1,choice,1#ها|1&lt;هم}' والمتابعة مع العملية}.
+            </validation-dialog-message>
+            <buttons-message/>
+            <saved-locally-open>انقر هنا لفتح المستند. سيتم عرض البيانات التي أدخلتها كما كانت في وقت حفظ عملك.</saved-locally-open>
+            <upload-in-progress>هناك عمليات تحميل ملفات جارية. يرجى المحاولة مرة أخرى بعد اكتمال تحميل الملف أو إلغائه.</upload-in-progress>
+            <upload-start>بدأ التحميل</upload-start>
+            <upload-cancel>تم إلغاء التحميل من قِبل المستخدم</upload-cancel>
+            <upload-done>اكتمل التحميل</upload-done>
+            <upload-error>حدث خطأ أثناء التحميل. يرجى المحاولة مرة أخرى.</upload-error>
+            <upload-error-empty-file>الملف الذي تم تحميله فارغ.</upload-error-empty-file>
+            <upload-error-size>الملف الذي تم تحميله كبير جدًا. الحجم الأقصى المسموح به هو {0} والحجم الفعلي المستلم هو {1}.</upload-error-size>
+            <upload-error-max-files-per-control>تم تجاوز الحد الأقصى لعدد الملفات. لا يمكنك إرفاق أكثر من {0,number,integer} ملفات بعنصر التحكم هذا.</upload-error-max-files-per-control>
+            <upload-error-mediatype>الملف الذي تم تحميله من نوع غير صحيح: {0}</upload-error-mediatype>
+            <upload-error-file-scan>تم رفض الملف الذي تم تحميله من قبل فاحص الملفات. يرجى التأكد من أن هذا الملف غير مصاب. إليك رسالة فاحص الملفات: "{0}".</upload-error-file-scan>
+            <lost-attachments>تم فقدان بعض مرفقات الملفات بسبب مشكلة في الخادم. يرجى التحقق من جميع مرفقاتك وتحميلها مرة أخرى إذا لزم الأمر.</lost-attachments>
+        </messages>
+        <draft-singleton>
+            <found-draft>تم العثور على مستند محفوظ تلقائيًا</found-draft>
+            <found-drafts>تم العثور على مستندات محفوظة تلقائيًا</found-drafts>
+            <found-draft-for-document>بعد حفظ هذا المستند، تم حفظ مستند تلقائيًا قد يحتوي على عمل إضافي. هل تريد فتح المستند المحفوظ، أم المستند المحفوظ تلقائيًا؟</found-draft-for-document>
+            <found-draft-for-never-saved>يتوفر مستند محفوظ تلقائيًا لهذا النموذج. هل ترغب في البدء من الصفر أو فتح المستند المحفوظ تلقائيًا؟</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>تتوفر عدة مستندات محفوظة تلقائيًا لهذا النموذج. هل ترغب في البدء من الصفر أو عرض المستندات المحفوظة تلقائيًا (ثم ربما تعديل أحدها)؟</found-drafts-for-never-saved>
+            <open-saved>فتح المستند المحفوظ صراحة</open-saved>
+            <open-draft>فتح المستند المحفوظ تلقائيًا</open-draft>
+            <view-drafts>عرض المستندات المحفوظة تلقائيًا</view-drafts>
+            <start-new>البدء من الصفر</start-new>
+            <multiple-docs-title>تم العثور على بيانات نموذج موجودة</multiple-docs-title>
+            <multiple-docs-explanation>لا يمكنك إنشاء بيانات جديدة لتعريف هذا النموذج، ولكن قد تتمكن من تعديل بيانات النموذج الموجودة.</multiple-docs-explanation>
+            <multiple-docs-view-data>عرض بيانات النموذج الموجودة</multiple-docs-view-data>
+        </draft-singleton>
+        <labels>
+            <language-choice>اللغة</language-choice>
+            <errors>ملخص الأخطاء</errors>
+            <check-errors-in-form>يحتوي هذا النموذج على أخطاء</check-errors-in-form>
+            <error-details>عرض تفاصيل الخطأ</error-details>
+            <confirm>تأكيد</confirm>
+            <alert>قيمة مفقودة أو غير صحيحة</alert>
+            <alert-out-of-range>قيمة خارج النطاق، يرجى تحديد قيمة متاحة</alert-out-of-range>
+            <alert-out-of-range-multiple>قيم خارج النطاق</alert-out-of-range-multiple>
+            <clear-out-of-range>مسح القيم خارج النطاق</clear-out-of-range>
+            <captcha-label>كابتشا</captcha-label>
+            <captcha-alert>يرجى التحقق من إجابتك على تحدي كابتشا</captcha-alert>
+        </labels>
+        <hints>
+            <upload-max-size-per-file>يجب أن تكون الملفات أقل من {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>يجب أن يكون إجمالي حجم الملف في عنصر التحكم أقل من {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-files-per-control>يمكنك إرفاق ما يصل إلى {0} ملفات.</upload-max-files-per-control>
+            <upload-mediatypes>فقط ملفات {0} مقبولة.</upload-mediatypes>
+            <upload-image>صورة</upload-image>
+            <upload-video>فيديو</upload-video>
+            <upload-audio>صوت</upload-audio>
+        </hints>
+        <view>
+            <explanation>
+                هذا عرض للقراءة فقط لبياناتك.
+            </explanation>
+        </view>
+        <lease>
+            <no-lease-title>الإيجار</no-lease-title>
+            <renew-lease-title>تجديد الإيجار؟</renew-lease-title>
+            <renew-lease-message>إيجارك على وشك الانتهاء. هل ترغب في تجديده الآن؟</renew-lease-message>
+            <current-user-left>أنت تمتلك إيجارًا على هذا المستند لمدة </current-user-left>
+            <current-user-right>.</current-user-right>
+            <relinquished>لم تعد تمتلك إيجارًا على هذا المستند.</relinquished>
+            <other-user>مستخدم آخر، باسم المستخدم "{0}"، يمتلك حاليًا إيجارًا على هذا المستند.</other-user>
+            <relinquish>التخلي عن الإيجار</relinquish>
+            <renew>تجديد الإيجار</renew>
+            <try-acquire>محاولة الحصول على الإيجار</try-acquire>
+            <show-in-view-mode>عرض في وضع القراءة فقط</show-in-view-mode>
+        </lease>
+        <session-expiration>
+            <title>
+                <expiring>الجلسة على وشك الانتهاء</expiring>
+                <expired>انتهت الجلسة</expired>
+            </title>
+            <message>
+                <expiring>جلستك على وشك الانتهاء. انقر على الزر أدناه إذا كنت ترغب في مواصلة استخدام هذه الصفحة.</expiring>
+                <expired>يجب إعادة تحميل هذا النموذج. قد ينقلك هذا إلى صفحة تسجيل الدخول. إذا كنت تعتقد أنه لا ينبغي أن ترى هذه الرسالة وأن المشكلة مستمرة، فيرجى الاتصال بالدعم.</expired>
+            </message>
+            <renew-button>تجديد الجلسة</renew-button>
+            <reload-button>إعادة تحميل</reload-button>
+        </session-expiration>
+        <available-from>
+            <message>هذا النموذج غير متاح حاليًا</message>
+        </available-from>
+        <available-to>
+            <message>هذا النموذج لم يعد متاحًا</message>
+        </available-to>
+        <workflow-stage>
+            <label>المرحلة</label>
+        </workflow-stage>
+    </detail>
+    <save-locally>
+        <dialog-title>حفظ محليًا</dialog-title>
+        <dialog-body>
+            <div>
+                <p>
+                    انقر على زر الحفظ أدناه لحفظ بيانات النموذج على جهاز الكمبيوتر الخاص بك كملف HTML.
+                </p>
+                <p>
+                    لإعادة فتح بيانات النموذج:
+                </p>
+                <ul>
+                    <li>افتح ملف HTML في متصفحك (بالنقر على الملف، أو سحبه إلى نافذة المتصفح).</li>
+                    <li>انقر على زر "فتح" الذي سيتم عرضه للتأكيد.</li>
+                </ul>
+                <p>
+                    <b>تحذير:</b> لا يتم الاحتفاظ بأي بيانات على الخادم وإذا قمت بحذف الملف الذي حفظته، ستفقد بياناتك.
+                </p>
+            </div>
+        </dialog-body>
+    </save-locally>
+    <share-dialog>
+        <label>إنشاء رابط للمشاركة</label>
+        <body>السماح لأي شخص لديه الرابط بعرض أو تعديل هذه البيانات.</body>
+        <link>رابط</link>
+        <select-operations>تحديد العمليات</select-operations>
+        <readonly>للقراءة فقط</readonly>
+        <readwrite>للقراءة والكتابة</readwrite>
+    </share-dialog>
+    <admin>
+        <title>إدارة النماذج</title>
+    </admin>
+    <landing>
+        <title>الصفحة الرئيسية</title>
+        <titles>
+            <published-forms>النماذج المنشورة</published-forms>
+            <form-builder-forms>نماذج منشئ النماذج</form-builder-forms>
+            <form-builder-new>نموذج منشئ نماذج جديد</form-builder-new>
+            <form-builder-summary>نماذج منشئ النماذج</form-builder-summary>
+            <demo-forms>نماذج تجريبية</demo-forms>
+            <demo-features>ميزات تجريبية</demo-features>
+            <quick-links>روابط سريعة</quick-links>
+            <form-runner-admin>إدارة النماذج</form-runner-admin>
+        </titles>
+        <descriptions>
+            <published-forms>الوصول إلى نماذجك المنشورة</published-forms>
+            <form-builder-forms>عرض وتحرير النماذج قيد التطوير التي تم إنشاؤها باستخدام منشئ النماذج</form-builder-forms>
+            <demo-forms>جرب مجموعة نماذج Orbeon Forms التجريبية</demo-forms>
+            <demo-features>جرب العروض التوضيحية لميزات محددة من Orbeon Forms</demo-features>
+        </descriptions>
+        <show-more>إظهار المزيد…</show-more>
+    </landing>
+    <home>
+        <title>النماذج المنشورة</title>
+        <buttons>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; جعله غير متاح</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; جعله متاحًا</publish>
+            <cancel>إلغاء</cancel>
+            <connect>اتصال</connect>
+            <select>تحديد</select>
+            <operation>عملية</operation>
+            <reindex>إعادة فهرسة قاعدة البيانات</reindex>
+            <stop-reindex>إيقاف إعادة الفهرسة</stop-reindex>
+            <all>الكل</all>
+            <none>لا شيء</none>
+            <unpublished-local>النماذج المحلية غير المتاحة</unpublished-local>
+            <published-local>النماذج المحلية المتاحة</published-local>
+            <unpublished-remote>النماذج البعيدة غير المتاحة</unpublished-remote>
+            <published-remote>النماذج البعيدة المتاحة</published-remote>
+            <newer-local>النماذج الأحدث محليًا</newer-local>
+            <newer-remote>النماذج الأحدث عن بعد</newer-remote>
+            <publish-local>جعل النماذج المحلية متاحة</publish-local>
+            <unpublish-local>جعل النماذج المحلية غير متاحة</unpublish-local>
+            <publish-remote>جعل النماذج البعيدة متاحة</publish-remote>
+            <unpublish-remote>جعل النماذج البعيدة غير متاحة</unpublish-remote>
+            <push-to-remote>الدفع إلى البعيد</push-to-remote>
+            <pull-from-remote>السحب من البعيد</pull-from-remote>
+            <navigate-summary>التنقل إلى الملخص</navigate-summary>
+            <navigate-new>التنقل إلى الجديد</navigate-new>
+            <upgrade-local>ترقية تعريفات النماذج المحلية</upgrade-local>
+            <upgrade-remote>ترقية تعريفات النماذج البعيدة</upgrade-remote>
+            <delete-local>حذف النماذج المحلية</delete-local>
+            <delete-remote>حذف النماذج البعيدة</delete-remote>
+            <reencrypt>إعادة تشفير تعريفات النماذج</reencrypt>
+            <reload-resources>إعادة تحميل الموارد</reload-resources>
+        </buttons>
+        <titles>
+            <publish-confirmation>تأكيد تغيير توفر النموذج</publish-confirmation>
+            <credentials>بيانات اعتماد الخادم البعيد</credentials>
+            <status>الحالة</status>
+            <view>عرض</view>
+            <new>جديد</new>
+            <local>محلي</local>
+            <remote>بعيد</remote>
+            <form-identification>تعريف النموذج</form-identification>
+            <reindexing-confirmation>تأكيد إعادة الفهرسة</reindexing-confirmation>
+            <reencrypt-confirmation>تأكيد إعادة التشفير</reencrypt-confirmation>
+            <purge-confirmation>تأكيد المسح</purge-confirmation>
+        </titles>
+        <messages>
+            <no-form-found>لم يتم العثور على نموذج مُنشر.</no-form-found>
+            <publish-confirmation>هل أنت متأكد من أنك تريد {0,choice,0#جعله متاحًا|1#جعله غير متاح|2#ترقية|3#حذف} {1,choice,1#نموذج واحد|1&lt;{1,number,integer} نماذج}؟ لا يمكن التراجع عن هذه العملية.</publish-confirmation>
+            <reindexing-confirmation>أثناء إعادة الفهرسة، لن تعمل بعض الميزات، مثل صفحات ملخص Form Runner، كما هو متوقع. لذلك، نوصي بإجراء إعادة الفهرسة أثناء عدم تشغيل النظام. هل أنت متأكد من أنك تريد المتابعة مع إعادة الفهرسة؟</reindexing-confirmation>
+            <reencrypt-confirmation>نوصي بإجراء إعادة التشفير أثناء عدم تشغيل النظام. هل أنت متأكد من أنك تريد المتابعة مع إعادة التشفير؟</reencrypt-confirmation>
+            <purge-confirmation>هل أنت متأكد من أنك تريد مسح البيانات المحددة؟</purge-confirmation>
+        </messages>
+        <labels>
+            <available>متاح</available>
+            <unavailable>غير متاح</unavailable>
+            <library>مكتبة</library>
+            <newer>أحدث</newer>
+            <remote-server>خادم بعيد</remote-server>
+            <username>اسم المستخدم</username>
+            <password>كلمة المرور</password>
+            <reindexing-generic>جاري إعادة الفهرسة &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>جاري إعادة فهرسة {0} ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>عملية إعادة الفهرسة تتوقف &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>انتهت عملية إعادة الفهرسة</reindexing-finished>
+            <reencrypt-state>إعادة تشفير {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>بدأت إعادة التشفير</reencrypt-started>
+            <reencrypt-finished>انتهت إعادة التشفير</reencrypt-finished>
+        </labels>
+        <export-purge>
+            <export>تصدير</export>
+            <purge>مسح</purge>
+            <or>أو</or>
+            <selected-forms>النماذج المحددة ({0,number,integer})</selected-forms>
+            <following-forms>النماذج التالية:</following-forms>
+            <application>التطبيق:</application>
+            <form>النموذج:</form>
+            <version>الإصدار:</version>
+            <all-applications>جميع التطبيقات</all-applications>
+            <all-forms>جميع النماذج</all-forms>
+            <all-versions>جميع الإصدارات</all-versions>
+            <latest-version>أحدث إصدار</latest-version>
+            <definitions-data>
+                <label>تعريفات النماذج / البيانات:</label>
+                <definitions>التعريفات فقط</definitions>
+                <data>البيانات فقط</data>
+                <both>التعريفات والبيانات</both>
+            </definitions-data>
+            <current-history>
+                <label>البيانات الحالية / سجل المراجعة:</label>
+                <current-data>البيانات الحالية فقط</current-data>
+                <revision-history>سجل المراجعة فقط</revision-history>
+                <both>البيانات الحالية وسجل المراجعة</both>
+            </current-history>
+            <from-date>من:</from-date>
+            <until-date>حتى:</until-date>
+            <redundant-values>قيم زائدة</redundant-values>
+            <invalid-date>تاريخ غير صالح</invalid-date>
+            <wrong-date-order>ترتيب تاريخ خاطئ</wrong-date-order>
+        </export-purge>
+    </home>
+    <import>
+        <form-version>
+            <label>إصدار النموذج</label>
+            <alert>إصدار النموذج مفقود</alert>
+        </form-version>
+        <application-name>
+            <label>اسم التطبيق</label>
+        </application-name>
+        <form-name>
+            <label>اسم النموذج</label>
+        </form-name>
+        <version-comment>
+            <label>تعليق الإصدار</label>
+        </version-comment>
+        <upload>
+            <label>رفع</label>
+        </upload>
+        <file>
+            <label>الملف المراد استيراده</label>
+            <hint>يجب أن يكون الملف بتنسيق إكسل 2007 (.xlsx) أو بتنسيق XML (.xml)</hint>
+            <alert>الملف مفقود أو غير مدعوم</alert>
+            <excel-headings-format>إكسل 2007 بتنسيق العناوين المسماة (.xlsx)</excel-headings-format>
+            <excel-named-ranges-format>إكسل 2007 بتنسيق النطاقات المسماة (.xlsx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>تنسيق Orbeon XML للتصدير (.xml)</xml-form-structure-and-data-format>
+        </file>
+        <validation>
+            <label>التحقق</label>
+            <alert>يرجى بدء عملية التحقق قبل المتابعة للاستيراد</alert>
+        </validation>
+        <start-validation>
+            <label>بدء التحقق</label>
+        </start-validation>
+        <total>الإجمالي</total>
+        <valid>صالح</valid>
+        <invalid>غير صالح</invalid>
+        <imported>تم استيراده</imported>
+        <skipped>تم تخطيه</skipped>
+        <eta>الوقت المتوقع للإنجاز</eta>
+        <cancel-validation>
+            <label>إلغاء التحقق</label>
+        </cancel-validation>
+        <validation-canceled>تم إلغاء عملية التحقق.</validation-canceled>
+        <import>
+            <label>استيراد</label>
+        </import>
+        <existing-records>
+            <label>السجلات الموجودة في قاعدة البيانات</label>
+            <item id="0">احتفاظ</item>
+            <item id="1">حذف</item>
+        </existing-records>
+        <invalid-data>
+            <label>السجلات ذات البيانات غير الصالحة</label>
+            <item id="0">تخطي</item>
+            <item id="1">استيراد</item>
+        </invalid-data>
+        <start-import>
+            <label>بدء الاستيراد</label>
+        </start-import>
+        <cancel-import>
+            <label>إلغاء الاستيراد</label>
+        </cancel-import>
+        <import-canceled>تم إلغاء الاستيراد.</import-canceled>
+        <start-over>
+            <label>البدء من جديد</label>
+        </start-over>
+        <review-data>
+            <label>مراجعة البيانات</label>
+        </review-data>
+        <existing-records-message>
+            يوجد {0,choice,1# مستند واحد|1&lt;{0,number,integer} مستندات} في قاعدة البيانات للإصدار {3} من النموذج {1}/{2}.
+        </existing-records-message>
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} ساعات} {1,choice,0#|0&lt;{1, number, integer} دقائق} {2,choice,0#|0&lt;{2, number, integer} ثوان}
+        </eta-message>
+        <invalid-records-message>
+            {0,number,integer} من أصل {1,number,integer} {1,choice,1#مستند غير صالح|1&lt;مستندات غير صالحة}.
+        </invalid-records-message>
+        <valid-records-message>
+            تم التحقق من صحة {0,number,integer} {0,choice,1#مستند وسيتم استيراده|1&lt;مستندات وسيتم استيرادها}.
+        </valid-records-message>
+        <invalid-document-message>
+            يحتوي المستند الذي تم تحميله على أخطاء في التحقق. استخدم زر "مراجعة البيانات" لمراجعة وإصلاح الأخطاء قبل الحفظ.
+        </invalid-document-message>
+        <valid-document-message>
+            يحتوي المستند الذي تم تحميله على بيانات صالحة. استخدم زر "مراجعة البيانات" لمراجعة بيانات النموذج قبل الحفظ.
+        </valid-document-message>
+        <import-complete-message>
+            اكتمل استيراد {0,number,integer} {0,choice,1#مستند|1&lt;مستندات}. تم تخطي {1,number,integer} {1,choice,1#مستند غير صالح|1&lt;مستندات غير صالحة}.
+        </import-complete-message>
+        <na>غير متاح</na>
+        <fields-found>الحقول الموجودة</fields-found>
+        <values-found>القيم الموجودة</values-found>
+        <errors>الأخطاء</errors>
+        <warnings>التحذيرات</warnings>
+        <error-messages>
+            <validating>حدث خطأ أثناء التحقق من صحة البيانات.</validating>
+            <importing>حدث خطأ أثناء استيراد البيانات.</importing>
+            <deleting>حدث خطأ أثناء حذف البيانات.</deleting>
+            <unauthorized>غير مصرح لك بالوصول إلى هذه البيانات.</unauthorized>
+            <reading-form-data>حدث خطأ أثناء استرداد بيانات النموذج.</reading-form-data>
+            <reading-form-metadata>حدث خطأ أثناء قراءة بيانات وصف النموذج.</reading-form-metadata>
+            <reading-form-definition>حدث خطأ أثناء قراءة تعريف النموذج.</reading-form-definition>
+        </error-messages>
+    </import>
+    <authentication>
+        <menu>
+            <logged-in-as>تم تسجيل الدخول كـ {0}</logged-in-as>
+            <logout>تسجيل الخروج</logout>
+            <login>تسجيل الدخول</login>
+            <register>تسجيل</register>
+        </menu>
+        <login>
+            <title>تسجيل الدخول إلى Form Runner</title>
+            <username>اسم المستخدم</username>
+            <password>كلمة المرور</password>
+            <login>تسجيل الدخول</login>
+        </login>
+        <logout-done>
+            <title>تسجيل الخروج من Form Runner</title>
+            <message>لقد قمت بتسجيل الخروج.</message>
+        </logout-done>
+        <login-error>
+            <title>خطأ في تسجيل الدخول إلى Form Runner</title>
+            <unrecognized>لم يتم التعرف على اسم المستخدم أو كلمة المرور التي أدخلتها.</unrecognized>
+            <try-again>يرجى المحاولة مرة أخرى.</try-again>
+        </login-error>
+    </authentication>
+    <home-summary>
+        <titles>
+            <created>تم الإنشاء</created>
+            <last-modified>تم التعديل</last-modified>
+            <last-modified-by>آخر تعديل بواسطة</last-modified-by>
+            <application-name>اسم التطبيق</application-name>
+            <form-name>اسم النموذج</form-name>
+            <version>الإصدار</version>
+            <form-title>عنوان النموذج</form-title>
+        </titles>
+        <search>
+            <search>بحث</search>
+            <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; بحث عن نماذج</search-forms>
+            <show-search-options>إظهار خيارات البحث</show-search-options>
+            <close-search-options>إخفاء خيارات البحث</close-search-options>
+            <search-options>خيارات البحث</search-options>
+            <any>[أي]</any>
+            <dates>
+                <item>
+                    <label>اليوم</label>
+                    <value>today</value>
+                </item>
+                <item>
+                    <label>الأمس</label>
+                    <value>yesterday</value>
+                </item>
+                <item>
+                    <label>آخر 7 أيام</label>
+                    <value>last-7-days</value>
+                </item>
+                <item>
+                    <label>آخر 30 يوم</label>
+                    <value>last-30-days</value>
+                </item>
+                <item>
+                    <label>آخر 90 يوم</label>
+                    <value>last-90-days</value>
+                </item>
+                <item>
+                    <label>مخصص...</label>
+                    <value>custom</value>
+                </item>
+            </dates>
+            <date-after>بعد</date-after>
+            <date-before>قبل</date-before>
+        </search>
+    </home-summary>
+</resource>

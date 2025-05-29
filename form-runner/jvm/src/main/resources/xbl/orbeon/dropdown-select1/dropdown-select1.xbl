@@ -83,6 +83,11 @@
                                 <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
                                 <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
                             </resource>
+                            <resource xml:lang="ar">
+                                <automatic-pdf>PDF تلقائي</automatic-pdf>
+                                <selected-only>إظهار القيمة المحددة فقط</selected-only>
+                                <show-all>إظهار جميع القيم كأزرار اختيار</show-all>
+                            </resource>
                         </_>
                     </xf:instance>
                 </xf:model>

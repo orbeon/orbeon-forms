@@ -103,6 +103,16 @@
                                     <hint>Constante ou modèle XPath</hint>
                                 </end-year>
                             </resource>
+                            <resource xml:lang="ar">
+                                <start-year>
+                                    <label>سنة البداية</label>
+                                    <hint>قيمة ثابتة أو قالب XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>سنة النهاية</label>
+                                    <hint>قيمة ثابتة أو قالب XPath</hint>
+                                </end-year>
+                            </resource>
                         </_>
                     </xf:instance>
 

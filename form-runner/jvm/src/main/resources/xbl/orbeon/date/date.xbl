@@ -218,6 +218,47 @@
                                     <label>Exemples</label>
                                 </examples>
                             </resource>
+                            <resource xml:lang="ar">
+                                <output-format>تنسيق التاريخ</output-format>
+                                <native-picker>
+                                    <label>استخدام منتقي التاريخ في المتصفح</label>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">تلقائياً</item>
+                                    <item id="2">دائماً</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">تنسيق مخصص</item>
+                                </default-custom>
+                                <format>
+                                    <label>ابدأ التاريخ بـ</label>
+                                    <item id="0">الشهر</item>
+                                    <item id="1">اليوم</item>
+                                    <item id="2">السنة</item>
+                                </format>
+                                <separator>
+                                    <label>الفاصل</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">مسافة</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>تنسيق الشهر واليوم</label>
+                                    <item id="0">بدون صفر في البداية (1)</item>
+                                    <item id="1">مع صفر في البداية (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>أول يوم في الأسبوع</label>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">السبت</item>
+                                    <item id="2">الأحد</item>
+                                    <item id="3">الاثنين</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>أمثلة</label>
+                                </examples>
+                            </resource>
                         </_>
                     </xf:instance>
 

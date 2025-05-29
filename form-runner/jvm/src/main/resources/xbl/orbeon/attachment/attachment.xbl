@@ -87,6 +87,10 @@
                                 <allow-download>Permettre le téléchargement</allow-download>
                                 <ow-si>Montrer la taille</ow-si>
                             </resource>
+                            <resource xml:lang="ar">
+                                <allow-download>السماح بالتنزيل</allow-download>
+                                <show-size>إظهار الحجم</show-size>
+                            </resource>
                         </_>
                     </xf:instance>
 

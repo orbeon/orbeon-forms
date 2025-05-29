@@ -160,6 +160,29 @@
                                     <item value="-2">Préserver</item>
                                 </format>
                             </resource>
+                            <resource xml:lang="ar">
+                                <max-width>
+                                    <label>ضبط العرض الأقصى إلى</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="-2">بدون ضبط</item>
+                                </max-width>
+                                <max-height>
+                                    <label>ضبط الارتفاع الأقصى إلى</label>
+                                </max-height>
+                                <quality>
+                                    <label>جودة الصورة المضغوطة</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="90">عالية (90%)</item>
+                                    <item value="80">متوسطة (80%)</item>
+                                    <item value="70">منخفضة (70%)</item>
+                                    <item value="50">منخفضة جداً (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>تنسيق الصورة الناتج</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="-2">الحفاظ على التنسيق</item>
+                                </format>
+                            </resource>
                         </_>
                     </xf:instance>
 

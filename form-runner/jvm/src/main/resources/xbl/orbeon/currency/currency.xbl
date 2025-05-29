@@ -210,6 +210,33 @@
                                     <item id="5">Point (.)</item>
                                 </grouping-separators>
                             </resource>
+                            <resource xml:lang="ar">
+                                <prefix>بادئة</prefix>
+                                <suffix>لاحقة</suffix>
+                                <decimal-separator>فاصل عشري</decimal-separator>
+                                <grouping-separator>فاصل المجموعات</grouping-separator>
+                                <digits-after-decimal>أرقام بعد الفاصلة العشرية</digits-after-decimal>
+                                <round-when-formatting>تقريب عند التنسيق</round-when-formatting>
+                                <round-when-storing>تقريب عند التخزين</round-when-storing>
+                                <default-yes-no>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">نعم</item>
+                                    <item id="2">لا</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="4">فاصلة (,)</item>
+                                    <item id="5">نقطة (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">بدون فاصل</item>
+                                    <item id="2">مسافة واحدة</item>
+                                    <item id="3">علامة اقتباس (')</item>
+                                    <item id="4">فاصلة (,)</item>
+                                    <item id="5">نقطة (.)</item>
+                                </grouping-separators>
+                            </resource>
                         </_>
                     </xf:instance>
                 </xf:model>
@@ -232,8 +259,7 @@
                                 <xf:label ref="xxf:r('digits-after-decimal')"/>
                                 <xf:alert/>
                             </fr:number>
-                        </xh:td>
-                    </xh:tr>
+                        </xh:tr>
                     <xh:tr>
                         <xh:td colspan="3">
                             <fr:open-select1 ref="instance('local')/decimal-separator" id="decimal-separator-control" appearance="minimal">

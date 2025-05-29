@@ -192,6 +192,44 @@
                                     <item id="6">A/P</item>
                                 </am-pm>
                             </resource>
+                            <resource xml:lang="ar">
+                                <output-format>تنسيق الوقت</output-format>
+                                <native-picker>
+                                    <label>استخدام منتقي الوقت في المتصفح</label>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">تلقائياً</item>
+                                    <item id="2">دائماً</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">تنسيق مخصص</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>نظام 12 ساعة/24 ساعة</label>
+                                    <item id="0">نظام 12 ساعة</item>
+                                    <item id="1">نظام 24 ساعة</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>تنسيق الساعة</label>
+                                    <item id="0">بدون صفر في البداية (1)</item>
+                                    <item id="1">مع صفر في البداية (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>تضمين الثواني</label>
+                                    <item id="0">لا</item>
+                                    <item id="1">نعم</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>تنسيق صباحاً/مساءً</label>
+                                    <item id="0">بدون</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
                         </_>
                     </xf:instance>
 

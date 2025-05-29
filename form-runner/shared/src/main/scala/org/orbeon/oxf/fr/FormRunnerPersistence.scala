@@ -395,10 +395,10 @@ trait FormRunnerPersistence {
 
   import FormRunnerPersistence.*
 
-  // Check whether a value correspond to an uploaded file
+  // Check whether a value corresponds to an uploaded file
   //
   // For this to be true
-  // - the protocol must be file:
+  // - the protocol must be `file:`
   // - the URL must have a valid signature
   //
   // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
@@ -419,7 +419,7 @@ trait FormRunnerPersistence {
     "" ::
     Nil mkString "/"
 
-  // Path neither starts nor ends with with `/`
+  // Path neither starts nor ends with `/`
   def createFormDataBasePathNoPrefix(
     appForm      : AppForm,
     version      : Option[Int],
@@ -766,10 +766,10 @@ trait FormRunnerPersistence {
     credentials   : Option[BasicCredentials],
     workflowStage : Option[String]
   )(implicit
-    safeRequestCtx          : SafeRequestContext,
-    connectionContext       : ConnectionContexts,
-    xfcd                    : XFormsContainingDocument,
-    indentedLogger          : IndentedLogger
+    safeRequestCtx: SafeRequestContext,
+    connectionCtx : ConnectionContexts,
+    xfcd          : XFormsContainingDocument,
+    indentedLogger: IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     val customPutHeaders =
@@ -813,13 +813,13 @@ trait FormRunnerPersistence {
   }
 
   private def readAttachmentIo(
-    fromBasePaths    : Iterable[(String, Int)],
-    beforeUrl        : String
+    fromBasePaths : Iterable[(String, Int)],
+    beforeUrl     : String
   )(implicit
-    safeRequestCtx   : SafeRequestContext,
-    connectionContext: ConnectionContexts,
-    xfcd             : XFormsContainingDocument,
-    indentedLogger   : IndentedLogger
+    safeRequestCtx: SafeRequestContext,
+    connectionCtx : ConnectionContexts,
+    xfcd          : XFormsContainingDocument,
+    indentedLogger: IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
@@ -838,16 +838,16 @@ trait FormRunnerPersistence {
   }
 
   private def saveAttachmentIo(
-    stream           : fs2.Stream[IO, Byte],
-    pathToHolder     : String,
-    resolvedPutUri   : URI,
-    formVersion      : Option[String],
-    credentials      : Option[BasicCredentials]
+    stream        : fs2.Stream[IO, Byte],
+    pathToHolder  : String,
+    resolvedPutUri: URI,
+    formVersion   : Option[String],
+    credentials   : Option[BasicCredentials]
   )(implicit
-    safeRequestCtx   : SafeRequestContext,
-    connectionContext: ConnectionContexts,
-    xfcd             : XFormsContainingDocument,
-    indentedLogger   : IndentedLogger
+    safeRequestCtx: SafeRequestContext,
+    connectionCtx : ConnectionContexts,
+    xfcd          : XFormsContainingDocument,
+    indentedLogger: IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
@@ -906,23 +906,23 @@ trait FormRunnerPersistence {
   }
 
   def putWithAttachments(
-    liveData          : DocumentNodeInfoType,
-    migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType], // 2021-11-22: only from `trySaveAttachmentsAndData`
-    toBaseURI         : String, // can be blank
-    fromBasePaths     : Iterable[(String, Int)],
-    toBasePath        : String, // not blank, starts with `CRUDBasePath`
-    filename          : String,
-    commonQueryString : String,
-    forceAttachments  : Boolean,
-    username          : Option[String] = None,
-    password          : Option[String] = None,
-    formVersion       : Option[String] = None,
-    workflowStage     : Option[String] = None
+    liveData         : DocumentNodeInfoType,
+    migrate          : Option[DocumentNodeInfoType => DocumentNodeInfoType], // 2021-11-22: only from `trySaveAttachmentsAndData`
+    toBaseURI        : String, // can be blank
+    fromBasePaths    : Iterable[(String, Int)],
+    toBasePath       : String, // not blank, starts with `CRUDBasePath`
+    filename         : String,
+    commonQueryString: String,
+    forceAttachments : Boolean,
+    username         : Option[String] = None,
+    password         : Option[String] = None,
+    formVersion      : Option[String] = None,
+    workflowStage    : Option[String] = None
   )(implicit
-    safeRequestCtx    : SafeRequestContext,
-    connectionContext : ConnectionContexts,
-    xfcd              : XFormsContainingDocument,
-    indentedLogger    : IndentedLogger
+    safeRequestCtx   : SafeRequestContext,
+    connectionCtx    : ConnectionContexts,
+    xfcd             : XFormsContainingDocument,
+    indentedLogger   : IndentedLogger
   ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
     val credentials =
@@ -969,8 +969,8 @@ trait FormRunnerPersistence {
 
     // xxx xxx close resources
     def saveAllAttachmentsStream(implicit
-      xfcd             : XFormsContainingDocument,
-      connectionContext: ConnectionContexts
+      xfcd         : XFormsContainingDocument,
+      connectionCtx: ConnectionContexts
     ): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
         AttachmentWithHolder(beforeUrl, migratedHolder)

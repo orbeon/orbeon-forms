@@ -259,7 +259,8 @@
                                 <xf:label ref="xxf:r('digits-after-decimal')"/>
                                 <xf:alert/>
                             </fr:number>
-                        </xh:tr>
+                        </xh:td>
+                    </xh:tr>
                     <xh:tr>
                         <xh:td colspan="3">
                             <fr:open-select1 ref="instance('local')/decimal-separator" id="decimal-separator-control" appearance="minimal">

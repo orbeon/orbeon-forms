@@ -189,7 +189,7 @@ object FormRunnerRename {
         )
       }
 
-    private val DefaultNorewriteSet : Set[String] = Set("fr-lang", "fr-mode")
+    private val DefaultNorewriteSet : Set[String] = Set("fr-lang", "fr-mode", "form-resources")
 
     def replaceVarReferencesWithFunctionCalls(
       xpathString     : String,

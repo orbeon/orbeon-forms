@@ -47,8 +47,8 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
     def logTry[U](t: Try[U])(m: String): Try[U] = {
       t match {
-        case Success(b) => buffer += (s"- found $m: $b")
-        case Failure(t) => buffer += (s"- did not find $m: ${t.getMessage}")
+        case Success(b) => buffer += s"- found $m: $b"
+        case Failure(t) => buffer += s"- did not find $m: ${t.getMessage}"
       }
       t
     }
@@ -68,10 +68,15 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
           IORuntimeConfig()
         )
 
-    fromJndi.getOrElse {
-      buffer += s"Using default IORuntime."
-      logger.info(buffer.mkString("\n"))
-      IORuntimeBuilder().build() // https://github.com/orbeon/orbeon-forms/issues/6089
+    fromJndi match {
+      case Success(runtime) =>
+        buffer += s"Using IORuntime from JNDI."
+        logger.info(buffer.mkString("\n"))
+        runtime
+      case Failure(_) =>
+        buffer += s"Using default IORuntime."
+        logger.info(buffer.mkString("\n"))
+        IORuntimeBuilder().build() // https://github.com/orbeon/orbeon-forms/issues/6089
     }
   }
 

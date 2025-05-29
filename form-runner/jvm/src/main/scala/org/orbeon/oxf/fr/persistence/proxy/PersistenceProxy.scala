@@ -384,7 +384,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                     appFormVersion     = (appForm, effectiveFormDefinitionVersion),
                     documentId         = documentIdOpt.getOrElse(throw new IllegalArgumentException), // for data there must be a `documentId`,
                     incomingTokenOpt   = incomingTokenOpt,
-                    responseHeadersOpt = responseHeadersOpt, // `None` in case of non-existing data
+                    responseHeadersOpt = responseHeadersOpt, // `None` in case of non-existing data,
+                    isAttachment       = filename.isDefined
                   )
                 } catch {
                   case NonFatal(t) =>

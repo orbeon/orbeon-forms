@@ -65,14 +65,15 @@ object PersistenceProxyPermissions {
     appFormVersion    : AppFormVersion,
     documentId        : String,
     incomingTokenOpt  : Option[String],
-    responseHeadersOpt: Option[ResponseHeaders]
+    responseHeadersOpt: Option[ResponseHeaders],
+    isAttachment      : Boolean
   )(implicit
     logger            : IndentedLogger
   ): Operations = {
 
     // TODO: add some logging in this method, at least in the case where we throw an `HttpStatusCodeException`
 
-    debug(s"findAuthorizedOperationsOrThrow: `$formPermissions`, `$credentialsOpt`, `$crudMethod`, `$appFormVersion`, `$documentId`, `$incomingTokenOpt`, `$responseHeadersOpt`")
+    debug(s"findAuthorizedOperationsOrThrow: `$formPermissions`, `$credentialsOpt`, `$crudMethod`, `$appFormVersion`, `$documentId`, `$incomingTokenOpt`, `$responseHeadersOpt`, `$isAttachment`")
 
     val authorizedOpsOpt = {
 
@@ -136,16 +137,18 @@ object PersistenceProxyPermissions {
             }
         }
 
-      val requestedOp =
+      val requestedAnyOfOp =
         crudMethod match {
-          case HttpMethod.GET | HttpMethod.HEAD             => Operation.Read
-          case HttpMethod.PUT if responseHeadersOpt.isEmpty => Operation.Create
-          case HttpMethod.PUT                               => Operation.Update
-          case HttpMethod.DELETE                            => Operation.Delete
+          case HttpMethod.GET | HttpMethod.HEAD                             => List(Operation.Read)
+          case HttpMethod.PUT if responseHeadersOpt.isEmpty && isAttachment => List(Operation.Create, Operation.Update)
+          case HttpMethod.PUT if responseHeadersOpt.isEmpty                 => List(Operation.Create)
+          case HttpMethod.PUT                                               => List(Operation.Update)
+          case HttpMethod.DELETE if isAttachment                            => List(Operation.Delete, Operation.Update)
+          case HttpMethod.DELETE                                            => List(Operation.Delete)
         }
 
       val authorized =
-        Operations.allows(authorizedOps, requestedOp)
+        requestedAnyOfOp.exists(Operations.allows(authorizedOps, _))
 
       authorized option authorizedOps
     }

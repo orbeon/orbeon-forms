@@ -1,6 +1,8 @@
 // Distributed under the MIT license, see: http://www.opensource.org/licenses/MIT
 package org.orbeon.errorified
 
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+
 // Exception formatter
 // This takes a Throwable and formats it into an ASCII table, including error message, application-specific traces,
 // and JVM stack traces.
@@ -125,13 +127,12 @@ trait Formatter {
                     val maxParamNameSize = params collect { case (name, _) => name.size } max
 
                     def formattedParam = params flatMap { case (name, value) =>
-                        val fixedName      = padded(Some(name), maxParamNameSize)
+                        val fixedName = padded(Some(name), maxParamNameSize)
                         val nameValue = fixedName + '=' + value
                         wrap(nameValue, width - 2)
-                          .split("\n")
+                          .splitTo[List]("\n")
                           .map(l => padded(Some(l), width - 2))
                           .map(withBorder)
-                          .toList
                     }
 
                     InnerHrLight :: formattedParam ::: InnerHr :: Nil

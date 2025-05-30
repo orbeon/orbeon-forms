@@ -125,9 +125,13 @@ trait Formatter {
                     val maxParamNameSize = params collect { case (name, _) => name.size } max
 
                     def formattedParam = params flatMap { case (name, value) =>
-                        val fixed = padded(Some(name), maxParamNameSize)
-
-                        List(withBorder(fixed + '=' + padded(Some(value), width - remainder(List(fixed)))))
+                        val fixedName      = padded(Some(name), maxParamNameSize)
+                        val nameValue = fixedName + '=' + value
+                        wrap(nameValue, width - 2)
+                          .split("\n")
+                          .map(l => padded(Some(l), width - 2))
+                          .map(withBorder)
+                          .toList
                     }
 
                     InnerHrLight :: formattedParam ::: InnerHr :: Nil

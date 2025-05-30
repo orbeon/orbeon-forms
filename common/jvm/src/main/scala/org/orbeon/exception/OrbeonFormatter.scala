@@ -36,21 +36,26 @@ object OrbeonFormatter extends Formatter {
     OrbeonLocationException.getAllLocationData(t) flatMap sourceLocation
 
   // Create SourceLocation from LocationData
-  private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
-    locationData.file.nonAllBlank option {
+  private def sourceLocation(locationData: LocationData): Option[SourceLocation] = {
 
-      val (description, params) =
-        locationData match {
-          case extended: ExtendedLocationData => (extended.description, extended.params)
-          case _                              => (None, Nil)
-        }
+    val (description, params) =
+      locationData match {
+        case extended: ExtendedLocationData => (extended.description, extended.params)
+        case _                              => (None, Nil)
+      }
 
+    val locationDataHasFileOrExpression =
+      locationData.file.nonAllBlank ||
+      params.exists(_._1 == "expression")
+
+    locationDataHasFileOrExpression.option {
       SourceLocation(
-        locationData.file,
+        Option(locationData.file).filter(_.nonAllBlank).getOrElse("Location not available"),
         filterLineCol(locationData.line),
         filterLineCol(locationData.col),
         description,
         params.to(List)
       )
     }
+  }
 }

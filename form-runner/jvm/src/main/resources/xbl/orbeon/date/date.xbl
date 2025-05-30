@@ -67,6 +67,7 @@
             <display-name lang="sv">Datum</display-name>
             <display-name lang="pt">Data</display-name>
             <display-name lang="da">Dato</display-name>
+            <display-name lang="ar">تاريخ</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

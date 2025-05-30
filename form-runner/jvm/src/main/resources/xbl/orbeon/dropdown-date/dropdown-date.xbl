@@ -41,6 +41,7 @@
             <display-name lang="sv">Datumväljare med rullgardinsmeny</display-name>
             <display-name lang="nl">Selectie datum</display-name>
             <display-name lang="pt">Lista de Opções para Data</display-name>
+            <display-name lang="ar">تاريخ منسدل</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

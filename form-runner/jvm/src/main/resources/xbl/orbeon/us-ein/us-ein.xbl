@@ -31,6 +31,7 @@
             <display-name lang="nl">Amerikaans werkgeversidentificatienummer (EIN)</display-name>
             <display-name lang="pt">Número de Identificação do Empregador dos EUA (EIN)</display-name>
             <display-name lang="sv">Amerikanskt arbetsgivaridentifikationsnummer (EIN)</display-name>
+            <display-name lang="ar">رقم تعريف صاحب العمل الأمريكي (EIN)</display-name>
 
             <icon>
                 <icon-class>fa fa-fw fa-industry</icon-class>

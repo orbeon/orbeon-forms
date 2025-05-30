@@ -39,6 +39,7 @@
             <display-name lang="sv">Bild som bilaga</display-name>
             <display-name lang="nl">Afbeeldingbijlage</display-name>
             <display-name lang="pt">Anexar imagem</display-name>
+            <display-name lang="ar">مرفق صورة</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-image-o</icon-class>
             </icon>

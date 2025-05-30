@@ -45,6 +45,7 @@
             <display-name lang="nl">Amerikaans sociaal zekerheidsnummer (SSN)</display-name>
             <display-name lang="pt">Número de Seguro Social dos EUA (SSN)</display-name>
             <display-name lang="sv">Amerikanskt personnummer (SSN)</display-name>
+            <display-name lang="ar">رقم الضمان الاجتماعي الأمريكي (SSN)</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-id-card</icon-class>
             </icon>

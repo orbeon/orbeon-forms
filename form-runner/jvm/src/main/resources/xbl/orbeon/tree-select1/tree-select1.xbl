@@ -42,6 +42,7 @@
             <display-name lang="sv" todo="true">[Tree Selector]</display-name>
             <display-name lang="nl" todo="true">[Tree Selector]</display-name>
             <display-name lang="pt" todo="true">[Tree Selector]</display-name>
+            <display-name lang="ar">منتقي الشجرة</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
             </icon>

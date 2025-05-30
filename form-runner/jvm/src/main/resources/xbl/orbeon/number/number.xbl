@@ -82,6 +82,7 @@
             <display-name lang="sv">Numeriskt värde</display-name>
             <display-name lang="nl">Getal</display-name>
             <display-name lang="pt">Número</display-name>
+            <display-name lang="ar">رقم</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-superscript</icon-class>
             </icon>

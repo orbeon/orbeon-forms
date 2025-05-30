@@ -38,6 +38,7 @@
             <display-name lang="nl">Uitklapmenu</display-name>
             <display-name lang="pt">Menu Lista de Opções</display-name>
             <display-name lang="sv">Rullgardinsmeny</display-name>
+            <display-name lang="ar">قائمة منسدلة</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>

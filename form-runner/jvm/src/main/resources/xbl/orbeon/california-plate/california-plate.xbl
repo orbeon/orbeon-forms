@@ -37,6 +37,7 @@
             <display-name lang="sv">Registreringsskylt från Kalifornien</display-name>
             <display-name lang="nl">Californische kentekenplaat</display-name>
             <display-name lang="pt">Matrícula da Califórnia</display-name>
+            <display-name lang="ar">لوحة كاليفورنيا</display-name>
             <icon>
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
             </icon>

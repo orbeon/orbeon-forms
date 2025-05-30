@@ -36,6 +36,7 @@
             <display-name lang="sv">Datumväljare</display-name>
             <display-name lang="nl">Datumkiezer</display-name>
             <display-name lang="pt">Escolher data</display-name>
+            <display-name lang="ar">منتقي التاريخ</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
             </icon>

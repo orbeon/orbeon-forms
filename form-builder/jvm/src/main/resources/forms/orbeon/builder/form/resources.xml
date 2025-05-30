@@ -17327,4 +17327,1581 @@
             </items>
         </template>
     </resource>
+    <resource xml:lang="ar">
+        <!-- Form metadata -->
+        <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+        <application-name>
+            <label>اسم التطبيق</label>
+            <hint>يحدد مجموعة من النماذج (مثل "acme" أو "مبيعات")</hint>
+            <help>
+                &lt;p>
+                اسم التطبيق هو اسم يسمح بتجميع النماذج معًا. يمكن أن يكون اسم التطبيق على سبيل المثال:
+                &lt;/p>
+                &lt;ul>
+                    &lt;li>اسم شركة مثل "orbeon" أو "acme"&lt;/li>
+                    &lt;li>اسم قسم بالشركة مثل "الموارد البشرية" أو "المبيعات" أو "الهندسة"&lt;/li>
+                    &lt;li>اسم مشروع مثل "mercury" أو "phoenix"&lt;/li>
+                &lt;/ul>
+                &lt;p>
+                يظهر هذا الاسم في عنوان URL للنموذج المنشور، لذلك نوصي باستخدام الأحرف الصغيرة فقط.
+                &lt;/p>
+            </help>
+            <alert>استخدم كحد أقصى 255 حرفًا من أحرف ASCII أو أرقام أو "-" أو "_"</alert>
+        </application-name>
+        <form-name>
+            <label>اسم النموذج</label>
+            <hint>يحدد هذا النموذج المعين (مثل "مطالبة")</hint>
+            <help>
+                &lt;p>
+                اسم النموذج هو اسم محلي لاسم التطبيق، على سبيل المثال "عنوان" أو "مطالبة".
+                &lt;/p>
+                &lt;p>
+                يظهر هذا الاسم في عنوان URL، لذلك نوصي باستخدام الأحرف الصغيرة فقط.
+                &lt;/p>
+            </help>
+            <alert>استخدم كحد أقصى 255 حرفًا من أحرف ASCII أو أرقام أو "-" أو "_"</alert>
+            <no-form-alert>
+                لا يوجد نموذج بهذا الاسم المحدد للتطبيق واسم النموذج في هذا النظام.
+            </no-form-alert>
+            <form-published-alert>
+                {0,choice,1#نموذج واحد|1&lt;{0,number,integer} نماذج}
+                بهذا الاسم للتطبيق واسم النموذج {0,choice,1#منشور|1&lt;منشورة}.
+                &lt;a href="{1}" target="_blank">عرض في صفحة الإدارة.&lt;/a>
+            </form-published-alert>
+            <form-in-progress-alert>
+                {0,choice,1#نموذج واحد|1&lt;{0,number,integer} نماذج}
+                بهذا الاسم للتطبيق واسم النموذج {0,choice,1#قيد التقدم|1&lt;قيد التقدم}.
+                &lt;a href="{1}" target="_blank">عرض في صفحة ملخص منشئ النماذج.&lt;/a>
+            </form-in-progress-alert>
+        </form-name>
+        <title>
+            <label>عنوان النموذج</label>
+            <hint>عنوان النموذج باللغة الحالية</hint>
+        </title>
+        <description>
+            <label>وصف النموذج</label>
+            <hint>وصف النموذج باللغة الحالية</hint>
+        </description>
+        <logo>
+            <label>الشعار</label>
+            <hint>يظهر الشعار في أعلى النموذج</hint>
+        </logo>
+        <general-settings>
+            <label>الإعدادات العامة</label>
+        </general-settings>
+        <custom-settings>
+            <label>إعدادات مخصصة</label>
+        </custom-settings>
+        <!-- Toolbox -->
+        <cut>
+            <label>قص</label>
+        </cut>
+        <copy>
+            <label>نسخ</label>
+        </copy>
+        <paste>
+            <label>لصق</label>
+        </paste>
+        <undo-redo>
+            <undo>تراجع عن {0}</undo>
+            <redo>إعادة {0}</redo>
+            <insert>إدراج</insert>
+            <rename>إعادة تسمية</rename>
+            <delete-control>حذف عنصر التحكم</delete-control>
+            <delete-container>حذف الحاوية</delete-container>
+            <merge-section-template>دمج قالب القسم</merge-section-template>
+            <move-control>نقل عنصر التحكم</move-control>
+            <move-container>نقل الحاوية</move-container>
+            <update-settings>تحديث الإعدادات</update-settings>
+            <insert-control>إدراج عنصر تحكم</insert-control>
+            <insert-section>إدراج قسم</insert-section>
+            <insert-grid>إدراج شبكة</insert-grid>
+            <delete-row>حذف صف</delete-row>
+            <insert-row>إدراج صف</insert-row>
+            <control-settings>إعدادات عنصر التحكم</control-settings>
+            <move-wall>تحريك الحاجز</move-wall>
+            <split-cell>تقسيم الخلية</split-cell>
+            <merge-cell>دمج الخلية</merge-cell>
+        </undo-redo>
+        <merge-section>
+            <label>دمج قالب القسم</label>
+        </merge-section>
+        <form-structure>
+            <label>هيكل النموذج</label>
+        </form-structure>
+        <controls>
+            <label>عناصر التحكم</label>
+        </controls>
+        <i18n>
+            <label>التدويل</label>
+        </i18n>
+        <language>
+            <label>اللغة الحالية</label>
+        </language>
+        <advanced>
+            <label>متقدم</label>
+        </advanced>
+        <attachments>
+            <label>المرفقات</label>
+        </attachments>
+        <services-actions>
+            <label>الخدمات والإجراءات</label>
+        </services-actions>
+        <http-services>
+            <label>خدمات HTTP</label>
+        </http-services>
+        <database-services>
+            <label>خدمات قاعدة البيانات</label>
+        </database-services>
+        <actions>
+            <label>الإجراءات</label>
+        </actions>
+        <new-section>
+            <label>قسم جديد</label>
+        </new-section>
+        <new-grid>
+            <label>شبكة جديدة</label>
+        </new-grid>
+        <new-repeated-grid>
+            <label>شبكة متكررة جديدة</label>
+        </new-repeated-grid>
+        <change-schema>
+            <label>تغيير المخطط</label>
+        </change-schema>
+        <upload-schema>
+            <label>مخطط XML</label>
+        </upload-schema>
+        <pdf-templates>
+            <label>قوالب PDF</label>
+        </pdf-templates>
+        <change-css>
+            <label>تغيير CSS</label>
+        </change-css>
+        <upload-css>
+            <label>إرفاق CSS</label>
+        </upload-css>
+        <show-source>
+            <label>عرض المصدر</label>
+        </show-source>
+        <edit-source>
+            <label>تحرير المصدر</label>
+        </edit-source>
+        <permissions>
+            <label>الأذونات</label>
+        </permissions>
+        <reload-components>
+            <label>إعادة تحميل صندوق الأدوات</label>
+        </reload-components>
+        <library-version>
+            <label>إصدار المكتبة</label>
+            <item>
+                <label>الإصدار {0,number,integer}</label>
+            </item>
+        </library-version>
+        <enter-section-title>
+            <label>انقر لإدخال عنوان القسم</label>
+        </enter-section-title>
+        <type-section-title>
+            <label>اكتب عنوان القسم</label>
+        </type-section-title>
+        <enter-label>
+            <label>انقر لإدخال تسمية</label>
+        </enter-label>
+        <type-label>
+            <label>اكتب التسمية هنا</label>
+        </type-label>
+        <enter-hint>
+            <label>انقر لإضافة تلميح</label>
+        </enter-hint>
+        <type-hint>
+            <label>اكتب التلميح هنا</label>
+        </type-hint>
+        <enter-text>
+            <label>انقر لإدخال نص</label>
+        </enter-text>
+        <type-text>
+            <label>اكتب النص هنا</label>
+        </type-text>
+        <click-cell>
+            <label>انقر لتحديد هذه الخلية</label>
+        </click-cell>
+        <insert-control>
+            <label>استخدم شريط الأدوات لإدراج عنصر تحكم</label>
+        </insert-control>
+        <edit-items>
+            <label>تحرير الخيارات</label>
+        </edit-items>
+        <merge-right-icon>
+            <label>دمج مع الخلية على اليمين</label>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label>تقسيم أفقيًا</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
+            <label>دمج مع الخلية أدناه</label>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label>تقسيم عموديًا</label>
+        </split-vertically-icon>
+        <delete-control-icon>
+            <label>حذف عنصر التحكم</label>
+        </delete-control-icon>
+        <move-icon>
+            <label>اسحب وأفلت للنقل أو النسخ</label>
+        </move-icon>
+        <delete-container-icon>
+            <label>حذف القسم أو الشبكة</label>
+        </delete-container-icon>
+        <delete-row-icon>
+            <label>حذف الصف</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>حذف العمود</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>إدراج عمود إلى اليسار</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>إدراج عمود إلى اليمين</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>إدراج صف فوق</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>إدراج صف أدناه</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>إعدادات القسم</label>
+        </section-details-icon>
+        <grid-details-icon>
+            <label>إعدادات الشبكة</label>
+        </grid-details-icon>
+        <move-up-icon>
+            <label>نقل لأعلى</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>نقل لأسفل</label>
+        </move-down-icon>
+        <move-right-icon>
+            <label>نقل لليمين</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>نقل لليسار</label>
+        </move-left-icon>
+        <control-settings-icon>
+            <label>إعدادات عنصر التحكم</label>
+        </control-settings-icon>
+        <switch-appearance-icon>
+            <label>تبديل المظهر</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>تحرير المساعدة</label>
+        </help-icon>
+        <!-- Common -->
+        <add>
+            <label>إضافة</label>
+        </add>
+        <remove>
+            <label>إزالة</label>
+        </remove>
+        <edit>
+            <label>تحرير</label>
+        </edit>
+        <classes>
+            <label>فئات CSS مخصصة</label>
+        </classes>
+        <autocomplete>
+            <label>خاصية الإكمال التلقائي</label>
+            <groups>
+                <general>عام</general>
+                <name>الاسم واللقب</name>
+                <credentials>بيانات الاعتماد</credentials>
+                <address>العنوان</address>
+                <contact>معلومات الاتصال</contact>
+                <payment>الدفع</payment>
+            </groups>
+        </autocomplete>
+        <property-yes-no>
+            <item id="0">استخدام الخاصية</item>
+            <item id="1">نعم</item>
+            <item id="2">لا</item>
+        </property-yes-no>
+        <!-- Dialogs -->
+        <continue>
+            <label>متابعة</label>
+        </continue>
+        <apply>
+            <label>تطبيق</label>
+        </apply>
+        <cancel>
+            <label>إلغاء</label>
+        </cancel>
+        <close>
+            <label>إغلاق</label>
+        </close>
+        <delete>
+            <label>حذف</label>
+        </delete>
+        <or>
+            <label>أو</label>
+        </or>
+        <errors>
+            <label>أخطاء</label>
+        </errors>
+        <back-to-summary>
+            <label>العودة إلى قائمة النماذج</label>
+        </back-to-summary>
+        <form-builder-page-layout>
+            <item id="0">عرض ثابت</item>
+            <item id="1">عرض مرن</item>
+        </form-builder-page-layout>
+        <suggestion>
+            <label>استخدام الاقتراح: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+        </suggestion>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label>الاسم</label>
+                    <alert>قيمة مفقودة أو غير صحيحة</alert>
+                </name>
+                <xpath>
+                    <label>الصيغة</label>
+                    <alert>صيغة مفقودة أو غير صحيحة</alert>
+                </xpath>
+                <control>
+                    <label>عنصر التحكم</label>
+                    <alert>قيمة مفقودة</alert>
+                </control>
+                <token>
+                    <label>إنشاء معلمة URL للرمز</label>
+                </token>
+                <type>
+                    <item id="0">قيمة عنصر التحكم</item>
+                    <item id="1">صيغة</item>
+                    <item id="2">جميع قيم عناصر التحكم</item>
+                    <choice label="رابط">
+                        <item id="3">صفحة التحرير</item>
+                        <item id="4">صفحة العرض</item>
+                        <item id="5">صفحة جديدة</item>
+                        <item id="6">صفحة الملخص</item>
+                        <item id="7">الصفحة الرئيسية</item>
+                        <item id="9">صفحة النماذج المنشورة</item>
+                        <item id="10">إدارة النماذج</item>
+                        <item id="8">ملف PDF</item>
+                    </choice>
+                </type>
+            </parameters-editor>
+        </components>
+        <dialog-form-settings>
+            <label>إعدادات النموذج</label>
+            <save-as>حفظ باسم…</save-as>
+            <open><label>إعدادات النموذج</label></open>
+            <options>خيارات النموذج</options>
+            <view-options>المظهر</view-options>
+            <wizard-options>المعالج</wizard-options>
+            <pdf-options>PDF</pdf-options>
+            <control-settings>إعدادات عنصر التحكم</control-settings>
+            <about>عن هذا النموذج</about>
+            <stats>إحصائيات النموذج</stats>
+            <sections>الأقسام</sections>
+            <repeats>التكرارات</repeats>
+            <grids>الشبكات</grids>
+            <section-templates>قوالب الأقسام</section-templates>
+            <controls>عناصر التحكم</controls>
+            <all>الكل</all>
+            <use-property>استخدام الخاصية</use-property>
+            <singleton>
+                <label>نموذج فردي</label>
+                <hint>السماح فقط بنسخة واحدة يمكن الوصول إليها من بيانات النموذج لتعريف النموذج هذا</hint>
+            </singleton>
+            <allow-template-use>
+                <label>السماح بالاستخدام كقالب نموذج</label>
+                <hint>إذا تم تحديده، سيظهر هذا النموذج في قائمة قوالب النماذج</hint>
+            </allow-template-use>
+            <wizard>
+                <label>عرض المعالج</label>
+                <hint>عرض الأقسام العلوية كصفحات معالج منفصلة</hint>
+            </wizard>
+            <wizard-mode>
+                <label>وضع التنقل في المعالج للتحقق من الصحة</label>
+                <hint>كيفية تصرف التنقل في المعالج عندما تكون البيانات غير صالحة</hint>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">حر</item>
+                <item id="2">متساهل</item>
+                <item id="3">صارم</item>
+            </wizard-mode>
+            <wizard-subsections-nav>
+                <label>تنقل الأقسام الفرعية للمعالج</label>
+                <hint>تمكين تنقل المعالج للأقسام والشبكات ضمن الأقسام العليا</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>جدول محتويات الأقسام الفرعية للمعالج</label>
+                <hint>كيفية عرض جدول محتويات المعالج للأقسام الفرعية</hint>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">إظهار الأقسام الفرعية للقسم النشط فقط</item>
+                <item id="2">إظهار الأقسام الفرعية لجميع الأقسام</item>
+                <item id="3">عدم إظهار الأقسام الفرعية</item>
+            </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label>جدول محتويات منفصل للمعالج</label>
+            </wizard-separate-toc>
+            <wizard-section-status>
+                <label>إظهار حالة قسم المعالج دائمًا</label>
+            </wizard-section-status>
+            <attachment-max-size-per-file>
+                <label>الحجم الأقصى للمرفق لكل ملف</label>
+                <hint>يمكن أيضًا تعيينه على أساس كل عنصر تحكم في إعدادات عنصر التحكم</hint>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
+                <label>الحجم الإجمالي الأقصى للمرفقات</label>
+                <hint>ينطبق على جميع عناصر تحكم المرفقات في هذا النموذج</hint>
+            </attachment-max-size-aggregate-per-form>
+            <attachment-max-files-per-control>
+                <label>الحد الأقصى لعدد الملفات لكل عنصر تحكم</label>
+            </attachment-max-files-per-control>
+            <attachment-mediatypes>
+                <label>أنواع الملفات المسموح بها</label>
+                <hint>على سبيل المثال "image/* application/pdf"</hint>
+            </attachment-mediatypes>
+            <labels>
+                <label>مظهر تسميات عناصر التحكم</label>
+            </labels>
+            <hints>
+                <label>مظهر تلميحات عناصر التحكم</label>
+            </hints>
+            <automatic-hints>
+                <label>استخدام التلميحات التلقائية</label>
+            </automatic-hints>
+            <appearances>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">مضمن</item>
+                <item id="2">تلميح منبثق</item>
+            </appearances>
+            <placeholders>
+                <label>استخدام العنصر النائب للحقول ومساحات النص</label>
+            </placeholders>
+            <data-migration>
+                <label>ترحيل البيانات البسيط</label>
+                <hint>إضافة/إزالة العناصر المفقودة في البيانات تلقائيًا</hint>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">مفعل</item>
+                <item id="2">معطل</item>
+                <item id="3">إظهار خطأ</item>
+            </data-migration>
+            <grid-tab-order>
+                <label>ترتيب التبويب في الشبكة</label>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">صفوف</item>
+                <item id="2">أعمدة</item>
+            </grid-tab-order>
+            <time-window>
+                <label>نافذة زمنية</label>
+                <available>
+                    <available-from>
+                        <label>الإنشاء متاح فقط من تاريخ محدد</label>
+                        <date>تاريخ ووقت البدء</date>
+                        <message>رسالة معلقة</message>
+                    </available-from>
+                    <available-to>
+                        <label>الإنشاء متاح فقط حتى تاريخ محدد</label>
+                        <date>تاريخ ووقت الانتهاء</date>
+                        <message>رسالة انتهاء الصلاحية</message>
+                    </available-to>
+                </available>
+            </time-window>
+            <rendered-page-orientation>
+                <label>اتجاه صفحة PDF</label>
+                <hint/>
+                <item id="default">استخدام الخاصية</item>
+                <item id="portrait">عمودي</item>
+                <item id="landscape">أفقي</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label>حجم صفحة PDF</label>
+                <hint/>
+                <item id="default">استخدام الخاصية</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter">خطاب</item>
+                <item id="a4">A4</item>
+                <item id="legal">قانوني</item>
+            </rendered-page-size>
+            <readonly-disable-calculate>
+                <label>الحسابات في أوضاع القراءة فقط (المراجعة، PDF)</label>
+                <hint/>
+                <item id="default">استخدام الخاصية</item>
+                <item id="false">تمكين</item>
+                <item id="true">تعطيل</item>
+            </readonly-disable-calculate>
+            <html-page-layout>
+                <label>تخطيط صفحة المتصفح</label>
+                <hint>ما إذا كان النموذج ذو عرض ثابت أو مرن</hint>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">عرض ثابت</item>
+                <item id="2">عرض مرن</item>
+            </html-page-layout>
+            <density>
+                <label>الكثافة</label>
+                <hint>المسافة بين العناصر في الواجهة</hint>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">مضغوط</item>
+                <item id="2">مريح</item>
+                <item id="3">فسيح</item>
+            </density>
+            <analysis-calculate>
+                <label>تبعيات الحسابات التلقائية</label>
+                <hint>تحديد ترتيب التقييم تلقائيًا لصيغ "القيمة المحسوبة" و "القيمة الأولية"</hint>
+            </analysis-calculate>
+            <versions>الإصدارات</versions>
+            <current-version>الإصدار الحالي</current-version>
+            <created-with-version>تم إنشاؤه بالإصدار</created-with-version>
+            <updated-with-versions>تم تحديثه بالإصدارات</updated-with-versions>
+            <thumbnail>
+                <label>صورة مصغرة للنموذج</label>
+                <hint>تستخدم لقوالب النماذج وصفحة البداية</hint>
+            </thumbnail>
+            <default-template>القالب الافتراضي</default-template>
+        </dialog-form-settings>
+        <dialog-control-settings>
+            <label>إعدادات عنصر التحكم: "{1}" / "{0}" ({2})</label>
+            <tab-base><label>الإعدادات الأساسية</label></tab-base>
+            <tab-validations><label>التحققات والتنبيهات</label></tab-validations>
+            <tab-formulas><label>الصيغ</label></tab-formulas>
+            <control-name>
+                <label>اسم عنصر التحكم</label>
+                <alert>الاسم قيد الاستخدام بالفعل أو غير صحيح</alert>
+                <hint>على سبيل المثال: "first-name"</hint>
+            </control-name>
+            <pdf-field-name>
+                <label>اسم حقل PDF</label>
+                <alert>اسم حقل PDF غير معروف</alert>
+                <item id="0">تلقائي</item>
+                <item id="1">مخصص</item>
+            </pdf-field-name>
+            <excel-field-name>
+                <label>اسم نطاق Excel</label>
+            </excel-field-name>
+            <options>
+                <item>
+                    <label>عنصر تحكم للفهرسة</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
+                    <label>عرض في صفحة الملخص</label>
+                    <value>fr-summary-show</value>
+                </item>
+                <item>
+                    <label>السماح بالتحرير الجماعي</label>
+                    <value>fr-allow-bulk-edit</value>
+                </item>
+                <item>
+                    <label>تشفير البيانات أثناء التخزين</label>
+                    <value>fr-encrypt</value>
+                </item>
+            </options>
+            <summary-show>
+                <do-not-show>عدم العرض في صفحة الملخص</do-not-show>
+                <show>عرض في صفحة الملخص</show>
+                <column-only>عرض العمود فقط</column-only>
+                <search-only>عرض البحث فقط</search-only>
+            </summary-show>
+            <role>
+                <restrict>تقييد الدور</restrict>
+                <all>الكل</all>
+                <any>أي</any>
+                <of-the-following>من التالي:</of-the-following>
+                <empty>دور فارغ</empty>
+                <duplicate>دور مكرر</duplicate>
+            </role>
+            <bulk-edit-actions>
+                <save-data>حفظ البيانات</save-data>
+                <run-process>تنفيذ العملية</run-process>
+            </bulk-edit-actions>
+            <control-appearance>
+                <label>مظهر عنصر التحكم</label>
+            </control-appearance>
+            <whitespace>
+                <item>
+                    <label>قص المسافات البادئة والتابعة</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
+            <types>
+                <label>نوع البيانات</label>
+            </types>
+            <builtin-type>
+                <label>النوع المدمج</label>
+                <hint>نوع البيانات المدمج</hint>
+
+                <use-schema-type>استخدام نوع المخطط</use-schema-type>
+                <use-component-type>استخدام نوع مُعرّف مسبقاً</use-component-type>
+
+                <choices>
+                    <choices>
+                        <label>الأنواع الشائعة</label>
+                        <type label="نص">string</type>
+                        <type label="منطقي">boolean</type>
+                        <type label="عنوان بريد إلكتروني">email</type>
+                    </choices>
+                    <choices>
+                        <label>أنواع الأرقام</label>
+                        <type label="عشري">decimal</type>
+
+                        <type label="عدد صحيح">integer</type>
+                        <type label="عدد صحيح موجب">positiveInteger</type>
+                        <type label="عدد صحيح غير موجب">nonPositiveInteger</type>
+                        <type label="عدد صحيح سالب">negativeInteger</type>
+                        <type label="عدد صحيح غير سالب">nonNegativeInteger</type>
+
+                        <type label="فاصلة عائمة بدقة بسيطة">float</type>
+                        <type label="فاصلة عائمة بدقة مزدوجة">double</type>
+
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>أنواع التاريخ والوقت</label>
+                        <type label="تاريخ">date</type>
+                        <type label="وقت">time</type>
+                        <type label="تاريخ ووقت">dateTime</type>
+                        <type label="مدة">duration</type>
+                        <type label="سنة وشهر">gYearMonth</type>
+                        <type label="شهر ويوم">gMonthDay</type>
+                        <type label="سنة">gYear</type>
+                        <type label="شهر">gMonth</type>
+                        <type label="يوم">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>أنواع XML</label>
+                        <type label="">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                        <type label="اسم XML مؤهل">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                    <choices>
+                        <label>أنواع أخرى</label>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="ثنائي مشفر بنظام Base64">base64Binary</type>
+                        <type label="ثنائي مشفر بنظام سداسي عشري">hexBinary</type>
+                        <type label="عنوان URI">anyURI</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>نوع المخطط</label>
+                <hint>نوع من مخطط مستورد</hint>
+            </schema-type>
+            <required>
+                <label>مطلوب</label>
+                <hint>ما إذا كانت البيانات مطلوبة</hint>
+                <item id="0">نعم</item>
+                <item id="1">لا</item>
+                <item id="2">صيغة</item>
+            </required>
+            <constraint>
+                <item id="formula">صيغة</item>
+                <item id="max-length">الحد الأقصى للطول</item>
+                <item id="min-length">الحد الأدنى للطول</item>
+                <item id="positive">موجب</item>
+                <item id="non-negative">موجب أو صفر</item>
+                <item id="non-positive">سالب أو صفر</item>
+                <item id="negative">سالب</item>
+                <item id="fraction-digits">الحد الأقصى للأرقام العشرية</item>
+                <item id="upload-max-size-per-file" multiple="false">الحد الأقصى لحجم المرفق</item>
+                <item id="upload-max-size-per-file" multiple="true">الحد الأقصى لحجم المرفق لكل ملف</item>
+                <item id="upload-max-size-aggregate-per-control">الحد الأقصى الإجمالي لحجم المرفقات</item>
+                <item id="upload-max-files-per-control">الحد الأقصى لعدد الملفات لكل عنصر تحكم</item>
+                <item id="upload-mediatypes">أنواع الملفات المدعومة</item>
+                <item id="excluded-dates">تواريخ للاستبعاد</item>
+            </constraint>
+            <formula>
+                <label>صيغة</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath منطقي</hint>
+            </formula>
+            <integer-argument>
+                <label>قيمة صحيحة</label>
+                <alert>قيمة غير صحيحة</alert>
+            </integer-argument>
+            <alert-template-parameters>
+                <edit-label>تحرير معلمات قالب التنبيه</edit-label>
+                <dialog-label>معلمات قالب التنبيه</dialog-label>
+            </alert-template-parameters>
+            <visibility>
+                <label>الرؤية</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath منطقي</hint>
+                <help>
+                    &lt;p>
+                        يتيح لك هذا تحديد ما إذا كان عنصر التحكم في النموذج مرئياً أم لا.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>نعم:&lt;/b> عنصر التحكم في النموذج مرئي.&lt;/li>
+                        &lt;li>&lt;b>لا:&lt;/b> عنصر التحكم في النموذج مخفي.&lt;/li>
+                        &lt;li>&lt;b>صيغة:&lt;/b> عنصر التحكم في النموذج مرئي أو مخفي ديناميكياً اعتماداً على صيغة.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        تتيح لك الصيغة تحديد ما إذا كان عنصر التحكم في النموذج مرئياً أم لا بشكل ديناميكي. يجب أن تُرجع قيمة منطقية.
+                        يكون عنصر التحكم في النموذج مرئياً إذا قيّمت الصيغة إلى &lt;code>true()&lt;/code>، ومخفياً إذا قيّمت إلى &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        يمكنك الإشارة إلى عناصر تحكم أخرى في النموذج في الصيغة باستخدام اسمها مسبوقاً بعلامة &lt;code>$&lt;/code>.
+                        عند إدخال علامة &lt;code>$&lt;/code>، يتم عرض قائمة بعناصر التحكم المتاحة.
+                    &lt;/p>
+                    &lt;p>
+                        لمزيد من المعلومات حول الصيغ، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">وثائق Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
+            </visibility>
+            <readonly>
+                <label>للقراءة فقط</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath منطقي</hint>
+                <help>
+                    &lt;p>
+                        يتيح لك هذا تحديد ما إذا كان عنصر التحكم في النموذج للقراءة فقط أو للقراءة والكتابة.
+                    &lt;/p>
+                    &lt;ul>
+                        &lt;li>&lt;b>نعم:&lt;/b> عنصر التحكم في النموذج للقراءة فقط.&lt;/li>
+                        &lt;li>&lt;b>لا:&lt;/b> عنصر التحكم في النموذج للقراءة والكتابة.&lt;/li>
+                        &lt;li>&lt;b>صيغة:&lt;/b> عنصر التحكم في النموذج للقراءة فقط أو للقراءة والكتابة ديناميكياً اعتماداً على صيغة.&lt;/li>
+                    &lt;/ul>
+                    &lt;p>
+                        تتيح لك الصيغة تحديد ما إذا كان عنصر التحكم في النموذج للقراءة فقط أو للقراءة والكتابة بشكل ديناميكي. يجب أن تُرجع قيمة منطقية.
+                        يكون عنصر التحكم في النموذج للقراءة فقط إذا قيّمت الصيغة إلى &lt;code>true()&lt;/code>، وللقراءة والكتابة إذا قيّمت إلى &lt;code>false()&lt;/code>.
+                    &lt;/p>
+                    &lt;p>
+                        يمكنك الإشارة إلى عناصر تحكم أخرى في النموذج في الصيغة باستخدام اسمها مسبوقاً بعلامة &lt;code>$&lt;/code>.
+                        عند إدخال علامة &lt;code>$&lt;/code>، يتم عرض قائمة بعناصر التحكم المتاحة.
+                    &lt;/p>
+                    &lt;p>
+                        لمزيد من المعلومات حول الصيغ، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">وثائق Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
+            </readonly>
+            <default>
+                <label>القيمة الأولية</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath</hint>
+                <help>
+                    &lt;p>
+                        تتيح لك هذه الصيغة تحديد قيمة أولية لعنصر التحكم في النموذج في وضع "جديد" فقط.
+                    &lt;/p>
+                    &lt;p>
+                        يمكنك الإشارة إلى عناصر تحكم أخرى في النموذج في الصيغة باستخدام اسمها مسبوقاً بعلامة &lt;code>$&lt;/code>.
+                        عند إدخال علامة &lt;code>$&lt;/code>، يتم عرض قائمة بعناصر التحكم المتاحة.
+                    &lt;/p>
+                    &lt;p>
+                        لمزيد من المعلومات حول الصيغ، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">وثائق Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
+            </default>
+            <calculate>
+                <label>القيمة المحسوبة</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath</hint>
+                <help>
+                    &lt;p>
+                        تتيح لك هذه الصيغة تحديد قيمة محسوبة لعنصر التحكم في النموذج.
+                        يتم إعادة تقييم هذه القيمة لتبقى محدثة حسب الحاجة.
+                    &lt;/p>
+                    &lt;p>
+                        يمكنك الإشارة إلى عناصر تحكم أخرى في النموذج في الصيغة باستخدام اسمها مسبوقاً بعلامة &lt;code>$&lt;/code>.
+                        عند إدخال علامة &lt;code>$&lt;/code>، يتم عرض قائمة بعناصر التحكم المتاحة.
+                    &lt;/p>
+                    &lt;p>
+                        لمزيد من المعلومات حول الصيغ، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">وثائق Form Builder&lt;/a>.
+                    &lt;/p>
+                </help>
+            </calculate>
+            <control-label>
+                <label>تسمية</label>
+            </control-label>
+            <control-hint>
+                <label>تلميح</label>
+            </control-hint>
+            <control-help>
+                <label>رسالة المساعدة</label>
+                <hint>تُعرض عند تفعيل المساعدة</hint>
+            </control-help>
+            <control-text>
+                <label>نص توضيحي</label>
+                <hint/>
+            </control-text>
+            <control-short-label>
+                <label>تسمية قصيرة</label>
+            </control-short-label>
+            <control-iteration-label>
+                <label>تسمية التكرار</label>
+            </control-iteration-label>
+            <control-add-iteration-label>
+                <label>تسمية إضافة تكرار</label>
+            </control-add-iteration-label>
+            <control-remove-iteration-label>
+                <label>نص إزالة التكرار</label>
+            </control-remove-iteration-label>
+            <alert>
+                <label>رسالة التنبيه</label>
+                <hint>تُعرض عندما يكون التنبيه نشطاً</hint>
+            </alert>
+            <default-alert>
+                <label>رسالة التنبيه الافتراضية</label>
+                <hint>نشطة عندما لا توجد رسالة تنبيه أكثر تحديداً</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>استخدام رسالة التنبيه الافتراضية العامة</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>استخدام رسالة التنبيه الافتراضية</label>
+            </use-default-alert>
+            <validation-type><label>نوع التحقق</label></validation-type>
+            <validation-details><label>تفاصيل التحقق</label></validation-details>
+            <level><label>المستوى</label></level>
+            <use-html>استخدام HTML</use-html>
+            <parameters>معلمات القالب</parameters>
+            <automatic-hint>
+                <label>استخدام تلميح تلقائي</label>
+                <hint>يضيف تلميحاً بناءً على الحد الأقصى لحجم الملف وأنواع الملفات المدعومة التي قد تكون حددتها في علامة التحققات والتنبيهات</hint>
+            </automatic-hint>
+            <open-selection>
+                <label>اختيار مفتوح</label>
+                <hint>إذا تم تمكينه، يمكن للمستخدمين إدخال قيمهم الخاصة، وتستخدم القيمة (النص المخزن في البيانات) أيضاً كتسمية (النص المعروض في القائمة المنسدلة)</hint>
+            </open-selection>
+            <store-label>
+                <label>تخزين التسمية</label>
+                <hint>إذا تم تمكينه، يتم تخزين التسمية المحددة مع البيانات</hint>
+            </store-label>
+            <default-yes-no>
+                <item id="0">استخدام الافتراضي</item>
+                <item id="1">نعم</item>
+                <item id="2">لا</item>
+            </default-yes-no>
+        </dialog-control-settings>
+        <dialog-container-settings>
+            <label>{0,choice,0#إعدادات القسم: "{2}" / "{1}"|1#إعدادات الشبكة: "{1}"}</label>
+            <control-name>
+                <label>الاسم</label>
+                <alert>الاسم قيد الاستخدام بالفعل أو غير صحيح</alert>
+                <hint>على سبيل المثال: "address"</hint>
+            </control-name>
+            <grid-columns>
+                <label>عدد أعمدة الشبكة</label>
+            </grid-columns>
+            <grid-rows>
+                <label>عدد صفوف الشبكة</label>
+            </grid-rows>
+            <grid-tab-order>
+                <label>ترتيب التبويب في الشبكة</label>
+                <item id="0">افتراضي</item>
+                <item id="1">صفوف</item>
+                <item id="2">أعمدة</item>
+            </grid-tab-order>
+            <options>
+                <label>الخيارات</label>
+                <item>
+                    <label>مفتوح مبدئياً</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
+                    <label>فاصل صفحة قبل</label>
+                    <value>fr-page-break-before</value>
+                </item>
+            </options>
+            <collapsible>
+                <label>قابل للطي</label>
+            </collapsible>
+            <visibility>
+                <label>الرؤية</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath منطقي</hint>
+            </visibility>
+            <readonly>
+                <label>للقراءة فقط</label>
+                <alert>تعبير XPath غير صحيح</alert>
+                <hint>تعبير XPath منطقي</hint>
+            </readonly>
+            <repeat>
+                <label>تكرار المحتوى</label>
+            </repeat>
+            <user-can-add-remove>
+                <label>السماح للمستخدم بإضافة أو إزالة أو نقل التكرارات</label>
+                <hint/>
+            </user-can-add-remove>
+            <number-rows>
+                <label>إظهار رقم التكرار</label>
+                <hint/>
+            </number-rows>
+            <use-paging>
+                <label>إظهار تكرار واحد في المرة في المعالج</label>
+                <hint/>
+            </use-paging>
+            <custom-iteration-name>
+                <label>تمكين اسم عنصر التكرار المخصص</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>اسم عنصر التكرار المخصص</label>
+                <alert>الاسم قيد الاستخدام بالفعل أو غير صحيح</alert>
+                <hint/>
+            </iteration-name>
+            <min>
+                <label>الحد الأدنى لعدد التكرارات</label>
+                <alert>قيمة غير صحيحة</alert>
+                <hint>رقم غير سالب أو تعبير XPath</hint>
+            </min>
+            <max>
+                <label>الحد الأقصى لعدد التكرارات</label>
+                <alert>قيمة غير صحيحة</alert>
+                <hint>رقم موجب أو تعبير XPath</hint>
+            </max>
+            <freeze>
+                <label>تجميد التكرارات</label>
+                <alert>قيمة غير صحيحة</alert>
+                <hint>رقم غير سالب أو تعبير XPath</hint>
+            </freeze>
+            <no-freeze>بدون تجميد</no-freeze>
+            <appearance-minimal>
+                <label>مظهر مبسط</label>
+                <hint>إظهار أزرار الإضافة/الإزالة الأساسية بدون قائمة أو إعادة ترتيب</hint>
+            </appearance-minimal>
+            <apply-defaults>
+                <label>تطبيق صيغ القيمة الأولية عند إضافة تكرارات</label>
+            </apply-defaults>
+            <initial-iterations>
+                <label>العدد الأولي للتكرارات يستخدم القالب</label>
+            </initial-iterations>
+            <other>أخرى</other>
+            <one>تكرار واحد</one>
+            <unlimited>غير محدود</unlimited>
+            <no-minimum>بدون حد أدنى</no-minimum>
+            <tab-base><label>الإعدادات الأساسية والصيغ</label></tab-base>
+            <tab-repeat><label>المحتوى المكرر</label></tab-repeat>
+        </dialog-container-settings>
+        <dialog-confirmation>
+            <label>تأكيد</label>
+        </dialog-confirmation>
+        <dialog-ids>
+            <label>أسماء عناصر التحكم</label>
+            <prefix>
+                <label>البادئة</label>
+            </prefix>
+            <suffix>
+                <label>اللاحقة</label>
+            </suffix>
+            <original-name>
+                <label>الاسم الأصلي</label>
+            </original-name>
+            <new-name>
+                <label>الاسم الجديد</label>
+            </new-name>
+        </dialog-ids>
+        <dialog-publish>
+            <label>نشر النموذج</label>
+            <publish>نشر</publish>
+            <publish-success>تم نشر تعريف النموذج بنجاح كإصدار {1,number,integer}، مع {0,choice,0#بدون مرفقات|1#مرفق واحد|1&lt;{0,number,integer} مرفقات}.</publish-success>
+            <publish-error>حدث خطأ أثناء نشر النموذج.</publish-error>
+            <latest-published-version>آخر إصدار منشور</latest-published-version>
+            <create-new-version-item>إنشاء تعريف نموذج جديد برقم إصدار {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>الكتابة فوق تعريف النموذج الحالي برقم إصدار {0,number,integer} ({1,choice,0#غير متاح|1#متاح})</overwrite-version-item>
+            <create-new-version-help>
+                ملاحظة: نشر تعريف النموذج هذا سينشئ إصدارًا جديدًا من تعريف النموذج في
+                قاعدة البيانات. البيانات الموجودة بالفعل في قاعدة البيانات سيتم عرضها وتحريرها باستخدام الإصدارات
+                السابقة من تعريف هذا النموذج المرتبطة بتلك البيانات. سيتم استخدام إصدار تعريف النموذج الجديد
+                لإنشاء بيانات جديدة.
+            </create-new-version-help>
+            <overwrite-version-help>
+                ملاحظة: هذا سيؤدي إلى استبدال تعريف النموذج الحالي. إذا كانت التغييرات التي أجريتها على تعريف النموذج
+                صغيرة، مثل تغيير تسميات عناصر التحكم، فسيكون تعريف النموذج متوافقًا مع
+                بيانات النموذج الحالية. ولكن إذا قمت بإجراء تغييرات هيكلية، مثل إضافة أو إزالة أو إعادة تسمية أو
+                نقل عناصر التحكم، فقد يكون تعريف النموذج غير متوافق مع البيانات الحالية. نوصي بالحذر
+                عند استبدال إصدار تعريف نموذج موجود.
+            </overwrite-version-help>
+            <open-summary>فتح صفحة ملخص النموذج المنشور</open-summary>
+            <open-new>فتح صفحة النموذج المنشور الجديدة</open-new>
+            <version>الإصدار</version>
+            <available>جعل النموذج المنشور متاحاً</available>
+            <comment>تعليق</comment>
+        </dialog-publish>
+        <dialog-add-language>
+            <label>إضافة لغة</label>
+            <new-language>
+                <label>إضافة اللغة التالية</label>
+            </new-language>
+            <common>اللغات الأكثر شيوعاً</common>
+            <all>لغات أخرى</all>
+            <add-language>
+                <label>إضافة لغة</label>
+            </add-language>
+            <remove-language>
+                <label>إزالة لغة</label>
+            </remove-language>
+        </dialog-add-language>
+        <dialog-search>
+            <label>البحث في عناصر التحكم</label>
+            <open-settings>
+                <label>فتح مربع حوار الإعدادات</label>
+            </open-settings>
+        </dialog-search>
+        <dialog-upload-schema>
+            <label>تحميل مخطط XML</label>
+            <schema-type>
+                <label>أنواع المخططات المتاحة</label>
+                <hint>الأنواع البسيطة المتوفرة في المخطط المحمّل</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>معرّف مساحة الاسم للمخطط</label>
+                <hint>هذا هو معرّف مساحة الاسم للمخطط المحمّل</hint>
+            </namespace-uri>
+            <operations>
+                <label>العمليات</label>
+            </operations>
+            <delete-schema>
+                <label>حذف مخطط XML الحالي</label>
+            </delete-schema>
+            <change-schema>
+                <label>تغيير مخطط XML</label>
+            </change-schema>
+            <replace-schema>
+                <label>استبدال مخطط XML</label>
+            </replace-schema>
+            <upload-schema>
+                <label>إرفاق مخطط XML</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>يبدو أن مخططك لا يحتوي على أنواع بسيطة. لن تتمكن من تحديد أنواع من هذا المخطط للتحقق.</no-simple-types>
+                <has-includes>يحتوي مخططك على استيرادات أو تضمينات. سيتم تعطيلها.</has-includes>
+                <not-a-schema>الملف المحمّل ليس مخططًا صالحًا.</not-a-schema>
+                <new-schema-information>معلومات المخطط الجديد</new-schema-information>
+                <existing-schema-information>معلومات المخطط الحالي</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
+        <dialog-edit-source>
+            <label>المصدر</label>
+            <source>
+                <alert>يرجى التأكد من أن المحتوى هو XML صحيح البنية</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <label>عرض المصدر</label>
+        </dialog-view-source>
+        <dialog-pdf>
+            <label>قوالب PDF</label>
+            <pdf-upload>
+                <label>ملف PDF</label>
+            </pdf-upload>
+            <attachment-name>
+                <label>الاسم</label>
+            </attachment-name>
+            <attachment-language>
+                <label>اللغة</label>
+            </attachment-language>
+        </dialog-pdf>
+        <dialog-itemsets>
+            <label>تحرير الخيارات</label>
+            <resources-language>
+                <label>لغة الموارد</label>
+            </resources-language>
+            <label-header>
+                <label>التسمية</label>
+            </label-header>
+            <value-header>
+                <label>القيمة</label>
+            </value-header>
+            <hint-header>
+                <label>تلميح</label>
+            </hint-header>
+            <clear-value>
+                <label>مسح القيمة</label>
+            </clear-value>
+            <remove-all>
+                <label>إزالة الكل</label>
+            </remove-all>
+            <filter>
+                <label>صيغة التصفية</label>
+            </filter>
+        </dialog-itemsets>
+        <dialog-http-services>
+            <label>محرر خدمة HTTP</label>
+            <tab-definition><label>التعريف</label></tab-definition>
+            <tab-advanced><label>متقدم</label></tab-advanced>
+            <tab-test><label>نتائج الاختبار</label></tab-test>
+            <url-parameters><label>معلمات URL</label></url-parameters>
+            <parameter-name><label>الاسم</label></parameter-name>
+            <parameter-default-value><label>القيمة الافتراضية</label></parameter-default-value>
+            <no-headers>لم يتم استلام أي ترويسات.</no-headers>
+            <service-name>
+                <label>اسم الخدمة</label>
+                <hint>اختر اسماً فريداً لهذه الخدمة</hint>
+            </service-name>
+            <service-performs-search>
+                <label>الخدمة تنفذ البحث</label>
+            </service-performs-search>
+            <service-supports-paging>
+                <label>الخدمة تدعم تقسيم الصفحات</label>
+            </service-supports-paging>
+            <resource>
+                <label>عنوان URL للمورد</label>
+                <hint>عنوان HTTP URL الذي توجد فيه الخدمة</hint>
+            </resource>
+            <method>
+                <label>الطريقة</label>
+            </method>
+            <serialization>
+                <label>التسلسل</label>
+            </serialization>
+            <soap-submission>
+                <label>خدمة SOAP</label>
+                <hint>ما إذا كانت هذه خدمة SOAP</hint>
+            </soap-submission>
+            <soap-action>
+                <label>إجراء SOAP</label>
+                <hint>ترويسة SOAPAction اختيارية</hint>
+            </soap-action>
+            <http-authentication>
+                <label>مصادقة HTTP</label>
+                <hint>مصادقة HTTP</hint>
+            </http-authentication>
+            <username>
+                <label>اسم المستخدم</label>
+            </username>
+            <password>
+                <label>كلمة المرور</label>
+            </password>
+            <request-body>
+                <label>محتوى الطلب</label>
+                <hint>بيانات XML (يمكن أن تكون غلاف SOAP)</hint>
+            </request-body>
+            <is-binary-response>
+                <label>استجابة الخدمة تحتوي على محتوى ثنائي</label>
+                <hint>حدد هذا الخيار إذا كانت الاستجابة تُستخدم لتعيين قيمة عنصر تحكم المرفقات</hint>
+            </is-binary-response>
+            <response>
+                <label>الاستجابة</label>
+            </response>
+            <error-type>
+                <label>نوع الخطأ</label>
+                <item>
+                    <label>الإرسال قيد التقدم</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>لا توجد بيانات</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>خطأ في التحقق</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>خطأ في المورد</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>خطأ في الهدف</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>خطأ داخلي</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>عنوان URL للمورد</label>
+            </resource-uri>
+            <status-code>
+                <label>رمز الحالة</label>
+            </status-code>
+            <headers>
+                <label>ترويسات HTTP</label>
+            </headers>
+            <header-name>
+                <label>اسم الترويسة</label>
+            </header-name>
+            <header-value>
+                <label>قيمة (قيم) الترويسة</label>
+            </header-value>
+            <response-body>
+                <label>محتوى الاستجابة الأصلي</label>
+            </response-body>
+            <xml-response-body>
+                <label>محتوى استجابة XML</label>
+            </xml-response-body>
+            <save>
+                <label>حفظ</label>
+            </save>
+            <test>
+                <label>اختبار</label>
+            </test>
+        </dialog-http-services>
+        <dialog-database-services>
+            <label>محرر خدمة قاعدة البيانات</label>
+            <service-name>
+                <label>اسم الخدمة</label>
+                <hint>اختر اسماً فريداً لهذه الخدمة</hint>
+            </service-name>
+            <datasource>
+                <label>مصدر البيانات</label>
+                <hint>مصدر بيانات JNDI لهذه الخدمة</hint>
+            </datasource>
+            <query>
+                <label>استعلام SQL</label>
+                <hint>استعلام SQL الذي يمكن أن يحتوي على عناصر نائبة للمعلمات</hint>
+            </query>
+            <save>
+                <label>حفظ</label>
+            </save>
+            <test>
+                <label>اختبار</label>
+            </test>
+        </dialog-database-services>
+        <dialog-actions>
+            <label>محرر الإجراءات</label>
+            <service-name>
+                <label>اسم الإجراء</label>
+                <hint>اختر اسماً فريداً لهذا الإجراء</hint>
+            </service-name>
+            <observer-type>
+                <label>تنفيذ الإجراء عندما</label>
+                <item id="0">
+                    <label>عنصر التحكم</label>
+                </item>
+                <item id="1">
+                    <label>يتم تحميل النموذج</label>
+                </item>
+            </observer-type>
+            <control-event-type>
+                <item>
+                    <label>يتغير قيمته</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <item>
+                    <label>يظهر</label>
+                    <value>xforms-enabled</value>
+                </item>
+                <item>
+                    <label>يختفي</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
+                    <label>يتم تنشيطه</label>
+                    <value>DOMActivate</value>
+                </item>
+            </control-event-type>
+            <form-event-type>
+                <item>
+                    <label>قبل حساب القيم الأولية للبيانات</label>
+                    <value>fr-run-form-load-action-before-data</value>
+                </item>
+                <item>
+                    <label>بعد جاهزية البيانات</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label>بعد جاهزية عناصر التحكم</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
+            <event-condition>
+                <label>تنفيذ الإجراء في الحالة التالية</label>
+                <item id="always">دائماً</item>
+                <item id="new-only">في وضع "جديد" فقط</item>
+                <item id="formula">عندما تقيم الصيغة إلى "صحيح"</item>
+                <formula>الصيغة</formula>
+            </event-condition>
+            <event-control>
+                <label>عنصر التحكم</label>
+            </event-control>
+            <service-to-call>
+                <label>الخدمة المراد استدعاؤها</label>
+                <hint>الخدمة المراد استدعاؤها عندما يحدث الحدث</hint>
+            </service-to-call>
+            <source>
+                <label>المصدر</label>
+            </source>
+            <destination>
+                <label>الوجهة</label>
+            </destination>
+            <source-control>
+                <label>عنصر تحكم المصدر</label>
+            </source-control>
+            <destination-xpath>
+                <label>صيغة الوجهة</label>
+            </destination-xpath>
+            <parameter-number>
+                <label>رقم المعلمة</label>
+            </parameter-number>
+            <response-values>
+                <label>تعيين قيم عنصر تحكم الاستجابة</label>
+            </response-values>
+            <destination-control>
+                <label>عنصر تحكم الوجهة</label>
+            </destination-control>
+            <source-xpath>
+                <label>صيغة المصدر</label>
+            </source-xpath>
+            <response-itemset>
+                <label>تعيين خيارات عنصر تحكم الاختيار للاستجابة</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>عنصر تحكم الاختيار للوجهة</label>
+            </destination-selection-control>
+            <items>
+                <label>صيغة الخيارات</label>
+                <hint>إرجاع عقدة واحدة لكل خيار</hint>
+            </items>
+            <item-label>
+                <label>صيغة التسمية</label>
+                <hint>نسبة إلى عقدة الخيار</hint>
+            </item-label>
+            <item-value>
+                <label>صيغة القيمة</label>
+                <hint>نسبة إلى عقدة الخيار</hint>
+            </item-value>
+            <item-hint>
+                <label>صيغة التلميح</label>
+                <hint>نسبة إلى عقدة الخيار</hint>
+            </item-hint>
+            <is-last-page>
+                <label>صيغة الصفحة الأخيرة</label>
+            </is-last-page>
+            <auto-select-unique-choice>
+                <label>اختيار تلقائي للخيار الفريد</label>
+            </auto-select-unique-choice>
+            <save>
+                <label>حفظ</label>
+            </save>
+            <test>
+                <label>اختبار</label>
+            </test>
+
+            <general-settings>الإعدادات العامة</general-settings>
+            <service-request-actions>إجراءات طلب الخدمة</service-request-actions>
+            <service-response-actions>إجراءات استجابة الخدمة</service-response-actions>
+
+            <set-control-value>تعيين قيمة عنصر التحكم</set-control-value>
+            <set-control-itemset>تعيين خيارات عنصر التحكم</set-control-itemset>
+            <save-to-dataset>حفظ في مجموعة البيانات</save-to-dataset>
+            <dataset-name>اسم مجموعة البيانات</dataset-name>
+            <set-control-value-unavailable>تعيين قيمة عنصر التحكم متاح فقط عند اختيار "بعد جاهزية عناصر التحكم"</set-control-value-unavailable>
+
+        </dialog-actions>
+        <dialog-test>
+            <label>معاينة النموذج</label>
+            <console>وحدة التحكم</console>
+        </dialog-test>
+        <dialog-test-pdf>
+            <label>اختبار إنتاج PDF</label>
+            <use-form-data>استخدام بيانات النموذج المدخلة</use-form-data>
+            <disable-default>تعطيل تقييم صيغ "القيم الأولية"</disable-default>
+            <disable-calculate>تعطيل تقييم صيغ "القيم المحسوبة"</disable-calculate>
+            <disable-relevant>إظهار عناصر التحكم والشبكات والأقسام ذات الرؤية الديناميكية</disable-relevant>
+            <show-hints>إظهار تلميحات عناصر التحكم</show-hints>
+            <show-alerts>إظهار تنبيهات عناصر التحكم غير الصالحة</show-alerts>
+            <show-required>تنسيق عناصر التحكم المطلوبة</show-required>
+            <use-pdf-template>استخدام قالب PDF</use-pdf-template>
+        </dialog-test-pdf>
+        <dialog-pe>
+            <label>ميزة Orbeon Forms PE</label>
+            <message>
+                <div>
+                    <p>هذه الميزة متوفرة فقط في Orbeon Forms PE.</p>
+                    <p>لمزيد من المعلومات، يرجى زيارة <a href="http://www.orbeon.com/download" target="_blank">موقع Orbeon على الويب</a>.</p>
+                </div>
+            </message>
+        </dialog-pe>
+        <dialog-email-settings>
+            <label>إعدادات البريد الإلكتروني</label>
+            <templates>قوالب البريد الإلكتروني</templates>
+            <template-name>
+                <label>اسم قالب البريد الإلكتروني</label>
+                <hint>هذا الاسم غير مرئي للمستخدمين النهائيين؛ يتم استخدامه في العمليات، على سبيل المثال: email(template = "notify-user")</hint>
+            </template-name>
+            <language>
+                <label>اللغة</label>
+                <any-language>أي لغة</any-language>
+            </language>
+            <headers>
+                <from>المرسل</from>
+                <to>المستلم</to>
+                <cc>نسخة كربونية</cc>
+                <bcc>نسخة كربونية مخفية</bcc>
+                <reply-to>الرد إلى</reply-to>
+            </headers>
+            <header-value-types>
+                <control-value>قيمة عنصر التحكم</control-value>
+                <expression>صيغة</expression>
+                <text>نص</text>
+            </header-value-types>
+            <enable-if-true>تمكين هذا القالب فقط إذا قيمت الصيغة التالية إلى صحيح</enable-if-true>
+            <subject>موضوع البريد الإلكتروني</subject>
+            <body>محتوى البريد الإلكتروني</body>
+            <use-html>استخدام HTML</use-html>
+            <attach-form-as>إرفاق النموذج كـ</attach-form-as>
+            <pdf>PDF</pdf>
+            <xml>XML</xml>
+            <attach-files>
+                <label>إرفاق الملفات التي قام المستخدمون بتحميلها إلى النموذج</label>
+                <choices>
+                    <all>الكل</all>
+                    <none>لا شيء</none>
+                    <selected>المرفقات المحددة</selected>
+                </choices>
+            </attach-files>
+            <exclude-from-all-control-values>استبعاد من كل قيم عناصر التحكم</exclude-from-all-control-values>
+            <use-default>استخدام الافتراضي</use-default>
+            <delete-template>حذف القالب</delete-template>
+            <template-parameters>معلمات القالب</template-parameters>
+        </dialog-email-settings>
+        <dialog-permissions>
+            <label>الأذونات</label>
+            <enable-permissions>تمكين الأذونات لهذا النموذج</enable-permissions>
+            <role>الدور</role>
+            <permissions>الأذونات</permissions>
+            <operations>العمليات</operations>
+            <anyone>أي شخص</anyone>
+            <anyone-with-token>يتطلب رمز</anyone-with-token>
+            <any-authenticated-user>أي مستخدم مصادق عليه</any-authenticated-user>
+            <owner>المالك</owner>
+            <group-member>أعضاء المجموعة</group-member>
+            <create>إنشاء</create>
+            <read>قراءة</read>
+            <update>تحديث</update>
+            <delete>حذف</delete>
+            <list>قائمة</list>
+        </dialog-permissions>
+        <dialog-workflow>
+            <label>سير العمل والأذونات</label>
+
+            <custom-operations>تحديد عمليات مخصصة لهذا النموذج</custom-operations>
+            <operation-label>التسمية</operation-label>
+            <predefined-label>محدد مسبقاً</predefined-label>
+            <custom-label>مخصص</custom-label>
+            <available-to>متاح لـ</available-to>
+            <availability-to-anyone>أي شخص</availability-to-anyone>
+            <availability-to-no-one>لا أحد</availability-to-no-one>
+            <availability-to-users>المستخدمين الذين يطابقون القاعدة التالية</availability-to-users>
+            <availability-to-users-before>المستخدمين الذين يطابقون</availability-to-users-before>
+            <availability-to-users-after>من القواعد التالية</availability-to-users-after>
+            <workflow-stage>مرحلة سير العمل</workflow-stage>
+            <workflow-role>دور سير العمل</workflow-role>
+            <authentication-role>دور المصادقة</authentication-role>
+            <show-button>إظهار الزر على صفحة التفاصيل</show-button>
+            <any>أي</any>
+            <all>الكل</all>
+            <actions>الإجراءات</actions>
+            <no-action>لا إجراء</no-action>
+            <change-stage-action>تغيير المرحلة</change-stage-action>
+            <run-process-action>تنفيذ العملية</run-process-action>
+            <remove-operation>إزالة العملية</remove-operation>
+            <is>هو</is>
+            <is-not>ليس</is-not>
+
+            <stages>المراحل</stages>
+
+            <stage-name>اسم المرحلة</stage-name>
+            <default-stage>افتراضي</default-stage>
+
+            <operations>
+                <label>العمليات</label>
+                <item>
+                    <label>ملء نموذج جديد</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>قائمة وبحث البيانات</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>الوصول إلى البيانات للتحرير</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>الوصول إلى البيانات للعرض</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>الوصول إلى PDF/TIFF</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
+        </dialog-workflow>
+        <dialog-messages>
+            <label>الرسائل</label>
+            <language-header>اللغة</language-header>
+            <name-header>الاسم</name-header>
+            <value-header>القيمة</value-header>
+        </dialog-messages>
+        <xbl-control-settings>
+            <field-width>عرض الحقل</field-width>
+            <default>استخدام الافتراضي</default>
+            <full>كامل</full>
+            <natural>طبيعي</natural>
+            <field-align>محاذاة الحقل</field-align>
+            <left>يسار</left>
+            <right>يمين</right>
+            <learn-settings-below>تعرف على المزيد حول الإعدادات أدناه</learn-settings-below>
+        </xbl-control-settings>
+        <messages>
+            <delete-section>هل أنت متأكد من أنك تريد حذف القسم الحالي؟</delete-section>
+            <delete-grid>هل أنت متأكد من أنك تريد حذف الشبكة الحالية؟</delete-grid>
+            <delete-column>هل أنت متأكد من أنك تريد حذف العمود الحالي؟</delete-column>
+            <delete-row>هل أنت متأكد من أنك تريد حذف الصف الحالي؟</delete-row>
+            <delete-resources>هل أنت متأكد من أنك تريد حذف كافة الموارد للغة</delete-resources>
+            <delete-service>هل أنت متأكد من أنك تريد حذف الخدمة "{0}"؟{1,choice,0# لا يوجد إجراء يستخدمها.|1# يوجد إجراء واحد يستخدمها.|1&lt; {1,number,integer} إجراءات تستخدمها.}</delete-service>
+            <delete-action>هل أنت متأكد من أنك تريد حذف الإجراء "{0}"؟</delete-action>
+            <controls-will-be-deleted>{0,choice,0#لن يتم حذف أي عنصر تحكم|1#سيتم حذف عنصر تحكم واحد|1&lt;سيتم حذف {0,number,integer} عناصر تحكم}.</controls-will-be-deleted>
+            <metadata-edit-title>بيانات وصفية للنموذج</metadata-edit-title>
+            <select-template-output>الرجاء اختيار قالب نموذج لاستخدامه كنقطة بداية.</select-template-output>
+            <app-form-optional>إذا رغبت، يمكنك تقديم اسم تطبيق واسم نموذج لتحديد نموذجك الآن. إذا كنت لا تعرف بعد ما ستدخله، يمكنك القيام بذلك لاحقاً. سيُطلب منك ذلك قبل أن تتمكن من حفظ أو نشر نموذجك.</app-form-optional>
+            <app-form-required>الرجاء تقديم اسم تطبيق واسم نموذج لتحديد نموذجك. هذه المعلومات ضرورية قبل أن تتمكن من حفظ أو نشر نموذجك.</app-form-required>
+            <save-as-metadata-output>أدخل اسم تطبيق جديد واسم نموذج ليتم استخدامهما لنسخة من هذا النموذج:</save-as-metadata-output>
+            <xpath-errors>هناك {0,choice,1#خطأ واحد في XPath|1&lt;{0,number,integer} أخطاء في الصيغ} في نموذجك.</xpath-errors>
+            <lhha-checkbox>حدد هذا المربع إذا كنت ترغب في كتابة علامات HTML</lhha-checkbox>
+        </messages>
+        <alerts>
+            <required>القيمة مطلوبة</required>
+            <xpath>تعبير XPath غير صحيح</xpath>
+        </alerts>
+        <template>
+            <untitled-form>نموذج بدون عنوان</untitled-form>
+            <items>
+                <item>
+                    <label>الخيار الأول</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>الخيار الثاني</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>الخيار الثالث</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+            </items>
+        </template>
+    </resource>
 </resources>

@@ -36,6 +36,7 @@
             <display-name lang="nl">Afbeelding</display-name>
             <display-name lang="pt">Imagem</display-name>
             <display-name lang="sv">Bild</display-name>
+            <display-name lang="ar">صورة</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-image</icon-class>
             </icon>

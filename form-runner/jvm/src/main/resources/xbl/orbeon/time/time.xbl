@@ -48,6 +48,7 @@
             <display-name lang="nl">Tijd</display-name>
             <display-name lang="sv">Tid</display-name>
             <display-name lang="pt">Hora</display-name>
+            <display-name lang="ar">الوقت</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-clock-o</icon-class>
             </icon>

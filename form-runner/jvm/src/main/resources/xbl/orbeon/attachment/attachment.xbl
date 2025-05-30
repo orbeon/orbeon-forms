@@ -37,6 +37,7 @@
             <display-name lang="sv">Fil som bilaga</display-name>
             <display-name lang="nl">Bestandsbijlage</display-name>
             <display-name lang="pt">Anexar ficheiro</display-name>
+            <display-name lang="ar">مرفق ملف واحد</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-o</icon-class>
             </icon>

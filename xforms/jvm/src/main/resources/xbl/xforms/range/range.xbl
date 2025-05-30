@@ -26,6 +26,7 @@
             <display-name lang="sv" todo="true">[Range]</display-name>
             <display-name lang="pt" todo="true">[Range]</display-name>
 			<display-name lang="da" todo="true">[Range]</display-name>
+            <display-name lang="ar">نطاق</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

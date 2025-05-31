@@ -137,6 +137,8 @@ object PersistenceProxyPermissions {
             }
         }
 
+      // We allow creating and deleting attachments with the update permissions, as the update permission applies to
+      // form data, and updating form data might require adding or removing attachments.
       val requestedAnyOfOp =
         crudMethod match {
           case HttpMethod.GET | HttpMethod.HEAD                             => List(Operation.Read)

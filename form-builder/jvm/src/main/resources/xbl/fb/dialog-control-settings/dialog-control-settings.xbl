@@ -1203,6 +1203,9 @@
                                                         event="DOMActivate"
                                                         ref="$i/control-name"
                                                         value="$suggestion"/>
+                                                    <xf:setfocus
+                                                        event="DOMActivate"
+                                                        control="control-name-input"/>
                                                 </xf:trigger>
                                             </xh:td>
                                         </xh:tr>

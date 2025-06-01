@@ -167,7 +167,7 @@ val CoreLibraryDependencies = Seq(
 val RedisLibraryDependencies = Seq(
   "org.redisson"                % "redisson-all"                    % "3.47.0",
   "org.redisson"                % "redisson-tomcat-9"               % "3.47.0",
-  "org.apache.fury"             % "fury-core"                       % "0.10.2"
+  "org.apache.fury"             % "fury-core"                       % "0.10.3"
 )
 
 val ExplodedWarLibPath            = "build/orbeon-war/WEB-INF/lib"

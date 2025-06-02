@@ -78,6 +78,9 @@ class Form(
     ErrorPanel.initializeErrorPanel(elem) getOrElse
       (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))
 
+  // https://github.com/orbeon/orbeon-forms/issues/6960
+  var allowClientDataStatus: Boolean = false
+
   // https://github.com/orbeon/orbeon-forms/issues/4286
   private var _formDataSafe: Boolean = true
 

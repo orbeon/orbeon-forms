@@ -656,6 +656,16 @@
                         then $property
                         else xxf:evaluate-avt($property) = 'true'
                     "/>
+            <xsl:if test="$is-detail">
+                <xf:action
+                    event    = "xforms-enabled"
+                    observer = "fr-data-safe">
+                    <xf:action type="javascript">
+                        <xf:param name="uuid" value="xxf:document-id()"/>
+                        <xf:body>ORBEON.fr.private.API.enableClientDataStatus(uuid)</xf:body>
+                    </xf:action>
+                </xf:action>
+            </xsl:if>
             <xf:action
                 event    = "xforms-enabled xforms-value-changed"
                 observer = "fr-data-safe fr-warn-when-data-unsafe">

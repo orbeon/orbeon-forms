@@ -1427,6 +1427,7 @@ object XFormsUI {
   def fieldValueChanged(targetElem: html.Element): Unit =
     // https://github.com/orbeon/orbeon-forms/issues/6960
     Page.findXFormsFormFromHtmlElem(targetElem)
+      .filter(_.allowClientDataStatus)
       .foreach(_.formDataSafe = false)
 
   private object Private {

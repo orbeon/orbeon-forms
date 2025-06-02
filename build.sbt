@@ -13,7 +13,7 @@ ThisBuild / githubOwner := "orbeon"
 ThisBuild / evictionErrorLevel := Level.Info
 
 lazy val scala213 = "2.13.16"
-lazy val scala3   = "3.6.4"
+lazy val scala3   = "3.7.0"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala213)
 
@@ -50,11 +50,11 @@ val ScalaLoggingVersion              = "3.9.4"
 val CatsVersion                      = "2.13.0"
 val CatsFs2Version                   = "3.12.0"
 val ScalaTestVersion                 = "3.2.19"
-val CirceVersion                     = "0.14.12"
-val EnumeratumVersion                = "1.7.6"
-val EnumeratumCirceVersion           = "1.7.5"
+val CirceVersion                     = "0.14.13"
+val EnumeratumVersion                = "1.9.0"
+val EnumeratumCirceVersion           = "1.9.0"
 val ShapelessVersion                 = "2.3.7"
-val ScalaXmlVersion                  = "2.3.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaXmlVersion                  = "2.4.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaParallelCollectionsVersion  = "1.2.0"
 val ScalaAsyncVersion                = "1.0.1"
 val Parboiled2Version                = "2.5.1"
@@ -87,7 +87,7 @@ val JavaxServletApiVersion           = "4.0.1"
 val JakartaServletApiVersion         = "6.1.0"
 val PortletApiVersion                = "3.0.1"
 val LiferayPortalServiceVersion      = "6.2.5"
-val LiferayPortalKernelVersion       = "159.0.0"
+val LiferayPortalKernelVersion       = "163.0.0"
 
 
 val CoreLibraryDependencies = Seq(
@@ -718,7 +718,7 @@ lazy val formRunnerJVM = formRunner.jvm
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 
-    libraryDependencies                ++= Seq(
+    libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser"

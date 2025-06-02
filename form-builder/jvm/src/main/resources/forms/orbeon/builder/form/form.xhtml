@@ -116,44 +116,9 @@
             </xh:div>
 
             <xh:div class="fr-buttons">
-
-                <xf:var
-                    name="buttons-names"
-                    value="xxf:split(xxf:property('oxf.fr.detail.buttons.orbeon.builder'))"/>
-
-                <xf:repeat ref="$buttons-names">
-                    <xf:var name="button-name" value="."/>
-                    <xf:var name="primary"     value="position() = last()"/>
-                    <xf:var name="parts"       value="xxf:split($button-name, '|')[xxf:non-blank()]"/>
-                    <xf:var name="is-multiple" value="count($parts) gt 1"/>
-
-                    <xf:var
-                        name="class"
-                        value="
-                            concat(
-                                'xforms-trigger-appearance-xxforms-',
-                                if ($primary) then
-                                    'primary'
-                                else
-                                    'default'
-                            )"/>
-
-                    <fr:process-button
-                        name="{$button-name}"
-                        class="{$class}"
-                        ref="if ($is-multiple) then () else xxf:instance('fb-triggers-instance')/other"/>
-
-                    <fr:drop-trigger
-                        class="{$class}"
-                        ref="if (not($is-multiple)) then () else xxf:instance('fb-triggers-instance')/other">
-                        <xf:itemset ref="$parts">
-                            <xf:label value="xxf:r(concat('buttons.', .), '|fr-fr-resources|')"/>
-                            <xf:value value="."/>
-                        </xf:itemset>
-                    </fr:drop-trigger>
-
-                </xf:repeat>
-
+                <fr:buttons-bar
+                    buttons-property="oxf.fr.detail.buttons"
+                    visibility-property="oxf.fr.detail.button"/>
             </xh:div>
         </xh:div>
 

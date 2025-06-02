@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.oxf.util as u
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
@@ -383,25 +384,29 @@ trait ProcessInterpreter extends Logging {
     ).asInstanceOf[BooleanValue].getBooleanValue
 
   def evaluateString(
-    expr    : String,
-    item    : om.Item          = xpathContext,
-    mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+    expr     : String,
+    item     : om.Item                                         = xpathContext,
+    mapping  : NamespaceMapping                                = ProcessInterpreter.StandardNamespaceMapping,
+    variables: collection.Map[String, ValueRepresentationType] = null
   ): String =
     evaluateOne(
-      expr    = u.StaticXPath.makeStringExpression(expr),
-      item    = item,
-      mapping = mapping
+      expr      = u.StaticXPath.makeStringExpression(expr),
+      item      = item,
+      mapping   = mapping,
+      variables = variables
     ).getStringValue
 
   def evaluateOne(
-    expr    : String,
-    item    : om.Item          = xpathContext,
-    mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+    expr     : String,
+    item     : om.Item                                         = xpathContext,
+    mapping  : NamespaceMapping                                = ProcessInterpreter.StandardNamespaceMapping,
+    variables: collection.Map[String, ValueRepresentationType] = null
   ): om.Item =
     evalOne(
       item            = item,
       expr            = expr,
       namespaces      = mapping,
+      variables       = variables,
       functionContext = xpathFunctionContext
     )
 

@@ -24,6 +24,7 @@ import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.{Defaults, OXFException}
 import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.fr.FormRunner.formRunnerPropertyWithNs
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
@@ -45,7 +46,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.value.StringValue
+import org.orbeon.saxon.value.{Int64Value, StringValue}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -55,7 +56,7 @@ import org.orbeon.xml.NamespaceMapping
 import java.net.URI
 import java.util as ju
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase
@@ -702,14 +703,73 @@ trait FormRunnerPersistence {
       setvalue(List(instance.rootElement), value)
     }
 
-  // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
-  // the client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
-  // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now,
-  // we just use .bin as an extension.
-  def createAttachmentFilename(url: String, basePath: String): String = {
+  private def uploadedAttachmentFilename(
+    url           : String,
+    liveData      : DocumentNodeInfoType)(implicit
+    indentedLogger: IndentedLogger
+  ): String = {
+
+    val randomFileId             = CoreCrossPlatformSupport.randomHexId
+    val defaultFilename          = s"$randomFileId.bin"
+    val path                     = new URI(url).getPath
+    val filename                 = PathUtils.getFirstQueryParameter(url, "filename").getOrElse(PathUtils.filenameFromPath(path))
+    val (baseName, extensionOpt) = FileUtils.baseNameAndExtension(filename)
+    val mediaType                = PathUtils.getFirstQueryParameter(url, "mediatype").getOrElse(ContentTypes.OctetStreamContentType)
+    val sizeOpt                  = PathUtils.getFirstQueryParameter(url, "size").map(_.toLong)
+
+    val PropertyName             = "oxf.fr.persistence.attachments.filename"
+
+    val filenameExpressionAndMappingsOpt = for {
+      (expression, ns)  <- formRunnerPropertyWithNs(PropertyName)(FormRunnerParams())
+      trimmedExpression <- expression.trimAllToOpt
+    } yield (trimmedExpression, ns)
+
+    filenameExpressionAndMappingsOpt match {
+      case None =>
+        // No property, use default filename
+        defaultFilename
+
+      case Some((expression, ns)) =>
+
+        // Variables that can be used by the XPath expression
+        val variables =
+          Map(
+            "fr-attachment-id"         -> randomFileId,
+            "fr-attachment-filename"   -> filename,
+            "fr-attachment-basename"   -> baseName,
+            "fr-attachment-extension"  -> extensionOpt.map("." + _).getOrElse(""),
+            "fr-attachment-media-type" -> mediaType
+          ).map { kv =>
+            kv._1 -> new StringValue(kv._2)
+          } ++
+            sizeOpt.map(size => "fr-attachment-size" -> new Int64Value(size)).toMap
+
+        Try(process.SimpleProcess.evaluateString(expression, liveData, ns, variables)) match {
+          case Success(filename) =>
+            // Make sure the resulting string can be used as a filename
+            FileUtils.sanitizedFilename(filename)
+
+          case Failure(throwable) =>
+            indentedLogger.logError(
+              "",
+              s"Error while evaluating expression '$expression' from property '$PropertyName': ${throwable.getMessage}",
+              throwable
+            )
+
+            throw throwable
+        }
+    }
+  }
+
+  def createAttachmentFilename(
+    url           : String,
+    basePath      : String,
+    liveData      : DocumentNodeInfoType)(implicit
+    indentedLogger: IndentedLogger
+  ): String = {
     val filename =
       if (isUploadedFileURL(url))
-        CoreCrossPlatformSupport.randomHexId + ".bin"
+        uploadedAttachmentFilename(url, liveData)
       else
         getAttachmentPathFilenameRemoveQuery(url)
 
@@ -978,7 +1038,7 @@ trait FormRunnerPersistence {
         getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
         pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        afterUrl          = createAttachmentFilename(beforeUrl, toBasePath)
+        afterUrl          = createAttachmentFilename(beforeUrl, toBasePath, liveData)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
         putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.content.stream, pathToHolder, resolvedPutUri, formVersion, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))

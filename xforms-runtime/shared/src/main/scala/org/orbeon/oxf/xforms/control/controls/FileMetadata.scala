@@ -69,10 +69,12 @@ trait FileMetadata extends XFormsValueControl {
     props.values foreach (_.handleMarkDirty())
 
   // Getters
-  def state        (collector: ErrorEventCollector): String         = props("state")    .value(collector)
-  def fileMediatype(collector: ErrorEventCollector): Option[String] = props("mediatype").value(collector).trimAllToOpt
-  def filename     (collector: ErrorEventCollector): Option[String] = props("filename") .value(collector).trimAllToOpt
-  def fileSize     (collector: ErrorEventCollector): Option[String] = props("size")     .value(collector).trimAllToOpt
+  def state            (collector: ErrorEventCollector): String         = props("state")         .value(collector)
+  def fileMediatype    (collector: ErrorEventCollector): Option[String] = props("mediatype")     .value(collector).trimAllToOpt
+  def filename         (collector: ErrorEventCollector): Option[String] = props("filename")      .value(collector).trimAllToOpt
+  def fileSize         (collector: ErrorEventCollector): Option[String] = props("size")          .value(collector).trimAllToOpt
+  def fileHashAlgorithm(collector: ErrorEventCollector): Option[String] = props("hash-algorithm").value(collector).trimAllToOpt
+  def fileHashValue    (collector: ErrorEventCollector): Option[String] = props("hash-value")    .value(collector).trimAllToOpt
 
   def iterateProperties(collector: ErrorEventCollector): Iterator[(String, Option[String])] = props.iterator map {
     case (k, v) => k -> Option(v.value(collector))
@@ -94,6 +96,14 @@ trait FileMetadata extends XFormsValueControl {
 
   def setFileSize(size: String, collector: ErrorEventCollector): Unit =
     staticFileMetadata.flatMap(_.sizeBinding).foreach(setMetadataValue(self, _, size, collector))
+
+  def setFileHashAlgorithm(hashAlgorithm: String, collector: ErrorEventCollector): Unit = {
+    staticFileMetadata.flatMap(_.hashAlgorithmBinding).foreach(setMetadataValue(self, _, hashAlgorithm, collector))
+  }
+
+  def setFileHashValue(hashValue: String, collector: ErrorEventCollector): Unit = {
+    staticFileMetadata.flatMap(_.hashValueBinding).foreach(setMetadataValue(self, _, hashValue, collector))
+  }
 
   def addFileMetadataAttributes(
     attributesImpl    : AttributesImpl,
@@ -141,9 +151,11 @@ object FileMetadata {
   private val Evaluators = Map[String, Evaluator](
     "state"             -> Evaluator((m, c) => if (m.getValue(c).isAllBlank) "empty" else "file", "empty"),
 
-    "mediatype"         -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.mediatypeBinding).map(getMetadataValue(m, _, c)).orNull, null),
-    "filename"          -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.filenameBinding) .map(getMetadataValue(m, _, c)).orNull, null),
-    "size"              -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.sizeBinding)     .map(getMetadataValue(m, _, c)).orNull, null),
+    "mediatype"         -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.mediatypeBinding)    .map(getMetadataValue(m, _, c)).orNull, null),
+    "filename"          -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.filenameBinding)     .map(getMetadataValue(m, _, c)).orNull, null),
+    "size"              -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.sizeBinding)         .map(getMetadataValue(m, _, c)).orNull, null),
+    "hash-algorithm"    -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.hashAlgorithmBinding).map(getMetadataValue(m, _, c)).orNull, null),
+    "hash-value"        -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.hashValueBinding)    .map(getMetadataValue(m, _, c)).orNull, null),
 
     "progress-state"    -> Evaluator((m, _) => progress(m).map    (_.state.name)                  .orNull, null),
     "progress-received" -> Evaluator((m, _) => progress(m).map    (_.receivedSize.toString)       .orNull, null),

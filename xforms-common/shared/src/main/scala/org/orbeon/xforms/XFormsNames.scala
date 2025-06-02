@@ -191,6 +191,8 @@ object XFormsNames {
   val XFORMS_MEDIATYPE_QNAME        = xformsQName("mediatype")
   val XXFORMS_DOWNLOAD_QNAME        = xxformsQName("download")
   val XXFORMS_SIZE_QNAME            = xxformsQName("size")
+  val XXFORMS_HASH_ALGORITHM_QNAME  = xxformsQName("hash-algorithm")
+  val XXFORMS_HASH_VALUE_QNAME      = xxformsQName("hash-value")
   val XXFORMS_TITLE_QNAME           = xxformsQName("title")
   val XXFORMS_ALT_QNAME             = xxformsQName("alt")
   val XXFORMS_MAXLENGTH_QNAME       = xxformsQName("maxlength")

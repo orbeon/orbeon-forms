@@ -138,6 +138,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                   Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
                   Option(storeEvent.contentType),
                   Option(storeEvent.contentLength),
+                  Option(storeEvent.hashAlgorithm),
+                  Option(storeEvent.hashValue),
                   collector
                 )
                 visitWithAncestors()
@@ -182,27 +184,31 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   def getUploadUniqueId: String = effectiveId
 
   private def handleUploadedFile(
-    value    : String,
-    filename : Option[String],
-    mediatype: Option[String],
-    size     : Option[String],
-    collector: ErrorEventCollector
+    value        : String,
+    filename     : Option[String],
+    mediatype    : Option[String],
+    size         : Option[String],
+    hashAlgorithm: Option[String],
+    hashValue    : Option[String],
+    collector    : ErrorEventCollector
   ): Unit =
     if (size.exists(_ != "0") || filename.exists(_ != ""))
-      storeExternalValueAndMetadata(value, filename, mediatype, size, collector)
+      storeExternalValueAndMetadata(value, filename, mediatype, size, hashAlgorithm, hashValue, collector)
 
   // This can only be called from the client to clear the value
   override def storeExternalValue(value: String, collector: ErrorEventCollector): Unit = {
     assert(value == "")
-    storeExternalValueAndMetadata(value, None, None, None, collector)
+    storeExternalValueAndMetadata(value, None, None, None, None, None, collector)
   }
 
   private def storeExternalValueAndMetadata(
-    rawNewValue : String,
-    filename    : Option[String],
-    mediatype   : Option[String],
-    size        : Option[String],
-    collector   : ErrorEventCollector
+    rawNewValue  : String,
+    filename     : Option[String],
+    mediatype    : Option[String],
+    size         : Option[String],
+    hashAlgorithm: Option[String],
+    hashValue    : Option[String],
+    collector    : ErrorEventCollector
   ): Unit =
     try {
 
@@ -245,10 +251,12 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       // obtain the new data, and control diffs wouldn't work properly. This was done for XFormsSubmissionUtils,
       // which is now modified to use boundFileMediatype/boundFilename instead.
 
-      // Filename, mediatype and size
+      // Filename, mediatype, size, and hash
       setFilename(filename.getOrElse(""), collector)
       setFileMediatype(mediatype.getOrElse(""), collector)
       setFileSize(size.getOrElse(""), collector)
+      setFileHashAlgorithm(hashAlgorithm.getOrElse(""), collector)
+      setFileHashValue(hashValue.getOrElse(""), collector)
 
     } catch {
       case NonFatal(t) => throw new ValidationException(t, getLocationData)
@@ -422,12 +430,14 @@ object XFormsUploadControl {
   // NOTE: This is very similar to `storeExternalValueAndMetadata` but this doesn't depend on the
   // actual control.
   def updateExternalValueAndMetadata(
-    boundNode   : om.NodeInfo,
-    rawNewValue : String,
-    filename    : Option[String],
-    mediatype   : Option[String],
-    size        : Long)(implicit
-    logger      : IndentedLogger
+    boundNode     : om.NodeInfo,
+    rawNewValue   : String,
+    filename      : Option[String],
+    mediatype     : Option[String],
+    size          : Long,
+    hashAlgorithm : Option[String] = None,
+    hashValue     : Option[String] = None)(implicit
+    logger        : IndentedLogger
   ): Unit = {
 
     val sizeStringOpt = size.toString.some
@@ -457,9 +467,11 @@ object XFormsUploadControl {
     )
 
     List(
-      "filename"  -> filename,
-      "mediatype" -> mediatype,
-      "size"      -> sizeStringOpt
+      "filename"       -> filename,
+      "mediatype"      -> mediatype,
+      "size"           -> sizeStringOpt,
+      "hash-algorithm" -> hashAlgorithm,
+      "hash-value"     -> hashValue
     ) collect { case (name, Some(value)) =>
       XFormsAPI.setvalue(
         boundNode /@ name,

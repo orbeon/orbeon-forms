@@ -117,9 +117,11 @@ private object TriggerControl {
 trait WithFileMetadata extends ElementAnalysis{
   self: ElementAnalysis =>
 
-  val mediatypeBinding: Option[SingleItemBinding]
-  val filenameBinding : Option[SingleItemBinding]
-  val sizeBinding     : Option[SingleItemBinding]
+  val mediatypeBinding    : Option[SingleItemBinding]
+  val filenameBinding     : Option[SingleItemBinding]
+  val sizeBinding         : Option[SingleItemBinding]
+  val hashAlgorithmBinding: Option[SingleItemBinding]
+  val hashValueBinding    : Option[SingleItemBinding]
 }
 
 class UploadControl(
@@ -133,10 +135,12 @@ class UploadControl(
   scope            : Scope,
   containerScope   : Scope
 )(
-  val multiple        : Boolean,
-  val mediatypeBinding: Option[SingleItemBinding],
-  val filenameBinding : Option[SingleItemBinding],
-  val sizeBinding     : Option[SingleItemBinding],
+  val multiple            : Boolean,
+  val mediatypeBinding    : Option[SingleItemBinding],
+  val filenameBinding     : Option[SingleItemBinding],
+  val sizeBinding         : Option[SingleItemBinding],
+  val hashAlgorithmBinding: Option[SingleItemBinding],
+  val hashValueBinding    : Option[SingleItemBinding],
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) with WithFileMetadata {
 
   override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ UploadControl.ExternalEvents

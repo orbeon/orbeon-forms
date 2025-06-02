@@ -25,10 +25,12 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.FileItemSupport.*
 import org.orbeon.oxf.util.Multipart.UploadItem
+import org.orbeon.oxf.util.SecureUtils
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
@@ -41,7 +43,9 @@ import org.orbeon.xforms.Constants
 import org.slf4j
 import shapeless.syntax.typeable.*
 
+import java.io.File
 import java.net.URI
+import java.nio.file.Files
 import scala.collection.mutable as m
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
@@ -51,12 +55,14 @@ import scala.util.{Failure, Success, Try}
 object UploaderServer extends UploaderServer {
 
   case class UploadResponse(
-    fieldName   : String,
-    messageOpt  : Option[String],
-    mediatypeOpt: Option[String],
-    filenameOpt : Option[String],
-    tmpFileUri  : URI,
-    actualSize  : Long
+    fieldName     : String,
+    messageOpt    : Option[String],
+    mediatypeOpt  : Option[String],
+    filenameOpt   : Option[String],
+    tmpFileUri    : URI,
+    actualSize    : Long,
+    hashAlgorithm : String,
+    hashValue     : String
   )
 
   protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
@@ -177,27 +183,39 @@ trait UploaderServer {
     val mediatypeOpt = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse diskFileItem.nonBlankContentTypeOpt
     val filenameOpt  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse diskFileItem.nonBlankClientFilenameOpt
 
-    val (tmpFileUri, actualSize) = contentFromFileScanResultOrDiskItem(fileScanAcceptResultOpt, diskFileItem)
+    val (tmpFileUri, actualSize, hashAlgorithm, hashValue) = contentFromFileScanResultOrDiskItem(fileScanAcceptResultOpt, diskFileItem)
 
-    UploadResponse(
-      fieldName    = fieldName,
-      messageOpt   = messageOpt,
-      mediatypeOpt = mediatypeOpt,
-      filenameOpt  = filenameOpt,
-      tmpFileUri   = tmpFileUri,
-      actualSize   = actualSize
+    val response = UploadResponse(
+      fieldName     = fieldName,
+      messageOpt    = messageOpt,
+      mediatypeOpt  = mediatypeOpt,
+      filenameOpt   = filenameOpt,
+      tmpFileUri    = tmpFileUri,
+      actualSize    = actualSize,
+      hashAlgorithm = hashAlgorithm,
+      hashValue     = hashValue
     )
+    response
+  }
+
+  private def computeFileHash(file: File): (String, String) = {
+    val hashAlgorithm = Properties.instance.getPropertySet.getString("oxf.crypto.hash-algorithm", "SHA-256")
+    val hashValue = SecureUtils.digestBytes(Files.readAllBytes(file.toPath), ByteEncoding.Hex)
+    (hashAlgorithm, hashValue)
   }
 
   private def contentFromFileScanResultOrDiskItem(
     fileScanAcceptResultOpt: Option[FileScanAcceptResult],
     diskFileItem           : DiskFileItem
-  ): (URI, Long) = {
+  ): (URI, Long, String, String) = {
 
-    def sessionUrlAndSizeFromFileScan: Option[(URI, Long)] =
+    def sessionUrlAndSizeAndHashFromFileScan: Option[(URI, Long, String, String)] =
       fileScanAcceptResultOpt.flatMap(_.content).map { is =>
         useAndClose(is) { _ =>
-          FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
+          val (uri, size) = FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
+          val file = new File(uri)
+          val (hashAlgorithm, hashValue) = computeFileHash(file)
+          (uri, size, hashAlgorithm, hashValue)
         }
       }
 
@@ -205,21 +223,22 @@ trait UploaderServer {
     // any chance a new file is created on disk at that time, it will be deleted separately as the request
     // completes. Here again we would create a new request-expired file, before renaming it and making
     // sure it expires with the session only.
-    def sessionUrlAndSizeFromFileItem: (URI, Long) = {
+    def sessionUrlAndSizeAndHashFromFileItem: (URI, Long, String, String) = {
 
       val newFile =
         FileItemSupport.renameAndExpireWithSession(
           FileItemSupport.urlForFileItemCreateIfNeeded(diskFileItem, ExpirationScope.Request)
         )
 
-      (newFile.toURI, newFile.length())
+      val (hashAlgorithm, hashValue) = computeFileHash(newFile)
+      (newFile.toURI, newFile.length(), hashAlgorithm, hashValue)
     }
 
 //    FileItemSupport.Logger.debug(
 //      s"UploaderServer got `FileItem` (disk location: `${fileItem.debugFileLocation}`)"
 //    )
 
-    sessionUrlAndSizeFromFileScan getOrElse sessionUrlAndSizeFromFileItem
+    sessionUrlAndSizeAndHashFromFileScan getOrElse sessionUrlAndSizeAndHashFromFileItem
   }
 
   // https://github.com/orbeon/orbeon-forms/issues/6738

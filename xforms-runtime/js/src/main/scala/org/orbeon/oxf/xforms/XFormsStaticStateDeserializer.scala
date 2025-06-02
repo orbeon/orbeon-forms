@@ -495,10 +495,12 @@ object XFormsStaticStateDeserializer {
 
               val uploadControl =
                 for {
-                    multiple         <- c.getOrElse[Boolean]("multiple")(false)
-                    mediatypeBinding <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
-                    filenameBinding  <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
-                    sizeBinding      <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
+                    multiple             <- c.getOrElse[Boolean]("multiple")(false)
+                    mediatypeBinding     <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
+                    filenameBinding      <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
+                    sizeBinding          <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
+                    hashAlgorithmBinding <- c.getOrElse[Option[SingleItemBinding]]("hashAlgorithmBinding")(None)
+                    hashValueBinding     <- c.getOrElse[Option[SingleItemBinding]]("hashValueBinding")(None)
                 } yield
                   new UploadControl(
                     index,
@@ -511,10 +513,12 @@ object XFormsStaticStateDeserializer {
                     scope,
                     containerScope
                   )(
-                    multiple         = multiple,
-                    mediatypeBinding = mediatypeBinding,
-                    filenameBinding  = filenameBinding,
-                    sizeBinding      = sizeBinding,
+                    multiple             = multiple,
+                    mediatypeBinding     = mediatypeBinding,
+                    filenameBinding      = filenameBinding,
+                    sizeBinding          = sizeBinding,
+                    hashAlgorithmBinding = hashAlgorithmBinding,
+                    hashValueBinding     = hashValueBinding,
                   )
 
               uploadControl.getOrElse(throw new NoSuchElementException) // XXX TODO
@@ -681,6 +685,8 @@ object XFormsStaticStateDeserializer {
                   mediatypeBinding     <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
                   filenameBinding      <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
                   sizeBinding          <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
+                  hashAlgorithmBinding <- c.getOrElse[Option[SingleItemBinding]]("hashAlgorithmBinding")(None)
+                  hashValueBinding     <- c.getOrElse[Option[SingleItemBinding]]("hashValueBinding")(None)
                 } yield
                   new OutputControl(
                     index,
@@ -700,7 +706,9 @@ object XFormsStaticStateDeserializer {
                     staticValue          = staticValue,
                     mediatypeBinding     = mediatypeBinding,
                     filenameBinding      = filenameBinding,
-                    sizeBinding          = sizeBinding
+                    sizeBinding          = sizeBinding,
+                    hashAlgorithmBinding = hashAlgorithmBinding,
+                    hashValueBinding     = hashValueBinding
                   )
 
               output.getOrElse(throw new NoSuchElementException) // XXX TODO

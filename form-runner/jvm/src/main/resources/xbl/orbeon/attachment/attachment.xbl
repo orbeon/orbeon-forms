@@ -43,7 +43,7 @@
             </icon>
             <templates>
                 <bind type="xf:anyURI"/>
-                <instance filename="" mediatype="" size=""/>
+                <instance filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
                 <view>
                      <fr:attachment id="" ref="" class="fr-attachment">
                         <xf:label ref=""/>
@@ -154,7 +154,7 @@
 
                 <!-- The upload takes place to the local instance first -->
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <_ filename="" mediatype="" size=""/>
+                    <_ filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
                 </xf:instance>
 
                 <!-- Propagate `base64Binary` -->
@@ -404,9 +404,11 @@
                             ref=".[not($disable-download)]"
                             class="fr-attachment-filename">
 
-                            <xf:label ref="@filename"/>
-                            <xf:filename  ref="@filename" />
-                            <xf:mediatype ref="@mediatype"/>
+                            <xf:label           ref="@filename"/>
+                            <xf:filename        ref="@filename" />
+                            <xf:mediatype       ref="@mediatype"/>
+                            <xxf:hash-algorithm ref="@hash-algorithm"/>
+                            <xxf:hash-value     ref="@hash-value"/>
                             <xf:header ref="fr:attachment-form-version()">
                                 <xf:name>Orbeon-Form-Definition-Version</xf:name>
                                 <xf:value value="."/>
@@ -485,9 +487,11 @@
                         }"
                         xxf:title="{xxf:label('fr-attachment')}">
 
-                        <xf:filename  ref="if ($readonly) then '' else @filename"/>
-                        <xf:mediatype ref="if ($readonly) then '' else @mediatype"/>
-                        <xxf:size     ref="if ($readonly) then '' else @size"/>
+                        <xf:filename        ref="if ($readonly) then '' else @filename"/>
+                        <xf:mediatype       ref="if ($readonly) then '' else @mediatype"/>
+                        <xxf:size           ref="if ($readonly) then '' else @size"/>
+                        <xxf:hash-algorithm ref="if ($readonly) then '' else @hash-algorithm"/>
+                        <xxf:hash-value     ref="if ($readonly) then '' else @hash-value"/>
 
                         <!-- Propagate the value to the binding *before* propagating the event (for #3061) -->
                         <xf:action event="xxforms-upload-done">

@@ -34,14 +34,16 @@ class OutputControl(
   scope                   : Scope,
   containerScope          : Scope
 )(
-  val isImageMediatype    : Boolean,
-  val isVideoMediatype    : Boolean,
-  val isHtmlMediatype     : Boolean,
-  val isDownloadAppearance: Boolean,
-  val staticValue         : Option[String], // TODO: `expressionOrConstant`
-  val mediatypeBinding    : Option[SingleItemBinding],
-  val filenameBinding     : Option[SingleItemBinding],
-  val sizeBinding         : Option[SingleItemBinding],
+  val isImageMediatype     : Boolean,
+  val isVideoMediatype     : Boolean,
+  val isHtmlMediatype      : Boolean,
+  val isDownloadAppearance : Boolean,
+  val staticValue          : Option[String], // TODO: `expressionOrConstant`
+  val mediatypeBinding     : Option[SingleItemBinding],
+  val filenameBinding      : Option[SingleItemBinding],
+  val sizeBinding          : Option[SingleItemBinding],
+  val hashAlgorithmBinding : Option[SingleItemBinding],
+  val hashValueBinding     : Option[SingleItemBinding],
 ) extends ValueControl(index, element, parent, preceding, staticId, prefixedId,  namespaceMapping,  scope,  containerScope)
      with OptionalSingleNode
      with WithFileMetadata {

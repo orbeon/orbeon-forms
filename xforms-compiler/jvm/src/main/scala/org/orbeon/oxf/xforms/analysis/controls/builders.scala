@@ -83,7 +83,9 @@ object OutputControlBuilder {
       staticValue          = staticValue,
       mediatypeBinding     = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       filenameBinding      = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
-      sizeBinding          = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _))
+      sizeBinding          = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      hashAlgorithmBinding = element.elementOpt(XXFORMS_HASH_ALGORITHM_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      hashValueBinding     = element.elementOpt(XXFORMS_HASH_VALUE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _))
     )
   }
 }
@@ -527,10 +529,12 @@ object UploadControlBuilder {
       scope,
       containerScope
     )(
-      multiple         = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME).contains("true"),
-      mediatypeBinding = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
-      filenameBinding  = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
-      sizeBinding      = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _))
+      multiple             = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME).contains("true"),
+      mediatypeBinding     = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      filenameBinding      = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      sizeBinding          = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      hashAlgorithmBinding = element.elementOpt(XXFORMS_HASH_ALGORITHM_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      hashValueBinding     = element.elementOpt(XXFORMS_HASH_VALUE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _))
     )
 
   def makeSingleItemBinding(

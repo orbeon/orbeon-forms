@@ -176,11 +176,13 @@ class XXFormsUploadStoreEvent(target: XFormsEventTarget, properties: PropertyGet
   def filename      = property[String]("filename").get
   def contentType   = property[String](Headers.ContentTypeLower).get
   def contentLength = property[String](Headers.ContentLengthLower).get // comes as String from the client
+  def hashAlgorithm = property[String]("hash-algorithm").get
+  def hashValue     = property[String]("hash-value").get
 }
 
 object XXFormsUploadStoreEvent {
   val StandardProperties = Map(
-    EventNames.XXFormsUploadStore -> List("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
+    EventNames.XXFormsUploadStore -> List("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower, "hash-algorithm", "hash-value")
   )
 }
 

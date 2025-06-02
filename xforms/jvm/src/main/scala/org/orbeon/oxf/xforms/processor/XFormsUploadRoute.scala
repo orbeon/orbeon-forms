@@ -69,7 +69,7 @@ object XFormsUploadRoute extends XmlNativeRoute {
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
             for {
-              UploadResponse(fieldName, messageOpt, mediatypeOpt, filenameOpt, sessionUrl, actualSize) <- uploadResponses
+              UploadResponse(fieldName, messageOpt, mediatypeOpt, filenameOpt, sessionUrl, actualSize, hashAlgorithm, hashValue) <- uploadResponses
               effectiveMediatypeOpt = Mediatypes.fromHeadersOrFilename(_ => mediatypeOpt, filenameOpt)
             } yield
               <xxf:event
@@ -79,6 +79,8 @@ object XFormsUploadRoute extends XmlNativeRoute {
                 filename          = {filenameOpt.getOrElse("")}
                 content-type      = {effectiveMediatypeOpt.map(_.toString).getOrElse("")}
                 content-length    = {actualSize.toString}
+                hash-algorithm    = {hashAlgorithm}
+                hash-value        = {hashValue}
                 messsage          = {messageOpt.getOrElse("")}/>
           }</xxf:events>
         )

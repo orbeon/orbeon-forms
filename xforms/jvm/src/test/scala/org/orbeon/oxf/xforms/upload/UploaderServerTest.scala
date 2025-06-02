@@ -80,7 +80,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
           .processUpload(makeContentRequest)
 
         uploadResponses
-          .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize)  =>
+          .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize, _, _)  =>
             assert(filenameOpt.contains("miserables-8000.txt"))
             assert(actualSize == 8000)
             assert(mediatypeOpt.contains("text/plain"))
@@ -129,7 +129,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
             .processUpload(makeContentRequest)
 
           uploadResponses
-            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize) =>
+            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize, _, _) =>
               assert(filenameOpt.contains("miserables-8000.txt"))
               assert(actualSize == 8000)
               assert(mediatypeOpt.contains("text/plain"))
@@ -179,7 +179,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
             .processUpload(makeContentRequest)
 
           items
-            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize) =>
+            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize, _, _) =>
               assert(filenameOpt.contains("miserables-8000.txt"))
               assert(actualSize == 8000)
               assert(mediatypeOpt.contains("text/html"))
@@ -205,6 +205,31 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
         }
       }
   }
+
+  describe("Test hashing") {
+
+    it(s"must compute hash") {
+      withTestExternalContext { _ =>
+
+        val (uploadResponses, None) =
+          new TestUploaderServer(
+            maximumSize       = MaximumSize.UnlimitedSize,
+            maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
+            allowedMediatypes = AllowedMediatypes.AllowedAnyMediatype,
+            fileScanProvider  = None
+          )
+          .processUpload(makeContentRequest)
+
+        uploadResponses
+          .foreach { case UploadResponse(_, _, _, _, _, _, hashAlgorithm, hashValue)  =>
+            assert(hashAlgorithm == "SHA-256")
+            assert(hashValue     == "6321d88b3e42789ba3a10bc29abe58ec9d51487137e5f86aa6a829b3f5b013e6")
+        }
+      }
+    }
+
+  }
+
 
   def buildMultipartContent(
     is          : InputStream,

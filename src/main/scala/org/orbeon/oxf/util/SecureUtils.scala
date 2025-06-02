@@ -151,7 +151,7 @@ object SecureUtils extends SecureUtilsTrait {
   private def getKeyLength: Int =
     Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128)
 
-  private def getHashAlgorithm: String =
+  def getHashAlgorithm: String =
     Properties.instance.getPropertySet.getString(HashAlgorithmProperty, DigestAlgorithm)
 
   private def getPreferredProvider: Option[String] =
@@ -244,6 +244,21 @@ object SecureUtils extends SecureUtilsTrait {
     val messageDigest = MessageDigest.getInstance(algorithm)
     messageDigest.update(bytes)
     withEncoding(messageDigest.digest, encoding)
+  }
+
+  def digestStream(
+    inputStream : java.io.InputStream,
+    algorithm   : String = getHashAlgorithm
+  ): String = {
+    val messageDigest = MessageDigest.getInstance(algorithm)
+    val buffer        = new Array[Byte](8192) // 8KB buffer
+
+    Iterator
+      .continually(inputStream.read(buffer))
+      .takeWhile(_ != -1)
+      .foreach(bytesRead => messageDigest.update(buffer, 0, bytesRead))
+
+    withEncoding(messageDigest.digest, ByteEncoding.Hex)
   }
 
   def hmacStringWeakJava(text: String): String =

@@ -199,8 +199,8 @@ trait UploaderServer {
   }
 
   private def computeFileHash(file: File): (String, String) = {
-    val hashAlgorithm = Properties.instance.getPropertySet.getString("oxf.crypto.hash-algorithm", "SHA-256")
-    val hashValue = SecureUtils.digestBytes(Files.readAllBytes(file.toPath), ByteEncoding.Hex)
+    val hashAlgorithm = SecureUtils.getHashAlgorithm
+    val hashValue     = useAndClose(Files.newInputStream(file.toPath))(SecureUtils.digestStream(_))
     (hashAlgorithm, hashValue)
   }
 

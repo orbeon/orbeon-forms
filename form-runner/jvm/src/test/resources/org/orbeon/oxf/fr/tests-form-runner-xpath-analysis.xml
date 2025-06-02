@@ -160,6 +160,7 @@
 
         </output>
     </test>
+
     <test description="#7000: Add dependency support for `fr:app-name()`, etc." name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -266,6 +267,70 @@
                         <analysis expression="string((fr:attachment-form-version())[1])" analyzed="true"/>
                     </value>
                 </output>
+            </root>
+        </output>
+    </test>
+
+    <test description="#6980: Add dependency support for `fr:component-param-value()`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model
+                         xxf:xpath-analysis="true"
+                         id="m"
+                         xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                        <xf:instance id="i">
+                            <_/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xf:output id="foo-output" value="fr:component-param-value('my-param')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:foo id="foo-1"/>
+                    <fr:foo id="foo-2" my-param="my-value"/>
+                    <!-- Dependencies for AVT parameters are not supported yet -->
+                    <fr:foo id="foo-3" my-param="{'my-value'}"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <foo scope="" prefixed-id="foo-1" model-prefixed-id="m" binding="false" value="false">
+                    <template scope="foo-1" prefixed-id="foo-1≡xf-2" binding="false" value="false">
+                        <output scope="foo-1" prefixed-id="foo-1≡foo-output" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((fr:component-param-value('my-param'))[1])" analyzed="true"/>
+                            </value>
+                        </output>
+                    </template>
+                </foo>
+                <foo scope="" prefixed-id="foo-2" model-prefixed-id="m" binding="false" value="false">
+                    <template scope="foo-2" prefixed-id="foo-2≡xf-3" binding="false" value="false">
+                        <output scope="foo-2" prefixed-id="foo-2≡foo-output" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((fr:component-param-value('my-param'))[1])" analyzed="true"/>
+                            </value>
+                        </output>
+                    </template>
+                </foo>
+                <foo scope="" prefixed-id="foo-3" model-prefixed-id="m" binding="false" value="false">
+                    <template scope="foo-3" prefixed-id="foo-3≡xf-4" binding="false" value="false">
+                        <output scope="foo-3" prefixed-id="foo-3≡foo-output" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((fr:component-param-value('my-param'))[1])" analyzed="false"/>
+                            </value>
+                        </output>
+                    </template>
+                </foo>
             </root>
         </output>
     </test>

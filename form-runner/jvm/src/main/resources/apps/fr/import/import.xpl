@@ -117,7 +117,7 @@
                         <!-- Only consider valid rows unless importing invalid ones is explicitly allowed -->
                         <xf:var
                             name="skip-row"
-                            value="$import-invalid-data or empty(index-of($invalid-rows, $rownum - 1))"/>
+                            value="not($import-invalid-data or empty(index-of($invalid-rows, $rownum - 1)))"/>
 
                         <xf:action if="$skip-row">
                             <xf:dispatch name="fr-maybe-process-next-row" targetid="fr-batch-import-model"/>

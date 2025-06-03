@@ -53,14 +53,12 @@ class XFormsOutputControl(
   with XFormsValueControl
   with ReadonlySingleNodeFocusableTrait
   with VisitableTrait
-  with FileMetadata {
+  with FileMetadata
+  with WithFormatTrait {
 
   override type Control <: OutputControl
 
   def supportedFileMetadata: Seq[String] = Seq("mediatype", "filename") // could add "state"?
-
-  // Optional format and mediatype
-  private def format: Option[String] = staticControlOpt flatMap (_.format)
 
   // Value attribute
   private val valueAttributeOpt = element.attributeValueOpt(VALUE_QNAME)
@@ -136,7 +134,7 @@ class XFormsOutputControl(
             internalValue
           case None =>
             // There is a single-node binding, so the format may be used
-            getValueUseFormat(format, collector) getOrElse internalValue
+            maybeEvaluateWithFormatOrDefaultFormat(collector).getOrElse(internalValue)
         }
       }
 

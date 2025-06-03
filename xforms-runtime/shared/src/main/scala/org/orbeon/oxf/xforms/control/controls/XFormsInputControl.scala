@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
@@ -42,17 +41,11 @@ class XFormsInputControl(
   element,
   _effectiveId
 ) with XFormsValueControl
-  with ReadonlySingleNodeFocusableTrait {
+  with ReadonlySingleNodeFocusableTrait
+  with WithFormatTrait
+  with WithUnformatTrait {
 
   override type Control <: InputControl
-
-  private def format   = staticControlOpt flatMap (_.format)
-  private def unformat = staticControlOpt flatMap (_.unformat)
-
-  private def unformatTransform(v: String, collector: ErrorEventCollector) = unformat match {
-    case Some(expr) => evaluateAsString(expr, Seq(stringToStringValue(v)), 1, collector, "translating exernal value") getOrElse ""
-    case None       => v
-  }
 
   override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     // The boolean input is rendered as a checkbox, so consider it visited on selection/deselection, to be consistent
@@ -81,9 +74,7 @@ class XFormsInputControl(
         normalizeBooleanString(internalValue)
       else
         // Other types or no type
-        // Format only if the format attribute is present. We don't use the default formats, because we don't
-        // yet have default "unformats".
-        format.flatMap(valueWithSpecifiedFormat(_, collector)) getOrElse internalValue
+        maybeEvaluateWithFormat(collector).getOrElse(internalValue)
 
     setExternalValue(updatedValue)
   }
@@ -94,12 +85,7 @@ class XFormsInputControl(
     collector    : ErrorEventCollector
   ): Option[String] = {
 
-    // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date
-    // formatted value
-    format foreach { _ =>
-      markExternalValueDirty()
-      containingDocument.controls.markDirtySinceLastRequest(false)
-    }
+    markExternalValueDirtyIfHasFormat()
 
     // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
     // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
@@ -129,7 +115,7 @@ class XFormsInputControl(
   }
 
   override def getFormattedValue(collector: ErrorEventCollector): Option[String] =
-    getValueUseFormat(format, collector) orElse Option(getExternalValue(collector))
+    maybeEvaluateWithFormatOrDefaultFormat(collector).orElse(Option(getExternalValue(collector)))
 
   def getFirstValueType: String = getBuiltinTypeName
 

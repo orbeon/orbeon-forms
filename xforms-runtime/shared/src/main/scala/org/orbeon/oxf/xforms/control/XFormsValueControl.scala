@@ -166,16 +166,6 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     // the controls as dirty, and they will be evaluated when necessary later.
   }
 
-  final protected def getValueUseFormat(
-    format             : Option[String],
-    collector          : ErrorEventCollector,
-    namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables
-  ): Option[String] =
-    format
-      .flatMap(valueWithSpecifiedFormat(_, collector, namespaceMapping, variableToValueMap))
-      .orElse(valueWithDefaultFormat(collector))
-
   // Formatted value for read-only output
   def getFormattedValue(collector: ErrorEventCollector): Option[String] = Option(getExternalValue(collector))
 

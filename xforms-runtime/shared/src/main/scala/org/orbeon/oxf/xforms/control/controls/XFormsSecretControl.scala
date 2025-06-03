@@ -17,6 +17,8 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.saxon.om
+
 
 // Represents an xf:secret control.
 class XFormsSecretControl(
@@ -30,10 +32,25 @@ class XFormsSecretControl(
   element,
   _effectiveId
 ) with XFormsValueControl
-  with SingleNodeFocusableTrait {
+  with SingleNodeFocusableTrait
+  with WithFormatTrait
+  with WithUnformatTrait {
 
-  override def getFormattedValue(collector: ErrorEventCollector): Option[String] = {
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
+    assert(isRelevant)
+    setExternalValue(maybeEvaluateWithFormat(collector).getOrElse(getValue(collector).ensuring(_ ne null)))
+  }
+
+  override def getFormattedValue(collector: ErrorEventCollector): Option[String] =
     Some(XFormsSecretControl.HiddenPasswordPlaceholder)
+
+  override def translateExternalValue(
+    boundItem    : om.Item,
+    externalValue: String,
+    collector    : ErrorEventCollector
+  ): Option[String] = {
+    markExternalValueDirtyIfHasFormat()
+    Option(containingDocument.staticState.sanitizeInput(unformatTransform(externalValue, collector)))
   }
 }
 

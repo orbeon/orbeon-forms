@@ -58,6 +58,10 @@ object ContentToken {
     def defaultContentType  : String = ContentTypes.XmlContentType
     def defaultSerialization: String = ContentTypes.XmlContentType
   }
+  case object Json extends ContentToken {
+    def defaultContentType  : String = ContentTypes.JsonContentType
+    def defaultSerialization: String = ContentTypes.JsonContentType
+  }
   case object Metadata extends ContentToken {
     def defaultContentType  : String = ContentTypes.XmlContentType
     def defaultSerialization: String = ContentTypes.XmlContentType
@@ -74,6 +78,7 @@ object ContentToken {
   def fromString(s: String): Set[ContentToken] =
     s.splitTo[Set]() flatMap {
       case "xml"         => ContentToken.Xml.some
+      case "json"        => ContentToken.Json.some
       case "metadata"    => ContentToken.Metadata.some
       case "attachments" => ContentToken.Attachments.some
       case rendered      => RenderedFormat.findRenderedFormatWithIsUrl(rendered).map((ContentToken.Rendered.apply _).tupled)
@@ -81,6 +86,7 @@ object ContentToken {
 
   def toString(contentToken: ContentToken): String = contentToken match {
     case ContentToken.Xml         => "xml"
+    case ContentToken.Json        => "json"
     case ContentToken.Metadata    => "metadata"
     case ContentToken.Attachments => "attachments"
     case ContentToken.Rendered(format, urlOnly) =>

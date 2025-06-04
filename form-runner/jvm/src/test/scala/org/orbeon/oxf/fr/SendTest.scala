@@ -237,5 +237,58 @@ class SendTest
         }
       }
     }
+
+    it("must be able to receive JSON") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "send-action", "new", initialize = true)
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+
+          XFormsAPI.dispatch(
+            name       = "my-run-process",
+            targetId   = Names.FormModel,
+            properties = Map(
+              "process" -> Some(
+                s"""
+                  send(
+                    uri     = "echo:",
+                    method  = "post",
+                    content = "json",
+                    replace = "text"
+                  )
+                """
+              )
+            )
+          )
+
+          val expectedFormatted = """{
+            "section-1": {
+              "control-1.1": "",
+              "grid-1": [
+                {
+                  "control-1.2": ""
+                }
+              ]
+            },
+            "section-2": {
+              "control-2.1": "",
+              "grid-2": [
+                {
+                  "control-2.2": ""
+                }
+              ]
+            }
+          }"""
+
+          val actualDoc          = instance("fr-send-submission-response").get.root
+          val actualString       = actualDoc.stringValue
+          val expectedNormalized = expectedFormatted.replaceAll("\\s", "")
+
+          assert(actualString == expectedNormalized)
+        }
+      }
+    }
   }
 }

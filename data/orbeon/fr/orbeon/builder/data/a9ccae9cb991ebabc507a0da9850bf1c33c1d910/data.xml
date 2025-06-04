@@ -26,6 +26,7 @@
                             <name-of-governing-body/>
                             <federal-tax-id-or-ssn>ein</federal-tax-id-or-ssn>
                             <ein/>
+                            <ein-or-ssn-combined/>
                             <ssn>078-05-1120</ssn>
                             <ssn-explanation/>
                         </grid-1>
@@ -120,6 +121,11 @@
                                  relevant="$federal-tax-id-or-ssn = 'ein'"/>
                         <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
                                  relevant="$federal-tax-id-or-ssn = 'ssn'"/>
+                        <xf:bind id="ein-or-ssn-combined-bind" ref="ein-or-ssn-combined"
+                                 name="ein-or-ssn-combined"
+                                 calculate="if ($federal-tax-id-or-ssn/string() = 'ein') then&#xA;    $ein&#xA;else&#xA;    $ssn"
+                                 readonly="false()"
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
                     </xf:bind>
 
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
@@ -504,11 +510,16 @@
 
 
                         </ein>
+                        <ein-or-ssn-combined>
+                            <label>EIN or SSN (combined)</label>
+                            <hint/>
+                        </ein-or-ssn-combined>
                         <ssn>
                             <label>SSN</label>
                             <hint/>
-
                             <alert>Make sure that you do not enter an actual personal SSN in this demo form.</alert>
+
+
 
 
 
@@ -618,7 +629,17 @@
 
                             </fr:us-ein>
                         </fr:c>
-                        <fr:c x="4" y="3" w="9" h="1"/>
+                        <fr:c x="4" y="3" w="9" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="ein-or-ssn-combined-control"
+                                       bind="ein-or-ssn-combined-bind"
+                                       fr:pdf-template-field-name="2">
+                                <xf:label ref="$form-resources/ein-or-ssn-combined/label"/>
+                                <xf:hint ref="$form-resources/ein-or-ssn-combined/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
 
                         <fr:c x="1" y="4" w="3">
                             <fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder" id="ssn-control" bind="ssn-bind"

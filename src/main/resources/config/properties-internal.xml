@@ -375,6 +375,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                   value="select-labels-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                  value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-output-field.*"                 value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-ssn.*"                       value="output-field"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state.*"                     value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"              value="attachment-metadata"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.string"              value="attachment-metadata"/>

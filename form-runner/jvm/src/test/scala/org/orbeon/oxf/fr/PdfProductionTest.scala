@@ -151,7 +151,7 @@ class PdfProductionTest
         // US State
         "CA - California",
         // US SSN
-        "078-05-1120",
+        "•••-••-1120",
         // US EIN
         "00-1234567",
         // Date

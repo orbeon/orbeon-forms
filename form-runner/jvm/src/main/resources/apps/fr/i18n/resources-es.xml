@@ -397,6 +397,7 @@
                 <expired>Tu sesión ha expirado</expired>
             </message>
             <renew-button>Renovar sesión</renew-button>
+            <reload-button>Recargar</reload-button>
         </session-expiration>
         <available-from>
             <message>Este formulario aún no está disponible</message>

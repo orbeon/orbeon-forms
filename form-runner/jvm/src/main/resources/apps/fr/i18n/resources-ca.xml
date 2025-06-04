@@ -385,6 +385,7 @@
                 <expired>La vostra sessió s'ha tancat.</expired>
             </message>
             <renew-button>Renovar la sessió</renew-button>
+            <reload-button>Recarregar</reload-button>
         </session-expiration>
         <available-from>
             <message>Aquest formulari encara no està disponible</message>

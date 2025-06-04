@@ -72,7 +72,7 @@
                 </view>
             </templates>
             <control-details>
-                <xf:model xmlns="" id="fb-editor-datetime-model">
+                <xf:model xmlns="" id="fb-editor-us-phone-model">
 
                     <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
                         <xf:var name="c" value="."/>
@@ -107,7 +107,7 @@
                     </xh:tr>
                 </fr:grid>
                 <xf:action
-                    id="fb-editor-datetime-action"
+                    id="fb-editor-us-phone-action"
                     event="xforms-value-changed"
                     observer="field-width-control">
 

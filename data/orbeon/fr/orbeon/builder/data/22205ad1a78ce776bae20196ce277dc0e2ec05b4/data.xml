@@ -10,7 +10,7 @@
         </xh:style>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
-            <!-- Main instance -->
+
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <section-3>
@@ -69,6 +69,10 @@
                             <second-date>2025-01-31</second-date>
                             <week-days/>
 
+                            <control-35/>
+                            <control-36/>
+                            <date-5-business-days/>
+
                         </grid-4>
                     </section-4>
                     <section-1>
@@ -114,7 +118,7 @@
                 </form>
             </xf:instance>
 
-            <!-- Bindings -->
+
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-3-bind" ref="section-3" name="section-3">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
@@ -178,6 +182,14 @@
                         <xf:bind id="second-date-bind" ref="second-date" name="second-date" type="xf:date"/>
                         <xf:bind id="week-days-bind" ref="week-days" name="week-days" calculate="for&#xA;    $start          in $first-date,&#xA;    $end            in $second-date,&#xA;    $startW         in xs:integer(format-date($start, '[F1]')),&#xA;    $endW           in xs:integer(format-date($end, '[F1]')),&#xA;    $days           in days-from-duration($end - $start),&#xA;    $daysNoWeekends in $days - (floor($days div 7) * 2)&#xA;return&#xA;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&#xA;    else if ($endW &lt; $startW) then $daysNoWeekends - 2&#xA;    else $daysNoWeekends" readonly="false()"/>
                         <xf:bind id="control-25-bind" ref="control-25" name="control-25"/>
+                        <xf:bind id="control-35-bind" ref="control-35" name="control-35"/>
+                        <xf:bind id="control-36-bind" ref="control-36" name="control-36"/>
+                        <xf:bind id="date-5-business-days-bind" ref="date-5-business-days" name="date-5-business-days" type="xf:date" constraint="count(
+    for $i in 1 to days-from-duration($date-5-business-days - current-date()) return
+    let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),
+        $is_business :=  xs:integer(format-date($current_date, '[F1]')) &lt;= 5
+    return if ($is_business) then $i else ()
+) &gt;= 5"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
@@ -222,7 +234,7 @@
 
             </xf:bind>
 
-            <!-- Metadata -->
+
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon-features</application-name>
@@ -361,10 +373,22 @@
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: #236fa1; font-family: andale mono, monospace;"&gt;let $isin := .&lt;br&gt;return&lt;br&gt;  (&lt;br&gt;    let&lt;br&gt;      $without-checksum := substring($isin, 1, 11),&lt;br&gt;      $letter-as-numbers-string :=&lt;br&gt;        string-join(&lt;br&gt;          for $code in string-to-codepoints($without-checksum)&lt;br&gt;          return&lt;br&gt;            if ($code &amp;gt;= string-to-codepoints('A') and&lt;br&gt;                string-to-codepoints('Z') &amp;gt;= $code) then&lt;br&gt;              (: Letters A-Z :)&lt;br&gt;              string($code - string-to-codepoints('A') + 10)&lt;br&gt;            else if ($code &amp;gt;= string-to-codepoints('0') and&lt;br&gt;                     string-to-codepoints('9') &amp;gt;= $code) then&lt;br&gt;              (: Digits 0-9 :)&lt;br&gt;              string($code - string-to-codepoints('0'))&lt;br&gt;              (: Unrecognized characters :)&lt;br&gt;            else&lt;br&gt;              '',&lt;br&gt;          ''&lt;br&gt;        ),&lt;br&gt;      $letter-as-numbers-digits :=&lt;br&gt;        for $code in string-to-codepoints($letter-as-numbers-string)&lt;br&gt;        return xs:decimal(codepoints-to-string($code)),&lt;br&gt;      $reversed-digits :=&lt;br&gt;        for $i in 1 to count($letter-as-numbers-digits)&lt;br&gt;        return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],&lt;br&gt;      $group-1-digits := $reversed-digits[position() mod 2 = 1],&lt;br&gt;      $group-2-digits := $reversed-digits[position() mod 2 = 0],&lt;br&gt;      $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,&lt;br&gt;      $group-1-x2-string := string-join(&lt;br&gt;                              for $d in $group-1-x2-decimals&lt;br&gt;                              return string($d),&lt;br&gt;                              ''&lt;br&gt;                            ),&lt;br&gt;      $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)&lt;br&gt;                            return xs:decimal(codepoints-to-string($code)),&lt;br&gt;      $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),&lt;br&gt;      $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),&lt;br&gt;      $checksum-provided := substring($isin, 12, 1),&lt;br&gt;      $proper-checksum := $checksum-computed = $checksum-provided,&lt;br&gt;      $proper-length := string-length($isin) = 12&lt;br&gt;    return&lt;br&gt;      $proper-checksum and $proper-length&lt;br&gt;  )&lt;/span&gt;&lt;/div&gt;</text>
                         </control-28>
-                        <control-17>
-                            <label>ISIN</label>
-                            <hint/>
+                        <control-17><label>ISIN</label><hint/>
+
+
                         </control-17>
+
+                        <control-35>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a date is at least 5 business days in the future.&lt;/strong&gt; This formula validates that a date is at least 5 business days (Monday to Friday) in the future.&lt;/div&gt;</text>
+                        </control-35>
+                        <control-36>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;for $i in 1 to days-from-duration($date-5-business-days - current-date()) return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$is_business :=  xs:integer(format-date($current_date, '[F1]')) &amp;lt;= 5&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return if ($is_business) then $i else ()&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;) &amp;gt;= 5&lt;/span&gt;&lt;/div&gt;</text>
+                        </control-36>
+                        <date-5-business-days>
+                            <label>Date</label>
+                            <hint/>
+                            <alert>Date must be at least 5 business days in the future</alert>
+                        </date-5-business-days>
 
                         <control-7>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Yes/No selection.&lt;/strong&gt; This formula tells whether the user selected a "Yes" answer using radio buttons.&lt;/div&gt;
@@ -877,6 +901,25 @@
                         <fr:c x="10" y="9" w="3" h="1">
 
                         </fr:c>
+                        <fr:c x="1" y="10" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-35-control" bind="control-35-bind">
+                                <fr:text ref="$form-resources/control-35/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="11" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-36-control" bind="control-36-bind">
+                                <fr:text ref="$form-resources/control-36/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="12" w="6">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-5-business-days-control" bind="date-5-business-days-bind">
+                                <xf:label ref="$form-resources/date-5-business-days/label"/>
+                                <xf:hint ref="$form-resources/date-5-business-days/hint"/>
+                                <xf:alert ref="$form-resources/date-5-business-days/alert"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="7" y="12" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="section-1-section" bind="section-1-bind">

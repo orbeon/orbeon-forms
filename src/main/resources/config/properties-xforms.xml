@@ -233,6 +233,11 @@
     <property as="xs:string" name="oxf.xforms.xbl.fr.friendly-captcha.server-endpoint"           value=""/>
     <property as="xs:string" name="oxf.xforms.xbl.fr.friendly-captcha.client-endpoint"           value=""/>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.edit-format"                        value="reveal"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.view-format"                        value="partial"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.pdf-format"                         value="partial"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.pdf-template-format"                value="partial"/>
+
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
         fr:grid-multiple

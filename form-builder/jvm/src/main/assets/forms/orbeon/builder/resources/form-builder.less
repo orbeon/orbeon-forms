@@ -1312,6 +1312,16 @@ body.orbeon {
             margin-top: 5px;
         }
 
+        .xxforms-dynamic-control {
+            fieldset {
+                margin-top: 4px;
+                margin-left: 4px; // otherwise the fieldset is too far to the left
+                legend.xforms-label {
+                    font-weight: bold;
+                }
+            }
+        }
+
         // Adjust so that images within radio/checkbox looks centered like it is in the toolbox
         label[class ~= radio], label[class ~= checkbox] {
             img {

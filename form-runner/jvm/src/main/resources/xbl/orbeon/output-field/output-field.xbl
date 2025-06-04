@@ -17,8 +17,6 @@
                 xf|textarea[appearance ~= 'xxf:autosize'][fr|pdf-template = true],
                 xf|textarea[appearance ~= clipboard-copy][fr|pdf-template = true],
                 xf|output[appearance ~= clipboard-copy][fr|pdf-template = true],
-                fr|us-ssn[fr|static-readonly = true],
-                fr|us-ssn[fr|pdf-template = true],
                 fr|us-ein[fr|static-readonly = true],
                 fr|us-ein[fr|pdf-template = true]"
             xxbl:mode="binding lhha"

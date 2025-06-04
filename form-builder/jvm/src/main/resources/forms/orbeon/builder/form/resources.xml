@@ -1537,6 +1537,12 @@
             <name-header>Name</name-header>
             <value-header>Value</value-header>
         </dialog-messages>
+        <modes>
+            <editable>Editable modes</editable>
+            <review>Review mode</review>
+            <pdf-automatic>Automatic PDF</pdf-automatic>
+            <pdf-template>PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width>Field width</field-width>
             <default>Use default</default>
@@ -1546,6 +1552,14 @@
             <left>Left</left>
             <right>Right</right>
             <learn-settings-below>Learn more about the settings below</learn-settings-below>
+            <field-value-visibility>
+                <label>Field Value Visibility</label>
+                <hint>Controls how the value of the field is displayed</hint>
+                <item id="visible">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial">Partial</item>
+                <item id="reveal">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -3115,6 +3129,12 @@
             <name-header>Nom</name-header>
             <value-header>Valeur</value-header>
         </dialog-messages>
+        <modes>
+            <editable>Modes éditables</editable>
+            <review>Mode lecture seule</review>
+            <pdf-automatic>PDF automatique</pdf-automatic>
+            <pdf-template>Modèle PDF</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width>Largeur du champ</field-width>
             <default>Utiliser le défaut</default>
@@ -3124,6 +3144,14 @@
             <left>À gauche</left>
             <right>À droite</right>
             <learn-settings-below>Plus d'information à propos des configurations ci-dessous</learn-settings-below>
+            <field-value-visibility>
+                <label>Visibilité de la valeur du champ</label>
+                <hint>Contrôle la façon dont la valeur du champ est montrée</hint>
+                <item id="visible">Visible</item>
+                <item id="obscured">Obscurcie</item>
+                <item id="partial">Partielle</item>
+                <item id="reveal">Permettre à l'utilisateur de révéler</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
@@ -4701,6 +4729,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -4710,6 +4744,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Er du sikker på at du ønsker å slette denne seksjonen?</delete-section>
@@ -6286,6 +6328,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -6295,6 +6343,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Вы уверены, что хотите удалить текущий раздел?</delete-section>
@@ -7836,6 +7892,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -7845,6 +7907,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Sei sicuro di voler cancellare la sezione attuale?</delete-section>
@@ -9387,6 +9457,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -9396,6 +9472,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below>Dokumentation der untenstehenden Einstellungen</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
@@ -10968,6 +11052,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -10977,6 +11067,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Haluatko varmasti poistaa nykyisen lohkon?</delete-section>
@@ -12546,6 +12644,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -12555,6 +12659,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Está seguro de eliminar la Sección actual?</delete-section>
@@ -14104,6 +14216,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -14113,6 +14231,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Weet u zeker dat u de huidige sectie wilt verwijderen?</delete-section>
@@ -15689,6 +15815,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -15698,6 +15830,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Tem a certeza que deseja remover a secção actual?</delete-section>
@@ -17275,6 +17415,12 @@
             <name-header todo="true">[Name]</name-header>
             <value-header todo="true">[Value]</value-header>
         </dialog-messages>
+        <modes>
+            <editable todo="true">Editable modes</editable>
+            <review todo="true">Review mode</review>
+            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
+            <pdf-template todo="true">PDF template</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -17284,6 +17430,14 @@
             <left todo="true">Left</left>
             <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-value-visibility>
+                <label todo="true">Field Value Visibility</label>
+                <hint todo="true">Controls how the value of the field is displayed</hint>
+                <item id="visible" todo="true">Visible</item>
+                <item id="obscured">Obscured</item>
+                <item id="partial" todo="true">Partial</item>
+                <item id="reveal" todo="true">Allow user to reveal</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>Bekräfta att du vill ta bort denna sektion</delete-section>
@@ -18852,6 +19006,12 @@
             <name-header>الاسم</name-header>
             <value-header>القيمة</value-header>
         </dialog-messages>
+        <modes>
+            <editable>أوضاع قابلة للتحرير</editable>
+            <review>وضع المراجعة</review>
+            <pdf-automatic>ملف PDF تلقائي</pdf-automatic>
+            <pdf-template>قالب PDF</pdf-template>
+        </modes>
         <xbl-control-settings>
             <field-width>عرض الحقل</field-width>
             <default>استخدام الافتراضي</default>
@@ -18861,6 +19021,14 @@
             <left>يسار</left>
             <right>يمين</right>
             <learn-settings-below>تعرف على المزيد حول الإعدادات أدناه</learn-settings-below>
+            <field-value-visibility>
+                <label>رؤية قيمة الحقل</label>
+                <hint>يتحكم في كيفية عرض قيمة الحقل</hint>
+                <item id="visible">مرئي</item>
+                <item id="obscured">غير مرئي</item>
+                <item id="partial">جزئي</item>
+                <item id="reveal">السماح للمستخدم بالكشف</item>
+            </field-value-visibility>
         </xbl-control-settings>
         <messages>
             <delete-section>هل أنت متأكد من أنك تريد حذف القسم الحالي؟</delete-section>

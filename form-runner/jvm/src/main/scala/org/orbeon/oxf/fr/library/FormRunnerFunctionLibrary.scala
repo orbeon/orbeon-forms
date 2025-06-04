@@ -43,6 +43,7 @@ import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.*
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
@@ -164,6 +165,28 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
+    )
+
+    // Attachment functions
+
+    Fun("attachment-id", classOf[FRAttachmentId], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("attachment-filename", classOf[FRAttachmentFilename], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("attachment-media-type", classOf[FRAttachmentMediaType], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("attachment-size", classOf[FRAttachmentSize], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("attachment-control-name", classOf[FRAttachmentControlName], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
   }
 }
@@ -557,5 +580,45 @@ private object FormRunnerFunctions {
   class FRAttachmentFormVersion extends DefaultFunctionSupport with AddToPathMap {
     override def evaluateItem(context: XPathContext): IntegerValue =
       FRComponentParamSupport.attachmentFormVersion(FormRunnerParams())
+  }
+
+  trait FRAttachmentFunction extends FunctionSupport with RuntimeDependentFunction {
+    def attribute: String
+
+    def value(xpathContext: XPathContext): Option[String] =
+      itemArgumentOrContextOpt(0)(xpathContext).collect { case nodeInfo: NodeInfo =>
+        (nodeInfo /@ attribute).stringValue
+      }
+  }
+
+  class FRAttachmentId extends FRAttachmentFunction {
+    override val attribute = "upload-id"
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+      value(xpathContext)
+  }
+
+  class FRAttachmentFilename extends FRAttachmentFunction {
+    override val attribute = "filename"
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+      value(xpathContext)
+  }
+
+  class FRAttachmentMediaType extends FRAttachmentFunction {
+    override val attribute = "mediatype"
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+      value(xpathContext)
+  }
+
+  class FRAttachmentSize extends FRAttachmentFunction {
+    override val attribute = "size"
+    override def evaluateItem(xpathContext: XPathContext): Int64Value =
+      value(xpathContext).map(string => new Int64Value(string.toLong)).orNull
+  }
+
+  class FRAttachmentControlName extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+      itemArgumentOrContextOpt(0)(xpathContext).collect { case nodeInfo: NodeInfo =>
+        if (nodeInfo.localname == "_") nodeInfo.getParent.localname else nodeInfo.localname
+      }
   }
 }

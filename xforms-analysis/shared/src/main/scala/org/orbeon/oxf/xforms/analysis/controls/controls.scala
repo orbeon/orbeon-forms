@@ -117,6 +117,7 @@ private object TriggerControl {
 trait WithFileMetadata extends ElementAnalysis{
   self: ElementAnalysis =>
 
+  val uploadIdBinding     : Option[SingleItemBinding]
   val mediatypeBinding    : Option[SingleItemBinding]
   val filenameBinding     : Option[SingleItemBinding]
   val sizeBinding         : Option[SingleItemBinding]
@@ -136,6 +137,7 @@ class UploadControl(
   containerScope   : Scope
 )(
   val multiple            : Boolean,
+  val uploadIdBinding     : Option[SingleItemBinding],
   val mediatypeBinding    : Option[SingleItemBinding],
   val filenameBinding     : Option[SingleItemBinding],
   val sizeBinding         : Option[SingleItemBinding],

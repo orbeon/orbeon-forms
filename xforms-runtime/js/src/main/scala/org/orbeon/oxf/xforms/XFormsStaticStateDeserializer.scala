@@ -496,6 +496,7 @@ object XFormsStaticStateDeserializer {
               val uploadControl =
                 for {
                     multiple             <- c.getOrElse[Boolean]("multiple")(false)
+                    uploadIdBinding      <- c.getOrElse[Option[SingleItemBinding]]("uploadIdBinding")(None)
                     mediatypeBinding     <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
                     filenameBinding      <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
                     sizeBinding          <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
@@ -514,6 +515,7 @@ object XFormsStaticStateDeserializer {
                     containerScope
                   )(
                     multiple             = multiple,
+                    uploadIdBinding      = uploadIdBinding,
                     mediatypeBinding     = mediatypeBinding,
                     filenameBinding      = filenameBinding,
                     sizeBinding          = sizeBinding,
@@ -682,6 +684,7 @@ object XFormsStaticStateDeserializer {
                   isHtmlMediatype      <- c.getOrElse[Boolean]("isHtmlMediatype")(false)
                   isDownloadAppearance <- c.getOrElse[Boolean]("isDownloadAppearance")(false)
                   staticValue          <- c.getOrElse[Option[String]]("staticValue")(None)
+                  uploadIdBinding      <- c.getOrElse[Option[SingleItemBinding]]("uploadIdBinding")(None)
                   mediatypeBinding     <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
                   filenameBinding      <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
                   sizeBinding          <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
@@ -704,6 +707,7 @@ object XFormsStaticStateDeserializer {
                     isHtmlMediatype      = isHtmlMediatype,
                     isDownloadAppearance = isDownloadAppearance,
                     staticValue          = staticValue,
+                    uploadIdBinding      = uploadIdBinding,
                     mediatypeBinding     = mediatypeBinding,
                     filenameBinding      = filenameBinding,
                     sizeBinding          = sizeBinding,

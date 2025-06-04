@@ -70,6 +70,7 @@ trait FileMetadata extends XFormsValueControl {
 
   // Getters
   def state            (collector: ErrorEventCollector): String         = props("state")         .value(collector)
+  def uploadId         (collector: ErrorEventCollector): Option[String] = props("upload-id")     .value(collector).trimAllToOpt
   def fileMediatype    (collector: ErrorEventCollector): Option[String] = props("mediatype")     .value(collector).trimAllToOpt
   def filename         (collector: ErrorEventCollector): Option[String] = props("filename")      .value(collector).trimAllToOpt
   def fileSize         (collector: ErrorEventCollector): Option[String] = props("size")          .value(collector).trimAllToOpt
@@ -88,6 +89,9 @@ trait FileMetadata extends XFormsValueControl {
   def boundFilename(collector: ErrorEventCollector): String = Evaluators("filename").evaluate(self, collector)
 
   // Setters for `XFormsUploadControl`
+  def setFileUploadId(uploadId: String, collector: ErrorEventCollector): Unit =
+    staticFileMetadata.flatMap(_.uploadIdBinding).foreach(setMetadataValue(self, _, uploadId, collector))
+
   def setFileMediatype(mediatype: String, collector: ErrorEventCollector): Unit =
     staticFileMetadata.flatMap(_.mediatypeBinding).foreach(setMetadataValue(self, _, mediatype, collector))
 
@@ -151,6 +155,7 @@ object FileMetadata {
   private val Evaluators = Map[String, Evaluator](
     "state"             -> Evaluator((m, c) => if (m.getValue(c).isAllBlank) "empty" else "file", "empty"),
 
+    "upload-id"         -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.uploadIdBinding)     .map(getMetadataValue(m, _, c)).orNull, null),
     "mediatype"         -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.mediatypeBinding)    .map(getMetadataValue(m, _, c)).orNull, null),
     "filename"          -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.filenameBinding)     .map(getMetadataValue(m, _, c)).orNull, null),
     "size"              -> Evaluator((m, c) => m.staticFileMetadata.flatMap(_.sizeBinding)         .map(getMetadataValue(m, _, c)).orNull, null),

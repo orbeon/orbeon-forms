@@ -18,13 +18,12 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.FormRunnerCommon.spc
 import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.process.ProcessParser.*
+import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
-import org.orbeon.oxf.util as u
-import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
@@ -41,7 +40,7 @@ import scala.util.{Failure, Success, Try}
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {
 
-  import ProcessInterpreter._
+  import ProcessInterpreter.*
 
   val EmptyActionParams: ActionParams = Map.empty
 
@@ -260,7 +259,7 @@ trait ProcessInterpreter extends Logging {
     } // end `runSubProcess()`
   }
 
-  import ProcessRuntime._
+  import ProcessRuntime.*
 
   private def rawProcessByName(scope: String, name: String): String =
     findProcessByName(scope, name) getOrElse
@@ -384,29 +383,25 @@ trait ProcessInterpreter extends Logging {
     ).asInstanceOf[BooleanValue].getBooleanValue
 
   def evaluateString(
-    expr     : String,
-    item     : om.Item                                         = xpathContext,
-    mapping  : NamespaceMapping                                = ProcessInterpreter.StandardNamespaceMapping,
-    variables: collection.Map[String, ValueRepresentationType] = null
+    expr   : String,
+    item   : om.Item          = xpathContext,
+    mapping: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
   ): String =
     evaluateOne(
-      expr      = u.StaticXPath.makeStringExpression(expr),
-      item      = item,
-      mapping   = mapping,
-      variables = variables
+      expr    = u.StaticXPath.makeStringExpression(expr),
+      item    = item,
+      mapping = mapping
     ).getStringValue
 
   def evaluateOne(
-    expr     : String,
-    item     : om.Item                                         = xpathContext,
-    mapping  : NamespaceMapping                                = ProcessInterpreter.StandardNamespaceMapping,
-    variables: collection.Map[String, ValueRepresentationType] = null
+    expr   : String,
+    item   : om.Item          = xpathContext,
+    mapping: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
   ): om.Item =
     evalOne(
       item            = item,
       expr            = expr,
       namespaces      = mapping,
-      variables       = variables,
       functionContext = xpathFunctionContext
     )
 

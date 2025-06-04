@@ -69,13 +69,14 @@ object XFormsUploadRoute extends XmlNativeRoute {
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
             for {
-              UploadResponse(fieldName, messageOpt, mediatypeOpt, filenameOpt, sessionUrl, actualSize, hashAlgorithm, hashValue) <- uploadResponses
+              UploadResponse(fieldName, messageOpt, mediatypeOpt, filenameOpt, uploadId, sessionUrl, actualSize, hashAlgorithm, hashValue) <- uploadResponses
               effectiveMediatypeOpt = Mediatypes.fromHeadersOrFilename(_ => mediatypeOpt, filenameOpt)
             } yield
               <xxf:event
                 name              = {EventNames.XXFormsUploadStore}
                 source-control-id = {fieldName}
                 file              = {sessionUrl.toString}
+                upload-id         = {uploadId}
                 filename          = {filenameOpt.getOrElse("")}
                 content-type      = {effectiveMediatypeOpt.map(_.toString).getOrElse("")}
                 content-length    = {actualSize.toString}

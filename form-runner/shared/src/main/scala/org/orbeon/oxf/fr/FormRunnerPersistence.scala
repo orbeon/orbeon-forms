@@ -46,7 +46,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.value.{Int64Value, StringValue}
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -704,20 +704,12 @@ trait FormRunnerPersistence {
     }
 
   private def uploadedAttachmentFilename(
-    url           : String,
-    liveData      : DocumentNodeInfoType)(implicit
-    indentedLogger: IndentedLogger
+    attachmentHolder: NodeInfo)(implicit
+    indentedLogger  : IndentedLogger
   ): String = {
 
-    val randomFileId             = CoreCrossPlatformSupport.randomHexId
-    val defaultFilename          = s"$randomFileId.bin"
-    val path                     = new URI(url).getPath
-    val filename                 = PathUtils.getFirstQueryParameter(url, "filename").getOrElse(PathUtils.filenameFromPath(path))
-    val (baseName, extensionOpt) = FileUtils.baseNameAndExtension(filename)
-    val mediaType                = PathUtils.getFirstQueryParameter(url, "mediatype").getOrElse(ContentTypes.OctetStreamContentType)
-    val sizeOpt                  = PathUtils.getFirstQueryParameter(url, "size").map(_.toLong)
-
-    val PropertyName             = "oxf.fr.persistence.attachments.filename"
+    val uploadId     = (attachmentHolder /@ "upload-id").stringValue.trimAllToOpt.getOrElse(CoreCrossPlatformSupport.randomHexId)
+    val PropertyName = "oxf.fr.persistence.attachments.filename"
 
     val filenameExpressionAndMappingsOpt = for {
       (expression, ns)  <- formRunnerPropertyWithNs(PropertyName)(FormRunnerParams())
@@ -727,27 +719,23 @@ trait FormRunnerPersistence {
     filenameExpressionAndMappingsOpt match {
       case None =>
         // No property, use default filename
-        defaultFilename
+        s"$uploadId.bin"
 
       case Some((expression, ns)) =>
-
-        // Variables that can be used by the XPath expression
-        val variables =
-          Map(
-            "fr-attachment-id"         -> randomFileId,
-            "fr-attachment-filename"   -> filename,
-            "fr-attachment-basename"   -> baseName,
-            "fr-attachment-extension"  -> extensionOpt.map("." + _).getOrElse(""),
-            "fr-attachment-media-type" -> mediaType
-          ).map { kv =>
-            kv._1 -> new StringValue(kv._2)
-          } ++
-            sizeOpt.map(size => "fr-attachment-size" -> new Int64Value(size)).toMap
-
-        Try(process.SimpleProcess.evaluateString(expression, liveData, ns, variables)) match {
+        // Evaluate the expression from the property
+        Try(process.SimpleProcess.evaluateString(expression, attachmentHolder, ns)) match {
           case Success(filename) =>
             // Make sure the resulting string can be used as a filename
-            FileUtils.sanitizedFilename(filename)
+            val sanitizedFilename = FileUtils.sanitizedFilename(filename)
+
+            // Check that the upload/attachment ID is included in the attachment filename
+            if (! sanitizedFilename.contains(uploadId)) {
+              val errorMessage = s"Expression '$expression' from property '$PropertyName' doesn't include attachment ID"
+              indentedLogger.logError("", errorMessage)
+              throw new OXFException(errorMessage)
+            }
+
+            sanitizedFilename
 
           case Failure(throwable) =>
             indentedLogger.logError(
@@ -762,14 +750,14 @@ trait FormRunnerPersistence {
   }
 
   def createAttachmentFilename(
-    url           : String,
-    basePath      : String,
-    liveData      : DocumentNodeInfoType)(implicit
-    indentedLogger: IndentedLogger
+    url             : String,
+    basePath        : String,
+    attachmentHolder: NodeInfo)(implicit
+    indentedLogger  : IndentedLogger
   ): String = {
     val filename =
       if (isUploadedFileURL(url))
-        uploadedAttachmentFilename(url, liveData)
+        uploadedAttachmentFilename(attachmentHolder)
       else
         getAttachmentPathFilenameRemoveQuery(url)
 
@@ -1038,7 +1026,7 @@ trait FormRunnerPersistence {
         getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
         pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        afterUrl          = createAttachmentFilename(beforeUrl, toBasePath, liveData)
+        afterUrl          = createAttachmentFilename(beforeUrl, toBasePath, migratedHolder)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
         putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.content.stream, pathToHolder, resolvedPutUri, formVersion, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))

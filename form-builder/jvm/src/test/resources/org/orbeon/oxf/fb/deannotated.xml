@@ -214,7 +214,7 @@
             <xf:instance xxf:exclude-result-prefixes="#all" xxf:readonly="true" id="grid-3-template">
                 <grid-3-iteration>
                     <control-5/>
-                    <control-16 filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
+                    <control-16 upload-id="" filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
                 </grid-3-iteration>
             </xf:instance>
             <xf:instance xxf:exclude-result-prefixes="#all" xxf:readonly="true" id="grid-6-template">

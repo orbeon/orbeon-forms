@@ -74,7 +74,9 @@ class FlatViewTest
       workflowStage   = None,
       ranges          = HttpRanges(),
       existingRow     = None,
-      singleton       = None
+      singleton       = None,
+      hashAlgorithm   = None,
+      hashValue       = None
     )
 
     case class Form(

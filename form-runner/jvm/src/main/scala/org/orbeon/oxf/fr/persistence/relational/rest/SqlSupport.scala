@@ -203,6 +203,24 @@ object SqlSupport {
           )
         )
     ) ::: (
+      req.forAttachment list
+        Col(
+          name          = "hash_algorithm",
+          value         = DynamicColValue(
+            placeholder = "?",
+            paramSetter = param(_.setString, req.hashAlgorithm.orNull)
+          )
+        )
+    ) ::: (
+      req.forAttachment list
+        Col(
+          name          = "hash_value",
+          value         = DynamicColValue(
+            placeholder = "?",
+            paramSetter = param(_.setString, req.hashValue.orNull)
+          )
+        )
+    ) ::: (
       isFormDefinition list
         Col(
           name          = "form_metadata",

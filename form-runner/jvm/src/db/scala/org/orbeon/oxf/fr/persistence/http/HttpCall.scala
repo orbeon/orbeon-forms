@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, SearchVersion, Version}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence, SearchVersion, Version}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.HttpMethod.*
 import org.orbeon.oxf.test.TestHttpClient
@@ -187,7 +187,9 @@ private[persistence] object HttpCall {
     credentials              : Option[Credentials],
     httpRange                : Option[HttpRange] = None,
     timeout                  : Option[Int]       = None,
-    ifMatch                  : Option[String]    = None
+    ifMatch                  : Option[String]    = None,
+    hashAlgorithm            : Option[String]    = None,
+    hashValue                : Option[String]    = None
   )(implicit
     logger                   : IndentedLogger,
     safeRequestCtx      : SafeRequestContext
@@ -210,7 +212,9 @@ private[persistence] object HttpCall {
       val stageHeader      = stage.map(_.name).map(StageHeader.HeaderName -> List(_))
       val httpRangeHeaders = httpRange.map(_.requestHeaders).getOrElse(Map.empty)
       val ifMatchHeader    = ifMatch.map(e => Headers.IfMatch -> List(e))
-      val headers          = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList ++ ifMatchHeader.toList).toMap ++ httpRangeHeaders
+      val hashHeaders      = hashAlgorithm.map(FormRunnerPersistence.OrbeonHashAlogrithm -> List(_)).toList ++
+                             hashValue.map(FormRunnerPersistence.OrbeonHashValue -> List(_)).toList
+      val headers          = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList ++ ifMatchHeader.toList ++ hashHeaders).toMap ++ httpRangeHeaders
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = URI.create(documentURL),
@@ -279,12 +283,14 @@ private[persistence] object HttpCall {
     stage         : Option[Stage],
     body          : Body,
     credentials   : Option[Credentials] = None,
-    ifMatch       : Option[String]      = None
+    ifMatch       : Option[String]      = None,
+    hashAlgorithm : Option[String]      = None,
+    hashValue     : Option[String]      = None
   )(implicit
     logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): HttpResponse =
-    useAndClose(request(url, PUT, version, stage, Some(body), credentials, None, None, ifMatch))(_.httpResponse)
+    useAndClose(request(url, PUT, version, stage, Some(body), credentials, None, None, ifMatch, hashAlgorithm, hashValue))(_.httpResponse)
 
   def del(
     url           : String,
@@ -305,7 +311,7 @@ private[persistence] object HttpCall {
     logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): (Int, Map[String, List[String]], Try[Array[Byte]]) =
-    useAndClose(request(url, GET, version, None, None, credentials, httpRange, None, None)) { chr =>
+    useAndClose(request(url, GET, version, None, None, credentials, httpRange, None, None, None, None)) { chr =>
 
       val httpResponse = chr.httpResponse
       val statusCode   = httpResponse.statusCode
@@ -351,7 +357,7 @@ private[persistence] object HttpCall {
       safeRequestCtx: SafeRequestContext
     ): Int = {
       val body = Some(XML(LockInfo.toOrbeonDom(lockInfo)))
-      useAndClose(request(url, method, Version.Unspecified, None, body, None, None, timeout, None))(_.httpResponse.statusCode)
+      useAndClose(request(url, method, Version.Unspecified, None, body, None, None, timeout, None, None, None))(_.httpResponse.statusCode)
     }
   }
 
@@ -377,12 +383,17 @@ private[persistence] object HttpCall {
     }.getOrElse(Version.Unspecified)
 
     val chr = HttpCall.request(
-      path        = path.stripPrefix(PersistenceBase),
-      method      = method,
-      version     = version,
-      stage       = None,
-      body        = requestBodyContent.map(sc => Binary(BufferedContent(sc)(toByteArray).body)),
-      credentials = None
+      path          = path.stripPrefix(PersistenceBase),
+      method        = method,
+      version       = version,
+      stage         = None,
+      body          = requestBodyContent.map(sc => Binary(BufferedContent(sc)(toByteArray).body)),
+      credentials   = None,
+      httpRange     = None,
+      timeout       = None,
+      ifMatch       = None,
+      hashAlgorithm = None,
+      hashValue     = None
     )
 
     ConnectionResult(

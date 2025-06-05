@@ -52,7 +52,7 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
+import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
@@ -170,6 +170,8 @@ object FormRunnerPersistence {
   val OrbeonOperations                    = "Orbeon-Operations"
   val OrbeonPathToHolder                  = "Orbeon-Path-To-Holder"
   val OrbeonPathToHolderLower             = OrbeonPathToHolder.toLowerCase
+  val OrbeonHashAlogrithm                 = "Orbeon-Hash-Algorithm"
+  val OrbeonHashValue                     = "Orbeon-Hash-Value"
   val OrbeonDidEncryptHeader              = "Orbeon-Did-Encrypt"
   val OrbeonDidEncryptHeaderLower         = OrbeonDidEncryptHeader.toLowerCase
   val OrbeonDecryptHeader                 = "Orbeon-Decrypt"
@@ -903,22 +905,26 @@ trait FormRunnerPersistence {
 
   private def saveAttachmentIo(
     streamedContent  : AsyncStreamedContent,
-    pathToHolder  : String,
-    resolvedPutUri: URI,
-    formVersion   : Option[String],
-    credentials   : Option[BasicCredentials]
+    pathToHolder     : String,
+    resolvedPutUri   : URI,
+    formVersion      : Option[String],
+    hashAlgorithmOpt : Option[String],
+    hashValueOpt     : Option[String],
+    credentials      : Option[BasicCredentials]
   )(implicit
-    safeRequestCtx: SafeRequestContext,
-    connectionCtx : ConnectionContexts,
-    xfcd          : XFormsContainingDocument,
-    indentedLogger: IndentedLogger
+    safeRequestCtx   : SafeRequestContext,
+    connectionCtx    : ConnectionContexts,
+    xfcd             : XFormsContainingDocument,
+    indentedLogger   : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
 
     val customPutHeaders =
-      (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
-      (OrbeonPathToHolder -> List(pathToHolder))                             ::
+      formVersion     .toList.map(OrbeonFormDefinitionVersion -> List(_)) :::
+      hashAlgorithmOpt.toList.map(OrbeonHashAlogrithm         -> List(_)) :::
+      hashValueOpt    .toList.map(OrbeonHashValue             -> List(_)) :::
+      (OrbeonPathToHolder -> List(pathToHolder))                           ::
       Nil
 
     val allPutHeaders =
@@ -1052,8 +1058,10 @@ trait FormRunnerPersistence {
         getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
         pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
+        hashAlgorithmOpt  = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_ALGORITHM_QNAME)
+        hashValueOpt      = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_VALUE_QNAME)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
-        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, credentials))
+        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, hashAlgorithmOpt, hashValueOpt, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
         isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
       } yield

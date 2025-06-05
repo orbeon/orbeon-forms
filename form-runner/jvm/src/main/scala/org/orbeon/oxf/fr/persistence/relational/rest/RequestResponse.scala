@@ -53,7 +53,9 @@ case class CrudRequest(
   workflowStage   : Option[String],
   ranges          : HttpRanges,
   existingRow     : Option[ExistingRow],
-  singleton       : Option[Boolean]
+  singleton       : Option[Boolean],
+  hashAlgorithm   : Option[String],
+  hashValue       : Option[String]
 ) {
   def forForm              : Boolean = dataPart.isEmpty
   def forData              : Boolean = dataPart.isDefined

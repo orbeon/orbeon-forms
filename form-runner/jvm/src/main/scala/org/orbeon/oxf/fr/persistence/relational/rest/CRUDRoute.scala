@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.controller.{Authorizer, NativeRoute}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, OrbeonHashAlogrithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
@@ -103,6 +103,8 @@ object CRUDRoute
     val requestGroup    = headerValueIgnoreCase(Headers.OrbeonGroup)
     val requestFlatView = headerValueIgnoreCase(Headers.OrbeonCreateFlatView).contains("true")
     val singleton       = headerValueIgnoreCase(Headers.OrbeonSingleton).map(_.toBoolean)
+    val hashAlgorithm   = headerValueIgnoreCase(OrbeonHashAlogrithm)
+    val hashValue       = headerValueIgnoreCase(OrbeonHashValue)
 
     val ranges = HttpRanges(httpRequest) match {
       case Success(ranges) => ranges
@@ -145,7 +147,9 @@ object CRUDRoute
           requestWorkflowStage,
           ranges,
           existingRow,
-          singleton
+          singleton,
+          hashAlgorithm,
+          hashValue
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
@@ -179,7 +183,9 @@ object CRUDRoute
           requestWorkflowStage,
           ranges,
           existingRow,
-          singleton
+          singleton,
+          hashAlgorithm,
+          hashValue
         )
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)

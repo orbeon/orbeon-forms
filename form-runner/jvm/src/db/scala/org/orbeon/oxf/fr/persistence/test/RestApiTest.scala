@@ -34,9 +34,10 @@ import org.orbeon.oxf.fr.{AppForm, FormOrData, S3Tag, S3Test}
 import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, SecureUtils}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.io.IOUtils.useAndClose
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
@@ -72,6 +73,12 @@ class RestApiTest
 
   private val AnyoneCanCreateAndRead = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
   private val AnyoneCanCreate        = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Create)))))
+
+  private def computeHash(data: Array[Byte]): (String, String) = {
+    val hashAlgorithm = SecureUtils.getHashAlgorithm
+    val hashValue     = useAndClose(new ByteArrayInputStream(data))(SecureUtils.digestStream(_))
+    (hashAlgorithm, hashValue)
+  }
 
   private def createForm(provider: Provider, formName: String = DefaultFormName)(implicit safeRequestCtx: SafeRequestContext): Unit = {
     val form = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, formName, title = Some("first")))
@@ -385,8 +392,9 @@ class RestApiTest
             val bodyArray = new Array[Byte](size) |!> Random.nextBytes
             val body      = bodyArray |> HttpCall.Binary.apply
             val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
+            val (hashAlgorithm, hashValue) = computeHash(bodyArray)
 
-            HttpAssert.put(url, Specific(1), body, StatusCode.Created)
+            HttpAssert.put(url, Specific(1), body, StatusCode.Created, hashAlgorithm = Some(hashAlgorithm), hashValue = Some(hashValue))
 
             // No range request
             HttpAssert.get(

@@ -342,10 +342,10 @@ object SimpleDataMigration {
         case Nil =>
           // Leaf node
 
-          // Data can be copied if there are no nested element. Specific case are:
+          // Data can be copied if there are no nested elements. Specific case are:
           //
           // - section template content
-          // - multiple attachment using nested array (`<_>`)
+          // - multiple attachment using a nested array (`<_>`)
           if (! rightElem.hasChildElement && ! leftElem.hasChildElement) {
 
             allValuesCount += 1
@@ -689,7 +689,7 @@ object SimpleDataMigration {
           }
 
         // https://github.com/orbeon/orbeon-forms/issues/5041
-        // Only delete if there are no nested bind, for backward compatibility first. But is this wrong? If we don't do
+        // Only delete if there are no nested binds, for backward compatibility first. But is this wrong? If we don't do
         // this, we will delete `<_>` for multiple attachments as well as the nested grids in section template data.
         // However, this probably also means that we'll not delete extra elements nested within other leaves.
         val deleteOps =

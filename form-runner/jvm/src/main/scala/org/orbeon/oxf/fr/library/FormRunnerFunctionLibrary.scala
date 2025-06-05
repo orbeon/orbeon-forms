@@ -177,7 +177,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
-    Fun("attachment-media-type", classOf[FRAttachmentMediaType], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+    Fun("attachment-mediatype", classOf[FRAttachmentMediatype], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
@@ -603,7 +603,7 @@ private object FormRunnerFunctions {
       value(xpathContext)
   }
 
-  class FRAttachmentMediaType extends FRAttachmentFunction {
+  class FRAttachmentMediatype extends FRAttachmentFunction {
     override val attribute = "mediatype"
     override def evaluateItem(xpathContext: XPathContext): StringValue =
       value(xpathContext)

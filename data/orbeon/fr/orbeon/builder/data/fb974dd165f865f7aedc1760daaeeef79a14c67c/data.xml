@@ -175,7 +175,7 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <thumbnail filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/builder/data/fb974dd165f865f7aedc1760daaeeef79a14c67c/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</thumbnail>
+                    <thumbnail filename="inventory.webp" mediatype="image/webp" size="51790">/fr/service/persistence/crud/orbeon/builder/data/fb974dd165f865f7aedc1760daaeeef79a14c67c/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <wizard>false</wizard>
                     <density>comfortable</density>

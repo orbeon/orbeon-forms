@@ -83,7 +83,7 @@
 
 
 
-                    <thumbnail filename="nobel-prizes.png" mediatype="image.png" size="301601">/fr/service/persistence/crud/orbeon/builder/data/3262298263a0f6ff04c96499997aa27e9da7b53a/fc4088d80515f2169bff927e96c21f10b0f33ed0.bin</thumbnail>
+                    <thumbnail filename="nobel-prizes.webp" mediatype="image/webp" size="105114">/fr/service/persistence/crud/orbeon/builder/data/3262298263a0f6ff04c96499997aa27e9da7b53a/fc4088d80515f2169bff927e96c21f10b0f33ed0.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>

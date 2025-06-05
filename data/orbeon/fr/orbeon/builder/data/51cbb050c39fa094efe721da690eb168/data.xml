@@ -87,7 +87,7 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <thumbnail filename="contact.png" mediatype="image/png" size="98158">/fr/service/persistence/crud/orbeon/builder/data/51cbb050c39fa094efe721da690eb168/2d9c2b10f685f73a717a52c1f87628cb0a2ce5cb.bin</thumbnail>
+                    <thumbnail filename="contact.webp" mediatype="image/webp" size="26948">/fr/service/persistence/crud/orbeon/builder/data/51cbb050c39fa094efe721da690eb168/2d9c2b10f685f73a717a52c1f87628cb0a2ce5cb.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <wizard>false</wizard>
                     <data-migration>enabled</data-migration>

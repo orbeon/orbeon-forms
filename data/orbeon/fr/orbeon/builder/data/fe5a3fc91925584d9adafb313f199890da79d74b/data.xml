@@ -51,7 +51,7 @@
                         <_>1</_>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
-                <thumbnail filename="invoice.png" mediatype="image/png" size="156609">/fr/service/persistence/crud/orbeon/builder/data/fe5a3fc91925584d9adafb313f199890da79d74b/137931bf03f9be219e23c92505ffec7ece316f84.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
+                <thumbnail filename="invoice.webp" mediatype="image/webp" size="53480">/fr/service/persistence/crud/orbeon/builder/data/fe5a3fc91925584d9adafb313f199890da79d74b/137931bf03f9be219e23c92505ffec7ece316f84.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
             </xf:instance>
 
             <!-- Attachments -->

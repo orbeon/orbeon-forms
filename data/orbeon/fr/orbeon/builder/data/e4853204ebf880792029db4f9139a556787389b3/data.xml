@@ -94,7 +94,7 @@
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
 
-                    <thumbnail filename="document-request.png" mediatype="image/png" size="41736">/fr/service/persistence/crud/orbeon/builder/data/e4853204ebf880792029db4f9139a556787389b3/af03cda4bc3749f5b545d9b23ea715ae53d3a383.bin</thumbnail>
+                    <thumbnail filename="document-request.webp" mediatype="image/webp" size="32358">/fr/service/persistence/crud/orbeon/builder/data/e4853204ebf880792029db4f9139a556787389b3/af03cda4bc3749f5b545d9b23ea715ae53d3a383.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>

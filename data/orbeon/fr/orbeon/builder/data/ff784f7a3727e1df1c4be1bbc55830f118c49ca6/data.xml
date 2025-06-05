@@ -100,7 +100,7 @@
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
-                    <thumbnail filename="emergency-medical-consent.png" mediatype="image/png" size="160175">/fr/service/persistence/crud/orbeon/builder/data/ff784f7a3727e1df1c4be1bbc55830f118c49ca6/fee5a9ed8f5ebedf7b6f72b169e0c716f9133c81.bin</thumbnail>
+                    <thumbnail filename="emergency-medical-consent.webp" mediatype="image/webp" size="54896">/fr/service/persistence/crud/orbeon/builder/data/ff784f7a3727e1df1c4be1bbc55830f118c49ca6/fee5a9ed8f5ebedf7b6f72b169e0c716f9133c81.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>

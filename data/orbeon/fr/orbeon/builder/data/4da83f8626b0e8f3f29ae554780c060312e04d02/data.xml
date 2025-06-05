@@ -142,7 +142,7 @@
 
 
 
-                    <thumbnail filename="copy-action" mediatype="image/png" size="44789">/fr/service/persistence/crud/orbeon/builder/data/4da83f8626b0e8f3f29ae554780c060312e04d02/2c828cbbd83a866832a0a4d8e374bcddabb52fd2.bin</thumbnail>
+                    <thumbnail filename="copy-action.webp" mediatype="image/webp" size="36762">/fr/service/persistence/crud/orbeon/builder/data/4da83f8626b0e8f3f29ae554780c060312e04d02/2c828cbbd83a866832a0a4d8e374bcddabb52fd2.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>

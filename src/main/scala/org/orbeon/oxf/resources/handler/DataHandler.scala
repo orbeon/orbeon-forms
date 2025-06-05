@@ -18,11 +18,14 @@ import java.net.{URLConnection, URL, URLStreamHandler}
 import java.io.ByteArrayInputStream
 
 object DataHandler extends URLStreamHandler {
+
+  val Protocol = "data"
+
   def openConnection(url: URL): URLConnection = new DataURLConnection(url)
 
   class DataURLConnection(url: URL) extends URLConnection(url) {
 
-    require(url.getProtocol == "data")
+    require(url.getProtocol == Protocol)
 
     private val decoded = DataURLDecoder.decode(url.toExternalForm)
 

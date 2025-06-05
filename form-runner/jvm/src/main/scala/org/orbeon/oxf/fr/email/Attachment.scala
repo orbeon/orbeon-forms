@@ -52,7 +52,8 @@ object Attachment {
 
   def xmlAttachment(
     formDataMaybeMigrated: NodeInfo,
-    template             : EmailMetadata.Template)(implicit
+    template             : EmailMetadata.Template
+  )(implicit
     formRunnerParams     : FormRunnerParams
   ): Option[Attachment] = {
 
@@ -68,7 +69,8 @@ object Attachment {
 
   def pdfAttachment(
     uri                     : URI,
-    template                : EmailMetadata.Template)(implicit
+    template                : EmailMetadata.Template
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams
@@ -88,7 +90,8 @@ object Attachment {
     attachOpt       : Option[Boolean],
     attachmentType  : String,
     contentType     : String,
-    contentFactory  : () => Content)(implicit
+    contentFactory  : () => Content
+  )(implicit
     formRunnerParams: FormRunnerParams
   ): Option[Attachment] = {
 
@@ -110,7 +113,8 @@ object Attachment {
   }
 
   def fileAttachments(
-    template                : EmailMetadata.Template)(implicit
+    template                : EmailMetadata.Template
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
@@ -166,7 +170,8 @@ object Attachment {
 
   private def uriContentFactory(
     uri                     : URI,
-    contentType             : String)(implicit
+    contentType             : String
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams
@@ -178,9 +183,8 @@ object Attachment {
         formVersionOpt = Left(FormDefinitionVersion.Specific(formRunnerParams.formVersion)).some
       )
 
-      if (! StatusCode.isSuccessCode(connectionResult.statusCode)) {
+      if (! StatusCode.isSuccessCode(connectionResult.statusCode))
         throw HttpStatusCodeException(code = connectionResult.statusCode, resource = uri.toString.some)
-      }
 
       // Use the content type from the attachment control (more exact)
       connectionResult.content.copy(contentType = contentType.some)

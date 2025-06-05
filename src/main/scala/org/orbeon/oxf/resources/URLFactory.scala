@@ -43,7 +43,7 @@ object URLFactory {
     case "http" | "https"       => new URL(context, spec, HTTP)
     case OXFHandler.Protocol    => new URL(context, removeQueryString(spec), OXF)
     case SystemHandler.PROTOCOL => new URL(context, removeQueryString(spec), System)
-    case "data"                 => new URL(context, removeQueryString(spec), DataHandler)
+    case DataHandler.Protocol   => new URL(context, removeQueryString(spec), DataHandler)
     case "file"                 => new URL(context, removeQueryString(spec))
     case _                      => new URL(context, spec)
   }

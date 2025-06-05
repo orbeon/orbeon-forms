@@ -250,6 +250,10 @@
                         )
                     ) then
                         concat('•••-••-', substring(., 8, 4))
+                    else if (
+                        matches(., '^[0-9]{3}-[0-9]{2}-[0-9]{4}$')
+                    ) then
+                        '•••-••-••••'
                     else
                         '••••••••'"
                 ref="xxf:binding('fr-us-ssn-static-readonly')"/>
@@ -275,6 +279,10 @@
                         fr:component-param-value('pdf-template-format')  = 'partial'
                     ) then
                         concat('•••-••-', substring(., 8, 4))
+                    else if (
+                        matches(., '^[0-9]{3}-[0-9]{2}-[0-9]{4}$')
+                    ) then
+                        '•••-••-••••'
                     else
                         '••••••••'"
                 ref="xxf:binding('fr-us-ssn-pdf-template')"/>

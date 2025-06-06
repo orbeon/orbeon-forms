@@ -106,11 +106,11 @@
                             <control-10>Orbeon</control-10>
                             <control-15/>
                             <control-27/>
-                            <lei>F50EOCWSQFAUVO9Q8Z97</lei>
+                            <lei>F50EOCWSQFAUVO9Q8Z97</lei><lei-builtin>F50EOCWSQFAUVO9Q8Z97</lei-builtin>
 
                             <control-16/>
                             <control-28/>
-                            <control-17>US0378331005</control-17>
+                            <control-17>US0378331005</control-17><isin-builtin>US0378331005</isin-builtin>
 
                         </grid-5>
                     </section-5>
@@ -184,12 +184,7 @@
                         <xf:bind id="control-25-bind" ref="control-25" name="control-25"/>
                         <xf:bind id="control-35-bind" ref="control-35" name="control-35"/>
                         <xf:bind id="control-36-bind" ref="control-36" name="control-36"/>
-                        <xf:bind id="date-5-business-days-bind" ref="date-5-business-days" name="date-5-business-days" type="xf:date" constraint="count(
-    for $i in 1 to days-from-duration($date-5-business-days - current-date()) return
-    let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),
-        $is_business :=  xs:integer(format-date($current_date, '[F1]')) &lt;= 5
-    return if ($is_business) then $i else ()
-) &gt;= 5"/>
+                        <xf:bind id="date-5-business-days-bind" ref="date-5-business-days" name="date-5-business-days" type="xf:date" constraint="count(     for $i in 1 to days-from-duration($date-5-business-days - current-date()) return     let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),         $is_business :=  xs:integer(format-date($current_date, '[F1]')) &lt;= 5     return if ($is_business) then $i else () ) &gt;= 5"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
@@ -224,10 +219,10 @@
                         <xf:bind id="regex-bind" ref="regex" name="regex" xxf:whitespace="trim"/>
                         <xf:bind id="control-10-bind" ref="control-10" name="control-10" xxf:whitespace="trim" constraint="matches(., $regex)"/>
                         <xf:bind id="control-26-bind" ref="control-26" name="control-26"/>
-                        <xf:bind id="lei-bind" ref="lei" name="lei" xxf:whitespace="trim" constraint="let $lei := .&#xA;return&#xA;  string-length($lei) = 20 and&#xA;  xs:decimal(&#xA;    string-join(&#xA;      for $code in string-to-codepoints($lei)&#xA;      return&#xA;        if ($code &gt;= string-to-codepoints('A') and string-to-codepoints('Z') &gt;= $code) then&#xA;          (: Letters A-Z :)&#xA;          xs:string($code - string-to-codepoints('A') + 10)&#xA;        else if ($code &gt;= string-to-codepoints('0') and string-to-codepoints('9') &gt;= $code) then&#xA;          (: Digits 0-9 :)&#xA;          xs:string($code - string-to-codepoints('0'))&#xA;          (: Unrecognized characters :)&#xA;        else&#xA;          '',&#xA;      ''&#xA;    )&#xA;  ) mod 97 = 1"/>
+                        <xf:bind id="lei-bind" ref="lei" name="lei" xxf:whitespace="trim" constraint="let $lei := . return   string-length($lei) = 20 and   xs:decimal(     string-join(       for $code in string-to-codepoints($lei)       return         if ($code &gt;= string-to-codepoints('A') and string-to-codepoints('Z') &gt;= $code) then           (: Letters A-Z :)           xs:string($code - string-to-codepoints('A') + 10)         else if ($code &gt;= string-to-codepoints('0') and string-to-codepoints('9') &gt;= $code) then           (: Digits 0-9 :)           xs:string($code - string-to-codepoints('0'))           (: Unrecognized characters :)         else           '',       ''     )   ) mod 97 = 1"/>
                         <xf:bind id="control-27-bind" ref="control-27" name="control-27"/>
                         <xf:bind id="control-17-bind" ref="control-17" name="control-17" xxf:whitespace="trim" constraint="let $isin := .&#xA;return&#xA;  (&#xA;    let&#xA;      $without-checksum := substring($isin, 1, 11),&#xA;      $letter-as-numbers-string :=&#xA;        string-join(&#xA;          for $code in string-to-codepoints($without-checksum)&#xA;          return&#xA;            if ($code &gt;= string-to-codepoints('A') and&#xA;                string-to-codepoints('Z') &gt;= $code) then&#xA;              (: Letters A-Z :)&#xA;              string($code - string-to-codepoints('A') + 10)&#xA;            else if ($code &gt;= string-to-codepoints('0') and&#xA;                     string-to-codepoints('9') &gt;= $code) then&#xA;              (: Digits 0-9 :)&#xA;              string($code - string-to-codepoints('0'))&#xA;              (: Unrecognized characters :)&#xA;            else&#xA;              '',&#xA;          ''&#xA;        ),&#xA;      $letter-as-numbers-digits :=&#xA;        for $code in string-to-codepoints($letter-as-numbers-string)&#xA;        return xs:decimal(codepoints-to-string($code)),&#xA;      $reversed-digits :=&#xA;        for $i in 1 to count($letter-as-numbers-digits)&#xA;        return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],&#xA;      $group-1-digits := $reversed-digits[position() mod 2 = 1],&#xA;      $group-2-digits := $reversed-digits[position() mod 2 = 0],&#xA;      $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,&#xA;      $group-1-x2-string := string-join(&#xA;                              for $d in $group-1-x2-decimals&#xA;                              return string($d),&#xA;                              ''&#xA;                            ),&#xA;      $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)&#xA;                            return xs:decimal(codepoints-to-string($code)),&#xA;      $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),&#xA;      $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),&#xA;      $checksum-provided := substring($isin, 12, 1),&#xA;      $proper-checksum := $checksum-computed = $checksum-provided,&#xA;      $proper-length := string-length($isin) = 12&#xA;    return&#xA;      $proper-checksum and $proper-length&#xA;  )"/>
-                        <xf:bind id="control-28-bind" ref="control-28" name="control-28"/>
+                        <xf:bind id="control-28-bind" ref="control-28" name="control-28"/><xf:bind id="lei-builtin-bind" ref="lei-builtin" name="lei-builtin" type="fr:lei"/><xf:bind id="isin-builtin-bind" ref="isin-builtin" name="isin-builtin" type="fr:isin"/>
                     </xf:bind>
                 </xf:bind>
 
@@ -265,7 +260,7 @@
 
 
 
-                <singleton>true</singleton><xbl><fr:number field-width="natural"/><fr:date field-width="natural"/><fr:time field-width="natural"/><fr:datetime field-width="natural"/><fr:toc position="left" modes="new edit view pdf tiff test test-pdf" min-sections="1"/></xbl><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-3"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-5"},{"value":"control-22"},{"value":"number-1"},{"value":"number-2"},{"value":"control-3"},{"value":"control-4"},{"value":"control-33"},{"value":"control-34"},{"value":"control-31"},{"value":"control-32"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"control-7"},{"value":"control-21"},{"value":"yes-no"},{"value":"control-2"}],"topLevel":true},{"containerPath":[{"value":"section-6"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"control-12"},{"value":"control-29"},{"value":"checkboxes"},{"value":"control-13"},{"value":"control-14"},{"value":"control-30"},{"value":"checkboxes-max"}],"topLevel":true},{"containerPath":[{"value":"section-4"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-6"},{"value":"control-23"},{"value":"birthdate"},{"value":"age"},{"value":"control-24"},{"value":"control-9"},{"value":"current-date"},{"value":"control-18"},{"value":"control-25"},{"value":"first-date"},{"value":"second-date"},{"value":"week-days"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-19"},{"value":"start-time"},{"value":"end-time"},{"value":"total-hours"},{"value":"control-11"},{"value":"control-20"},{"value":"current-time"}],"topLevel":true},{"containerPath":[{"value":"section-5"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"control-8"},{"value":"control-26"},{"value":"regex"},{"value":"control-10"},{"value":"control-15"},{"value":"control-27"},{"value":"lei"},{"value":"control-16"},{"value":"control-28"},{"value":"control-17"}],"topLevel":true}]}</migration></metadata>
+                <singleton>true</singleton><xbl><fr:number field-width="natural"/><fr:date field-width="natural"/><fr:time field-width="natural"/><fr:datetime field-width="natural"/><fr:toc position="left" modes="new edit view pdf tiff test test-pdf" min-sections="1"/></xbl><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-3"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-5"},{"value":"control-22"},{"value":"number-1"},{"value":"number-2"},{"value":"control-3"},{"value":"control-4"},{"value":"control-33"},{"value":"control-34"},{"value":"control-31"},{"value":"control-32"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"control-7"},{"value":"control-21"},{"value":"yes-no"},{"value":"control-2"}],"topLevel":true},{"containerPath":[{"value":"section-6"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"control-12"},{"value":"control-29"},{"value":"checkboxes"},{"value":"control-13"},{"value":"control-14"},{"value":"control-30"},{"value":"checkboxes-max"}],"topLevel":true},{"containerPath":[{"value":"section-4"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-6"},{"value":"control-23"},{"value":"birthdate"},{"value":"age"},{"value":"control-24"},{"value":"control-9"},{"value":"current-date"},{"value":"control-18"},{"value":"control-25"},{"value":"first-date"},{"value":"second-date"},{"value":"week-days"},{"value":"control-35"},{"value":"control-36"},{"value":"date-5-business-days"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-19"},{"value":"start-time"},{"value":"end-time"},{"value":"total-hours"},{"value":"control-11"},{"value":"control-20"},{"value":"current-time"}],"topLevel":true},{"containerPath":[{"value":"section-5"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"control-8"},{"value":"control-26"},{"value":"regex"},{"value":"control-10"},{"value":"control-15"},{"value":"control-27"},{"value":"lei"},{"value":"lei-builtin"},{"value":"control-16"},{"value":"control-28"},{"value":"control-17"},{"value":"isin-builtin"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
 
@@ -350,21 +345,21 @@
                             <hint>Type text here and see if it validates</hint>
                         </control-10>
                         <control-15>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a Legal Entity Identifier (LEI).&lt;/strong&gt; This formula validates an &lt;a href="https://en.wikipedia.org/wiki/Legal_Entity_Identifier"&gt;LEI&lt;/a&gt; (Legal Entity Identifier) field.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a Legal Entity Identifier (LEI).&lt;/strong&gt; This formula validates an &lt;a href="https://en.wikipedia.org/wiki/Legal_Entity_Identifier"&gt;LEI&lt;/a&gt; (Legal Entity Identifier) field.&lt;br&gt;&lt;br&gt;&lt;em&gt;NOTE: Since Orbeon Forms 2024.1.2, Orbeon Forms includes a built-in LEI component which performs this validation out of the box.&lt;/em&gt;&lt;/div&gt;</text>
                         </control-15>
                         <control-27>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;let $lei := .&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  string-length($lei) = 20 and&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  xs:decimal(&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    string-join(&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      for $code in string-to-codepoints($lei)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        if ($code &amp;gt;= string-to-codepoints('A') and string-to-codepoints('Z') &amp;gt;= $code) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Letters A-Z :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          xs:string($code - string-to-codepoints('A') + 10)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        else if ($code &amp;gt;= string-to-codepoints('0') and string-to-codepoints('9') &amp;gt;= $code) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Digits 0-9 :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          xs:string($code - string-to-codepoints('0'))&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Unrecognized characters :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          '',&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      ''&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    )&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  ) mod 97 = 1&lt;/span&gt;&lt;/div&gt;</text>
                         </control-27>
-                        <lei>
-                            <label>LEI</label>
-                            <hint/>
-                        </lei>
+                        <lei><label>Legal Entity Identifier (LEI)</label><hint/>
+
+
+                        </lei><lei-builtin><label>Builtin LEI form control</label><hint/></lei-builtin>
 
                         <control-16>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;
 &lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;&lt;strong&gt;Validating an International Securities Identification Number (ISIN).&lt;/strong&gt;&lt;/div&gt;
 &lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt; &lt;/div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;This formula validates an &lt;a href="https://en.wikipedia.org/wiki/International_Securities_Identification_Number"&gt;ISIN&lt;/a&gt; (International Securities Identification Number). This shows how a formula can become quite sophisticated.&lt;/div&gt;
+&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;This formula validates an &lt;a href="https://en.wikipedia.org/wiki/International_Securities_Identification_Number"&gt;ISIN&lt;/a&gt; (International Securities Identification Number). This shows how a formula can become quite sophisticated.&lt;br&gt;&lt;br&gt;&lt;em&gt;NOTE: Since Orbeon Forms 2024.1.2, Orbeon Forms includes a built-in ISIN component which performs this validation out of the box.&lt;/em&gt;&lt;/div&gt;
 &lt;h2 id="validating-an-international-securities-identification-number-isin" class="text-3xl font-semibold heading group relative grid w-full mx-auto decoration-primary/6 max-w-3xl page-api-block:ml-0"&gt;&lt;/h2&gt;
 &lt;/div&gt;</text>
                         </control-16>
@@ -374,7 +369,7 @@
                         <control-17><label>ISIN</label><hint/>
 
 
-                        </control-17>
+                        </control-17><isin-builtin><label>Builtin ISIN form control</label><hint/></isin-builtin>
 
                         <control-35>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a date is at least 5 business days in the future.&lt;/strong&gt; This formula validates that a date is at least 5 business days (Monday to Friday) in the future.&lt;/div&gt;</text>
@@ -1044,16 +1039,21 @@
                                 <fr:text ref="$form-resources/control-27/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
-                        <fr:c x="1" y="6" w="6">
+                        <fr:c x="1" y="6" w="4">
                             <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="lei-control" bind="lei-bind">
                                 <xf:label ref="$form-resources/lei/label"/>
-                                <xf:hint ref="$form-resources/lei/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/lei/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
 
 
                             </xf:input>
-                        </fr:c>
-                        <fr:c x="7" y="6" w="6"/>
+                        </fr:c><fr:c x="5" y="6" w="2" h="1"/>
+                        <fr:c x="7" y="6" w="4"><fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="lei-builtin-control" bind="lei-builtin-bind">
+                        <xf:label ref="$form-resources/lei-builtin/label"/>
+                        <xf:hint ref="$form-resources/lei-builtin/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:lei></fr:c><fr:c x="11" y="6" w="2" h="1"/>
                         <fr:c x="1" y="7" w="12">
                             <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-16-control" bind="control-16-bind">
                                 <fr:text ref="$form-resources/control-16/text" mediatype="text/html"/>
@@ -1064,7 +1064,7 @@
                                 <fr:text ref="$form-resources/control-28/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
-                        <fr:c x="1" y="9" w="6">
+                        <fr:c x="1" y="9" w="3">
                             <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-17-control" bind="control-17-bind">
                                 <xf:label ref="$form-resources/control-17/label"/>
                                 <xf:hint ref="$form-resources/control-17/hint"/>
@@ -1072,8 +1072,13 @@
 
 
                             </xf:input>
-                        </fr:c>
-                        <fr:c x="7" y="9" w="6"/>
+                        </fr:c><fr:c x="4" y="9" w="3" h="1"/>
+                        <fr:c x="7" y="9" w="3"><fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="isin-builtin-control" bind="isin-builtin-bind">
+                        <xf:label ref="$form-resources/isin-builtin/label"/>
+                        <xf:hint ref="$form-resources/isin-builtin/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:isin></fr:c><fr:c x="10" y="9" w="3" h="1"/>
                     </fr:grid>
                 </fr:section>
 

@@ -199,7 +199,9 @@
                                                         name="child-path"
                                                         as="xs:string"
                                                         select="
-                                                            if (exists($root/@iteration-name)) then
+                                                            if ($editable) then (: https://github.com/orbeon/orbeon-forms/issues/7067 :)
+                                                                '*'
+                                                            else if (exists($root/@iteration-name)) then
                                                                 $root/@iteration-name/string()
                                                             else if (exists($root/@bind[ends-with(., '-bind')])) then
                                                                 concat(frf:controlNameFromId($root/@bind), '-iteration')

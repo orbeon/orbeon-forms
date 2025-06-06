@@ -149,7 +149,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     Map(
                       "filename"       -> Option(storeEvent.filename),
                       "content-type"   -> Option(storeEvent.contentType),
-                      "content-length" -> Option(storeEvent.contentLength)
+                      "content-length" -> Option(storeEvent.contentLength),
+                      "hash-algorithm" -> storeEvent.hashAlgorithm,
+                      "hash-value"     -> storeEvent.hashValue,
                     )
                   ),
                   collector

@@ -77,7 +77,10 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
                   case SQLite => "notnull"
                   case _      => "is_nullable"
                 },
-                "data_type"
+                provider match {
+                  case SQLite => "type"
+                  case _      => "data_type"
+                }
               )
               val colKeyVals = for (metaKey <- interestingKeys) yield
                 ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))

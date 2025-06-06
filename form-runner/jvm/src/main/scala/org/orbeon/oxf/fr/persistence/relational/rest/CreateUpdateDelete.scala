@@ -439,8 +439,10 @@ trait CreateUpdateDelete {
     }
 
     // Update index if needed
-    // No need to reindex as we only delete historical data, which is not indexed
-    if (! req.dataPart.exists(_.forceDelete)) {
+    if (
+        ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
+        ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only delete historical data, which is not indexed
+    ) {
       val whatToReindex = req.dataPart match {
         case Some(dataPart) =>
           // Data: update index for this document id

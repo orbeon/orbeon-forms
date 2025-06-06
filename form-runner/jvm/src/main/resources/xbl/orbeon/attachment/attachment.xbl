@@ -43,7 +43,7 @@
             </icon>
             <templates>
                 <bind type="xf:anyURI"/>
-                <instance upload-id="" filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
+                <instance filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
                 <view>
                      <fr:attachment id="" ref="" class="fr-attachment">
                         <xf:label ref=""/>
@@ -154,7 +154,7 @@
 
                 <!-- The upload takes place to the local instance first -->
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <_ upload-id="" filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
+                    <_ filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
                 </xf:instance>
 
                 <!-- Propagate `base64Binary` -->
@@ -405,7 +405,6 @@
                             class="fr-attachment-filename">
 
                             <xf:label           ref="@filename"/>
-                            <xxf:upload-id      ref="@upload-id"/>
                             <xf:filename        ref="@filename" />
                             <xf:mediatype       ref="@mediatype"/>
                             <xxf:hash-algorithm ref="@hash-algorithm"/>
@@ -488,7 +487,6 @@
                         }"
                         xxf:title="{xxf:label('fr-attachment')}">
 
-                        <xxf:upload-id      ref="if ($readonly) then '' else @upload-id"/>
                         <xf:filename        ref="if ($readonly) then '' else @filename"/>
                         <xf:mediatype       ref="if ($readonly) then '' else @mediatype"/>
                         <xxf:size           ref="if ($readonly) then '' else @size"/>

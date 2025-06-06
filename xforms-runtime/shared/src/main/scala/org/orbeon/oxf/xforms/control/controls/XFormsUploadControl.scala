@@ -135,7 +135,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                 XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
                 handleUploadedFile(
                   storeEvent.file,
-                  Option(storeEvent.uploadId),
                   Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
                   Option(storeEvent.contentType),
                   Option(storeEvent.contentLength),
@@ -186,7 +185,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
   private def handleUploadedFile(
     value        : String,
-    uploadId     : Option[String],
     filename     : Option[String],
     mediatype    : Option[String],
     size         : Option[String],
@@ -195,17 +193,16 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     collector    : ErrorEventCollector
   ): Unit =
     if (size.exists(_ != "0") || filename.exists(_ != ""))
-      storeExternalValueAndMetadata(value, uploadId, filename, mediatype, size, hashAlgorithm, hashValue, collector)
+      storeExternalValueAndMetadata(value, filename, mediatype, size, hashAlgorithm, hashValue, collector)
 
   // This can only be called from the client to clear the value
   override def storeExternalValue(value: String, collector: ErrorEventCollector): Unit = {
     assert(value == "")
-    storeExternalValueAndMetadata(value, None, None, None, None, None, None, collector)
+    storeExternalValueAndMetadata(value, None, None, None, None, None, collector)
   }
 
   private def storeExternalValueAndMetadata(
     rawNewValue  : String,
-    uploadId     : Option[String],
     filename     : Option[String],
     mediatype    : Option[String],
     size         : Option[String],
@@ -255,7 +252,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       // which is now modified to use boundFileMediatype/boundFilename instead.
 
       // Filename, mediatype, size, and hash
-      setFileUploadId(uploadId.getOrElse(""), collector)
       setFilename(filename.getOrElse(""), collector)
       setFileMediatype(mediatype.getOrElse(""), collector)
       setFileSize(size.getOrElse(""), collector)
@@ -439,7 +435,6 @@ object XFormsUploadControl {
     filename      : Option[String],
     mediatype     : Option[String],
     size          : Long,
-    uploadId      : Option[String] = None,
     hashAlgorithm : Option[String] = None,
     hashValue     : Option[String] = None)(implicit
     logger        : IndentedLogger
@@ -472,7 +467,6 @@ object XFormsUploadControl {
     )
 
     List(
-      "upload-id"      -> uploadId,
       "filename"       -> filename,
       "mediatype"      -> mediatype,
       "size"           -> sizeStringOpt,

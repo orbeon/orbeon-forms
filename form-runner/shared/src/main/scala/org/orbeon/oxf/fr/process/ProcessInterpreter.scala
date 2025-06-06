@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -383,26 +383,29 @@ trait ProcessInterpreter extends Logging {
     ).asInstanceOf[BooleanValue].getBooleanValue
 
   def evaluateString(
-    expr   : String,
-    item   : om.Item          = xpathContext,
-    mapping: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+    expr           : String,
+    item           : om.Item          = xpathContext,
+    mapping        : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping,
+    functionContext: FunctionContext  = xpathFunctionContext
   ): String =
     evaluateOne(
-      expr    = u.StaticXPath.makeStringExpression(expr),
-      item    = item,
-      mapping = mapping
+      expr            = u.StaticXPath.makeStringExpression(expr),
+      item            = item,
+      mapping         = mapping,
+      functionContext = functionContext
     ).getStringValue
 
   def evaluateOne(
-    expr   : String,
-    item   : om.Item          = xpathContext,
-    mapping: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+    expr           : String,
+    item           : om.Item          = xpathContext,
+    mapping        : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping,
+    functionContext: FunctionContext  = xpathFunctionContext
   ): om.Item =
     evalOne(
       item            = item,
       expr            = expr,
       namespaces      = mapping,
-      functionContext = xpathFunctionContext
+      functionContext = functionContext
     )
 
   def evaluateNodes(expr: String, item: om.Item = xpathContext): collection.Seq[om.NodeInfo] =

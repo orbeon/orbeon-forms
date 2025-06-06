@@ -59,7 +59,6 @@ object UploaderServer extends UploaderServer {
     messageOpt    : Option[String],
     mediatypeOpt  : Option[String],
     filenameOpt   : Option[String],
-    uploadId      : String,
     tmpFileUri    : URI,
     actualSize    : Long,
     hashAlgorithm : String,
@@ -190,8 +189,6 @@ trait UploaderServer {
       fieldName     = fieldName,
       messageOpt    = messageOpt,
       mediatypeOpt  = mediatypeOpt,
-      // Assign a unique ID to the upload/attachment (this used to be done in FormRunnerPersistence)
-      uploadId      = CoreCrossPlatformSupport.randomHexId,
       filenameOpt   = filenameOpt,
       tmpFileUri    = tmpFileUri,
       actualSize    = actualSize,

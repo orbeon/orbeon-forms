@@ -187,7 +187,6 @@ object XFormsNames {
 
   val XXFORMS_ALL_EVENTS = "#all"
 
-  val XFORMS_UPLOAD_ID_QNAME        = xxformsQName("upload-id")
   val XFORMS_FILENAME_QNAME         = xformsQName("filename")
   val XFORMS_MEDIATYPE_QNAME        = xformsQName("mediatype")
   val XXFORMS_DOWNLOAD_QNAME        = xxformsQName("download")

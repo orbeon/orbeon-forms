@@ -582,6 +582,20 @@ private object FormRunnerFunctions {
       FRComponentParamSupport.attachmentFormVersion(FormRunnerParams())
   }
 
+  class FRAttachmentId extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): StringValue = {
+      // Extract the attachment ID from the function context
+      Option(XFormsFunction.context).flatMap(_.attachmentIdOpt)
+    }
+  }
+
+  class FRAttachmentControlName extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+      itemArgumentOrContextOpt(0)(xpathContext).collect { case nodeInfo: NodeInfo =>
+        if (nodeInfo.localname == "_") nodeInfo.getParent.localname else nodeInfo.localname
+      }
+  }
+
   trait FRAttachmentFunction extends FunctionSupport with RuntimeDependentFunction {
     def attribute: String
 
@@ -589,12 +603,6 @@ private object FormRunnerFunctions {
       itemArgumentOrContextOpt(0)(xpathContext).collect { case nodeInfo: NodeInfo =>
         (nodeInfo /@ attribute).stringValue
       }
-  }
-
-  class FRAttachmentId extends FRAttachmentFunction {
-    override val attribute = "upload-id"
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-      value(xpathContext)
   }
 
   class FRAttachmentFilename extends FRAttachmentFunction {
@@ -613,12 +621,5 @@ private object FormRunnerFunctions {
     override val attribute = "size"
     override def evaluateItem(xpathContext: XPathContext): Int64Value =
       value(xpathContext).map(string => new Int64Value(string.toLong)).orNull
-  }
-
-  class FRAttachmentControlName extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-      itemArgumentOrContextOpt(0)(xpathContext).collect { case nodeInfo: NodeInfo =>
-        if (nodeInfo.localname == "_") nodeInfo.getParent.localname else nodeInfo.localname
-      }
   }
 }

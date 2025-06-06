@@ -50,7 +50,6 @@ object XFormsExtractor {
       "attribute",
       "text",
       "context",
-      "upload-id",      //xf:upload/xxf:upload-id
       "size",           //xf:upload/xxf:size
       "hash-algorithm", //xf:upload/xxf:hash-algorithm
       "hash-value",     //xf:upload/xxf:hash-value

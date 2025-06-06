@@ -39,7 +39,6 @@ class OutputControl(
   val isHtmlMediatype      : Boolean,
   val isDownloadAppearance : Boolean,
   val staticValue          : Option[String], // TODO: `expressionOrConstant`
-  val uploadIdBinding      : Option[SingleItemBinding],
   val mediatypeBinding     : Option[SingleItemBinding],
   val filenameBinding      : Option[SingleItemBinding],
   val sizeBinding          : Option[SingleItemBinding],

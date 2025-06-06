@@ -81,7 +81,6 @@ object OutputControlBuilder {
       isHtmlMediatype      = isHtmlMediatype,
       isDownloadAppearance = isDownloadAppearance,
       staticValue          = staticValue,
-      uploadIdBinding      = element.elementOpt(XFORMS_UPLOAD_ID_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       mediatypeBinding     = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       filenameBinding      = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       sizeBinding          = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
@@ -531,7 +530,6 @@ object UploadControlBuilder {
       containerScope
     )(
       multiple             = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME).contains("true"),
-      uploadIdBinding      = element.elementOpt(XFORMS_UPLOAD_ID_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       mediatypeBinding     = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       filenameBinding      = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
       sizeBinding          = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),

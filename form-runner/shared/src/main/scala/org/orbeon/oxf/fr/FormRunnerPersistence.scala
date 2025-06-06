@@ -29,6 +29,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.datamigration.{MigrationSupport, PathElem}
+import org.orbeon.oxf.fr.process.SimpleProcess.xpathFunctionContext
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.{Property, PropertySet}
@@ -43,6 +44,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
@@ -708,7 +710,7 @@ trait FormRunnerPersistence {
     indentedLogger  : IndentedLogger
   ): String = {
 
-    val uploadId     = (attachmentHolder /@ "upload-id").stringValue.trimAllToOpt.getOrElse(CoreCrossPlatformSupport.randomHexId)
+    val attachmentId = CoreCrossPlatformSupport.randomHexId
     val PropertyName = "oxf.fr.persistence.attachments.filename"
 
     val filenameExpressionAndMappingsOpt = for {
@@ -719,17 +721,23 @@ trait FormRunnerPersistence {
     filenameExpressionAndMappingsOpt match {
       case None =>
         // No property, use default filename
-        s"$uploadId.bin"
+        s"$attachmentId.bin"
 
       case Some((expression, ns)) =>
+        // Include the attachment ID in the function context
+        val functionContext = xpathFunctionContext match {
+          case context: XFormsFunction.Context => context.copy(attachmentIdOpt = attachmentId.some)
+          case functionContext                 => functionContext
+        }
+
         // Evaluate the expression from the property
-        Try(process.SimpleProcess.evaluateString(expression, attachmentHolder, ns)) match {
+        Try(process.SimpleProcess.evaluateString(expression, attachmentHolder, ns, functionContext)) match {
           case Success(filename) =>
             // Make sure the resulting string can be used as a filename
             val sanitizedFilename = FileUtils.sanitizedFilename(filename)
 
-            // Check that the upload/attachment ID is included in the attachment filename
-            if (! sanitizedFilename.contains(uploadId)) {
+            // Check that the attachment ID is included in the attachment filename
+            if (! sanitizedFilename.contains(attachmentId)) {
               val errorMessage = s"Expression '$expression' from property '$PropertyName' doesn't include attachment ID"
               indentedLogger.logError("", errorMessage)
               throw new OXFException(errorMessage)

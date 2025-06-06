@@ -42,6 +42,8 @@
         oxf:/xbl/orbeon/us-state/us-state.xbl
         oxf:/xbl/orbeon/us-ssn/us-ssn.xbl
         oxf:/xbl/orbeon/us-ein/us-ein.xbl
+        oxf:/xbl/orbeon/lei/lei.xbl
+        oxf:/xbl/orbeon/isin/isin.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">

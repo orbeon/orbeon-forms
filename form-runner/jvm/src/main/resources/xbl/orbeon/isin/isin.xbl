@@ -1,0 +1,110 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-isin"
+        element="fr|isin"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input"
+        xxbl:type="xs:string"
+        xxbl:constraint="
+            let $isin := string(.)
+            return
+              xxf:is-blank($isin) or
+              (
+                let
+                  $without-checksum := substring($isin, 1, 11),
+                  $letter-as-numbers-string :=
+                    string-join(
+                      for $code in string-to-codepoints($without-checksum)
+                      return
+                        if ($code >= string-to-codepoints('A') and
+                            string-to-codepoints('Z') >= $code) then
+                          (: Letters A-Z :)
+                          string($code - string-to-codepoints('A') + 10)
+                        else if ($code >= string-to-codepoints('0') and
+                                 string-to-codepoints('9') >= $code) then
+                          (: Digits 0-9 :)
+                          string($code - string-to-codepoints('0'))
+                          (: Unrecognized characters :)
+                        else
+                          '',
+                      ''
+                    ),
+                  $letter-as-numbers-digits :=
+                    for $code in string-to-codepoints($letter-as-numbers-string)
+                    return xs:decimal(codepoints-to-string($code)),
+                  $reversed-digits :=
+                    for $i in 1 to count($letter-as-numbers-digits)
+                    return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],
+                  $group-1-digits := $reversed-digits[position() mod 2 = 1],
+                  $group-2-digits := $reversed-digits[position() mod 2 = 0],
+                  $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,
+                  $group-1-x2-string := string-join(
+                                          for $d in $group-1-x2-decimals
+                                          return string($d),
+                                          ''
+                                        ),
+                  $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)
+                                        return xs:decimal(codepoints-to-string($code)),
+                  $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),
+                  $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),
+                  $checksum-provided := substring($isin, 12, 1),
+                  $proper-checksum := $checksum-computed = $checksum-provided,
+                  $proper-length := string-length($isin) = 12
+                return
+                  $proper-checksum and $proper-length
+              )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">International Securities Identification Number (ISIN)</display-name>
+            <display-name lang="es">Número Internacional de Identificación de Valores (ISIN)</display-name>
+            <display-name lang="fi">Kansainvälinen arvopaperitunnus (ISIN)</display-name>
+            <display-name lang="fr">Numéro international d’identification des valeurs mobilières (ISIN)</display-name>
+            <display-name lang="ru">Международный идентификационный номер ценных бумаг (ISIN)</display-name>
+            <display-name lang="de">Internationale Wertpapierkennnummer (ISIN)</display-name>
+            <display-name lang="it">Numero Internazionale di Identificazione dei Titoli (ISIN)</display-name>
+            <display-name lang="nl">Internationaal effectenidentificatienummer (ISIN)</display-name>
+            <display-name lang="pt">Número Internacional de Identificação de Valores Mobiliários (ISIN)</display-name>
+            <display-name lang="sv">Internationellt värdepappersidentifieringsnummer (ISIN)</display-name>
+            <display-name lang="ar">رقم التعريف الدولي للأوراق المالية (ISIN)</display-name>
+
+            <icon>
+                <icon-class>fa fa-fw fa-coins</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:isin"/>
+                <view>
+                    <fr:isin>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:isin>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xh:span class="input-append">
+                <xf:input
+                    id="input"
+                    xbl:attr="navindex navindex=tabindex autocomplete"
+                    ref="xxf:binding('fr-isin')"
+                    xxf:maxlength="12">
+                </xf:input>
+                <xh:span class="add-on">
+                    <xh:i class="fa fa-fw fa-coins"/>
+                </xh:span>
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

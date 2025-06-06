@@ -261,6 +261,9 @@ trait FormRunnerActionsCommon {
       frc.updateMode("edit")
       // Manual dependency HACK: RR `fr-form-model` as we have changed mode
       recalculate(FormModel)
+
+      // Recalculate `possible-operations`, which might change in `edit` mode, and drive the share button visibility
+      dispatch(name = "fr-recalculate-possible-operations", targetId = PersistenceModel)
     }
   }
 

@@ -1336,4 +1336,16 @@
 
     </xf:action>
 
+    <xf:action event="fr-recalculate-possible-operations" observer="fr-persistence-model" target="fr-persistence-model">
+        <xf:setvalue
+            ref="instance('fr-share-dialog-instance')/possible-operations"
+            value="
+                frf:possiblyAllowedTokenOperations(
+                    xxf:instance('fr-form-metadata')/permissions,
+                    $app,
+                    $form,
+                    instance('fr-authorized-operations')
+                )"/>
+    </xf:action>
+
 </xf:model>

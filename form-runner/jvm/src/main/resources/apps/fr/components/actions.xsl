@@ -493,17 +493,51 @@
                     <xsl:attribute name="replace">instance</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <!-- For now attribute on submission takes precedence over event. We could easily revert that. -->
-            <xsl:if test="empty(@mode)">
-                <xsl:attribute name="mode">{
+            <!--
+                An attribute on the submission (so the service) takes precedence over the event.
+                As of 2024.1.x, this is not exposed through the "HTTP Service Editor" dialog, so if there
+                is an attribute, it's because it has been put there by hand. The idea, though, is that
+                until now in the JVM environment all service calls are 'synchronous', but we could mark a
+                service explicitly as 'asynchronous'. In the browser environment, all service calls must
+                be 'asynchronous'.
+
+                NOTE: Another way would be to entirely disable synchronous calls in the JS environment at the
+                XForms level. But are there cases where we still want synchronous calls on `xf:submission`, such as
+                when loading resources? For now, we handle services below.
+            -->
+            <xsl:choose>
+                <xsl:when test="@mode = 'synchronous'">
+                    <!--
+                        This takes precedence over the event, but we force 'asynchronous' anyway in the JS environment.
+                        This said, having an explicit 'synchronous' should not happen, see the above comment.
+                    -->
+                    <xsl:attribute name="mode">{
+                    if (fr:is-browser-environment()) then 'asynchronous' else 'synchronous'
+                    }</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="empty(@mode)">
+                    <!--
+                        Nothing was specified, so we honor the event if it exists, except that in the JS environment
+                        we always use 'asynchronous' (see the above comment). If there is no event, we default to
+                        'synchronous' in the JVM environment, and to 'asynchronous' in the JS environment.
+                    -->
+                    <xsl:attribute name="mode">{
                     (
+                        if (fr:is-browser-environment()) then 'asynchronous' else (),
                         'asynchronous'[exists(event('fr-async')[. = 'true'])],
                         'synchronous'[exists(event('fr-async')[. = 'false'])],
-                        if (fr:is-browser-environment()) then 'asynchronous' else 'synchronous'
+                        'synchronous'
                     )[1]
-                }</xsl:attribute>
-            </xsl:if>
-            <!-- For now attribute on submission takes precedence over event. We could easily revert that. -->
+                    }</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!--
+                        This could be 'asynchronous' or an AVT. But we shouldn't support an AVT here in the form definition.
+                        So we should be 'asynchronous'. In this case, this takes precedence, so we leave the value as is.
+                    -->
+                </xsl:otherwise>
+            </xsl:choose>
+            <!-- For now attribute on submission takes precedence over event. We could easily reverse that. -->
             <xsl:if test="empty(@xxf:response-must-await)">
                 <xsl:attribute name="xxf:response-must-await">{
                     (

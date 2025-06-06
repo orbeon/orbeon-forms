@@ -138,8 +138,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                   Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
                   Option(storeEvent.contentType),
                   Option(storeEvent.contentLength),
-                  Option(storeEvent.hashAlgorithm),
-                  Option(storeEvent.hashValue),
+                  storeEvent.hashAlgorithm,
+                  storeEvent.hashValue,
                   collector
                 )
                 visitWithAncestors()

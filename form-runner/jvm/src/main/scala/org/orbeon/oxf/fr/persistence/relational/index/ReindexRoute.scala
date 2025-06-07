@@ -22,10 +22,9 @@ import org.orbeon.oxf.util.*
 
 
 /**
- * Processor repopulating the relational indices. This doesn't create the tables, but deletes their content
+ * Route repopulating the relational indices. This doesn't create the tables, but deletes their content
  * and repopulates them from scratch.
  *
- * - mapped to `fr:persistence-reindex` in `processors.xml`
  * - mapped to `/fr/service/[provider]/reindex` in `fr/page-flow.xml`
  */
 object ReindexRoute extends NativeRoute {

@@ -39,7 +39,7 @@ import scala.util.{Failure, Success}
 trait Reindex extends FormDefinition {
 
   // Reindexing is a 3-step process:
-  //   1. Clean the index
+  //   1. Clear the index
   //   2. Get the documents to index
   //   3. For each document:
   //      - add 1 row to orbeon_i_current
@@ -100,7 +100,7 @@ trait Reindex extends FormDefinition {
 
     val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection { connection =>
 
-      // Clean index
+      // Clear index
       locally {
 
         val deleteWhereClause = whereConditions match {
@@ -207,7 +207,7 @@ trait Reindex extends FormDefinition {
       }.toMap
 
     RelationalUtils.withConnection { connection =>
-      // Get all the row from orbeon_form_data that are "latest" and not deleted
+      // Get all the rows from `orbeon_form_data` that are "latest" and not deleted
       val xmlCol         = Provider.xmlColSelect(provider, "d")
       val selectXmlSql   = s"SELECT $xmlCol FROM orbeon_form_data d WHERE id = ?"
       val currentDataSql =

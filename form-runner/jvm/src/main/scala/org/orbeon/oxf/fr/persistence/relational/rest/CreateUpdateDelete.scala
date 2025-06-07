@@ -452,8 +452,13 @@ trait CreateUpdateDelete {
           WhatToReindex.DataForForm((req.appForm, versionToSet))
       }
 
+      // If we are deleting a form definition, we should clear the index, but we should not reindex the data after that.
+      // https://github.com/orbeon/orbeon-forms/issues/6915
+      val clearOnly =
+        delete && req.forForm // we know it's not for an attachment as that's tested above
+
       withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-        Index.reindex(req.provider, whatToReindex)
+        Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly)
       }
     }
 

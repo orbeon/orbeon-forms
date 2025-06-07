@@ -45,11 +45,12 @@ trait Reindex extends FormDefinition {
   //      - add 1 row to orbeon_i_current
   //      - add as many as necessary to orbeon_i_control_text
   def reindex(
-    provider        : Provider,
-    whatToReindex   : WhatToReindex
+    provider       : Provider,
+    whatToReindex  : WhatToReindex,
+    clearOnly      : Boolean
   )(implicit
-    externalContext : ExternalContext,
-    indentedLogger  : IndentedLogger
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
   ): Unit = {
 
     // If a document id was provided, produce WHERE clause, and set parameter
@@ -153,6 +154,10 @@ trait Reindex extends FormDefinition {
           }
         }
       }
+
+      // https://github.com/orbeon/orbeon-forms/issues/6915
+      if (clearOnly)
+        return
 
       // Count how many documents we'll reindex, and tell progress code (side effect)
       val countSql =

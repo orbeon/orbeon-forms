@@ -14,14 +14,16 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.SafeRequestContext
+import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.db.Connect
-import org.orbeon.oxf.fr.persistence.http.HttpCall
+import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.http.HttpCall.{Check, assertCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.HttpMethod.POST
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{HttpMethod, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter.*
@@ -595,6 +597,78 @@ class SearchTest
               }</search>.toDocument
 
           expectStatusCode(SearchURL, searchRequestBoth, code = StatusCode.BadRequest)
+        }
+      }
+    }
+  }
+
+  describe("Indexing") {
+
+    it("must clear or rebuild the index when the form definition is deleted or recreated") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("form definition") { (connection, provider) =>
+
+          val testForm  = TestForm(provider, controls = Seq(TestForm.Control("control label")))
+          val version   = Version.Specific(1)
+
+          def readCount(tableName: String): Int = {
+            val sql =
+              s"""SELECT count(*) count
+                 |  FROM $tableName
+                 | WHERE app          = '${testForm.appForm.app}'
+                 |   AND form         = '${testForm.appForm.form}'
+                 |   AND form_version = ${version.version}
+               """.stripMargin
+            useAndClose(connection.prepareStatement(sql)) { ps =>
+              useAndClose(ps.executeQuery()) { rs =>
+                rs.next()
+                rs.getInt("count")
+              }
+            }
+          }
+
+          def readCountFromIndex: Int = {
+            val sql =
+              s"""SELECT count(*) count
+                 |  FROM orbeon_i_control_text
+                 | WHERE data_id in (
+                 |   SELECT data_id FROM orbeon_i_current
+                 |   WHERE app          = '${testForm.appForm.app}'
+                 |     AND form         = '${testForm.appForm.form}'
+                 |     AND form_version = ${version.version}
+                 | )
+               """.stripMargin
+            useAndClose(connection.prepareStatement(sql)) { ps =>
+              useAndClose(ps.executeQuery()) { rs =>
+                rs.next()
+                rs.getInt("count")
+              }
+            }
+          }
+
+          testForm.putFormDefinition(version)
+          testForm.putFormData(version, Seq(FormData("1", "a"), FormData("2", "b")))
+
+          // 1. Test that form data is indexed
+          assert(readCount("orbeon_i_current") == 2)
+          assert(readCount("orbeon_form_data") == 2)
+          assert(readCountFromIndex == 2)
+
+          // 2. Delete form definition
+          val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+          HttpAssert.del(formURL, version, StatusCode.NoContent)
+
+          // 3. Test that index tables are now empty, but the data is still there
+          assert(readCount("orbeon_i_current") == 0)
+          assert(readCount("orbeon_form_data") == 2)
+          assert(readCountFromIndex == 0)
+
+          // 4. Put form definition again and test that data is indexed again
+          testForm.putFormDefinition(version)
+
+          assert(readCount("orbeon_i_current") == 2)
+          assert(readCount("orbeon_form_data") == 2)
+          assert(readCountFromIndex == 2)
         }
       }
     }

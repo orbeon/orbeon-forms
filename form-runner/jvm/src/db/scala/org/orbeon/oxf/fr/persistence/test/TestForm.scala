@@ -69,11 +69,11 @@ case class TestForm(
   def formDataURL(id: String): String = HttpCall.crudURLPrefix(appForm) + s"data/$id/$DataXml"
 
   def putFormDefinition(
-    version            : Version,
-    credentials        : Option[Credentials] = None,
-    update             : Boolean = false
+    version       : Version,
+    credentials   : Option[Credentials] = None,
+    update        : Boolean = false
   )(implicit
-    logger             : IndentedLogger,
+    logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Unit =
     HttpAssert.put(

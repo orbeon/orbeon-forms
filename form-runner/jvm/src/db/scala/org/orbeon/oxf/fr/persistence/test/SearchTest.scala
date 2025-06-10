@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
-import org.orbeon.datatypes.Mediatype
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
@@ -240,11 +239,12 @@ class SearchTest
     }
 
     it("returns correct results with created by, last modified by, and workflow stage") {
+
       def searchRequest(
         createdByOpt     : Option[String] = None,
         lastModifiedByOpt: Option[String] = None,
         workflowStageOpt : Option[String] = None
-      ) =
+      ): Document =
         <search>{
           baseParams.child ++
             <query path={controlPath} match="substring">test</query> ++
@@ -618,11 +618,11 @@ class SearchTest
           // Create the form data and retrieve creation/modification dates
           val formDataDates = testForm.putFormData(version, formData, returnDates = true)
 
-          // Use eventually clause mainly for SQL Server, which doesn't update its indexes during several seconds after
+          // Use `eventually` clause mainly for SQL Server, which doesn't update its indexes during several seconds after
           // the form data has been created
           eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
             assertCall(
-              actualRequest  = HttpCall.SolicitedRequest(
+              actualRequest = HttpCall.SolicitedRequest(
                 path              = HttpCall.searchURL(provider),
                 version           = Unspecified,
                 method            = POST,

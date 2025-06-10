@@ -16,12 +16,11 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.*
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
 import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, SecureUtils}
@@ -30,6 +29,7 @@ import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
 import java.time.Instant
 import scala.annotation.tailrec
+import scala.util.{Failure, Success, Try}
 
 
 trait Read {
@@ -54,14 +54,16 @@ trait Read {
 
           case Some(range) =>
             // Ask for the total attachment size first
-            val totalSize = this.fromDatabase(
-              req                     = req,
-              hasStage                = hasStage,
-              readTotalAttachmentSize = true,
-              bodyContentOpt          = None
-            ).totalAttachmentSize.getOrElse {
-              throw HttpStatusCodeException(StatusCode.InternalServerError)
-            }
+            val totalSize =
+              this.fromDatabase(
+                req                     = req,
+                hasStage                = hasStage,
+                readTotalAttachmentSize = true,
+                bodyContentOpt          = None
+              )
+              .get // will throw nested `HttpStatusCodeException` if is `Failure`
+              .totalAttachmentSize
+              .getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError))
 
             Some(PartialAttachment(offset = range.start, length = range.length(totalSize)))
         }
@@ -106,15 +108,17 @@ trait Read {
         (bodyContentOpt, None)
     }
 
-    val fromDatabase = this.fromDatabase(
-      req                     = req,
-      hasStage                = hasStage,
-      readTotalAttachmentSize = actualBodyContentOpt match {
-        case Some(PartialAttachment(_, _)) => true
-        case _                             => false
-      },
-      bodyContentOpt          = actualBodyContentOpt
-    )
+    val fromDatabase =
+      this.fromDatabase(
+        req                     = req,
+        hasStage                = hasStage,
+        readTotalAttachmentSize = actualBodyContentOpt match {
+          case Some(PartialAttachment(_, _)) => true
+          case _                             => false
+        },
+        bodyContentOpt          = actualBodyContentOpt
+      )
+      .get // will throw nested `HttpStatusCodeException` if is `Failure`
 
     val httpResponse = externalContext.getResponse
 
@@ -211,7 +215,7 @@ trait Read {
   )(implicit
     externalContext        : ExternalContext,
     indentedLogger         : IndentedLogger
-  ): FromDatabase = RelationalUtils.withConnection { connection =>
+  ): Try[FromDatabase] = RelationalUtils.withConnection { connection =>
     val sql = {
       val table  = SqlSupport.tableName(req)
       val idCols = SqlSupport.idColumns(req)
@@ -316,7 +320,7 @@ trait Read {
           val deleted     = resultSet.getString("deleted") == "Y"
           val forceDelete = req.dataPart.exists(_.forceDelete)
           if (deleted && ! forceDelete)
-            throw HttpStatusCodeException(StatusCode.Gone)
+            return Failure(HttpStatusCodeException(StatusCode.Gone))
 
           // Check version if specified
           val dbFormVersion = resultSet.getInt("form_version")
@@ -351,20 +355,21 @@ trait Read {
             bodyInputStream.map(useAndClose(_)(NetUtils.inputStreamToByteArray))
           }
 
-          FromDatabase(
-            idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
-            dataUserOpt          = dataUser,
-            lastModifiedByOpt    = lastModifiedByOpt,
-            formVersion          = dbFormVersion,
-            stageOpt             = if (hasStage) Option(resultSet.getString("stage")) else None,
-            createdDateTime      = resultSet.getTimestamp("created").toInstant,
-            lastModifiedDateTime = resultSet.getTimestamp("last_modified_time").toInstant,
-            bodyOpt              = bodyOpt,
-            totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getInt("total_file_content_size"))
+          Success(
+            FromDatabase(
+              idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
+              dataUserOpt          = dataUser,
+              lastModifiedByOpt    = lastModifiedByOpt,
+              formVersion          = dbFormVersion,
+              stageOpt             = if (hasStage) Option(resultSet.getString("stage")) else None,
+              createdDateTime      = resultSet.getTimestamp("created").toInstant,
+              lastModifiedDateTime = resultSet.getTimestamp("last_modified_time").toInstant,
+              bodyOpt              = bodyOpt,
+              totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getInt("total_file_content_size"))
+            )
           )
-
         } else {
-          throw HttpStatusCodeException(StatusCode.NotFound)
+          Failure(HttpStatusCodeException(StatusCode.NotFound))
         }
       }
     }

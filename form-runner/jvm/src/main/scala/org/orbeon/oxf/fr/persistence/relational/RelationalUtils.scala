@@ -30,7 +30,7 @@ import java.sql.{Connection, ResultSet}
 import java.time.Instant
 import javax.naming.InitialContext
 import javax.sql.DataSource
-import scala.util.control.NonFatal
+import scala.util.control.{ControlThrowable, NonFatal}
 import scala.util.{Success, Try}
 
 
@@ -102,8 +102,12 @@ object RelationalUtils extends Logging {
         connection.commit()
         result
       } catch {
+        case t: ControlThrowable =>
+          debug("about to commit following `ControlThrowable`")
+          connection.commit()
+          throw t
         case NonFatal(t) =>
-          debug("about to rollback", List("throwable" -> Exceptions.getRootThrowable(t).toString))
+          debug("about to rollback following `NonFatal`", List("throwable" -> Exceptions.getRootThrowable(t).toString))
           connection.rollback()
           throw t
       }

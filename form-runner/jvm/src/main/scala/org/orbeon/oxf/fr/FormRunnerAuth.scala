@@ -121,7 +121,7 @@ object FormRunnerAuth {
       getHeader   : String => List[String]
     ): Option[Credentials] = {
 
-      val sessionCredentialsOpt = ServletPortletRequest.findCredentialsInSession(session)
+      val sessionCredentialsOpt = CredentialsSupport.findCredentialsInSession(session)
 
       lazy val stickyHeadersConfigured =
         Properties.instance.getPropertySet.getBoolean(HeaderStickyPropertyName, default = false)
@@ -129,7 +129,7 @@ object FormRunnerAuth {
       lazy val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getAttribute, getHeader)
 
       def storeAndReturnNewCredentials(): Option[Credentials] = {
-        ServletPortletRequest.storeCredentialsInSession(session, newCredentialsOpt)
+        CredentialsSupport.storeCredentialsInSession(session, newCredentialsOpt)
         newCredentialsOpt
       }
 

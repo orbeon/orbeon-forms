@@ -59,6 +59,33 @@ case class Credentials(
   def defaultOrganization: Option[Organization] = organizations.headOption
 }
 
+object Credentials {
+  def fromStrings(username: String, groupname: String, roles: List[String]): Option[Credentials] =
+    UserAndGroup.fromStrings(username, groupname).map { userAndGroup =>
+      Credentials(userAndGroup, roles.flatMap(_.trimAllToOpt).map(SimpleRole.apply), Nil)
+    }
+}
+
+object CredentialsSupport {
+
+  private val CredentialsSessionKey = "org.orbeon.auth.credentials"
+
+  def findCredentialsInSession(session: ExternalContext.Session): Option[Credentials] =
+    session.getAttribute(CredentialsSessionKey) collect {
+      case credentials: Credentials => credentials
+    }
+
+  def storeCredentialsInSession(
+    session        : ExternalContext.Session,
+    credentialsOpt : Option[Credentials]
+  ): Unit = {
+    credentialsOpt match {
+      case Some(credentials) => session.setAttribute(CredentialsSessionKey, credentials)
+      case None              => session.removeAttribute(CredentialsSessionKey)
+    }
+  }
+}
+
 /**
   * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
   * Servlet API or Portlet API can be removed.

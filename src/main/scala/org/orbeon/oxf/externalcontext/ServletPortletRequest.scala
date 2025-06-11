@@ -16,33 +16,13 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.util.URLRewriterUtils
 
 
-object ServletPortletRequest {
-
-  private val CredentialsSessionKey = "org.orbeon.auth.credentials"
-
-  def findCredentialsInSession(session: ExternalContext.Session): Option[Credentials] =
-    session.getAttribute(CredentialsSessionKey) collect {
-      case credentials: Credentials => credentials
-    }
-
-  def storeCredentialsInSession(
-    session        : ExternalContext.Session,
-    credentialsOpt : Option[Credentials]
-  ): Unit = {
-    credentialsOpt match {
-      case Some(credentials) => session.setAttribute(CredentialsSessionKey, credentials)
-      case None              => session.removeAttribute(CredentialsSessionKey)
-    }
-  }
-}
-
 // Implementations shared between `ServletExternalContext` and `Portlet2ExternalContext`.
 trait ServletPortletRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]
 
   lazy val credentials: Option[Credentials] =
-    sessionOpt flatMap ServletPortletRequest.findCredentialsInSession
+    sessionOpt.flatMap(CredentialsSupport.findCredentialsInSession)
 
   def isUserInRole(role: String): Boolean =
     credentials exists (_.roles exists (_.roleName == role))

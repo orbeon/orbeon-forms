@@ -16,7 +16,7 @@ package org.orbeon.oxf.servlet
 import cats.data.NonEmptyList
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.{ArgumentMatchers, Mockito}
-import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, SimpleRole, UserAndGroup}
+import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
@@ -86,7 +86,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       val amendedRequest = newAmendedRequest("/fr/orbeon/controls/new", initialHeaders)
 
       assert((initialHeaders ++ testOrbeonHeaders) == headersFromRequest(amendedRequest))
-      assert(ServletPortletRequest.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
+      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
     }
 
     it("must keep authentication headers for services and store credentials") {
@@ -94,7 +94,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       val amendedRequest = newAmendedRequest("/fr/service/acme", testOrbeonHeaders)
 
       assert(testOrbeonHeaders == headersFromRequest(amendedRequest))
-      assert(ServletPortletRequest.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
+      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
     }
   }
 

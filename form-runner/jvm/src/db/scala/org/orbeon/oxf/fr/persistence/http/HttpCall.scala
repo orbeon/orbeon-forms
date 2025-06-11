@@ -259,6 +259,7 @@ private[persistence] object HttpCall {
   def searchURL       (provider: Provider, formName: String = DefaultFormName): String = s"search/${provider.entryName}/$formName"
   def formMetadataURL (provider: Provider, formName: String = DefaultFormName): String = s"form/${provider.entryName}/$formName"
   def distinctValueURL(provider: Provider, formName: String = DefaultFormName): String = s"distinct-values/${provider.entryName}/$formName"
+  def reindexURL      (provider: Provider, formName: String = DefaultFormName): String = s"reindex/${provider.entryName}/$formName"
 
   def post(
     url           : String,

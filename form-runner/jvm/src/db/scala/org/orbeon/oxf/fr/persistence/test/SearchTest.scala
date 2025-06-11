@@ -604,7 +604,7 @@ class SearchTest
 
   describe("Indexing") {
 
-    it("must clear or rebuild the index when the form definition is deleted or recreated") {
+    it("must clear or rebuild the index when the form definition is deleted or recreated (#6915)") {
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
@@ -666,6 +666,23 @@ class SearchTest
           // 4. Put form definition again and test that data is indexed again
           testForm.putFormDefinition(version)
 
+          assert(readCount("orbeon_i_current") == 2)
+          assert(readCount("orbeon_form_data") == 2)
+          assert(readCountFromIndex == 2)
+
+          // 5. Call indexing API to rebuild the index
+          assertCall(
+            actualRequest = HttpCall.SolicitedRequest(
+              path    = HttpCall.reindexURL(provider, testForm.appForm.form),
+              version = version,
+              method  = HttpMethod.POST
+            ),
+            assertResponse = actualResponse => {
+              assert(actualResponse.code == StatusCode.Ok)
+            }
+          )
+
+          // 6. Test that data is still indexed (should not change, would be nice to have a way to check that the index was rebuilt)
           assert(readCount("orbeon_i_current") == 2)
           assert(readCount("orbeon_form_data") == 2)
           assert(readCountFromIndex == 2)

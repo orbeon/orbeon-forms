@@ -17,13 +17,17 @@ import cats.effect.IO
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.fr.process.TestProcessInterpreter.ConstantProcessId
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerSupport, Names}
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{executionContext, runtime}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.scaxon.SimplePath.*
 import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -46,7 +50,7 @@ trait TestProcessInterpreter extends ProcessInterpreter {
   def findProcessByName(scope: String, name: String): Option[String] = None
   def processError(t: Throwable) = ()
   var xpathContext: Item = null
-  val xpathFunctionLibrary: FunctionLibrary = null
+  val xpathFunctionLibrary: FunctionLibrary = XFormsFunctionLibrary
   def xpathFunctionContext: FunctionContext = null
 
   // Just store the continuation locally
@@ -83,7 +87,10 @@ trait TestProcessInterpreter extends ProcessInterpreter {
 class SimpleProcessTest
 extends DocumentTestBase
    with ResourceManagerSupport // access to resources is needed because `XPathCache` needs the default cache size
-   with AnyFunSpecLike {
+   with AnyFunSpecLike
+   with FormRunnerSupport
+   with XMLSupport
+   with XFormsSupport {
 
   describe("Serialization") {
 
@@ -400,6 +407,55 @@ extends DocumentTestBase
       Interpreter.awaitResultAndProcessSingleBatch()
       assert(s"a1 a2 $MyAsyncFailureAction-start $MyAsyncFailureAction-continuation(Success(after a2)) $MyAsyncSuccessAction-start $MyAsyncSuccessAction-continuation(Success(after a4)) a5 a6" == Interpreter.trace)
       assert(Interpreter.pendingList.isEmpty)
+    }
+  }
+
+  describe("Use of variables") {
+
+    def testSetValueWith(ref: String): Unit = {
+
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+
+          val InitialName        = "Homer Simpson"
+          val NewName            = "Marge Simpson"
+          val formData           = FormRunner.formInstance.root
+          def submitterName      = formData.descendant("submitter-name").stringValue
+
+          assert(submitterName == InitialName)
+
+          XFormsAPI.dispatch(
+            name       = "my-run-process",
+            targetId   = Names.FormModel,
+            properties = Map(
+              "process" -> Some(
+                s"""xf:setvalue(
+                   |    ref   = "$ref",
+                   |    value = "'$NewName'"
+                   |)""".stripMargin
+              )
+            )
+          )
+          assert(submitterName == NewName)
+        }
+      }
+    }
+
+    val refs = List(
+      "//submitter-name",
+      "$submitter-name"
+    )
+
+    refs.foreach { ref =>
+      it(s"""must set control value using `xxf:setvalue(ref = "$ref")`""") {
+        testSetValueWith(ref)
+      }
     }
   }
 }

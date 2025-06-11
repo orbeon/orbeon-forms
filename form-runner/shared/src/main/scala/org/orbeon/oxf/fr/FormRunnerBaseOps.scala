@@ -118,6 +118,13 @@ object AppForm {
 
   def isSpecificAppForm(app: String, form: String): Boolean =
     isSpecificPart(app) && isSpecificPart(form)
+
+  def apply(appOpt: Option[String], formOpt: Option[String]): Option[AppForm] =
+    (appOpt.flatMap(_.trimAllToOpt), formOpt.flatMap(_.trimAllToOpt)) match {
+      case (None, None)            => None
+      case (Some(app), Some(form)) => Some(AppForm(app, form))
+      case _                       => throw new IllegalArgumentException("Both `app` and `form` should be defined or both should be `None`")
+    }
 }
 
 case class AppFormOpt(app: String, formOpt: Option[String])

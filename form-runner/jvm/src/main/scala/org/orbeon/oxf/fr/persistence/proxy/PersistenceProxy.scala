@@ -192,7 +192,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       case (HttpMethod.GET,  HistoryPath(path, app, form, _, _))                 => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (HttpMethod.POST, DistinctValuesPath(path, app, form))                => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (_,               PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, AppFormOpt(Option(app), Option(form)))
-      case (HttpMethod.GET,  ReindexPath)                                        => proxyReindex               (request, response) // TODO: should be `POST`
+      case (HttpMethod.GET,  ReindexPath(null, null))                            => proxyReindex               (request, response, None)
+      case (HttpMethod.POST, ReindexPath(app, form))                             => proxyReindex               (request, response, AppForm(Option(app), Option(form)))
       case (HttpMethod.GET,  ReEncryptStatusPath)                                => proxyReEncryptStatus       (request, response)
       case (_, incomingPath)                                                     => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
     }
@@ -972,21 +973,28 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
   private def proxyReindex(
     request       : Request,
-    response      : Response
+    response      : Response,
+    appFormOpt    : Option[AppForm],
   )(implicit
     indentedLogger: IndentedLogger
   ): Unit = {
-    val dataProviders = getProviders(appOpt = None, formOpt = None, FormOrData.Data)
 
     val dataProvidersWithIndexSupport =
-      dataProviders.filter { provider =>
-        FormRunner.providerPropertyAsBoolean(provider, "reindex", default = false)
-      }
+      getProviders(appOpt = appFormOpt.map(_.app), formOpt = appFormOpt.map(_.form), FormOrData.Data)
+        .filter { provider =>
+          FormRunner.providerPropertyAsBoolean(provider, "reindex", default = false)
+        }
+
     Backend.reindexingProviders(
       dataProvidersWithIndexSupport, p => {
 
         val (baseURI, outgoingPersistenceHeaders) = getPersistenceURLHeadersFromProvider(p)
-        val serviceURI = baseURI + "/reindex"
+
+        val serviceURI =
+          appFormOpt match {
+            case Some(appForm) => s"$baseURI/reindex/${appForm.app}/${appForm.form}" // form version will be forwarded with headers
+            case None          => s"$baseURI/reindex"
+          }
 
         proxyRequestImpl(
           proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, outgoingPersistenceHeaders),

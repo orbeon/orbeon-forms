@@ -16,6 +16,8 @@ package org.orbeon.oxf.fr.persistence.relational.index
 import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.fr.{AppForm, Version}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*
@@ -29,7 +31,7 @@ import org.orbeon.oxf.util.*
  */
 object ReindexRoute extends NativeRoute {
 
-  private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
+  private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex(?:/([^/]+)/([^/]+))?""".r
 
   def process(
     matchResult: MatchResult
@@ -40,7 +42,20 @@ object ReindexRoute extends NativeRoute {
 
     implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
 
-    val ReindexPathRegex(providerToken) = ec.getRequest.getRequestPath
-    Index.reindex(Provider.withName(providerToken), WhatToReindex.AllData, clearOnly = false)
+    ec.getRequest.getRequestPath match {
+      case ReindexPathRegex(providerToken, null, null) =>
+        Index.reindex(Provider.withName(providerToken), WhatToReindex.AllData, clearOnly = false)
+      case ReindexPathRegex(providerToken, app, form) =>
+
+        // Version is required if we pass app/form
+        val incomingVersion =
+          ec
+            .getRequest
+            .getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion)
+            .map(_.toInt)
+            .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
+
+        Index.reindex(Provider.withName(providerToken), WhatToReindex.DataForForm((AppForm(app, form), incomingVersion)), clearOnly = false)
+    }
   }
 }

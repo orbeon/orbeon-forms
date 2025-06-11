@@ -146,7 +146,7 @@ object FormRunnerPersistence {
   val ExportPath                          = """/fr/service/persistence/export(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val PurgePath                           = """/fr/service/persistence/purge(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val DistinctValuesPath                  = """/fr/service/persistence(/distinct-values/([^/]+)/([^/]+))""".r
-  val ReindexPath                         =   "/fr/service/persistence/reindex"
+  val ReindexPath                         = """/fr/service/persistence/reindex(?:/([^/]+)/([^/]+))?""".r
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 
   val DataXml                             = "data.xml"

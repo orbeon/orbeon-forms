@@ -73,8 +73,14 @@
     <!-- Deployed forms services -->
     <service path="/fr/service/resource/form(/([^/]+)(/([^/]+))?)?" view="persistence/resource/form.xpl"/>
 
+    <!-- Support `GET` for backward compatibility, but adding `POST` which makes more sense -->
     <service
         path="/fr/service/([^/]+)/reindex"
+        methods="GET POST"
+        class="org.orbeon.oxf.fr.persistence.relational.index.ReindexRoute"/>
+    <service
+        path="/fr/service/([^/]+)/reindex/([^/]+)/([^/]+)"
+        methods="POST"
         class="org.orbeon.oxf.fr.persistence.relational.index.ReindexRoute"/>
 
     <!-- ==== Internationalization ================================================================================= -->

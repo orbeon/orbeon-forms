@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.process
 import cats.effect.IO
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.FormRunnerCommon.spc
-import org.orbeon.oxf.fr.XMLNames
+import org.orbeon.oxf.fr.{FormRunnerRename, XMLNames}
 import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
@@ -382,16 +382,32 @@ trait ProcessInterpreter extends Logging {
       item = item
     ).asInstanceOf[BooleanValue].getBooleanValue
 
+  private def exprWithProcessedVarReferences(
+    xpathString     : String,
+    namespaceMapping: NamespaceMapping
+  ): String =
+    FormRunnerRename.replaceVarReferencesWithFunctionCalls(
+      xpathString      = xpathString,
+      namespaceMapping = namespaceMapping,
+      library          = xpathFunctionLibrary,
+      avt              = false,
+      libraryNameOpt   = None,
+      norewrite        = Set.empty
+    )
+
+  private def namespaceMappingWithFRF(mapping: NamespaceMapping): NamespaceMapping =
+    NamespaceMapping(mapping.mapping + ("frf" -> "java:org.orbeon.oxf.fr.FormRunner"))
+
   def evaluateString(
     expr           : String,
     item           : om.Item          = xpathContext,
     mapping        : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping,
     functionContext: FunctionContext  = xpathFunctionContext
   ): String =
-    evaluateOne(
-      expr            = u.StaticXPath.makeStringExpression(expr),
+    evalOne(
       item            = item,
-      mapping         = mapping,
+      expr            = u.StaticXPath.makeStringExpression(exprWithProcessedVarReferences(expr, mapping)),
+      namespaces      = namespaceMappingWithFRF(mapping),
       functionContext = functionContext
     ).getStringValue
 
@@ -403,16 +419,16 @@ trait ProcessInterpreter extends Logging {
   ): om.Item =
     evalOne(
       item            = item,
-      expr            = expr,
-      namespaces      = mapping,
+      expr            = exprWithProcessedVarReferences(expr, mapping),
+      namespaces      = namespaceMappingWithFRF(mapping),
       functionContext = functionContext
     )
 
   def evaluateNodes(expr: String, item: om.Item = xpathContext): collection.Seq[om.NodeInfo] =
     evalNodes(
       item            = item,
-      expr            = expr,
-      namespaces      = ProcessInterpreter.StandardNamespaceMapping,
+      expr            = exprWithProcessedVarReferences(expr, ProcessInterpreter.StandardNamespaceMapping),
+      namespaces      = namespaceMappingWithFRF(ProcessInterpreter.StandardNamespaceMapping),
       functionContext = xpathFunctionContext
     )
 

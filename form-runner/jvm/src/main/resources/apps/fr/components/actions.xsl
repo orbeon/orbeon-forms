@@ -892,7 +892,7 @@
         <xsl:param name="itemset-action-control-names" tunnel="yes"/>
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:choose>
-            <xsl:when test="frf:controlNameFromId(../@id) = $itemset-action-control-names">
+            <xsl:when test="../@fr:itemsetid-mode = 'always' or (frf:controlNameFromId(../@id) = $itemset-action-control-names and not(../@fr:itemsetid-mode = 'never'))">
                 <xsl:copy>
                     <!-- Update `@ref` attribute to disable the default itemset if an `@fr:itemsetid` attribute is present -->
                     <xsl:if test="exists(@ref)">

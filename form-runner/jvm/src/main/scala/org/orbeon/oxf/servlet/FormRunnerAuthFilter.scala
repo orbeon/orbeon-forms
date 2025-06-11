@@ -14,12 +14,13 @@
 package org.orbeon.oxf.servlet
 
 import org.apache.logging.log4j.ThreadContext
-import org.orbeon.oxf.externalcontext.ServletPortletRequest
+import org.orbeon.oxf.externalcontext.CredentialsSupport
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils.*
 import org.slf4j.LoggerFactory
+
 
 // For backward compatibility
 class FormRunnerAuthFilter extends JavaxFormRunnerAuthFilter
@@ -90,9 +91,9 @@ object FormRunnerAuthFilterImpl {
         // the session. This is done by `getCredentialsAsHeadersUseSession()` if we are not a service, but here we
         // don't use that function so we need to do make sure they are stored.
 
-        ServletPortletRequest.findCredentialsInSession(httpSession) match {
+        CredentialsSupport.findCredentialsInSession(httpSession) match {
           case None =>
-            ServletPortletRequest.storeCredentialsInSession(
+            CredentialsSupport.storeCredentialsInSession(
               httpSession,
               FormRunnerAuth.fromHeaderValues(
                 credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),

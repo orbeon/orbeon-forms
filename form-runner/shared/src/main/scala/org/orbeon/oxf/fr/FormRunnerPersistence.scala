@@ -117,6 +117,12 @@ case class AttachmentWithHolder(
   holder   : NodeInfo
 )
 
+case class AttachmentWithHolderAndFilename(
+  fromPath            : String,
+  holder              : NodeInfo,
+  persistenceFilename : String
+)
+
 case class AttachmentWithHolders(
   fromPath : String,
   holder   : List[NodeInfo]
@@ -707,14 +713,15 @@ trait FormRunnerPersistence {
 
   private def uploadedAttachmentFilename(
     attachmentHolder: NodeInfo)(implicit
-    indentedLogger  : IndentedLogger
+    formRunnerParams: FormRunnerParams,
+    indentedLogger  : IndentedLogger,
   ): String = {
 
     val attachmentId = CoreCrossPlatformSupport.randomHexId
     val PropertyName = "oxf.fr.persistence.attachments.filename"
 
     val filenameExpressionAndMappingsOpt = for {
-      (expression, ns)  <- formRunnerPropertyWithNs(PropertyName)(FormRunnerParams())
+      (expression, ns)  <- formRunnerPropertyWithNs(PropertyName)
       trimmedExpression <- expression.trimAllToOpt
     } yield (trimmedExpression, ns)
 
@@ -757,10 +764,11 @@ trait FormRunnerPersistence {
     }
   }
 
-  def createAttachmentFilename(
+  private def createAttachmentFilename(
     url             : String,
     basePath        : String,
     attachmentHolder: NodeInfo)(implicit
+    formRunnerParams: FormRunnerParams,
     indentedLogger  : IndentedLogger
   ): String = {
     val filename =
@@ -981,6 +989,8 @@ trait FormRunnerPersistence {
     indentedLogger   : IndentedLogger
   ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
     val credentials =
       username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None))
 
@@ -1006,15 +1016,23 @@ trait FormRunnerPersistence {
     val preparedDataDocumentInfo =
       new DocumentWrapper(preparedData, null, XPath.GlobalConfiguration)
 
-    // Find all instance nodes containing file URLs we need to upload
-    val attachmentsWithHolder =
+    // Find all instance nodes containing file URLs we need to upload, and compute the attachment filenames
+    val attachmentsWithHolderAndFilename =
       collectUnsavedAttachments(
         preparedDataDocumentInfo,
         if (forceAttachments)
           AttachmentMatch.BasePaths(includes = toBasePath :: fromBasePaths.map(_._1).toList, excludes = Nil)
         else
           AttachmentMatch.BasePaths(includes = fromBasePaths.map(_._1), excludes = List(toBasePath))
-      )
+      ).map { case AttachmentWithHolder(beforeUrl, migratedHolder) =>
+        // Compute the attachment filenames here to have access to all the necessary context (in-scope containing
+        // document, XPath function context, etc.)
+        AttachmentWithHolderAndFilename(
+          fromPath            = beforeUrl,
+          holder              = migratedHolder,
+          persistenceFilename = createAttachmentFilename(beforeUrl, toBasePath, migratedHolder)
+        )
+      }
 
     def rewriteServiceUrl(url: String) =
       URLRewriterUtils.rewriteServiceURLPlain(
@@ -1029,12 +1047,11 @@ trait FormRunnerPersistence {
       connectionCtx: ConnectionContexts
     ): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
-        AttachmentWithHolder(beforeUrl, migratedHolder)
-                          <- fs2.Stream.emits(attachmentsWithHolder)
+        case AttachmentWithHolderAndFilename(beforeUrl, migratedHolder, afterUrl)
+                          <- fs2.Stream.emits(attachmentsWithHolderAndFilename)
         getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
         pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        afterUrl          = createAttachmentFilename(beforeUrl, toBasePath, migratedHolder)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
         putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.content.stream, pathToHolder, resolvedPutUri, formVersion, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))

@@ -138,12 +138,32 @@ object Metadata {
 
   // For pattern matching
   case class StringOption(stringOpt: Option[String])
+  case class InstantOption(instantOpt: Option[Instant])
 
   trait StringOptionMetadata extends Metadata[StringOption] with MultiValueSupport[StringOption] {
     override def valueFromString(string: String): StringOption = StringOption(Some(string).filter(_.nonEmpty))
     override def valueAsString(value: StringOption): String    = value.stringOpt.getOrElse("")
 
     override val allowedMatchTypes: Set[MatchType] = Set(Exact, Substring)
+  }
+
+  trait InstantOptionMetadata extends Metadata[InstantOption] with MultiValueSupport[InstantOption] {
+    override def valueFromString(string: String): InstantOption = InstantOption(Some(string).filter(_.nonEmpty).map(RelationalUtils.instantFromString))
+    override def valueAsString(value: InstantOption): String    = value.instantOpt.map(_.toString).getOrElse("")
+
+    override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThanOrEqual, LowerThan, Exact)
+
+    override def min(values: List[InstantOption]): Option[InstantOption] =
+      values.flatMap(_.instantOpt) match {
+        case Nil => None
+        case instants => InstantOption(instants.min.some).some
+      }
+
+    override def max(values: List[InstantOption]): Option[InstantOption] =
+      values.flatMap(_.instantOpt) match {
+        case Nil => None
+        case instants => InstantOption(instants.max.some).some
+      }
   }
 
   trait OperationsListMetadata extends Metadata[OperationsList] with MultiValueSupport[OperationsList] {
@@ -203,12 +223,12 @@ object Metadata {
       if (localRemoteOrCombinator == Local) form.version.some else throwInvalidUrlOrCombinator(localRemoteOrCombinator)
   }
 
-  case object Created extends InstantMetadata {
+  case object Created extends InstantOptionMetadata {
     override val string    = "created"
     override val sqlColumn = "created"
 
-    override def value(formMetadata: FormMetadata, language: => String): Instant =
-      formMetadata.created
+    override def value(formMetadata: FormMetadata, language: => String): InstantOption =
+      InstantOption(formMetadata.created)
   }
 
   case object LastModified extends InstantMetadata {

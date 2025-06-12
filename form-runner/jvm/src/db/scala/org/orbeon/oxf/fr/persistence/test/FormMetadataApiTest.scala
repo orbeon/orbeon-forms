@@ -203,7 +203,7 @@ class FormMetadataApiTest
       )
     )
 
-  case class PartialFormMetadata(formName: String, created: Instant, modified: Instant)
+  case class PartialFormMetadata(formName: String, created: Option[Instant], modified: Instant)
 
   private def partialFormMetadata(body: Array[Byte]): Seq[PartialFormMetadata] = {
     val root = orbeonDomToTinyTree(IOSupport.readOrbeonDom(new ByteArrayInputStream(body))).rootElement
@@ -211,7 +211,7 @@ class FormMetadataApiTest
     (root / "form").toList map { formElem =>
       PartialFormMetadata(
         formName = (formElem / "form-name").head.stringValue,
-        created  = instantFromString((formElem / "created"           ).head.stringValue),
+        created  = (formElem / "created").headOption.map(_.stringValue).map(instantFromString),
         modified = instantFromString((formElem / "last-modified-time").head.stringValue)
       )
     }
@@ -551,8 +551,8 @@ class FormMetadataApiTest
 
         // Creation date
 
-        val minCreated = partialFormMetadata.map(_.created).min
-        val maxCreated = partialFormMetadata.map(_.created).max
+        val minCreated = partialFormMetadata.flatMap(_.created).min
+        val maxCreated = partialFormMetadata.flatMap(_.created).max
 
         assertFilter(
           metadata          = "created",
@@ -1018,7 +1018,7 @@ class FormMetadataApiTest
             localMetadataOpt = FormMetadata(
               lastModifiedTime  = Instant.now,
               lastModifiedByOpt = "user-3".some,
-              created           = Instant.now.plus(1, ChronoUnit.HOURS),
+              created           = Some(Instant.now.plus(1, ChronoUnit.HOURS)),
               title             = Map("en" -> "Title"),
               available         = true,
               permissionsOpt    = None, // assert won't compare NodeInfo correctly
@@ -1027,7 +1027,7 @@ class FormMetadataApiTest
             remoteMetadata   = Map("https://localhost:8083" -> FormMetadata(
               lastModifiedTime  = Instant.now.plus(2, ChronoUnit.HOURS),
               lastModifiedByOpt = "user-4".some,
-              created           = Instant.now.plus(3, ChronoUnit.HOURS),
+              created           = Some(Instant.now.plus(3, ChronoUnit.HOURS)),
               title             = Map("fr" -> "Titre"),
               available         = false,
               permissionsOpt    = None, // assert won't compare NodeInfo correctly

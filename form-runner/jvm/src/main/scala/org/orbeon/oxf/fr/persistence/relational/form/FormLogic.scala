@@ -118,7 +118,7 @@ object FormLogic {
                 title             = title,
                 lastModifiedTime  = resultSet.getTimestamp("last_modified_time").toInstant,
                 lastModifiedByOpt = Option(resultSet.getString("last_modified_by")),
-                created           = resultSet.getTimestamp("created").toInstant,
+                created           = Some(resultSet.getTimestamp("created").toInstant),
                 available         = available,
                 permissionsOpt    = permissions,
                 operations        = OperationsList(Nil)

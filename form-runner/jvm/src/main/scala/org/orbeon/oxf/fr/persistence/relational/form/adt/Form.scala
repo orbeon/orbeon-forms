@@ -33,7 +33,7 @@ case class OperationsList(ops: List[String])
 case class FormMetadata(
   lastModifiedTime : Instant,
   lastModifiedByOpt: Option[String],
-  created          : Instant,
+  created          : Option[Instant],
   title            : Map[String, String],
   available        : Boolean,
   permissionsOpt   : Option[NodeInfo], // Keep permissions as untyped XML for now
@@ -48,7 +48,7 @@ case class FormMetadata(
     // Use "last-modified-time" instead of "last-modified" for compatibility reasons
     val lastModifiedTimeXml  = <last-modified-time>{lastModifiedTime}</last-modified-time>
     val lastModifiedByXmlOpt = lastModifiedByOpt.map(lastModifiedBy => <last-modified-by>{lastModifiedBy}</last-modified-by>)
-    val createdXml           = <created>{created}</created>
+    val createdXmlOpt        = created.map(c => <created>{c}</created>)
     val titleXml             = title.map { case (lang, title) => <title xml:lang={lang}>{title}</title> }
     val availabilityXml      = <available>{available}</available>
     val permissionsXmlOpt    = permissionsOpt.map(nodeInfoToElem).map(Form.elemWithoutScope)
@@ -60,7 +60,7 @@ case class FormMetadata(
     val elems =
       Seq(lastModifiedTimeXml) ++
       lastModifiedByXmlOpt.toSeq ++
-      Seq(createdXml) ++
+      createdXmlOpt.toSeq ++
       titleXml ++
       Seq(availabilityXml) ++
       permissionsXmlOpt.toSeq
@@ -106,7 +106,7 @@ object FormMetadata {
       FormMetadata(
         lastModifiedTime  = instantFromString(lastModifiedTimeString),
         lastModifiedByOpt = xml.elemValueOpt("last-modified-by"),
-        created           = instantFromString(xml.elemValue("created")),
+        created           = xml.elemValueOpt("created").map(instantFromString),
         title             = (xml / "title").map { title =>
           title.attValue("*:lang") -> title.stringValue
         }.toMap,

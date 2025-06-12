@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.form.adt
 
 import org.orbeon.oxf.fr.FormDefinitionVersion
-import org.orbeon.oxf.fr.persistence.relational.form.adt.Metadata.StringOption
+import org.orbeon.oxf.fr.persistence.relational.form.adt.Metadata.{StringOption, InstantOption}
 
 import java.time.Instant
 
@@ -36,6 +36,7 @@ case object Order {
     case (x: OperationsList, y: OperationsList)               => x.ops.mkString(" ").compareTo(y.ops.mkString(" "))
     case (x: String, y: String)                               => x.toLowerCase.compareTo(y.toLowerCase) // Case-insensitive comparison
     case (x: StringOption, y: StringOption)                   => compare(x.stringOpt, y.stringOpt)
+    case (x: InstantOption, y: InstantOption)                 => compare(x.instantOpt, y.instantOpt)
     case _                                                    => throw new IllegalArgumentException(s"Unsupported metadata type: ${x.getClass}")
   }
 

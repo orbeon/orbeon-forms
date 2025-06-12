@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.IndentedLogger.*
 
 import java.lang as jl
 import scala.annotation.varargs
+import scala.util.control.ControlThrowable
 
 /**
  * Abstraction which provides:
@@ -130,6 +131,8 @@ class IndentedLogger(
 
       body
     } catch {
+      case t: ControlThrowable =>
+        throw t // `success` will remain `true`
       case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
         success = false
         throw t

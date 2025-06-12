@@ -33,6 +33,7 @@ class ClipboardTest
   val SectionsRepeatsDoc      = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
   val SectionsGridsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids-repeats.xhtml"
   val RepeatedSectionDoc      = "oxf:/org/orbeon/oxf/fb/template-with-repeated-section.xhtml"
+  val SectionTemplatesDoc     = "oxf:/org/orbeon/oxf/fb/template-with-section-templates.xhtml"
 
   val Control1   = "control-1"
   val Control2   = "control-2"
@@ -240,6 +241,31 @@ class ClipboardTest
 
         assertContainerCutPaste(NestedGridId,         List(RepeatedControl111, RepeatedControl112), List("value111⊙1", "value111⊙2", "value112⊙1", "value112⊙2"))
         assertContainerCutPaste(NestedRepeatedGridId, List(RepeatedControl121, RepeatedControl122), List("value121⊙1", "value121⊙2", "value122⊙1", "value122⊙2"))
+      }
+    }
+
+    it("must copy and paste section with template content (#6925)") {
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
+
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+
+        // This section does not contain an element with an `id`
+        FormBuilderRpcApiImpl.containerCopy("section-1-section")
+
+        ToolboxOps.readXcvFromClipboardAndClone flatMap
+          (ToolboxOps.pasteSectionGridFromXcv(_, "", "", None, Set.empty, copyAttachments = true))
+
+        assert(FormBuilder.findContainerById("section-6-section").isDefined)
+
+        // This section contains an element with an `id`
+        FormBuilderRpcApiImpl.containerCopy("section-5-section")
+
+        ToolboxOps.readXcvFromClipboardAndClone flatMap
+          (ToolboxOps.pasteSectionGridFromXcv(_, "", "", None, Set.empty, copyAttachments = true))
+
+        assert(FormBuilder.findContainerById("section-7-section").isDefined)
+        assert(FormBuilder.findContainerById("section-7-section").toList.flatMap(_.child(*).ids).contains("section-7-content-control"))
       }
     }
   }

@@ -627,15 +627,28 @@ object ToolboxOps {
     val newControlNamesWithAutomaticIdsMap = {
 
       val xcvNamesWithPrefixSuffix   = xcvNamesInUse map toNameWithPrefixSuffix
-      val needRenameWithAutomaticIds = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect getAllNamesInUse
+      val allNamesInUse              = getAllNamesInUse
+      val needRenameWithAutomaticIds = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect allNamesInUse
 
-      // These names are both subsets of `getAllNamesInUse`
-      val (allSectionNamesInUse, allGridNamesInUse) = {
+      // These names are both subsets of `allNamesInUse`
+      val (allSectionNamesInUse, allGridNamesInUse, templateContentNamesToSectionNames) = {
 
         val (allSections, allGrids) =
           findNestedContainers(ctx.bodyElem) partition IsSection
 
-        (allSections flatMap getControlNameOpt toSet, allGrids flatMap getControlNameOpt toSet)
+        (
+          allSections.flatMap(getControlNameOpt).toSet,
+          allGrids   .flatMap(getControlNameOpt).toSet,
+          (
+            for {
+              sectionElem <- allSections
+              sectionName <- getControlNameOpt(sectionElem)
+              contentElem <- FormRunner.findComponentElemForSection(sectionElem)
+              contentName <- getControlNameOpt(contentElem)
+            } yield
+              contentName -> sectionName
+          ).toMap
+        )
       }
 
       // We do not want to generate a new id that matches the `ignore`d id, so we add `ignore` here.
@@ -656,7 +669,27 @@ object ToolboxOps {
         else
           newControlNamesIt.next()
 
-      needRenameWithAutomaticIds.iterator.map(name => name -> newName(name)).toMap
+      val resultWithoutSyncedTemplateContent =
+        needRenameWithAutomaticIds
+          .iterator
+          .map(name => name -> newName(name))
+          .toMap
+
+      // Try to sync the template content names with the section names
+      val newTemplateContentNames =
+        needRenameWithAutomaticIds
+          .iterator
+          .flatMap(name => templateContentNamesToSectionNames.get(name).map(name -> _))
+          .flatMap { case (contentName, oldSectionName) =>
+            resultWithoutSyncedTemplateContent.get(oldSectionName).flatMap { newSectionName =>
+              val newName = s"$newSectionName$TemplateContentSuffix"
+
+              (! resultWithoutSyncedTemplateContent.contains(newName) && ! allNamesInUse.contains(newName))
+                .option(contentName -> newName)
+            }
+          }
+
+      resultWithoutSyncedTemplateContent ++ newTemplateContentNames
     }
 
     xcvNamesInUse map { xcvName =>
@@ -899,6 +932,7 @@ object ToolboxOps {
 
         // Rename self control, nested sections and grids, and nested controls
         (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++
+          findComponentElemForSection(containerControlElem).iterator                      ++
           findNestedContainers(containerControlElem).iterator                             ++
           findNestedControls(containerControlElem).iterator foreach { controlElem =>
 

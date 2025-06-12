@@ -225,5 +225,21 @@ class ActionsFormat20182Test
         }
       }
     }
+
+    describe("#7083: initial value depending on service running before initial values are calculated") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("issue", "7083", "new", initialize = true)
+
+      val doc = docOpt.get
+
+      it("must have initialized the control value") {
+        withTestExternalContext { implicit ec =>
+          withFormRunnerDocument(processorService, doc) {
+            assert("Overview" == resolveObject[XFormsValueControl]("foo-c-control").get.getValue(EventCollector.Throw))
+          }
+        }
+      }
+    }
   }
 }

@@ -167,10 +167,16 @@
 
         </xf:action> <!-- `$mode = 'new'` -->
 
-        <xf:dispatch
-            if="xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
-            name="fr-run-form-load-action-before-data"
-            targetid="fr-form-model"/>
+        <xf:action if="xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)">
+            <!-- Run actions "before the data's initial values are calculated" -->
+            <xf:dispatch
+                name="fr-run-form-load-action-before-data"
+                targetid="fr-form-model"/>
+            <!-- Actions can cause a recalculate, so recalculate the defaults, as some may depend on actions -->
+            <xf:recalculate
+                model="fr-form-model"
+                xxf:defaults="true"/>
+        </xf:action>
 
     </xf:action>
 

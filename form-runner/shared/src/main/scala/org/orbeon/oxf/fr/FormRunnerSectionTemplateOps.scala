@@ -149,7 +149,7 @@ trait FormRunnerSectionTemplateOps {
     els / "*:bind"
   }
 
-  def findComponentNodeForSection(sectionNode: NodeInfo): Option[NodeInfo] =
+  def findComponentElemForSection(sectionNode: NodeInfo): Option[NodeInfo] =
     sectionNode child * find (e => matchesComponentURI(e.getURI))
 
   def isSectionWithTemplateContent(containerElem: NodeInfo): Boolean =

@@ -495,12 +495,12 @@ object FormBuilderXPathApi {
     // Find data holders for all section templates
     val holdersWithRoots =
       for {
-        sectionNode   <- FormRunner.findSectionsWithTemplates
-        controlName   <- FormRunner.getControlNameOpt(sectionNode).toList
+        sectionElem   <- FormRunner.findSectionsWithTemplates
+        controlName   <- FormRunner.getControlNameOpt(sectionElem).toList
         holder        <- FormRunner.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
-        componentNode <- FormRunner.findComponentNodeForSection(sectionNode)
-        bindingNode   <- FormRunner.findXblBinding(ctx.bodyElem, componentNode.uriQualifiedName)
-        instance      <- FormRunner.findXblInstance(bindingNode, fr.Names.FormTemplate)
+        componentElem <- FormRunner.findComponentElemForSection(sectionElem)
+        bindingElem   <- FormRunner.findXblBinding(ctx.bodyElem, componentElem.uriQualifiedName)
+        instance      <- FormRunner.findXblInstance(bindingElem, fr.Names.FormTemplate)
         instanceRoot  <- instance / * headOption
       } yield
         holder -> instanceRoot

@@ -232,7 +232,7 @@ trait ControlOps extends ResourcesOps {
       // Maybe rename section template content
       findControlByName(oldName)
         .filter(FormRunner.isSectionWithTemplateContent)
-        .foreach( _ => renameControlIfNeeded(oldName + TemplateContentSuffix, newName + TemplateContentSuffix))
+        .foreach(_ => renameControlIfNeeded(oldName + TemplateContentSuffix, newName + TemplateContentSuffix))
 
       findDataHolders(oldName)     foreach (rename(_, newName))
       findResourceHolders(oldName) foreach (rename(_, newName))

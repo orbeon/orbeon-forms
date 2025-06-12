@@ -57,6 +57,10 @@
 
     <!-- Initialize dialog -->
     <xf:action event="xxforms-dialog-open">
+
+        <!-- Workaround for https://github.com/orbeon/orbeon-forms/issues/7010 -->
+        <xf:recalculate model="fb-actions-editor-model"/>
+
         <xf:var name="instance"     value="instance('fb-actions-editor-instance')"/>
         <xf:var name="binding-name" value="event('binding-name')"/>
 

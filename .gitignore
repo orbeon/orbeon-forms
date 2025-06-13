@@ -12,11 +12,7 @@ lib/xerces-2.12-orbeon-jar/
 .target/.history
 src/resources-packaged-target/
 src/resources-local/
-resources-local-A/
-resources-local-B/
 resources-local/
-node_modules/
-tmp
 scratch.txt
 *~
 .bloop
@@ -39,4 +35,4 @@ react/dist/
 react-test/dist/
 # FormMetadataApiTest
 src/test/resources/properties-form-metadata-api-test.xml
-.aider*
+CLAUDE.md

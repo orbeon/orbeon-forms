@@ -141,15 +141,13 @@ case class DataHistory(
 
   def save(formWithData: FormWithData): DataHistory = {
     val updatedDataEntries = dataEntries.zipWithIndex map { case (data, index) =>
-      val expectedCode = if (index == 0) StatusCode.Created else StatusCode.NoContent
-
       val httpResponse = HttpCall.put(
         url     = data.url(formWithData, this),
         version = formWithData.version,
         stage   = None,
         body    = HttpCall.XML(formWithData.testForm.formData(Seq(data.value)))
       )
-      assert(httpResponse.statusCode == expectedCode)
+      assert(StatusCode.isSuccessCode(httpResponse.statusCode))
 
       // Retrieve last modified time from headers
       val lastModified = headerFromRFC1123OrIso(httpResponse.headers, Headers.OrbeonLastModified, Headers.LastModified)

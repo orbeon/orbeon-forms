@@ -10,6 +10,7 @@ import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsB
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
+import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -40,7 +41,7 @@ trait PersistenceApiTrait {
   val PageSizeParam         = "page-size"
   val PageNumberParam       = "page-number"
 
-  private val SearchPageSize = 100
+  val SearchPageSize = 100
 
   case class DataDetails(
     createdTime       : Instant,
@@ -51,6 +52,7 @@ trait PersistenceApiTrait {
     workflowStage     : Option[String],
     documentId        : String,
     isDraft           : Boolean,
+    operations        : Option[Operations],
     details           : List[String],
   )
 
@@ -189,6 +191,7 @@ trait PersistenceApiTrait {
             workflowStage      = documentElem.attValueNonBlankOpt("workflow-stage"),
             documentId         = documentElem.attValue("name"),
             isDraft            = documentElem.attValue("draft") == "true",
+            operations         = Operations.parseFromString(documentElem.attValue("operations")),
             details            = if (returnDetails) (documentElem / "details" / "detail").map(_.getStringValue).toList else Nil,
           )
         },

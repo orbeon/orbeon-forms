@@ -108,9 +108,12 @@ trait Reindex extends FormDefinition {
           case Nil => ""
           case _   => "WHERE " + whereConditions.mkString(" AND ")
         }
-        val orderByClause = provider match {
-          case Provider.MySQL => " ORDER BY data_id"
-          case _              => ""
+
+        // 2025-06-13: `ORDER BY` was added for #3606 and appeared to solve a problem. However, it costs a huge amount
+        // of performance when reindexing a single document. Cautiously remove it in that specific case.
+        val orderByClause = (provider, whatToReindex) match {
+          case (Provider.MySQL, AllData | DataForForm(_)) => " ORDER BY data_id"
+          case _                                          => ""
         }
         val deleteFromValueIndexWhereSql =
           whatToReindex match {

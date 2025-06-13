@@ -328,6 +328,11 @@
                 action="/fr/service/persistence/crud/{$app}/{$form}/data/"
                 replace="none">
 
+                <xf:header>
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="instance('fr-form-instance')/version/selected-version"/>
+                </xf:header>
+
                 <!-- Start import once data is successfully deleted -->
                 <xf:send event="xforms-submit-done" submission="fr-import-import-submission"/>
 

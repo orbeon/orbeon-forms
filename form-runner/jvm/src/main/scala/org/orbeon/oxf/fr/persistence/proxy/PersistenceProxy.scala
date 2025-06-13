@@ -186,7 +186,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     (request.getMethod, request.getRequestPath) match {
       case (_,               FormPath(path, app, form, _))                       => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
       case (_,               DataPath(path, app, form, _, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(documentId))
-      case (_,               DataCollectionPath(path, app, form))                => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.DELETE, DataCollectionPath(path, app, form))              => BatchDelete.process        (request, response, AppForm(app, form))
       case (HttpMethod.POST, SearchPath(path, app, form))                        => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))              => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case (HttpMethod.GET,  HistoryPath(path, app, form, _, _))                 => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)

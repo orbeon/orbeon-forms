@@ -484,8 +484,8 @@
         observer="fr-form-model"
         event="
             fr-run-form-load-action-before-data
-            xforms-model-construct-done
-            xforms-ready">
+            fr-run-form-load-action-after-data
+            fr-run-form-load-action-after-controls">
 
         <!--
             We handle two types of processes:
@@ -518,9 +518,9 @@
                     return
                         if ($name = 'fr-run-form-load-action-before-data') then
                             'before-data'
-                        else if ($name = 'xforms-model-construct-done') then
+                        else if ($name = 'fr-run-form-load-action-after-data') then
                             'after-data'
-                        else if ($name = 'xforms-ready') then
+                        else if ($name = 'fr-run-form-load-action-after-controls') then
                             'after-controls'
                         else
                             error(

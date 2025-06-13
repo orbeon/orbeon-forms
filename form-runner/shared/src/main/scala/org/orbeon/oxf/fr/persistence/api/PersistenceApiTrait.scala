@@ -136,7 +136,8 @@ trait PersistenceApiTrait {
     searchVersion           : SearchVersion,
     isInternalAdminUser     : Boolean,
     searchQueryOpt          : Option[DocumentNodeInfoType],
-    returnDetails           : Boolean
+    returnDetails           : Boolean,
+    pageIncrement           : Int
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -195,7 +196,7 @@ trait PersistenceApiTrait {
         (page.rootElement / "document").size
       )
 
-    callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
+    callPagedService(pageIncrement, pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
   def distinctValues(
@@ -266,6 +267,7 @@ trait PersistenceApiTrait {
     documentId           : String,
     attachmentFilenameOpt: Option[String],
     isInternalAdminUser  : Boolean,
+    pageIncrement        : Int
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -343,7 +345,7 @@ trait PersistenceApiTrait {
       )
     }
 
-    callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
+    callPagedService(pageIncrement, pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
   def readFormData(
@@ -608,7 +610,8 @@ trait PersistenceApiTrait {
     ).headers
 
   private def callPagedService[R](
-    readPage: Int => Try[(Iterator[R], Int, Int)]
+    pageIncrement: Int,
+    readPage     : Int => Try[(Iterator[R], Int, Int)]
   )(implicit
     logger                  : IndentedLogger
   ): Iterator[R] = {
@@ -625,7 +628,7 @@ trait PersistenceApiTrait {
             debug(s"search total is `$total`")
             searchTotal = total.some
           }
-          currentPage  += 1
+          currentPage  += pageIncrement
           currentCount += count
           it
         }

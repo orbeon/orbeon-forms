@@ -483,7 +483,7 @@
     <xf:action
         observer="fr-form-model"
         event="
-            xxforms-instances-ready
+            fr-run-form-load-action-before-data
             xforms-model-construct-done
             xforms-ready">
 
@@ -516,7 +516,7 @@
                 let $current-event-phase :=
                     for $name in event('xxf:type')
                     return
-                        if ($name = 'xxforms-instances-ready') then
+                        if ($name = 'fr-run-form-load-action-before-data') then
                             'before-data'
                         else if ($name = 'xforms-model-construct-done') then
                             'after-data'

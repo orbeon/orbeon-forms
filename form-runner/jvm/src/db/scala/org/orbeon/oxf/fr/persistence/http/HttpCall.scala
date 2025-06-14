@@ -260,6 +260,7 @@ private[persistence] object HttpCall {
   def formMetadataURL (provider: Provider, formName: String = DefaultFormName): String = s"form/${provider.entryName}/$formName"
   def distinctValueURL(provider: Provider, formName: String = DefaultFormName): String = s"distinct-values/${provider.entryName}/$formName"
   def reindexURL      (provider: Provider, formName: String = DefaultFormName): String = s"reindex/${provider.entryName}/$formName"
+  def batchDeleteURL  (provider: Provider, formName: String = DefaultFormName): String = crudURLPrefix(provider, formName) + "data/"
 
   def post(
     url           : String,

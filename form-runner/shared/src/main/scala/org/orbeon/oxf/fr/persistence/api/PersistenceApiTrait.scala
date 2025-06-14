@@ -616,7 +616,7 @@ trait PersistenceApiTrait {
     pageIncrement: Int,
     readPage     : Int => Try[(Iterator[R], Int, Int)]
   )(implicit
-    logger                  : IndentedLogger
+    logger  : IndentedLogger
   ): Iterator[R] = {
 
     var searchTotal: Option[Int] = None

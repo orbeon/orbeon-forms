@@ -19,18 +19,17 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Drafts, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, Whitespace, XPath}
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger, Whitespace, XPath}
 import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
@@ -440,8 +439,8 @@ trait CreateUpdateDelete {
 
     // Update index if needed
     if (
-        ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
-        ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only delete historical data, which is not indexed
+      ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
+      ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
     ) {
       val whatToReindex = req.dataPart match {
         case Some(dataPart) =>

@@ -277,16 +277,30 @@ trait CreateUpdateDelete {
         // immediately removed! So we remove draft attachments from `from orbeon_form_data_attach` only when we are
         // saving data which is not for a draft. Note that there is no garbage collection for attachments.
 
+        // See https://github.com/orbeon/orbeon-forms/issues/7049: we also want to delete draft attachments in the case
+        // where we're explicitly deleting a draft. Before the fix for #7049, we had:
+        //
+        //  val deleteDraftAttachments = ! dataPart.isDraft
+        //
+        // Now, with both conditions, we have:
+        //
+        //  val deleteDraftAttachments = ! dataPart.isDraft || (dataPart.isDraft && delete)
+        //                             = ! dataPart.isDraft || delete
+
+        val deleteDraftAttachments = ! dataPart.isDraft || delete
+
         val tablesToDeleteDraftsFrom =
-          "orbeon_i_control_text"                             ::
-          (! dataPart.isDraft list "orbeon_form_data_attach") :::
-          "orbeon_i_current"                                  ::
-          "orbeon_form_data"                                  ::
+          "orbeon_i_control_text"                                 ::
+          (deleteDraftAttachments list "orbeon_form_data_attach") :::
+          "orbeon_i_current"                                      ::
+          "orbeon_form_data"                                      ::
           Nil
 
         tablesToDeleteDraftsFrom.foreach { table =>
           doDelete(table, dataPart.documentId, isDraft = true, lastModifiedOpt = None, filenameOpt = None)
         }
+
+        // TODO: delete draft attachments also in filesystem/S3
 
         // 1. In `CreateUpdateDelete.scala`:
         //   1.1. Above, we read/write from/to orbeon_i_current/orbeon_i_control_text (remove drafts)

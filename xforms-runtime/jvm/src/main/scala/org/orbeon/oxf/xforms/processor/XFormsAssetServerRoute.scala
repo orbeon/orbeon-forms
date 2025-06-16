@@ -283,8 +283,8 @@ object XFormsAssetServerRoute extends NativeRoute {
               logBody     = false
             )
 
-          // Forward HTTP range headers and status to client
-          HttpRanges.forwardRangeHeaders(cxr, response)
+          // Forward HTTP range headers, content length/type, and status to client
+          HttpRanges.forwardResponseHeaders(cxr, response)
           response.setStatus(cxr.statusCode)
 
           IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)

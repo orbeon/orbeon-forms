@@ -439,8 +439,14 @@ object Connection extends ConnectionTrait {
               def contentTypeFromPath =
                 Option(normalizedUrl.getPath) flatMap Mediatypes.findMediatypeForPath
 
+              def contentTypeFromQueryParameters =
+                splitQueryDecodeParams(normalizedUrl.toString)._2.toMap.get("mediatype")
+
               def contentTypeHeader =
-                contentTypeFromConnection orElse contentTypeFromPath map (ct => ContentType -> List(ct))
+                contentTypeFromConnection
+                  .orElse(contentTypeFromPath)
+                  .orElse(contentTypeFromQueryParameters)
+                  .map(ct => ContentType -> List(ct))
 
               val headersFromConnection =
                 urlConnection.getHeaderFields.asScala map { case (k, v) => k -> v.asScala.to(List) } toMap

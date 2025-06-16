@@ -113,9 +113,10 @@ object HttpRanges {
       value  <- request.getFirstHeaderIgnoreCase(header)
     } yield header -> List(value)).toMap
 
-  def forwardRangeHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
+  def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
     for {
-      header <- Seq(Headers.AcceptRanges, Headers.ContentRange)
+      // Forward the content type as well, if available, as it's stored in S3
+      header <- Seq(Headers.AcceptRanges, Headers.ContentRange, Headers.ContentLength, Headers.ContentType)
       value  <- cxr.getHeaderIgnoreCase(header)
     } locally {
       response.addHeader(header, value)

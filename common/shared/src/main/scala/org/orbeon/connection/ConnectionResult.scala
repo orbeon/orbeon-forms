@@ -1,7 +1,8 @@
 package org.orbeon.connection
 
 import org.log4s
-import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, Headers as HttpHeaders}
+import org.orbeon.oxf.http.Headers.{ContentLength, ContentType}
+import org.orbeon.oxf.http.{DateHeaders, Headers, HttpStatusCodeException, StatusCode, Headers as HttpHeaders}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger}
 
@@ -74,6 +75,12 @@ case class ConnectionResultT[S](
       log(logLevel, "response has content")
     else
       log(logLevel, "response has no content")
+
+  def contentWithTypeAndLengthFromHeadersIfMissing: StreamedContentT[S] =
+    content.copy(
+      contentType   = content.contentType   orElse Headers.firstItemIgnoreCase                 (headers, ContentType),
+      contentLength = content.contentLength orElse Headers.firstNonNegativeLongHeaderIgnoreCase(headers, ContentLength)
+    )
 }
 
 object ConnectionResult {

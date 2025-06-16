@@ -18,7 +18,7 @@ import cats.syntax.option.*
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
-import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult, StreamedContent}
+import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, StreamedContent}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common
@@ -902,7 +902,7 @@ trait FormRunnerPersistence {
   }
 
   private def saveAttachmentIo(
-    stream        : fs2.Stream[IO, Byte],
+    streamedContent  : AsyncStreamedContent,
     pathToHolder  : String,
     resolvedPutUri: URI,
     formVersion   : Option[String],
@@ -935,7 +935,7 @@ trait FormRunnerPersistence {
       method      = HttpMethod.PUT,
       url         = resolvedPutUri,
       credentials = credentials,
-      content     = StreamedContent(stream, ContentTypes.OctetStreamContentType.some, contentLength = None).some,
+      content     = streamedContent.some,
       headers     = allPutHeaders,
       loadState   = true,
       logBody     = false
@@ -1053,7 +1053,7 @@ trait FormRunnerPersistence {
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
         pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
-        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.content.stream, pathToHolder, resolvedPutUri, formVersion, credentials))
+        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
         isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
       } yield

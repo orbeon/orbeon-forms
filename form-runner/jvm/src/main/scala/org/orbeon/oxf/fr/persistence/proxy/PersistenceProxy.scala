@@ -876,9 +876,9 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
       request.getMethod match {
         case HttpMethod.GET | HttpMethod.HEAD if StatusCode.isSuccessCode(connectionResult.statusCode) =>
-          // Forward HTTP range headers and status to client
           attachmentsProviderCxrOpt.foreach { attachmentsProviderCxr =>
-            HttpRanges.forwardRangeHeaders(attachmentsProviderCxr, response)
+            // Forward HTTP range headers, content length/type, and status to client
+            HttpRanges.forwardResponseHeaders(attachmentsProviderCxr, response)
             response.setStatus(attachmentsProviderCxr.statusCode)
           }
 

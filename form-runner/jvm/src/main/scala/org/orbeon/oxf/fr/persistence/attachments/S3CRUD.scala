@@ -20,7 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
-import org.orbeon.oxf.http.{HttpRange, HttpRanges, StatusCode}
+import org.orbeon.oxf.http.{Headers, HttpRange, HttpRanges, StatusCode}
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.function.Property.evaluateAsAvt
@@ -43,10 +43,13 @@ trait S3CRUD extends CRUDMethods {
     implicit val s3Config: S3Config = s3Context.s3Config
     implicit val s3Client: S3Client = s3Context.s3Client
 
-    val key          = s3Context.key(attachmentInformation)
-    val objectLength = S3.objectMetadata(s3Config.bucket, key).get.contentLength()
+    val key            = s3Context.key(attachmentInformation)
+    val objectMetadata = S3.objectMetadata(s3Config.bucket, key).get
+    val objectLength   = objectMetadata.contentLength()
+    val objectTypeOpt  = Option(objectMetadata.contentType())
 
     httpResponse.addHeaders(HttpRanges.acceptRangesHeader(objectLength))
+    objectTypeOpt.foreach(httpResponse.addHeader(Headers.ContentType, _))
     httpResponse.setStatus(StatusCode.Ok)
   }
 
@@ -62,12 +65,18 @@ trait S3CRUD extends CRUDMethods {
 
     val key = s3Context.key(attachmentInformation)
 
+    val objectMetadata = S3.objectMetadata(s3Config.bucket, key).get
+    val objectLength   = objectMetadata.contentLength()
+    val objectTypeOpt  = Option(objectMetadata.contentType())
+
     CRUDMethods.get(
       httpRanges         = httpRanges,
-      length             = S3.objectMetadata(s3Config.bucket, key).get.contentLength(),
+      length             = objectLength,
       partialInputStream = (httpRange: HttpRange) => S3.inputStream(key, httpRange.some).get,
       fullInputStream    = S3.inputStream(key, httpRangeOpt = None).get,
     )
+
+    objectTypeOpt.foreach(httpResponse.addHeader(Headers.ContentType, _))
   }
 
   override def put(

@@ -52,7 +52,7 @@ object BatchDelete {
         isInternalAdminUser = false,
         searchQueryOpt      = Some(query),
         returnDetails       = false,
-        pageIncrement       = 1
+        firstPageOnly       = false
       )
       .take(SearchPageSize)
       .map { searchResult =>

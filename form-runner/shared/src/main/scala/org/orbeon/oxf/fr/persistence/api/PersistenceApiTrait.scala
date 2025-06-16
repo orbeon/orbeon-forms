@@ -139,7 +139,7 @@ trait PersistenceApiTrait {
     isInternalAdminUser     : Boolean,
     searchQueryOpt          : Option[DocumentNodeInfoType],
     returnDetails           : Boolean,
-    pageIncrement           : Int
+    firstPageOnly           : Boolean
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -199,7 +199,7 @@ trait PersistenceApiTrait {
         (page.rootElement / "document").size
       )
 
-    callPagedService(pageIncrement, pageNumber => readPage(pageNumber).map(pageToDataDetails))
+    callPagedService(firstPageOnly, pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
   def distinctValues(
@@ -270,7 +270,7 @@ trait PersistenceApiTrait {
     documentId           : String,
     attachmentFilenameOpt: Option[String],
     isInternalAdminUser  : Boolean,
-    pageIncrement        : Int
+    firstPageOnly        : Boolean
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -348,7 +348,7 @@ trait PersistenceApiTrait {
       )
     }
 
-    callPagedService(pageIncrement, pageNumber => readPage(pageNumber).map(pageToDataDetails))
+    callPagedService(firstPageOnly, pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
   def readFormData(
@@ -613,7 +613,7 @@ trait PersistenceApiTrait {
     ).headers
 
   private def callPagedService[R](
-    pageIncrement: Int,
+    firstPageOnly: Boolean,
     readPage     : Int => Try[(Iterator[R], Int, Int)]
   )(implicit
     logger  : IndentedLogger
@@ -631,7 +631,11 @@ trait PersistenceApiTrait {
             debug(s"search total is `$total`")
             searchTotal = total.some
           }
-          currentPage  += pageIncrement
+          // If firstPageOnly, always fetch the first page. This is used for purging. In that case, the first page will
+          // always contain the next batch of entries to purge.
+          if (! firstPageOnly) {
+            currentPage += 1
+          }
           currentCount += count
           it
         }

@@ -22,7 +22,7 @@ import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging}
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XML_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
@@ -449,6 +449,7 @@ object ProcessInterpreter {
   val StandardNamespaceMapping =
     NamespaceMapping(
       Map(
+        XML_PREFIX           -> XMLConstants.XML_URI,
         XSD_PREFIX           -> XMLConstants.XSD_URI,
         XFORMS_PREFIX        -> XFORMS_NAMESPACE_URI,
         XFORMS_SHORT_PREFIX  -> XFORMS_NAMESPACE_URI,

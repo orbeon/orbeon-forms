@@ -86,8 +86,8 @@
 
 
 
-                    <allow-template-use>true</allow-template-use>
-                    <singleton>true</singleton>
+
+
 
                     <email>
                         <templates>
@@ -98,6 +98,9 @@
                         </templates>
                         <parameters/>
                     </email>
+                    <thumbnail filename="screenshot.webp" mediatype="image/webp" size="29310">/fr/service/persistence/crud/orbeon/builder/data/df4e5accdd12b409495abaf541e61914c0b1d272/2f7e3cb74f2b2e3b565f9f15ee97088d25e2bdfc.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <singleton>true</singleton>
                 </metadata>
             </xf:instance>
 

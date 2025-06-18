@@ -2,14 +2,13 @@ package org.orbeon.oxf.fr.persistence.proxy
 
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
-import org.orbeon.oxf.fr.permission.{AnyOperation, Operation, Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.SearchPageSize
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
 import org.orbeon.oxf.fr.{AppForm, FormRunner, SearchVersion, Version}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.PathUtils.PathOps
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, JvmUrlEncoderDecoder, Logging, PathUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, JvmUrlEncoderDecoder, PathUtils}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.scaxon.NodeConversions.elemToDocumentInfo
 
@@ -93,10 +92,4 @@ object BatchDelete {
 
     response.setStatus(StatusCode.Ok)
   }
-
-  private def canDelete(operations: Operations): Boolean =
-    operations match {
-      case AnyOperation            => true
-      case SpecificOperations(ops) => ops(Operation.Delete)
-    }
 }

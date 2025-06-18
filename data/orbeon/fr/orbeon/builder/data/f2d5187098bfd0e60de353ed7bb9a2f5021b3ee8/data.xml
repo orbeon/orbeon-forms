@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Public Records Act Request Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <requester-information-section>
+                        <grid-1>
+                            <name/>
+                            <date/>
+                            <company/>
+                            <email/>
+                        </grid-1>
+                        <mailing-grid-3>
+                            <mailing-us-address-street-1/>
+                            <mailing-us-address-city/>
+
+
+                            <mailing-us-address-street-2/>
+                            <mailing-us-address-state/>
+                            <mailing-us-address-zip/>
+
+
+                            <mailing-us-address-urbanization/>
+                            <phone-number/>
+                            <fax-number/>
+                            <preferred-method-of-contact/>
+
+                        </mailing-grid-3>
+
+                    </requester-information-section>
+                    <requested-records-section>
+                        <grid-3>
+                            <grid-3-iteration>
+                                <requested-record/>
+                            </grid-3-iteration>
+                        </grid-3>
+                        <grid-2>
+                            <time-period/>
+                            <inspect-or-request-copies/>
+                            <signature-of-requester/>
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </grid-2>
+                    </requested-records-section><hidden-section><grid-4><control-1/><control-2/><control-3/><control-4/><control-5/><control-6/><control-7/><control-8/><control-9/></grid-4></hidden-section>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="requester-information-section-bind" name="requester-information-section" ref="requester-information-section">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="name-bind" ref="name" name="name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="date-bind" ref="date" name="date" type="xs:date" required="true()"/>
+                        <xf:bind id="company-bind" ref="company" name="company" xxf:whitespace="trim"/>
+                        <xf:bind id="email-bind" ref="email" name="email" type="xf:email" xxf:whitespace="trim"/>
+                    </xf:bind>
+                    <xf:bind id="mailing-grid-3-bind" ref="mailing-grid-3" name="mailing-grid-3">
+                        <xf:bind id="mailing-us-address-street-1-bind" ref="mailing-us-address-street-1" name="mailing-us-address-street-1" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="mailing-us-address-street-2-bind" ref="mailing-us-address-street-2" name="mailing-us-address-street-2" xxf:whitespace="trim"/>
+
+
+
+                        <xf:bind id="mailing-us-address-urbanization-bind" ref="mailing-us-address-urbanization" name="mailing-us-address-urbanization" xxf:whitespace="trim" relevant="$mailing-us-address-state = 'PR'"/>
+                        <xf:bind id="mailing-us-address-zip-bind" ref="mailing-us-address-zip" name="mailing-us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                        <xf:bind id="mailing-us-address-state-bind" ref="mailing-us-address-state" name="mailing-us-address-state" required="true()"/>
+                        <xf:bind id="mailing-us-address-city-bind" ref="mailing-us-address-city" name="mailing-us-address-city" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="phone-number-bind" ref="phone-number" name="phone-number" constraint=". = '' or matches(., '^\d{10}$')"/>
+                        <xf:bind id="fax-number-bind" ref="fax-number" name="fax-number" constraint=". = '' or matches(., '^\d{10}$')"/>
+                        <xf:bind id="preferred-method-of-contact-bind" ref="preferred-method-of-contact" name="preferred-method-of-contact" xxf:whitespace="trim" required="true()"/>
+
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="requested-records-section-bind" ref="requested-records-section" name="requested-records-section">
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="grid-3-iteration-bind" ref="grid-3-iteration" name="grid-3-iteration">
+                            <xf:bind id="requested-record-bind" ref="requested-record" name="requested-record" xxf:whitespace="trim" required="true()"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="time-period-bind" ref="time-period" name="time-period" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="signature-of-requester-bind" ref="signature-of-requester" name="signature-of-requester" type="xf:anyURI"/>
+                        <xf:bind id="inspect-or-request-copies-bind" ref="inspect-or-request-copies" name="inspect-or-request-copies"/>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </xf:bind>
+                </xf:bind><xf:bind id="hidden-section-bind" ref="hidden-section" name="hidden-section"><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="control-1-bind" ref="control-1" name="control-1" calculate="$requested-record[1]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-2-bind" ref="control-2" name="control-2" calculate="$requested-record[2]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-3-bind" ref="control-3" name="control-3" calculate="$requested-record[3]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-4-bind" ref="control-4" name="control-4" calculate="$requested-record[4]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-5-bind" ref="control-5" name="control-5" calculate="$requested-record[5]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-6-bind" ref="control-6" name="control-6" calculate="$requested-record[6]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-7-bind" ref="control-7" name="control-7" calculate="$requested-record[7]" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-8-bind" ref="control-8" name="control-8" calculate="if ($inspect-or-request-copies = 'inspect-only') then 'Yes' else ''" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/><xf:bind id="control-9-bind" ref="control-9" name="control-9" calculate="if ($inspect-or-request-copies = 'request-copies') then 'Yes' else ''" readonly="false()" relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/></xf:bind></xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>public-records</form-name>
+                    <title xml:lang="en">Public Records Act Request Form</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+                        <_>1</_>
+                    </library-versions>
+                    <created-with-version>2024.1.2.202506170050 PE</created-with-version>
+                    <updated-with-version>2024.1.2.202506170050 PE</updated-with-version>
+                    <updated-with-version>2024.1.2.202506181311 PE</updated-with-version>
+                    
+                    
+                    
+                    
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><thumbnail filename="screenshot.webp" mediatype="image/webp" size="38472">/fr/service/persistence/crud/orbeon/builder/data/f2d5187098bfd0e60de353ed7bb9a2f5021b3ee8/497a7a7b97fcf8c58377b1d922b7bbb2d95c49c2.bin</thumbnail></metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <pdf name="" lang="" filename="PRA_Request_Form.pdf" mediatype="application/pdf" size="382418" hash-algorithm="SHA-256" hash-value="7abbb02fccf025d7a8c6017c316de3792b9658ee6d11e891731f93a553affd17">/fr/service/persistence/crud/orbeon/builder/data/f2d5187098bfd0e60de353ed7bb9a2f5021b3ee8/05bcd8aa388717acac0920633e213adbf3e92c35.bin</pdf>
+                    
+                    
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><control-1>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-1><control-2>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-2><control-3>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-3><control-4>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-4><control-5>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-5><control-6>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-6><control-7>
+                            <label/>
+                            <hint/>
+                            
+                            
+                        </control-7><control-8><label/><hint/>
+                            
+                            
+                            <item>
+                                <label/>
+                                <hint/>
+                                <value>Yes</value>
+                            </item>
+                        </control-8><control-9><label/><hint/>
+                            
+                            
+                            <item>
+                                <label/>
+                                <hint/>
+                                <value>Yes</value>
+                            </item>
+                        </control-9>
+                        <requested-record>
+                            <label>Requested record</label>
+                            <hint/>
+                        </requested-record>
+                        <time-period>
+                            <label>Time period covering documents requested</label>
+                            <hint/>
+                        </time-period>
+                        <inspect-or-request-copies>
+                            <label/>
+                            <hint/>
+                            <item>
+                                <label>I wish to inspect the requested records, where applicable, and do not want copies produced at this time.</label>
+                                <hint/>
+                                <value>inspect-only</value>
+                            </item>
+                            <item>
+                                <label>I would like copies of the requested records and I understand that I will be contacted with a count of the number of pages to be copied and their cost prior to copying. I understand and agree that I will be required to make payment for the copying costs prior to the documents requested being copied.</label>
+                                <hint/>
+                                <value>request-copies</value>
+                            </item>
+                            
+                            
+                        </inspect-or-request-copies>
+                        <signature-of-requester>
+                            <label>Signature of requester</label>
+                            <hint/>
+                            
+                            
+                        </signature-of-requester>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <mailing-grid-3/>
+                        <mailing-us-address-street-1>
+                            <label>Mailing street address</label>
+                            <hint/>
+
+
+                        </mailing-us-address-street-1>
+                        <mailing-us-address-street-2>
+                            <label>Street address line 2</label>
+                            <hint/>
+
+
+                        </mailing-us-address-street-2>
+                        <mailing-us-address-urbanization>
+                            <label>Urbanization</label>
+                            <hint/>
+
+
+                        </mailing-us-address-urbanization>
+                        <phone-number>
+                            <label>Phone number</label>
+                            <hint/>
+                        </phone-number>
+                        <fax-number>
+                            <label>Fax number</label>
+                            <hint/>
+                        </fax-number>
+                        <preferred-method-of-contact>
+                            <label>Preferred method of contact in the event of questions</label>
+                            <hint/>
+                        </preferred-method-of-contact>
+                        <grid-3/>
+                        <mailing-us-address-zip>
+                            <label>Zip code</label>
+                            <hint/>
+
+
+                        </mailing-us-address-zip>
+                        <mailing-us-address-state><label>State, territory, or military post</label><hint/>
+                            
+                            
+
+
+                        </mailing-us-address-state>
+                        <mailing-us-address-city><label>City</label><hint/>
+                            
+                            
+
+
+                        </mailing-us-address-city>
+                        <name><label>Name</label><hint/>
+                            
+                            
+                        </name>
+                        <date><label>Date</label><hint/>
+                            
+                            
+                        </date>
+                        <company>
+                            <label>Company</label>
+                            <hint/>
+                        </company>
+                        <email>
+                            <label>Email</label>
+                            <hint/>
+                        </email>
+                        <requester-information-section>
+                            <label>Requester information</label>
+                        </requester-information-section>
+                        <requested-records-section>
+                            <label>Requested records</label>
+                        </requested-records-section><hidden-section/>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-3-template"><grid-3-iteration><requested-record/></grid-3-iteration></xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="requester-information-section-section" bind="requester-information-section-bind">
+                    <xf:label ref="$form-resources/requester-information-section/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="name-control" bind="name-bind" fr:pdf-template-field-name="Name"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/name/label"/>
+                                <xf:hint ref="$form-resources/name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-control" bind="date-bind" fr:pdf-template-field-name="Date"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/date/label"/>
+                                <xf:hint ref="$form-resources/date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="company-control" bind="company-bind" fr:pdf-template-field-name="Company">
+                                <xf:label ref="$form-resources/company/label"/>
+                                <xf:hint ref="$form-resources/company/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-control" bind="email-bind" fr:pdf-template-field-name="Email address">
+                                <xf:label ref="$form-resources/email/label"/>
+                                <xf:hint ref="$form-resources/email/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="mailing-grid-3-grid" bind="mailing-grid-3-bind" tab-order="columns">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="mailing-us-address-street-1-control" bind="mailing-us-address-street-1-bind" fr:pdf-template-field-name="Mailing Address" autocomplete="address-line1">
+                                <xf:label ref="$form-resources/mailing-us-address-street-1/label"/>
+                                <xf:hint ref="$form-resources/mailing-us-address-street-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="mailing-us-address-city-control" bind="mailing-us-address-city-bind" fr:pdf-template-field-name="City" autocomplete="address-line3"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/mailing-us-address-city/label"/>
+                                <xf:hint ref="$form-resources/mailing-us-address-city/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+
+                            </xf:input>
+
+                        </fr:c>
+
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input id="mailing-us-address-street-2-control" bind="mailing-us-address-street-2-bind" fr:pdf-template-field-name="City" autocomplete="address-line2">
+                                <xf:label ref="$form-resources/mailing-us-address-street-2/label"/>
+                                <xf:hint ref="$form-resources/mailing-us-address-street-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="4">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="mailing-us-address-state-control" bind="mailing-us-address-state-bind" fr:pdf-template-field-name="State"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/mailing-us-address-state/label"/>
+                                <xf:hint ref="$form-resources/mailing-us-address-state/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+
+                            </fr:us-state>
+
+
+                        </fr:c>
+                        <fr:c x="11" y="2" w="2" h="1">
+                            <xf:input id="mailing-us-address-zip-control" bind="mailing-us-address-zip-bind" fr:pdf-template-field-name="Zip Code" autocomplete="postal-code">
+                                <xf:label ref="$form-resources/mailing-us-address-zip/label"/>
+                                <xf:hint ref="$form-resources/mailing-us-address-zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
+                            <xf:input id="mailing-us-address-urbanization-control" bind="mailing-us-address-urbanization-bind">
+                                <xf:label ref="$form-resources/mailing-us-address-urbanization/label"/>
+                                <xf:hint ref="$form-resources/mailing-us-address-urbanization/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+
+                        </fr:c>
+                        <fr:c x="1" y="4" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="phone-number-control" bind="phone-number-bind" fr:pdf-template-field-name="Phone number">
+                                <xf:label ref="$form-resources/phone-number/label"/>
+                                <xf:hint ref="$form-resources/phone-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="fax-number-control" bind="fax-number-bind" fr:pdf-template-field-name="Fax number">
+                                <xf:label ref="$form-resources/fax-number/label"/>
+                                <xf:hint ref="$form-resources/fax-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="preferred-method-of-contact-control" bind="preferred-method-of-contact-bind" fr:pdf-template-field-name="Preferred method of contact in the event of questions Row 1">
+                                <xf:label ref="$form-resources/preferred-method-of-contact/label"/>
+                                <xf:hint ref="$form-resources/preferred-method-of-contact/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="5" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section collapsible="false" id="requested-records-section-section" bind="requested-records-section-bind">
+                    <xf:label ref="$form-resources/requested-records-section/label"/>
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="content" number-rows="true" min="1" template="instance('grid-3-template')" apply-defaults="true" fb:initial-iterations="first" max="7" appearance="minimal">
+                        <fr:c x="1" y="1" w="12">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="requested-record-control" bind="requested-record-bind">
+                                <xf:label ref="$form-resources/requested-record/label"/>
+                                <xf:hint ref="$form-resources/requested-record/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="time-period-control" bind="time-period-bind" fr:pdf-template-field-name="Time period covering documents requested Row 1">
+                                <xf:label ref="$form-resources/time-period/label"/>
+                                <xf:hint ref="$form-resources/time-period/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="12">
+                            <xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="inspect-or-request-copies-control" appearance="full" bind="inspect-or-request-copies-bind">
+                                <xf:label ref="$form-resources/inspect-or-request-copies/label"/>
+                                <xf:hint ref="$form-resources/inspect-or-request-copies/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/inspect-or-request-copies/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="7"/>
+                        <fr:c x="8" y="3" w="5" h="1">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="signature-of-requester-control" bind="signature-of-requester-bind" fr:pdf-template-field-name="Signature1">
+                                <xf:label ref="$form-resources/signature-of-requester/label"/>
+                                <xf:hint ref="$form-resources/signature-of-requester/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </fr:grid>
+                </fr:section><fr:section id="hidden-section-section" bind="hidden-section-bind"><fr:grid id="grid-4-grid" bind="grid-4-bind">
+              <fr:c x="1" y="1" w="2"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control" bind="control-1-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 1">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="3" y="1" w="2" h="1"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control" bind="control-2-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 2">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="5" y="1" w="2" h="1"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-3-control" bind="control-3-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 3">
+                                <xf:label ref="$form-resources/control-3/label"/>
+                                <xf:hint ref="$form-resources/control-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="7" y="1" w="2" h="1"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control" bind="control-4-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 4">
+                                <xf:label ref="$form-resources/control-4/label"/>
+                                <xf:hint ref="$form-resources/control-4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="9" y="1" w="2" h="1"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-5-control" bind="control-5-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 5">
+                                <xf:label ref="$form-resources/control-5/label"/>
+                                <xf:hint ref="$form-resources/control-5/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="11" y="1" w="2" h="1"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-6-control" bind="control-6-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 6">
+                                <xf:label ref="$form-resources/control-6/label"/>
+                                <xf:hint ref="$form-resources/control-6/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="1" y="2" w="2"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-7-control" bind="control-7-bind" fr:pdf-template-field-name="REQUESTED RECORDS Row 7">
+                                <xf:label ref="$form-resources/control-7/label"/>
+                                <xf:hint ref="$form-resources/control-7/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:output></fr:c><fr:c x="3" y="2" w="2"><xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-8-control" appearance="full" bind="control-8-bind" fr:pdf-template-field-name="I wish to inspect the requested records, where applicable, and do not want copies produced at this time">
+                                <xf:label ref="$form-resources/control-8/label"/>
+                                <xf:hint ref="$form-resources/control-8/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+                        
+                        
+                                <xf:itemset ref="$form-resources/control-8/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1></fr:c><fr:c x="5" y="2" w="2"><xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-9-control" appearance="full" bind="control-9-bind" fr:pdf-template-field-name="I would like copies of the requested records and I understand that I will be contacted with a count of the number of pages to be copied and their cost prior to copying. I understand and agree that I will be required to make payment for the copying costs prior to the documents requested being copied">
+                                <xf:label ref="$form-resources/control-9/label"/>
+                                <xf:hint ref="$form-resources/control-9/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+                        
+                        
+                                <xf:itemset ref="$form-resources/control-9/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1></fr:c><fr:c x="7" y="2" w="2"/><fr:c x="9" y="2" w="2"/><fr:c x="11" y="2" w="2"/>
+            </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -61,7 +61,7 @@ trait Read {
                 readTotalAttachmentSize = true,
                 bodyContentOpt          = None
               )
-              .get // will throw nested `HttpStatusCodeException` if is `Failure`
+              .fold(t => throw t, identity) // will throw nested `HttpStatusCodeException` if present
               .totalAttachmentSize
               .getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError))
 
@@ -118,7 +118,7 @@ trait Read {
         },
         bodyContentOpt          = actualBodyContentOpt
       )
-      .get // will throw nested `HttpStatusCodeException` if is `Failure`
+      .fold(t => throw t, identity) // will throw nested `HttpStatusCodeException` if present
 
     val httpResponse = externalContext.getResponse
 
@@ -215,7 +215,7 @@ trait Read {
   )(implicit
     externalContext        : ExternalContext,
     indentedLogger         : IndentedLogger
-  ): Try[FromDatabase] = RelationalUtils.withConnection { connection =>
+  ): Either[HttpStatusCodeException, FromDatabase] = RelationalUtils.withConnection { connection =>
     val sql = {
       val table  = SqlSupport.tableName(req)
       val idCols = SqlSupport.idColumns(req)
@@ -320,7 +320,7 @@ trait Read {
           val deleted     = resultSet.getString("deleted") == "Y"
           val forceDelete = req.dataPart.exists(_.forceDelete)
           if (deleted && ! forceDelete)
-            return Failure(HttpStatusCodeException(StatusCode.Gone))
+            return Left(HttpStatusCodeException(StatusCode.Gone))
 
           // Check version if specified
           val dbFormVersion = resultSet.getInt("form_version")
@@ -355,7 +355,7 @@ trait Read {
             bodyInputStream.map(useAndClose(_)(NetUtils.inputStreamToByteArray))
           }
 
-          Success(
+          Right(
             FromDatabase(
               idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
               dataUserOpt          = dataUser,
@@ -369,7 +369,7 @@ trait Read {
             )
           )
         } else {
-          Failure(HttpStatusCodeException(StatusCode.NotFound))
+          Left(HttpStatusCodeException(StatusCode.NotFound))
         }
       }
     }

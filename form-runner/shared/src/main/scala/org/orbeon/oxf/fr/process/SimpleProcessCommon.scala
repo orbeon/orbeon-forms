@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.process.ProcessParser.Combinator
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, LoggerFactory, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -56,7 +56,10 @@ trait SimpleProcessCommon
 
   // Don't store the logger as a `val` or `lazy val`!
   // https://github.com/orbeon/orbeon-forms/issues/179
-  implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
+  implicit def logger: IndentedLogger = inScopeContainingDocumentOpt.map(_.getIndentedLogger("process")).getOrElse {
+    // don't depend on in-scope document for tests
+    new IndentedLogger(LoggerFactory.createLogger(classOf[SimpleProcessCommon]), true)
+  }
 
   override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] =
     AllowedFormRunnerActions ++ AllowedXFormsActions

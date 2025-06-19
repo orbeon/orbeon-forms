@@ -72,7 +72,7 @@ trait FormRunnerPermissionsOps {
           AppForm(app, form)
         ),
         CoreCrossPlatformSupport.externalContext.getRequest.credentials,
-        PermissionsAuthorization.CheckWithoutDataUserPessimistic
+        PermissionsAuthorization.CheckAssumingOrganizationMatch
       ),
       normalized = true
     )

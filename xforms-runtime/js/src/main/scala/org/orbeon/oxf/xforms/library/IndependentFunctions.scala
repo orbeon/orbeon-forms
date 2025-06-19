@@ -8,8 +8,7 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.xml.FunctionSupport.*
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
+import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, StringValueWithEquals}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{AtomicValue, StringValue}

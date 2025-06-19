@@ -9,6 +9,20 @@ import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import scala.util.Try
 
 
+// Version of `StringValue` which supports `equals()` (universal equality).
+// Saxon throws on `equals()` to make a point that a collation should be used for `StringValue` comparison.
+// Here, we don't really care about equality, but we want to implement `equals()` as e.g. Jetty calls `equals()` on
+// objects stored into the session. See:
+// http://forge.ow2.org/tracker/index.php?func=detail&aid=315528&group_id=168&atid=350207
+class StringValueWithEquals(value: CharSequence) extends StringValue(value) {
+  override def equals(other: Any): Boolean = {
+    // Compare the CharSequence
+    other.isInstanceOf[StringValue] && getStringValueCS == other.asInstanceOf[StringValue].getStringValueCS
+  }
+
+  override def hashCode(): Int = value.hashCode()
+}
+
 trait SaxonUtilsTrait {
 
   // Duplicate constant from Saxon because they are in different packages between Saxon versions
@@ -96,20 +110,6 @@ trait SaxonUtilsTrait {
 
   // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
   def createFingerprintedPath(node: om.NodeInfo): String
-
-  // Version of `StringValue` which supports `equals()` (universal equality).
-  // Saxon throws on `equals()` to make a point that a collation should be used for `StringValue` comparison.
-  // Here, we don't really care about equality, but we want to implement `equals()` as e.g. Jetty calls `equals()` on
-  // objects stored into the session. See:
-  // http://forge.ow2.org/tracker/index.php?func=detail&aid=315528&group_id=168&atid=350207
-  class StringValueWithEquals(value: CharSequence) extends StringValue(value) {
-    override def equals(other: Any): Boolean = {
-      // Compare the CharSequence
-      other.isInstanceOf[StringValue] && getStringValueCS == other.asInstanceOf[StringValue].getStringValueCS
-    }
-
-    override def hashCode(): Int = value.hashCode()
-  }
 
   def fixStringValue[V <: om.Item](item: V): V =
     item match {

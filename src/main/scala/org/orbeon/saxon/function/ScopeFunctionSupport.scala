@@ -16,8 +16,7 @@ package org.orbeon.saxon.function
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.scope.ScopeGenerator
 import org.orbeon.oxf.util.ContentTypes.PlainTextContentType
-import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{StringValueWithEquals, TransformerUtils}
 import org.orbeon.saxon.`type`.ExternalObjectType
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om

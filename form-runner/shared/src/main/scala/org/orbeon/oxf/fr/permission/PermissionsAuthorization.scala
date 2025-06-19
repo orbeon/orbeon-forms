@@ -76,6 +76,19 @@ object PermissionsAuthorization {
         }
     }
 
+  def authorizedOperationsForSummary(
+    permissions          : Permissions,
+    currentCredentialsOpt: Option[Credentials]
+  )(implicit
+    logger               : IndentedLogger
+  ): Operations = {
+    authorizedOperations(
+        permissions,
+        currentCredentialsOpt,
+        PermissionsAuthorization.CheckAssumingOrganizationMatch
+      )
+  }
+
   def authorizedOperations(
     permissions          : Permissions,
     currentCredentialsOpt: Option[Credentials],

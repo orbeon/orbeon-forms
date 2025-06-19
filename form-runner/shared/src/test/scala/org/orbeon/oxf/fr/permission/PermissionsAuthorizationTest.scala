@@ -325,4 +325,72 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       }
     }
   }
+
+  describe("#7089: The `authorizedOperationsForSummary()` function") {
+
+    val permissions =
+      Permissions.Defined(
+        List(
+          Permission(
+            List(
+              Condition.RolesAnyOf(
+                List("clerk")
+              )
+            ),
+            SpecificOperations(Set(Operation.Create, Operation.List))
+          )
+        )
+      )
+
+    val credentialsWithParametrizedRole =
+      Credentials(
+        userAndGroup  = UserAndGroup("juser", None),
+        roles         = List(ParametrizedRole("clerk", "456")),
+        organizations = List(Organization(List("123", "456")))
+      )
+
+    it("must return the `list` operation if the user has it through an organization role") {
+      assert(
+        SpecificOperations(Set(Operation.Create, Operation.List)) ==
+          PermissionsAuthorization.authorizedOperationsForSummary(
+            permissions           = permissions,
+            currentCredentialsOpt = credentialsWithParametrizedRole.some
+          )
+      )
+    }
+
+    val credentialsWithSimpleRole =
+      Credentials(
+        userAndGroup  = UserAndGroup("juser", None),
+        roles         = List(SimpleRole("clerk")),
+        organizations = Nil
+      )
+
+    it("must return the `list` operation if the user has it through a simple role") {
+      assert(
+        SpecificOperations(Set(Operation.Create, Operation.List)) ==
+          PermissionsAuthorization.authorizedOperationsForSummary(
+            permissions           = permissions,
+            currentCredentialsOpt = credentialsWithSimpleRole.some
+          )
+      )
+    }
+
+    val credentialsWithoutParametrizedRole =
+      Credentials(
+        userAndGroup  = UserAndGroup("juser", None),
+        roles         = List(ParametrizedRole("other-role", "456")),
+        organizations = List(Organization(List("123", "456")))
+      )
+
+    it("must not return not the `list` operation if the user doesn't have the role") {
+      assert(
+        SpecificOperations(Set.empty) ==
+          PermissionsAuthorization.authorizedOperationsForSummary(
+            permissions           = permissions,
+            currentCredentialsOpt = credentialsWithoutParametrizedRole.some
+          )
+      )
+    }
+  }
 }

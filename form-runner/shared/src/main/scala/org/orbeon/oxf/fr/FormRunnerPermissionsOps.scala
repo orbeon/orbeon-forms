@@ -66,13 +66,12 @@ trait FormRunnerPermissionsOps {
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
     Operations.serialize(
-      PermissionsAuthorization.authorizedOperations(
+      PermissionsAuthorization.authorizedOperationsForSummary(
         permissionsFromElemOrProperties(
           Option(permissionsElOrNull),
           AppForm(app, form)
         ),
-        CoreCrossPlatformSupport.externalContext.getRequest.credentials,
-        PermissionsAuthorization.CheckAssumingOrganizationMatch
+        CoreCrossPlatformSupport.externalContext.getRequest.credentials
       ),
       normalized = true
     )

@@ -18,7 +18,11 @@
                 xf|textarea[appearance ~= clipboard-copy][fr|pdf-template = true],
                 xf|output[appearance ~= clipboard-copy][fr|pdf-template = true],
                 fr|us-ein[fr|static-readonly = true],
-                fr|us-ein[fr|pdf-template = true]"
+                fr|us-ein[fr|pdf-template = true],
+                fr|isin[fr|static-readonly = true],
+                fr|isin[fr|pdf-template = true],
+                fr|lei[fr|static-readonly = true],
+                fr|lei[fr|pdf-template = true]"
             xxbl:mode="binding lhha"
             xxbl:container="span">
         <xbl:template>

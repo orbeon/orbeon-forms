@@ -154,6 +154,10 @@ class PdfProductionTest
         "•••-••-1120",
         // US EIN
         "00-1234567",
+        // LEI
+        "F50EOCWSQFAUVO9Q8Z97",
+        // ISIN
+        "US0378331005",
         // Date
         "4/11/2025",
         // Time

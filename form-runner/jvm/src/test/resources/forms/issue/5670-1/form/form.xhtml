@@ -2,48 +2,48 @@
     <xh:head>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
-            
+
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <section>
-                        <grid-1><text-field/><text-field-with-character-counter/><text-field-with-clipboard-copy/><plain-text-area/><plain-text-area-with-resizing/><plain-text-area-with-character-counter/><plain-text-area-with-clipboard-copy/><formatted-text-area/><explanatory-text/><calculated-value/><calculated-value-with-clipboard-copy/><number/><currency/><email-address/><us-phone-number/><us-state/><us-ssn/><us-ein/><date/><time/><date-and-time/><dropdown-date/><fields-date/><dropdown/><dropdown-with-other/><dropdown-with-search/><dynamic-dropdown/><dynamic-dropdown-with-search/><radio-buttons/><radio-buttons-with-other/><checkboxes/><scrollable-checkboxes/><single-checkbox>false</single-checkbox><yes_no-answer/><image-attachment filename="" mediatype="" size=""/><handwritten-signature/><image-annotation><image filename="" mediatype="" size=""/><annotation/></image-annotation></grid-1>
+                        <grid-1><text-field/><text-field-with-character-counter/><text-field-with-clipboard-copy/><plain-text-area/><plain-text-area-with-resizing/><plain-text-area-with-character-counter/><plain-text-area-with-clipboard-copy/><formatted-text-area/><explanatory-text/><calculated-value/><calculated-value-with-clipboard-copy/><number/><currency/><email-address/><us-phone-number/><us-state/><us-ssn/><us-ein/><lei/><isin/><date/><time/><date-and-time/><dropdown-date/><fields-date/><dropdown/><dropdown-with-other/><dropdown-with-search/><dynamic-dropdown/><dynamic-dropdown-with-search/><radio-buttons/><radio-buttons-with-other/><checkboxes/><scrollable-checkboxes/><single-checkbox>false</single-checkbox><yes_no-answer/><image-attachment filename="" mediatype="" size=""/><handwritten-signature/><image-annotation><image filename="" mediatype="" size=""/><annotation/></image-annotation></grid-1>
 
                     </section><section-2><grid-2><secret/><hidden-field/><single-file-attachment filename="" mediatype="" size=""/><multiple-file-attachments/><video-attachment filename="" mediatype="" size=""/><static-image filename="" mediatype=""/><static-video filename="" mediatype=""/><button/></grid-2></section-2>
                 </form>
             </xf:instance>
 
-            
+
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-bind" name="section" ref="section">
-                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="text-field-bind" ref="text-field" name="text-field" xxf:whitespace="trim"/><xf:bind id="formatted-text-area-bind" ref="formatted-text-area" name="formatted-text-area"/><xf:bind id="number-bind" ref="number" name="number" type="xf:decimal"/><xf:bind id="email-address-bind" ref="email-address" name="email-address" type="xf:email" xxf:whitespace="trim"/><xf:bind id="currency-bind" ref="currency" name="currency" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="us-phone-number-bind" ref="us-phone-number" name="us-phone-number" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="us-state-bind" ref="us-state" name="us-state"/><xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/><xf:bind id="us-ein-bind" ref="us-ein" name="us-ein" type="fr:us-ein"/><xf:bind id="date-bind" ref="date" name="date" type="xf:date"/><xf:bind id="time-bind" ref="time" name="time" type="xf:time"/><xf:bind id="date-and-time-bind" ref="date-and-time" name="date-and-time" type="xf:dateTime"/><xf:bind id="dropdown-date-bind" ref="dropdown-date" name="dropdown-date" type="xf:date"/><xf:bind id="fields-date-bind" ref="fields-date" name="fields-date" type="xf:date"/><xf:bind id="dropdown-bind" ref="dropdown" name="dropdown"/><xf:bind id="dropdown-with-other-bind" ref="dropdown-with-other" name="dropdown-with-other"/><xf:bind id="dynamic-dropdown-bind" ref="dynamic-dropdown" name="dynamic-dropdown"/><xf:bind id="radio-buttons-with-other-bind" ref="radio-buttons-with-other" name="radio-buttons-with-other"/><xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/><xf:bind id="scrollable-checkboxes-bind" ref="scrollable-checkboxes" name="scrollable-checkboxes"/><xf:bind id="single-checkbox-bind" ref="single-checkbox" name="single-checkbox" type="xf:boolean"/><xf:bind id="yes_no-answer-bind" ref="yes_no-answer" name="yes_no-answer" type="xf:boolean"/><xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/><xf:bind id="handwritten-signature-bind" ref="handwritten-signature" name="handwritten-signature" type="xf:anyURI"/><xf:bind id="image-annotation-bind" ref="image-annotation" name="image-annotation"/><xf:bind id="calculated-value-bind" ref="calculated-value" name="calculated-value" calculate="'686614dd52e678010d2ad24a5ff04e0160b1fb02'" readonly="false()"/><xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text"/><xf:bind id="plain-text-area-bind" ref="plain-text-area" name="plain-text-area"/><xf:bind id="text-field-with-character-counter-bind" ref="text-field-with-character-counter" name="text-field-with-character-counter" xxf:whitespace="trim"/><xf:bind id="text-field-with-clipboard-copy-bind" ref="text-field-with-clipboard-copy" name="text-field-with-clipboard-copy" xxf:whitespace="trim"/><xf:bind id="plain-text-area-with-resizing-bind" ref="plain-text-area-with-resizing" name="plain-text-area-with-resizing"/><xf:bind id="plain-text-area-with-character-counter-bind" ref="plain-text-area-with-character-counter" name="plain-text-area-with-character-counter"/><xf:bind id="plain-text-area-with-clipboard-copy-bind" ref="plain-text-area-with-clipboard-copy" name="plain-text-area-with-clipboard-copy"/><xf:bind id="dropdown-with-search-bind" ref="dropdown-with-search" name="dropdown-with-search"/><xf:bind id="radio-buttons-bind" ref="radio-buttons" name="radio-buttons"/><xf:bind id="dynamic-dropdown-with-search-bind" ref="dynamic-dropdown-with-search" name="dynamic-dropdown-with-search"/><xf:bind id="calculated-value-with-clipboard-copy-bind" ref="calculated-value-with-clipboard-copy" name="calculated-value-with-clipboard-copy" calculate="'3dbf71213d81e2e21a15fbdb2426abd650ffb5d5'" readonly="false()"/></xf:bind>
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="text-field-bind" ref="text-field" name="text-field" xxf:whitespace="trim"/><xf:bind id="formatted-text-area-bind" ref="formatted-text-area" name="formatted-text-area"/><xf:bind id="number-bind" ref="number" name="number" type="xf:decimal"/><xf:bind id="email-address-bind" ref="email-address" name="email-address" type="xf:email" xxf:whitespace="trim"/><xf:bind id="currency-bind" ref="currency" name="currency" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="us-phone-number-bind" ref="us-phone-number" name="us-phone-number" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="us-state-bind" ref="us-state" name="us-state"/><xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/><xf:bind id="us-ein-bind" ref="us-ein" name="us-ein" type="fr:us-ein"/><xf:bind id="date-bind" ref="date" name="date" type="xf:date"/><xf:bind id="time-bind" ref="time" name="time" type="xf:time"/><xf:bind id="date-and-time-bind" ref="date-and-time" name="date-and-time" type="xf:dateTime"/><xf:bind id="dropdown-date-bind" ref="dropdown-date" name="dropdown-date" type="xf:date"/><xf:bind id="fields-date-bind" ref="fields-date" name="fields-date" type="xf:date"/><xf:bind id="dropdown-bind" ref="dropdown" name="dropdown"/><xf:bind id="dropdown-with-other-bind" ref="dropdown-with-other" name="dropdown-with-other"/><xf:bind id="dynamic-dropdown-bind" ref="dynamic-dropdown" name="dynamic-dropdown"/><xf:bind id="radio-buttons-with-other-bind" ref="radio-buttons-with-other" name="radio-buttons-with-other"/><xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/><xf:bind id="scrollable-checkboxes-bind" ref="scrollable-checkboxes" name="scrollable-checkboxes"/><xf:bind id="single-checkbox-bind" ref="single-checkbox" name="single-checkbox" type="xf:boolean"/><xf:bind id="yes_no-answer-bind" ref="yes_no-answer" name="yes_no-answer" type="xf:boolean"/><xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/><xf:bind id="handwritten-signature-bind" ref="handwritten-signature" name="handwritten-signature" type="xf:anyURI"/><xf:bind id="image-annotation-bind" ref="image-annotation" name="image-annotation"/><xf:bind id="calculated-value-bind" ref="calculated-value" name="calculated-value" calculate="'686614dd52e678010d2ad24a5ff04e0160b1fb02'" readonly="false()"/><xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text"/><xf:bind id="plain-text-area-bind" ref="plain-text-area" name="plain-text-area"/><xf:bind id="text-field-with-character-counter-bind" ref="text-field-with-character-counter" name="text-field-with-character-counter" xxf:whitespace="trim"/><xf:bind id="text-field-with-clipboard-copy-bind" ref="text-field-with-clipboard-copy" name="text-field-with-clipboard-copy" xxf:whitespace="trim"/><xf:bind id="plain-text-area-with-resizing-bind" ref="plain-text-area-with-resizing" name="plain-text-area-with-resizing"/><xf:bind id="plain-text-area-with-character-counter-bind" ref="plain-text-area-with-character-counter" name="plain-text-area-with-character-counter"/><xf:bind id="plain-text-area-with-clipboard-copy-bind" ref="plain-text-area-with-clipboard-copy" name="plain-text-area-with-clipboard-copy"/><xf:bind id="dropdown-with-search-bind" ref="dropdown-with-search" name="dropdown-with-search"/><xf:bind id="radio-buttons-bind" ref="radio-buttons" name="radio-buttons"/><xf:bind id="dynamic-dropdown-with-search-bind" ref="dynamic-dropdown-with-search" name="dynamic-dropdown-with-search"/><xf:bind id="calculated-value-with-clipboard-copy-bind" ref="calculated-value-with-clipboard-copy" name="calculated-value-with-clipboard-copy" calculate="'3dbf71213d81e2e21a15fbdb2426abd650ffb5d5'" readonly="false()"/><xf:bind id="isin-bind" ref="isin" name="isin" type="fr:isin"/><xf:bind id="lei-bind" ref="lei" name="lei" type="fr:lei"/></xf:bind>
 
                 </xf:bind><xf:bind id="section-2-bind" ref="section-2" name="section-2"><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="secret-bind" ref="secret" name="secret"/><xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"/><xf:bind id="single-file-attachment-bind" ref="single-file-attachment" name="single-file-attachment" type="xf:anyURI"/><xf:bind id="multiple-file-attachments-bind" ref="multiple-file-attachments" name="multiple-file-attachments"/><xf:bind id="video-attachment-bind" ref="video-attachment" name="video-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('video/*')"/><xf:bind id="static-image-bind" ref="static-image" name="static-image" type="xf:anyURI"/><xf:bind id="static-video-bind" ref="static-video" name="static-video" type="xf:anyURI"/><xf:bind id="button-bind" ref="button" name="button"/></xf:bind></xf:bind>
             </xf:bind>
 
-            
+
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>issue</application-name>
                     <form-name>5670-1</form-name>
                     <title xml:lang="en">For #5670: test PDF template output</title>
                     <description xml:lang="en"/>
-                    
+
                     <library-versions>
-                        
+
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
-                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"text-field"},{"value":"text-field-with-character-counter"},{"value":"text-field-with-clipboard-copy"},{"value":"plain-text-area"},{"value":"plain-text-area-with-resizing"},{"value":"plain-text-area-with-character-counter"},{"value":"plain-text-area-with-clipboard-copy"},{"value":"formatted-text-area"},{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-with-clipboard-copy"},{"value":"number"},{"value":"currency"},{"value":"email-address"},{"value":"us-phone-number"},{"value":"us-state"},{"value":"us-ssn"},{"value":"us-ein"},{"value":"date"},{"value":"time"},{"value":"date-and-time"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"single-checkbox"},{"value":"yes_no-answer"},{"value":"image-attachment"},{"value":"handwritten-signature"},{"value":"image-annotation"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"secret"},{"value":"hidden-field"},{"value":"single-file-attachment"},{"value":"multiple-file-attachments"},{"value":"video-attachment"},{"value":"static-image"},{"value":"static-video"},{"value":"button"}],"topLevel":true}]}</migration></metadata>
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"text-field"},{"value":"text-field-with-character-counter"},{"value":"text-field-with-clipboard-copy"},{"value":"plain-text-area"},{"value":"plain-text-area-with-resizing"},{"value":"plain-text-area-with-character-counter"},{"value":"plain-text-area-with-clipboard-copy"},{"value":"formatted-text-area"},{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-with-clipboard-copy"},{"value":"number"},{"value":"currency"},{"value":"email-address"},{"value":"us-phone-number"},{"value":"us-state"},{"value":"us-ssn"},{"value":"us-ein"},{"value":"lei"},{"value":"isin"},{"value":"date"},{"value":"time"},{"value":"date-and-time"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"single-checkbox"},{"value":"yes_no-answer"},{"value":"image-attachment"},{"value":"handwritten-signature"},{"value":"image-annotation"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"secret"},{"value":"hidden-field"},{"value":"single-file-attachment"},{"value":"multiple-file-attachments"},{"value":"video-attachment"},{"value":"static-image"},{"value":"static-video"},{"value":"button"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
-            
+
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments><pdf name="" lang="" filename="For #5670_ test PDF template output - 10a5f82f1f57a015.pdf" mediatype="application/pdf" size="123287">/fr/service/persistence/crud/issue/5670-1/form/febf664febc463371e67140decd9213fa116a720.bin</pdf></attachments>
             </xf:instance>
 
-            
+
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
-                    <resource xml:lang="en"><secret><label>Secret</label><hint/></secret><hidden-field><label>Hidden Field</label><hint/></hidden-field><single-file-attachment><label>Single File Attachment</label><hint/></single-file-attachment><multiple-file-attachments><label>Multiple File Attachments</label><hint/></multiple-file-attachments><video-attachment><label>Video Attachment</label><hint/></video-attachment><static-image><label>Static Image</label><hint/></static-image><static-video><label>Static Video</label><hint/></static-video><button><label>Button</label><hint/></button><text-field><label>Text field</label><hint/></text-field><text-field-with-character-counter><label>Text field with Character Counter</label><hint/></text-field-with-character-counter><text-field-with-clipboard-copy><label>Text field with Clipboard Copy</label><hint/></text-field-with-clipboard-copy><plain-text-area><label>Plain text Area</label><hint/></plain-text-area><plain-text-area-with-resizing><label>Plain text Area with Resizing</label><hint/></plain-text-area-with-resizing><plain-text-area-with-character-counter><label>Plain text Area with Character Counter</label><hint/></plain-text-area-with-character-counter><plain-text-area-with-clipboard-copy><label>Plain text Area with Clipboard Copy</label><hint/></plain-text-area-with-clipboard-copy><formatted-text-area><label>Formatted Text area</label><hint/></formatted-text-area><explanatory-text><text>&lt;div&gt;This is an explanation.&lt;/div&gt;</text></explanatory-text><calculated-value><label>Calculated Value</label><hint/></calculated-value><calculated-value-with-clipboard-copy><label>Calculated Value with Clipboard Copy</label><hint/></calculated-value-with-clipboard-copy><number><label>Number</label><hint/></number><currency><label>Currency</label><hint/></currency><email-address><label>Email address</label><hint/></email-address><us-phone-number><label>US Phone Number</label><hint/></us-phone-number><us-state><label>US State</label><hint/></us-state><us-ssn><label>US SSN</label><hint/></us-ssn><us-ein><label>US EIN</label><hint/></us-ein><date><label>Date</label><hint/></date><time><label>Time</label><hint/></time><date-and-time><label>Date and Time</label><hint/></date-and-time><dropdown-date><label>Dropdown Date</label><hint/></dropdown-date><fields-date><label>Fields Date</label><hint/></fields-date><dropdown><label>Dropdown</label><hint/><item>
+                    <resource xml:lang="en"><secret><label>Secret</label><hint/></secret><hidden-field><label>Hidden Field</label><hint/></hidden-field><single-file-attachment><label>Single File Attachment</label><hint/></single-file-attachment><multiple-file-attachments><label>Multiple File Attachments</label><hint/></multiple-file-attachments><video-attachment><label>Video Attachment</label><hint/></video-attachment><static-image><label>Static Image</label><hint/></static-image><static-video><label>Static Video</label><hint/></static-video><button><label>Button</label><hint/></button><text-field><label>Text field</label><hint/></text-field><text-field-with-character-counter><label>Text field with Character Counter</label><hint/></text-field-with-character-counter><text-field-with-clipboard-copy><label>Text field with Clipboard Copy</label><hint/></text-field-with-clipboard-copy><plain-text-area><label>Plain text Area</label><hint/></plain-text-area><plain-text-area-with-resizing><label>Plain text Area with Resizing</label><hint/></plain-text-area-with-resizing><plain-text-area-with-character-counter><label>Plain text Area with Character Counter</label><hint/></plain-text-area-with-character-counter><plain-text-area-with-clipboard-copy><label>Plain text Area with Clipboard Copy</label><hint/></plain-text-area-with-clipboard-copy><formatted-text-area><label>Formatted Text area</label><hint/></formatted-text-area><explanatory-text><text>&lt;div&gt;This is an explanation.&lt;/div&gt;</text></explanatory-text><calculated-value><label>Calculated Value</label><hint/></calculated-value><calculated-value-with-clipboard-copy><label>Calculated Value with Clipboard Copy</label><hint/></calculated-value-with-clipboard-copy><number><label>Number</label><hint/></number><currency><label>Currency</label><hint/></currency><email-address><label>Email address</label><hint/></email-address><us-phone-number><label>US Phone Number</label><hint/></us-phone-number><us-state><label>US State</label><hint/></us-state><us-ssn><label>US SSN</label><hint/></us-ssn><us-ein><label>US EIN</label><hint/></us-ein><lei><label>LEI</label><hint/></lei><isin><label>ISIN</label><hint/></isin><date><label>Date</label><hint/></date><time><label>Time</label><hint/></time><date-and-time><label>Date and Time</label><hint/></date-and-time><dropdown-date><label>Dropdown Date</label><hint/></dropdown-date><fields-date><label>Fields Date</label><hint/></fields-date><dropdown><label>Dropdown</label><hint/><item>
                     <label>First choice</label>
                     <value>1</value>
                     <hint/>
@@ -128,281 +128,291 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-section" bind="section-bind"><xf:label ref="$form-resources/section/label"/>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="text-field-control" bind="text-field-bind">
                         <xf:label ref="$form-resources/text-field/label"/>
                         <xf:hint ref="$form-resources/text-field/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input>
 
                             </fr:c>
                         <fr:c y="1" x="7" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="text-field-with-character-counter-control" bind="text-field-with-character-counter-bind" appearance="character-counter">
                         <xf:label ref="$form-resources/text-field-with-character-counter/label"/>
                         <xf:hint ref="$form-resources/text-field-with-character-counter/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c><fr:c x="1" y="2" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="text-field-with-clipboard-copy-control" bind="text-field-with-clipboard-copy-bind" appearance="clipboard-copy">
                         <xf:label ref="$form-resources/text-field-with-clipboard-copy/label"/>
                         <xf:hint ref="$form-resources/text-field-with-clipboard-copy/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c><fr:c x="7" y="2" w="6"/><fr:c x="1" y="3" w="6"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="plain-text-area-control" bind="plain-text-area-bind">
                         <xf:label ref="$form-resources/plain-text-area/label"/>
                         <xf:hint ref="$form-resources/plain-text-area/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:textarea></fr:c><fr:c x="7" y="3" w="6"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="plain-text-area-with-resizing-control" bind="plain-text-area-with-resizing-bind" appearance="xxf:autosize">
                         <xf:label ref="$form-resources/plain-text-area-with-resizing/label"/>
                         <xf:hint ref="$form-resources/plain-text-area-with-resizing/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:textarea></fr:c><fr:c x="1" y="4" w="6"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="plain-text-area-with-character-counter-control" bind="plain-text-area-with-character-counter-bind" appearance="character-counter">
                         <xf:label ref="$form-resources/plain-text-area-with-character-counter/label"/>
                         <xf:hint ref="$form-resources/plain-text-area-with-character-counter/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:textarea></fr:c><fr:c x="7" y="4" w="6"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="plain-text-area-with-clipboard-copy-control" bind="plain-text-area-with-clipboard-copy-bind" appearance="clipboard-copy">
                         <xf:label ref="$form-resources/plain-text-area-with-clipboard-copy/label"/>
                         <xf:hint ref="$form-resources/plain-text-area-with-clipboard-copy/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:textarea></fr:c><fr:c x="1" y="5" w="6"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="formatted-text-area-control" bind="formatted-text-area-bind">
                         <xf:label ref="$form-resources/formatted-text-area/label"/>
                         <xf:hint ref="$form-resources/formatted-text-area/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:textarea></fr:c><fr:c x="7" y="5" w="6"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="explanatory-text-control" bind="explanatory-text-bind"><xf:alert ref="$fr-resources/detail/labels/alert"/>
                         <fr:text ref="$form-resources/explanatory-text/text" mediatype="text/html"/>
                     </fr:explanation></fr:c><fr:c x="1" y="6" w="6"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="calculated-value-control" bind="calculated-value-bind">
                         <xf:label ref="$form-resources/calculated-value/label"/>
                         <xf:hint ref="$form-resources/calculated-value/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:output></fr:c><fr:c x="7" y="6" w="6"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="calculated-value-with-clipboard-copy-control" bind="calculated-value-with-clipboard-copy-bind" appearance="clipboard-copy">
                         <xf:label ref="$form-resources/calculated-value-with-clipboard-copy/label"/>
                         <xf:hint ref="$form-resources/calculated-value-with-clipboard-copy/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:output></fr:c><fr:c x="1" y="7" w="6"><fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="number-control" bind="number-bind" suffix="m/s">
                         <xf:label ref="$form-resources/number/label"/>
                         <xf:hint ref="$form-resources/number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:number></fr:c><fr:c x="7" y="7" w="6"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="currency-control" bind="currency-bind">
                         <xf:label ref="$form-resources/currency/label"/>
                         <xf:hint ref="$form-resources/currency/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:currency></fr:c><fr:c x="1" y="8" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="email-address-control" bind="email-address-bind">
                         <xf:label ref="$form-resources/email-address/label"/>
                         <xf:hint ref="$form-resources/email-address/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c><fr:c x="7" y="8" w="6"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-phone-number-control" bind="us-phone-number-bind">
                         <xf:label ref="$form-resources/us-phone-number/label"/>
                         <xf:hint ref="$form-resources/us-phone-number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:us-phone></fr:c><fr:c x="1" y="9" w="6"><fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-state-control" bind="us-state-bind">
                         <xf:label ref="$form-resources/us-state/label"/>
                         <xf:hint ref="$form-resources/us-state/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:us-state></fr:c><fr:c x="7" y="9" w="6"><fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-ssn-control" bind="us-ssn-bind">
                         <xf:label ref="$form-resources/us-ssn/label"/>
                         <xf:hint ref="$form-resources/us-ssn/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:us-ssn></fr:c><fr:c x="1" y="10" w="6"><fr:us-ein xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-ein-control" bind="us-ein-bind">
                         <xf:label ref="$form-resources/us-ein/label"/>
                         <xf:hint ref="$form-resources/us-ein/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:us-ein></fr:c><fr:c x="7" y="10" w="6"/><fr:c x="1" y="11" w="6"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-control" bind="date-bind">
+
+
+                    </fr:us-ein></fr:c><fr:c x="7" y="10" w="6"/><fr:c x="1" y="11" w="6"><fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="lei-control" bind="lei-bind">
+                        <xf:label ref="$form-resources/lei/label"/>
+                        <xf:hint ref="$form-resources/lei/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:lei></fr:c><fr:c x="7" y="11" w="6"><fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="isin-control" bind="isin-bind">
+                        <xf:label ref="$form-resources/isin/label"/>
+                        <xf:hint ref="$form-resources/isin/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:isin></fr:c><fr:c x="1" y="12" w="6"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-control" bind="date-bind">
                         <xf:label ref="$form-resources/date/label"/>
                         <xf:hint ref="$form-resources/date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:date></fr:c><fr:c x="7" y="11" w="6"><fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="time-control" bind="time-bind">
+
+
+                    </fr:date></fr:c><fr:c x="7" y="12" w="6"><fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="time-control" bind="time-bind">
                         <xf:label ref="$form-resources/time/label"/>
                         <xf:hint ref="$form-resources/time/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:time></fr:c><fr:c x="1" y="12" w="6"><fr:datetime xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="date-and-time-control" bind="date-and-time-bind">
+
+
+                    </fr:time></fr:c><fr:c x="1" y="13" w="6"><fr:datetime xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="date-and-time-control" bind="date-and-time-bind">
                         <xf:label ref="$form-resources/date-and-time/label"/>
                         <xf:hint ref="$form-resources/date-and-time/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:datetime></fr:c><fr:c x="7" y="12" w="6"><fr:dropdown-date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-date-control" bind="dropdown-date-bind">
+
+
+                    </fr:datetime></fr:c><fr:c x="7" y="13" w="6"><fr:dropdown-date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-date-control" bind="dropdown-date-bind">
                         <xf:label ref="$form-resources/dropdown-date/label"/>
                         <xf:hint ref="$form-resources/dropdown-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:dropdown-date></fr:c><fr:c x="1" y="13" w="6"><fr:fields-date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="fields-date-control" bind="fields-date-bind">
+
+
+                    </fr:dropdown-date></fr:c><fr:c x="1" y="14" w="6"><fr:fields-date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="fields-date-control" bind="fields-date-bind">
                         <xf:label ref="$form-resources/fields-date/label"/>
                         <xf:hint ref="$form-resources/fields-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:fields-date></fr:c><fr:c x="7" y="13" w="6"/><fr:c x="1" y="14" w="6"><xf:select1 id="dropdown-control" bind="dropdown-bind" ref="" appearance="dropdown">
+
+
+                    </fr:fields-date></fr:c><fr:c x="7" y="14" w="6"/><fr:c x="1" y="15" w="6"><xf:select1 id="dropdown-control" bind="dropdown-bind" ref="" appearance="dropdown">
                         <xf:label ref="$form-resources/dropdown/label"/>
                         <xf:hint ref="$form-resources/dropdown/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="$form-resources/dropdown/item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </xf:select1></fr:c><fr:c x="7" y="14" w="6"><fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-with-other-control" appearance="minimal" bind="dropdown-with-other-bind">
+                    </xf:select1></fr:c><fr:c x="7" y="15" w="6"><fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-with-other-control" appearance="minimal" bind="dropdown-with-other-bind">
                         <xf:label ref="$form-resources/dropdown-with-other/label"/>
                         <xf:hint ref="$form-resources/dropdown-with-other/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="$form-resources/dropdown-with-other/item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </fr:open-select1></fr:c><fr:c x="1" y="15" w="6"><xf:select1 id="dropdown-with-search-control" bind="dropdown-with-search-bind" ref="" appearance="search">
+                    </fr:open-select1></fr:c><fr:c x="1" y="16" w="6"><xf:select1 id="dropdown-with-search-control" bind="dropdown-with-search-bind" ref="" appearance="search">
                         <xf:label ref="$form-resources/dropdown-with-search/label"/>
                         <xf:hint ref="$form-resources/dropdown-with-search/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="$form-resources/dropdown-with-search/item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </xf:select1></fr:c><fr:c x="7" y="15" w="6"/><fr:c x="1" y="16" w="6"><fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-control" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-dropdown-bind">
+                    </xf:select1></fr:c><fr:c x="7" y="16" w="6"/><fr:c x="1" y="17" w="6"><fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-control" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-dropdown-bind">
                         <xf:label ref="$form-resources/dynamic-dropdown/label"/>
                         <xf:hint ref="$form-resources/dynamic-dropdown/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="/countries/country">
                             <xf:label ref="name"/>
                             <xf:value ref="us-code"/>
                             <xf:hint ref="''"/>
                         </xf:itemset>
-                    </fr:databound-select1></fr:c><fr:c x="7" y="16" w="6"><fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-with-search-control" bind="dynamic-dropdown-with-search-bind" resource="/fr/service/custom/orbeon/controls/countries?all=true" appearance="search" service-performs-search="false" service-supports-paging="false" is-last-page="">
+                    </fr:databound-select1></fr:c><fr:c x="7" y="17" w="6"><fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-with-search-control" bind="dynamic-dropdown-with-search-bind" resource="/fr/service/custom/orbeon/controls/countries?all=true" appearance="search" service-performs-search="false" service-supports-paging="false" is-last-page="">
                         <xf:label ref="$form-resources/dynamic-dropdown-with-search/label"/>
                         <xf:hint ref="$form-resources/dynamic-dropdown-with-search/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="/countries/country">
                             <xf:label ref="name"/>
                             <xf:value ref="us-code"/>
                             <xf:hint ref="''"/>
                         </xf:itemset>
-                    </fr:databound-select1></fr:c><fr:c x="1" y="17" w="6"><xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="radio-buttons-control" bind="radio-buttons-bind" appearance="full">
+                    </fr:databound-select1></fr:c><fr:c x="1" y="18" w="6"><xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="radio-buttons-control" bind="radio-buttons-bind" appearance="full">
                         <xf:label ref="$form-resources/radio-buttons/label"/>
                         <xf:hint ref="$form-resources/radio-buttons/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="$form-resources/radio-buttons/item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </xf:select1></fr:c><fr:c x="7" y="17" w="6"/><fr:c x="1" y="18" w="6"><fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="radio-buttons-with-other-control" bind="radio-buttons-with-other-bind" appearance="full">
+                    </xf:select1></fr:c><fr:c x="7" y="18" w="6"/><fr:c x="1" y="19" w="6"><fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="radio-buttons-with-other-control" bind="radio-buttons-with-other-bind" appearance="full">
                         <xf:label ref="$form-resources/radio-buttons-with-other/label"/>
                         <xf:hint ref="$form-resources/radio-buttons-with-other/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="$form-resources/radio-buttons-with-other/item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </fr:open-select1></fr:c><fr:c x="7" y="18" w="6"><xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="checkboxes-control" appearance="full" bind="checkboxes-bind">
+                    </fr:open-select1></fr:c><fr:c x="7" y="19" w="6"><xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="checkboxes-control" appearance="full" bind="checkboxes-bind">
                         <xf:label ref="$form-resources/checkboxes/label"/>
                         <xf:hint ref="$form-resources/checkboxes/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                         <xf:itemset ref="$form-resources/checkboxes/item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </xf:select></fr:c><fr:c x="1" y="19" w="6"><xf:select id="scrollable-checkboxes-control" bind="scrollable-checkboxes-bind" appearance="scroll">
+                    </xf:select></fr:c><fr:c x="1" y="20" w="6"><xf:select id="scrollable-checkboxes-control" bind="scrollable-checkboxes-bind" appearance="scroll">
                      <xf:label ref="$form-resources/scrollable-checkboxes/label"/>
                      <xf:hint ref="$form-resources/scrollable-checkboxes/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                     
-                     
+
+
                      <xf:itemset ref="$form-resources/scrollable-checkboxes/item">
                         <xf:label ref="label"/>
                         <xf:value ref="value"/>
                     </xf:itemset>
-                </xf:select></fr:c><fr:c x="7" y="19" w="6"><fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="single-checkbox-control" bind="single-checkbox-bind">
+                </xf:select></fr:c><fr:c x="7" y="20" w="6"><fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="single-checkbox-control" bind="single-checkbox-bind">
                         <xf:label ref="$form-resources/single-checkbox/label"/>
                         <xf:hint ref="$form-resources/single-checkbox/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:checkbox-input></fr:c><fr:c x="1" y="20" w="6"><fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="yes_no-answer-control" bind="yes_no-answer-bind">
+
+
+                    </fr:checkbox-input></fr:c><fr:c x="1" y="21" w="6"><fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="yes_no-answer-control" bind="yes_no-answer-bind">
                         <xf:label ref="$form-resources/yes_no-answer/label"/>
                         <xf:hint ref="$form-resources/yes_no-answer/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:yesno-input></fr:c><fr:c x="7" y="20" w="6"/><fr:c x="1" y="21" w="6"><fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="image-attachment-control" bind="image-attachment-bind" class="fr-attachment">
+
+
+                    </fr:yesno-input></fr:c><fr:c x="7" y="21" w="6"/><fr:c x="1" y="22" w="6"><fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="image-attachment-control" bind="image-attachment-bind" class="fr-attachment">
                         <xf:label ref="$form-resources/image-attachment/label"/>
                         <xf:hint ref="$form-resources/image-attachment/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:image-attachment></fr:c><fr:c x="7" y="21" w="6"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="handwritten-signature-control" bind="handwritten-signature-bind">
+
+
+                    </fr:image-attachment></fr:c><fr:c x="7" y="22" w="6"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="handwritten-signature-control" bind="handwritten-signature-bind">
                         <xf:label ref="$form-resources/handwritten-signature/label"/>
                         <xf:hint ref="$form-resources/handwritten-signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:handwritten-signature></fr:c><fr:c x="1" y="22" w="6"><fr:wpaint xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="image-annotation-control" bind="image-annotation-bind">
+
+
+                    </fr:handwritten-signature></fr:c><fr:c x="1" y="23" w="6"><fr:wpaint xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="image-annotation-control" bind="image-annotation-bind">
                         <xf:label ref="$form-resources/image-annotation/label"/>
                         <xf:hint ref="$form-resources/image-annotation/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
-                    </fr:wpaint></fr:c><fr:c x="7" y="22" w="6"/>
+
+
+                    </fr:wpaint></fr:c><fr:c x="7" y="23" w="6"/>
                     </fr:grid>
                 </fr:section><fr:section id="section-2-section" bind="section-2-bind"><xf:label ref="$form-resources/section-2/label"/><fr:grid id="grid-2-grid" bind="grid-2-bind">
               <fr:c x="1" y="1" w="6"><xf:secret xmlns="http://orbeon.org/oxf/xml/form-builder" id="secret-control" bind="secret-bind">
                         <xf:label ref="$form-resources/secret/label"/>
                         <xf:hint ref="$form-resources/secret/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:secret></fr:c><fr:c x="7" y="1" w="6"><fr:hidden xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hidden-field-control" bind="hidden-field-bind">
                         <xf:label ref="$form-resources/hidden-field/label"/>
                         <xf:hint ref="$form-resources/hidden-field/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:hidden></fr:c><fr:c x="1" y="2" w="6"><fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="single-file-attachment-control" bind="single-file-attachment-bind" class="fr-attachment">
                         <xf:label ref="$form-resources/single-file-attachment/label"/>
                         <xf:hint ref="$form-resources/single-file-attachment/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:attachment></fr:c><fr:c x="7" y="2" w="6"><fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" multiple="true" id="multiple-file-attachments-control" bind="multiple-file-attachments-bind" class="fr-attachment">
                         <xf:label ref="$form-resources/multiple-file-attachments/label"/>
                         <xf:hint ref="$form-resources/multiple-file-attachments/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:attachment></fr:c><fr:c x="1" y="3" w="6"><fr:video-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="video-attachment-control" bind="video-attachment-bind" class="fr-attachment">
                         <xf:label ref="$form-resources/video-attachment/label"/>
                         <xf:hint ref="$form-resources/video-attachment/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:video-attachment></fr:c><fr:c x="7" y="3" w="6"><fr:image xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="static-image-control" bind="static-image-bind" class="fr-static-attachment">
                          <xf:label ref="$form-resources/static-image/label"/>
                          <xf:hint ref="$form-resources/static-image/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                         
-                         
+
+
                     </fr:image></fr:c><fr:c x="1" y="4" w="6"><fr:video xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="static-video-control" bind="static-video-bind" class="fr-static-attachment">
                         <xf:label ref="$form-resources/static-video/label"/>
                         <xf:hint ref="$form-resources/static-video/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:video></fr:c><fr:c x="7" y="4" w="6"><xf:trigger xmlns="http://orbeon.org/oxf/xml/form-builder" id="button-control" bind="button-bind">
                     <xf:label ref="$form-resources/button/label"/>
-                    
+
                     <xf:hint ref="$form-resources/button/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                    
+
                 </xf:trigger></fr:c>
             </fr:grid></fr:section>
             </fr:body>

@@ -100,10 +100,17 @@
                 background-color: @error;
             }
 
+            // Nested navigations
             .nav {
                 list-style-type: none;
-                padding-right: 1em;
+                padding-right: 0;  // better with no padding
                 padding-left: 1em; // nested list for subsection navigation
+
+                // https://github.com/orbeon/orbeon-forms/issues/7098
+                > li:first-of-type + li .btn-link {
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                }
             }
         }
     }

@@ -5,6 +5,13 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
     version="3.1">
 
+    <!-- JavaScript API including Angular and React -->
+    <!-- Change to the full URL if needed, for example: http://localhost:8080/orbeon -->
+    <context-param>
+        <param-name>orbeon-forms-context</param-name>
+        <param-value>/orbeon</param-value>
+    </context-param>
+
     <!-- Declare and configure the embedding filter -->
     <!-- For Java API -->
     <filter>

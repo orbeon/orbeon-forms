@@ -48,7 +48,7 @@
     <link rel="stylesheet" href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
 
     <% if (isEmbeddingApiJS) { %>
-    <script type="text/javascript" src="/orbeon/xforms-server/baseline.js?updates=<%= selectedForm.equals("builder") ? "fb" : "fr" %>"></script>
+    <script type="text/javascript" src="<%= orbeonFormsContext %>/xforms-server/baseline.js?updates=<%= selectedForm.equals("builder") ? "fb" : "fr" %>"></script>
     <% } %>
 
     <% if (isEmbeddingApiAngular) { %>

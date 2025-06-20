@@ -100,6 +100,24 @@ body.orbeon {
         margin-bottom: 10px;
     }
 
+    // Restore border and asterisk color
+    // https://github.com/orbeon/orbeon-forms/issues/5554
+    .fr-mode-new,
+    .fr-mode-edit {
+        .fb-body {
+            .xforms-invalid.xforms-visited {
+                &> input, &> textarea, &> select {
+                    border-color: @minGrayDecorationVariable; // TODO: variable specifically for field border
+                }
+            }
+            .xforms-required.xforms-empty {
+                .xforms-label:before {
+                    color: #333; // TODO: variable specifically for field border
+                }
+            }
+        }
+    }
+
     .fb-bottom {
         z-index: @zindexFixedNavbar;                                        // put in front like the navbar
         background-color: @fbButtonsBackground;

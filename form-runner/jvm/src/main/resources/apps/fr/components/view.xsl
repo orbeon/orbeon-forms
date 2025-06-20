@@ -656,7 +656,7 @@
                         then $property
                         else xxf:evaluate-avt($property) = 'true'
                     "/>
-            <xsl:if test="$is-detail">
+            <xsl:if test="$is-detail and not($mode = ('import'))">
                 <xf:action
                     event    = "xforms-enabled"
                     observer = "fr-data-safe">

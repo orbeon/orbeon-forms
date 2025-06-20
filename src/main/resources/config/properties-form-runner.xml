@@ -466,6 +466,10 @@
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.*"                           value="none"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon.*"                              value="new edit view"/>
 
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon-features.*"              value="2"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon-features.*"                  value="none"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon-features.*"                     value="new edit view"/>
+
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon-features.controls"           value="left"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.dmv-14"                      value="left"/>
     <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.w9"                          value="left"/>

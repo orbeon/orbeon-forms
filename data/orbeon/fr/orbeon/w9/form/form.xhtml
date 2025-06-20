@@ -98,8 +98,10 @@
                 <xf:bind name="tin" id="tin-bind" ref="tin">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
                         <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
-                        <xf:bind name="ssn" id="ssn-bind" ref="ssn" constraint="matches(., '^\d{3}-\d{2}-\d{4}$')" relevant="$ssn-or-ein = 'ssn'" xxf:whitespace="trim"/>
-                        <xf:bind name="ein" id="ein-bind" ref="ein" constraint="matches(., '^\d{2}-\d{7}$')" relevant="$ssn-or-ein = 'ein'" xxf:whitespace="trim"/>
+
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation" relevant="$ssn-or-ein = 'ssn'"/>
+                        <xf:bind name="ssn" id="ssn-bind" ref="ssn" type="fr:us-ssn" relevant="$ssn-or-ein = 'ssn'" xxf:whitespace="trim"/>
+                        <xf:bind name="ein" id="ein-bind" ref="ein" type="fr:us-ein" relevant="$ssn-or-ein = 'ein'" xxf:whitespace="trim"/>
                     </xf:bind>
 
 
@@ -133,7 +135,22 @@
 
 
 
-                <thumbnail filename="w9.webp" mediatype="image/webp" size="27034">/fr/service/persistence/crud/orbeon/w9/form/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</thumbnail><allow-template-use>true</allow-template-use><wizard>true</wizard><wizard-subsections-nav>false</wizard-subsections-nav><wizard-mode>lax</wizard-mode><density>comfortable</density><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"applicant"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"name"},{"value":"business-name"}],"topLevel":true},{"containerPath":[{"value":"classification"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"federal-tax-classification"},{"value":"llc-classification"},{"value":"other-classification"},{"value":"exempt-payee"}],"topLevel":true},{"containerPath":[{"value":"address-account"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"address-1"},{"value":"address-2"},{"value":"account-numbers"},{"value":"requester-name-address"}],"topLevel":true},{"containerPath":[{"value":"tin"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"ssn-or-ein"},{"value":"ssn"},{"value":"ein"}],"topLevel":true},{"containerPath":[{"value":"certification"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"signature"}],"topLevel":true},{"containerPath":[{"value":"hidden"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"current-date"}],"topLevel":true}]}</migration></metadata>
+
+
+
+
+
+
+
+                    <thumbnail filename="w9.webp" mediatype="image/webp" size="27034">/fr/service/persistence/crud/orbeon/w9/form/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+                    <wizard>true</wizard>
+                    <wizard-subsections-nav>false</wizard-subsections-nav>
+                    <wizard-mode>lax</wizard-mode>
+                    <data-migration>enabled</data-migration>
+                    <density>comfortable</density>
+
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"applicant"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"name"},{"value":"business-name"}],"topLevel":true},{"containerPath":[{"value":"classification"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"federal-tax-classification"},{"value":"llc-classification"},{"value":"other-classification"},{"value":"exempt-payee"}],"topLevel":true},{"containerPath":[{"value":"address-account"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"address-1"},{"value":"address-2"},{"value":"account-numbers"},{"value":"requester-name-address"}],"topLevel":true},{"containerPath":[{"value":"tin"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"ssn-or-ein"},{"value":"ssn"},{"value":"ssn-explanation"},{"value":"ein"}],"topLevel":true},{"containerPath":[{"value":"certification"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"signature"}],"topLevel":true},{"containerPath":[{"value":"hidden"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"current-date"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -171,15 +188,25 @@
                         </current-date>
                         <ssn>
                             <label>Social security number</label>
-                            <hint>Format: 555-55-5555</hint>
+                            <hint/>
 
-                            <alert/>
+
+
+
                         </ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+
+                        </ssn-explanation>
                         <ein>
                             <label>Employer identification number</label>
-                            <hint>Format: 55-5555555</hint>
+                            <hint/>
 
-                            <alert/>
+
+
+
                         </ein>
 
                         <name>
@@ -444,21 +471,39 @@
                                 </xf:select1>
                             </fr:c>
                         <fr:c y="1" x="5" w="4">
-                                <xf:input id="ssn-control" bind="ssn-bind">
+
+                            </fr:c>
+                        <fr:c y="1" x="9" w="4">
+
+                            </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:us-ssn id="ssn-control" bind="ssn-bind">
                                     <xf:label ref="$form-resources/ssn/label"/>
                                     <xf:hint ref="$form-resources/ssn/hint"/>
 
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
+
+
+                                </fr:us-ssn>
                             </fr:c>
-                        <fr:c y="1" x="9" w="4">
-                                <xf:input id="ein-control" bind="ein-bind">
+                        <fr:c x="5" y="2" w="8">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ssn-explanation-control" bind="ssn-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:us-ein id="ein-control" bind="ein-bind">
                                     <xf:label ref="$form-resources/ein/label"/>
                                     <xf:hint ref="$form-resources/ein/hint"/>
 
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
+
+
+                                </fr:us-ein>
                             </fr:c>
+                        <fr:c x="5" y="3" w="8"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="certification-control" bind="certification-bind">

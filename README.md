@@ -161,7 +161,8 @@ All documentation is available online:
 What's happening?
 -----------------
 
-- [Orbeon Blog](https://blog.orbeon.com/)
+- [Orbeon Blog](https://www.orbeon.com/blog/)
+- [Orbeon on Bluesky](https://bsky.app/profile/orbeon.bsky.social)
 - [Orbeon on Twitter](https://twitter.com/orbeon)
 - [Latest commits on github](https://github.com/orbeon/orbeon-forms/commits)
 - [Forum archive](https://groups.google.com/g/orbeon)

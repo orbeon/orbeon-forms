@@ -31,20 +31,32 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <grid-9>
                             <explanatory-text/>
                             <calculated-value>Great love and great achievements involve great risk.</calculated-value>
-                            <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless><calculated-value-clipboard>Great love and great achievements involve great risk.</calculated-value-clipboard><hidden-field/>
+                            <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless>
+                            <calculated-value-clipboard>Great love and great achievements involve great risk.</calculated-value-clipboard>
+                            <hidden-field/>
 
 
                         </grid-9>
                     </utility-controls>
                     <typed-controls>
                         <grid-3>
-                            <email>info@orbeon.com</email><currency>10.99</currency><number>299792458</number><currency-right>10.99</currency-right><number-right>299792458</number-right>
+                            <email>info@orbeon.com</email>
+                            <currency>10.99</currency>
+                            <number>299792458</number>
+                            <currency-right>10.99</currency-right>
+                            <number-right>299792458</number-right>
 
 
 
 
 
-                            <us-phone>5555555555</us-phone><us-state>CA</us-state><control-2>00-1234567</control-2><us-ssn>078-05-1120</us-ssn><international-securities-identification-number-isin>US0378331005</international-securities-identification-number-isin><ssn-explanation/><legal-entity-identifier-lei>F50EOCWSQFAUVO9Q8Z97</legal-entity-identifier-lei>
+                            <us-phone>5555555555</us-phone>
+                            <us-state>CA</us-state>
+                            <control-2>00-1234567</control-2>
+                            <us-ssn>078-05-1120</us-ssn>
+                            <international-securities-identification-number-isin>US0378331005</international-securities-identification-number-isin>
+                            <ssn-explanation/>
+                            <legal-entity-identifier-lei>F50EOCWSQFAUVO9Q8Z97</legal-entity-identifier-lei>
                         </grid-3>
 
 
@@ -61,11 +73,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                             <time/>
-                            <time-24hour/><native-time/>
+                            <time-24hour/>
+                            <native-time/>
 
 
                             <time-12hour-noseconds/>
-                            <time-24hour-noseconds/><native-time-noseconds/>
+                            <time-24hour-noseconds/>
+                            <native-time-noseconds/>
                             <datetime/>
 
                         </grid-4>
@@ -76,11 +90,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <dropdown-with-other>Pistachio</dropdown-with-other>
                             <dropdown-with-search>cat</dropdown-with-search>
                             <dynamic-dropdown itemset-empty="false">ca</dynamic-dropdown>
-                            <dynamic-dropdown-with-search-by-ui itemset-empty="false">ca</dynamic-dropdown-with-search-by-ui>
+                            <dynamic-dropdown-with-search-by-ui itemset-empty="false">Canada</dynamic-dropdown-with-search-by-ui>
+                            <dynamic-dropdown-with-search-by-service itemset-empty="false" label="Canada">Canada</dynamic-dropdown-with-search-by-service>
+                            <dynamic-dropdown-with-search-and-paging-by-service itemset-empty="false" label="Rick Sanchez">Rick Sanchez</dynamic-dropdown-with-search-and-paging-by-service>
                             <open-selection-1>false</open-selection-1>
-                            <dynamic-dropdown-with-search itemset-empty="false">ca</dynamic-dropdown-with-search>
-                            <dynamic-dropdown-with-search-by-service itemset-empty="false" label="">ca</dynamic-dropdown-with-search-by-service>
                             <open-selection-2>false</open-selection-2>
+                            <open-selection-3>false</open-selection-3>
+
+
+
+
+
+
 
                             <checkboxes>cat bird</checkboxes>
                             <scrollable-checkboxes>cat bird</scrollable-checkboxes>
@@ -126,18 +147,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </buttons>
                     <reusable-sections>
                         <address-us><grid-3>
-                            <us-address-street-1/>
-                            <us-address-city/>
+                            <us-address-street-1/><us-address-city/>
 
 
-                            <us-address-street-2/>
-                            <us-address-state/>
-                            <us-address-zip/>
+                            <us-address-street-2/><us-address-state/><us-address-zip/>
 
 
                             <us-address-urbanization/>
 
                         </grid-3>
+
+
+
 
 
 
@@ -158,14 +179,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
+
+
+
                         </address-uk>
-                        <contact-information><grid-5>
-                            <contact-information-first-name/>
-                            <contact-information-last-name/>
-                            <contact-information-phone/>
-                            <contact-information-email/>
-                            <control-4/>
-                        </grid-5>
+                        <contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5>
+
+
+
 
 
 
@@ -186,11 +207,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </xf:bind>
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
                         <xf:bind id="input-bind" ref="input" name="input" xxf:whitespace="trim"/>
-                        <xf:bind id="input-counter-bind" ref="input-counter" name="input-counter"><xf:constraint id="validation-49-validation" value="xxf:max-length(30)"/>
+                        <xf:bind id="input-counter-bind" ref="input-counter" name="input-counter">
+                            <xf:constraint id="validation-49-validation" value="xxf:max-length(30)"/>
 
                         </xf:bind>
                         <xf:bind id="textarea-bind" ref="textarea" name="textarea" xxf:whitespace="trim"/>
-                        <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter"><xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"/>
+                        <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
+                            <xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"/>
 
                         </xf:bind>
 
@@ -218,7 +241,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
                         <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
                         <xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
-                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/><xf:bind id="native-time-bind" ref="native-time" name="native-time" type="xf:time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="native-time-noseconds-bind" ref="native-time-noseconds" name="native-time-noseconds" type="xf:time" xxf:default="let $t := adjust-time-to-timezone(current-time(), ()),&#xA;    $s := seconds-from-time($t),&#xA;    $d := xs:dayTimeDuration(concat('PT', $s, 'S'))&#xA;return&#xA;    $t - $d"/>
+                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/>
+                        <xf:bind id="native-time-bind" ref="native-time" name="native-time" type="xf:time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
+                        <xf:bind id="native-time-noseconds-bind" ref="native-time-noseconds" name="native-time-noseconds" type="xf:time" xxf:default="let $t := adjust-time-to-timezone(current-time(), ()),&#xA;    $s := seconds-from-time($t),&#xA;    $d := xs:dayTimeDuration(concat('PT', $s, 'S'))&#xA;return&#xA;    $t - $d"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
@@ -227,7 +252,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/>
                         <xf:bind id="radio-buttons-bind" ref="radio-buttons" name="radio-buttons"/>
                         <xf:bind id="dropdown-with-search-bind" ref="dropdown-with-search" name="dropdown-with-search"/>
-                        <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"/>
+
 
 
                         <xf:bind id="dropdown-with-other-bind" ref="dropdown-with-other" name="dropdown-with-other"/>
@@ -237,12 +262,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                         <xf:bind id="checkboxes-horizontal-bind" ref="checkboxes-horizontal" name="checkboxes-horizontal"/>
                         <xf:bind id="radio-buttons-horizontal-bind" ref="radio-buttons-horizontal" name="radio-buttons-horizontal"/>
-                        <xf:bind name="dynamic-dropdown-with-search-by-service" id="dynamic-dropdown-with-search-by-service-bind" ref="dynamic-dropdown-with-search-by-service"/>
-                        <xf:bind id="open-selection-1-bind" ref="open-selection-1" name="open-selection-1" type="xf:boolean" xxf:default="false()"/>
-                        <xf:bind id="open-selection-2-bind" ref="open-selection-2" name="open-selection-2" type="xf:boolean" xxf:default="false()"/>
 
-                        <xf:bind name="dynamic-dropdown-with-search" id="dynamic-dropdown-with-search-bind" ref="dynamic-dropdown-with-search"/>
+
+
+
+
+                        <xf:bind name="dynamic-dropdown-with-search-and-paging-by-service" id="dynamic-dropdown-with-search-and-paging-by-service-bind" ref="dynamic-dropdown-with-search-and-paging-by-service"/>
+                        <xf:bind name="dynamic-dropdown-with-search-by-service" id="dynamic-dropdown-with-search-by-service-bind" ref="dynamic-dropdown-with-search-by-service"/>
                         <xf:bind name="dynamic-dropdown-with-search-by-ui" id="dynamic-dropdown-with-search-by-ui-bind" ref="dynamic-dropdown-with-search-by-ui"/>
+                        <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"/>
+                        <xf:bind id="open-selection-3-bind" ref="open-selection-3" name="open-selection-3" type="xf:boolean" xxf:default="false()"/>
+                        <xf:bind id="open-selection-2-bind" ref="open-selection-2" name="open-selection-2" type="xf:boolean" xxf:default="false()"/>
+                        <xf:bind id="open-selection-1-bind" ref="open-selection-1" name="open-selection-1" type="xf:boolean" xxf:default="false()"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="signature-controls-bind" ref="signature-controls" name="signature-controls" relevant="fr:is-pe()">
@@ -282,7 +313,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/><xf:bind ref="us-state" id="us-state-bind" name="us-state"/><xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/><xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/><xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/><xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal" name="currency-right"/><xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"/><xf:bind id="control-2-bind" ref="control-2" name="control-2" type="fr:us-ein"/><xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"/><xf:bind id="legal-entity-identifier-lei-bind" ref="legal-entity-identifier-lei" name="legal-entity-identifier-lei" type="fr:lei"/><xf:bind id="international-securities-identification-number-isin-bind" ref="international-securities-identification-number-isin" name="international-securities-identification-number-isin" type="fr:isin"/>
+                        <xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/>
+                        <xf:bind ref="us-state" id="us-state-bind" name="us-state"/>
+                        <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
+                        <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
+                        <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
+                        <xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal" name="currency-right"/>
+                        <xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="fr:us-ein"/>
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"/>
+                        <xf:bind id="legal-entity-identifier-lei-bind" ref="legal-entity-identifier-lei" name="legal-entity-identifier-lei" type="fr:lei"/>
+                        <xf:bind id="international-securities-identification-number-isin-bind" ref="international-securities-identification-number-isin" name="international-securities-identification-number-isin" type="fr:isin"/>
                     </xf:bind>
 
 
@@ -293,7 +334,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text"/>
                         <xf:bind ref="calculated-value" id="calculated-value-bind" name="calculated-value"/>
                         <xf:bind ref="calculated-value-borderless" id="calculated-value-borderless-bind" name="calculated-value-borderless"/>
-                        <xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"/><xf:bind ref="calculated-value-clipboard" id="calculated-value-clipboard-bind" name="calculated-value-clipboard"/>
+                        <xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"/>
+                        <xf:bind ref="calculated-value-clipboard" id="calculated-value-clipboard-bind" name="calculated-value-clipboard"/>
 
                     </xf:bind>
                 </xf:bind>
@@ -341,7 +383,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <wizard-subsections-toc>all</wizard-subsections-toc>
                     <data-migration>enabled</data-migration>
                     <density>comfortable</density>
-                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2020.1 PE</updated-with-version><updated-with-version>2022.1 PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"textarea-resize"},{"value":"textarea-clipboard"},{"value":"input-clipboard"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"utility-controls"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-borderless"},{"value":"calculated-value-clipboard"},{"value":"hidden-field"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"currency"},{"value":"number"},{"value":"currency-right"},{"value":"number-right"},{"value":"us-phone"},{"value":"us-state"},{"value":"control-2"},{"value":"us-ssn"},{"value":"international-securities-identification-number-isin"},{"value":"ssn-explanation"},{"value":"legal-entity-identifier-lei"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date-us"},{"value":"date-eu"},{"value":"date-iso"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"native-date"},{"value":"time"},{"value":"time-24hour"},{"value":"native-time"},{"value":"time-12hour-noseconds"},{"value":"time-24hour-noseconds"},{"value":"native-time-noseconds"},{"value":"datetime"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search-by-ui"},{"value":"open-selection-1"},{"value":"dynamic-dropdown-with-search"},{"value":"dynamic-dropdown-with-search-by-service"},{"value":"open-selection-2"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"checkbox-input"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"yesno-input"},{"value":"checkboxes-horizontal"},{"value":"radio-buttons-horizontal"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"static-video"},{"value":"image-attachment"},{"value":"video-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"primary-button"},{"value":"inverse-button"},{"value":"success-button"},{"value":"danger-button"},{"value":"warning-button"},{"value":"info-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"reusable-sections"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"},{"value":"control-4"}],"topLevel":false}]}</migration></metadata>
+
+
+
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2020.1 PE</updated-with-version><updated-with-version>2022.1 PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"textarea-resize"},{"value":"textarea-clipboard"},{"value":"input-clipboard"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"utility-controls"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-borderless"},{"value":"calculated-value-clipboard"},{"value":"hidden-field"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"currency"},{"value":"number"},{"value":"currency-right"},{"value":"number-right"},{"value":"us-phone"},{"value":"us-state"},{"value":"control-2"},{"value":"us-ssn"},{"value":"international-securities-identification-number-isin"},{"value":"ssn-explanation"},{"value":"legal-entity-identifier-lei"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date-us"},{"value":"date-eu"},{"value":"date-iso"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"native-date"},{"value":"time"},{"value":"time-24hour"},{"value":"native-time"},{"value":"time-12hour-noseconds"},{"value":"time-24hour-noseconds"},{"value":"native-time-noseconds"},{"value":"datetime"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search-by-ui"},{"value":"dynamic-dropdown-with-search-by-service"},{"value":"dynamic-dropdown-with-search-and-paging-by-service"},{"value":"open-selection-1"},{"value":"open-selection-2"},{"value":"open-selection-3"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"checkbox-input"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"yesno-input"},{"value":"checkboxes-horizontal"},{"value":"radio-buttons-horizontal"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"static-video"},{"value":"image-attachment"},{"value":"video-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"primary-button"},{"value":"inverse-button"},{"value":"success-button"},{"value":"danger-button"},{"value":"warning-button"},{"value":"info-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"reusable-sections"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"},{"value":"control-4"}],"topLevel":false}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -401,7 +446,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <explanatory-text><text>&lt;div&gt;&lt;strong&gt;This is an explanatory text:&lt;/strong&gt;&lt;/div&gt;
+                        <explanatory-text>
+                            <text>&lt;div&gt;&lt;strong&gt;This is an explanatory text:&lt;/strong&gt;&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
 &lt;ul&gt;
 &lt;li&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&lt;/li&gt;
@@ -417,19 +463,29 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 &lt;div&gt;Here is a &lt;a href="{$link}" target="_blank" rel="noopener"&gt;link to this form&lt;/a&gt;.&lt;/div&gt;</text>
 
                         </explanatory-text>
-                        <calculated-value><label>Calculated Value</label><hint>Standard text output with a label</hint>
+                        <calculated-value>
+                            <label>Calculated Value</label>
+                            <hint>Standard text output with a label</hint>
 
 
                         </calculated-value>
-                        <calculated-value-borderless><label>Calculated Value without border</label><hint>Standard text output with a label but no border</hint>
+                        <calculated-value-borderless>
+                            <label>Calculated Value without border</label>
+                            <hint>Standard text output with a label but no border</hint>
 
 
-                        </calculated-value-borderless><calculated-value-clipboard><label>Calculated Value with Clipboard Copy</label><hint>Standard text output with a label and copy</hint>
+                        </calculated-value-borderless>
+                        <calculated-value-clipboard>
+                            <label>Calculated Value with Clipboard Copy</label>
+                            <hint>Standard text output with a label and copy</hint>
 
 
 
 
-                        </calculated-value-clipboard><hidden-field><label/><hint/>
+                        </calculated-value-clipboard>
+                        <hidden-field>
+                            <label/>
+                            <hint/>
 
 
                         </hidden-field>
@@ -495,29 +551,47 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </item>
                         </dropdown-with-search>
                         <dynamic-dropdown>
-                            <label>Dynamic Dropdown</label>
+                            <label>Dynamic Dropdown&lt;br&gt;No search&lt;br&gt;No paging</label>
                             <hint/>
                         </dynamic-dropdown>
                         <dynamic-dropdown-with-search-by-ui>
-                            <label>Dynamic Dropdown with UI search</label>
-                            <hint>Search done by the UI</hint>
+                            <label>Dynamic Dropdown&lt;br&gt;Search by UI&lt;br&gt;No paging</label>
+                            <hint/>
+
+
                         </dynamic-dropdown-with-search-by-ui>
+                        <dynamic-dropdown-with-search-by-service>
+                            <label>Dynamic Dropdown&lt;br&gt;Search by service&lt;br&gt;No paging</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-by-service>
+                        <dynamic-dropdown-with-search-and-paging-by-service>
+                            <label>Dynamic Dropdown&lt;br&gt;Search by service&lt;br&gt;Paging by service</label>
+                            <hint/>
+
+
+                        </dynamic-dropdown-with-search-and-paging-by-service>
                         <open-selection-1>
                             <label>Open Selection</label>
                             <hint/>
                         </open-selection-1>
-                        <dynamic-dropdown-with-search>
-                            <label>Dynamic Dropdown with search</label>
-                            <hint>Search done by the UI</hint>
-                        </dynamic-dropdown-with-search>
-                        <dynamic-dropdown-with-search-by-service>
-                            <label>Dynamic Dropdown with service search</label>
-                            <hint>Search done by the service</hint>
-                        </dynamic-dropdown-with-search-by-service>
                         <open-selection-2>
                             <label>Open Selection</label>
                             <hint/>
                         </open-selection-2>
+                        <open-selection-3>
+                            <label>Open Selection</label>
+                            <hint/>
+
+
+                        </open-selection-3>
+
+
+
+
+
+
 
 
                         <checkboxes>
@@ -584,19 +658,33 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>US address</label>
                             <help/>
                         </address-us>
-                        <email><label>Email Address</label><hint>Email field with validation</hint>
+                        <email>
+                            <label>Email Address</label>
+                            <hint>Email field with validation</hint>
 
 
-                        </email><currency><label>Currency</label><hint>Currency field</hint>
+                        </email>
+                        <currency>
+                            <label>Currency</label>
+                            <hint>Currency field</hint>
 
 
-                        </currency><number><label>Number</label><hint>Number field with validation</hint>
+                        </currency>
+                        <number>
+                            <label>Number</label>
+                            <hint>Number field with validation</hint>
 
 
-                        </number><currency-right><label>Currency (right-aligned)</label><hint>Currency field</hint>
+                        </number>
+                        <currency-right>
+                            <label>Currency (right-aligned)</label>
+                            <hint>Currency field</hint>
 
 
-                        </currency-right><number-right><label>Number (right-aligned)</label><hint>Number field with validation</hint>
+                        </currency-right>
+                        <number-right>
+                            <label>Number (right-aligned)</label>
+                            <hint>Number field with validation</hint>
 
 
                         </number-right>
@@ -605,15 +693,39 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <us-phone><label>US Phone Number</label><hint>US phone number field</hint>
+                        <us-phone>
+                            <label>US Phone Number</label>
+                            <hint>US phone number field</hint>
 
 
-                        </us-phone><us-state><label>US State</label><hint>US state selector</hint>
+                        </us-phone>
+                        <us-state>
+                            <label>US State</label>
+                            <hint>US state selector</hint>
 
 
-                        </us-state><control-2><label>US EIN</label><hint>US Employer Identification Number</hint></control-2><us-ssn><label>US SSN</label><hint>US Social Security Number</hint></us-ssn><international-securities-identification-number-isin><label>ISIN</label><hint>International Securities Identification Number (ISIN)</hint></international-securities-identification-number-isin><ssn-explanation><text>&lt;div&gt;
+                        </us-state>
+                        <control-2>
+                            <label>US EIN</label>
+                            <hint>US Employer Identification Number</hint>
+                        </control-2>
+                        <us-ssn>
+                            <label>US SSN</label>
+                            <hint>US Social Security Number</hint>
+                        </us-ssn>
+                        <international-securities-identification-number-isin>
+                            <label>ISIN</label>
+                            <hint>International Securities Identification Number (ISIN)</hint>
+                        </international-securities-identification-number-isin>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
 &lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
-&lt;/div&gt;</text></ssn-explanation><legal-entity-identifier-lei><label>LEI</label><hint>Legal Entity Identifier (LEI)</hint></legal-entity-identifier-lei>
+&lt;/div&gt;</text>
+                        </ssn-explanation>
+                        <legal-entity-identifier-lei>
+                            <label>LEI</label>
+                            <hint>Legal Entity Identifier (LEI)</hint>
+                        </legal-entity-identifier-lei>
                         <standard-button>
                             <label>Standard Button</label>
                             <hint>Standard browser button</hint>
@@ -781,7 +893,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        </time-24hour><native-time><label>Browser Time</label><hint/></native-time>
+                        </time-24hour>
+                        <native-time>
+                            <label>Browser Time</label>
+                            <hint/>
+                        </native-time>
 
 
                         <time-12hour-noseconds>
@@ -799,7 +915,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        </time-24hour-noseconds><native-time-noseconds><label>Browser Time (No Seconds)</label><hint/></native-time-noseconds>
+                        </time-24hour-noseconds>
+                        <native-time-noseconds>
+                            <label>Browser Time (No Seconds)</label>
+                            <hint/>
+                        </native-time-noseconds>
                         <datetime>
                             <label>Date and Time</label>
                             <hint>Standard date and time field</hint>
@@ -809,7 +929,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                         </datetime>
 
-                        <htmlarea><label>Formatted Text Area</label><hint>Rich text editor</hint>
+                        <htmlarea>
+                            <label>Formatted Text Area</label>
+                            <hint>Rich text editor</hint>
 
 
                         </htmlarea>
@@ -826,35 +948,49 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Text Field</label>
                             <hint>Standard input field</hint>
                         </input>
-                        <input-counter><label>Text Field with Character Counter</label><hint>This is an input field with a character counter</hint>
+                        <input-counter>
+                            <label>Text Field with Character Counter</label>
+                            <hint>This is an input field with a character counter</hint>
 
                             <alert>30 characters maximum</alert>
 
                         </input-counter>
-                        <textarea><label>Plain Text Area</label><hint>Standard text area</hint>
+                        <textarea>
+                            <label>Plain Text Area</label>
+                            <hint>Standard text area</hint>
 
 
                         </textarea>
-                        <textarea-counter><label>Plain Text Area with Character counter</label><hint>This is a text area with a character counter</hint>
+                        <textarea-counter>
+                            <label>Plain Text Area with Character counter</label>
+                            <hint>This is a text area with a character counter</hint>
 
                             <alert>280 characters at most</alert>
 
                         </textarea-counter>
-                        <textarea-resize><label>Plain Text Area with Resizing</label><hint>Standard text area</hint>
+                        <textarea-resize>
+                            <label>Plain Text Area with Resizing</label>
+                            <hint>Standard text area</hint>
 
 
                         </textarea-resize>
-                        <textarea-clipboard><label>Plain Text Area with Clipboard Copy</label><hint>Standard text area with clipboard copy</hint>
+                        <textarea-clipboard>
+                            <label>Plain Text Area with Clipboard Copy</label>
+                            <hint>Standard text area with clipboard copy</hint>
 
 
 
 
                         </textarea-clipboard>
-                        <input-clipboard><label>Text Field with Clipboard Copy</label><hint/>
+                        <input-clipboard>
+                            <label>Text Field with Clipboard Copy</label>
+                            <hint/>
 
 
                         </input-clipboard>
-                        <secret><label>Secret Field</label><hint>The password is 42 ;)</hint>
+                        <secret>
+                            <label>Secret Field</label>
+                            <hint>The password is 42 ;)</hint>
 
 
                         </secret>
@@ -916,7 +1052,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <explanatory-text><text>&lt;div&gt;
+                        <explanatory-text>
+                            <text>&lt;div&gt;
 &lt;div&gt;&lt;strong&gt;Ceci est un texte explicatif:&lt;/strong&gt;&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
 &lt;ul&gt;
@@ -934,19 +1071,29 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 &lt;/div&gt;</text>
 
                         </explanatory-text>
-                        <calculated-value><label>Valeur calculée</label><hint>Sortie texte standard avec libellé</hint>
+                        <calculated-value>
+                            <label>Valeur calculée</label>
+                            <hint>Sortie texte standard avec libellé</hint>
 
 
                         </calculated-value>
-                        <calculated-value-borderless><label>Valeur calculée sans bord</label><hint>Sortie texte standard avec libellé mais sans bord</hint>
+                        <calculated-value-borderless>
+                            <label>Valeur calculée sans bord</label>
+                            <hint>Sortie texte standard avec libellé mais sans bord</hint>
 
 
-                        </calculated-value-borderless><calculated-value-clipboard><label>Valeur calculée avec copie vers le presse-papiers</label><hint>Sortie texte standard avec libellé et copie</hint>
+                        </calculated-value-borderless>
+                        <calculated-value-clipboard>
+                            <label>Valeur calculée avec copie vers le presse-papiers</label>
+                            <hint>Sortie texte standard avec libellé et copie</hint>
 
 
 
 
-                        </calculated-value-clipboard><hidden-field><label/><hint/>
+                        </calculated-value-clipboard>
+                        <hidden-field>
+                            <label/>
+                            <hint/>
 
 
                         </hidden-field>
@@ -1018,23 +1165,41 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dynamic-dropdown-with-search-by-ui>
                             <label>Menu déroulant dynamique avec recherche</label>
                             <hint>Recherche faite par l'interface</hint>
+
+
                         </dynamic-dropdown-with-search-by-ui>
+                        <dynamic-dropdown-with-search-by-service>
+                            <label>Menu déroulant dynamique avec recherche</label>
+                            <hint>Recherche faite par le service</hint>
+
+
+                        </dynamic-dropdown-with-search-by-service>
+                        <dynamic-dropdown-with-search-and-paging-by-service>
+                            <label>Menu déroulant dynamique avec recherche</label>
+                            <hint>Recherche faite par le service</hint>
+
+
+                        </dynamic-dropdown-with-search-and-paging-by-service>
                         <open-selection-1>
                             <label>Sélection ouverte</label>
                             <hint/>
                         </open-selection-1>
-                        <dynamic-dropdown-with-search>
-                            <label>Menu déroulant dynamique avec recherche</label>
-                            <hint>Recherche faite par l'interface</hint>
-                        </dynamic-dropdown-with-search>
-                        <dynamic-dropdown-with-search-by-service>
-                            <label>Menu déroulant dynamique avec recherche</label>
-                            <hint>Recherche faite par le service</hint>
-                        </dynamic-dropdown-with-search-by-service>
                         <open-selection-2>
                             <label>Sélection ouverte</label>
                             <hint/>
                         </open-selection-2>
+                        <open-selection-3>
+                            <label>Sélection ouverte</label>
+                            <hint/>
+
+
+                        </open-selection-3>
+
+
+
+
+
+
 
 
                         <checkboxes>
@@ -1101,19 +1266,33 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Adresse US</label>
                             <help/>
                         </address-us>
-                        <email><label>Adresse email</label><hint>Email field with validation</hint>
+                        <email>
+                            <label>Adresse email</label>
+                            <hint>Email field with validation</hint>
 
 
-                        </email><currency><label>Devise</label><hint>Currency field</hint>
+                        </email>
+                        <currency>
+                            <label>Devise</label>
+                            <hint>Currency field</hint>
 
 
-                        </currency><number><label>Nombre</label><hint>Number field with validation</hint>
+                        </currency>
+                        <number>
+                            <label>Nombre</label>
+                            <hint>Number field with validation</hint>
 
 
-                        </number><currency-right><label>Devise (alignement à droite)</label><hint>Currency field</hint>
+                        </number>
+                        <currency-right>
+                            <label>Devise (alignement à droite)</label>
+                            <hint>Currency field</hint>
 
 
-                        </currency-right><number-right><label>Nombre (alignement à droite)</label><hint>Number field with validation</hint>
+                        </currency-right>
+                        <number-right>
+                            <label>Nombre (alignement à droite)</label>
+                            <hint>Number field with validation</hint>
 
 
                         </number-right>
@@ -1122,15 +1301,39 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <us-phone><label>Téléphone US</label><hint>US phone number field</hint>
+                        <us-phone>
+                            <label>Téléphone US</label>
+                            <hint>US phone number field</hint>
 
 
-                        </us-phone><us-state><label>Etat US</label><hint>US state selector</hint>
+                        </us-phone>
+                        <us-state>
+                            <label>Etat US</label>
+                            <hint>US state selector</hint>
 
 
-                        </us-state><control-2><label>EIN</label><hint>Numéro d'identifiant employeur US (EIN)</hint></control-2><us-ssn><label>US SSN</label><hint>Numéro de sécurité sociale US (SSN)</hint></us-ssn><international-securities-identification-number-isin><label>ISIN</label><hint>Numéro international d’identification des valeurs mobilières (ISIN)</hint></international-securities-identification-number-isin><ssn-explanation><text>&lt;div&gt;
+                        </us-state>
+                        <control-2>
+                            <label>EIN</label>
+                            <hint>Numéro d'identifiant employeur US (EIN)</hint>
+                        </control-2>
+                        <us-ssn>
+                            <label>US SSN</label>
+                            <hint>Numéro de sécurité sociale US (SSN)</hint>
+                        </us-ssn>
+                        <international-securities-identification-number-isin>
+                            <label>ISIN</label>
+                            <hint>Numéro international d’identification des valeurs mobilières (ISIN)</hint>
+                        </international-securities-identification-number-isin>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
 &lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
-&lt;/div&gt;</text></ssn-explanation><legal-entity-identifier-lei><label>LEI</label><hint>Identifiant d’entité juridique (LEI)</hint></legal-entity-identifier-lei>
+&lt;/div&gt;</text>
+                        </ssn-explanation>
+                        <legal-entity-identifier-lei>
+                            <label>LEI</label>
+                            <hint>Identifiant d’entité juridique (LEI)</hint>
+                        </legal-entity-identifier-lei>
                         <standard-button>
                             <label>Bouton standard</label>
                             <hint>Bouton navigateur standard</hint>
@@ -1298,7 +1501,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        </time-24hour><native-time><label/><hint/></native-time>
+                        </time-24hour>
+                        <native-time>
+                            <label/>
+                            <hint/>
+                        </native-time>
 
 
                         <time-12hour-noseconds>
@@ -1316,7 +1523,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        </time-24hour-noseconds><native-time-noseconds><label/><hint/></native-time-noseconds>
+                        </time-24hour-noseconds>
+                        <native-time-noseconds>
+                            <label/>
+                            <hint/>
+                        </native-time-noseconds>
                         <datetime>
                             <label>Date et heure</label>
                             <hint>Champ date et heure standard</hint>
@@ -1326,7 +1537,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                         </datetime>
 
-                        <htmlarea><label>Texte formatté</label><hint>Editeur de texte enrichi</hint>
+                        <htmlarea>
+                            <label>Texte formatté</label>
+                            <hint>Editeur de texte enrichi</hint>
 
 
                         </htmlarea>
@@ -1343,35 +1556,49 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Champ de texte</label>
                             <hint>Champ de texte standard</hint>
                         </input>
-                        <input-counter><label>Champ de texte avec compteur de caractères</label><hint>Ceci est un champ de texte avec compteur de caractères</hint>
+                        <input-counter>
+                            <label>Champ de texte avec compteur de caractères</label>
+                            <hint>Ceci est un champ de texte avec compteur de caractères</hint>
 
                             <alert>30 caractères au plus</alert>
 
                         </input-counter>
-                        <textarea><label>Zone de texte</label><hint>Zone de texte standard</hint>
+                        <textarea>
+                            <label>Zone de texte</label>
+                            <hint>Zone de texte standard</hint>
 
 
                         </textarea>
-                        <textarea-counter><label>Zone de texte avec compteur de caractères</label><hint>Ceci est une zone de texte avec compteur de caractères</hint>
+                        <textarea-counter>
+                            <label>Zone de texte avec compteur de caractères</label>
+                            <hint>Ceci est une zone de texte avec compteur de caractères</hint>
 
                             <alert>280 caractères au plus</alert>
 
                         </textarea-counter>
-                        <textarea-resize><label>Zone de texte avec redimensionnement</label><hint>Zone de texte standard</hint>
+                        <textarea-resize>
+                            <label>Zone de texte avec redimensionnement</label>
+                            <hint>Zone de texte standard</hint>
 
 
                         </textarea-resize>
-                        <textarea-clipboard><label>Zone de texte avec copie vers le presse-papiers</label><hint>Zone de texte standard avec copie vers le presse-papiers</hint>
+                        <textarea-clipboard>
+                            <label>Zone de texte avec copie vers le presse-papiers</label>
+                            <hint>Zone de texte standard avec copie vers le presse-papiers</hint>
 
 
 
 
                         </textarea-clipboard>
-                        <input-clipboard><label>Champ de texte avec copie vers le presse-papiers</label><hint/>
+                        <input-clipboard>
+                            <label>Champ de texte avec copie vers le presse-papiers</label>
+                            <hint/>
 
 
                         </input-clipboard>
-                        <secret><label>Champ secret</label><hint>Le mot de passe est 42 ;)</hint>
+                        <secret>
+                            <label>Champ secret</label>
+                            <hint>Le mot de passe est 42 ;)</hint>
 
 
                         </secret>
@@ -1388,35 +1615,29 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
         </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="_-address-us-component" element="component|address-us" class="fr-section-component"><xbl:implementation><xf:model id="address-us-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><address-us xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                         <grid-3>
-                            <us-address-street-1/>
-                            <us-address-city/>
+                            <us-address-street-1/><us-address-city/>
 
 
-                            <us-address-street-2/>
-                            <us-address-state/>
-                            <us-address-zip/>
+                            <us-address-street-2/><us-address-state/><us-address-zip/>
 
 
                             <us-address-urbanization/>
 
                         </grid-3>
                     </address-us></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-3-bind" ref="grid-3" name="grid-3">
-                        <xf:bind id="us-address-street-1-bind" ref="us-address-street-1" name="us-address-street-1" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="us-address-street-1-bind" ref="us-address-street-1" name="us-address-street-1" xxf:whitespace="trim"/>
                         <xf:bind id="us-address-street-2-bind" ref="us-address-street-2" name="us-address-street-2" xxf:whitespace="trim"/>
 
 
 
-                        <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/>
-                        <xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
-                        <xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state" required="true()"/>
-                        <xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/><xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/><xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state"/><xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
 
                     </xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><address-us xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                             <label>US address</label>
 
-                        </address-us><grid-3 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"/><us-address-street-1 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Street address</label><hint/>
-
-
+                        </address-us><grid-3 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"/><us-address-street-1 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+                            <label>Street address</label>
+                            <hint/>
                         </us-address-street-1><us-address-street-2 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                             <label>Street address line 2</label>
                             <hint/>
@@ -1426,9 +1647,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </us-address-urbanization><us-address-zip xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                             <label>Zip code</label>
                             <hint/>
-                        </us-address-zip><us-address-state xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>State, territory, or military post</label><hint/>
-
-
+                        </us-address-zip><us-address-state xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+                            <label>State, territory, or military post</label>
+                            <hint/>
                         </us-address-state><us-address-city xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                             <label>City</label>
                             <hint/>
@@ -1436,14 +1657,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="1" y="1" w="6">
                             <xf:input id="us-address-street-1-control" bind="us-address-street-1-bind" autocomplete="address-line1">
                                 <xf:label ref="$form-resources/us-address-street-1/label"/>
-                                <xf:hint ref="$form-resources/us-address-street-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
+                                <xf:hint ref="$form-resources/us-address-street-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="1" w="6">
-                            <xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
+                        <fr:c x="7" y="1" w="6"><xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
                                 <xf:label ref="$form-resources/us-address-city/label"/>
                                 <xf:hint ref="$form-resources/us-address-city/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1462,31 +1682,26 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="2" w="4">
-                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="us-address-state-control" bind="us-address-state-bind">
+                        <fr:c x="7" y="2" w="4"><fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="us-address-state-control" bind="us-address-state-bind">
                                 <xf:label ref="$form-resources/us-address-state/label"/>
-                                <xf:hint ref="$form-resources/us-address-state/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
+                                <xf:hint ref="$form-resources/us-address-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </fr:us-state>
 
 
-                        </fr:c>
-                        <fr:c x="11" y="2" w="2" h="1">
-                            <xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
+                        </fr:c><fr:c x="11" y="2" w="2" h="1"><xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
                                 <xf:label ref="$form-resources/us-address-zip/label"/>
                                 <xf:hint ref="$form-resources/us-address-zip/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:input>
-                        </fr:c>
+                            </xf:input></fr:c>
                         <fr:c x="1" y="3" w="6">
 
                         </fr:c>
-                        <fr:c x="7" y="3" w="6">
-                            <xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
+                        <fr:c x="7" y="3" w="6"><xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
                                 <xf:label ref="$form-resources/us-address-urbanization/label"/>
                                 <xf:hint ref="$form-resources/us-address-urbanization/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1582,83 +1797,34 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="_-contact-information-component" element="component|contact-information" class="fr-section-component"><xbl:implementation><xf:model id="contact-information-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                        <grid-5>
-                            <contact-information-first-name/>
-                            <contact-information-last-name/>
-                            <contact-information-phone/>
-                            <contact-information-email/>
-                            <control-4/>
-                        </grid-5>
-                    </contact-information></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-bind" ref="grid-5" name="grid-5">
-                        <xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/>
-                        <xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/>
-                        <xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')"/>
-                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:email" xxf:whitespace="trim" required="true()"/>
-                        <xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/>
-                    </xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                            <label>Contact information</label>
-                        </contact-information><contact-information-first-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                            <label>First Name</label>
-                            <hint/>
-                        </contact-information-first-name><contact-information-phone xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                            <label>Last Name</label>
-                            <hint/>
-                        </contact-information-phone><contact-information-email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                            <label>Phone number</label>
-                            <hint/>
-                        </contact-information-email><control-4 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                            <label>Email</label>
-                            <hint/>
-                        </control-4><contact-information-last-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
-                            <label>Middle initial</label>
-                            <hint/>
-                        </contact-information-last-name></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="contact-information-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-contact-information-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / contact-information / v</xh:div><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-grid" bind="grid-5-bind">
-                        <fr:c x="1" y="1" w="4">
-                            <xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
-                                <xf:label ref="$form-resources/contact-information-first-name/label"/>
-                                <xf:hint ref="$form-resources/contact-information-first-name/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="_-contact-information-component" element="component|contact-information" class="fr-section-component"><xbl:implementation><xf:model id="contact-information-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5></contact-information></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:email" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/></xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><contact-information xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Contact information</label></contact-information><contact-information-first-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>First Name</label><hint/></contact-information-first-name><contact-information-phone xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Last Name</label><hint/></contact-information-phone><contact-information-email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Phone number</label><hint/></contact-information-email><control-4 xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Email</label><hint/></control-4><contact-information-last-name xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><label>Middle initial</label><hint/></contact-information-last-name></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map"><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="contact-information-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-contact-information-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / contact-information / v</xh:div><fr:grid xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:map="http://www.w3.org/2005/xpath-functions/map" id="grid-5-grid" bind="grid-5-bind">
+              <fr:c x="1" y="1" w="4"><xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
+                        <xf:label ref="$form-resources/contact-information-first-name/label"/>
+                        <xf:hint ref="$form-resources/contact-information-first-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:input>
-                        </fr:c>
-                        <fr:c x="5" y="1" w="2" h="1">
-                            <xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
-                                <xf:label ref="$form-resources/contact-information-last-name/label"/>
-                                <xf:hint ref="$form-resources/contact-information-last-name/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input></fr:c><fr:c x="5" y="1" w="2" h="1"><xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
+                        <xf:label ref="$form-resources/contact-information-last-name/label"/>
+                        <xf:hint ref="$form-resources/contact-information-last-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:input>
-                        </fr:c>
-                        <fr:c x="7" y="1" w="6">
-                            <xf:input id="contact-information-phone-control" bind="contact-information-phone-bind">
-                                <xf:label ref="$form-resources/contact-information-phone/label"/>
-                                <xf:hint ref="$form-resources/contact-information-phone/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input></fr:c><fr:c x="7" y="1" w="6"><xf:input id="contact-information-phone-control" bind="contact-information-phone-bind">
+                        <xf:label ref="$form-resources/contact-information-phone/label"/>
+                        <xf:hint ref="$form-resources/contact-information-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:input>
-                        </fr:c>
-                        <fr:c x="1" y="2" w="6">
-                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-email-control" bind="contact-information-email-bind">
-                                <xf:label ref="$form-resources/contact-information-email/label"/>
-                                <xf:hint ref="$form-resources/contact-information-email/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input></fr:c><fr:c x="1" y="2" w="6"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-email-control" bind="contact-information-email-bind">
+                        <xf:label ref="$form-resources/contact-information-email/label"/>
+                        <xf:hint ref="$form-resources/contact-information-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </fr:us-phone>
-                        </fr:c>
-                        <fr:c x="7" y="2" w="6">
-                            <xf:input id="control-4-control" bind="control-4-bind">
-                                <xf:label ref="$form-resources/control-4/label"/>
+                    </fr:us-phone></fr:c><fr:c x="7" y="2" w="6"><xf:input id="control-4-control" bind="control-4-bind">
+                        <xf:label ref="$form-resources/control-4/label"/>
                                 <xf:hint ref="$form-resources/control-4/hint"/>
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:input>
-                        </fr:c>
-                    </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
+                    </xf:input></fr:c>
+            </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
     </xh:head>
     <xh:body>
         <fr:view>
@@ -1675,7 +1841,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c y="1" x="7" w="6">
                             <xf:input id="input-counter-control" bind="input-counter-bind" appearance="character-counter">
                                 <xf:label ref="$form-resources/input-counter/label"/>
-                                <xf:hint ref="$form-resources/input-counter/hint"/><xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/input-counter/hint"/>
+                                <xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </xf:input>
@@ -1683,13 +1851,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c y="2" x="1" w="6">
                             <xf:textarea bind="textarea-bind" id="textarea-control">
                                 <xf:label ref="$form-resources/textarea/label"/>
-                                <xf:hint ref="$form-resources/textarea/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/textarea/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:textarea>
                         </fr:c>
                         <fr:c y="2" x="7" w="6">
                             <xf:textarea id="textarea-counter-control" bind="textarea-counter-bind" appearance="character-counter">
                                 <xf:label ref="$form-resources/textarea-counter/label"/>
-                                <xf:hint ref="$form-resources/textarea-counter/hint"/><xf:alert ref="$form-resources/textarea-counter/alert" validation="constraint-49-constraint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/textarea-counter/hint"/>
+                                <xf:alert ref="$form-resources/textarea-counter/alert" validation="constraint-49-constraint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </xf:textarea>
@@ -1697,14 +1868,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="1" y="3" w="6">
                             <xf:textarea bind="textarea-resize-bind" id="textarea-resize-control" appearance="xxf:autosize">
                                 <xf:label ref="$form-resources/textarea-resize/label"/>
-                                <xf:hint ref="$form-resources/textarea-resize/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/textarea-resize/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </xf:textarea>
                         </fr:c>
                         <fr:c x="7" y="3" w="6">
                             <xf:textarea bind="textarea-clipboard-bind" id="textarea-clipboard-control" appearance="clipboard-copy">
                                 <xf:label ref="$form-resources/textarea-clipboard/label"/>
-                                <xf:hint ref="$form-resources/textarea-clipboard/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/textarea-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </xf:textarea>
 
@@ -1713,7 +1886,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="1" y="4" w="6">
                             <xf:input id="input-clipboard-control" bind="input-clipboard-bind" appearance="clipboard-copy">
                                 <xf:label ref="$form-resources/input-clipboard/label"/>
-                                <xf:hint ref="$form-resources/input-clipboard/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/input-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
 
@@ -1722,7 +1896,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="7" y="4" w="6">
                             <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
                                 <xf:label ref="$form-resources/secret/label"/>
-                                <xf:hint ref="$form-resources/secret/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/secret/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </xf:secret>
                         </fr:c>
@@ -1731,7 +1906,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c y="1" x="1" w="12">
                             <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
                                 <xf:label ref="$form-resources/htmlarea/label"/>
-                                <xf:hint ref="$form-resources/htmlarea/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/htmlarea/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </fr:tinymce>
                         </fr:c>
@@ -1741,7 +1917,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <xf:label ref="$form-resources/utility-controls/label"/>
                     <fr:grid id="grid-9-grid" bind="grid-9-bind">
                         <fr:c x="1" y="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="explanatory-text-control" bind="explanatory-text-bind"><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="explanatory-text-control" bind="explanatory-text-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                                 <fr:text ref="$form-resources/explanatory-text/text" mediatype="text/html">
                                     <fr:param type="ControlValueParam">
@@ -1761,7 +1938,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="1" y="2" w="6">
                             <xf:output bind="calculated-value-bind" id="calculated-value-control" appearance="full">
                                 <xf:label ref="$form-resources/calculated-value/label"/>
-                                <xf:hint ref="$form-resources/calculated-value/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/calculated-value/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </xf:output>
@@ -1769,23 +1947,28 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c x="7" y="2" w="6">
                             <xf:output bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal">
                                 <xf:label ref="$form-resources/calculated-value-borderless/label"/>
-                                <xf:hint ref="$form-resources/calculated-value-borderless/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/calculated-value-borderless/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                             </xf:output>
                         </fr:c>
-                        <fr:c x="1" y="3" w="6"><xf:output bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy">
+                        <fr:c x="1" y="3" w="6">
+                            <xf:output bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy">
                                 <xf:label ref="$form-resources/calculated-value-clipboard/label"/>
-                                <xf:hint ref="$form-resources/calculated-value-clipboard/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/calculated-value-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
 
                             </xf:output>
 
                         </fr:c>
-                        <fr:c x="7" y="3" w="6"><fr:hidden xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hidden-field-control" bind="hidden-field-bind">
+                        <fr:c x="7" y="3" w="6">
+                            <fr:hidden xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hidden-field-control" bind="hidden-field-bind">
                                 <xf:label ref="$form-resources/hidden-field/label"/>
-                                <xf:hint ref="$form-resources/hidden-field/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/hidden-field/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
 
@@ -1800,19 +1983,24 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c y="1" x="1" w="4">
                             <xf:input bind="email-bind" id="email-control">
                                 <xf:label ref="$form-resources/email/label"/>
-                                <xf:hint ref="$form-resources/email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/email/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
-                        <fr:c y="1" x="5" w="4"><fr:currency bind="currency-bind" id="currency-control">
+                        <fr:c y="1" x="5" w="4">
+                            <fr:currency bind="currency-bind" id="currency-control">
                                 <xf:label ref="$form-resources/currency/label"/>
-                                <xf:hint ref="$form-resources/currency/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/currency/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </fr:currency>
 
                         </fr:c>
-                        <fr:c y="1" x="9" w="4"><fr:number id="number-control" bind="number-bind">
+                        <fr:c y="1" x="9" w="4">
+                            <fr:number id="number-control" bind="number-bind">
                                 <xf:label ref="$form-resources/number/label"/>
-                                <xf:hint ref="$form-resources/number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </fr:number>
 
@@ -1820,51 +2008,83 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <fr:c y="2" x="1" w="4">
 
                         </fr:c>
-                        <fr:c y="2" x="5" w="4"><fr:currency bind="currency-right-bind" id="currency-right-control">
+                        <fr:c y="2" x="5" w="4">
+                            <fr:currency bind="currency-right-bind" id="currency-right-control">
                                 <xf:label ref="$form-resources/currency-right/label"/>
-                                <xf:hint ref="$form-resources/currency-right/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/currency-right/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
                             </fr:currency>
 
                         </fr:c>
-                        <fr:c y="2" x="9" w="4"><fr:number id="number-right-control" bind="number-right-bind">
+                        <fr:c y="2" x="9" w="4">
+                            <fr:number id="number-right-control" bind="number-right-bind">
                                 <xf:label ref="$form-resources/number-right/label"/>
-                                <xf:hint ref="$form-resources/number-right/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/number-right/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
-                            </fr:number></fr:c>
+                            </fr:number>
+                        </fr:c>
 
 
-                        <fr:c x="1" y="3" w="4"><fr:us-phone bind="us-phone-bind" id="us-phone-control">
+                        <fr:c x="1" y="3" w="4">
+                            <fr:us-phone bind="us-phone-bind" id="us-phone-control">
                                 <xf:label ref="$form-resources/us-phone/label"/>
-                                <xf:hint ref="$form-resources/us-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/us-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
-                            </fr:us-phone></fr:c><fr:c x="5" y="3" w="4"><fr:us-state bind="us-state-bind" id="us-state-control">
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4">
+                            <fr:us-state bind="us-state-bind" id="us-state-control">
                                 <xf:label ref="$form-resources/us-state/label"/>
-                                <xf:hint ref="$form-resources/us-state/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/us-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
-                            </fr:us-state></fr:c><fr:c x="9" y="3" w="4"><fr:us-ein xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control" bind="control-2-bind">
-                        <xf:label ref="$form-resources/control-2/label"/>
-                        <xf:hint ref="$form-resources/control-2/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:us-ein></fr:c><fr:c x="1" y="4" w="6"><fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-ssn-control" bind="us-ssn-bind">
-                        <xf:label ref="$form-resources/us-ssn/label"/>
-                        <xf:hint ref="$form-resources/us-ssn/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:us-ssn></fr:c><fr:c x="7" y="4" w="6"><fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="international-securities-identification-number-isin-control" bind="international-securities-identification-number-isin-bind">
-                        <xf:label ref="$form-resources/international-securities-identification-number-isin/label"/>
-                        <xf:hint ref="$form-resources/international-securities-identification-number-isin/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4">
+                            <fr:us-ein xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control" bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:isin></fr:c><fr:c x="1" y="5" w="6"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ssn-explanation-control" bind="ssn-explanation-bind"><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
-                    </fr:explanation></fr:c><fr:c x="7" y="5" w="6"><fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="legal-entity-identifier-lei-control" bind="legal-entity-identifier-lei-bind">
-                        <xf:label ref="$form-resources/legal-entity-identifier-lei/label"/>
-                        <xf:hint ref="$form-resources/legal-entity-identifier-lei/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-ein>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="6">
+                            <fr:us-ssn xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-ssn-control" bind="us-ssn-bind">
+                                <xf:label ref="$form-resources/us-ssn/label"/>
+                                <xf:hint ref="$form-resources/us-ssn/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:lei></fr:c>
+                            </fr:us-ssn>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="6">
+                            <fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="international-securities-identification-number-isin-control" bind="international-securities-identification-number-isin-bind">
+                                <xf:label ref="$form-resources/international-securities-identification-number-isin/label"/>
+                                <xf:hint ref="$form-resources/international-securities-identification-number-isin/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:isin>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="6">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ssn-explanation-control" bind="ssn-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="7" y="5" w="6">
+                            <fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="legal-entity-identifier-lei-control" bind="legal-entity-identifier-lei-bind">
+                                <xf:label ref="$form-resources/legal-entity-identifier-lei/label"/>
+                                <xf:hint ref="$form-resources/legal-entity-identifier-lei/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:lei>
+                        </fr:c>
                     </fr:grid>
 
 
@@ -1950,12 +2170,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:time>
 
                         </fr:c>
-                        <fr:c y="3" x="9" w="4"><fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="native-time-control" bind="native-time-bind" native-picker="always" output-format="[h]:[m]:[s] [P,2-2]">
-                        <xf:label ref="$form-resources/native-time/label"/>
-                        <xf:hint ref="$form-resources/native-time/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:c y="3" x="9" w="4">
+                            <fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="native-time-control" bind="native-time-bind" native-picker="always" output-format="[h]:[m]:[s] [P,2-2]">
+                                <xf:label ref="$form-resources/native-time/label"/>
+                                <xf:hint ref="$form-resources/native-time/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:time>
+                            </fr:time>
 
                         </fr:c>
                         <fr:c x="1" y="4" w="4">
@@ -1976,12 +2198,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:time>
                         </fr:c>
-                        <fr:c x="9" y="4" w="4"><fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="native-time-noseconds-control" bind="native-time-noseconds-bind" native-picker="always" output-format="[h]:[m] [P,2-2]">
-                        <xf:label ref="$form-resources/native-time-noseconds/label"/>
-                        <xf:hint ref="$form-resources/native-time-noseconds/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:c x="9" y="4" w="4">
+                            <fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="native-time-noseconds-control" bind="native-time-noseconds-bind" native-picker="always" output-format="[h]:[m] [P,2-2]">
+                                <xf:label ref="$form-resources/native-time-noseconds/label"/>
+                                <xf:hint ref="$form-resources/native-time-noseconds/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:time>
+                            </fr:time>
 
                         </fr:c>
                         <fr:c x="1" y="5" w="7">
@@ -2000,7 +2224,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
                     <xf:label ref="$form-resources/selection-controls/label"/>
                     <fr:grid columns="3" id="grid-5-grid" bind="grid-5-bind">
-                        <fr:c y="1" x="1" w="4">
+                        <fr:c y="1" x="1" w="3">
                             <xf:select1 bind="dropdown-bind" id="dropdown-control" ref="" appearance="dropdown">
                                 <xf:label ref="$form-resources/dropdown/label"/>
                                 <xf:hint ref="$form-resources/dropdown/hint"/>
@@ -2011,7 +2235,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="5" y="1" w="4">
+                        <fr:c x="4" y="1" w="3">
                             <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-with-other-control" appearance="minimal" bind="dropdown-with-other-bind">
                                 <xf:label ref="$form-resources/dropdown-with-other/label"/>
                                 <xf:hint ref="$form-resources/dropdown-with-other/hint"/>
@@ -2023,7 +2247,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
-                        <fr:c x="9" y="1" w="4">
+                        <fr:c x="7" y="1" w="3">
                             <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control" appearance="search" ref="">
                                 <xf:label ref="$form-resources/dropdown-with-search/label"/>
                                 <xf:hint ref="$form-resources/dropdown-with-search/hint"/>
@@ -2034,9 +2258,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="1" y="2" w="4">
+                        <fr:c x="10" y="1" w="3" h="1"/>
+                        <fr:c x="1" y="2" w="3">
                             <fr:databound-select1 id="dynamic-dropdown-control" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-dropdown-bind">
-                                <xf:label ref="$form-resources/dynamic-dropdown/label"/>
+                                <xf:label ref="$form-resources/dynamic-dropdown/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/dynamic-dropdown/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="/*/country">
@@ -2044,20 +2269,50 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                     <xf:value ref="us-code"/>
                                 </xf:itemset>
                             </fr:databound-select1>
+
                         </fr:c>
-                        <fr:c x="5" y="2" w="5">
+                        <fr:c x="4" y="2" w="3">
                             <fr:databound-select1 selection="{if ($open-selection-1) then 'open' else ''}" id="dynamic-dropdown-with-search-by-ui-control" bind="dynamic-dropdown-with-search-by-ui-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true" ref="" service-performs-search="false" service-supports-paging="false" is-last-page="">
-                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-ui/label"/>
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-ui/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-ui/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
                                 <xf:itemset ref="/*/country">
-                                    <xf:label ref="us-code"/>
-                                    <xf:value ref="us-code"/>
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="name"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3" h="1">
+                            <fr:databound-select1 selection="{if ($open-selection-2) then 'open' else ''}" id="dynamic-dropdown-with-search-by-service-control" bind="dynamic-dropdown-with-search-by-service-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?country-name={$fr-search-value}" ref="" service-performs-search="true" service-supports-paging="false" is-last-page="">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-service/label" mediatype="text/html"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-service/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="/*/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="name"/>
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
                         <fr:c x="10" y="2" w="3">
+                            <fr:databound-select1 selection="{if ($open-selection-3) then 'open' else ''}" id="dynamic-dropdown-with-search-and-paging-by-service-control" bind="dynamic-dropdown-with-search-and-paging-by-service-bind" appearance="search" resource="https://rickandmortyapi.com/api/character?name={$fr-search-value}&amp;page={$fr-search-page}" ref="" service-performs-search="true" service-supports-paging="true" is-last-page="/json/info/next/@type = 'null'">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-and-paging-by-service/label" mediatype="text/html"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-and-paging-by-service/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="/json/results/_">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="name"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+
+
+                        </fr:c>
+                        <fr:c x="1" y="3" w="3"/>
+                        <fr:c x="4" y="3" w="3">
                             <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-1-control" bind="open-selection-1-bind">
                                 <xf:label ref="$form-resources/open-selection-1/label"/>
                                 <xf:hint ref="$form-resources/open-selection-1/hint"/>
@@ -2065,32 +2320,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                             </fr:checkbox-input>
-
                         </fr:c>
-                        <fr:c x="1" y="3" w="4">
-                            <fr:databound-select1 id="dynamic-dropdown-with-search-control" bind="dynamic-dropdown-with-search-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true" ref="" service-performs-search="false" service-supports-paging="false" is-last-page="">
-                                <xf:label ref="$form-resources/dynamic-dropdown-with-search/label"/>
-                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-                                <xf:itemset ref="/*/country">
-                                    <xf:label ref="name"/>
-                                    <xf:value ref="us-code"/>
-                                </xf:itemset>
-                            </fr:databound-select1>
-                        </fr:c>
-                        <fr:c x="5" y="3" w="5">
-                            <fr:databound-select1 selection="{if ($open-selection-2) then 'open' else ''}" id="dynamic-dropdown-with-search-by-service-control" bind="dynamic-dropdown-with-search-by-service-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?country-name={$fr-search-value}" ref="" service-performs-search="true" service-supports-paging="false" is-last-page="">
-                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-service/label"/>
-                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-service/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                <xf:itemset ref="/*/country">
-                                    <xf:label ref="us-code"/>
-                                    <xf:value ref="us-code"/>
-                                </xf:itemset>
-                            </fr:databound-select1>
-                        </fr:c>
-                        <fr:c x="10" y="3" w="3" h="1">
+                        <fr:c x="7" y="3" w="3" h="1">
                             <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-2-control" bind="open-selection-2-bind">
                                 <xf:label ref="$form-resources/open-selection-2/label"/>
                                 <xf:hint ref="$form-resources/open-selection-2/hint"/>
@@ -2099,6 +2330,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:checkbox-input>
                         </fr:c>
+                        <fr:c x="10" y="3" w="3">
+                            <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-selection-3-control" bind="open-selection-3-bind">
+                                <xf:label ref="$form-resources/open-selection-3/label"/>
+                                <xf:hint ref="$form-resources/open-selection-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:checkbox-input>
+                        </fr:c>
+
+
+
                         <fr:c y="4" x="1" w="4">
                             <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
                                 <xf:label ref="$form-resources/checkboxes/label"/>

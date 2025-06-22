@@ -112,7 +112,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             )
           case _ =>
             // https://github.com/orbeon/orbeon-forms/issues/6606
-            val size = storeEvent.contentLength.toLong
+            val size = storeEvent.contentLength.get.toLong
             UploadCheckerLogic.checkSizeLimitExceeded(
               maxSize     = maxSize,
               currentSize = size
@@ -134,10 +134,10 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                 containingDocument.endUpload(getUploadUniqueId)
                 XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
                 handleUploadedFile(
-                  storeEvent.file,
-                  Option(storeEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
-                  Option(storeEvent.contentType),
-                  Option(storeEvent.contentLength),
+                  storeEvent.file.get,
+                  storeEvent.filename.map(PathUtils.filenameFromPath), // in case the filename contains a path
+                  storeEvent.contentType,
+                  storeEvent.contentLength,
                   storeEvent.hashAlgorithm,
                   storeEvent.hashValue,
                   collector
@@ -147,9 +147,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                   new XXFormsUploadDoneEvent(
                     this,
                     Map(
-                      "filename"       -> Option(storeEvent.filename),
-                      "content-type"   -> Option(storeEvent.contentType),
-                      "content-length" -> Option(storeEvent.contentLength),
+                      "filename"       -> storeEvent.filename,
+                      "content-type"   -> storeEvent.contentType,
+                      "content-length" -> storeEvent.contentLength,
                       "hash-algorithm" -> storeEvent.hashAlgorithm,
                       "hash-value"     -> storeEvent.hashValue,
                     )

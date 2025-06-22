@@ -172,10 +172,10 @@ class XXFormsUploadStoreEvent(target: XFormsEventTarget, properties: PropertyGet
   extends XFormsEvent(EventNames.XXFormsUploadStore, target, properties, bubbles = true, cancelable = true) {
 
   // These properties come from the client
-  def file                          = property[String]("file").get
-  def filename                      = property[String]("filename").get
-  def contentType                   = property[String](Headers.ContentTypeLower).get
-  def contentLength                 = property[String](Headers.ContentLengthLower).get // comes as String from the client
+  def file         : Option[String] = property[String]("file")
+  def filename     : Option[String] = property[String]("filename")
+  def contentType  : Option[String] = property[String](Headers.ContentTypeLower)
+  def contentLength: Option[String] = property[String](Headers.ContentLengthLower) // comes as String from the client
   def hashAlgorithm: Option[String] = property[String]("hash-algorithm")
   def hashValue    : Option[String] = property[String]("hash-value")
 }

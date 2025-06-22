@@ -261,8 +261,7 @@ trait FormRunnerActionsCommon {
       frc.updateMode("edit")
       // Manual dependency HACK: RR `fr-form-model` as we have changed mode
       recalculate(FormModel)
-
-      // Recalculate `possible-operations`, which might change in `edit` mode, and drive the share button visibility
+      // Update Share dialog `possible-operations`, as it isn't calculated in `new`, and the button visibility depends on it
       dispatch(name = "fr-recalculate-possible-operations", targetId = PersistenceModel)
     }
   }
@@ -272,6 +271,7 @@ trait FormRunnerActionsCommon {
       frc.updateMode("new")
       // Manual dependency HACK: RR `fr-form-model` as we have changed mode
       recalculate(FormModel)
+      // No need to update the Share dialog `possible-operations` as the button is not visible in `new` mode
       XFormsAPI.dispatch(name = "fr-new-document", targetId = "fr-persistence-model")
     }
   }

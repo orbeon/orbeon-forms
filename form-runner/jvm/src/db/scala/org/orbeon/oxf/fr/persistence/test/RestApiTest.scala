@@ -394,10 +394,12 @@ class RestApiTest
               version   = Unspecified,
               httpRange = None,
               expected  = HttpAssert.ExpectedBody(
-                body        = body,
-                operations  = AnyOperation,
-                formVersion = Some(1),
-                statusCode  = StatusCode.Ok
+                body          = body,
+                operations    = AnyOperation,
+                formVersion   = Some(1),
+                hashAlgorithm = Some(hashAlgorithm),
+                hashValue     = Some(hashValue),
+                statusCode    = StatusCode.Ok
               )
             )
 
@@ -412,6 +414,8 @@ class RestApiTest
                   operations         = AnyOperation,
                   formVersion        = Some(1),
                   contentRangeHeader = Some(s"bytes 0-1/$size"),
+                  hashAlgorithm      = Some(hashAlgorithm),
+                  hashValue          = Some(hashValue),
                   statusCode         = StatusCode.PartialContent
                 )
               )
@@ -428,6 +432,8 @@ class RestApiTest
                   operations         = AnyOperation,
                   formVersion        = Some(1),
                   contentRangeHeader = Some(s"bytes 128-${size-1}/$size"),
+                  hashAlgorithm      = Some(hashAlgorithm),
+                  hashValue          = Some(hashValue),
                   statusCode         = StatusCode.PartialContent
                 )
               )
@@ -444,6 +450,8 @@ class RestApiTest
                   operations = AnyOperation,
                   formVersion = Some(1),
                   contentRangeHeader = Some(s"bytes 1-32770/$size"),
+                  hashAlgorithm = Some(hashAlgorithm),
+                  hashValue = Some(hashValue),
                   statusCode = StatusCode.PartialContent
                 )
               )
@@ -460,6 +468,8 @@ class RestApiTest
                   operations = AnyOperation,
                   formVersion = Some(1),
                   contentRangeHeader = Some(s"bytes 1-65540/$size"),
+                  hashAlgorithm = Some(hashAlgorithm),
+                  hashValue = Some(hashValue),
                   statusCode = StatusCode.PartialContent
                 )
               )

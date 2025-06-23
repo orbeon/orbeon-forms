@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.http
 
 import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext}
 import org.orbeon.oxf.fr.Version
+import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlogrithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
@@ -46,6 +47,8 @@ private[persistence] object HttpAssert extends XMLSupport {
     stage             : Option[Stage] = None,
     contentRangeHeader: Option[String] = None,
     etag              : Option[String] = None,
+    hashAlgorithm     : Option[String] = None,
+    hashValue         : Option[String] = None,
     statusCode        : Int = StatusCode.Ok
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
@@ -67,7 +70,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     }
 
     expected match {
-      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage, contentRangeHeader, etag, code) =>
+      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage, contentRangeHeader, etag, hashAlgorithm, hashValue, code) =>
         assert(resultCode == code)
         // Check body
         body match {
@@ -98,6 +101,16 @@ private[persistence] object HttpAssert extends XMLSupport {
             case "*"   => assert(etagHeader.isDefined)
             case value => assert(etagHeader.contains(List(value)))
           }
+        }
+        // Check hash algorithm header if specified
+        hashAlgorithm.foreach { expectedHashAlgorithm =>
+          val hashAlgorithmHeader = headers.get(OrbeonHashAlogrithm.toLowerCase)
+          assert(hashAlgorithmHeader.contains(List(expectedHashAlgorithm)))
+        }
+        // Check hash value header if specified
+        hashValue.foreach { expectedHashValue =>
+          val hashValueHeader = headers.get(OrbeonHashValue.toLowerCase)
+          assert(hashValueHeader.contains(List(expectedHashValue)))
         }
 
       case ExpectedCode(expectedCode) =>

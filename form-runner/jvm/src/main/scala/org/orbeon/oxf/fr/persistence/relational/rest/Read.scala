@@ -17,6 +17,7 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlogrithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.*
@@ -141,6 +142,8 @@ trait Read {
         httpResponse.setHeader(Headers.OrbeonLastModifiedByUsername, lastModifiedBy.username)
       }
       fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
+      fromDatabase.hashAlgorithmOpt.foreach(httpResponse.setHeader(OrbeonHashAlogrithm, _))
+      fromDatabase.hashValueOpt.foreach(httpResponse.setHeader(OrbeonHashValue, _))
       httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime))
       httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime))
       // Also provide this with in ISO format with millisecond precision for compatibility with Search and History APIs
@@ -199,7 +202,9 @@ trait Read {
    createdDateTime     : Instant,
    lastModifiedDateTime: Instant,
    bodyOpt             : Option[Array[Byte]],
-   totalAttachmentSize : Option[Int]
+   totalAttachmentSize : Option[Int],
+   hashAlgorithmOpt    : Option[String],
+   hashValueOpt        : Option[String]
  )
 
   private sealed trait BodyContent
@@ -264,6 +269,7 @@ trait Read {
               |        ${if (req.forDataNotAttachment) ", t.id" else ""}
               |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
               |        ${if (hasStage)                 ", t.stage"                                    else ""}
+              |        ${if (req.forAttachment)        ", t.hash_algorithm, t.hash_value"            else ""}
               |        , t.form_version, t.deleted
               |FROM    $table t
               |WHERE   t.app  = ?
@@ -280,6 +286,7 @@ trait Read {
               |        ${if (req.forDataNotAttachment) ", t.id" else ""}
               |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
               |        ${if (hasStage)                 ", t.stage"                                    else ""}
+              |        ${if (req.forAttachment)        ", t.hash_algorithm, t.hash_value"            else ""}
               |        , t.form_version, t.deleted
               |FROM    $table t,
               |        (
@@ -361,11 +368,13 @@ trait Read {
               dataUserOpt          = dataUser,
               lastModifiedByOpt    = lastModifiedByOpt,
               formVersion          = dbFormVersion,
-              stageOpt             = if (hasStage) Option(resultSet.getString("stage")) else None,
+              stageOpt             = hasStage.option(resultSet.getString("stage")),
               createdDateTime      = resultSet.getTimestamp("created").toInstant,
               lastModifiedDateTime = resultSet.getTimestamp("last_modified_time").toInstant,
               bodyOpt              = bodyOpt,
-              totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getInt("total_file_content_size"))
+              totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getInt("total_file_content_size")),
+              hashAlgorithmOpt     = req.forAttachment.option(resultSet.getString("hash_algorithm")),
+              hashValueOpt         = req.forAttachment.option(resultSet.getString("hash_value"))
             )
           )
         } else {

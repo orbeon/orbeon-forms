@@ -258,6 +258,11 @@
         padding: 5px;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        // https://github.com/orbeon/orbeon-forms/issues/7097
+        span.xforms-output-output:empty::before {
+          content: "\00A0";  // &nbsp;
+        }
       }
     }
 

@@ -70,10 +70,11 @@ private[persistence] object HttpAssert extends XMLSupport {
     }
 
     expected match {
-      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage, contentRangeHeader, etag, hashAlgorithm, hashValue, code) =>
-        assert(resultCode == code)
+      case expectedBody@ExpectedBody(_, _, _, _, _, _, _, _, _) =>
+
+        assert(resultCode == expectedBody.statusCode)
         // Check body
-        body match {
+        expectedBody.body match {
           case HttpCall.XML(expectedDoc) =>
             val resultDoc = IOSupport.readOrbeonDom(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(expectedDoc, resultDoc)
@@ -82,20 +83,20 @@ private[persistence] object HttpAssert extends XMLSupport {
             assert(resultBody.get sameElements expectedFile)
         }
         // Check operations
-        assert(Operations.parseFromHeaders(headers).getOrElse(Operations.None) == expectedOperations)
+        assert(Operations.parseFromHeaders(headers).getOrElse(Operations.None) == expectedBody.operations)
         // Check form version
         val resultFormVersion = Headers.firstItemIgnoreCase(headers, Version.OrbeonFormDefinitionVersion).map(_.toInt)
-        assert(expectedFormVersion == resultFormVersion)
+        assert(expectedBody.formVersion == resultFormVersion)
         // Check stage
         val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage.apply(_, ""))
-        assert(expectedStage == resultStage)
+        assert(expectedBody.stage == resultStage)
         // Check content range header
-        contentRangeHeader.foreach { expectedContentRangeHeader =>
+        expectedBody.contentRangeHeader.foreach { expectedContentRangeHeader =>
           val resultContentRangeHeader = headers.get(Headers.ContentRange.toLowerCase).map(_.head)
           assert(resultContentRangeHeader.contains(expectedContentRangeHeader))
         }
         // Check ETag header if specified
-        etag.foreach { expectedEtag =>
+        expectedBody.etag.foreach { expectedEtag =>
           val etagHeader = headers.get("etag")
           expectedEtag match {
             case "*"   => assert(etagHeader.isDefined)
@@ -103,12 +104,12 @@ private[persistence] object HttpAssert extends XMLSupport {
           }
         }
         // Check hash algorithm header if specified
-        hashAlgorithm.foreach { expectedHashAlgorithm =>
+        expectedBody.hashAlgorithm.foreach { expectedHashAlgorithm =>
           val hashAlgorithmHeader = headers.get(OrbeonHashAlogrithm.toLowerCase)
           assert(hashAlgorithmHeader.contains(List(expectedHashAlgorithm)))
         }
         // Check hash value header if specified
-        hashValue.foreach { expectedHashValue =>
+        expectedBody.hashValue.foreach { expectedHashValue =>
           val hashValueHeader = headers.get(OrbeonHashValue.toLowerCase)
           assert(hashValueHeader.contains(List(expectedHashValue)))
         }

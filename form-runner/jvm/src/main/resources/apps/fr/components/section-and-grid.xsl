@@ -112,6 +112,21 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- https://github.com/orbeon/orbeon-forms/issues/7114 -->
+    <xsl:template match="fr:section/*[not(frf:isSectionTemplateContent(.)) and empty(self::xf:* | self::fr:*) ]" mode="within-controls">
+        <xsl:copy>
+             <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template match="fr:grid" mode="within-controls within-dialogs">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:param name="binds-root"                   tunnel="yes"/>

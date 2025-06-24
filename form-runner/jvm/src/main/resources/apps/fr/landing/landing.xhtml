@@ -308,8 +308,7 @@
                 >
                     <xf:label ref="xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-form-builder-instance')/*[position() le $page-size]">
-                        <!-- FIXME: The API returns the i18n titles comma-separated. This is not great. -->
-                        <xf:label ref="if (contains(details/detail[3], ',')) then substring-before(details/detail[3], ',') else details/detail[3]"/>
+                        <xf:label ref="details/detail[3]"/>
                         <xf:value ref="
                             concat(
                                 '/fr/orbeon/builder/edit/',

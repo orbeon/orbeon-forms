@@ -55,9 +55,7 @@ install:
 - npm install
 - nvm install 18
 - nvm use 18
-# update this only when sbt-the-bash-script needs to be updated
 - |
-  export SBT_LAUNCHER=1.4.9
   export SBT_OPTS="-Dfile.encoding=UTF-8"
   export NODE_OPTIONS="--no-deprecation" # Avoid warnings shown as errors running UglifyJS, to be removed when #6642 is done
 before_script:

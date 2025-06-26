@@ -397,9 +397,6 @@ object FormRunnerPersistence {
 
   private def providerPropertyAsString(provider: String, property: String, default: String) =
     properties.getString(fullProviderPropertyName(provider, property), default)
-
-  // NOTE: We generate .bin, but sample data can contain other extensions
-  private val RecognizedAttachmentExtensions = Set("bin", "jpg", "jpeg", "gif", "png", "pdf")
 }
 
 trait FormRunnerPersistence {
@@ -490,8 +487,11 @@ trait FormRunnerPersistence {
     }
 
   // Whether the given path is an attachment path (ignoring an optional query string)
-  def isAttachmentURLFor(basePath: String, url: String): Boolean =
-    url.startsWith(basePath) && (splitQuery(url)._1.splitTo[List](".").lastOption exists RecognizedAttachmentExtensions)
+  private def isAttachmentURLFor(basePath: String, url: String): Boolean =
+    url.startsWith(basePath) && splitQuery(url)._1.splitTo[List]("/").lastOption.exists { filename =>
+      // Since #6565 we cannot just rely on the file extension to detect attachments
+      filename != DataXml && filename != FormXhtml
+    }
 
   // For a given attachment path, return the filename
   def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =

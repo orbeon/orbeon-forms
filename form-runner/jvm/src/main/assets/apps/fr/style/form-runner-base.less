@@ -375,6 +375,8 @@
             // is used, e.g. they won't be correct when the popover is for a section title
             font-size:   @frFontSize;
             line-height: @baseLineHeight;
+            // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
+            z-index: 1040;
         }
     }
 

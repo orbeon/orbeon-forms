@@ -78,11 +78,11 @@ class XFormsOutputDefaultHandler(
 
     val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
 
-    val isMinimal =
-      XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
+    val isMinimal = XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
+    val isField   = hasDirectOrByLabel && ! isMinimal
 
     val containerAttributes =
-      getContainerAttributes(getEffectiveId, outputControl, isField = hasDirectOrByLabel && ! isMinimal)
+      getContainerAttributes(getEffectiveId, outputControl, isField)
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
@@ -101,9 +101,11 @@ class XFormsOutputDefaultHandler(
       // Also do static readonly, see:
       // - https://github.com/orbeon/orbeon-forms/issues/5525
       // - https://github.com/orbeon/orbeon-forms/issues/5367
-      containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
       containerAttributes.addOrReplace(AriaReadonly, "true")
-      containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, "textbox")
+      if (isField) {
+        containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+        containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, "textbox")
+      }
     }
 
     withElement(if (hasDirectOrByLabel) "output" else "span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {

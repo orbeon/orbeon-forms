@@ -1,12 +1,13 @@
 package org.orbeon.xforms
 
+import io.udash.wrappers.jquery.JQuery
 import org.orbeon.jquery.Offset
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.Placement.PositionDetails
 import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -15,7 +16,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("OrbeonHelp")
 object Help {
 
-  import Private._
+  import Private.*
 
   dom.document.addEventListener("keyup", handleKeyUp _)
 
@@ -32,18 +33,22 @@ object Help {
     val labelText = Controls.getLabelMessage(controlEl)
     val helpText  = Controls.getHelpMessage(controlEl)
 
-    val declaredContainerOpt =
-      if (controlEl.classList.contains("xforms-help-popover-control"))
-        Some(controlEl)
-      else
-        Option(controlEl.querySelector(".xforms-help-popover-control"))
+    def explicitContainerWithClassOpt: Option[dom.Element] = {
+      val explicitClassSelector = ".xforms-help-popover-control"
+      controlEl.matches(explicitClassSelector).option(controlEl)
+        .orElse(Option(controlEl.querySelector(".xforms-help-popover-control")))
+    }
+
+    def fieldsCommonAncestorOpt: Option[dom.Element] =
+      // Exclude help button
+      jCommonAncestor(jControlEl.find(":input:visible:not(.xforms-help), output:visible"))
 
     // We want the arrow to point to the form field, not somewhere between the label and the field,
     // hence here we look for the first element which is not an LHHA. If we don't find any such element
     // we use the container as a fallback (e.g. `xf:group` that only contains the help and a label).
     val containerOpt =
-      declaredContainerOpt
-        .orElse(jCommonAncestor(jControlEl.find(":input:visible")))
+      explicitContainerWithClassOpt
+        .orElse(fieldsCommonAncestorOpt)
         .getOrElse(controlEl)
 
     val elPos     = Placement.getPositionDetails($(containerOpt))
@@ -210,10 +215,13 @@ object Help {
       }
     }
 
-    def jCommonAncestor(jElems: JQuery): Option[html.Element] =
-      if (jElems.length >= 2)
-        DomSupport.findCommonAncestor(jElems.toArray.toList.collect { case e: html.Element => e })
-      else
-        None
+    def jCommonAncestor(jElems: JQuery): Option[html.Element] = {
+      val elems: List[html.Element] = jElems.toArray.toList.asInstanceOf[List[html.Element]]
+      elems match {
+        case Nil     => None
+        case List(e) => Some(e)
+        case _       => DomSupport.findCommonAncestor(elems)
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@ package org.orbeon.date
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.date.IsoDate.*
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.*
 
 import java.time.LocalDate
@@ -49,10 +50,14 @@ case class IsoDate(
 // This means that we just need to indicate the first component. Other permutations are not needed.
 case class DateFormat(
   firstComponent     : DateFormatComponent,
-  separator          : Char, // typically `/`, `.`, `-`, ` `
+  separator          : String, // typically `/`, `.`, `-`, ` `
   isPadDayMonthDigits: Boolean
 ) {
-  require(! separator.isDigit)
+  require(separator.forall(! _.isDigit))
+  require(
+    (  isPadDayMonthDigits && separator.length <= 1) ||
+    (! isPadDayMonthDigits && separator.length == 1)
+  )
 
   // Use a `java.time` format so we don't have to write our own parser. Currently, this is used only for parsing, not
   // formatting. For parsing, we support non-padded day and month digits, as those are entered by the user and there is
@@ -142,7 +147,7 @@ case class DateFormat(
 
 object IsoDate {
 
-  val IsoDateFormat = DateFormat(DateFormatComponent.Year, '-', isPadDayMonthDigits = true)
+  private val IsoDateFormat = DateFormat(DateFormatComponent.Year, "-", isPadDayMonthDigits = true)
 
   // Supported format only:
   //
@@ -189,17 +194,19 @@ object IsoDate {
           DateFormatComponent.Year
         else
           throw new IllegalArgumentException(s"Invalid format: `$formatInputDate`"),
-      separator           = formatInputDate.dropWhile(_ != ']').drop(1).head, // first character after the first `]`
+      separator           = formatInputDate.dropWhile(_ != ']').slice(1, 2), // first character after the first `]`
       isPadDayMonthDigits = formatInputDate.contains("[D01]") || formatInputDate.contains("[M01]")
     )
 
-  def findMagicDateAsIsoDateWithNow(dateFormat: DateFormat, magicDate: String, currentDate: => IsoDate): Option[IsoDate] =
+  def findMagicDateAsIsoDateWithNow(dateFormat: DateFormat, magicDate: String, currentDate: => IsoDate): Option[IsoDate] = {
     magicDate.some.map(_.trimAllToEmpty)
       .collect {
         case "today" => currentDate
         // TODO: implement more magic?
       }
       .orElse(parseUserDateValue(dateFormat, magicDate))
+      .orElse(dateFormat.isPadDayMonthDigits.flatOption(parseUserDateValue(dateFormat.copy(separator = ""), magicDate)))
+  }
 
   // The `java.time` format that we create validates dates against a chronology. So for example `2023-02-29` is not
   // valid.

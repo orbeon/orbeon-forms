@@ -448,7 +448,7 @@
         <xbl:template>
             <xf:group
                 ref="xxf:binding('fr-date')"
-                class="input-append fr-field-width-{
+                class="xforms-help-popover-control input-append fr-field-width-{
                         fr:component-param-value('field-width')
                     } fr-native-picker-{
                         fr:component-param-value('native-picker')

@@ -270,9 +270,13 @@
                     <xf:property name="schema-type"    value="$i/validations/validation[@type = 'datatype']/schema-type/string()[xxf:non-blank()]"/>
                 </xf:dispatch>
 
-                <xxf:show
-                    if="not(event('is-prev-or-next'))"
-                    dialog="dialog"/>
+
+                <xf:action if="not(event('is-prev-or-next'))">
+                    <xxf:show dialog="dialog"/>
+                    <xf:action type="javascript">
+                        ORBEON.xforms.XBL.instanceForControl(this).dialogOpening();
+                    </xf:action>
+                </xf:action>
 
                 <!-- Tell custom settings to initialize -->
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
@@ -654,6 +658,9 @@
                 <xxf:hide dialog="dialog">
                     <xf:property name="fb-save" value="false()"/>
                 </xxf:hide>
+            </xbl:handler>
+            <xbl:handler event="xxforms-dialog-close" observer="dialog" type="javascript">
+                ORBEON.xforms.XBL.instanceForControl(this).dialogClosing();
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -2034,10 +2041,10 @@
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
                         <xh:div class="pull-left">
-                            <xf:trigger id="prev-button" ref="$i/prev-control-id">
+                            <xf:trigger id="prev-button" ref="$i/prev-control-id" class="fb-prev-button">
                                 <xf:label ref="xxf:r('buttons.previous', '|fr-fr-resources|')"/>
                             </xf:trigger>
-                            <xf:trigger id="next-button" ref="$i/next-control-id">
+                            <xf:trigger id="next-button" ref="$i/next-control-id" class="fb-next-button">
                                 <xf:label ref="xxf:r('buttons.next', '|fr-fr-resources|')"/>
                             </xf:trigger>
                         </xh:div>

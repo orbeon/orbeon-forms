@@ -46,6 +46,7 @@ object Constants {
   // NOTE: We could use a short SVG image but it's not guaranteed to be 1x1 IIUC.
   //     data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E
   val DUMMY_IMAGE_URI  = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" // smallest GIF 1x1 transparent image
+  val DUMMY_VIDEO_URI  = "data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAHBtZGF0AAAA" // minimal valid MP4
 
   val NamespacePrefix           = "o"
   val XFormServerPrefix         = "/xforms-server/"

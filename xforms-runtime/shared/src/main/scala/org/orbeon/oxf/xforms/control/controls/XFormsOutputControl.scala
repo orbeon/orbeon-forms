@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
+import org.orbeon.xforms.Constants.{DUMMY_IMAGE_URI, DUMMY_VIDEO_URI}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
@@ -342,10 +342,9 @@ object XFormsOutputControl {
       // Ask control
       control.getExternalValue(collector)
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("image/"))
-      // Dummy image
       DUMMY_IMAGE_URI
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("video/"))
-      ""
+      DUMMY_VIDEO_URI
     else
       // Default for other mediatypes
       null

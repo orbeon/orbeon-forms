@@ -8,7 +8,7 @@
                             <first-name/>
                             <last-name/>
                             <email/>
-                            <phone/><order-number/><topic/><comments/>
+                            <phone/><order-number/><topic/><comments/><photo/>
                         </grid-1>
 
 
@@ -24,7 +24,7 @@
                         <xf:bind id="first-name-bind" ref="first-name" type="xs:string" required="true()" name="first-name" xxf:whitespace="trim"/>
                         <xf:bind id="last-name-bind" ref="last-name" type="xs:string" required="true()" name="last-name" xxf:whitespace="trim"/>
                         <xf:bind id="email-bind" ref="email" type="xf:email" required="true()" name="email" xxf:whitespace="trim"/>
-                        <xf:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/><xf:bind id="order-number-bind" ref="order-number" type="xs:string" required="true()" xxf:whitespace="trim" name="order-number"/><xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/><xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()" name="comments"/>
+                        <xf:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/><xf:bind id="order-number-bind" ref="order-number" type="xs:string" required="true()" xxf:whitespace="trim" name="order-number"/><xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/><xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()" name="comments"/><xf:bind id="photo-bind" ref="photo" type="xs:anyURI" name="photo"/>
                 </xf:bind>
 
 
@@ -49,7 +49,7 @@
 
 
 
-                <thumbnail filename="contact.png" mediatype="image/png" size="98158">/fr/service/persistence/crud/orbeon/feedback/form/2d9c2b10f685f73a717a52c1f87628cb0a2ce5cb.bin</thumbnail><allow-template-use>true</allow-template-use><wizard>false</wizard><data-migration>enabled</data-migration><density>roomy</density><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"contact"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"first-name"},{"value":"last-name"},{"value":"email"},{"value":"phone"},{"value":"order-number"},{"value":"topic"},{"value":"comments"}],"topLevel":true}]}</migration></metadata>
+                <thumbnail filename="contact.png" mediatype="image/png" size="98158">/fr/service/persistence/crud/orbeon/feedback/form/2d9c2b10f685f73a717a52c1f87628cb0a2ce5cb.bin</thumbnail><allow-template-use>true</allow-template-use><wizard>false</wizard><data-migration>enabled</data-migration><density>roomy</density><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"contact"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"first-name"},{"value":"last-name"},{"value":"email"},{"value":"phone"},{"value":"order-number"},{"value":"topic"},{"value":"comments"},{"value":"photo"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -126,7 +126,12 @@
                             <hint>Your questions and/or comments</hint>
 
                             <alert/>
-                        </comments>
+                        </comments><photo>
+                            <label>Photo</label>
+                            <hint>Upload a photo</hint>
+
+                            <alert/>
+                        </photo>
 
                     </resource>
                     <resource xml:lang="fr">
@@ -196,7 +201,12 @@
                             <hint>Vos questions et/ou commentaires</hint>
 
                             <alert/>
-                        </comments>
+                        </comments><photo>
+                            <label>Photo</label>
+                            <hint>Télécharger une photo</hint>
+
+                            <alert/>
+                        </photo>
 
                     </resource>
                 </resources>
@@ -268,6 +278,12 @@
 
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:textarea>
+                            </fr:c><fr:c x="1" y="5" w="12"><fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" bind="photo-bind" id="photo-control" class="fr-attachment">
+                                    <xf:label ref="$form-resources/photo/label"/>
+                                    <xf:hint ref="$form-resources/photo/hint"/>
+
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:image-attachment>
                             </fr:c></fr:grid>
                 </fr:section>
             </fr:body>

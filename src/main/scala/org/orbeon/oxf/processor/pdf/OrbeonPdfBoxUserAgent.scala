@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.TryUtils.*
-import org.orbeon.oxf.util.{Connection, IndentedLogger, ResourceResolver, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, ImageMetadata, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
 import java.io.*
 import java.net.URI
@@ -93,23 +93,35 @@ class OrbeonPdfBoxUserAgent(
         }
         else {
           val sourceStreamBytes = readStream(is)
+          val isWebP =
+            sourceStreamBytes.length >= 12 &&
+            sourceStreamBytes.slice(0, 4 ).sameElements(Array[Byte]('R', 'I', 'F', 'F')) &&
+            sourceStreamBytes.slice(8, 12).sameElements(Array[Byte]('W', 'E', 'B', 'P'))
           val imgBytes =
-            findImageOrientation(new ByteArrayInputStream(sourceStreamBytes)) match {
-              case Some(orientation) if orientation >= 2 && orientation <= 8 =>
+            if (isWebP) {
+              // Convert WebP to JPG, as PDFBox does not support WebP natively
+              Option(ImageIO.read(new ByteArrayInputStream(sourceStreamBytes)))
+                .map(compressJpegImage(_, jpegCompressionLevel))
+                .getOrElse(sourceStreamBytes)
+            } else {
+              // Handle non-WebP images with existing orientation logic
+              findImageOrientation(new ByteArrayInputStream(sourceStreamBytes)) match {
+                case Some(orientation) if orientation >= 2 && orientation <= 8 =>
 
-                val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceStreamBytes))
+                  val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceStreamBytes))
 
-                val rotatedImage =
-                  transformImage(
-                    sourceImage,
-                    findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight)
-                      .getOrElse(throw new IllegalStateException)
-                  )
+                  val rotatedImage =
+                    transformImage(
+                      sourceImage,
+                      findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight)
+                        .getOrElse(throw new IllegalStateException)
+                    )
 
-                // https://github.com/orbeon/orbeon-forms/issues/4593
-                compressJpegImage(rotatedImage, jpegCompressionLevel)
-              case _ =>
-                sourceStreamBytes
+                  // https://github.com/orbeon/orbeon-forms/issues/4593
+                  compressJpegImage(rotatedImage, jpegCompressionLevel)
+                case _ =>
+                  sourceStreamBytes
+              }
             }
           val fsImage = new PdfBoxImage(imgBytes, uriStr)
           scaleToOutputResolution(fsImage)

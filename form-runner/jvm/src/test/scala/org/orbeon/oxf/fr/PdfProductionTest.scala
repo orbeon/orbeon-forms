@@ -7,6 +7,7 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.scalatest.funspec.AnyFunSpecLike
 
+import scala.jdk.CollectionConverters.IterableHasAsScala
 import scala.util.chaining.*
 
 
@@ -40,6 +41,7 @@ class PdfProductionTest
         "O888",
         "Returns",
         "D'oh!",
+        "Photo",
       )
 
       val (_, content, _) =
@@ -56,6 +58,20 @@ class PdfProductionTest
 
         ExpectedMetadataMatches.iterator ++ ExpectedDataMatches.iterator foreach { word =>
           assert(extractedText.contains(word))
+        }
+      }
+    }
+
+    it("PDF must contain WebP image attachment") {
+      val (_, content, _) =
+        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = "9eff349bfd95aab8d4d5e048bd25a815".some)
+      withTestExternalContext { _ =>
+        useAndClose(PDDocument.load(content.stream)) { pdd =>
+          // The test that follows assumes there is only one page
+          assert(pdd.getNumberOfPages == 1)
+          // Look for 2 images: the logo and our WebP image
+          val imageCount = pdd.getPage(0).getResources.getXObjectNames.asScala.size
+          assert(imageCount == 2)
         }
       }
     }

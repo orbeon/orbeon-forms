@@ -7,5 +7,6 @@
         <order-number>O888</order-number>
         <topic>returns</topic>
         <comments>D'oh!</comments>
+        <photo filename="sample.webp" mediatype="image/webp" size="10568">/fr/service/persistence/crud/tests/pdf-production/data/9eff349bfd95aab8d4d5e048bd25a815/7k9m2x5q8n1p4r6t3w9y2z5a8c1e4g7j.bin</photo>
     </contact>
 </form>

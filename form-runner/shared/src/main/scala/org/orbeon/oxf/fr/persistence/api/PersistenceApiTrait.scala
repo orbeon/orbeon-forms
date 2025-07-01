@@ -147,16 +147,16 @@ trait PersistenceApiTrait {
 
     debug(s"calling search for `$appForm`/`$searchVersion`")
 
-    val servicePathQuery =
-      PathUtils.recombineQuery(
-        s"/fr/service/persistence/search/${appForm.app}/${appForm.form}",
-        createInternalAdminUserTokenParam(isInternalAdminUser).toList,
-        overwrite = true
-      )
-
     def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
 
       debug(s"reading search page `$pageNumber`")
+
+      val servicePathQuery =
+        PathUtils.recombineQuery(
+          s"/fr/service/persistence/search/${appForm.app}/${appForm.form}",
+          createInternalAdminUserTokenParam(isInternalAdminUser).toList,
+          overwrite = true
+        )
 
       def fromIncomingSearchQuery: Option[Array[Byte]] =
         searchQueryOpt.map { searchQuery =>

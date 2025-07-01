@@ -19,6 +19,7 @@ import com.drew.metadata.bmp.BmpHeaderDirectory
 import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
+import com.drew.metadata.webp.WebpDirectory
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
 import org.orbeon.datatypes.Mediatype
@@ -77,6 +78,7 @@ object ImageMetadata {
       case _: PngDirectory       => "image/png"
       case _: GifHeaderDirectory => "image/gif"
       case _: BmpHeaderDirectory => "image/bmp"
+      case _: WebpDirectory      => "image/webp"
     }
   }
 

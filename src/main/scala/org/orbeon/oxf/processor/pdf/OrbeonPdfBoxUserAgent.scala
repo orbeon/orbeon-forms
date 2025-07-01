@@ -92,23 +92,20 @@ class OrbeonPdfBoxUserAgent(
           // resource = new ImageResource(uriStr, image);
         }
         else {
-          val sourceStreamBytes = readStream(is)
-          val isWebP =
-            sourceStreamBytes.length >= 12 &&
-            sourceStreamBytes.slice(0, 4 ).sameElements(Array[Byte]('R', 'I', 'F', 'F')) &&
-            sourceStreamBytes.slice(8, 12).sameElements(Array[Byte]('W', 'E', 'B', 'P'))
-          val imgBytes =
+          val sourceBytes = readStream(is)
+          val isWebP      = ImageMetadata.findImageMediatype(new ByteArrayInputStream(sourceBytes)).contains("image/webp")
+          val imgBytes    =
             if (isWebP) {
               // Convert WebP to JPG, as PDFBox does not support WebP natively
-              Option(ImageIO.read(new ByteArrayInputStream(sourceStreamBytes)))
+              Option(ImageIO.read(new ByteArrayInputStream(sourceBytes)))
                 .map(compressJpegImage(_, jpegCompressionLevel))
-                .getOrElse(sourceStreamBytes)
+                .getOrElse(sourceBytes)
             } else {
               // Handle non-WebP images with existing orientation logic
-              findImageOrientation(new ByteArrayInputStream(sourceStreamBytes)) match {
+              findImageOrientation(new ByteArrayInputStream(sourceBytes)) match {
                 case Some(orientation) if orientation >= 2 && orientation <= 8 =>
 
-                  val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceStreamBytes))
+                  val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceBytes))
 
                   val rotatedImage =
                     transformImage(
@@ -120,7 +117,7 @@ class OrbeonPdfBoxUserAgent(
                   // https://github.com/orbeon/orbeon-forms/issues/4593
                   compressJpegImage(rotatedImage, jpegCompressionLevel)
                 case _ =>
-                  sourceStreamBytes
+                  sourceBytes
               }
             }
           val fsImage = new PdfBoxImage(imgBytes, uriStr)

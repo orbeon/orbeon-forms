@@ -36,7 +36,7 @@ object Help {
     def explicitContainerWithClassOpt: Option[dom.Element] = {
       val explicitClassSelector = ".xforms-help-popover-control"
       controlEl.matches(explicitClassSelector).option(controlEl)
-        .orElse(Option(controlEl.querySelector(".xforms-help-popover-control")))
+        .orElse(Option(controlEl.querySelector(explicitClassSelector)))
     }
 
     def fieldsCommonAncestorOpt: Option[dom.Element] =

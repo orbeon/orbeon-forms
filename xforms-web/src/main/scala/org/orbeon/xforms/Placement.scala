@@ -40,7 +40,7 @@ object Placement {
    * For the element, returns an object with the following properties:
    *      width, height, scrollTop                // Equivalent to jQuery functions
    *      offset: { top, left }                   // Position relative to the document
-   *      margins: { top, right, bottom, left }   // In in a scrollable area (e.g. FB), space around that area
+   *      margins: { top, right, bottom, left }   // In a scrollable area (e.g. FB), space around that area
    */
   def getPositionDetails(el: JQuery): PositionDetails = {
 

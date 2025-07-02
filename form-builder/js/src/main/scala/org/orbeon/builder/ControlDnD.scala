@@ -44,7 +44,7 @@ private object ControlDnD {
     dom.document.addEventListener("keyup"  , updateShiftPressed _)
     dom.document.addEventListener("keydown", updateShiftPressed _)
 
-    val drake = Dragula(
+    val controlMoverCopier = Dragula(
       js.Array(),
       new DragulaOptions {
 
@@ -68,13 +68,13 @@ private object ControlDnD {
       }
     )
 
-    drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
+    controlMoverCopier.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
       // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
       if (target ne null)
         RpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, el.classList.contains(CopyClass)).call()
     })
 
-    val drake2 = Dragula(
+    val controlInserter = Dragula(
       js.Array(),
       new DragulaOptions {
 
@@ -104,14 +104,14 @@ private object ControlDnD {
     )
 
     // Dragula creates the mirror under the body; move it under the same parent as the original so our CSS applies
-    List(drake, drake2).foreach {
+    List(controlMoverCopier, controlInserter).foreach {
       _.onCloned { (clone, original, cloneType) =>
         if (cloneType == "mirror")
           original.parentElement.appendChild(clone)
       }
     }
 
-    drake2.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
+    controlInserter.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
       // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
       if (target ne null) {
 

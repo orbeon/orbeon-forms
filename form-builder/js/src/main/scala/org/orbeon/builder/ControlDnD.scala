@@ -68,12 +68,6 @@ private object ControlDnD {
       }
     )
 
-    // Dragula creates the mirror under the body; move it under the same parent as the original so our CSS applies
-    drake.onCloned { (clone, original, cloneType) =>
-      if (cloneType == "mirror")
-        original.parentElement.appendChild(clone)
-    }
-
     drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
       // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
       if (target ne null)
@@ -83,10 +77,6 @@ private object ControlDnD {
     val drake2 = Dragula(
       js.Array(),
       new DragulaOptions {
-
-        // Create the mirror inside the first container, so the proper CSS applies to the mirror
-        override val mirrorContainer: UndefOr[Element] =
-          dom.document.querySelectorT(".fb-tools fieldset.xforms-group")
 
         override def isContainer(el: html.Element) =
           (
@@ -112,6 +102,14 @@ private object ControlDnD {
         }
       }
     )
+
+    // Dragula creates the mirror under the body; move it under the same parent as the original so our CSS applies
+    List(drake, drake2).foreach {
+      _.onCloned { (clone, original, cloneType) =>
+        if (cloneType == "mirror")
+          original.parentElement.appendChild(clone)
+      }
+    }
 
     drake2.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
       // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`

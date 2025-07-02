@@ -61,8 +61,9 @@ object Select2 {
   }
 
   trait Option extends js.Object {
-    val id   : String
-    val text : String
+    val id    : String
+    val text  : String
+    val title : js.UndefOr[String] = js.undefined
   }
 
   trait ParamsData extends js.Object {

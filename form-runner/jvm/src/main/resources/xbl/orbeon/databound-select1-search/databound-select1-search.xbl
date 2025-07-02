@@ -338,6 +338,7 @@
                                     <itemset-ref><xsl:value-of select="xf:itemset/@ref"/></itemset-ref>
                                     <label-ref><xsl:value-of select="xf:itemset/xf:label/@ref"/></label-ref>
                                     <value-ref><xsl:value-of select="xf:itemset/xf:value/@ref"/></value-ref>
+                                    <hint-ref><xsl:value-of select="xf:itemset/xf:hint/@ref"/></hint-ref>
                                     <submission-status/>
                                 </_>
                             </xf:instance>
@@ -429,7 +430,12 @@
                                                             (
                                                                 xf:attribute('type', 'object'),
                                                                 xf:element  ('id'  , string($item/xxf:evaluate(instance('local')/value-ref))),
-                                                                xf:element  ('text', string($item/xxf:evaluate(instance('local')/label-ref)))
+                                                                xf:element  ('text', string($item/xxf:evaluate(instance('local')/label-ref))),
+                                                                let $hint-value := $item/xxf:evaluate(instance('local')/hint-ref)
+                                                                return
+                                                                    if (xxf:non-blank($hint-value)) then
+                                                                        xf:element('title', $hint-value)
+                                                                    else ()
                                                             )
                                                         )
                                                 )

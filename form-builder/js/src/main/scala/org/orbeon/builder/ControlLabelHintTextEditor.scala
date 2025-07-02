@@ -191,23 +191,29 @@ object ControlLabelHintTextEditor {
       private val TinyMceEmptyContent = "<div>\u00A0</div>"
 
       // State
-      var tinyMceObjectOpt  : Option[TinyMceEditor] = None
-      var tinyMceInitialized: Boolean               = false
+      var tinyMceObjectOpt   : Option[TinyMceEditor] = None
+      var tinyMceInitialized : Boolean               = false
 
       // Create elements for editing
-      val containerDiv        = $("""<div   class="xforms-hidden fb-label-editor"/>""")
-      val textInput           = $("""<input class="xforms-hidden" type="text">""")
-      val checkboxInput       = $("""<input class="xforms-hidden" type="checkbox">""")
-      val tinyMceContainerDiv = $("""<div   class="xforms-hidden">""")
+      val containerDiv       : JQuery = $("""<div   class="xforms-hidden fb-label-editor"/>""")
+      val textInput          : JQuery = $("""<input class="xforms-hidden" type="text">""")
+      val checkboxInput      : JQuery = $("""<input class="xforms-hidden" type="checkbox">""")
+      val tinyMceContainerDiv: JQuery = $("""<div   class="xforms-hidden">""")
 
       // Add elements to the page
       locally {
+        val fbMain = document.querySelectorT(".fb-main")
+        Page.findXFormsFormFromHtmlElemOrDefault(fbMain).foreach { form =>
+          // Add `name` to form fields for correctness
+          textInput    .attr("name", form.namespaceIdIfNeeded("fb-label-editor-text"    ))
+          checkboxInput.attr("name", form.namespaceIdIfNeeded("fb-label-editor-checkbox"))
+        }
         // Nest and add to the page
         containerDiv
           .append(textInput)
           .append(checkboxInput)
           .append(tinyMceContainerDiv)
-         $(".fb-main").append(containerDiv)
+        $(fbMain).append(containerDiv)
 
         // Event handlers
         textInput.get(0).foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {

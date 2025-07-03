@@ -436,6 +436,18 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
                         </fr:trigger>
+                        <fr:trigger
+                                id="open-keyboard-shortcuts-trigger"
+                                bind="fb-relevant-bind"
+                                name="toolbox.open-keyboard-shortcuts">
+                            <xf:label>
+                                <xh:i class="fa fa-keyboard-o fa-fw"/>
+                                <xf:output value="$form-resources/dialog-keyboard-shortcuts/dialog-title"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch name="fb-show-dialog" targetid="dialog-keyboard-shortcuts"/>
+                            </xf:action>
+                        </fr:trigger>
 
                         <!-- Edit Source -->
                         <fr:trigger

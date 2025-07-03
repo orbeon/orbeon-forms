@@ -1531,6 +1531,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Keyboard Shortcuts</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label>Messages</label>
             <language-header>Language</language-header>
@@ -3123,6 +3126,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Raccourcis clavier</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label>Messages</label>
             <language-header>Langue</language-header>
@@ -4723,6 +4729,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Tastatursnarveier</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -6322,6 +6331,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Горячие клавиши</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -7886,6 +7898,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+             <dialog-title>Scorciatoie da tastiera</dialog-title>
+         </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -9451,6 +9466,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Tastaturkürzel</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -11046,6 +11064,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Pikanäppäimet</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -12638,6 +12659,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Atajos de teclado</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -14210,6 +14234,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Sneltoetsen</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -15809,6 +15836,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Atalhos de teclado</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -17409,6 +17439,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>Tangentbordsgenvägar</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label todo="true">[Messages]</label>
             <language-header todo="true">[Language]</language-header>
@@ -19000,6 +19033,9 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-keyboard-shortcuts>
+            <dialog-title>اختصارات لوحة المفاتيح</dialog-title>
+        </dialog-keyboard-shortcuts>
         <dialog-messages>
             <label>الرسائل</label>
             <language-header>اللغة</language-header>

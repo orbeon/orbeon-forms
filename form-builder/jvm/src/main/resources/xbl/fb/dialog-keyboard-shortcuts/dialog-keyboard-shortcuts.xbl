@@ -1,0 +1,257 @@
+<!--
+  Copyright (C) 2025 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fb-dialog-keyboard-shortcuts"
+        element="fb|dialog-keyboard-shortcuts">
+
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target">
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template>
+            <xf:group id="container" appearance="xxf:internal">
+
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+
+                <xxf:dialog id="dialog" class="fb-dialog-keyboard-shortcuts" level="modal">
+                    <xf:label ref="$resources/dialog-keyboard-shortcuts/dialog-title"/>
+                    <xh:div class="fb-dialog-body">
+                        <xh:table class="table table-condensed table-bordered">
+                            <xh:tbody>
+                                <xh:tr>
+                                    <xh:td rowspan="2">Actions</xh:td>
+                                    <xh:td><xh:kbd>⌘S</xh:kbd>/<xh:kbd>⌃S</xh:kbd></xh:td>
+                                    <xh:td>Save the form definition</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌘P</xh:kbd>/<xh:kbd>⌃P</xh:kbd></xh:td>
+                                    <xh:td>Open the Publish dialog</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="3">Cut, Copy, Paste</xh:td>
+                                    <xh:td><xh:kbd>⌘X</xh:kbd>/<xh:kbd>⌃X</xh:kbd></xh:td>
+                                    <xh:td>Cut the current control</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌘C</xh:kbd>/<xh:kbd>⌃C</xh:kbd></xh:td>
+                                    <xh:td>Copy the current control</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌘V</xh:kbd>/<xh:kbd>⌃V</xh:kbd></xh:td>
+                                    <xh:td>Paste from the toolbox</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="3">Grid Navigation</xh:td>
+                                    <xh:td><xh:kbd>←</xh:kbd>/<xh:kbd>→</xh:kbd></xh:td>
+                                    <xh:td>Move to the previous or next grid cell, including empty cells.</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⇧←</xh:kbd>/<xh:kbd>⇧→</xh:kbd></xh:td>
+                                    <xh:td>Move to the previous or next grid cell, skipping empty cells.</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>↑</xh:kbd>/<xh:kbd>↓</xh:kbd></xh:td>
+                                    <xh:td>Move to the previous or next grid cell vertically, including empty cells.</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="2">Undo and Redo</xh:td>
+                                    <xh:td><xh:kbd>⌘Z</xh:kbd>/<xh:kbd>⌃Z</xh:kbd></xh:td>
+                                    <xh:td>Undo the last operation</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌘⇧Z</xh:kbd>/<xh:kbd>⌃Y</xh:kbd></xh:td>
+                                    <xh:td>Redo the last operation</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="15">All dialogs</xh:td>
+                                    <xh:td><xh:kbd>⇧↵</xh:kbd></xh:td>
+                                    <xh:td>Open the Control Settings dialog</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌘↵</xh:kbd>/<xh:kbd>⌃↵</xh:kbd></xh:td>
+                                    <xh:td>Apply/OK dialog (clicks primary button)</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌘J</xh:kbd>/<xh:kbd>⌃J</xh:kbd></xh:td>
+                                    <xh:td>Open the Quick control search</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>O F</xh:kbd></xh:td>
+                                    <xh:td>Open Form Settings</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>O P</xh:kbd></xh:td>
+                                    <xh:td>Open Permissions</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>O E</xh:kbd></xh:td>
+                                    <xh:td>Open Email Settings</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>O M</xh:kbd></xh:td>
+                                    <xh:td>Open Messages</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>O S</xh:kbd></xh:td>
+                                    <xh:td>Open Edit Source</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>T W</xh:kbd></xh:td>
+                                    <xh:td>Test the web form</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>T P</xh:kbd></xh:td>
+                                    <xh:td>Test PDF production</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>T O</xh:kbd></xh:td>
+                                    <xh:td>Test the offline form</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>T F</xh:kbd></xh:td>
+                                    <xh:td>Inspect formulas</xh:td>
+                                </xh:tr>
+                            </xh:tbody>
+                        </xh:table>
+                        <xh:table class="table table-condensed table-bordered">
+                            <xh:tbody>
+                                <xh:tr>
+                                    <xh:td rowspan="2">Control Settings dialog</xh:td>
+                                    <xh:td><xh:kbd>⌃[</xh:kbd></xh:td>
+                                    <xh:td>Go to previous control</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌃]</xh:kbd></xh:td>
+                                    <xh:td>Go to next control</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="2">Tab Navigation</xh:td>
+                                    <xh:td><xh:kbd>⌃}</xh:kbd>/<xh:kbd>⌃Tab</xh:kbd></xh:td>
+                                    <xh:td>Move to next tab</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>⌃{</xh:kbd>/<xh:kbd>⌃⇧Tab</xh:kbd></xh:td>
+                                    <xh:td>Move to previous tab</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="3">Inserting Form Structure</xh:td>
+                                    <xh:td><xh:kbd>I F S</xh:kbd></xh:td>
+                                    <xh:td>Insert a new section</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I F G</xh:kbd></xh:td>
+                                    <xh:td>Insert a new grid</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I F R</xh:kbd></xh:td>
+                                    <xh:td>Insert a new repeated grid</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td rowspan="16">Inserting Form Controls</xh:td>
+                                    <xh:td><xh:kbd>I C I</xh:kbd></xh:td>
+                                    <xh:td>Insert Text Field</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I C T</xh:kbd></xh:td>
+                                    <xh:td>Insert Text Area</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I C F</xh:kbd></xh:td>
+                                    <xh:td>Insert Formatted Text Area</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I U E</xh:kbd></xh:td>
+                                    <xh:td>Insert Explanatory Text</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I U C</xh:kbd></xh:td>
+                                    <xh:td>Insert Calculated Value</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I U H</xh:kbd></xh:td>
+                                    <xh:td>Insert Hidden Field</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I T N</xh:kbd></xh:td>
+                                    <xh:td>Insert Number</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I T E</xh:kbd></xh:td>
+                                    <xh:td>Insert Email Field</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I T D</xh:kbd></xh:td>
+                                    <xh:td>Insert Date Field</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I T T</xh:kbd></xh:td>
+                                    <xh:td>Insert Time Field</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I S D</xh:kbd></xh:td>
+                                    <xh:td>Insert Dropdown</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I S R</xh:kbd></xh:td>
+                                    <xh:td>Insert Radio Buttons</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I S C</xh:kbd></xh:td>
+                                    <xh:td>Insert Checkboxes</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I A F</xh:kbd></xh:td>
+                                    <xh:td>Insert Attachment</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I A I</xh:kbd></xh:td>
+                                    <xh:td>Insert Image Attachment</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td><xh:kbd>I A V</xh:kbd></xh:td>
+                                    <xh:td>Insert Video Attachment</xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>Reloading the Toolbox</xh:td>
+                                    <xh:td><xh:kbd>⌘⇧R</xh:kbd>/<xh:kbd>⌃⇧R</xh:kbd></xh:td>
+                                    <xh:td>Reload the toolbox</xh:td>
+                                </xh:tr>
+                            </xh:tbody>
+                        </xh:table>
+                    </xh:div>
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:trigger id="close-trigger" appearance="xxf:primary">
+                            <xf:label ref="$resources/close/label"/>
+                            <xf:action event="DOMActivate">
+                                <xxf:hide dialog="dialog"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

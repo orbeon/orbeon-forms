@@ -327,6 +327,10 @@
         value="OM"/>
     <property
         as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-keyboard-shortcuts"
+        value="?"/>
+    <property
+        as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-edit-source"
         value="OS"/>
     <property

@@ -1291,7 +1291,8 @@ body.orbeon {
     .fb-dialog-form-settings,
     .fb-dialog-container-settings,
     .fb-action-dialog,
-    .fb-dialog-http-services {
+    .fb-dialog-http-services,
+    .fb-dialog-keyboard-shortcuts {
         .xbl-fr-tabbable {
             min-height: 0;
             display: flex;
@@ -1493,6 +1494,29 @@ body.orbeon {
                     padding-left: 0; // align with previous control
                 }
             }
+        }
+    }
+
+    .fb-dialog-keyboard-shortcuts {
+        width: 1000px;
+        max-width: none;
+        .fb-dialog-body {
+            overflow: auto;
+            display: flex; // Tables next to each other
+        }
+        .table {
+            margin: 10px;
+            td:nth-child(1) { width: 30%; } // For both tables to have the same column widths
+            td:nth-child(2) { width: 20%; }
+            td:nth-child(3) { width: 50%; }
+        }
+        kbd {
+            background-color: #eee;
+            border: 1px solid #ddd;
+            padding: 3px;
+            border-radius: 4px;
+            font-size: smaller;
+            margin: 4px;
         }
     }
 

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom
+import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.process.FormRunnerActionsCommon
@@ -148,9 +149,10 @@ object ResourcesPatcher {
     def resourceForLang(lang: String): Option[dom.Element] =
       resourcesDocument.getRootElement.elements.find(_.attributeValue(XMLNames.XMLLangQName) == lang)
 
-    val resourceToCopy = resourceForLang(defaultLang) orElse resourceForLang("en") getOrElse {
-      throw new OXFException(s"Could not find resource for default language $defaultLang or English")
-    }
+    def resourceToCopy: Element =
+      resourceForLang(defaultLang)
+        .orElse(resourceForLang("en"))
+        .getOrElse(throw new OXFException(s"Could not find resource for default language $defaultLang or English"))
 
     missingLanguages.foreach { missingLanguage =>
       val newResource = resourceToCopy.deepCopy

@@ -110,7 +110,7 @@ val CoreLibraryDependencies = Seq(
   "javax.xml.bind"              % "jaxb-api"                        % "2.3.1",   // for Ehcache 3
   "commons-codec"               % "commons-codec"                   % "1.15",
   "org.apache.commons"          % "commons-collections4"            % "4.4",
-  "commons-fileupload"          % "commons-fileupload"              % "1.5",
+  "commons-fileupload"          % "commons-fileupload"              % "1.6.0",
   "commons-io"                  % "commons-io"                      % CommonsIoVersion,
   "commons-pool"                % "commons-pool"                    % "1.6",
   "org.apache.ant"              % "ant"                             % AntVersion,

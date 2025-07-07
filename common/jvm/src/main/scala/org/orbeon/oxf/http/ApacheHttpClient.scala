@@ -57,7 +57,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
     cookieStore  : CookieStore,
     method       : HttpMethod,
     headers      : Map[String, List[String]],
-    content      : Option[StreamedContent]
+    contentOpt   : Option[StreamedContent]
   )(implicit
     requestCtx   : Option[RequestCtx],                                // unused
     connectionCtx: ConnectionContexts // unused for external HTTP connections
@@ -145,7 +145,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
       case request: HttpEntityEnclosingRequest =>
 
         def contentTypeFromContent =
-          content flatMap (_.contentType)
+          contentOpt flatMap (_.contentType)
 
         def contentTypeFromRequest =
           Headers.firstItemIgnoreCase(headers, Headers.ContentType)
@@ -156,11 +156,11 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
             .getOrElse(throw new ProtocolException("Can't set request entity: Content-Type header is missing"))
 
         val is =
-          content map (_.stream) getOrElse
+          contentOpt map (_.stream) getOrElse
           (throw new IllegalArgumentException(s"No request content provided for method ${method.entryName}"))
 
         val contentLength =
-          content flatMap (_.contentLength) filter (_ >= 0L)
+          contentOpt flatMap (_.contentLength) filter (_ >= 0L)
 
         val inputStreamEntity =
           new InputStreamEntity(is, contentLength getOrElse -1L, ContentType.parse(contentTypeHeader))

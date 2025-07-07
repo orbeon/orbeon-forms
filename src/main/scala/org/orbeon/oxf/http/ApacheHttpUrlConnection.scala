@@ -65,7 +65,7 @@ class ApacheHttpUrlConnection(url: URL)(client: PropertiesApacheHttpClient.type)
             cookieStore   = new BasicCookieStore,
             method        = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
             headers       = _requestHeaders.view.mapValues(_.toList).toMap,
-            content       = None
+            contentOpt    = None
           )(
             requestCtx    = None,
             connectionCtx = EmptyConnectionContexts

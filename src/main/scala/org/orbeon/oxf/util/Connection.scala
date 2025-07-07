@@ -110,7 +110,7 @@ object Connection extends ConnectionTrait {
     connectionCtx   : ConnectionContexts,
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
-    
+
     // Copy `IndentedLogger` as we cannot share logger state with other threads, and the caller's logger might be
     // associated with the `XFormsContainingDocument` and reused by the calling thread.
     val newLogger = IndentedLogger(logger)
@@ -552,7 +552,7 @@ object Connection extends ConnectionTrait {
                       cookieStore   = cookieStore,
                       method        = method,
                       headers       = cleanCapitalizedHeaders,
-                      content       = content
+                      contentOpt    = content
                     )(
                       requestCtx    = None,
                       connectionCtx = connectionCtx

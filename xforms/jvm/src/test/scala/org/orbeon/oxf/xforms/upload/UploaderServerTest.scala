@@ -4,6 +4,7 @@ import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.{HttpMultipartMode, MultipartEntityBuilder}
 import org.orbeon.connection.StreamedContent
 import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumSize}
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, SafeRequestContext, TestWebAppContext}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
@@ -167,6 +168,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     for (mediatype <- AllowTextMediatypes)
       it(s"must upload when mediatype constraints are satisfied after file scan updates them: `$mediatype`") {
+        assume(Version.isPE)
         withTestExternalContext { _ =>
 
           val (items, None) =
@@ -189,6 +191,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     for (mediatype <- AllowTextMediatypes)
       it(s"must not upload when mediatype constraints are not satisfied after file scan updates them: `$mediatype`") {
+        assume(Version.isPE)
         withTestExternalContext { _ =>
 
           val (items, throwableOpt) =

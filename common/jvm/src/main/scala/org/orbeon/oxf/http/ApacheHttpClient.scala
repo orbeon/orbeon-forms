@@ -141,29 +141,20 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
       requestMethod.addHeader(name, value)
     }
 
-    requestMethod match {
-      case request: HttpEntityEnclosingRequest =>
+    (requestMethod, contentOpt) match {
+      case (request: HttpEntityEnclosingRequest, Some(content)) =>
 
-        def contentTypeFromContent =
-          contentOpt flatMap (_.contentType)
-
-        def contentTypeFromRequest =
-          Headers.firstItemIgnoreCase(headers, Headers.ContentType)
-
-        val contentTypeHeader =
+        val contentTypeHeader = {
+          def contentTypeFromContent = content.contentType
+          def contentTypeFromRequest = Headers.firstItemIgnoreCase(headers, Headers.ContentType)
           contentTypeFromContent
             .orElse(contentTypeFromRequest)
             .getOrElse(throw new ProtocolException("Can't set request entity: Content-Type header is missing"))
+        }
 
-        val is =
-          contentOpt map (_.stream) getOrElse
-          (throw new IllegalArgumentException(s"No request content provided for method ${method.entryName}"))
-
-        val contentLength =
-          contentOpt flatMap (_.contentLength) filter (_ >= 0L)
-
+        val contentLength = content.contentLength.filter(_ >= 0L)
         val inputStreamEntity =
-          new InputStreamEntity(is, contentLength getOrElse -1L, ContentType.parse(contentTypeHeader))
+          new InputStreamEntity(content.stream, contentLength getOrElse -1L, ContentType.parse(contentTypeHeader))
 
         // With HTTP 1.1, chunking is required if there is no Content-Length. But if the header is present, then
         // chunking is optional. We support disabling this to work around a limitation with eXist when we

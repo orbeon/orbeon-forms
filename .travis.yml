@@ -21,7 +21,6 @@ env:
     - TARGET=test-db     DB=postgresql
     - TARGET=test-db     DB=sqlite
 addons:
-  postgresql: "9.5"
   artifacts:
     paths:
     - $(ls build/distrib/* | egrep -v '(embedding|proxy-portlet|xforms-filter|orbeon-auth)' | egrep -v '\-[CP]E\.(tgz|war)' | tr "\n" ":")
@@ -67,8 +66,7 @@ before_script:
 - if [ "$TARGET" == "test-unit"                              ]; then docker run -d --name httpbin -p 8084:80 kennethreitz/httpbin; fi
 - if [ "$TARGET" == "test-db"                                ]; then echo $DOCKER_PASSWORD | docker login -u orbeon --password-stdin; fi
 - if [ "$TARGET" == "test-db"   ] && [ "$DB" == "mysql"      ]; then docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 --sql-mode=ALLOW_INVALID_DATES --character-set-server=utf8mb4 --collation-server=utf8mb4_bin; fi
-- if [ "$TARGET" == "test-db"   ] && [ "$DB" == "postgresql" ]; then createuser --superuser orbeon; fi
-- if [ "$TARGET" == "test-db"   ] && [ "$DB" == "postgresql" ]; then createdb --owner=orbeon orbeon; fi
+- if [ "$TARGET" == "test-db"   ] && [ "$DB" == "postgresql" ]; then ./tools/postgresql-prepare.sh; fi
 script:
 - if [ "$TARGET" == "orbeon-dist"                            ]; then ant orbeon-dist                  ; fi
 - if [ "$TARGET" == "test-unit"                              ]; then sbt test:compile ; sbt test:test ; fi

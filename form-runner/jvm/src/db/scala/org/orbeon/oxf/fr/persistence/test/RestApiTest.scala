@@ -336,6 +336,41 @@ class RestApiTest
         }
       }
     }
+
+    it("must allow attachment creation with update permission because owner (#7145)") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("attachment-permissions") { (_, provider) =>
+          val formURL            = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+          val dataURL            = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+          val attachment1URL     = HttpCall.crudURLPrefix(provider) + "data/123/attachment1"
+          val attachment2URL     = HttpCall.crudURLPrefix(provider) + "data/123/attachment2"
+          val data               = <data/>.toDocument
+          val createReadUpdate   = SpecificOperations(Set(Create, Read, Update))
+          val readUpdate         = SpecificOperations(Set(        Read, Update))
+          val attachmentBody     = HttpCall.Binary(Array[Byte](1, 2, 3, 4, 5))
+          val user               = Some(Credentials(UserAndGroup("user", None), Nil, Nil))
+
+          def storeForm(formPermissions: Permissions, isUpdate: Boolean = false): Unit =
+            HttpAssert.put(formURL, Specific(1), HttpCall.XML(buildFormDefinition(provider, formPermissions)), if (isUpdate) StatusCode.NoContent else StatusCode.Created)
+
+          // Anyone can create, owners can read and update
+          storeForm(Permissions.Defined(List(
+            Permission(Nil, SpecificOperations(Set(Create))),
+            Permission(List(Condition.Owner), SpecificOperations(Set(Read, Update)))
+          )))
+          HttpAssert.put(dataURL       , Specific(1), HttpCall.XML(data), StatusCode.Created  , user) // Create initial data
+          HttpAssert.put(attachment1URL, Specific(1), attachmentBody    , StatusCode.Created, user) // Can attach
+          HttpAssert.get(attachment1URL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, createReadUpdate, Some(1)), user)
+
+          // Now we change the permissions, and only owners can read and update
+          storeForm(Permissions.Defined(List(
+            Permission(List(Condition.Owner), SpecificOperations(Set(Read, Update)))
+          )), isUpdate = true)
+          HttpAssert.put(attachment2URL, Specific(1), attachmentBody    , StatusCode.Created, user) // Can still attach
+          HttpAssert.get(attachment2URL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, readUpdate, Some(1)), user)
+        }
+      }
+    }
   }
 
   describe("Organizations") {

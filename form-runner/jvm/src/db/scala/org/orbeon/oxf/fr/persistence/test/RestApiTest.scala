@@ -306,6 +306,36 @@ class RestApiTest
         }
       }
     }
+
+    it("must allow attachment creation with update permission because of role (#7057)") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("attachment-permissions") { (_, provider) =>
+          val formURL            = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+          val mainDataURL        = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+          val otherDataURL       = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
+          val mainAttachmentURL  = HttpCall.crudURLPrefix(provider) + "data/123/attachment"
+          val data               = <data/>.toDocument
+          val createReadUpdate   = SpecificOperations(Set(Create, Read, Update))
+          val attachmentBody     = HttpCall.Binary(Array[Byte](1, 2, 3, 4, 5))
+          val attachmentExpected = HttpAssert.ExpectedBody(attachmentBody, createReadUpdate, Some(1))
+          val creatorUser        = Some(Credentials(UserAndGroup("creator", None), List(SimpleRole("creator")), Nil))
+          val updaterUser        = Some(Credentials(UserAndGroup("updater", None), List(SimpleRole("updater")), Nil))
+
+          val formPermissions = Permissions.Defined(List(
+            Permission(List(Condition.RolesAnyOf(List("creator"))), createReadUpdate),
+            Permission(List(Condition.RolesAnyOf(List("updater"))), SpecificOperations(Set(Update)))
+          ))
+
+          HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, formPermissions)), StatusCode.Created)
+
+          HttpAssert.put(mainDataURL      , Specific(1), HttpCall.XML(data), StatusCode.Created  , creatorUser) // Creator creates initial data
+          HttpAssert.put(otherDataURL     , Specific(1), HttpCall.XML(data), StatusCode.Forbidden, updaterUser) // Updater can't create data
+          HttpAssert.put(mainDataURL      , Unspecified, HttpCall.XML(data), StatusCode.NoContent, updaterUser) // Updater can update data
+          HttpAssert.put(mainAttachmentURL, Specific(1), attachmentBody    , StatusCode.Created  , updaterUser) // Updater can attach
+          HttpAssert.get(mainAttachmentURL, Unspecified, attachmentExpected                      , creatorUser) // Attachment was stored
+        }
+      }
+    }
   }
 
   describe("Organizations") {

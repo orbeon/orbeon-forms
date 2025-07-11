@@ -282,10 +282,12 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
     val isVersioningSupported = FormRunner.isFormDefinitionVersioningSupported(appForm.app, appForm.form)
 
-    val serviceUri = PathUtils.appendQueryString(
-      persistenceBaseURL.dropTrailingSlash + path,
-      PathUtils.encodeQueryString(request.parameters)
-    )
+    def buildServiceUri(path: String): String =
+      PathUtils.appendQueryString(
+        persistenceBaseURL.dropTrailingSlash + path,
+        PathUtils.encodeQueryString(request.parameters)
+      )
+    val serviceUri           = buildServiceUri(path)
 
     // TODO: what about permissions for the attachments? is that a thing?
     val (cxrOpt, effectiveFormDefinitionVersionOpt, responseHeadersOpt) =
@@ -363,6 +365,21 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                   queryForToken              = queryForToken
                 )
 
+              val responseHeadersForPermissionsOpt = responseHeadersOpt.orElse(
+                isAttachment.flatOption {
+                  val dataXmlPath = path.substring(0, path.lastIndexOf('/') + 1) + DataXml
+                  val dataXmlServiceUri = buildServiceUri(dataXmlPath)
+                  val dataResult = connectToObtainHeadersAndCheckPreconditions(
+                    request                    = OutgoingRequest(request),
+                    serviceUri                 = dataXmlServiceUri,
+                    outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+                    specificIncomingVersionOpt = vOpt.map(_.version),
+                    queryForToken              = queryForToken
+                  )
+                  dataResult._3
+                }
+              )
+
               // 2024-07-23: Here, we read the form permissions by calling `/fr/service/persistence/form`, then we
               // extract the `<permissions>` element if any, and obtain a `Permissions` object. I wondered why we
               // couldn't just use the `operations` attribute from the form metadata, and the answer is that we have
@@ -384,7 +401,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                     appFormVersion     = (appForm, effectiveFormDefinitionVersion),
                     documentId         = documentIdOpt.getOrElse(throw new IllegalArgumentException), // for data there must be a `documentId`,
                     incomingTokenOpt   = incomingTokenOpt,
-                    responseHeadersOpt = responseHeadersOpt, // `None` in case of non-existing data,
+                    responseHeadersOpt = responseHeadersForPermissionsOpt, // `None` in case of non-existing data,
                     isAttachment       = isAttachment
                   )
                 } catch {

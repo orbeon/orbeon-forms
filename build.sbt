@@ -160,6 +160,8 @@ val CoreLibraryDependencies = Seq(
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
   "org.orbeon"                  % "kaptcha"                         % "2.3.3-SNAPSHOT",
 
+  "org.webjars.npm"             % "codemirror"                      % "5.65.19",
+
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,
   "javax.portlet"               % "portlet-api"                     % PortletApiVersion        % Provided

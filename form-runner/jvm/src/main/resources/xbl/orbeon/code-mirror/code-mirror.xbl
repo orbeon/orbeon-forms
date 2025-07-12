@@ -20,17 +20,17 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/lib/codemirror.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/mode/xml/xml.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/fold/foldcode.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/fold/foldgutter.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/fold/xml-fold.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/dialog/dialog.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/search/searchcursor.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/search/search.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/scroll/annotatescrollbar.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/search/matchesonscrollbar.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/search/jump-to-line.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/lib/codemirror.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/mode/xml/xml.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/fold/foldcode.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/fold/foldgutter.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/fold/xml-fold.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/dialog/dialog.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/search/searchcursor.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/search/search.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/scroll/annotatescrollbar.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/search/matchesonscrollbar.js"/>
+    <xbl:script src="/webjars/codemirror/5.65.19/addon/search/jump-to-line.js"/>
 
     <xbl:binding
         id="fr-code-mirror"
@@ -39,12 +39,12 @@
         xxf:external-events="DOMActivate">
 
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.19/lib/codemirror.css"/>
-            <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.19/theme/solarized.css"/>
+            <xbl:style src="/webjars/codemirror/5.65.19/lib/codemirror.css"/>
+            <xbl:style src="/webjars/codemirror/5.65.19/theme/solarized.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
-            <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/fold/foldgutter.css"/>
-            <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/dialog/dialog.css"/>
-            <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.19/addon/search/matchesonscrollbar.css"/>
+            <xbl:style src="/webjars/codemirror/5.65.19/addon/fold/foldgutter.css"/>
+            <xbl:style src="/webjars/codemirror/5.65.19/addon/dialog/dialog.css"/>
+            <xbl:style src="/webjars/codemirror/5.65.19/addon/search/matchesonscrollbar.css"/>
         </xbl:resources>
         <xbl:template>
             <xh:div class="xbl-fr-code-mirror-editor"/>

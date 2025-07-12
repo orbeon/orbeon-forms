@@ -42,8 +42,12 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
 
     private URLConnection getConnection(final String key, boolean doNotThrowResourceNotFound) throws IOException {
-        final String adjustedKey = prependSlash && !key.startsWith("/") ? "/" + key : key;
-        final URL u = clazz.getResource(adjustedKey);
+        final String keyAdjustedForPrependedSlash = prependSlash && !key.startsWith("/") ? "/" + key : key;
+        final String keyAdjustedForWebjars        = keyAdjustedForPrependedSlash.startsWith("/webjars/")
+            ? "/META-INF/resources" + keyAdjustedForPrependedSlash
+            : keyAdjustedForPrependedSlash;
+
+        final URL u = clazz.getResource(keyAdjustedForWebjars);
         if (u == null) {
             if (doNotThrowResourceNotFound) return null;
             else throw new ResourceNotFoundException(key);

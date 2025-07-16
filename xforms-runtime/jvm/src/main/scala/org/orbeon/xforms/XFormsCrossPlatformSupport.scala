@@ -109,6 +109,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def proxyURI(
     urlString      : String,
+    forEffectiveId : String,
+    forDownload    : Boolean,
     filename       : Option[String],
     contentType    : Option[String],
     lastModified   : Long,
@@ -118,7 +120,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   )(implicit
     logger           : IndentedLogger,
     resourceResolver: Option[ResourceResolver]
-  ): URI =
+  ): Option[URI] =
     XFormsAssetServerRoute.proxyURI(
       urlString        = urlString,
       filename         = filename,
@@ -141,13 +143,14 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): URI =
     proxyURI(
       urlString        = NetUtils.base64BinaryToAnyURI(value, NetUtils.SESSION_SCOPE, logger.logger.logger),
+      forEffectiveId   = null, // not used
       filename         = filename,
       contentType      = mediatype,
       lastModified     = -1,
       customHeaders    = evaluatedHeaders,
       getHeader        = getHeader,
       fromCacheOrElse  = (_, compute) => compute()
-    )
+    ).get
 
   def mapSavedUri(
     beforeUri         : String,

@@ -144,6 +144,8 @@ trait XFormsCrossPlatformSupportTrait {
 
   def proxyURI(
     urlString      : String,
+    forEffectiveId : String,
+    forDownload    : Boolean,
     filename       : Option[String],
     contentType    : Option[String],
     lastModified   : Long,
@@ -153,7 +155,7 @@ trait XFormsCrossPlatformSupportTrait {
   )(implicit
     logger           : IndentedLogger,
     resourceResolver: Option[ResourceResolver]
-  ): URI
+  ): Option[URI]
 
   def proxyBase64Binary(
     value            : String,

@@ -120,10 +120,9 @@ class XFormsOutputControl(
 
     val updatedValue =
       if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
-        proxyValueIfNeeded(internalValueMaybeFromTmpFile, "", filename(collector), fileMediatype(collector) orElse mediatype, collector)
+        proxyValueIfNeeded(internalValueMaybeFromTmpFile, "", filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = staticControlOpt.exists(_.isDownloadAppearance))
       } else if (staticControlOpt exists (_.isImageMediatype)) {
-        // Use dummy image as default value so that client always has something to load
-        proxyValueIfNeeded(internalValueMaybeFromTmpFile, DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector)
+        proxyValueIfNeeded(internalValueMaybeFromTmpFile, DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = false)
       } else if (staticControlOpt exists (_.isHtmlMediatype)) {
         internalValue
       } else {
@@ -169,7 +168,8 @@ class XFormsOutputControl(
     defaultValue : String,
     filename     : Option[String],
     mediatype    : Option[String],
-    collector    : ErrorEventCollector
+    collector    : ErrorEventCollector,
+    forDownload  : Boolean
   ): String =
     try {
       // If the value is a file: we make sure it is signed otherwise we return the default value
@@ -202,13 +202,17 @@ class XFormsOutputControl(
                     resolvedURI,
                     XFormsCrossPlatformSupport.proxyURI(
                       urlString       = resolvedURI,
+                      forEffectiveId  = effectiveId,
+                      forDownload     = forDownload,
                       filename        = filename,
                       contentType     = mediatype,
                       lastModified    = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
                       customHeaders   = evaluatedHeaders(collector),
                       getHeader       = containingDocument.headersGetter,
                       fromCacheOrElse = (uri: URI, compute: () => URI) => containingDocument.staticState.fromUriCacheOrElse(uri, compute())
-                    ).toString // TODO: would be nice to stay with `URI`
+                    )
+                    .map(_.toString)         // TODO: would be nice to stay with `URI`
+                    .getOrElse(defaultValue) // https://github.com/orbeon/orbeon-forms/issues/7149
                   )
                 } else {
                   // Otherwise we leave the value as is

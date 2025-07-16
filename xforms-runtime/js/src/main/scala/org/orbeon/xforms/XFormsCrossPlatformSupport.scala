@@ -13,12 +13,16 @@
  */
 package org.orbeon.xforms
 
+import cats.effect.IO
+import cats.syntax.option.*
 import org.orbeon
 import org.orbeon.apache.xerces.parsers.{NonValidatingConfiguration, SAXParser}
 import org.orbeon.apache.xerces.util.SymbolTable
 import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XMLParseException}
+import org.orbeon.connection.AsyncConnectionResult
+import org.orbeon.connection.ConnectionContextSupport.{ConnectionContexts, EmptyConnectionContexts}
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StaticXPath.*
@@ -32,6 +36,7 @@ import java.io.*
 import java.net.URI
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
+import scala.concurrent.duration.DurationInt
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.typedarray.Uint8Array
@@ -93,71 +98,143 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   //     - `fromResourceResolver()`
   //     - `fromSubmissionProviderSync()`
   def proxyURI(
-    urlString       : String,
-    filename        : Option[String],
-    contentType     : Option[String],
-    lastModified    : Long,
-    customHeaders   : Map[String, List[String]],
-    getHeader       : String => Option[List[String]],
-    fromCacheOrElse : (URI, () => URI) => URI
+    urlString      : String,
+    forEffectiveId : String,
+    forDownload    : Boolean,
+    filename       : Option[String],
+    contentType    : Option[String],
+    lastModified   : Long,
+    customHeaders  : Map[String, List[String]],
+    getHeader      : String => Option[List[String]],
+    fromCacheOrElse: (URI, () => URI) => URI
   )(implicit
-    logger           : IndentedLogger,
+    logger          : IndentedLogger,
     resourceResolver: Option[ResourceResolver]
-  ): URI = {
-
-    implicit val ec = externalContext
+  ): Option[URI] = {
 
     val uri = URI.create(urlString)
 
     uri.getScheme match {
       case "data" | "blob" =>
-        uri
+        uri.some
       case scheme =>
         JsFileSupport.findObjectUrl(uri) match {
-          case Some(objectUrl) =>
-            objectUrl
+          case some @ Some(_) =>
+            some
           case None if scheme == JsFileSupport.UploadUriScheme =>
             // Can this happen?
-            URI.create("javascript:void(0)")
-          case None            =>
+            URI.create("javascript:void(0)").some
+          case None if ! forDownload =>
 
-            def fromZip =
-              resourceResolver.flatMap(_.resolve(HttpMethod.GET, uri, None, Map.empty)).map(_ -> true)
+            // Try to load the resource as soon as possible
 
-            // TODO: Ideally, this would use HTTP caching, so we could do a conditional `GET`, for example.
-            def fromConnection =
-              Connection.connectNow(
-                method          = HttpMethod.GET,
-                url             = uri,
-                credentials     = None,
-                content         = None,
-                headers         = Map.empty,
-                loadState       = false,
-                saveState       = false,
-                logBody         = false
-              ) -> false
+            resourceResolver.flatMap(_.resolve(HttpMethod.GET, uri, None, Map.empty)) match {
+              case Some(cxr) =>
 
-            val (cxr, isSourceFromZip) =
-              fromZip.getOrElse(fromConnection)
+                // Resource was found from the resource resolver, so we can create a `blob:` URL from it.
 
-            // TODO: Handle unsuccessful connection result.
-            val isSuccess =
-              cxr.isSuccessResponse
+                // TODO: Handle unsuccessful connection result.
+                val isSuccess =
+                  cxr.isSuccessResponse
 
-            def createBlobUrl(): URI =
-              URI.create(
-                js.Dynamic.global.window.URL.createObjectURL(
-                  new dom.Blob(
-                    js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
-                    new dom.BlobPropertyBag { `type` = cxr.mediatype.orUndefined }
+                def createBlobUrl(): URI =
+                  URI.create(
+                    dom.URL.createObjectURL(
+                      new dom.Blob(
+                        blobParts = js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
+                        options   = new dom.BlobPropertyBag { `type` = cxr.mediatype.orUndefined }
+                      )
+                    )
                   )
-                ).asInstanceOf[String]
-              )
 
-            if (isSourceFromZip)
-              fromCacheOrElse(uri, createBlobUrl) // UriUtils.removeQueryAndFragment ? or just fragment if any?
-            else
-              createBlobUrl()
+                fromCacheOrElse(uri, createBlobUrl).some // UriUtils.removeQueryAndFragment ? or just fragment if any?
+
+              case None =>
+
+                // Resource was not found in the resource resolver, so we need to retrieve it. The current use case is
+                // that of an image resource saved into the persistence layer:
+                //
+                //   https://github.com/orbeon/orbeon-forms/issues/7149
+                //
+                // In the future, we may want to handle other cases, such as:
+                //
+                // - video attachments specifically, maybe using `MediaSource`
+                // - other file attachments
+
+                // TODO: Ideally, this would use HTTP caching, so we could do a conditional `GET`, for example.
+                def fromConnection: IO[AsyncConnectionResult] = {
+
+                  implicit val connectionCtx : ConnectionContexts = EmptyConnectionContexts
+                  implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(XFormsCrossPlatformSupport.externalContext)
+
+                  Connection.connectAsync(
+                    method      = HttpMethod.GET,
+                    url         = uri,
+                    credentials = None,
+                    content     = None,
+                    headers     = Map.empty,
+                    loadState   = false,
+                    logBody     = false
+                  )
+                }
+
+                def createBlobFromByteArray(byteArray: Array[Byte]): dom.Blob =
+                  new dom.Blob(
+                    blobParts = Array[dom.BlobPart](new Uint8Array(byteArray.toJSArray.asInstanceOf[js.Array[Short]]).buffer).toJSArray,
+                    options   = new dom.BlobPropertyBag { `type` = contentType.orUndefined }
+                  )
+
+                def setImageSourceBlob(blob: dom.Blob): IO[Unit] =
+                  Option(dom.document.querySelector(s"#$forEffectiveId img").asInstanceOf[dom.html.Image]) match {
+                    case Some(img) =>
+                      img.src    = dom.URL.createObjectURL(blob)
+                      img.onload = _ => dom.URL.revokeObjectURL(img.src)
+                      IO.unit
+                    case None =>
+                      IO.raiseError(new RuntimeException(s"Image element not found for effective ID: $forEffectiveId"))
+                  }
+
+                // Schedule retrieval of the resource, which will be done asynchronously. We use this to create a
+                // `blob:` URL which we set on the image when available.
+                import CoreCrossPlatformSupport.runtime
+
+                // By the time the retrieval of the resource is done, the control might not yet be present in the DOM.
+                // Eventually, it should be, but there is no guarantee, for example if the retrieval is slow, and the
+                // control becomes non-relevant in the meantime. We use a retry policy to handle reasonable cases but
+                // eventually we will give up and not set the image source.
+                import retry.*
+
+                val retryPolicy =
+                  RetryPolicies.exponentialBackoff[IO](10.millis)
+                    .join(RetryPolicies.limitRetries[IO](10))
+
+                fromConnection
+                  .flatMap(_.content.stream.compile.to(Array) /* no `Collector` for `js.Array` yet */)
+                  .map(createBlobFromByteArray)
+                  .flatMap { blob =>
+                    // Only retry setting the image source, not the retrieval of the resource
+                    retryingOnAllErrors(retryPolicy, (_: Throwable, _: RetryDetails) => IO.unit)(setImageSourceBlob(blob))
+                  }
+                  .unsafeToFuture()
+
+                // Return `None` so that the caller can handle the case where the resource is not available yet and
+                // use a default/dummy URL.
+                None
+            }
+
+          case None =>
+            // TODO: handle download, see https://github.com/orbeon/orbeon-forms/issues/7149
+
+            def setDownloadSourceBlob(blob: dom.Blob): Boolean =
+              Option(dom.document.querySelector(s"#$forEffectiveId .xforms-output-appearance-xxforms-download a[href]").asInstanceOf[dom.html.Anchor])
+                .map { anchor =>
+                  anchor.href = dom.URL.createObjectURL(blob)
+                  // TODO: blob won't be revoked; it can be downloaded multiple times; but should be revoked eventually;
+                  //  Should be: 1. When the control becomes non-relevant, 2. When the form is destroyed.
+                }
+                .nonEmpty
+
+            None
         }
     }
   }

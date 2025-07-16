@@ -30,14 +30,14 @@ class XFormsAssetServerTest
     it("must work for an absolute path") {
       withTestExternalContext { _ =>
         assert("/xforms-server/dynamic/6db2b6931155fa285c94ef20c5fa7ea190e24163" ==
-          XFormsAssetServerRoute.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ => None).toString)
+          XFormsAssetServerRoute.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ => None).get.toString)
       }
     }
 
     it("must work for an absolute URL") {
       withTestExternalContext { _ =>
         assert("/xforms-server/dynamic/f4e9ff96622e4257216504cf4457468a912b3ae7" ==
-          XFormsAssetServerRoute.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ => None).toString)
+          XFormsAssetServerRoute.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ => None).get.toString)
       }
     }
   }

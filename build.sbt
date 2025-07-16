@@ -49,6 +49,7 @@ val ScalaLoggingVersion              = "3.9.4"
 // Shared Scala libraries
 val CatsVersion                      = "2.13.0"
 val CatsFs2Version                   = "3.12.0"
+val CatsRetryVersion                 = "3.1.3"
 val ScalaTestVersion                 = "3.2.19"
 val CirceVersion                     = "0.14.14"
 val EnumeratumVersion                = "1.9.0"
@@ -511,12 +512,13 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     name := "orbeon-common",
     libraryDependencies += ("org.typelevel"          %%% "cats-kernel"       % CatsVersion).cross(CrossVersion.for3Use2_13),
     libraryDependencies += ("org.typelevel"          %%% "cats-core"         % CatsVersion).cross(CrossVersion.for3Use2_13),
-    libraryDependencies += "co.fs2"                 %%% "fs2-core"          % CatsFs2Version,
-    libraryDependencies += "co.fs2"                 %%% "fs2-io"            % CatsFs2Version,
-    libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
-    libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
-    libraryDependencies += "org.log4s"              %%% "log4s"             % Log4sVersion,
-    libraryDependencies += "com.lihaoyi"            %%% "pprint"            % PPrintVersion,
+    libraryDependencies +=  "co.fs2"                 %%% "fs2-core"          % CatsFs2Version,
+    libraryDependencies +=  "co.fs2"                 %%% "fs2-io"            % CatsFs2Version,
+    libraryDependencies +=  "com.github.cb372"       %%% "cats-retry"        % CatsRetryVersion,
+    libraryDependencies +=  "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
+    libraryDependencies +=  "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
+    libraryDependencies +=  "org.log4s"              %%% "log4s"             % Log4sVersion,
+    libraryDependencies +=  "com.lihaoyi"            %%% "pprint"            % PPrintVersion,
     crossScalaVersions := supportedScalaVersions
   )
   .jvmSettings(commonScalaJvmSettings)

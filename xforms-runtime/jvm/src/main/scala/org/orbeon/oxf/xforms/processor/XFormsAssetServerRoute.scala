@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor
 
+import cats.syntax.option.*
 import org.orbeon.errorified.Exceptions.{getRootThrowable, isConnectionInterruption}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
@@ -387,7 +388,7 @@ object XFormsAssetServerRoute extends NativeRoute {
     getHeader       : String => Option[List[String]]
   )(implicit
     logger          : IndentedLogger
-  ): URI = {
+  ): Option[URI] = {
 
     // Get session
     val externalContext = XFormsCrossPlatformSupport.externalContext
@@ -424,7 +425,7 @@ object XFormsAssetServerRoute extends NativeRoute {
     // Store mapping into session
     session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)
 
-    URI.create(DynamicResourcesPath + resource.digest)
+    URI.create(DynamicResourcesPath + resource.digest).some
   }
 
   // For Java callers

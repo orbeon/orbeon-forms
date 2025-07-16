@@ -37,7 +37,6 @@ import java.net.URI
 import java.util as ju
 import java.util.Base64
 import scala.collection.mutable
-import scala.scalajs.js
 
 
 object XFormsStaticStateDeserializer {
@@ -1153,7 +1152,7 @@ object XFormsStaticStateImpl {
           .filter(_.getScheme == "blob") // should be the case for all URIs in the cache
           .foreach(uri => {
             debug(s"revoking blob URL: `$uri`")
-            js.Dynamic.global.window.URL.revokeObjectURL(uri.toString)
+            org.scalajs.dom.URL.revokeObjectURL(uri.toString)
           })
         uriCache.clear()
       }

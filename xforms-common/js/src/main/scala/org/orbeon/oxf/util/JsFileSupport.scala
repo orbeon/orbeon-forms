@@ -11,7 +11,7 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 object JsFileSupport {
 
-  import Private._
+  import Private.*
 
   val UploadUriScheme = "upload"
 
@@ -52,14 +52,14 @@ object JsFileSupport {
       // The URL must be associated only once, as each call to `URL.createObjectURL()` creates a new URL.
       private var mustRevokeObjectUrl: Boolean = false
       lazy val objectUrl: URI = {
-        val result = js.Dynamic.global.window.URL.createObjectURL(file).asInstanceOf[String]
+        val result = dom.URL.createObjectURL(file).asInstanceOf[String]
         mustRevokeObjectUrl = true
         URI.create(result)
       }
 
       def revokeObjectUrl(): Unit =
         if (mustRevokeObjectUrl) {
-          js.Dynamic.global.window.URL.revokeObjectURL(objectUrl.toString)
+          dom.URL.revokeObjectURL(objectUrl.toString)
           mustRevokeObjectUrl = false
         }
     }

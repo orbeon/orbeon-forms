@@ -104,7 +104,7 @@ object ReadableStream {
       // `ReadableStreamUnderlyingSource` yet. So when we need to create a `ReadableStream` from a
       // `ReadableStreamUnderlyingSource`, we instantiate it using the polyfill. Currently, our use case is to
       // create a `ReadableStream` and pass it to our `SubmissionProvider`. Similarly, if a `SubmissionProvider`
-      // returns a `ReadableStream`, it will need to  instantiate it using the polyfill under Safari.
+      // returns a `ReadableStream`, it will need to instantiate it using the polyfill under Safari.
       // Safari error: `TypeError: ReadableByteStreamController` is not implemented. References:
       //
       // - https://streams.spec.whatwg.org/#rbs-controller-class

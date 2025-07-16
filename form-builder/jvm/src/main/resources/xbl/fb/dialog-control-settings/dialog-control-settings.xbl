@@ -1089,7 +1089,8 @@
                 <xf:bind ref="$i/fr-index/@enabled" type="xs:boolean"/>
                 <xf:bind ref="$i/*[local-name() = ('fr-summary-show', 'fr-allow-bulk-edit')]" name="summary-setting">
                     <xf:bind ref="@enabled"         type="xs:boolean"/>
-                    <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting/@enabled = true()"/>
+                    <!-- Always show the 'Restrict to role' checkbox for 'Show on Summary page', only show it for 'Allow bulk edit' if enabled -->
+                    <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting/local-name() = 'fr-summary-show' or $summary-setting/@enabled = true()"/>
                     <xf:bind
                             ref="require-role"
                             relevant="$summary-setting/@enabled = true() and $summary-setting/@role-required = true()"
@@ -1345,6 +1346,8 @@
                                                                                         if="count($base-binding/require-role) = 0"
                                                                                         context="$base-binding"
                                                                                         origin="xf:element('require-role')"/>
+                                                                                    <xf:setvalue ref="$i/fr-index/@enabled"        value="true()"/>
+                                                                                    <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
                                                                                 </xf:action>
                                                                                 <xf:action event="xforms-deselect">
                                                                                     <xf:delete ref="$base-binding/require-role"/>

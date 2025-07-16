@@ -38,10 +38,11 @@ object WhatToReindex {
 }
 
 case class SummarySettings(
-  show        : Boolean,
-  search      : Boolean,
-  edit        : Boolean,
-  editProcess : Option[String]
+  show          : Boolean,
+  search        : Boolean,
+  edit          : Boolean,
+  editProcess   : Option[String],
+  sortDirection : Option[String]
 )
 
 case class SearchableValues(
@@ -79,6 +80,7 @@ case class IndexedControl(
         summary-search={summarySettings.search.toString}
         summary-edit={summarySettings.edit.toString}
         summary-edit-process={summarySettings.editProcess.getOrElse("")}
+        summary-sort-direction={summarySettings.sortDirection.orNull}
         statically-required={staticallyRequired.toString}
         match={matchForControl(control)}
         html-label={htmlLabel.toString}>{

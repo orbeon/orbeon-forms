@@ -579,6 +579,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label>By default, sort by this column</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label>Encrypt data at rest</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -601,6 +605,10 @@
                 <save-data>Save data</save-data>
                 <run-process>Run Process</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending>Ascending</ascending>
+                <descending>Descending</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
@@ -2171,6 +2179,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label>Trier par cette colonne par défaut</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label>Crypter les données au repos</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -2193,6 +2205,10 @@
                 <save-data>Sauvegarder les données</save-data>
                 <run-process>Exécuter le processus</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending>Croissant</ascending>
+                <descending>Décroissant</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
@@ -3748,6 +3764,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -3770,6 +3790,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -5351,6 +5375,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -5373,6 +5401,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -6954,6 +6986,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -6976,6 +7012,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -8521,6 +8561,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label>Daten in der Datenbank verschlüsseln</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -8543,6 +8587,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
@@ -10091,6 +10139,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -10113,6 +10165,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -11686,6 +11742,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -11708,6 +11768,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>Presentación del Control</label>
             </control-appearance>
@@ -13282,6 +13346,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label>Encrypt gegevens in rust</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -13304,6 +13372,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>Control weergave</label>
             </control-appearance>
@@ -14857,6 +14929,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -14879,6 +14955,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -16459,6 +16539,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -16481,6 +16565,10 @@
                 <save-data todo="true">[Save data]</save-data>
                 <run-process todo="true">[Run Process]</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>
@@ -18081,6 +18169,10 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
+                    <label todo="true">[By default, sort by this column]</label>
+                    <value>fr-default-sort-column</value>
+                </item>
+                <item>
                     <label>تشفير البيانات أثناء التخزين</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -18103,6 +18195,10 @@
                 <save-data>حفظ البيانات</save-data>
                 <run-process>تنفيذ العملية</run-process>
             </bulk-edit-actions>
+            <default-sort-column>
+                <ascending todo="true">[Ascending]</ascending>
+                <descending todo="true">[Descending]</descending>
+            </default-sort-column>
             <control-appearance>
                 <label>مظهر عنصر التحكم</label>
             </control-appearance>

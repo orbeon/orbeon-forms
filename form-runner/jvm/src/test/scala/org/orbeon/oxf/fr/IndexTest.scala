@@ -335,29 +335,29 @@ class IndexTest
 
     val expected40 =
       List(
-        IndexedControl("in-summary", "my-section/in-summary",       "xs:string", "input", SummarySettings(search = false, show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = true,  resources = Nil),
-        IndexedControl("in-search",  "my-section/in-search",        "xs:string", "input", SummarySettings(search = true,  show = false, edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("in-both",    "my-section/in-both",          "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("date",       "my-section/date",             "xf:date"  , "date",  SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("in-repeat",  "my-section/repeat/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
+        IndexedControl("in-summary", "my-section/in-summary",       "xs:string", "input", SummarySettings(search = false, show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = true,  resources = Nil),
+        IndexedControl("in-search",  "my-section/in-search",        "xs:string", "input", SummarySettings(search = true,  show = false, edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("in-both",    "my-section/in-both",          "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("date",       "my-section/date",             "xf:date"  , "date",  SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("in-repeat",  "my-section/repeat/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 
     val expected48 =
       List(
-        IndexedControl("in-summary", "my-section/in-summary",                        "xs:string", "input", SummarySettings(search = false, show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = true,  resources = Nil),
-        IndexedControl("in-search",  "my-section/in-search",                         "xs:string", "input", SummarySettings(search = true,  show = false, edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("in-both",    "my-section/in-both",                           "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("date",       "my-section/date",                              "xf:date"  , "date",  SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("in-repeat",  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
+        IndexedControl("in-summary", "my-section/in-summary",                        "xs:string", "input", SummarySettings(search = false, show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = true,  resources = Nil),
+        IndexedControl("in-search",  "my-section/in-search",                         "xs:string", "input", SummarySettings(search = true,  show = false, edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("in-both",    "my-section/in-both",                           "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("date",       "my-section/date",                              "xf:date"  , "date",  SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("in-repeat",  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 
     val expected20191 =
       List(
-        IndexedControl("in-summary", "my-section/my-grid/in-summary",                "xs:string", "input", SummarySettings(search = false, show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = true,  resources = Nil),
-        IndexedControl("in-search",  "my-section/my-grid/in-search",                 "xs:string", "input", SummarySettings(search = true,  show = false, edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("in-both",    "my-section/my-grid/in-both",                   "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("date",       "my-section/my-grid/date",                      "xf:date"  , "date",  SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("in-repeat",  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
+        IndexedControl("in-summary", "my-section/my-grid/in-summary",                "xs:string", "input", SummarySettings(search = false, show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = true,  resources = Nil),
+        IndexedControl("in-search",  "my-section/my-grid/in-search",                 "xs:string", "input", SummarySettings(search = true,  show = false, edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("in-both",    "my-section/my-grid/in-both",                   "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("date",       "my-section/my-grid/date",                      "xf:date"  , "date",  SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("in-repeat",  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false, editProcess = None, sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 
     val appForm = AppForm("test", "index")
@@ -544,12 +544,12 @@ class IndexTest
 
     val expectedIndexedControls =
       List(
-        IndexedControl("control-1", "section-1/grid-1/control-1", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false, editProcess = None                ), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-2", "section-1/grid-1/control-2", "xs:string", "input", SummarySettings(show = true,  search = false,  edit = false, editProcess = None                ), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-3", "section-1/grid-1/control-3", "xs:string", "input", SummarySettings(show = false, search = true,   edit = false, editProcess = None                ), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false, editProcess = None                ), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-5", "section-1/grid-1/control-5", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true , editProcess = None                ), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-7", "section-1/grid-1/control-7", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true , editProcess = Some("process-name")), staticallyRequired = false, htmlLabel = false, resources = Nil)
+        IndexedControl("control-1", "section-1/grid-1/control-1", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false, editProcess = None                , sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-2", "section-1/grid-1/control-2", "xs:string", "input", SummarySettings(show = true,  search = false,  edit = false, editProcess = None                , sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-3", "section-1/grid-1/control-3", "xs:string", "input", SummarySettings(show = false, search = true,   edit = false, editProcess = None                , sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false, editProcess = None                , sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-5", "section-1/grid-1/control-5", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true , editProcess = None                , sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-7", "section-1/grid-1/control-7", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true , editProcess = Some("process-name"), sortDirection = None), staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 
     it("must find the expected indexed controls when using sub-elements instead of classes") {

@@ -52,7 +52,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_VAR_QNAME}
+import org.orbeon.xforms.XFormsNames.XFORMS_VAR_QNAME
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
@@ -569,6 +569,19 @@ object FormBuilderXPathApi {
   def getAllNamesInUseAsString: String = {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     FormBuilder.getAllNamesInUse.mkString(" ")
+  }
+
+  //@XPathFunction
+  def controlsWithSorting(currentControlName: String): String = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    val currentControlNameOpt               = Option(currentControlName)
+
+    FormBuilder
+      .getAllControlsWithIds
+      .filter(control => (control / "*:index" / "*:default-sort-column").nonEmpty)
+      .map(FormRunner.getControlName)
+      .filterNot(currentControlNameOpt.contains)
+      .mkString(" ")
   }
 
   //@XPathFunction

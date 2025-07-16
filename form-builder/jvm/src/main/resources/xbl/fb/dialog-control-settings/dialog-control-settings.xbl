@@ -71,7 +71,7 @@
                 <xf:setvalue ref="$i/multiple-attribute"      value="if ($control/@multiple = 'true') then 'true' else 'false'"/>
 
                 <xf:setvalue ref="$i/fr-index/@enabled"       value="exists($control/fr:index)"/>
-                <xf:action iterate="('summary-show', 'allow-bulk-edit')">
+                <xf:action iterate="('summary-show', 'allow-bulk-edit', 'default-sort-column')">
                     <xf:var name="current"          value="."/>
                     <xf:var name="instance-element" value="$i/*[local-name()                   = concat('fr-', $current)]"/>
                     <xf:var name="control-element"  value="$control/fr:index/fr:*[local-name() = $current]"/>
@@ -107,6 +107,11 @@
                     <!-- Bulk edit action -->
                     <xf:setvalue ref="$instance-element/@action"  value="if (xxf:is-blank($control-element/@process)) then 'save-data' else 'run-process'"/>
                     <xf:setvalue ref="$instance-element/@process" value="$control-element/@process"/>
+
+                    <xf:setvalue
+                        if="$current = 'default-sort-column'"
+                        ref="$instance-element/@direction"
+                        value="if (exists($control-element/@direction)) then $control-element/@direction else 'asc'"/>
                 </xf:action>
                 <xf:setvalue ref="$i/fr-encrypt/@enabled" value="exists($control/fr:encrypt)"/>
 
@@ -489,7 +494,17 @@
                         <xf:delete ref="$control/fr:index"/>
                         <xf:action if="$i/fr-index/@enabled = true()">
                             <xf:insert context="$control" origin="xf:element('fr:index')"/>
-                            <xf:action iterate="('summary-show', 'allow-bulk-edit')">
+
+                            <!-- If sorting is enabled on the current control, first remove sorting on all controls -->
+                            <xf:action if="$i/fr-default-sort-column/@enabled = true()">
+                                <xf:var name="controlsWithSorting" value="fbf:controlsWithSorting(())"/>
+                                <xf:action iterate="xxf:split($controlsWithSorting)">
+                                    <xf:var name="control-name" value="."/>
+                                    <xf:delete ref="fbf:findControlByNameOrEmpty($control-name)/fr:index/fr:default-sort-column"/>
+                                </xf:action>
+                            </xf:action>
+
+                            <xf:action iterate="('summary-show', 'allow-bulk-edit', 'default-sort-column')">
                                 <xf:var name="current"          value="."/>
                                 <xf:var name="instance-element" value="$i/*[local-name() = concat('fr-', $current)]"/>
                                 <xf:action if="$instance-element/@enabled = true()">
@@ -518,6 +533,10 @@
                                                     (),
                                                 if ($instance-element/@action = 'run-process' and xxf:non-blank($instance-element/@process)) then
                                                     xf:attribute('process', $instance-element/@process)
+                                                else
+                                                    (),
+                                                if ($current = 'default-sort-column') then
+                                                    xf:attribute('direction', $instance-element/@direction)
                                                 else
                                                     ()
                                             )
@@ -784,14 +803,15 @@
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
                         <pdf-field-name type="automatic"/>
 
-                        <fr-index           enabled=""/>
-                        <fr-summary-show    enabled="" role-required="" require-role-constraint="" legacy="">
+                        <fr-index               enabled=""/>
+                        <fr-summary-show        enabled="" role-required="" require-role-constraint="" legacy="">
                             <!--<require-role/>-->
                         </fr-summary-show>
-                        <fr-allow-bulk-edit enabled="" role-required="" require-role-constraint="" action="" process="">
+                        <fr-allow-bulk-edit     enabled="" role-required="" require-role-constraint="" action="" process="">
                             <!--<require-role/>-->
                         </fr-allow-bulk-edit>
-                        <fr-encrypt         enabled=""/>
+                        <fr-default-sort-column enabled="" direction=""/>
+                        <fr-encrypt             enabled=""/>
 
                         <default-alert
                             global-default-alert-message=""
@@ -1099,7 +1119,8 @@
                         <xf:constraint id="role-non-duplicated" value=". = '' or not(. = (../require-role except .))"/>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind ref="$i/fr-encrypt/@enabled" type="xs:boolean"/>
+                <xf:bind ref="$i/fr-default-sort-column/@enabled" type="xs:boolean"/>
+                <xf:bind ref="$i/fr-encrypt/@enabled"             type="xs:boolean"/>
 
                 <xf:instance id="processes">
                     <_>
@@ -1249,18 +1270,18 @@
                                                                 (
                                                                     (
                                                                         $selected-values   = 'fr-encrypt'
-                                                                        and $current-value = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit')
+                                                                        and $current-value = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit')
+                                                                        $selected-values   = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')
                                                                         and $current-value = 'fr-encrypt'
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = ('fr-summary-show', 'fr-allow-bulk-edit')
+                                                                        $selected-values   = ('fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')
                                                                         and $current-value = 'fr-index'
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = 'fr-allow-bulk-edit'
+                                                                        $selected-values   = ('fr-allow-bulk-edit', 'fr-default-sort-column')
                                                                         and $current-value = 'fr-summary-show'
                                                                         and xxf:is-blank($i/fr-summary-show/@legacy)
                                                                     )
@@ -1274,8 +1295,9 @@
                                                             name="select-binding"
                                                             value="$base-binding/(if ($checkbox-disabled) then @legacy/string() else @legacy)"/>
 
-                                                        <xf:var name="fr-index-sub-values" value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit')"/>
-                                                        <xf:var name="base-class-name"     value="concat('fb-control-settings-', substring-after($current-value, 'fr-'))"/>
+                                                        <xf:var name="fr-index-sub-values"        value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')"/>
+                                                        <xf:var name="fr-summary-show-sub-values" value="$current-value = ('fr-allow-bulk-edit', 'fr-default-sort-column')"/>
+                                                        <xf:var name="base-class-name"            value="concat('fb-control-settings-', substring-after($current-value, 'fr-'))"/>
 
                                                         <xh:div class="{{if ($fr-index-sub-values) then $base-class-name else ''}}">
                                                             <xf:switch caseref="not(exists($base-binding/@legacy)) or xxf:is-blank($base-binding/@legacy)">
@@ -1292,7 +1314,7 @@
                                                                         <xf:action event="xforms-select" if="$fr-index-sub-values">
                                                                             <xf:setvalue ref="$i/fr-index/@enabled" value="true()"/>
                                                                         </xf:action>
-                                                                        <xf:action event="xforms-select" if="$current-value = 'fr-allow-bulk-edit'">
+                                                                        <xf:action event="xforms-select" if="$fr-summary-show-sub-values">
                                                                             <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
                                                                         </xf:action>
                                                                         <xf:action event="xforms-deselect" if="$fr-index-sub-values">
@@ -1302,6 +1324,9 @@
                                                                         <xf:action event="xforms-deselect" if="$current-value = 'fr-allow-bulk-edit'">
                                                                             <xf:setvalue ref="$base-binding/@action" value="'save-data'"/>
                                                                             <xf:setvalue ref="$base-binding/@process"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-deselect" if="$current-value = 'fr-default-sort-column'">
+                                                                            <xf:setvalue ref="$base-binding/@direction" value="'asc'"/>
                                                                         </xf:action>
                                                                     </fr:checkbox-input>
                                                                 </xf:case>
@@ -1448,6 +1473,22 @@
                                                                                     <xf:input ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']"/>
                                                                                 </xf:case>
                                                                             </xf:switch>
+                                                                        </xf:case>
+                                                                        <xf:case value="false()"/>
+                                                                    </xf:switch>
+
+                                                                    <xf:switch caseref="$current-value = 'fr-default-sort-column' and $i/fr-default-sort-column/@enabled = true()" class="fb-direction">
+                                                                        <xf:case value="true()">
+                                                                            <xf:select1 appearance="full xxf:horizontal" ref="$i/fr-default-sort-column/@direction">
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/default-sort-column/ascending"/>
+                                                                                    <xf:value>asc</xf:value>
+                                                                                </xf:item>
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/default-sort-column/descending"/>
+                                                                                    <xf:value>desc</xf:value>
+                                                                                </xf:item>
+                                                                            </xf:select1>
                                                                         </xf:case>
                                                                         <xf:case value="false()"/>
                                                                     </xf:switch>

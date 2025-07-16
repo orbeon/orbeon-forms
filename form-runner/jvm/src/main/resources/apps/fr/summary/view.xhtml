@@ -287,6 +287,19 @@
                 </search>
             </xf:instance>
 
+            <xf:action event="fr-set-search-instance-sort-attribute">
+                <xf:var name="column" value="instance('fr-order-by')/column"/>
+
+                <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
+                <xf:insert
+                    context="
+                        if ($column = ('created', 'created-by', 'last-modified', 'last-modified-by', 'workflow-stage')) then
+                            instance('fr-search-instance')/query[@metadata = $column]
+                        else
+                            instance('fr-search-instance')/query[@path = $column]"
+                    origin="xf:attribute('sort', instance('fr-order-by')/direction)"/>
+            </xf:action>
+
             <xf:instance id="fr-metadata-search-instance">
                 <search>
                     <created/>
@@ -475,10 +488,6 @@
                     ref="instance('fr-search-instance')/page-size"
                     value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
-                <!-- Reset order by directive to default -->
-                <xf:setvalue ref="instance('fr-order-by')/column"    value="'last-modified'"/>
-                <xf:setvalue ref="instance('fr-order-by')/direction" value="'desc'"/>
-
                 <!-- Create elements holding structured search data -->
                 <xf:delete
                     ref="
@@ -497,6 +506,22 @@
                 <!-- Don't leave nested `<resources>`s -->
                 <xf:delete
                     ref="instance('fr-search-instance')/query/resources"/>
+
+                <!-- Reset order by directive to default -->
+                <xf:setvalue ref="instance('fr-order-by')/column"    value="'last-modified'"/>
+                <xf:setvalue ref="instance('fr-order-by')/direction" value="'desc'"/>
+
+                <!-- Set default sort column, if any -->
+                <xf:action iterate="instance('fr-search-labels-instance')/query[@summary-sort-direction = ('asc', 'desc')]">
+                    <xf:var name="control-path"  value="@path"/>
+                    <xf:var name="sort-direction" value="@summary-sort-direction"/>
+
+                    <xf:setvalue ref="instance('fr-order-by')/column"    value="$control-path"/>
+                    <xf:setvalue ref="instance('fr-order-by')/direction" value="$sort-direction"/>
+
+                    <!-- Update sort attribute in search query -->
+                    <xf:dispatch name="fr-set-search-instance-sort-attribute" targetid="fr-form-model"/>
+                </xf:action>
 
                 <!-- If requested to, only show drafts we can edit for never saved document -->
                 <xf:insert
@@ -852,6 +877,7 @@
 
             </xf:submission>
 
+            <!-- Event dispatched by fr-sortable-th component (click on column header) -->
             <xf:action event="fr-order-by">
                 <xf:var name="column" value="event('column')"/>
 
@@ -872,15 +898,8 @@
 
                 <xf:setvalue ref="instance('fr-order-by')/column" value="$column"/>
 
-                <!-- Set sort attribute in search query -->
-                <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
-                <xf:insert
-                    context="
-                        if ($column = ('created', 'created-by', 'last-modified', 'last-modified-by', 'workflow-stage')) then
-                            instance('fr-search-instance')/query[@metadata = $column]
-                        else
-                            instance('fr-search-instance')/query[@path = $column]"
-                    origin="xf:attribute('sort', instance('fr-order-by')/direction)"/>
+                <!-- Update sort attribute in search query -->
+                <xf:dispatch name="fr-set-search-instance-sort-attribute" targetid="fr-form-model"/>
 
                 <!-- Update search results (do not reset pagination, etc.) -->
                 <xf:send submission="fr-summary-search-submission"/>

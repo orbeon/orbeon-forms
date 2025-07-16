@@ -48,8 +48,8 @@ before_install:
   - sudo chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg
   - sudo apt-get update
   - sudo apt-get install sbt
-  - mkdir -p $HOME/.sbt/launchers/1.11.2
-  - curl -L -o $HOME/.sbt/launchers/1.11.2/sbt-launch.jar https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.2/sbt-launch-1.11.2.jar
+  - mkdir -p $HOME/.sbt/launchers/1.11.3
+  - curl -L -o $HOME/.sbt/launchers/1.11.3/sbt-launch.jar https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.3/sbt-launch-1.11.3.jar
 install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.

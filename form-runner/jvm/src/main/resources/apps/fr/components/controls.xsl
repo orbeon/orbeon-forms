@@ -315,6 +315,20 @@
 
         <xsl:copy>
             <xsl:apply-templates select="@*" mode="#current"/>
+            <xsl:variable name="xxf-r-path" select="
+                (: For instance: `$form-resources/control/alert[2]` → `control.alert.1` :)
+                let
+                    $without-prefix := substring-after(@ref, '$form-resources/'),
+                    $dot            := replace($without-prefix, '/', '.'),
+                    $indexed        := replace($dot, '\[(\d+)\]', '.$1'),
+                    $split-on-dot   := tokenize($indexed, '\.'),
+                    $adjust-index   := for $part in $split-on-dot return
+                                       if ($part castable as xs:integer)
+                                       then string(xs:integer($part) - 1)
+                                       else $part,
+                    $merge          := string-join($adjust-index, '.')
+                return $merge
+            "/>
             <xsl:attribute
                 name="ref"
                 select="

@@ -301,14 +301,20 @@
     <!-- Process dynamic LHHA with parameters -->
     <xsl:template
         match="
-            xf:label              [exists(fr:param)] |
-            xf:help               [exists(fr:param)] |
-            xf:hint               [exists(fr:param)] |
-            xf:alert              [exists(fr:param)] |
-            fr:text               [exists(fr:param)] |
-            fr:short-label        [exists(fr:param)] |
-            fr:iteration-label    [exists(fr:param)] |
-            fr:add-iteration-label[exists(fr:param)]"
+            *[
+                (
+                    self::xf:label               or
+                    self::xf:help                or
+                    self::xf:hint                or
+                    self::xf:alert               or
+                    self::fr:text                or
+                    self::fr:short-label         or
+                    self::fr:iteration-label     or
+                    self::fr:add-iteration-label
+                ) and
+                exists(fr:param)
+            ]
+        "
         mode="within-controls within-grid">
 
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>

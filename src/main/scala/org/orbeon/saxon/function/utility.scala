@@ -16,7 +16,7 @@ package org.orbeon.saxon.function
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing}
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.*
 import org.orbeon.saxon.value.{BooleanValue, StringValue, Value}
 import org.orbeon.saxon.MapFunctions

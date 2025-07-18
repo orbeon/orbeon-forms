@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -41,6 +41,33 @@ class ControlsTest
                     assert(control.getValue(EventCollector.Throw) == "")
                   }
               }
+          }
+        }
+      }
+    }
+
+    describe("#7152: Alert message validation") {
+      val (processorService, docOpt, _) =
+        runFormRunner("issue", "7152", "new")
+
+      val doc = docOpt.get
+
+      it("must show correct alert message for invalid input") {
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+
+            val valueAlertOpt = List(
+              "a" -> Some("Must be int"),
+              "2" -> Some("Must be 1"),
+              "1" -> None
+            )
+
+            val c2Control = resolveObject[XFormsValueControl]("c2-control").get
+            valueAlertOpt.foreach { case (value, expectedAlert) =>
+              setControlValue(c2Control.effectiveId, value)
+              val actualAlert = c2Control.getAlert(EventCollector.Throw)
+              assert(actualAlert == expectedAlert)
+            }
           }
         }
       }

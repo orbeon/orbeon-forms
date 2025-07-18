@@ -144,6 +144,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     proxyURI(
       urlString        = NetUtils.base64BinaryToAnyURI(value, NetUtils.SESSION_SCOPE, logger.logger.logger),
       forEffectiveId   = null, // not used
+      forDownload      = false,
       filename         = filename,
       contentType      = mediatype,
       lastModified     = -1,

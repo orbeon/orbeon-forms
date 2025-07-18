@@ -346,7 +346,7 @@
 
             <xf:var
                 name="disable-download"
-                value="xs:string(fr:component-param-value('allow-download')) = 'false' or fr:mode() = ('pdf', 'email')"/>
+                value="fr:is-browser-environment() or xs:string(fr:component-param-value('allow-download')) = 'false' or fr:mode() = ('pdf', 'email')"/>
 
             <xh:div id="fr-attachment-elem" xxf:control="true" tabindex="-1">
                 <fr:dnd-repeat

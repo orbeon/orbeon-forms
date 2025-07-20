@@ -79,7 +79,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     }
 
     expected match {
-      case expectedBody@ExpectedBody(_, _, _, _, _, _, _, _, _) =>
+      case expectedBody: ExpectedBody =>
 
         assert(resultCode == expectedBody.statusCode)
         // Check body

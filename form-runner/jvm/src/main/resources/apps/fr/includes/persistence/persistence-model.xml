@@ -590,7 +590,7 @@
                 return
                     ($explicit-process-property-tuple-opt, $implicit-process-property-tuple-opt)"/>
 
-        <xf:action if="empty($process-property-tuple-opt) and event('xxf:type') = 'xforms-ready'">
+        <xf:action if="empty($process-property-tuple-opt) and event('xxf:type') = 'fr-run-form-load-action-after-controls'">
             <!-- There is no process to run, and it's the last phase, so we send the response. -->
             <xf:dispatch targetid="fr-persistence-model" name="fr-send-response-action"/>
         </xf:action>

@@ -209,7 +209,7 @@ trait FormRunnerActionsCommon {
 
       // This will be run when the future completes, but in a controlled way
       // Q: Could we make this an `IO`?
-      def continuation(value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])]): Try[Unit] =
+      def continuation(xfcd: XFormsContainingDocument, value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])]): Try[Unit] =
         Try {
           value match {
             case Success((savedAttachments, _, stringOpt)) =>
@@ -245,7 +245,7 @@ trait FormRunnerActionsCommon {
           }
         } .flatten
 
-      (computation, continuation _)
+      (computation, continuation)
     }
 
   def tryRelinquishLease(params: ActionParams): ActionResult = ActionResult.trySync {
@@ -432,7 +432,7 @@ trait FormRunnerActionsCommon {
         IO.sleep(
           Duration(SubmissionUtils.normalizeDurationString(requiredParamByNameUseAvt(params, "sleep", "duration")))
         ),
-        identity
+        (_, computationResult) => computationResult
       )
     }
 }

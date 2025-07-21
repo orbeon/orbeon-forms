@@ -113,7 +113,7 @@ trait SimpleProcessCommon
       .addAsynchronousCompletion(
         description           = message,
         computation           = computation,
-        continuation          = continuation,
+        continuation          = (_, t) => continuation(t),
         awaitInCurrentRequest = Some(Duration.Inf)
       )
 

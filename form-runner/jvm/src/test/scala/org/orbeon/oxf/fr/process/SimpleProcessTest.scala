@@ -22,6 +22,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupp
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{executionContext, runtime}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -362,12 +363,12 @@ extends DocumentTestBase
 
           val io = IO(params.getOrElse(Some("v"), throw new IllegalArgumentException))
 
-          def continuation(t: Try[String]): Try[Any] = {
+          def continuation(xfcd: XFormsContainingDocument,t: Try[String]): Try[Any] = {
             _trace += s"$name-continuation($t)"
             continuationResult
           }
 
-          (io, continuation _)
+          (io, continuation)
         }
     }
 

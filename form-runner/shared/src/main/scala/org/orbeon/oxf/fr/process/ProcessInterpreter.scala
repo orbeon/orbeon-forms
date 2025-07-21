@@ -22,6 +22,8 @@ import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XML_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -168,8 +170,12 @@ trait ProcessInterpreter extends Logging {
                   submitContinuation(
                     s"continuation of process $runningProcessId",
                     computation,
-                    continuation.andThen { initialTry =>
-                      runProcess(processScope, serializedContinuation._2, initialTry)
+                    (computationResult: Try[Any]) => {
+                      runProcess(
+                        processScope,
+                        serializedContinuation._2,
+                        continuation(inScopeContainingDocument, computationResult)
+                      )
                     }
                   )
                 )
@@ -468,11 +474,11 @@ object ProcessInterpreter {
   sealed trait InternalActionResult extends ActionResult
   object ActionResult {
     case class Sync(value: Try[Any])                                                    extends InternalActionResult
-    case class Async[T](value: Try[(IO[T], Try[T] => Try[Any])])                        extends ActionResult
+    case class Async[T](value: Try[(IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])])                        extends ActionResult
     case class Interrupt(message: Option[String], value: Either[Try[Any], Future[Any]]) extends InternalActionResult
 
     def trySync(body: => Any): ActionResult = ActionResult.Sync(Try(body))
-    def tryAsync[T](body: => (IO[T], Try[T] => Try[Any])): ActionResult = ActionResult.Async(Try(body))
+    def tryAsync[T](body: => (IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])): ActionResult = ActionResult.Async(Try(body))
   }
 
   type ActionParams = Map[Option[String], String]

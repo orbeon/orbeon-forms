@@ -464,16 +464,16 @@ class XFormsModelSubmission(
                     .getAsynchronousSubmissionManager
                     .addAsynchronousCompletion(
                       description   = s"submission id: `${thisSubmission.effectiveId}`",
-                      computation   = connectResultIo.flatMap(convertConnectResult), // running asynchronously
-                      continuation  = (connectResultTry: Try[ConnectResult]) =>      // running synchronously when we process the completed submission
+                      computation   = connectResultIo.flatMap(convertConnectResult),  // running asynchronously
+                      continuation  = (xfcd, connectResultTry: Try[ConnectResult]) => // running synchronously when we process the completed submission
                         Left {
                           Try {
-                          containingDocument
-                            .getObjectByEffectiveId(thisSubmission.effectiveId).asInstanceOf[XFormsModelSubmission]
-                            .processAsyncSubmissionResponse(
-                              connectResultTry,
-                              submissionParameters
-                            )
+                            xfcd
+                              .getObjectByEffectiveId(thisSubmission.effectiveId).asInstanceOf[XFormsModelSubmission]
+                              .processAsyncSubmissionResponse(
+                                connectResultTry,
+                                submissionParameters
+                              )
                           }
                         },
                       awaitInCurrentRequest = submissionParameters.responseMustAwait

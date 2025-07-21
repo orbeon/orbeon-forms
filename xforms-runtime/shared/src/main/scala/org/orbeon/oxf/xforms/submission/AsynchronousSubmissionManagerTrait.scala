@@ -43,7 +43,7 @@ trait AsynchronousSubmissionManagerTrait {
     sequence    : Int,
     description : String,
     result      : Try[Any],
-    continuation: Try[Any] => Either[Try[Any], Future[Any]],
+    continuation: (XFormsContainingDocument, Try[Any]) => Either[Try[Any], Future[Any]],
     promise     : Promise[Any]
   )
 
@@ -64,7 +64,7 @@ trait AsynchronousSubmissionManagerTrait {
   def addAsynchronousCompletion[T, U](
     description          : String,
     computation          : IO[T],
-    continuation         : Try[T] => Either[Try[U], Future[U]],
+    continuation         : (XFormsContainingDocument, Try[T]) => Either[Try[U], Future[U]],
     awaitInCurrentRequest: Option[Duration]
   ): Future[U] = {
 
@@ -101,7 +101,7 @@ trait AsynchronousSubmissionManagerTrait {
           sequence,
           description,
           result,
-          continuation.asInstanceOf[Try[Any] => Either[Try[Any], Future[Any]]],
+          continuation.asInstanceOf[(XFormsContainingDocument, Try[Any]) => Either[Try[Any], Future[Any]]],
           p.asInstanceOf[Promise[Any]]
         )
       )
@@ -141,7 +141,7 @@ trait AsynchronousSubmissionManagerTrait {
 
           debug(s"processing asynchronous result `$description`")
           try {
-            continuation(resultTry) match {
+            continuation(containingDocument, resultTry) match {
               case Left(t) =>
                 callerPromise.complete(t)
               case Right(future) =>

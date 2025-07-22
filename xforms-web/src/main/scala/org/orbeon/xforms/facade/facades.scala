@@ -13,12 +13,13 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.{$, YUICustomEvent}
+import org.orbeon.xforms.{$, Page, YUICustomEvent}
 import org.scalajs
 import org.scalajs.dom
 import org.scalajs.dom.Element
 import org.scalajs.dom.{FocusEvent, UIEvent, html, raw}
 import io.udash.wrappers.jquery.JQueryPromise
+import org.orbeon.xforms
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
@@ -79,6 +80,12 @@ class XBLCompanion extends js.Object {
   // Helpers
   private def containerElem: html.Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[html.Element]
   def isMarkedReadonly: Boolean = containerElem.classList.contains("xforms-readonly")
+
+  def getXFormsFormOrThrow: xforms.Form =
+    Page.findXFormsForm(containerElem)
+      .getOrElse(throw new IllegalStateException(
+        s"XBL companion for element `${containerElem.id}` is not associated with a form"
+      ))
 }
 
 @JSGlobal("ORBEON.xforms.XBL")

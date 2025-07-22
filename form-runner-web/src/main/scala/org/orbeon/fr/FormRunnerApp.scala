@@ -72,6 +72,7 @@ object FormRunnerApp extends App {
     xbl.AutosizeTextarea
     xbl.TinyMCE
     xbl.AttachmentMultiple
+    xbl.ImageAttachment
     xbl.Recaptcha
     xbl.FriendlyCaptcha
     xbl.ClipboardCopy

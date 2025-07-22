@@ -23,7 +23,7 @@
     <xbl:binding
         id="fr-image-attachment"
         element="fr|image-attachment"
-        xxbl:mode="binding lhha value"
+        xxbl:mode="binding lhha value javascript-lifecycle"
         xxbl:container="span"
         xxbl:label-for="fr-image-attachment-elem">
 

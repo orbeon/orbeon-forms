@@ -27,11 +27,15 @@ object XFormsApp extends App {
   def clientServerChannel: ClientServerChannel = _clientServerChannel
 
   def onOrbeonApiLoaded(): Unit =
-    onOrbeonApiLoaded(RemoteClientServerChannel)
+    onOrbeonApiLoaded(RemoteClientServerChannel, isBrowserEnvironment = false)
 
-  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel): Unit = {
+  private var _isBrowserEnvironment: Boolean = _
+  def isBrowserEnvironment: Boolean = _isBrowserEnvironment
+
+  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel, isBrowserEnvironment: Boolean): Unit = {
 
     _clientServerChannel = clientServerChannel
+    _isBrowserEnvironment = isBrowserEnvironment
 
     // By this point, `window.ORBEON` is already defined by our jQuery wrapper
     val orbeonDyn = g.window.ORBEON

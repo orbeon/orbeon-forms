@@ -59,7 +59,11 @@ trait TestProcessInterpreter extends ProcessInterpreter {
   def writeSuspendedProcess(processId: String, process: String): Unit = _suspendedProcess = Some(processId -> process)
   def readSuspendedProcess: Try[(String, String)] = Try(_suspendedProcess.get)
 
-  def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U] = ???
+  def submitContinuation[T, U](
+    message     : String,
+    computation : IO[T],
+    continuation: (XFormsContainingDocument, Try[T]) => Either[Try[U], Future[U]]
+  ): Future[U] = ???
 
   // Constant so that we can test properly
   override def createUniqueProcessId: String = ConstantProcessId
@@ -319,16 +323,26 @@ extends DocumentTestBase
           Nil
         )
 
-      val completionQueue = new ConcurrentLinkedQueue[(Try[Any] => Either[Try[Any], Future[Any]], Promise[Any], Try[Any])]
+      val completionQueue = new ConcurrentLinkedQueue[((XFormsContainingDocument, Try[Any]) => Either[Try[Any], Future[Any]], Promise[Any], Try[Any])]
       var pendingList     = List.empty[Future[Any]]
 
-      override def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U] = {
+      override def submitContinuation[T, U](
+        message     : String,
+        computation : IO[T],
+        continuation: (XFormsContainingDocument, Try[T]) => Either[Try[U], Future[U]]
+      ): Future[U] = {
 
         val p = Promise[U]()
 
         def preProcessFutureCompletion(result: Try[T]): Try[T] = {
           // Make sure we add to the completion queue before the `Future` in the pendingList is completed
-          completionQueue.add((continuation.asInstanceOf[Try[Any] => Either[Try[Any], Future[Any]]], p.asInstanceOf[Promise[Any]], result))
+          completionQueue.add(
+            (
+              continuation.asInstanceOf[(XFormsContainingDocument, Try[Any]) => Either[Try[Any], Future[Any]]],
+              p.asInstanceOf[Promise[Any]],
+              result
+            )
+          )
           result
         }
 
@@ -347,7 +361,7 @@ extends DocumentTestBase
         // Do it only once
         Option(completionQueue.poll()).foreach {
           case (continuation, callerPromise, resultTry) =>
-            continuation(resultTry) match {
+            continuation(null /* will not be used in these tests */, resultTry) match {
               case Left(t) =>
                 callerPromise.complete(t)
               case Right(future) =>
@@ -363,7 +377,7 @@ extends DocumentTestBase
 
           val io = IO(params.getOrElse(Some("v"), throw new IllegalArgumentException))
 
-          def continuation(xfcd: XFormsContainingDocument,t: Try[String]): Try[Any] = {
+          def continuation(xfcd: XFormsContainingDocument, t: Try[String]): Try[Any] = {
             _trace += s"$name-continuation($t)"
             continuationResult
           }

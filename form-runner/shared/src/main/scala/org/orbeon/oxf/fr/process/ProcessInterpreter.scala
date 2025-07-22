@@ -55,7 +55,7 @@ trait ProcessInterpreter extends Logging {
   def clearSuspendedProcess(): Unit
   def writeSuspendedProcess(processId: String, process: String): Unit
   def readSuspendedProcess: Try[(String, String)]
-  def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U]
+  def submitContinuation[T, U](message: String, computation: IO[T], continuation: (XFormsContainingDocument, Try[T]) => Either[Try[U], Future[U]]): Future[U]
   def createUniqueProcessId: String = CoreCrossPlatformSupport.randomHexId
   def transactionStart(): Unit
   def transactionRollback(): Unit
@@ -170,11 +170,11 @@ trait ProcessInterpreter extends Logging {
                   submitContinuation(
                     s"continuation of process $runningProcessId",
                     computation,
-                    (computationResult: Try[Any]) => {
+                    (xfcd: XFormsContainingDocument, computationResult: Try[Any]) => {
                       runProcess(
                         processScope,
                         serializedContinuation._2,
-                        continuation(inScopeContainingDocument, computationResult)
+                        continuation(xfcd, computationResult)
                       )
                     }
                   )

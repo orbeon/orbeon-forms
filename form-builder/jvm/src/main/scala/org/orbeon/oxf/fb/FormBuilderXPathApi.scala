@@ -33,6 +33,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
@@ -138,13 +139,13 @@ object FormBuilderXPathApi {
 
   private def saveThenContinue(description: String)(body: => Unit): Unit = {
 
-    def continuation(t: Try[Any]): Either[Try[Unit], Nothing] = t match {
+    def continuation(xfcd: XFormsContainingDocument, t: Try[Any]): Either[Try[Unit], Nothing] = t match {
       case Failure(t) => Left(Failure(t))
       case Success(_) => Left(Try(body))
     }
 
     process.SimpleProcess.runProcessByName("oxf.fr.detail.process", "save") match {
-      case Left(t)       => continuation(t)
+      case Left(t)       => continuation(null /* not used in our continuation above */, t)
       case Right(future) => process.SimpleProcess.submitContinuation(s"continuation of `$description`", IO.fromFuture(IO.pure(future)), continuation)
     }
   }

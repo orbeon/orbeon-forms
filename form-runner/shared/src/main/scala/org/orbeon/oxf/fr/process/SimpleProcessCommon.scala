@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, LoggerFactory, XPath}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -107,13 +108,17 @@ trait SimpleProcessCommon
   def clearSuspendedProcess(): Unit =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, "")
 
-  def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U] =
+  def submitContinuation[T, U](
+    message     : String,
+    computation : IO[T],
+    continuation: (XFormsContainingDocument, Try[T]) => Either[Try[U], Future[U]]
+  ): Future[U] =
     inScopeContainingDocument
       .getAsynchronousSubmissionManager
       .addAsynchronousCompletion(
         description           = message,
         computation           = computation,
-        continuation          = (_, t) => continuation(t),
+        continuation          = continuation,
         awaitInCurrentRequest = Some(Duration.Inf)
       )
 

@@ -922,6 +922,7 @@
                     (
                         @xxf:external-events,
                         if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else (),
+                        'fr-rpc-request',
                         'fb-test-pdf-prepare-data'
                     ),
                     ' '
@@ -1256,6 +1257,29 @@
                     fr:mode() = ('new', 'edit')                                 and
                     xxf:get-request-parameter('fr-show-relevant-errors') = 'true'">
                 fr:run-process('oxf.fr.detail.process', 'show-relevant-errors')
+            </xf:action>
+
+            <!-- RPC entry point -->
+            <xf:action
+                event="fr-rpc-request"
+                observer="#document"
+                type="xpath">
+                frf:processRequest(event('id'), event('path'), event('args'))
+            </xf:action>
+
+            <xf:action
+                event="fr-rpc-response"
+                observer="#document"
+                type="javascript">
+                <xf:param
+                    name="id"
+                    value="event('id')"/>
+                <xf:param
+                    name="response"
+                    value="event('response')"/>
+                <xf:body>
+                    ORBEON.fr.private.API.processRpcResponse(id, response);
+                </xf:body>
             </xf:action>
 
             <!-- Helper for Form Builder test only -->

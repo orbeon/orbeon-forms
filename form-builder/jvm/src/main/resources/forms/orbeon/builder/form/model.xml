@@ -79,7 +79,7 @@
             value="event('id')"/>
         <xf:param
             name="response"
-            value="router:processRequest(event('path'), event('args'))"/>
+            value="router:processRequest(event('id'), event('path'), event('args'))"/>
         <xf:body>
             ORBEON.xforms.RpcClient.processResponse(id, response);
         </xf:body>

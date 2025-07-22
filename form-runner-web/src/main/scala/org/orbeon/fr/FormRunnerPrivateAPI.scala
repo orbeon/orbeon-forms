@@ -13,6 +13,7 @@
   */
 package org.orbeon.fr
 
+import org.orbeon.fr.rpc.FormRunnerRpcClient
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.Page
@@ -35,7 +36,7 @@ object FormRunnerPrivateAPI extends js.Object {
       .foreach(_.allowClientDataStatus = true)
 
   // https://github.com/orbeon/orbeon-forms/issues/4286
-  def setDataStatus(uuid: String, safe: Boolean): Unit = 
+  def setDataStatus(uuid: String, safe: Boolean): Unit =
     Page.findFormByUuid(uuid)
       .foreach(_.formDataSafe = safe)
 
@@ -166,4 +167,7 @@ object FormRunnerPrivateAPI extends js.Object {
       sectionNames.splitTo[Array]().toJSArray
     )
   }
+
+  def processRpcResponse(id: String, response: String): Unit =
+    FormRunnerRpcClient.processResponse(id, response)
 }

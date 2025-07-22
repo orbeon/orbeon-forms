@@ -55,7 +55,7 @@ abstract class RouterBase
   // to a string to send back to the client.
   // TODO: Handle failure response so we can tell the client that the call has failed.
   //@XPathFunction
-  def processRequest(path: String, argsString: String): String = {
+  def processRequest(id: String, path: String, argsString: String): String = {
     val splitPath = path.split("/")
     try {
       debug("RPC: Processing request", List("method" -> (splitPath mkString ".")))

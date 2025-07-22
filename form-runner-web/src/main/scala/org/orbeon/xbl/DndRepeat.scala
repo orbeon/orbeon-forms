@@ -14,9 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Page}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -140,7 +139,7 @@ object DndRepeat {
               AjaxEvent(
                 eventName  = EventNames.XXFormsDnD,
                 targetId   = repeatId,
-                form       = Page.findXFormsForm(containerElem).map(_.elem),
+                form       = Some(getXFormsFormOrThrow.elem),
                 properties = Map(
                   "dnd-start" -> (dndStart + 1),
                   "dnd-end"   -> (dndEnd + 1)

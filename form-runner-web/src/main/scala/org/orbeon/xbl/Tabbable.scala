@@ -13,7 +13,7 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.facades.{Bowser, Dragula, DragulaOptions, Drake}
+import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.*
@@ -128,7 +128,7 @@ object Tabbable {
                 AjaxEvent(
                   eventName  = EventNames.XXFormsDnD,
                   targetId   = repeatId,
-                  form       = Page.findXFormsForm(containerElem).map(_.elem),
+                  form       = Some(getXFormsFormOrThrow.elem),
                   properties = Map(
                     "dnd-start" -> (dndStart + 1),
                     "dnd-end"   -> (dndEnd + 1)

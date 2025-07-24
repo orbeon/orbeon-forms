@@ -32,9 +32,9 @@ case class FormStorageDetails(
 
 sealed trait WhatToReindex
 object WhatToReindex {
-  case object AllData                               extends WhatToReindex
-  case class  DataForDocumentId(documentId: String) extends WhatToReindex
-  case class  DataForForm(appForm: AppFormVersion)  extends WhatToReindex
+  case object AllData                                                               extends WhatToReindex
+  case class  DataForDocumentId(documentId: String, appFormVersion: AppFormVersion) extends WhatToReindex
+  case class  DataForForm(appFormVersion: AppFormVersion)                           extends WhatToReindex
 }
 
 case class SummarySettings(

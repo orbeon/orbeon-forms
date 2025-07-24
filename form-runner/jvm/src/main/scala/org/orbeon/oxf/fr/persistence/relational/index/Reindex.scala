@@ -47,22 +47,25 @@ trait Reindex extends FormDefinition {
   def reindex(
     provider       : Provider,
     whatToReindex  : WhatToReindex,
-    clearOnly      : Boolean
+    clearOnly      : Boolean,
+    connectionOpt  : Option[java.sql.Connection] = None
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): Unit = {
 
     // If a document id was provided, produce WHERE clause, and set parameter
-    val (whereConditions, paramSetter) =
+    val (whereConditions, paramSetter, updateStatus) =
       whatToReindex match {
         case AllData => (
           Nil,
-          (_: PreparedStatement) => ()
+          (_: PreparedStatement) => (),
+          true
         )
-        case DataForDocumentId(id) => (
+        case DataForDocumentId(id, _) => (
           List("document_id = ?"),
-          (ps: PreparedStatement) => ps.setString(1, id)
+          (ps: PreparedStatement) => ps.setString(1, id),
+          false
         )
         case DataForForm((AppForm(app, form), version)) => (
           List(
@@ -74,7 +77,8 @@ trait Reindex extends FormDefinition {
             ps.setString(1, app)
             ps.setString(2, form)
             ps.setInt   (3, version)
-          }
+          },
+          true
         )
       }
 
@@ -99,7 +103,7 @@ trait Reindex extends FormDefinition {
           |     d.deleted = 'N'
           |""".stripMargin
 
-    val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection { connection =>
+    val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection(connectionOpt) { connection =>
 
       // Clear index
       locally {
@@ -162,41 +166,50 @@ trait Reindex extends FormDefinition {
       if (clearOnly)
         return
 
-      // Count how many documents we'll reindex, and tell progress code (side effect)
-      val countSql =
-        s"""|SELECT count(*)
-            |$currentFromWhere
-            |""".stripMargin
-      useAndClose(connection.prepareStatement(countSql)) { ps =>
-        paramSetter(ps)
-        useAndClose(ps.executeQuery()) { rs =>
-          rs.next()
-          val count = rs.getInt(1)
-          Backend.setProviderDocumentTotal(count)
+      if (updateStatus) {
+        // Count how many documents we'll reindex, and tell progress code (side effect)
+        val countSql =
+          s"""|SELECT count(*)
+              |$currentFromWhere
+              |""".stripMargin
+        useAndClose(connection.prepareStatement(countSql)) { ps =>
+          paramSetter(ps)
+          useAndClose(ps.executeQuery()) { rs =>
+            rs.next()
+            val count = rs.getInt(1)
+            Backend.setProviderDocumentTotal(count)
+          }
         }
       }
 
-      val distinctFormsSql =
-        s"""|SELECT DISTINCT
-            |       app,
-            |       form,
-            |       form_version
-            |$currentFromWhere
-            |""".stripMargin
+      whatToReindex match {
+        case DataForDocumentId(_, appFormVersion) =>
+          List(appFormVersion)
+        case DataForForm(appFormVersion) =>
+          List(appFormVersion)
+        case AllData =>
+          val distinctFormsSql =
+            s"""|SELECT DISTINCT
+                |       app,
+                |       form,
+                |       form_version
+                |$currentFromWhere
+                |""".stripMargin
 
-        useAndClose(connection.prepareStatement(distinctFormsSql)) { ps =>
-          paramSetter(ps)
-          useAndClose(ps.executeQuery()) { rs =>
-            var forms = List.empty[AppFormVersion]
-            while (rs.next()) {
-              val app     = rs.getString("app")
-              val form    = rs.getString("form")
-              val version = rs.getInt("form_version")
-              forms = (AppForm(app, form), version) :: forms
+          useAndClose(connection.prepareStatement(distinctFormsSql)) { ps =>
+            paramSetter(ps)
+            useAndClose(ps.executeQuery()) { rs =>
+              var forms = List.empty[AppFormVersion]
+              while (rs.next()) {
+                val app     = rs.getString("app")
+                val form    = rs.getString("form")
+                val version = rs.getInt("form_version")
+                forms = (AppForm(app, form), version) :: forms
+              }
+              forms
             }
-            forms
           }
-        }
+      }
     }
 
     val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
@@ -214,7 +227,7 @@ trait Reindex extends FormDefinition {
         appFormVersion -> indexedControlsXPaths
       }.toMap
 
-    RelationalUtils.withConnection { connection =>
+    RelationalUtils.withConnection(connectionOpt) { connection =>
       // Get all the rows from `orbeon_form_data` that are "latest" and not deleted
       val xmlCol         = Provider.xmlColSelect(provider, "d")
       val selectXmlSql   = s"SELECT $xmlCol FROM orbeon_form_data d WHERE id = ?"
@@ -253,7 +266,9 @@ trait Reindex extends FormDefinition {
                 // Go through each data document
                 while (currentDataRS.next() && StatusStore.getStatus != Status.Stopping) {
 
-                  Backend.setProviderDocumentNext()
+                  if (updateStatus)
+                    Backend.setProviderDocumentNext()
+
                   val app         = currentDataRS.getString("app")
                   val form        = currentDataRS.getString("form")
                   val formVersion = currentDataRS.getInt   ("form_version")

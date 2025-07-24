@@ -30,6 +30,7 @@ class AsynchronousSubmissionManager
         maxDuration => (maxDuration != Duration.Inf).option(initialTime + maxDuration.toMillis)
       }
 
+    // `None` if the batch is empty, or if any duration in the batch is `Duration.Inf`.
     var expirationTimeOpt = computeExpirationTime(batch.map(_._2))
 
     while (batch.nonEmpty) {

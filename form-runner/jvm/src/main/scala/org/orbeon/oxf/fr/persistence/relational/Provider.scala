@@ -151,12 +151,13 @@ object Provider extends Enum[Provider] {
     }
   }
 
-  def withLockedTable(
+  def withLockedTable[T](
     connection : Connection,
     provider   : Provider,
-    tableName  : String,
-    thunk      : () => Unit
-  ): Unit = {
+    tableName  : String
+  )(
+    thunk      : => T
+  ): T = {
     val lockSQLOpt = provider match {
       case MySQL                      => Some(s"LOCK TABLES $tableName WRITE")
       case PostgreSQL                 => Some(s"LOCK TABLE $tableName IN EXCLUSIVE MODE")
@@ -166,7 +167,7 @@ object Provider extends Enum[Provider] {
     // See https://github.com/orbeon/orbeon-forms/issues/3866
     lockSQLOpt.foreach(lockSQL => useAndClose(connection.createStatement())(_.execute(lockSQL)))
     try {
-      thunk()
+      thunk
     } finally {
       val unlockSQLOpt = provider match {
         case MySQL => Some(s"UNLOCK TABLES")

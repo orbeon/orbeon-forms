@@ -111,7 +111,7 @@ trait LockUnlock {
       RelationalUtils.withConnection { connection =>
         def callThunk(leaseStatus: LeaseStatus): Unit =
           thunk(connection, leaseStatus, req.dataPart, reqLockInfo)
-        Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease", () =>
+        Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease") {
           LockSql.readLease(connection, req.provider, req.dataPart) match {
             case Some(lease) =>
               val canUseExistingLease =
@@ -123,7 +123,7 @@ trait LockUnlock {
             case None =>
               callThunk(DoesNotExist)
           }
-        )
+        }
       }
     }
   }

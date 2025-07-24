@@ -181,7 +181,7 @@ object RequestReader {
 trait CreateUpdateDelete {
 
   // NOTE: Gets the first organization if there are multiple organization roots
-  private def currentUserOrganization(connection: Connection, req: CrudRequest): Option[OrganizationId] =
+  private def currentUserOrganization(connection: java.sql.Connection, req: CrudRequest): Option[OrganizationId] =
     req.credentials
       .flatMap(_.defaultOrganization)
       .map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
@@ -190,7 +190,7 @@ trait CreateUpdateDelete {
 
   // TODO: consider splitting into `deleteDrafts()` and `store()`
   private def store(
-    connection     : Connection,
+    connection     : java.sql.Connection,
     req            : CrudRequest,
     reqBodyOpt     : Option[RequestReader.Body],
     delete         : Boolean,
@@ -424,128 +424,151 @@ trait CreateUpdateDelete {
       }
     }
 
+    def reindex(connection: java.sql.Connection): Unit =
+      // Update index if needed
+      if (
+        ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
+        ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
+      ) {
+        val whatToReindex = req.dataPart match {
+          case Some(dataPart) =>
+            // Data: update index for this document id
+            WhatToReindex.DataForDocumentId(dataPart.documentId, appFormVersion = (req.appForm, versionToSet))
+          case None =>
+            // Form definition: update index for this form version
+            WhatToReindex.DataForForm((req.appForm, versionToSet))
+        }
+
+        // If we are deleting a form definition, we should clear the index, but we should not reindex the data after that.
+        // https://github.com/orbeon/orbeon-forms/issues/6915
+        val clearOnly =
+          delete && req.forForm // we know it's not for an attachment as that's tested above
+
+        withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
+          Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly, connectionOpt = Some(connection))
+        }
+      }
+
+    // Is this for a singleton `PUT`?
+    val allowCreateOnlyIfSearchEmpty =
+      req.forData             &&
+      ! delete                &&
+      req.existingRow.isEmpty &&
+      req.singleton.getOrElse(false)
+
     // Update database
-    val storeResult = RelationalUtils.withConnection { connection =>
+    val lastModifiedOpt =
+      try {
+        RelationalUtils.withConnection { connection =>
 
-      // For singleton PUT, check that the search is empty
-      val allowCreateOnlyIfSearchEmpty =
-        req.forData             &&
-        !delete                 &&
-        req.existingRow.isEmpty &&
-        req.singleton.getOrElse(false)
+          if (allowCreateOnlyIfSearchEmpty) {
 
-      if (allowCreateOnlyIfSearchEmpty) {
-        val (_, count) = SearchLogic.doSearch(
-          request = SearchRequest(
-            provider            = req.provider,
-            appForm             = req.appForm,
-            version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
-            credentials         = req.credentials,
-            isInternalAdminUser = false,
-            pageSize            = 1,
-            pageNumber          = 1,
-            queries             = Nil,
-            drafts              = Drafts.IncludeDrafts,
-            freeTextSearch      = None,
-            anyOfOperations     = None
-          ),
-          connectionOpt = Some(connection)
-        )
-        if (count > 0)
+            // This works with PostgreSQL, with:
+            // - using the "serializable" transaction isolation level
+            // - locking the `orbeon_i_current` table
+            // See https://github.com/orbeon/orbeon-forms/issues/7164
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+            Provider.withLockedTable(connection, req.provider, "orbeon_i_current") {
+
+              val (_, count) = SearchLogic.doSearch(
+                request = SearchRequest(
+                  provider            = req.provider,
+                  appForm             = req.appForm,
+                  version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
+                  credentials         = req.credentials,
+                  isInternalAdminUser = false,
+                  pageSize            = 1,
+                  pageNumber          = 1,
+                  queries             = Nil,
+                  drafts              = Drafts.IncludeDrafts,
+                  freeTextSearch      = None,
+                  anyOfOperations     = None
+                ),
+                connectionOpt = Some(connection)
+              )
+              if (count > 0)
+                throw HttpStatusCodeException(StatusCode.Conflict)
+
+              val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
+              reindex(connection)
+              lastModifiedOpt
+            }
+          } else {
+            // This is the normal case, which doesn't require any special locking
+            val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
+            reindex(connection)
+            lastModifiedOpt
+          }
+        }
+      } catch {
+        case _: java.sql.SQLException if allowCreateOnlyIfSearchEmpty =>
+          // See https://github.com/orbeon/orbeon-forms/issues/7164
+          // If we get an error with `allowCreateOnlyIfSearchEmpty == true` we assume that it is a conflict.
+          // Can we do better?
           throw HttpStatusCodeException(StatusCode.Conflict)
       }
 
-      store(connection, req, reqBodyOpt, delete, versionToSet)
+    if (createFlatView)
+      doCreateFlatView(req, reqBodyOpt, versionToSet)
+
+    val httpResponse = externalContext.getResponse
+
+    // Inform caller of the form definition version used
+    httpResponse.setHeader(OrbeonFormDefinitionVersion, versionToSet.toString)
+    // Inform caller of the last modified time of the resource
+    //
+    // This is compatible with RFC7231, see sections 6.3.2, 6.3.5, and 7.2. But note that here we return the last
+    // known modified time associated with the resource, which for a `PUT` is definitely correct, however in the case
+    // of a `DELETE` this means the date the resource was *marked* as deleted. We could argue that this should return
+    // the last modified time of the resource when it was extant. However, for our callers (purge API), it is
+    // necessary to know the last modified time of the resource when it was marked as deleted, so we return that.
+    //
+    // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case,
+    // although we don't have a use for it at the moment.
+    lastModifiedOpt.foreach { lastModified =>
+      httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified))
+      httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified))
     }
 
-    // Update index if needed
-    if (
-      ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
-      ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
-    ) {
-      val whatToReindex = req.dataPart match {
-        case Some(dataPart) =>
-          // Data: update index for this document id
-          WhatToReindex.DataForDocumentId(dataPart.documentId)
-        case None =>
-          // Form definition: update index for this form version
-          WhatToReindex.DataForForm((req.appForm, versionToSet))
-      }
-
-      // If we are deleting a form definition, we should clear the index, but we should not reindex the data after that.
-      // https://github.com/orbeon/orbeon-forms/issues/6915
-      val clearOnly =
-        delete && req.forForm // we know it's not for an attachment as that's tested above
-
-      withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-        Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly)
-      }
-    }
-
-    RelationalUtils.withConnection { connection =>
-      // Create flat view if needed
-      if (createFlatView)
-        withDebug("CRUD: creating flat view") {
-
-          val prefixesInMainViewColumnNames = FormRunner.providerPropertyAsBoolean(
-            req.provider.entryName,
-            "flat-view.prefixes-in-main-view-column-names",
-            default = true
-          )
-
-          val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
-            req.provider.entryName,
-            "flat-view.max-identifier-length",
-            default = FlatView.CompatibilityMaxIdentifierLength
-          )
-
-          FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, prefixesInMainViewColumnNames, maxIdentifierLength)
-        }
-
-      val httpResponse = externalContext.getResponse
-
-      // Inform caller of the form definition version used
-      httpResponse.setHeader(OrbeonFormDefinitionVersion, versionToSet.toString)
-      // Inform caller of the last modified time of the resource
-      //
-      // This is compatible with RFC7231, see sections 6.3.2, 6.3.5, and 7.2. But note that here we return the last
-      // known modified time associated with the resource, which for a `PUT` is definitely correct, however in the case
-      // of a `DELETE` this means the date the resource was *marked* as deleted. We could argue that this should return
-      // the last modified time of the resource when it was extant. However, for our callers (purge API), it is
-      // necessary to know the last modified time of the resource when it was marked as deleted, so we return that.
-      //
-      // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case,
-      // although we don't have a use for it at the moment.
-      storeResult.lastModifiedOpt.foreach { lastModified =>
-        httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified))
-        httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified))
-      }
-
-      if (req.forDataNotAttachment) {
-        for {
-          id           <- storeResult.idOpt
-          lastModified <- storeResult.lastModifiedOpt
-        } {
-          httpResponse.setHeader(
-            Headers.ETag,
-            ETag.eTag(tableName = SqlSupport.tableName(req), id = id, lastModified = lastModified)
-          )
-        }
-      }
-
-      // "If the target resource does not have a current representation and the PUT successfully creates one, then the
-      // origin server MUST inform the user agent by sending a 201 (Created) response. If the target resource does have
-      // a current representation and that representation is successfully modified in accordance with the state of the
-      // enclosed representation, then the origin server MUST send either a 200 (OK) or a 204 (No Content) response to
-      // indicate successful completion of the request." (https://www.rfc-editor.org/rfc/rfc9110#name-put)
-      httpResponse.setStatus(
-        if (delete)
-          StatusCode.NoContent
-        else if (req.existingRow.isDefined)
-          StatusCode.NoContent
-        else
-          StatusCode.Created
-      )
-    }
+    // "If the target resource does not have a current representation and the PUT successfully creates one, then the
+    // origin server MUST inform the user agent by sending a 201 (Created) response. If the target resource does have
+    // a current representation and that representation is successfully modified in accordance with the state of the
+    // enclosed representation, then the origin server MUST send either a 200 (OK) or a 204 (No Content) response to
+    // indicate successful completion of the request." (https://www.rfc-editor.org/rfc/rfc9110#name-put)
+    httpResponse.setStatus(
+      if (delete)
+        StatusCode.NoContent
+      else if (req.existingRow.isDefined)
+        StatusCode.NoContent
+      else
+        StatusCode.Created
+    )
   }
+
+  private def doCreateFlatView(
+    req            : CrudRequest,
+    reqBodyOpt     : Option[RequestReader.Body],
+    versionToSet   : Int
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): Unit =
+    withDebug("CRUD: creating flat view") {
+      RelationalUtils.withConnection { connection =>
+
+        val prefixesInMainViewColumnNames = FormRunner.providerPropertyAsBoolean(
+          req.provider.entryName,
+          "flat-view.prefixes-in-main-view-column-names",
+          default = true
+        )
+
+        val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
+          req.provider.entryName,
+          "flat-view.max-identifier-length",
+          default = FlatView.CompatibilityMaxIdentifierLength
+        )
+
+        FlatView.createFlatViews(req, reqBodyOpt, versionToSet, connection, prefixesInMainViewColumnNames, maxIdentifierLength)
+      }
+    }
 }

@@ -463,12 +463,20 @@ trait CreateUpdateDelete {
 
           if (allowCreateOnlyIfSearchEmpty) {
 
-            // This works with PostgreSQL, with:
-            // - using the "serializable" transaction isolation level
-            // - locking the `orbeon_i_current` table
-            // See https://github.com/orbeon/orbeon-forms/issues/7164
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
-            Provider.withLockedTable(connection, req.provider, "orbeon_i_current") {
+            // https://github.com/orbeon/orbeon-forms/issues/7164
+            val mustLockTable =
+              req.provider match {
+                case Provider.MySQL | Provider.SQLite =>
+                  // Currently, we are unable to support MySQL and SQLite, see issue
+                  false
+                case _ =>
+                  true
+                }
+
+            if (mustLockTable)
+              connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+
+            Provider.maybeWithLockedTable(connection, req.provider, "orbeon_i_current", mustLockTable) {
 
               val (_, count) = SearchLogic.doSearch(
                 request = SearchRequest(

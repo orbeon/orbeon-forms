@@ -151,6 +151,19 @@ object Provider extends Enum[Provider] {
     }
   }
 
+  def maybeWithLockedTable[T](
+    connection : Connection,
+    provider   : Provider,
+    tableName  : String,
+    condition  : Boolean
+  )(
+    thunk      : => T
+  ): T =
+    if (condition)
+      withLockedTable(connection, provider, tableName)(thunk)
+    else
+      thunk
+
   def withLockedTable[T](
     connection : Connection,
     provider   : Provider,

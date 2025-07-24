@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
-import org.orbeon.dom
-import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.SafeRequestContext
-import org.orbeon.oxf.fr.Version._
-import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.Version.*
+import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
+import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpecLike
+
+import scala.concurrent.Await
+import scala.concurrent.duration.{Duration, DurationInt}
+import scala.util.Random
+
 
 class SingletonTest
   extends DocumentTestBase
@@ -74,6 +76,62 @@ class SingletonTest
             HttpAssert.put(dataURL1, Specific(1), formData, StatusCode.Created)
             HttpAssert.put(dataURL2, Specific(1), formData, expectedStatus)
           }
+        }
+      }
+    }
+  }
+
+  describe("Singleton: concurrent attempts to create new form data") {
+    it("must only create a single row in the database for each form") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("singleton document creation") { (_, provider) =>
+
+          // We are unable to support MySQL and SQLite at the moment
+          // See https://github.com/orbeon/orbeon-forms/issues/7164
+          assume(! List(Provider.MySQL, Provider.SQLite).contains(provider))
+
+          import cats.effect.*
+          import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
+
+          def testForForm(formName: String, createNextDelay: => Duration): Assertion = {
+            val ConcurrentRequestsCount = 6 // things get stuck at 8 concurrent requests, so we use 6
+
+            createSingletonForm(provider, isSingleton = true, formName)
+
+            val formData = HttpCall.XML(<form/>.toDocument)
+
+            // We create a list of IOs that will simulate concurrent requests to insert data into the singleton form
+            val ios =
+              (1 to ConcurrentRequestsCount)
+                .map(_ -> createNextDelay)
+                .map { case (i, duration) =>
+                val dataURL = HttpCall.crudURLPrefix(provider, formName) + s"data/$i/data.xml"
+                for {
+                  _ <- IO.sleep(duration)
+                  r <- IO.blocking(HttpCall.put(dataURL, Specific(1), stage = None, formData))
+                } yield
+                  r
+              }
+
+            val responses =
+              Await.result(
+                awaitable = ios.toList.parSequence.unsafeToFuture(),
+                atMost    = Duration.Inf
+              )
+
+            assert(responses.size == ConcurrentRequestsCount)
+
+            assert(responses.count(r => StatusCode.isSuccessCode(r.statusCode)) == 1)
+            assert(responses.count(r => r.statusCode == StatusCode.Conflict) == ConcurrentRequestsCount - 1)
+
+            val dataURL  = HttpCall.crudURLPrefix(provider, formName) + s"data/${ConcurrentRequestsCount + 1}/data.xml"
+            val response = HttpCall.put(dataURL, Specific(1), stage = None, formData)
+
+            assert(response.statusCode == StatusCode.Conflict)
+          }
+
+          testForForm("singleton-no-delay", 0.millis)
+          testForForm("singleton-with-delay", Random.between(0, 20).millis)
         }
       }
     }

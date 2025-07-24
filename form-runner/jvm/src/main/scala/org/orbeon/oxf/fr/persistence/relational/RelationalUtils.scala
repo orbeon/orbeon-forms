@@ -92,10 +92,29 @@ object RelationalUtils extends Logging {
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): T =
-    withConnection(getDataSourceNameFromHeaders)(thunk)
+    withConnection(connectionOpt = None)(thunk)
 
-  def withConnection[T](datasourceName: String)(thunk: Connection => T)(implicit indentedLogger: IndentedLogger): T =
-    useAndClose(getConnection(getDataSource(datasourceName))) { connection =>
+  def withConnection[T](
+    connectionOpt  : Option[java.sql.Connection]
+  )(
+    thunk          : Connection => T
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): T =
+    connectionOpt match {
+      case Some(connection) => thunk(connection)
+      case None             => withConnectionHandleTransaction(getConnection(getDataSource(getDataSourceNameFromHeaders)))(thunk)
+    }
+
+  private def withConnectionHandleTransaction[T](
+    connection    : java.sql.Connection
+  )(
+    thunk         : Connection => T
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): T =
+    useAndClose(connection) { connection =>
       try {
         val result = withDebug("executing block with connection")(thunk(connection))
         debug("about to commit")

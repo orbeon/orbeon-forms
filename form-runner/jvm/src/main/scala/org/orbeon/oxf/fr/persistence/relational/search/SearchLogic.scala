@@ -101,10 +101,7 @@ object SearchLogic {
     else {
       val commonStatementPart = commonPart(request.appForm, request.version, queries, freeTextSearch)
       val bodyPartial         = body(_, List(commonStatementPart, permissionsPart(permissions)), permissions)
-      connectionOpt match {
-        case Some(connection) => bodyPartial(connection)
-        case None             => RelationalUtils.withConnection(bodyPartial)
-      }
+      RelationalUtils.withConnection(connectionOpt)(bodyPartial)
     }
   }
 

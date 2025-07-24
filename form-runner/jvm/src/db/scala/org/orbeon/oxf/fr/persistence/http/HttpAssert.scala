@@ -44,12 +44,12 @@ private[persistence] object HttpAssert extends XMLSupport {
     body              : HttpCall.Body,
     operations        : Operations,
     formVersion       : Option[Int],
-    stage             : Option[Stage] = None,
+    stage             : Option[Stage]  = None,
     contentRangeHeader: Option[String] = None,
     etag              : Option[String] = None,
     hashAlgorithm     : Option[String] = None,
     hashValue         : Option[String] = None,
-    statusCode        : Int = StatusCode.Ok
+    statusCode        : Int            = StatusCode.Ok
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
 
@@ -67,7 +67,8 @@ private[persistence] object HttpAssert extends XMLSupport {
     version       : Version,
     expected      : Expected,
     credentials   : Option[Credentials] = None,
-    httpRange     : Option[HttpRange] = None)(implicit
+    httpRange     : Option[HttpRange  ] = None
+  )(implicit
     logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Unit = {
@@ -170,11 +171,11 @@ private[persistence] object HttpAssert extends XMLSupport {
   }
 
   def lock(
-    url          : String,
-    lockInfo     : LockInfo,
-    expectedCode : Int
+    url           : String,
+    lockInfo      : LockInfo,
+    expectedCode  : Int
   )(implicit
-    logger       : IndentedLogger,
+    logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.lock(url, lockInfo, 60)
@@ -182,11 +183,11 @@ private[persistence] object HttpAssert extends XMLSupport {
   }
 
   def unlock(
-    url         : String,
-    lockInfo    : LockInfo,
-    expectedCode: Int
+    url           : String,
+    lockInfo      : LockInfo,
+    expectedCode  : Int
   )(implicit
-    logger      : IndentedLogger,
+    logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Unit = {
     val actualCode = HttpCall.unlock(url, lockInfo)

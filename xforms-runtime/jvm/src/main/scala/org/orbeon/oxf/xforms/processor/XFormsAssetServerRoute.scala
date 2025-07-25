@@ -431,7 +431,7 @@ object XFormsAssetServerRoute extends NativeRoute {
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
   def jProxyURI(urlString: String, contentType: String): String =
-    proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null).toString
+    proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null).map(_.toString).getOrElse("")
 
   // Try to remove a dynamic resource
   //

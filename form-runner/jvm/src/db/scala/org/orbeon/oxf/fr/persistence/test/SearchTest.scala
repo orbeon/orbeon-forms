@@ -633,7 +633,7 @@ class SearchTest
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
           val testForm  = TestForm(provider, controls = Seq(TestForm.Control("control label")))
-          val version   = Version.Specific(1)
+          val SpecificVersion1   = Version.Specific(1)
 
           def readCount(tableName: String, deleted: Option[Boolean] = None): Int = {
             val sql =
@@ -641,7 +641,7 @@ class SearchTest
                  |  FROM $tableName
                  | WHERE app          = '${testForm.appForm.app}'
                  |   AND form         = '${testForm.appForm.form}'
-                 |   AND form_version = ${version.version}
+                 |   AND form_version = ${SpecificVersion1.version}
                  |   ${deleted match {
                    case Some(d) => s"AND deleted = '${if (d) "Y" else "N"}'"
                    case None    => ""
@@ -663,7 +663,7 @@ class SearchTest
                  |   SELECT data_id FROM orbeon_i_current
                  |   WHERE app          = '${testForm.appForm.app}'
                  |     AND form         = '${testForm.appForm.form}'
-                 |     AND form_version = ${version.version}
+                 |     AND form_version = ${SpecificVersion1.version}
                  | )
                """.stripMargin
             useAndClose(connection.prepareStatement(sql)) { ps =>
@@ -676,8 +676,8 @@ class SearchTest
 
           val DataCount = 225
 
-          testForm.putFormDefinition(version)
-          testForm.putFormData(version, 1 to DataCount map (i => FormData(i.toString, s"v$i")))
+          testForm.putFormDefinition(SpecificVersion1)
+          testForm.putFormData(SpecificVersion1, 1 to DataCount map (i => FormData(i.toString, s"v$i")))
 
           // 1. Test that form data is indexed
           assert(readCount("orbeon_i_current") == DataCount)
@@ -686,7 +686,7 @@ class SearchTest
 
           // 2. Delete form definition
           val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-          HttpAssert.del(formURL, version, StatusCode.NoContent)
+          HttpAssert.del(formURL, SpecificVersion1, StatusCode.NoContent)
 
           // 3. Test that index tables are now empty, but the data is still there
           assert(readCount("orbeon_i_current") == 0)
@@ -694,7 +694,7 @@ class SearchTest
           assert(readCountFromIndex == 0)
 
           // 4. Put form definition again and test that data is indexed again
-          testForm.putFormDefinition(version)
+          testForm.putFormDefinition(SpecificVersion1)
 
           assert(readCount("orbeon_i_current") == DataCount)
           assert(readCount("orbeon_form_data") == DataCount)
@@ -704,7 +704,7 @@ class SearchTest
           assertCall(
             actualRequest = HttpCall.SolicitedRequest(
               path    = HttpCall.reindexURL(provider, testForm.appForm.form),
-              version = version,
+              version = SpecificVersion1,
               method  = HttpMethod.POST
             ),
             assertResponse = actualResponse => {
@@ -721,7 +721,7 @@ class SearchTest
           assertCall(
             actualRequest = HttpCall.SolicitedRequest(
               path    = HttpCall.batchDeleteURL(provider, testForm.appForm.form),
-              version = version,
+              version = SpecificVersion1,
               method  = HttpMethod.DELETE
             ),
             assertResponse = actualResponse => {

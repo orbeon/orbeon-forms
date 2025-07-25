@@ -424,7 +424,7 @@ trait CreateUpdateDelete {
       }
     }
 
-    def reindex(connection: java.sql.Connection): Unit =
+    def reindex(connectionOpt: Option[java.sql.Connection]): Unit =
       // Update index if needed
       if (
         ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
@@ -445,7 +445,7 @@ trait CreateUpdateDelete {
           delete && req.forForm // we know it's not for an attachment as that's tested above
 
         withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-          Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly, connectionOpt = Some(connection))
+          Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly, connectionOpt)
         }
       }
 
@@ -458,53 +458,46 @@ trait CreateUpdateDelete {
 
     // Update database
     val lastModifiedOpt =
+    if (allowCreateOnlyIfSearchEmpty) {
+      // https://github.com/orbeon/orbeon-forms/issues/7164
       try {
         RelationalUtils.withConnection { connection =>
 
-          if (allowCreateOnlyIfSearchEmpty) {
+          val mustLockTable =
+            req.provider match {
+              case Provider.MySQL | Provider.SQLite =>
+                // Currently, we are unable to support MySQL and SQLite, see issue
+                false
+              case _ =>
+                true
+              }
 
-            // https://github.com/orbeon/orbeon-forms/issues/7164
-            val mustLockTable =
-              req.provider match {
-                case Provider.MySQL | Provider.SQLite =>
-                  // Currently, we are unable to support MySQL and SQLite, see issue
-                  false
-                case _ =>
-                  true
-                }
+          if (mustLockTable)
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
 
-            if (mustLockTable)
-              connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+          Provider.maybeWithLockedTable(connection, req.provider, "orbeon_i_current", mustLockTable) {
 
-            Provider.maybeWithLockedTable(connection, req.provider, "orbeon_i_current", mustLockTable) {
+            val (_, count) = SearchLogic.doSearch(
+              request = SearchRequest(
+                provider            = req.provider,
+                appForm             = req.appForm,
+                version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
+                credentials         = req.credentials,
+                isInternalAdminUser = false,
+                pageSize            = 1,
+                pageNumber          = 1,
+                queries             = Nil,
+                drafts              = Drafts.IncludeDrafts,
+                freeTextSearch      = None,
+                anyOfOperations     = None
+              ),
+              connectionOpt = Some(connection)
+            )
+            if (count > 0)
+              throw HttpStatusCodeException(StatusCode.Conflict)
 
-              val (_, count) = SearchLogic.doSearch(
-                request = SearchRequest(
-                  provider            = req.provider,
-                  appForm             = req.appForm,
-                  version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
-                  credentials         = req.credentials,
-                  isInternalAdminUser = false,
-                  pageSize            = 1,
-                  pageNumber          = 1,
-                  queries             = Nil,
-                  drafts              = Drafts.IncludeDrafts,
-                  freeTextSearch      = None,
-                  anyOfOperations     = None
-                ),
-                connectionOpt = Some(connection)
-              )
-              if (count > 0)
-                throw HttpStatusCodeException(StatusCode.Conflict)
-
-              val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
-              reindex(connection)
-              lastModifiedOpt
-            }
-          } else {
-            // This is the normal case, which doesn't require any special locking
             val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
-            reindex(connection)
+            reindex(Some(connection))
             lastModifiedOpt
           }
         }
@@ -515,6 +508,15 @@ trait CreateUpdateDelete {
           // Can we do better?
           throw HttpStatusCodeException(StatusCode.Conflict)
       }
+    } else {
+      // This is the normal case, which doesn't require any special locking
+      val lastModifiedOpt =
+        RelationalUtils.withConnection { connection =>
+          store(connection, req, reqBodyOpt, delete, versionToSet)
+        }
+      reindex(None)
+      lastModifiedOpt
+    }
 
     if (createFlatView)
       doCreateFlatView(req, reqBodyOpt, versionToSet)

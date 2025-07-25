@@ -465,11 +465,9 @@ trait CreateUpdateDelete {
 
           val mustLockTable =
             req.provider match {
-              case Provider.MySQL | Provider.SQLite =>
-                // Currently, we are unable to support MySQL and SQLite, see issue
-                false
-              case _ =>
-                true
+              case Provider.PostgreSQL | Provider.SQLServer => true  // supported
+              case Provider.Oracle     | Provider.DB2       => false // can hopefully be supported
+              case Provider.MySQL      | Provider.SQLite    => false // might be supported
               }
 
           if (mustLockTable)

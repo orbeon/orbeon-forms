@@ -86,9 +86,9 @@ class SingletonTest
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("singleton document creation") { (_, provider) =>
 
-          // We are unable to support MySQL and SQLite at the moment
+          // Whitelist supported providers
           // See https://github.com/orbeon/orbeon-forms/issues/7164
-          assume(! List(Provider.MySQL, Provider.SQLite).contains(provider))
+          assume(List(Provider.PostgreSQL, Provider.SQLServer).contains(provider))
 
           import cats.effect.*
           import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime

@@ -340,9 +340,7 @@
                 select="
                     concat(
                         'xxf:r(''',
-                            frf:controlNameFromId(../@id),
-                            '.',
-                            local-name(),
+                            $xxf-r-path,
                             ''',''fr-form-resources'',',
                             fr:build-template-param-map(
                                 fr:param,

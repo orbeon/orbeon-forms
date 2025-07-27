@@ -63,7 +63,7 @@ val AutowireVersion                  = "0.3.3"
 val ScalatagsVersion                 = "0.13.1"
 val SbinaryVersion                   = "0.5.1"
 val Log4sVersion                     = "1.10.0"
-val PPrintVersion                    = "0.9.0"
+val PPrintVersion                    = "0.9.3"
 
 // Java libraries
 val SaxonJvmVersion                  = "9.1.0.8.4"

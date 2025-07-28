@@ -119,7 +119,7 @@
                 <xsl:variable name="insert"                   select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
                 <xsl:variable name="use-wizard-repeat-paging" select="$root/@view-appearance = 'wizard' and $root/@page-size = '1'"/>
-                <xsl:variable name="use-pager"                select="not($root/@view-appearance = 'wizard') and $root/@page-size/xs:integer(.) gt 0"/>
+                <xsl:variable name="use-pager"                select="$root/@page-size/xs:integer(.) gt 1"/>
 
                 <xsl:template match="/*">
                     <xh:div xxf:control="true" class="{'fr-repeat-container', 'fr-repeater-paging'[$use-wizard-repeat-paging], @class}">

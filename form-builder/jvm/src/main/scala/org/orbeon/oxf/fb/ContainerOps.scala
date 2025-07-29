@@ -16,9 +16,9 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.XMLNames.*
 import org.orbeon.oxf.fr.FormRunner.*
-import org.orbeon.oxf.fr.FormRunnerTemplatesOps
 import org.orbeon.oxf.fr.NodeInfoCell.*
 import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerTemplatesOps}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
@@ -54,7 +54,7 @@ trait ContainerOps extends ControlOps {
 
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(implicit ctx: FormBuilderDocContext): NodeColl =
-    FormBuilder.getAllControlsWithIds filter IsContainer
+    FormRunner.getAllContainersWithIds
 
   def getAllContainerControls(inDoc: NodeInfo): NodeColl = getFormRunnerBodyElem(inDoc) descendant * filter IsContainer
 

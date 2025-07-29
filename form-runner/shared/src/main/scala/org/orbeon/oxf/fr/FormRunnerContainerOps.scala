@@ -175,4 +175,9 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       // https://github.com/orbeon/orbeon-forms/issues/4786
       IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
     }
+
+  def getAllContainersWithIds(implicit ctx: FormRunnerDocContext): NodeColl =
+    getAllControlsWithIds filter { elem =>
+      IsContainer(elem)
+    }
 }

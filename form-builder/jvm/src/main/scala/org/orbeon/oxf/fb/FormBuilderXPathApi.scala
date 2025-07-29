@@ -577,8 +577,8 @@ object FormBuilderXPathApi {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     val currentControlNameOpt               = Option(currentControlName)
 
-    FormBuilder
-      .getAllControlsWithIds
+    FormRunner
+      .getAllControlsWithIdsExcludeContainers
       .filter(control => (control / "*:index" / "*:default-sort-column").nonEmpty)
       .map(FormRunner.getControlName)
       .filterNot(currentControlNameOpt.contains)
@@ -815,7 +815,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllControlsWithIds: Iterable[NodeInfo] =
-    FormBuilder.getAllControlsWithIds(FormBuilderDocContext())
+    FormRunner.getAllControlsWithIdsExcludeContainers(FormBuilderDocContext())
 
   //@XPathFunction
   def getControlsLabelValueItemset(): Iterable[NodeInfo] = {
@@ -825,7 +825,7 @@ object FormBuilderXPathApi {
     val someResourcesMap =
       Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap) // accelerate resources lookups
 
-    FormBuilder.getAllControlsWithIds.map { controlElem =>
+    FormRunner.getAllControlsWithIdsExcludeContainers.map { controlElem =>
       val controlId    = controlElem.id
       val controlName  = FormRunner.controlNameFromId(controlId)
       val controlLabel =

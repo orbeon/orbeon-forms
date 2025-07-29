@@ -329,7 +329,4 @@ trait ResourcesOps extends BaseOps {
       )
     }
   }
-
-  def getAllControlsWithIds(implicit ctx: FormBuilderDocContext): NodeColl =
-    FormRunner.getAllControlsWithIdsExcludeContainers
 }

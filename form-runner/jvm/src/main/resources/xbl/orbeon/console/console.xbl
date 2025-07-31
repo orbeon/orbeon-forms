@@ -140,7 +140,7 @@
                 <fr:tabbable>
                     <fr:tab>
                         <xf:label ref="xxf:r('formula-errors')"/>
-                        <fr:grid id="fr-console-formulas-grid" bind="formulas-bind" repeat="content" readonly="true" columns="24" template="()" number-rows="true">
+                        <fr:grid id="fr-console-formulas-grid" bind="formulas-bind" repeat="content" readonly="true" columns="24" template="()" number-rows="true" iteration-name="_">
                             <fr:c x="1" y="1" w="4">
                                 <xf:output id="formula-bind-name-control" bind="formula-bind-name-bind">
                                     <xf:label appearance="minimal" ref="xxf:r('control-name')"/>

@@ -133,14 +133,14 @@ object SubmissionUtils {
     XFormsCrossPlatformSupport.hmacStringToHexShort(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""))
 
   def readByteArray(
-    headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI,
-    method              : HttpMethod              = HttpMethod.GET,
-    content             : Option[StreamedContent] = None,
+    headersGetter      : String => Option[List[String]],
+    resolvedAbsoluteUrl: URI,
+    method             : HttpMethod              = HttpMethod.GET,
+    content            : Option[StreamedContent] = None,
   )(implicit
-    logger              : IndentedLogger,
-    externalContext     : ExternalContext,
-    resourceResolver    : Option[ResourceResolver]
+    logger             : IndentedLogger,
+    externalContext    : ExternalContext,
+    resourceResolver   : Option[ResourceResolver]
   ): Array[Byte] =
     processConnection(resolvedAbsoluteUrl, headersGetter, method, content) { case (is, _) =>
       inputStreamToByteArray(is)
@@ -154,15 +154,15 @@ object SubmissionUtils {
   }
 
   def readTinyTree(
-    headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI,
-    handleXInclude      : Boolean,
-    method              : HttpMethod              = HttpMethod.GET,
-    content             : Option[StreamedContent] = None,
+    headersGetter      : String => Option[List[String]],
+    resolvedAbsoluteUrl: URI,
+    handleXInclude     : Boolean,
+    method             : HttpMethod              = HttpMethod.GET,
+    content            : Option[StreamedContent] = None,
   )(implicit
-    logger              : IndentedLogger,
-    externalContext     : ExternalContext,
-    resourceResolver    : Option[ResourceResolver]
+    logger             : IndentedLogger,
+    externalContext    : ExternalContext,
+    resourceResolver   : Option[ResourceResolver]
   ): (DocumentNodeInfoType, Map[String, List[String]]) =
     processConnection(resolvedAbsoluteUrl, headersGetter, method, content) { case (is, headers) =>
       XFormsCrossPlatformSupport.readTinyTree(
@@ -175,30 +175,30 @@ object SubmissionUtils {
     }
 
   private def processConnection[T](
-    url          : URI,
-    headersGetter: String => Option[List[String]],
-    method       : HttpMethod,
-    content      : Option[StreamedContent],
+    url             : URI,
+    headersGetter   : String => Option[List[String]],
+    method          : HttpMethod,
+    content         : Option[StreamedContent],
   )(
-    body                : (InputStream, Map[String, List[String]]) => T
+    body            : (InputStream, Map[String, List[String]]) => T
   )(implicit
-    logger              : IndentedLogger,
-    externalContext     : ExternalContext,
-    resourceResolver    : Option[ResourceResolver]
+    logger          : IndentedLogger,
+    externalContext : ExternalContext,
+    resourceResolver: Option[ResourceResolver]
   ): T = {
     val cxr = openConnection(method, url, content, headersGetter)
     ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(body(_, cxr.headers))
   }
 
   private def openConnection(
-    method       : HttpMethod,
-    url          : URI,
-    content      : Option[StreamedContent],
-    headersGetter: String => Option[List[String]],
+    method          : HttpMethod,
+    url             : URI,
+    content         : Option[StreamedContent],
+    headersGetter   : String => Option[List[String]],
   )(implicit
-    logger              : IndentedLogger,
-    externalContext     : ExternalContext,
-    resourceResolver    : Option[ResourceResolver]
+    logger          : IndentedLogger,
+    externalContext : ExternalContext,
+    resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
 
     implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
@@ -266,7 +266,7 @@ object SubmissionUtils {
     } else
       Map.empty[String, List[String]]
 
-  private def forwardResponseHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit =
+  private def forwardResponseHeaders(cxr: ConnectionResultT[?], response: ExternalContext.Response): Unit =
     for {
       (headerName, headerValues) <- http.Headers.proxyHeaders(cxr.headers, request = false)
       headerValue                <- headerValues
@@ -279,7 +279,7 @@ object SubmissionUtils {
     forwardResponseHeaders(cxr, response)
   }
 
-  def forwardStatusContentTypeAndHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit = {
+  def forwardStatusContentTypeAndHeaders(cxr: ConnectionResultT[?], response: ExternalContext.Response): Unit = {
     response.setStatus(cxr.statusCode)
     cxr.content.contentType.foreach(response.setContentType)
     forwardResponseHeaders(cxr, response)

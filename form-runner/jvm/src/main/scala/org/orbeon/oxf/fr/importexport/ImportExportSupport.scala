@@ -400,12 +400,13 @@ object ImportExportSupport {
     ec.getRequest.getFirstParamAsString("document-id").flatMap(_.trimAllToOpt)
 
   def readFormDataIfDocumentIdPresentAndAuthorizedOrThrow(
-    appForm         : AppForm,
-    documentId      : String,
-    form            : om.DocumentInfo,
-    modeType        : ModeType)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    appForm        : AppForm,
+    documentId     : String,
+    form           : om.DocumentInfo,
+    modeType       : ModeType
+  )(implicit
+    logger         : IndentedLogger,
+    externalContext: ExternalContext
   ): (DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type) = {
 
     debug(s"document id provided: `$documentId`")

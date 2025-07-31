@@ -34,11 +34,11 @@ object Transforms {
 
   // TODO: Move this.
   def loadComponentBindings(
-    appForm         : AppForm,
-    frDocCtx        : FormRunnerDocContext
+    appForm        : AppForm,
+    frDocCtx       : FormRunnerDocContext
   )(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    logger         : IndentedLogger,
+    externalContext: ExternalContext
   ): DocumentInfo = {
 
     val (globalLibraryVersionOpt, specialLibraryVersionOpt, appLibraryVersionOpt) =
@@ -68,10 +68,11 @@ object Transforms {
   }
 
   def readFormData(
-    appForm         : AppForm,
-    documentId      : String)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    appForm        : AppForm,
+    documentId     : String
+  )(implicit
+    logger         : IndentedLogger,
+    externalContext: ExternalContext
   ): (DocumentInfo, Map[String, List[String]]) =
     SubmissionUtils.readTinyTree(
       headersGetter       = _ => None, // Q: Do we need any header forwarding here?

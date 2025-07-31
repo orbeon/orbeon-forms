@@ -8,11 +8,13 @@
 package org.orbeon.oxf.util
 
 /*
- * Variant on the Scala DynamicVariable which removes the ThreadLocal value after usage.
+ * Variant on the Scala `DynamicVariable` which removes the `ThreadLocal` value after usage.
  *
- * This is important when the thread is handled by a third-party, such as a servlet container.
+ * This is important when the thread is handled by a third party, such as a servlet container.
  */
 class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = true) {
+
+  self =>
 
   protected val threadLocal: ThreadLocal[Option[T]] =
     if (isInheritable)
@@ -27,7 +29,7 @@ class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = 
   def value: Option[T] = threadLocal.get match {
     case some @ Some(_) => some
     case None =>
-      threadLocal.remove() // because get above creates the ThreadLocal if missing
+      threadLocal.remove() // because `get` above creates the ThreadLocal if missing
       None
   }
 
@@ -37,15 +39,15 @@ class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = 
 
   def withValue[S](value: T)(thunk: => S): S = {
 
-    val oldValue = threadLocal.get
-    threadLocal set Some(value)
+    val oldValueOpt = self.value
+    self.value = value
 
     try
       thunk
     finally
-      oldValue match {
-        case some @ Some(_) => threadLocal set some
-        case None => threadLocal.remove()
+      oldValueOpt match {
+        case Some(oldValue) => self.value = oldValue
+        case None           => self.clear()
       }
   }
 

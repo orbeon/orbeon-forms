@@ -75,7 +75,7 @@ object Connection extends ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
 
-    implicit val connectionCtx : ConnectionContexts = ConnectionContextSupport.findContext(Map.empty)
+    implicit val connectionCtx : ConnectionContexts = EmptyConnectionContexts
     implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
     val (cookieStore, cxr) =

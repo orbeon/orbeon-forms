@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.persistence.http
 
 import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext}
-import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlogrithm, OrbeonHashValue}
+import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
@@ -52,6 +52,15 @@ private[persistence] object HttpAssert extends XMLSupport {
     statusCode        : Int = StatusCode.Ok
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
+
+  private def assertETag(headers: Map[String, List[String]], expectedETagOpt: Option[String]): Unit =
+    expectedETagOpt.foreach { expectedEtag =>
+      val etagValues = Headers.allItemsIgnoreCase(headers, Headers.ETag).toSet
+      expectedEtag match {
+        case "*"   => assert(etagValues.nonEmpty)
+        case value => assert(etagValues.contains(value))
+      }
+    }
 
   def get(
     url           : String,
@@ -96,13 +105,7 @@ private[persistence] object HttpAssert extends XMLSupport {
           assert(resultContentRangeHeader.contains(expectedContentRangeHeader))
         }
         // Check ETag header if specified
-        expectedBody.etag.foreach { expectedEtag =>
-          val etagHeader = headers.get("etag")
-          expectedEtag match {
-            case "*"   => assert(etagHeader.isDefined)
-            case value => assert(etagHeader.contains(List(value)))
-          }
-        }
+        assertETag(headers, expectedBody.etag)
         // Check hash algorithm header if specified
         expectedBody.hashAlgorithm.foreach { expectedHashAlgorithm =>
           val hashAlgorithmHeader = headers.get(OrbeonHashAlogrithm.toLowerCase)
@@ -142,13 +145,15 @@ private[persistence] object HttpAssert extends XMLSupport {
     stage         : Option[Stage]       = None,
     ifMatch       : Option[String]      = None,
     hashAlgorithm : Option[String]      = None,
-    hashValue     : Option[String]      = None
+    hashValue     : Option[String]      = None,
+    expectedETag  : Option[String]      = None
   )(implicit
     logger        : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Unit = {
-    val actualCode = HttpCall.put(url, version, stage, body, credentials, ifMatch, hashAlgorithm, hashValue).statusCode
-    assert(actualCode == expectedCode)
+    val httpResponse = HttpCall.put(url, version, stage, body, credentials, ifMatch, hashAlgorithm, hashValue)
+    assert(httpResponse.statusCode == expectedCode)
+    assertETag(httpResponse.headers, expectedETag)
   }
 
   def del(

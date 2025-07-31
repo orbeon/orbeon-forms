@@ -771,21 +771,21 @@ class RestApiTest
           }
 
           // We get an ETag
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created, expectedETag = Some("*"))
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some("*")))
 
           // The ETag is different after a subsequent PUT
           val firstETag = getETag
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some(firstETag)))
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent)
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent, expectedETag = Some("*"))
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), etag = Some("*")))
           val secondETag = getETag
           assert(firstETag != secondETag)
 
           // If-Match with a non-matching (fails), matching (succeeds), and wildcard "*" ETag (succeeds)
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.PreconditionFailed, ifMatch = Some("123"))
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some(secondETag))
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some("*"))
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.PreconditionFailed, ifMatch = Some("123")     , expectedETag = None)
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some(secondETag), expectedETag = Some("*"))
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some("*")       , expectedETag = Some("*"))
         }
       }
     }

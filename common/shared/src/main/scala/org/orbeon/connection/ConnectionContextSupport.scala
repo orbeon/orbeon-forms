@@ -24,6 +24,22 @@ trait ConnectionContextSupportTrait {
   )(implicit
     connectionCtx: ConnectionContexts
   ): T
+
+  def maybeWithContext[T](
+    url          : URI,
+    method       : HttpMethod,
+    headers      : Map[String, List[String]],
+    extension    : Map[String, Any],
+    condition    : Boolean
+  )(
+    body         : => T
+  )(implicit
+    connectionCtx: ConnectionContexts
+  ): T =
+    if (condition)
+      withContext(url, method, headers, extension)(body)
+    else
+      body
 }
 
 object ConnectionContextSupport extends ConnectionContextSupportPlatform with ConnectionContextSupportTrait {

@@ -86,7 +86,8 @@ object Connection extends ConnectionTrait {
         content     = content,
         headers     = headers,
         loadState   = loadState,
-        logBody     = logBody
+        logBody     = logBody,
+        isAsync     = false
       )
 
     if (saveState)
@@ -145,7 +146,8 @@ object Connection extends ConnectionTrait {
             content     = requestStreamedContentOpt,
             headers     = headers,
             loadState   = loadState,
-            logBody     = logBody
+            logBody     = logBody,
+            isAsync     = true
           )(
             logger         = newLogger,
             safeRequestCtx = safeRequestCtx,
@@ -376,7 +378,8 @@ object Connection extends ConnectionTrait {
       content       : Option[StreamedContent],
       headers       : Map[String, List[String]],
       loadState     : Boolean,
-      logBody       : Boolean
+      logBody       : Boolean,
+      isAsync       : Boolean
     )(implicit
       logger        : IndentedLogger,
       safeRequestCtx: SafeRequestContext,
@@ -400,7 +403,8 @@ object Connection extends ConnectionTrait {
           content       = content,
           cookieStore   = cookieStore,
           headers       = headers,
-          logBody       = logBody
+          logBody       = logBody,
+          isAsync       = isAsync
         )
       )
     }
@@ -412,7 +416,8 @@ object Connection extends ConnectionTrait {
       content       : Option[StreamedContent],
       cookieStore   : CookieStore,
       headers       : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
-      logBody       : Boolean
+      logBody       : Boolean,
+      isAsync       : Boolean
     )(implicit
       logger        : IndentedLogger,
       safeRequestCtx: SafeRequestContext,
@@ -530,32 +535,32 @@ object Connection extends ConnectionTrait {
                   (
                     "internal",
                     internalPath,
-                    InternalHttpClient.connect(
-                      url           = internalPath,
-                      credentials   = credentials,
-                      cookieStore   = cookieStore,
-                      method        = method,
-                      headers       = cleanCapitalizedHeaders,
-                      content       = content
-                    )(
-                      requestCtx    = Some(safeRequestCtx),
-                      connectionCtx = connectionCtx
-                    )
+                    ConnectionContextSupport.maybeWithContext(URI.create(internalPath), method, headers, Map.empty, isAsync) {
+                      InternalHttpClient.connect(
+                        url         = internalPath,
+                        credentials = credentials,
+                        cookieStore = cookieStore,
+                        method      = method,
+                        headers     = cleanCapitalizedHeaders,
+                        content     = content
+                      )(
+                        requestCtx  = Some(safeRequestCtx)
+                      )
+                    }
                   )
                 case _ =>
                   (
                     "Apache",
                     normalizedUrlString,
                     PropertiesApacheHttpClient.connect(
-                      url           = normalizedUrlString,
-                      credentials   = credentials,
-                      cookieStore   = cookieStore,
-                      method        = method,
-                      headers       = cleanCapitalizedHeaders,
-                      contentOpt    = content
+                      url         = normalizedUrlString,
+                      credentials = credentials,
+                      cookieStore = cookieStore,
+                      method      = method,
+                      headers     = cleanCapitalizedHeaders,
+                      contentOpt  = content
                     )(
-                      requestCtx    = None,
-                      connectionCtx = connectionCtx
+                      requestCtx  = None
                     )
                   )
               }

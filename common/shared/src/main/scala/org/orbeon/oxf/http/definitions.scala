@@ -217,15 +217,14 @@ trait HttpClient[CookieStore] {
   type RequestCtx
 
   def connect(
-    url          : String,
-    credentials  : Option[BasicCredentials],
-    cookieStore  : CookieStore,
-    method       : HttpMethod,
-    headers      : Map[String, List[String]],
-    content      : Option[StreamedContent]
+    url        : String,
+    credentials: Option[BasicCredentials],
+    cookieStore: CookieStore,
+    method     : HttpMethod,
+    headers    : Map[String, List[String]],
+    content    : Option[StreamedContent]
   )(implicit
-    requestCtx   : Option[RequestCtx],
-    connectionCtx: ConnectionContexts
+    requestCtx : Option[RequestCtx]
   ): HttpResponse
 
   def shutdown(): Unit

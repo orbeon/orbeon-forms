@@ -412,15 +412,14 @@ object APISupport {
     // - resources: typically image, CSS, JavaScript, etc.
     def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): HttpResponse =
       ctx.httpClient.connect(
-        url           = recombineQuery(requestDetails.url, requestDetails.params),
-        credentials   = None,
-        cookieStore   = getOrCreateCookieStore,
-        method        = if (requestDetails.content.isEmpty) GET else POST,
-        headers       = requestDetails.headersMapWithContentType + (Headers.OrbeonClient -> List(ctx.client)),
-        content       = requestDetails.content
+        url         = recombineQuery(requestDetails.url, requestDetails.params),
+        credentials = None,
+        cookieStore = getOrCreateCookieStore,
+        method      = if (requestDetails.content.isEmpty) GET else POST,
+        headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient -> List(ctx.client)),
+        content     = requestDetails.content
       )(
-        requestCtx    = None,
-        connectionCtx = EmptyConnectionContexts
+        requestCtx  = None
       )
 
     private def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =

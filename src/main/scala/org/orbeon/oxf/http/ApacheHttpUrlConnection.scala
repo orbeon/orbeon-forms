@@ -60,15 +60,14 @@ class ApacheHttpUrlConnection(url: URL)(client: PropertiesApacheHttpClient.type)
 
         Some(
           client.connect(
-            url           = url.toExternalForm,
-            credentials   = credentialsFromURL(url),
-            cookieStore   = new BasicCookieStore,
-            method        = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
-            headers       = _requestHeaders.view.mapValues(_.toList).toMap,
-            contentOpt    = None
+            url         = url.toExternalForm,
+            credentials = credentialsFromURL(url),
+            cookieStore = new BasicCookieStore,
+            method      = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
+            headers     = _requestHeaders.view.mapValues(_.toList).toMap,
+            contentOpt  = None
           )(
-            requestCtx    = None,
-            connectionCtx = EmptyConnectionContexts
+            requestCtx  = None
           )
         )
       }

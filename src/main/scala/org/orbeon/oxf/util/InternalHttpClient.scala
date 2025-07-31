@@ -14,8 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
-import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
-import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
+import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials as _, *}
 import org.orbeon.oxf.http.*
@@ -23,7 +22,6 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.webapp.ProcessorService
 
-import java.net.URI
 import scala.annotation.tailrec
 
 
@@ -43,10 +41,8 @@ object InternalHttpClient extends HttpClient[CookieStore] {
     headers      : Map[String, List[String]],
     content      : Option[StreamedContent]
   )(implicit
-    requestCtx   : Option[SafeRequestContext],
-    connectionCtx: ConnectionContexts
-  ): HttpResponse =
-    ConnectionContextSupport.withContext(URI.create(url), method, headers, Map.empty) {
+    requestCtx   : Option[SafeRequestContext]
+  ): HttpResponse = {
 
       require(url.startsWith("/"),  "`InternalHttpClient` only supports absolute paths")
       val safeRequestCtx = requestCtx.getOrElse(throw new IllegalArgumentException("`InternalHttpClient` requires a `SafeRequestContext`"))

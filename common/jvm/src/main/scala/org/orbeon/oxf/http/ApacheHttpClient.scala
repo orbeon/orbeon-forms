@@ -31,7 +31,6 @@ import org.apache.http.protocol.{BasicHttpContext, HttpContext, HttpCoreContext}
 import org.apache.http.ssl.SSLContexts
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException as _, *}
-import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.http.HttpMethod.*
@@ -52,15 +51,14 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
   def createURL(urlString: String): URL
 
   def connect(
-    url          : String,
-    credentials  : Option[BasicCredentials],
-    cookieStore  : CookieStore,
-    method       : HttpMethod,
-    headers      : Map[String, List[String]],
-    contentOpt   : Option[StreamedContent]
+    url        : String,
+    credentials: Option[BasicCredentials],
+    cookieStore: CookieStore,
+    method     : HttpMethod,
+    headers    : Map[String, List[String]],
+    contentOpt : Option[StreamedContent]
   )(implicit
-    requestCtx   : Option[RequestCtx],                                // unused
-    connectionCtx: ConnectionContexts // unused for external HTTP connections
+    requestCtx : Option[RequestCtx] // unused
   ): org.orbeon.oxf.http.HttpResponse = {
 
     val uri               = URI.create(url)

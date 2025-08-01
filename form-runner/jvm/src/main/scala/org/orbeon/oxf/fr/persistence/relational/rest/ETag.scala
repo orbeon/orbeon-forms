@@ -21,8 +21,7 @@ import java.time.Instant
 object ETag {
 
   def eTag(tableName: String, id: Int, lastModified: Instant): String = {
-    val etagPlain    = s"$tableName:$id:$lastModified"
-    println(s"***** etagPlain=$etagPlain")
+    val etagPlain = s"$tableName:$id:$lastModified"
     SecureUtils.digestStringToHexShort(etagPlain)
   }
 }

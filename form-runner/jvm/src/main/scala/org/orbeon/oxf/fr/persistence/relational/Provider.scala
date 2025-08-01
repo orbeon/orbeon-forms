@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 
 import java.io.StringReader
-import java.sql.{Connection, ResultSet}
+import java.sql.{Connection, PreparedStatement, ResultSet, Statement}
 import javax.xml.transform.stream.StreamSource
 
 
@@ -345,4 +345,48 @@ object Provider extends Enum[Provider] {
     provider match {
       case _         => s"DISTINCT $columnName AS $alias"
     }
+
+  def executeUpdateAndReturnGeneratedId(
+    connection         : java.sql.Connection,
+    provider           : Provider,
+    table              : String,
+    sql                : String
+  )(
+    beforeExecuteUpdate: PreparedStatement => Unit
+  ): Option[Int] = {
+
+    val tableWithId = table == "orbeon_form_data"
+
+    val preparedStatement =
+      if (tableWithId) {
+        provider match {
+          case Provider.MySQL  => connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+          case Provider.SQLite => connection.prepareStatement(sql)
+          case _               => connection.prepareStatement(sql, Array("id"))
+        }
+      } else {
+        connection.prepareStatement(sql)
+      }
+
+    val idFromGeneratedKeysOpt = useAndClose(preparedStatement) { ps =>
+      beforeExecuteUpdate(ps)
+      ps.executeUpdate()
+
+      // All databases except SQLite support getGeneratedKeys
+      (tableWithId && provider != Provider.SQLite).flatOption {
+        val generatedKeys = ps.getGeneratedKeys
+        generatedKeys.next().option(generatedKeys.getInt(1))
+      }
+    }
+
+    // Special case for SQLite
+    val idFromLastInsertRowidOpt = (tableWithId && provider == Provider.SQLite).flatOption {
+      useAndClose(connection.prepareStatement("SELECT last_insert_rowid()")) { ps =>
+        val rs = ps.executeQuery()
+        rs.next().option(rs.getInt(1))
+      }
+    }
+
+    idFromGeneratedKeysOpt orElse idFromLastInsertRowidOpt
+  }
 }

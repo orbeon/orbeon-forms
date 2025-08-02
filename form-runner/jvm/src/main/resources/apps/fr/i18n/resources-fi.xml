@@ -69,6 +69,10 @@
         <validation-dialog-review>Käy läpi</validation-dialog-review>
         <validation-dialog-continue>Jatka</validation-dialog-continue>
 
+        <!-- Conflict dialog -->
+        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
         <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
         <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
@@ -302,6 +306,16 @@
             <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
             <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
             <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
+            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
+            <conflict-dialog-message todo="true">[
+                <div>
+                    <p>The data has changed since you loaded it. You can either:</p>
+                    <ul>
+                        <li>Save now, overwriting the data saved previously.</li>
+                        <li>Discard your current changes, and reload the data saved previously.</li>
+                    </ul>
+                </div>
+            ]</conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Löydetty luonnos</found-draft>

@@ -69,6 +69,10 @@
         <validation-dialog-review>İncele</validation-dialog-review>
         <validation-dialog-continue>Devam Et</validation-dialog-continue>
 
+        <!-- Conflict dialog -->
+        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Formülleri İncele (Beta)</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Çevrimdışı Test Et (Beta)</test-offline>
@@ -302,6 +306,16 @@
             <upload-error-mediatype>Yüklenen dosya yanlış türde: {0}</upload-error-mediatype>
             <upload-error-file-scan>Yüklenen dosya dosya tarayıcısı tarafından reddedildi. Lütfen bunun virüslü bir dosya olmadığından emin olun. İşte dosya tarayıcısı mesajı: "{0}".</upload-error-file-scan>
             <lost-attachments>Bazı dosya ekleri bir sunucu sorunu nedeniyle kayboldu. Lütfen tüm eklerinizi kontrol edin ve gerekirse tekrar yükleyin.</lost-attachments>
+            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
+            <conflict-dialog-message todo="true">[
+                <div>
+                    <p>The data has changed since you loaded it. You can either:</p>
+                    <ul>
+                        <li>Save now, overwriting the data saved previously.</li>
+                        <li>Discard your current changes, and reload the data saved previously.</li>
+                    </ul>
+                </div>
+            ]</conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Otomatik kaydedilmiş belge bulundu</found-draft>

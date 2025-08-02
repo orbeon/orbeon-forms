@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.common.OXFException
@@ -25,7 +26,9 @@ import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
+import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
@@ -145,12 +148,11 @@ trait FormRunnerActionsCommon {
   def trySaveAttachmentsAndData(params: ActionParams): ActionResult =
     ActionResult.tryAsync {
 
-      implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
-      implicit val connectionCtx           : ConnectionContexts = ConnectionContextSupport.findContext(Map.empty)
-      implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
+      implicit val externalContext: ExternalContext          = CoreCrossPlatformSupport.externalContext
+      implicit val connectionCtx  : ConnectionContexts       = ConnectionContextSupport.findContext(Map.empty)
+      implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
 
-      val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
+      implicit val formRunnerParams @ FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 
@@ -190,10 +192,35 @@ trait FormRunnerActionsCommon {
           Nil
         )
 
+      // If the feature is enabled, we'll try to detect concurrent data modifications
+      val detectDataConflict = frc.booleanFormRunnerProperty("oxf.fr.detail.detect-data-conflict")
+
+      // Since we can't pass parameters to processes (#1688), we use an instance value as a workaround and make sure
+      // it's cleared after being read. Ideally, this value would simply be passed to the "save-final" process and
+      // then to the save action as a parameter.
+
+      lazy val overwriteIfConflictDetected = instanceRoot("fr-persistence-instance").exists { i =>
+        val ref   = i / "save" / "conflict-overwrite"
+        val value = ref.headOption.flatMap(_.stringValue.trimAllToOpt).contains("true")
+        XFormsAPI.setvalue(ref, "")
+        value
+      }
+
+      // We'll provide an If-Match directive to the PUT request if the following conditions are met:
+      //  - the feature is enabled
+      //  - we're not forcing an overwrite
+      //  - we're not saving a draft
+      //  - the original ETag of the form data is available
+      val ifMatchOpt = (detectDataConflict && ! overwriteIfConflictDetected && ! isDraft).flatOption {
+        instanceRoot("fr-document-metadata").flatMap { i =>
+          (i /@ "etag").headOption.flatMap(_.stringValue.trimAllToOpt)
+        }
+      }
+
       implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
       // Saving is an asynchronous operation
-      val computation: IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] =
+      val computation: IO[PutWithAttachmentsResult] =
         frc.putWithAttachments(
           liveData          = frc.formInstance.root,
           migrate           = Some(maybeMigrateData),
@@ -203,22 +230,23 @@ trait FormRunnerActionsCommon {
           filename          = DataXml,
           commonQueryString = systemParams + querySuffix,
           forceAttachments  = false,
+          ifMatch           = ifMatchOpt,
           formVersion       = Some(formVersion.toString),
           workflowStage     = frc.documentWorkflowStage
         )
 
       // This will be run when the future completes, but in a controlled way
       // Q: Could we make this an `IO`?
-      def continuation(xfcd: XFormsContainingDocument, value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])]): Try[Unit] =
+      def continuation(xfcd: XFormsContainingDocument, value: Try[PutWithAttachmentsResult]): Try[Unit] =
         Try {
           value match {
-            case Success((savedAttachments, _, stringOpt)) =>
+            case Success(putWithAttachmentsResult) =>
 
               // Update, in this thread, the attachment paths
-              updateAttachments(frc.formInstance.root, savedAttachments, setTmpFileAtt = true)
+              updateAttachments(frc.formInstance.root, putWithAttachmentsResult.savedAttachments, setTmpFileAtt = true)
 
               // Update the response instance, optionally used by the result dialog
-              setCreateUpdateResponse(stringOpt.getOrElse(""))
+              setCreateUpdateResponse(putWithAttachmentsResult.stringOpt.getOrElse(""))
 
               // Manual dependency HACK: RR `fr-persistence-model` before updating the status because we do a setvalue just
               // before calling the submission
@@ -228,20 +256,36 @@ trait FormRunnerActionsCommon {
               // Mark data clean
               trySetDataStatus(Map(Some("status") -> "safe", Some("draft") -> isDraft.toString))
 
-              // Notify that the data is saved (2014-07-07: used by FB only)
-              // We pass the URLs to the event so that Form Builder can update `fb-form-instance`
+              // Notify that the data is saved
               dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
-                "before-urls" -> Some(savedAttachments.map(_.fromPath)),
-                "after-urls"  -> Some(savedAttachments.map(_.toPath))
+                // We pass the URLs to the event so that Form Builder can update `fb-form-instance`
+                "before-urls"   -> Some(putWithAttachmentsResult.savedAttachments.map(_.fromPath)),
+                "after-urls"    -> Some(putWithAttachmentsResult.savedAttachments.map(_.toPath)),
+                // The following is used to detect concurrent data modifications (see #7157)
+                "last-modified" -> Headers.firstItemIgnoreCase(putWithAttachmentsResult.headers, Headers.LastModified),
+                "etag"          -> Headers.firstItemIgnoreCase(putWithAttachmentsResult.headers, Headers.ETag)
               ))
 
               Success(())
 
             case Failure(t) =>
 
-              dispatch(name = "fr-data-save-error", targetId = FormModel)
+              val statusCodeOpt    = Option(t).collect { case HttpStatusCodeException(statusCode, _, _) => statusCode }
+              val conflictDetected = detectDataConflict && statusCodeOpt.contains(StatusCode.PreconditionFailed)
 
-              Failure(t)
+              // If we detect a concurrent modification of the form data, let the persistence model process the issue
+              // (by displaying a dialog to the user, etc.) and let the action succeed (#7157)
+
+              dispatch(
+                name       = "fr-data-save-error",
+                targetId   = FormModel,
+                properties = (
+                  ("conflict-detected" -> conflictDetected.some) ::
+                  statusCodeOpt.map(statusCode => "status-code" -> statusCode.some).toList
+                ).toMap
+              )
+
+              if (conflictDetected) Success(()) else Failure(t)
           }
         } .flatten
 

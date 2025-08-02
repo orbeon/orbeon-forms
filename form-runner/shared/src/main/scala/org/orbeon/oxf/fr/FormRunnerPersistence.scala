@@ -140,6 +140,14 @@ object AttachmentMatch {
   case class  BasePaths(includes: Iterable[String], excludes: Iterable[String]) extends AttachmentMatch
 }
 
+case class PutWithAttachmentsResult(
+ savedAttachments: List[AttachmentWithEncryptedAtRest],
+ versionOpt      : Option[Int],
+ stringOpt       : Option[String],
+ statusCode      : Int,
+ headers         : Map[String, List[String]]
+)
+
 object FormRunnerPersistence {
 
   val FormPath                            = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
@@ -830,7 +838,8 @@ trait FormRunnerPersistence {
     resolvedPutUri: URI,
     formVersion   : Option[String],
     credentials   : Option[BasicCredentials],
-    workflowStage : Option[String]
+    workflowStage : Option[String],
+    ifMatch       : Option[String]
   )(implicit
     safeRequestCtx: SafeRequestContext,
     connectionCtx : ConnectionContexts,
@@ -838,16 +847,17 @@ trait FormRunnerPersistence {
     indentedLogger: IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
-    val customPutHeaders =
+    val putHeaders =
       (formVersion.toList                         map (v => OrbeonFormDefinitionVersion -> List(v))) :::
       (workflowStage.filter(_.nonAllBlank).toList map (v => "Orbeon-Workflow-Stage" -> List(v)))     :::
+      (ifMatch.toList                             map (v => Headers.IfMatch -> List(v)))             :::
       Nil
 
     val allPutHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = resolvedPutUri,
         hasCredentials   = false, // xxx ?
-        customHeaders    = customPutHeaders.toMap,
+        customHeaders    = putHeaders.toMap,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = xfcd.headersGetter
@@ -984,6 +994,7 @@ trait FormRunnerPersistence {
     filename         : String,
     commonQueryString: String,
     forceAttachments : Boolean,
+    ifMatch          : Option[String] = None,
     username         : Option[String] = None,
     password         : Option[String] = None,
     formVersion      : Option[String] = None,
@@ -993,7 +1004,7 @@ trait FormRunnerPersistence {
     connectionCtx    : ConnectionContexts,
     xfcd             : XFormsContainingDocument,
     indentedLogger   : IndentedLogger
-  ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
+  ): IO[PutWithAttachmentsResult] = {
 
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
 
@@ -1073,16 +1084,18 @@ trait FormRunnerPersistence {
     for {
       savedAttachments <- saveAllAttachmentsStream.compile.toList
       _                = updateAttachments(preparedDataDocumentInfo, savedAttachments, setTmpFileAtt = false) // works on a copy of the data
-      cr               <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
+      cr               <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage = workflowStage, ifMatch = ifMatch)
       cxr              <- IO.fromTry(ConnectionResult.trySuccessConnection(cr))
       versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
       bytesOpt         <- if (cxr.content.contentType.exists(isTextOrXMLOrJSONContentType)) cxr.content.stream.compile.to(Array).map(Some.apply) else IO.pure(None)
       stringOpt        = bytesOpt.flatMap(b => SubmissionUtils.readTextContent(StreamedContent.fromBytes(b, cxr.content.contentType)))
     } yield
-      (
-        savedAttachments,
-        versionOpt,
-        stringOpt
+      PutWithAttachmentsResult(
+        savedAttachments = savedAttachments,
+        versionOpt       = versionOpt,
+        stringOpt        = stringOpt,
+        statusCode       = cr.statusCode,
+        headers          = cr.headers
       )
 
     // In our persistence implementation, we do not remove attachments if saving the data fails.

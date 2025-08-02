@@ -69,6 +69,10 @@
         <validation-dialog-review>Revoir</validation-dialog-review>
         <validation-dialog-continue>Continuer</validation-dialog-continue>
 
+        <!-- Conflict dialog -->
+        <conflict-dialog-save-overwrite>Enregistrer et écraser</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Annuler et recharger</conflict-dialog-discard-reload>
+
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspecter formules (expérimental)</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Tester hors ligne (expérimental)</test-offline>
@@ -305,6 +309,16 @@
             <upload-error-mediatype>Le fichier téléchargé est d''un type incorrect: {0}</upload-error-mediatype>
             <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu''il ne s'agit pas d''un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
             <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
+            <conflict-dialog-title>Conflit Détecté</conflict-dialog-title>
+            <conflict-dialog-message>
+                <div>
+                    <p>Les données ont été modifiées depuis que vous les avez chargées. Vous pouvez :</p>
+                    <ul>
+                        <li>Enregistrer maintenant, en écrasant les données sauvegardées précédemment.</li>
+                        <li>Abandonner vos modifications actuelles et recharger les données sauvegardées précédemment..</li>
+                    </ul>
+                </div>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Un document enregistré automatiquement est disponible</found-draft>

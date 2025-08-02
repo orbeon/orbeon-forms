@@ -69,6 +69,10 @@
         <validation-dialog-review>Áttekintés</validation-dialog-review>
         <validation-dialog-continue>Folytatás</validation-dialog-continue>
 
+        <!-- Conflict dialog -->
+        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Teszt</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Képletek vizsgálata (Béta)</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Offline teszt (Béta)</test-offline>
@@ -302,6 +306,16 @@
             <upload-error-mediatype>A feltöltött fájl típusa helytelen: {0}</upload-error-mediatype>
             <upload-error-file-scan>A feltöltött fájlt a fájlszkenner elutasította. Kérjük, győződjön meg arról, hogy ez nem fertőzött fájl. Itt van a fájlszkenner üzenete: „{0}".</upload-error-file-scan>
             <lost-attachments>Néhány fájlmelléklet elveszett egy szerverprobléma miatt. Kérjük, ellenőrizze az összes mellékletet, és szükség esetén töltse fel újra.</lost-attachments>
+            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
+            <conflict-dialog-message todo="true">[
+                <div>
+                    <p>The data has changed since you loaded it. You can either:</p>
+                    <ul>
+                        <li>Save now, overwriting the data saved previously.</li>
+                        <li>Discard your current changes, and reload the data saved previously.</li>
+                    </ul>
+                </div>
+            ]</conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Automatikusan mentett dokumentum található</found-draft>

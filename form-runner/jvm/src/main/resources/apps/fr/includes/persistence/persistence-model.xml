@@ -951,12 +951,14 @@
                         $stage-value     := if (empty($header)) then '' else $header/string()
                     return
                         $stage-value"/>
-            <!-- Save value of date headers -->
+            <!-- Make sure we don't keep any out-of-date value -->
+            <xf:delete ref="instance('fr-document-metadata')/@*[not(name() = 'workflow-stage')]"/>
+            <!-- Save value of date and ETag headers, if available -->
             <xf:insert
                 context="instance('fr-document-metadata')"
                 origin="
                     for $header in event('response-headers')[
-                        lower-case(name) = ('created', 'last-modified')
+                        lower-case(name) = ('created', 'last-modified', 'etag')
                     ]
                     return
                         xf:attribute(lower-case($header/name/string()), $header/value/string())"/>
@@ -1088,6 +1090,42 @@
         <metadata workflow-stage=""/>
     </xf:instance>
 
+    <xf:action event="fr-data-save-done" observer="fr-form-model">
+        <!-- Update last modification date/time and ETag after save -->
+        <xf:delete ref="instance('fr-document-metadata')/@*[name() = ('last-modified', 'etag')]"/>
+        <xf:insert
+            context="instance('fr-document-metadata')"
+            origin="
+                for $name in ('last-modified', 'etag')[xxf:non-blank(event(.))]
+                return xf:attribute($name, event($name))"/>
+    </xf:action>
+
+    <xf:action event="fr-data-save-error" observer="fr-form-model">
+        <!-- If a concurrent modification has been detected, show a dialog so that the user can choose what to do (#7157) -->
+        <xf:action if="event('conflict-detected') = true()">
+            <xxf:show dialog="fr-conflict-dialog"/>
+        </xf:action>
+    </xf:action>
+
+    <!-- Concurrent modification detected, option 1: save and overwrite -->
+    <xf:action event="fr-conflict-save-overwrite">
+        <!-- Since we can't pass parameters to processes (#1688), we use an instance value as a workaround and make
+             sure it's cleared after being read. Ideally, this value would simply be passed to the "save-final" process
+             and then to the save action as a parameter. -->
+
+        <xf:setvalue ref="instance('fr-persistence-instance')/save/conflict-overwrite" value="'true'"/>
+        <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'save-final')</xf:action>
+        <xf:setvalue ref="instance('fr-persistence-instance')/save/conflict-overwrite"/>
+    </xf:action>
+
+    <!-- Concurrent modification detected, option 2: discard and reload -->
+    <xf:action event="fr-conflict-discard-reload">
+        <!-- Simply reload the document without handling the drafts -->
+        <xf:send submission="fr-get-document-submission">
+            <xf:property name="data-or-draft" value="'data'"/>
+        </xf:send>
+    </xf:action>
+
     <xf:instance id="fr-persistence-instance" xxf:exclude-result-prefixes="#all">
         <_ xmlns="">
             <!-- Dialog to show upon xforms-ready for handling drafts -->
@@ -1100,6 +1138,9 @@
                 <status>clean</status>
                 <autosave-timestamp/>
             </autosave>
+            <save>
+                <conflict-overwrite/>
+            </save>
             <!-- Success or error message to display -->
             <message/>
             <!-- Error document returned -->

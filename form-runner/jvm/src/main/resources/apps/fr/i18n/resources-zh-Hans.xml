@@ -64,6 +64,10 @@
         <validation-dialog-review>审核</validation-dialog-review>
         <validation-dialog-continue>继续</validation-dialog-continue>
 
+        <!-- Conflict dialog -->
+        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; 测试</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 检查公式（测试版）</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; 离线测试（测试版）</test-offline>
@@ -296,6 +300,16 @@
             <upload-error-mediatype>上传的文件类型不正确：{0}</upload-error-mediatype>
             <upload-error-file-scan>上传的文件被文件扫描程序拒绝。请确保这不是受感染的文件。以下是文件扫描程序的消息："{0}"。</upload-error-file-scan>
             <lost-attachments>由于服务器问题，一些文件附件丢失。请检查所有附件，如有需要请重新上传。</lost-attachments>
+            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
+            <conflict-dialog-message todo="true">[
+                <div>
+                    <p>The data has changed since you loaded it. You can either:</p>
+                    <ul>
+                        <li>Save now, overwriting the data saved previously.</li>
+                        <li>Discard your current changes, and reload the data saved previously.</li>
+                    </ul>
+                </div>
+            ]</conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>找到自动保存的文档</found-draft>

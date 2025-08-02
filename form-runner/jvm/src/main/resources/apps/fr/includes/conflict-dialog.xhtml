@@ -1,0 +1,56 @@
+<!--
+  Copyright (C) 2025 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxf:dialog
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+
+    id="fr-conflict-dialog"
+    level="modal"
+    close="false"
+    draggable="true"
+    class="fr-dialog fr-conflict-dialog">
+
+    <xf:label ref="$fr-resources/detail/messages/conflict-dialog-title"/>
+
+    <xh:div class="fr-dialog-icon-and-message">
+        <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
+        <xh:div class="fr-dialog-message">
+            <xf:output mediatype="text/html" value="xxf:serialize($fr-resources/detail/messages/conflict-dialog-message/*, 'html')"/>
+        </xh:div>
+    </xh:div>
+
+    <xh:div class="fr-dialog-buttons">
+        <xf:group>
+            <xxf:hide ev:event="DOMActivate" dialog="fr-conflict-dialog"/>
+
+            <xf:trigger id="fr-conflict-save-overwrite" appearance="xxf:danger">
+                <xf:label mediatype="text/html" value="$fr-resources/buttons/conflict-dialog-save-overwrite"/>
+                <xf:action event="DOMActivate">
+                    <xf:dispatch name="fr-conflict-save-overwrite" target="fr-persistence-model"/>
+                </xf:action>
+            </xf:trigger>
+
+            <xf:trigger id="fr-conflict-discard-reload" appearance="xxf:primary">
+                <xf:label mediatype="text/html" value="$fr-resources/buttons/conflict-dialog-discard-reload"/>
+                <xf:action event="DOMActivate">
+                    <xf:dispatch name="fr-conflict-discard-reload" target="fr-persistence-model"/>
+                </xf:action>
+            </xf:trigger>
+        </xf:group>
+    </xh:div>
+
+    <xf:setfocus ev:event="xxforms-dialog-open" control="fr-conflict-discard-reload"/>
+</xxf:dialog>

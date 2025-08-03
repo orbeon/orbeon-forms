@@ -13,7 +13,7 @@ ThisBuild / githubOwner := "orbeon"
 ThisBuild / evictionErrorLevel := Level.Info
 
 lazy val scala213 = "2.13.16"
-lazy val scala3   = "3.7.1"
+lazy val scala3   = "3.7.2"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala213)
 

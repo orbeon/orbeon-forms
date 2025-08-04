@@ -47,7 +47,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
   def requireRefresh(): Unit = {
     Private.requireRefresh = true
-    markDirtySinceLastRequest(true)
+    markDirtySinceLastRequest(bindingsAffected = true)
   }
 
   def withRefresh[A](thunk: => A): A = {

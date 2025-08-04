@@ -27,7 +27,7 @@ trait WithFormatTrait extends XFormsValueControl {
   final protected def markExternalValueDirtyIfHasFormat(): Unit =
     format.foreach { _ =>
       markExternalValueDirty()
-      containingDocument.controls.markDirtySinceLastRequest(false)
+      containingDocument.controls.markDirtySinceLastRequest(bindingsAffected = false)
     }
 
   // TODO: format must take place between instance and internal value instead

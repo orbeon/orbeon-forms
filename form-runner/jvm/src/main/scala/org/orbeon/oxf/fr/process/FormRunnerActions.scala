@@ -456,6 +456,14 @@ trait FormRunnerActions
     showProgress       : Boolean        = true,
     responseIsResource : Boolean        = false
   ): Option[XFormsSubmitDoneEvent] = {
+
+    // Propagate original last modification date/time and ETag, in order to detect concurrent data modifications (#7157)
+    val headers = for {
+      instance                    <- instanceRoot("fr-document-metadata").toList
+      (attributeName, headerName) <- List("etag" -> Headers.ETag, "last-modified" -> Headers.LastModified)
+      attributeValue              <- (instance /@ attributeName).headOption.flatMap(_.stringValue.trimAllToOpt)
+    } yield s"$headerName: $attributeValue"
+
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
     trySendImpl(
       SendActionParams(
@@ -471,7 +479,7 @@ trait FormRunnerActions
         pruneMetadata       = false,
         pruneTmpAttMetadata = false,
         replace             = replace,
-        headersOpt          = None,
+        headersOpt          = Some(headers).filter(_.nonEmpty).map(_.mkString("\n")),
         serialization       = ContentTypes.XmlContentType,
         binaryContentUrlOpt = None,
         contentTypeOpt      = ContentTypes.XmlContentType.some,

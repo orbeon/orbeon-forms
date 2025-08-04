@@ -303,6 +303,16 @@
                     if="$is-background"
                     ref="instance('fr-document-metadata')/@workflow-stage"
                     value="xxf:get-request-header('orbeon-workflow-stage')[1]"/>
+
+                <!-- Propagate original last modification date/time and ETag, in order to detect concurrent data modifications (#7157) -->
+                <xf:delete ref="instance('fr-document-metadata')/@*[name() = ('last-modified', 'etag')]"/>
+                <xf:insert
+                    context="instance('fr-document-metadata')"
+                    origin="
+                        for $name in ('last-modified', 'etag')
+                        return
+                            for $value in xxf:get-request-header($name)
+                            return xf:attribute($name, $value)"/>
             </xf:action> <!-- `$is-submit` -->
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs

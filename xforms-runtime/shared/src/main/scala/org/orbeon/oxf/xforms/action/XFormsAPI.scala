@@ -60,7 +60,9 @@ object XFormsAPI {
     }
 
   // Return the action interpreter
-  def inScopeActionInterpreter: XFormsActionInterpreter = actionInterpreterDyn.value.get
+  def inScopeActionInterpreter: XFormsActionInterpreter = inScopeActionInterpreterOpt.get
+
+  def inScopeActionInterpreterOpt: Option[XFormsActionInterpreter] = actionInterpreterDyn.value
 
   // Return the containing document
   def inScopeContainingDocument: XFormsContainingDocument = inScopeContainingDocumentOpt.get
@@ -262,7 +264,7 @@ object XFormsAPI {
 
   // Return an instance's root element in the current action context as per xxf:instance()
   def instanceRoot(staticId: String): Option[om.NodeInfo] =
-    XFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
+    inScopeActionInterpreterOpt flatMap (inScopeActionInterpreter => XFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId))
 
   // Return an instance within a top-level model
   def topLevelInstance(modelId: String, instanceId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocumentOpt.orNull): Option[XFormsInstance] =

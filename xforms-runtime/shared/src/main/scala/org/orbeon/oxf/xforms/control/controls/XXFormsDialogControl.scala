@@ -102,7 +102,8 @@ class XXFormsDialogControl(
           localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
           localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
 
-          containingDocument.controls.markDirtySinceLastRequest(true)
+          containingDocument.controls.requireRefresh()
+          containingDocument.controls.openDialogs += 1
           containingDocument.controls.doPartialRefresh(this, collector)
 
           Dispatch.dispatchEvent(new XFormsDialogShownEvent(this), collector)
@@ -116,7 +117,8 @@ class XXFormsDialogControl(
           localForUpdate.neighborControlId   = None
           localForUpdate.constrainToViewport = false
 
-          containingDocument.controls.markDirtySinceLastRequest(false)
+          containingDocument.controls.requireRefresh()
+          containingDocument.controls.openDialogs -= 1
           containingDocument.controls.doPartialRefresh(this, collector)
 
           Dispatch.dispatchEvent(new XFormsDialogHiddenEvent(this), collector)

@@ -400,6 +400,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     XFormsFunction.context.containingDocument.countPendingUploads
 
   @XPathFunction
+  def openDialogs(): Int =
+    XFormsFunction.context.containingDocument.controls.openDialogs
+
+  @XPathFunction
   def documentId()(implicit xfc: XFormsFunction.Context): String =
     xfc.containingDocument.uuid
 

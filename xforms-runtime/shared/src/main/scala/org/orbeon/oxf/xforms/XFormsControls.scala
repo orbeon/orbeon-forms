@@ -39,6 +39,8 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   def isRequireRefresh        : Boolean = Private.requireRefresh
   def isInRefresh             : Boolean = Private.inRefresh
 
+  var openDialogs: Int = 0
+
   def markDirtySinceLastRequest(bindingsAffected: Boolean): Unit = {
     dirtySinceLastRequest = true
     if (bindingsAffected)

@@ -169,6 +169,7 @@ class XFormsContainingDocument(
   def restoreDynamicState(
     sequence           : Long,
     delayedEvents      : immutable.Seq[DelayedEvent],
+    openDialogs        : Int,
     pendingUploads     : Set[String],
     lastAjaxResponse   : Option[SAXStore],
     decodeControls     : InstancesControls,
@@ -191,6 +192,7 @@ class XFormsContainingDocument(
 
     // Restore other encoded objects
     restoreDelayedEvents(delayedEvents)
+    this.controls.openDialogs = openDialogs
     this.pendingUploads = pendingUploads
     this._lastAjaxResponse = lastAjaxResponse
 

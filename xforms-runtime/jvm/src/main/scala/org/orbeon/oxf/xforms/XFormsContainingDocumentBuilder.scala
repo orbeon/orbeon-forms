@@ -172,6 +172,7 @@ object XFormsContainingDocumentBuilder {
         doc.restoreDynamicState(
           dynamicState.sequence,
           dynamicState.decodeDelayedEvents,
+          dynamicState.openDialogs,
           dynamicState.decodePendingUploads,
           dynamicState.decodeLastAjaxResponse,
           dynamicState.decodeInstancesControls,

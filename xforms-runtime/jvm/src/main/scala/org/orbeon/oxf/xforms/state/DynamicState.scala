@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.{PathMatcher, SecureUtils}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl}
@@ -52,7 +51,8 @@ case class DynamicState(
   instances         : Seq[Byte],
   controls          : Seq[Byte],
   initializationData: Option[(Option[String], String)],
-  delayedEvents     : Seq[Byte]
+  delayedEvents     : Seq[Byte],
+  openDialogs       : Int
 ) {
   // Decode individual bits
   def decodePathMatchers     : List[PathMatcher]           = fromByteSeq[List[PathMatcher]](pathMatchers)
@@ -223,6 +223,7 @@ object DynamicState {
       controls           = toByteSeq(Controls.iterateControlsToSerialize(startOpt).toList),
       initializationData = document.getInitializationData,
       delayedEvents      = toByteSeq(document.delayedEvents),
+      openDialogs        = document.controls.openDialogs
     )
 
   // Create a `DynamicState` from an encoded string representation

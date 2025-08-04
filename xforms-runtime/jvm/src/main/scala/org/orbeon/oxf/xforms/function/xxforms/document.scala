@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
+import org.orbeon.saxon.value.IntegerValue
 import org.orbeon.saxon.{om, value}
 import org.orbeon.scaxon.Implicits.*
 
@@ -54,4 +55,14 @@ class XXFormsRemoveDocumentAttributes extends XFormsFunction {
     XFormsFunction.getContainingDocument.removeAttributes(stringArgument(0))
     om.EmptyIterator.getInstance
   }
+}
+
+class XXFormsPendingUploads extends XFormsFunction {
+  override def evaluateItem(xpathContext: XPathContext): IntegerValue =
+    XFormsFunction.context.containingDocument.countPendingUploads
+}
+
+class XXFormsOpenDialogs extends XFormsFunction {
+  override def evaluateItem(xpathContext: XPathContext): IntegerValue =
+    XFormsFunction.context.containingDocument.controls.openDialogs
 }

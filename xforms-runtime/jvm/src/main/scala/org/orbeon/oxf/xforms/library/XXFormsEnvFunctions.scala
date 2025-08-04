@@ -199,6 +199,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     )
 
     Fun("pending-uploads", classOf[XXFormsPendingUploads], op = 0, min = 0, INTEGER, EXACTLY_ONE)
+    Fun("open-dialogs",    classOf[XXFormsOpenDialogs],    op = 0, min = 0, INTEGER, EXACTLY_ONE)
 
     Fun("document-id", classOf[XXFormsDocumentId], op = 0, min = 0, STRING, EXACTLY_ONE)
 

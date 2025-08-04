@@ -247,7 +247,7 @@
                         <xf:group id="fr-form-group" class="fr-body" model="fr-form-model" ref="instance('fr-form-instance')" xxf:element="div">
                             <xh:a name="fr-form"/>
 
-                            <xf:var name="dialogs-closed" value="instance('fb-variables')/dialogs-open = 0"/>
+                            <xf:var name="dialogs-closed" value="xxf:open-dialogs() = 0"/>
 
                             <xf:action   if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="mod"          xxf:text="j">
                                 <xf:dispatch name="fb-show-dialog" targetid="dialog-search"/>

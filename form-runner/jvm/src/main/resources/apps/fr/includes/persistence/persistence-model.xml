@@ -290,29 +290,36 @@
 
                 <!-- https://github.com/orbeon/orbeon-forms/issues/5984 -->
                 <!-- In the JS runtime, there is currently no need to encrypt or decrypt parameters. -->
-                <xf:setvalue
-                    if="not(fr:is-browser-environment()) and not($is-background)"
-                    ref="instance('fr-document-metadata')/@workflow-stage"
-                    value="
-                        frf:decryptParameterIfNeeded(
-                            xxf:get-request-parameter(frf:InternalWorkflowStageParam())[1]
-                        )"/>
+                <xf:action if="not(fr:is-browser-environment()) and not($is-background)">
+                    <xf:setvalue
+                        ref="instance('fr-document-metadata')/@workflow-stage"
+                        value="
+                            frf:decryptParameterIfNeeded(
+                                xxf:get-request-parameter(frf:InternalWorkflowStageParam())[1]
+                            )"/>
+
+                    <!-- Propagate original document metadata in order to detect concurrent data modifications (#7157) -->
+                    <xf:delete ref="instance('fr-document-metadata')/@*[not(name() = 'workflow-stage')]"/>
+                    <xf:insert
+                        context="instance('fr-document-metadata')"
+                        origin="
+                            for $name in ('created', 'last-modified', 'etag')
+                            return
+                                let $internal-param-name :=
+                                    if      ($name = 'created')       then frf:InternalCreatedParam()
+                                    else if ($name = 'last-modified') then frf:InternalLastModifiedParam()
+                                    else if ($name = 'etag')          then frf:InternalETagParam()
+                                    else                              error()
+                                return
+                                    for    $encrypted-value in xxf:get-request-parameter($internal-param-name)
+                                    return xf:attribute($name, frf:decryptParameterIfNeeded($encrypted-value))"/>
+                </xf:action>
 
                 <!-- Workflow stage must be available to background processes as well -->
                 <xf:setvalue
                     if="$is-background"
                     ref="instance('fr-document-metadata')/@workflow-stage"
                     value="xxf:get-request-header('orbeon-workflow-stage')[1]"/>
-
-                <!-- Propagate original last modification date/time and ETag, in order to detect concurrent data modifications (#7157) -->
-                <xf:delete ref="instance('fr-document-metadata')/@*[name() = ('last-modified', 'etag')]"/>
-                <xf:insert
-                    context="instance('fr-document-metadata')"
-                    origin="
-                        for $name in ('last-modified', 'etag')
-                        return
-                            for $value in xxf:get-request-header($name)
-                            return xf:attribute($name, $value)"/>
             </xf:action> <!-- `$is-submit` -->
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
@@ -1119,13 +1126,7 @@
 
     <!-- Concurrent modification detected, option 1: save and overwrite -->
     <xf:action event="fr-conflict-save-overwrite">
-        <!-- Since we can't pass parameters to processes (#1688), we use an instance value as a workaround and make
-             sure it's cleared after being read. Ideally, this value would simply be passed to the "save-final" process
-             and then to the save action as a parameter. -->
-
-        <xf:setvalue ref="instance('fr-persistence-instance')/save/conflict-overwrite" value="'true'"/>
-        <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'save-final')</xf:action>
-        <xf:setvalue ref="instance('fr-persistence-instance')/save/conflict-overwrite"/>
+        <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'save-overwrite')</xf:action>
     </xf:action>
 
     <!-- Concurrent modification detected, option 2: discard and reload -->
@@ -1148,9 +1149,6 @@
                 <status>clean</status>
                 <autosave-timestamp/>
             </autosave>
-            <save>
-                <conflict-overwrite/>
-            </save>
             <!-- Success or error message to display -->
             <message/>
             <!-- Error document returned -->

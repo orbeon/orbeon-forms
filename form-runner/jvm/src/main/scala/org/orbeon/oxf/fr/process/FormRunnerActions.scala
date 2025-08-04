@@ -457,13 +457,6 @@ trait FormRunnerActions
     responseIsResource : Boolean        = false
   ): Option[XFormsSubmitDoneEvent] = {
 
-    // Propagate original last modification date/time and ETag, in order to detect concurrent data modifications (#7157)
-    val headers = for {
-      instance                    <- instanceRoot("fr-document-metadata").toList
-      (attributeName, headerName) <- List("etag" -> Headers.ETag, "last-modified" -> Headers.LastModified)
-      attributeValue              <- (instance /@ attributeName).headOption.flatMap(_.stringValue.trimAllToOpt)
-    } yield s"$headerName: $attributeValue"
-
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
     trySendImpl(
       SendActionParams(
@@ -479,7 +472,7 @@ trait FormRunnerActions
         pruneMetadata       = false,
         pruneTmpAttMetadata = false,
         replace             = replace,
-        headersOpt          = Some(headers).filter(_.nonEmpty).map(_.mkString("\n")),
+        headersOpt          = None,
         serialization       = ContentTypes.XmlContentType,
         binaryContentUrlOpt = None,
         contentTypeOpt      = ContentTypes.XmlContentType.some,
@@ -562,7 +555,10 @@ trait FormRunnerActions
     DataMigrationBehaviorName         +
     DataFormatVersionName             +
     InternalAuthorizedOperationsParam +
-    InternalWorkflowStageParam
+    InternalWorkflowStageParam        +
+    InternalCreatedParam              +
+    InternalLastModifiedParam         +
+    InternalETagParam
 
   private def prependUserAndStandardParamsForModeChange(pathQuery: String, dataFormatVersion: DataFormatVersion): String = {
 
@@ -575,11 +571,27 @@ trait FormRunnerActions
 
     // https://github.com/orbeon/orbeon-forms/issues/2999
     // https://github.com/orbeon/orbeon-forms/issues/5437
+    // https://github.com/orbeon/orbeon-forms/issues/7157
     val internalParams = {
-        val ops = frc.authorizedOperations
-        (ops.nonEmpty list (InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))) :::
-        FormRunner.documentWorkflowStage.toList.map(stage => InternalWorkflowStageParam -> FormRunnerOperationsEncryption.encryptString(stage))
+      val ops                = frc.authorizedOperations
+      val opsParam           = ops.nonEmpty.list(InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
+      val workflowStageParam = FormRunner.documentWorkflowStage.toList.map { workflowStage =>
+        InternalWorkflowStageParam -> FormRunnerOperationsEncryption.encryptString(workflowStage)
       }
+
+      // Propagate original document metadata in order to detect concurrent data modifications (#7157)
+      val documentMetadataParams = for {
+        instance                       <- instanceRoot("fr-document-metadata").toList
+        (attributeName, internalParam) <- List(
+          "created"       -> InternalCreatedParam,
+          "last-modified" -> InternalLastModifiedParam,
+          "etag"          -> InternalETagParam
+        )
+        attributeValue                 <- (instance /@ attributeName).headOption.flatMap(_.stringValue.trimAllToOpt)
+      } yield internalParam -> FormRunnerOperationsEncryption.encryptString(attributeValue)
+
+      opsParam ::: workflowStageParam ::: documentMetadataParams
+    }
 
     def filterParams[T](p: List[(String, T)]): List[(String, T)] =
       p filterNot { case (name, _) => ParamsToExcludeUponModeChange(name) }

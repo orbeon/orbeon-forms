@@ -150,9 +150,14 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   val InternalAuthorizedOperationsParam = "fr-internal-authorized-operations"
   //@XPathFunction
   val InternalAdminTokenParam           = "fr-internal-admin-token"
-
   //@XPathFunction
-  val InternalWorkflowStageParam = "fr-internal-workflow-stage"
+  val InternalWorkflowStageParam        = "fr-internal-workflow-stage"
+  //@XPathFunction
+  val InternalCreatedParam              = "fr-internal-created"
+  //@XPathFunction
+  val InternalLastModifiedParam         = "fr-internal-last-modified"
+  //@XPathFunction
+  val InternalETagParam                 = "fr-internal-etag"
 
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 

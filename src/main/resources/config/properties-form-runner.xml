@@ -532,6 +532,12 @@
         then success-message("save-success")
         recover error-message("database-error")
     </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-overwrite.*.*">
+        save(overwrite = "true")
+        then new-to-edit
+        then success-message("save-success")
+        recover error-message("database-error")
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*"><!-- deprecated, use `save-progress` -->
         process("save-progress")
     </property>

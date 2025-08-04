@@ -157,8 +157,9 @@ trait FormRunnerActionsCommon {
       ensureDataCalculationsAreUpToDate()
 
       val appForm       = AppForm(app, form)
-      val isDraft       = booleanParamByNameUseAvt(params, "draft", default = false)
+      val isDraft       = booleanParamByNameUseAvt(params, "draft",          default = false)
       val pruneMetadata = booleanParamByNameUseAvt(params, "prune-metadata", default = false)
+      val overwrite     = booleanParamByNameUseAvt(params, "overwrite",      default = false)
       val querySuffix   = paramByNameUseAvt(params, "query").map("&" + _).getOrElse("")
 
       // Notify that the data is about to be saved
@@ -193,25 +194,14 @@ trait FormRunnerActionsCommon {
         )
 
       // If the feature is enabled, we'll try to detect concurrent data modifications
-      val detectDataConflict = frc.booleanFormRunnerProperty("oxf.fr.detail.detect-data-conflict")
-
-      // Since we can't pass parameters to processes (#1688), we use an instance value as a workaround and make sure
-      // it's cleared after being read. Ideally, this value would simply be passed to the "save-final" process and
-      // then to the save action as a parameter.
-
-      lazy val overwriteIfConflictDetected = instanceRoot("fr-persistence-instance").exists { i =>
-        val ref   = i / "save" / "conflict-overwrite"
-        val value = ref.headOption.flatMap(_.stringValue.trimAllToOpt).contains("true")
-        XFormsAPI.setvalue(ref, "")
-        value
-      }
+      val detectDataConflict = frc.formRunnerProperty("oxf.fr.detail.conflict-detection").contains("save-only")
 
       // We'll provide an If-Match directive to the PUT request if the following conditions are met:
       //  - the feature is enabled
       //  - we're not forcing an overwrite
       //  - we're not saving a draft
       //  - the original ETag of the form data is available
-      val ifMatchOpt = (detectDataConflict && ! overwriteIfConflictDetected && ! isDraft).flatOption {
+      val ifMatchOpt = (detectDataConflict && ! overwrite && ! isDraft).flatOption {
         instanceRoot("fr-document-metadata").flatMap { i =>
           (i /@ "etag").headOption.flatMap(_.stringValue.trimAllToOpt)
         }

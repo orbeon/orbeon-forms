@@ -7,7 +7,6 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.function.CoreSupport
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.saxon.{IndependentRequestFunctions, om}
 import org.orbeon.xforms.{Namespaces, XFormsNames}
 
 

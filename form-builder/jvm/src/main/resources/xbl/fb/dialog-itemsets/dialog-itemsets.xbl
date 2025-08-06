@@ -42,6 +42,7 @@
                 <xf:setvalue ref="appearance"           value="event('control-element')/@appearance"/>
                 <xf:setvalue ref="html"                 value="fbf:isItemsetHTMLMediatype($control-name)"/>
                 <xf:setvalue ref="filter"               value="event('control-element')/xf:itemset[1]/fr:filter/fr:expr"/>
+                <xf:setvalue ref="itemsetid-mode"       value="event('control-element')/@fr:itemsetid-mode"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
 
@@ -104,6 +105,16 @@
                                 )
                             )"/>
                 </xf:action>
+                <xf:delete
+                    ref="$control/@fr:itemsetid-mode"/>
+                <xf:insert
+                    if="xxf:non-blank($i/itemsetid-mode)"
+                    context="$control"
+                    origin="
+                        xf:attribute(
+                            'fr:itemsetid-mode',
+                            $i/itemsetid-mode/string()
+                        )"/>
             </xbl:handler>
 
             <!-- Add line when users press enter -->
@@ -129,6 +140,7 @@
                             <disabled/>     <!-- A node that is always disabled -->
                         </triggers>
                         <filter/>
+                        <itemsetid-mode/>
                     </instance>
                 </xf:instance>
 
@@ -223,11 +235,28 @@
                         </fr:grid>
                     </xf:group>
                     <fr:grid ref="$i" markup="css-grid">
-                        <fr:c x="1" w="12">
+                        <fr:c y="1" x="1" w="12">
                             <xf:textarea ref="filter" appearance="xpath-completion" xpath-completion-updates="">
                                 <xf:label ref="xxf:r('dialog-itemsets.filter.label', '|fr-form-resources|')"/>
                                 <xf:alert ref="xxf:r('components.parameters-editor.xpath.alert', '|fr-form-resources|')"/>
                             </xf:textarea>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="12">
+                            <xf:select1 ref="itemsetid-mode" appearance="full xxf:horizontal">
+                                <xf:label ref="xxf:r('dialog-itemsets.itemsetid-mode.label', '|fr-form-resources|')"/>
+                                <xf:itemset ref="xxf:resource-elements('dialog-itemsets.itemsetid-mode.item', '|fr-form-resources|')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="
+                                        if (@id = '0') then
+                                            ''
+                                        else if (@id = '1') then
+                                            'always'
+                                        else if (@id = '2') then
+                                            'never'
+                                        else
+                                            error()"/>
+                                </xf:itemset>
+                            </xf:select1>
                         </fr:c>
                     </fr:grid>
 

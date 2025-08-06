@@ -1127,6 +1127,12 @@
             <filter>
                 <label>Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Use choices from metadata</label>
+                <item id="0">When the control is the target of an action (default)</item>
+                <item id="1">Always</item>
+                <item id="2">Never</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>
@@ -2730,6 +2736,12 @@
             <filter>
                 <label>Formule filtre</label>
             </filter>
+            <itemsetid-mode>
+                <label>Utiliser les choix provenant des métadonnées</label>
+                <item id="0">Lorsque le contrôle est la cible d'une action</item>
+                <item id="1">Toujours</item>
+                <item id="2">Jamais</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editeur de services HTTP</label>
@@ -4313,6 +4325,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Bruk valg fra metadata</label>
+                <item id="0">Når kontrollen er målet for en handling (standard)</item>
+                <item id="1">Alltid</item>
+                <item id="2">Aldri</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjenesteredigering</label>
@@ -5923,6 +5941,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Использовать варианты из метаданных</label>
+                <item id="0">Когда элемент управления является целью действия (по умолчанию)</item>
+                <item id="1">Всегда</item>
+                <item id="2">Никогда</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Редактор HTTP-сервисов</label>
@@ -7526,6 +7550,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Usa le scelte dai metadati</label>
+                <item id="0">Quando il controllo è il target di un'azione (predefinito)</item>
+                <item id="1">Sempre</item>
+                <item id="2">Mai</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore servizi HTTP</label>
@@ -9102,6 +9132,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Auswahlen aus Metadaten verwenden</label>
+                <item id="0">Wenn das Steuerelement Ziel einer Aktion ist (Standard)</item>
+                <item id="1">Immer</item>
+                <item id="2">Nie</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
@@ -10680,6 +10716,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Käytä valintoja metatiedoista</label>
+                <item id="0">Kun ohjauselementti on toiminnon kohde (oletus)</item>
+                <item id="1">Aina</item>
+                <item id="2">Ei koskaan</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>
@@ -12283,6 +12325,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Usar opciones de los metadatos</label>
+                <item id="0">Cuando el control es el objetivo de una acción (predeterminado)</item>
+                <item id="1">Siempre</item>
+                <item id="2">Nunca</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor de Servicios HTTP</label>
@@ -13894,6 +13942,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Keuzes uit metadata gebruiken</label>
+                <item id="0">Wanneer de besturing het doel is van een actie (standaard)</item>
+                <item id="1">Altijd</item>
+                <item id="2">Nooit</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP service-editor</label>
@@ -15476,6 +15530,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Usar opções dos metadados</label>
+                <item id="0">Quando o controle é o alvo de uma ação (padrão)</item>
+                <item id="1">Sempre</item>
+                <item id="2">Nunca</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor do serviço HTTP</label>
@@ -17087,6 +17147,12 @@
             <filter>
                 <label todo="true">Filter Formula</label>
             </filter>
+            <itemsetid-mode>
+                <label>Använd val från metadata</label>
+                <item id="0">När kontrollen är målet för en åtgärd (standard)</item>
+                <item id="1">Alltid</item>
+                <item id="2">Aldrig</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjänster</label>
@@ -18717,6 +18783,12 @@
             <filter>
                 <label>صيغة التصفية</label>
             </filter>
+            <itemsetid-mode>
+                <label>استخدام الخيارات من البيانات الوصفية</label>
+                <item id="0">عندما يكون عنصر التحكم هو هدف الإجراء (الافتراضي)</item>
+                <item id="1">دائمًا</item>
+                <item id="2">أبدًا</item>
+            </itemsetid-mode>
         </dialog-itemsets>
         <dialog-http-services>
             <label>محرر خدمة HTTP</label>

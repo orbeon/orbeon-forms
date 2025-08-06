@@ -194,7 +194,8 @@ trait CreateUpdateDelete {
     req            : CrudRequest,
     reqBodyOpt     : Option[RequestReader.Body],
     delete         : Boolean,
-    versionToSet   : Int
+    versionToSet   : Int,
+    forSingleton   : Boolean
   )(implicit
     externalContext: ExternalContext
   ): StoreResult = {
@@ -305,6 +306,7 @@ trait CreateUpdateDelete {
 
         // TODO: delete draft attachments also in filesystem/S3
 
+        // For https://github.com/orbeon/orbeon-forms/issues/4515
         // 1. In `CreateUpdateDelete.scala`:
         //   1.1. Above, we read/write from/to orbeon_i_current/orbeon_i_control_text (remove drafts)
         //   1.2. Below, we write      to      orbeon_form_data                       (write data)
@@ -314,7 +316,9 @@ trait CreateUpdateDelete {
         // This can lead to a deadlock, hence here doing a commit after deleting the drafts.
         // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems
         // negligible.
-        connection.commit()
+        // For singletons, we search, store, and reindex in a single transaction, so we don't commit here.
+        if (! forSingleton)
+          connection.commit()
 
       case _ =>
     } // end delete draft data and attachments
@@ -457,63 +461,62 @@ trait CreateUpdateDelete {
       req.singleton.getOrElse(false)
 
     // Update database
-    val lastModifiedOpt =
-    if (allowCreateOnlyIfSearchEmpty) {
-      // https://github.com/orbeon/orbeon-forms/issues/7164
-      try {
-        RelationalUtils.withConnection { connection =>
+    val storeResult =
+      if (allowCreateOnlyIfSearchEmpty) {
+        // https://github.com/orbeon/orbeon-forms/issues/7164
+        try {
+          RelationalUtils.withConnection { connection =>
 
-          val mustLockTable =
-            req.provider match {
-              case Provider.PostgreSQL | Provider.SQLServer => true  // supported
-              case Provider.Oracle     | Provider.DB2       => false // can hopefully be supported
-              case Provider.MySQL      | Provider.SQLite    => false // might be supported
-              }
+            val mustLockTable =
+              req.provider match {
+                case Provider.PostgreSQL => true
+                case _                   => false
+                }
 
-          if (mustLockTable)
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+            if (mustLockTable)
+              connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
 
-          Provider.maybeWithLockedTable(connection, req.provider, "orbeon_i_current", mustLockTable) {
+            Provider.maybeWithLockedTable(connection, req.provider, "orbeon_i_current", mustLockTable) {
 
-            val (_, count) = SearchLogic.doSearch(
-              request = SearchRequest(
-                provider            = req.provider,
-                appForm             = req.appForm,
-                version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
-                credentials         = req.credentials,
-                isInternalAdminUser = false,
-                pageSize            = 1,
-                pageNumber          = 1,
-                queries             = Nil,
-                drafts              = Drafts.IncludeDrafts,
-                freeTextSearch      = None,
-                anyOfOperations     = None
-              ),
-              connectionOpt = Some(connection)
-            )
-            if (count > 0)
-              throw HttpStatusCodeException(StatusCode.Conflict)
+              val (_, count) = SearchLogic.doSearch(
+                request = SearchRequest(
+                  provider            = req.provider,
+                  appForm             = req.appForm,
+                  version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
+                  credentials         = req.credentials,
+                  isInternalAdminUser = false,
+                  pageSize            = 1,
+                  pageNumber          = 1,
+                  queries             = Nil,
+                  drafts              = Drafts.IncludeDrafts,
+                  freeTextSearch      = None,
+                  anyOfOperations     = None
+                ),
+                connectionOpt = Some(connection)
+              )
+              if (count > 0)
+                throw HttpStatusCodeException(StatusCode.Conflict)
 
-            val lastModifiedOpt = store(connection, req, reqBodyOpt, delete, versionToSet)
-            reindex(Some(connection))
-            lastModifiedOpt
+              val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet, forSingleton = true)
+              reindex(Some(connection))
+              storeResult
+            }
           }
+        } catch {
+          case _: java.sql.SQLException if allowCreateOnlyIfSearchEmpty =>
+            // See https://github.com/orbeon/orbeon-forms/issues/7164
+            // If we get an error with `allowCreateOnlyIfSearchEmpty == true` we assume that it is a conflict.
+            // Can we do better?
+            throw HttpStatusCodeException(StatusCode.Conflict)
         }
-      } catch {
-        case _: java.sql.SQLException if allowCreateOnlyIfSearchEmpty =>
-          // See https://github.com/orbeon/orbeon-forms/issues/7164
-          // If we get an error with `allowCreateOnlyIfSearchEmpty == true` we assume that it is a conflict.
-          // Can we do better?
-          throw HttpStatusCodeException(StatusCode.Conflict)
-      }
-    } else {
-      // This is the normal case, which doesn't require any special locking
-      val lastModifiedOpt =
-        RelationalUtils.withConnection { connection =>
-          store(connection, req, reqBodyOpt, delete, versionToSet)
-        }
-      reindex(None)
-      lastModifiedOpt
+      } else {
+        // This is the normal case, which doesn't require any special locking
+        val storeResult =
+          RelationalUtils.withConnection { connection =>
+            store(connection, req, reqBodyOpt, delete, versionToSet, forSingleton = false)
+          }
+        reindex(None)
+        storeResult
     }
 
     if (createFlatView)
@@ -533,7 +536,7 @@ trait CreateUpdateDelete {
     //
     // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case,
     // although we don't have a use for it at the moment.
-    lastModifiedOpt.foreach { lastModified =>
+    storeResult.lastModifiedOpt.foreach { lastModified =>
       httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified))
       httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified))
     }

@@ -188,7 +188,6 @@ trait CreateUpdateDelete {
 
   case class StoreResult(idOpt: Option[Int], lastModifiedOpt: Option[Instant])
 
-  // TODO: consider splitting into `deleteDrafts()` and `store()`
   private def store(
     connection     : java.sql.Connection,
     req            : CrudRequest,
@@ -272,85 +271,73 @@ trait CreateUpdateDelete {
         }
     }
 
-    // If for data, start by deleting any draft document and draft attachments
-    req.dataPart match {
-      case Some(dataPart) if ! req.forAttachment =>
+    def doDeleteDraftDataAndAttachments(dataPart: DataPart): Unit = {
+      // See https://github.com/orbeon/orbeon-forms/issues/2980: when saving the data for a draft, we don't want to
+      // remove draft attachments from `orbeon_form_data_attach`, otherwise the attachments which were just saved are
+      // immediately removed! So we remove draft attachments from `from orbeon_form_data_attach` only when we are
+      // saving data which is not for a draft. Note that there is no garbage collection for attachments.
 
-        // See https://github.com/orbeon/orbeon-forms/issues/2980: when saving the data for a draft, we don't want to
-        // remove draft attachments from `orbeon_form_data_attach`, otherwise the attachments which were just saved are
-        // immediately removed! So we remove draft attachments from `from orbeon_form_data_attach` only when we are
-        // saving data which is not for a draft. Note that there is no garbage collection for attachments.
+      // See https://github.com/orbeon/orbeon-forms/issues/7049: we also want to delete draft attachments in the case
+      // where we're explicitly deleting a draft. Before the fix for #7049, we had:
+      //
+      //  val deleteDraftAttachments = ! dataPart.isDraft
+      //
+      // Now, with both conditions, we have:
+      //
+      //  val deleteDraftAttachments = ! dataPart.isDraft || (dataPart.isDraft && delete)
+      //                             = ! dataPart.isDraft || delete
 
-        // See https://github.com/orbeon/orbeon-forms/issues/7049: we also want to delete draft attachments in the case
-        // where we're explicitly deleting a draft. Before the fix for #7049, we had:
-        //
-        //  val deleteDraftAttachments = ! dataPart.isDraft
-        //
-        // Now, with both conditions, we have:
-        //
-        //  val deleteDraftAttachments = ! dataPart.isDraft || (dataPart.isDraft && delete)
-        //                             = ! dataPart.isDraft || delete
+      val deleteDraftAttachments = ! dataPart.isDraft || delete
 
-        val deleteDraftAttachments = ! dataPart.isDraft || delete
+      val tablesToDeleteDraftsFrom =
+        "orbeon_i_control_text"                                 ::
+        (deleteDraftAttachments list "orbeon_form_data_attach") :::
+        "orbeon_i_current"                                      ::
+        "orbeon_form_data"                                      ::
+        Nil
 
-        val tablesToDeleteDraftsFrom =
-          "orbeon_i_control_text"                                 ::
-          (deleteDraftAttachments list "orbeon_form_data_attach") :::
-          "orbeon_i_current"                                      ::
-          "orbeon_form_data"                                      ::
-          Nil
+      tablesToDeleteDraftsFrom.foreach { table =>
+        doDelete(table, dataPart.documentId, isDraft = true, lastModifiedOpt = None, filenameOpt = None)
+      }
 
-        tablesToDeleteDraftsFrom.foreach { table =>
-          doDelete(table, dataPart.documentId, isDraft = true, lastModifiedOpt = None, filenameOpt = None)
-        }
+      // TODO: delete draft attachments also in filesystem/S3
 
-        // TODO: delete draft attachments also in filesystem/S3
-
-        // For https://github.com/orbeon/orbeon-forms/issues/4515
-        // 1. In `CreateUpdateDelete.scala`:
-        //   1.1. Above, we read/write from/to orbeon_i_current/orbeon_i_control_text (remove drafts)
-        //   1.2. Below, we write      to      orbeon_form_data                       (write data)
-        // 2. In `Reindex.scala`:
-        //   2.1. 1st,   we read       from    orbeon_form_data                       (get data to index)
-        //   2.2. 2nd,   we write      to      orbeon_i_current/orbeon_i_control_text (update the index)
-        // This can lead to a deadlock, hence here doing a commit after deleting the drafts.
-        // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems
-        // negligible.
-        // For singletons, we search, store, and reindex in a single transaction, so we don't commit here.
-        if (! forSingleton)
-          connection.commit()
-
-      case _ =>
-    } // end delete draft data and attachments
-
-    req.dataPart match {
-      case Some(dataPart) if dataPart.forceDelete =>
-
-        assert(delete)
-
-        // Force delete, AKA purge, historical data and/or attachments
-
-        req.filename match {
-          case None if req.lastModifiedOpt.isEmpty =>
-            // For data but missing last modified time
-            throw HttpStatusCodeException(StatusCode.BadRequest)
-          case None =>
-            // For data
-            doDelete("orbeon_form_data", dataPart.documentId, isDraft = false, req.lastModifiedOpt, filenameOpt = None)
-          case someFilename =>
-            // For attachment
-            // Here we delete all data matching the document id and filename, regardless of the last modified time
-            doDelete("orbeon_form_data_attach", dataPart.documentId, isDraft = false, None, someFilename)
-        }
-      case _ =>
+      // For https://github.com/orbeon/orbeon-forms/issues/4515
+      // 1. In `CreateUpdateDelete.scala`:
+      //   1.1. Above, we read/write from/to orbeon_i_current/orbeon_i_control_text (remove drafts)
+      //   1.2. Below, we write      to      orbeon_form_data                       (write data)
+      // 2. In `Reindex.scala`:
+      //   2.1. 1st,   we read       from    orbeon_form_data                       (get data to index)
+      //   2.2. 2nd,   we write      to      orbeon_i_current/orbeon_i_control_text (update the index)
+      // This can lead to a deadlock, hence here doing a commit after deleting the drafts.
+      // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems
+      // negligible.
+      // For singletons, we search, store, and reindex in a single transaction, so we don't commit here.
+      if (! forSingleton)
+        connection.commit()
     }
 
-    val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
-    val forceDelete       = delete && req.dataPart.exists(_.forceDelete)
+    def doForceDelete(dataPart: DataPart): Unit = {
 
-    if (! deletingDataDraft && ! forceDelete) {
+      assert(delete)
 
-      // Do insert, unless we're deleting draft data or force deleting
+      // Force delete, AKA purge, historical data and/or attachments
+
+      req.filename match {
+        case None if req.lastModifiedOpt.isEmpty =>
+          // For data but missing last modified time
+          throw HttpStatusCodeException(StatusCode.BadRequest)
+        case None =>
+          // For data
+          doDelete("orbeon_form_data", dataPart.documentId, isDraft = false, req.lastModifiedOpt, filenameOpt = None)
+        case someFilename =>
+          // For attachment
+          // Here we delete all data matching the document id and filename, regardless of the last modified time
+          doDelete("orbeon_form_data_attach", dataPart.documentId, isDraft = false, None, someFilename)
+      }
+    }
+
+    def doInsert(): StoreResult = {
 
       val currentTimestamp = new Timestamp(System.currentTimeMillis())
 
@@ -385,9 +372,26 @@ trait CreateUpdateDelete {
       }
 
       StoreResult(idOpt, currentTimestamp.toInstant.some)
-    } else {
-      StoreResult(idOpt = None, lastModifiedOpt = None)
     }
+
+    req.dataPart.collect {
+      case dataPart if ! req.forAttachment =>
+        doDeleteDraftDataAndAttachments(dataPart)
+    }
+
+    req.dataPart match {
+      case Some(dataPart) if dataPart.forceDelete =>
+        doForceDelete(dataPart)
+      case _ =>
+    }
+
+    val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
+    val forceDelete       = delete && req.dataPart.exists(_.forceDelete)
+
+    if (! deletingDataDraft && ! forceDelete)
+      doInsert()
+    else
+      StoreResult(idOpt = None, lastModifiedOpt = None)
   }
 
   def change(

@@ -573,24 +573,20 @@ trait FormRunnerActions
     // https://github.com/orbeon/orbeon-forms/issues/5437
     // https://github.com/orbeon/orbeon-forms/issues/7157
     val internalParams = {
-      val ops                = frc.authorizedOperations
-      val opsParam           = ops.nonEmpty.list(InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
-      val workflowStageParam = FormRunner.documentWorkflowStage.toList.map { workflowStage =>
-        InternalWorkflowStageParam -> FormRunnerOperationsEncryption.encryptString(workflowStage)
+      val ops      = frc.authorizedOperations
+      val opsParam = ops.nonEmpty.list(InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
+
+      val documentMetadataParams = List(
+        InternalWorkflowStageParam -> FormRunner.documentWorkflowStage,
+        // Propagate original document metadata in order to detect concurrent data modifications (#7157)
+        InternalCreatedParam       -> FormRunner.documentMetadataStringOpt(Headers.Created),
+        InternalLastModifiedParam  -> FormRunner.documentMetadataStringOpt(Headers.LastModified),
+        InternalETagParam          -> FormRunner.documentMetadataStringOpt(Headers.ETag)
+      ).flatMap { case (param, valueOpt) =>
+        valueOpt.map(param -> FormRunnerOperationsEncryption.encryptString(_))
       }
 
-      // Propagate original document metadata in order to detect concurrent data modifications (#7157)
-      val documentMetadataParams = for {
-        instance                       <- instanceRoot("fr-document-metadata").toList
-        (attributeName, internalParam) <- List(
-          "created"       -> InternalCreatedParam,
-          "last-modified" -> InternalLastModifiedParam,
-          "etag"          -> InternalETagParam
-        )
-        attributeValue                 <- (instance /@ attributeName).headOption.flatMap(_.stringValue.trimAllToOpt)
-      } yield internalParam -> FormRunnerOperationsEncryption.encryptString(attributeValue)
-
-      opsParam ::: workflowStageParam ::: documentMetadataParams
+      opsParam ::: documentMetadataParams
     }
 
     def filterParams[T](p: List[(String, T)]): List[(String, T)] =

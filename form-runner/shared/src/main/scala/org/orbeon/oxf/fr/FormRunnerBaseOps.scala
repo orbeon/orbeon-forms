@@ -424,6 +424,9 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
   private def documentMetadataWorkflowStageAtt: NodeInfo = documentMetadataInstance.rootElement.att(Names.WorkflowStage).head
 
+  def documentMetadataStringOpt(header: String): Option[String] =
+    documentMetadataInstance.rootElement.attValueOpt(header.toLowerCase).flatMap(_.trimAllToOpt)
+
   def documentCreatedDate: Option[Long]     = documentMetadataDate(Headers.Created)
   def documentModifiedDate: Option[Long]    = documentMetadataDate(Headers.LastModified)
   def documentWorkflowStage: Option[String] = documentMetadataWorkflowStageAtt.stringValue.trimAllToOpt

@@ -202,9 +202,7 @@ trait FormRunnerActionsCommon {
       //  - we're not saving a draft
       //  - the original ETag of the form data is available
       val ifMatchOpt = (detectDataConflict && ! overwrite && ! isDraft).flatOption {
-        instanceRoot("fr-document-metadata").flatMap { i =>
-          (i /@ "etag").headOption.flatMap(_.stringValue.trimAllToOpt)
-        }
+        FormRunner.documentMetadataStringOpt(Headers.ETag)
       }
 
       implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)

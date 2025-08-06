@@ -1242,11 +1242,16 @@ body.orbeon {
     .fb-ids-dialog {
         width: 500px;
 
-        table {
-            table-layout: fixed;
+        .fb-dialog-body {
 
-            .fb-status {
-                width: 24px;
+            overflow-y: auto;
+
+            table {
+                table-layout: fixed;
+
+                .fb-status {
+                    width: 24px;
+                }
             }
         }
     }

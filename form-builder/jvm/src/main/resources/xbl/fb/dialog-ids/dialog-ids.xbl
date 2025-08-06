@@ -81,7 +81,7 @@
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-ids-dialog">
                     <xf:label ref="$resources/dialog-ids/label"/>
 
-                    <xh:div>
+                    <xh:div class="fb-dialog-body">
 
                         <fr:grid>
                             <xh:tr>
@@ -131,20 +131,20 @@
                                 </xf:repeat>
                             </xh:tbody>
                         </xh:table>
-
-                        <xh:div class="fr-dialog-buttons">
-                            <xf:group id="triggers">
-                                <xf:trigger id="save-trigger" appearance="xxf:primary">
-                                    <xf:label ref="$resources/apply/label"/>
-                                </xf:trigger>
-                                <xf:output value="$resources/or/label"/>
-                                <xf:trigger appearance="minimal" id="cancel-trigger">
-                                    <xf:label ref="$resources/cancel/label"/>
-                                </xf:trigger>
-                            </xf:group>
-                        </xh:div>
-
                     </xh:div>
+
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group id="triggers">
+                            <xf:trigger id="save-trigger" appearance="xxf:primary">
+                                <xf:label ref="$resources/apply/label"/>
+                            </xf:trigger>
+                            <xf:output value="$resources/or/label"/>
+                            <xf:trigger appearance="minimal" id="cancel-trigger">
+                                <xf:label ref="$resources/cancel/label"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+
                 </xxf:dialog>
             </xf:group>
         </xbl:template>

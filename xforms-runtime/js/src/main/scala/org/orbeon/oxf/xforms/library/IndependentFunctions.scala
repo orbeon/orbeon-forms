@@ -31,11 +31,14 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("get-portlet-mode", classOf[GetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
-//
-//    Fun("get-window-state", classOf[GetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
-//
+
+  @XPathFunction
+  def getPortletMode: Option[String] =
+    Option(CoreCrossPlatformSupport.externalContext.getRequest.getPortletMode)
+
+  @XPathFunction
+  def getWindowState: Option[String] =
+    Option(CoreCrossPlatformSupport.externalContext.getRequest.getWindowState)
 
   @XPathFunction
   def getSessionAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {

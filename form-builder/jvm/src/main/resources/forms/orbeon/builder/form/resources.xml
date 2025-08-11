@@ -333,6 +333,12 @@
         <errors>
             <label>Errors</label>
         </errors>
+        <error-summary>
+            <label>{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}</label>
+        </error-summary>
         <back-to-summary>
             <label>Back to List of Forms</label>
         </back-to-summary>
@@ -608,6 +614,7 @@
             <default-sort-column>
                 <ascending>Ascending</ascending>
                 <descending>Descending</descending>
+                <conflict>Enabling sorting on this control will disable it on the following control: {0}</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Control Appearance</label>
@@ -1939,6 +1946,12 @@
         <errors>
             <label>Erreurs</label>
         </errors>
+        <error-summary>
+            <label todo="true">{1,choice,
+                0#Pas de message|
+                1#'{0,choice,0#Erreur|1#Avertissement|2#Message informatif|3#Message}'|
+                1&lt;'{0,choice,0#Erreurs|1#Avertissements|2#Messages informatifs|3#Messages}'}</label>
+        </error-summary>
         <back-to-summary>
             <label>Retour à la liste des formulaires</label>
         </back-to-summary>
@@ -2214,6 +2227,7 @@
             <default-sort-column>
                 <ascending>Croissant</ascending>
                 <descending>Décroissant</descending>
+                <conflict>L''activation du tri sur ce contrôle le désactivera sur le contrôle suivant : {0}</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Apparence du contrôle</label>
@@ -3530,6 +3544,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -3805,6 +3825,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -5147,6 +5168,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -5422,6 +5449,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -6764,6 +6792,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -7039,6 +7073,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -8345,6 +8380,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -8620,6 +8661,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
@@ -9929,6 +9971,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -10204,6 +10252,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -11538,6 +11587,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -11813,6 +11868,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Presentación del Control</label>
@@ -13148,6 +13204,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -13423,6 +13485,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Control weergave</label>
@@ -14737,6 +14800,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -15012,6 +15081,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -16353,6 +16423,12 @@
         <errors>
             <label todo="true">Errors</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -16628,6 +16704,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Kontrollens utseende</label>
@@ -17989,6 +18066,12 @@
         <errors>
             <label>أخطاء</label>
         </errors>
+        <error-summary>
+            <label todo="true">[{1,choice,
+                0#No message|
+                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
+                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        </error-summary>
         <back-to-summary>
             <label>العودة إلى قائمة النماذج</label>
         </back-to-summary>
@@ -18264,6 +18347,7 @@
             <default-sort-column>
                 <ascending todo="true">[Ascending]</ascending>
                 <descending todo="true">[Descending]</descending>
+                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>مظهر عنصر التحكم</label>

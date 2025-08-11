@@ -803,6 +803,8 @@
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
                         <pdf-field-name type="automatic"/>
 
+                        <visible-counts alert="" error="" warning="" info=""/>
+
                         <fr-index               enabled=""/>
                         <fr-summary-show        enabled="" role-required="" require-role-constraint="" legacy="">
                             <!--<require-role/>-->
@@ -944,6 +946,8 @@
                             else
                                 true()"/>
                 </xf:bind>
+
+                <xf:bind ref="visible-counts/@*" type="xs:integer"/>
 
                 <xf:bind ref="default-alert">
                     <xf:bind
@@ -1119,7 +1123,14 @@
                         <xf:constraint id="role-non-duplicated" value=". = '' or not(. = (../require-role except .))"/>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind ref="$i/fr-default-sort-column/@enabled" type="xs:boolean"/>
+
+                <xf:bind ref="$i/fr-default-sort-column/@enabled" type="xs:boolean">
+                    <!-- Display information if other controls have sorting enabled -->
+                    <xf:constraint
+                        id="default-sort-column-validation"
+                        level="info"
+                        value=". = false() or empty(xxf:split(fbf:controlsWithSorting($i/original-control-name)))"/>
+                </xf:bind>
                 <xf:bind ref="$i/fr-encrypt/@enabled"             type="xs:boolean"/>
 
                 <xf:instance id="processes">
@@ -1305,6 +1316,14 @@
                                                                     <!-- Normal case: do not expose 'column only' and 'search only' options -->
                                                                     <fr:checkbox-input ref="$checkbox-binding" class="{{concat($base-class-name, '-checkbox')}}">
                                                                         <xf:label ref="$item-to-show/label"/>
+
+                                                                        <xf:alert
+                                                                            ref="xxf:format-message(
+                                                                                    $resources/dialog-control-settings/default-sort-column/conflict,
+                                                                                    fbf:controlsWithSorting($i/original-control-name)
+                                                                                 )"
+                                                                            validation="default-sort-column-validation"/>
+
                                                                         <!--
                                                                             We don't like to update values of another checkbox when one is selected, but
                                                                             we accept this way of doing things here as we indent the Summary checkboxes
@@ -2078,8 +2097,39 @@
                         </xsl:if>
                     </fr:tabbable>
 
-                    <fr:error-summary id="error-summary" observer="fb-tabbable" valid-ref="$i/@valid">
-                        <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
+                    <fr:error-summary
+                        id="error-summary"
+                        observer="fb-tabbable"
+                        valid-ref="$i/@valid"
+                        visible-alerts-count-ref="$i/visible-counts/@alert"
+                        visible-errors-count-ref="$i/visible-counts/@error"
+                        visible-warnings-count-ref="$i/visible-counts/@warning"
+                        visible-infos-count-ref="$i/visible-counts/@info"
+                    >
+
+                        <fr:label>
+                            <xf:output
+                                value="
+                                    xxf:format-message(
+                                        xxf:r('error-summary.label', '|fr-form-resources|'),
+                                        (
+                                            $i/visible-counts/(
+                                                if (count((@error, @warning, @info)[. gt 0]) gt 1) then
+                                                    3
+                                                else if (@error gt 0) then
+                                                    0
+                                                else if (@warning gt 0) then
+                                                    1
+                                                else if (@info gt 0) then
+                                                    2
+                                                else
+                                                    4
+                                            ),
+                                            $i/visible-counts/xs:integer(@alert)
+                                        )
+                                    )"/>
+                        </fr:label>
+
                     </fr:error-summary>
 
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->

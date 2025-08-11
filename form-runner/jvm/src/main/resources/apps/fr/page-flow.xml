@@ -11,7 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
+<controller
+    xmlns="http://www.orbeon.com/oxf/controller"
+    matcher="regexp"
+    request-interceptor="org.orbeon.xforms.route.XFormsServerInterceptor">
 
     <!-- ==== XForms================================================================================================ -->
 
@@ -224,7 +227,6 @@
 
     <!-- New, edit or view document (supports POST of XML, or GET)  -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(new|edit|view)(/([^/^.]+))?"
-          public-methods="GET HEAD POST"
           model="detail/detail-model.xpl" view="html-view.xpl">
     </page>
 

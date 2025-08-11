@@ -86,10 +86,6 @@ class SingletonTest
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("singleton document creation") { (_, provider) =>
 
-          // Whitelist supported providers
-          // See https://github.com/orbeon/orbeon-forms/issues/7164
-          assume(List(Provider.PostgreSQL, Provider.SQLServer).contains(provider))
-
           import cats.effect.*
           import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
 
@@ -130,8 +126,11 @@ class SingletonTest
             assert(response.statusCode == StatusCode.Conflict)
           }
 
-          testForForm("singleton-no-delay", 0.millis)
-          testForForm("singleton-with-delay", Random.between(0, 20).millis)
+          // Run a number of times (but not too many times for CI) to try to catch concurrency issues
+          for (i <- 1 to 100) {
+            testForForm(s"singleton-no-delay-$i", 0.millis)
+            testForForm(s"singleton-with-delay-$i", Random.between(0, 20).millis)
+          }
         }
       }
     }

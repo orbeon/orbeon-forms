@@ -302,17 +302,8 @@ trait CreateUpdateDelete {
 
       // TODO: delete draft attachments also in filesystem/S3
 
-      // For https://github.com/orbeon/orbeon-forms/issues/4515
-      // 1. In `CreateUpdateDelete.scala`:
-      //   1.1. Above, we read/write from/to orbeon_i_current/orbeon_i_control_text (remove drafts)
-      //   1.2. Below, we write      to      orbeon_form_data                       (write data)
-      // 2. In `Reindex.scala`:
-      //   2.1. 1st,   we read       from    orbeon_form_data                       (get data to index)
-      //   2.2. 2nd,   we write      to      orbeon_i_current/orbeon_i_control_text (update the index)
-      // This can lead to a deadlock, hence here doing a commit after deleting the drafts.
-      // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems
-      // negligible.
-      // For singletons, we search, store, and reindex in a single transaction, so we don't commit here.
+      // We used to do a `commit()` here for #4515
+      // But we must not commit for singletons at least, as that breaks what should be a single transaction
       if (! forSingleton)
         connection.commit()
     }
@@ -471,40 +462,30 @@ trait CreateUpdateDelete {
         try {
           RelationalUtils.withConnection { connection =>
 
-            val mustLockTable =
-              req.provider match {
-                case Provider.PostgreSQL => true
-                case _                   => false
-                }
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
 
-            if (mustLockTable)
-              connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+            val (_, count) = SearchLogic.doSearch(
+              request = SearchRequest(
+                provider            = req.provider,
+                appForm             = req.appForm,
+                version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
+                credentials         = req.credentials,
+                isInternalAdminUser = false,
+                pageSize            = 1,
+                pageNumber          = 1,
+                queries             = Nil,
+                drafts              = Drafts.IncludeDrafts,
+                freeTextSearch      = None,
+                anyOfOperations     = None
+              ),
+              connectionOpt = Some(connection)
+            )
+            if (count > 0)
+              throw HttpStatusCodeException(StatusCode.Conflict)
 
-            Provider.maybeWithLockedTable(connection, req.provider, "orbeon_i_current", mustLockTable) {
-
-              val (_, count) = SearchLogic.doSearch(
-                request = SearchRequest(
-                  provider            = req.provider,
-                  appForm             = req.appForm,
-                  version             = req.version.map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest),
-                  credentials         = req.credentials,
-                  isInternalAdminUser = false,
-                  pageSize            = 1,
-                  pageNumber          = 1,
-                  queries             = Nil,
-                  drafts              = Drafts.IncludeDrafts,
-                  freeTextSearch      = None,
-                  anyOfOperations     = None
-                ),
-                connectionOpt = Some(connection)
-              )
-              if (count > 0)
-                throw HttpStatusCodeException(StatusCode.Conflict)
-
-              val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet, forSingleton = true)
-              reindex(Some(connection))
-              storeResult
-            }
+            val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet, forSingleton = true)
+            reindex(Some(connection))
+            storeResult
           }
         } catch {
           case _: java.sql.SQLException if allowCreateOnlyIfSearchEmpty =>

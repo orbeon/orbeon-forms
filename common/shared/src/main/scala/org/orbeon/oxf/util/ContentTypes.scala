@@ -33,6 +33,8 @@ object ContentTypes {
   val OctetStreamContentType      = "application/octet-stream"
   val UnknownContentType          = "content/unknown"
   val MultipartRelatedContentType = "multipart/related"
+  val MultipartFormDataContentType  = "multipart/form-data"
+  val ApplicationXWwwFormUrlencoded = "application/x-www-form-urlencoded"
 
   val CharsetParameter            = "charset"
   val ActionParameter             = "action"

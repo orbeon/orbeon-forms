@@ -236,8 +236,11 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         // Run the given route and let the caller handle errors
         debug("processing file", logParams)
         route.process(pc, ec, matchResult)
+      case Some((route: PageOrServiceRoute, matchResult)) if route.isPage && pageFlow.interceptor.exists(_.matches(ec.getRequest)) =>
+        pageFlow.interceptor.foreach(_.process(matchResult)(pc, ec))
       case Some((route: PageOrServiceRoute, matchResult)) =>
         debug("processing page/service", logParams)
+
         // The path type, `page` or `service`, can be used by the serializer to determine the appropriate `Cache-Control` header
         pc.setAttribute(PathTypeKey, if (route.isPage) PathType.Page else PathType.Service)
         // Run the given route and handle "not found" and error conditions
@@ -422,13 +425,19 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id.contains(pageId) => page }
       }
 
+    // https://github.com/orbeon/orbeon-forms/issues/7171
+    val interceptorOpt: Option[PageFlowInterceptor] =
+      controllerProperty(RequestInterceptorProperty)
+        .map(c => Class.forName(c + "$").getDeclaredField("MODULE$").get(null).asInstanceOf[PageFlowInterceptor])
+
     PageFlow(
       routes,
       handler(Set("not-found-handler")),
       handler(Set("unauthorized-handler")),
       handler(Set("error-handler")),
       pathMatchers,
-      Option(urlBase)
+      Option(urlBase),
+      interceptorOpt
     )
   }
 
@@ -499,6 +508,7 @@ object PageFlowControllerProcessor {
   val SubmissionModelProperty      = "submission-model"
   val SubmissionPathProperty       = "submission-path"
   val EpilogueProperty             = "epilogue"
+  val RequestInterceptorProperty   = "request-interceptor"
 
   val PagePublicMethodsProperty    = "page-public-methods"
   val ServicePublicMethodsProperty = "service-public-methods"
@@ -697,7 +707,8 @@ object PageFlowControllerProcessor {
     unauthorizedRoute : Option[PageOrServiceRoute],
     errorRoute        : Option[PageOrServiceRoute],
     pathMatchers      : Seq[PathMatcher],
-    file              : Option[String]
+    file              : Option[String],
+    interceptor       : Option[PageFlowInterceptor]
   )
 
   def att(e: Element, name: String): Option[String] = e.attributeValueOpt(name)

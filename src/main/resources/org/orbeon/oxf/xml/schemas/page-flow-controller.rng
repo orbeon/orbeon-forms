@@ -191,6 +191,9 @@
                 <data type="anyURI"/>
             </attribute>
         </optional>
+        <optional>
+            <attribute name="request-interceptor"/>
+        </optional>
     </define>
 
     <define name="route-attributes">

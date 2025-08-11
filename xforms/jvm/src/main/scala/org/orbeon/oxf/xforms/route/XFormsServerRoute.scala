@@ -9,6 +9,7 @@ import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.event.XFormsServer
@@ -58,7 +59,7 @@ object XFormsServerRoute extends XmlNativeRoute {
       (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
 
     // Logger used for heartbeat and request/response
-    implicit val indentedLogger = Loggers.newIndentedLogger("server")
+    implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("server")
 
     val logRequestResponse = Loggers.isDebugEnabled("server-body")
 

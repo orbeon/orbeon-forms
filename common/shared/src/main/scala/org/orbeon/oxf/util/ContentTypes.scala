@@ -82,9 +82,9 @@ object ContentTypes {
 
     val semicolonIndex = contentTypeOrNull.indexOf(";")
     if (semicolonIndex < 0)
-      return contentTypeOrNull.trimAllToOpt
-
-    contentTypeOrNull.substring(0, semicolonIndex).trimAllToOpt filterNot (_.equalsIgnoreCase(UnknownContentType))
+      contentTypeOrNull.trimAllToOpt
+    else
+      contentTypeOrNull.substring(0, semicolonIndex).trimAllToOpt.filterNot(_.equalsIgnoreCase(UnknownContentType))
   }
 
   def getContentTypeCharset(contentTypeOrNull: String): Option[String] =

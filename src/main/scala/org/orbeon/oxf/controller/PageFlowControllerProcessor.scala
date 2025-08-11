@@ -291,12 +291,16 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     // Gather properties
     implicit val properties: PropertySet = getPropertySet
 
-    def controllerProperty(name: String, default: Option[String] = None, allowEmpty: Boolean = false) =
-      att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
+    def controllerProperty(name: String, default: Option[String] = None, allowEmpty: Boolean = false): Option[String] =
+      att(configRoot, name)
+        .orElse(properties.getStringOrURIAsStringOpt(name, allowEmpty))
+        .orElse(default)
 
-    def controllerPropertyQName(name: String, default: Option[QName]) =
-      configRoot.resolveAttValueQName(name, unprefixedIsNoNamespace = true) orElse
-        Option(properties.getQName(name, default.orNull))
+    def controllerPropertyQName(name: String, default: Option[QName]): Option[QName] =
+      configRoot
+        .resolveAttValueQName(name, unprefixedIsNoNamespace = true)
+        .orElse(properties.getQNameOpt(name)
+        .orElse(default))
 
     val defaultMatcher         = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
     val defaultInstancePassing = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
@@ -328,11 +332,11 @@ class PageFlowControllerProcessor extends ProcessorImpl {
       att(configRoot, "versioned") map (_.toBoolean) getOrElse isResourcesVersioned
 
     // NOTE: We support a null epilogue value and the pipeline then uses a plain HTML serializer
-    val epilogueElement =
-      configRoot.element("epilogue")
+    val epilogueElementOpt =
+      configRoot.elementOpt("epilogue")
 
     val epilogueURL =
-      Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty)
+      epilogueElementOpt flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty)
 
     val topLevelElements = configRoot.elements
 
@@ -393,7 +397,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         urlBase                   = urlBase,
         globalInstancePassing     = defaultInstancePassing,
         epilogueURL               = epilogueURL,
-        epilogueElement           = epilogueElement,
+        epilogueElement           = epilogueElementOpt,
         pageIdToPathInfo          = pathIdToPath.asJava,
         pageIdToSetValuesDocument = pageIdToSetValuesDocument.asJava
       )
@@ -448,7 +452,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     urlBase                   : String,
     globalInstancePassing     : String,
     epilogueURL               : Option[String],
-    epilogueElement           : Element,
+    epilogueElement           : Option[Element],
     pageIdToPathInfo          : ju.Map[String, String],
     pageIdToSetValuesDocument : ju.Map[String, Document]
    ): ASTPipeline =
@@ -482,7 +486,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
       addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {
         addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {
           setNamespaces(PageFlowControllerBuilder.NAMESPACES_WITH_XSI_AND_XSLT)
-          handleEpilogue(urlBase, getStatements, epilogueURL.orNull, epilogueElement,
+          handleEpilogue(urlBase, getStatements, epilogueURL.orNull, epilogueElement.orNull,
               epilogueData, epilogueModelData, epilogueInstance)
         })
         addWhen(new ASTWhen() {

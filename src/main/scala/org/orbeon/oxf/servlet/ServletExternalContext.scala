@@ -151,10 +151,10 @@ class ServletExternalContext(
       // Only handle the `multipart/form-data"` case, as for `application/x-www-form-urlencoded` the servlet container
       // exposes parameters with getParameter*() methods (see SRV.4.1.1).
       val multipartParameterMap: Map[String, Array[AnyRef]] =
-        if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
+        if ((getContentType ne null) && getContentType.startsWith(ContentTypes.MultipartFormDataContentType)) {
           if (getInputStreamCalled)
             throw new IllegalStateException(
-              s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `multipart/form-data`"
+              s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `${ContentTypes.MultipartFormDataContentType}`"
             )
           // Decode the multipart data
           val result = Multipart.getParameterMapMultipartJava(pipelineContext, getRequest, ExternalContext.StandardHeaderCharacterEncoding)

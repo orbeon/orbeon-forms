@@ -885,7 +885,7 @@
         </xh:a>
         <xh:ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledBy="menu-button">
 
-            <xf:var name="is-logged-in"  value="exists(xxf:username())"/>
+            <xf:var name="is-logged-in"  value="exists(fr:username())"/>
 
             <!-- Who is logged in -->
             <xf:var
@@ -903,7 +903,7 @@
                                 'authentication.menu.logged-in-as',
                                 'fr-fr-resources'
                             ),
-                            xxf:username()
+                            fr:username()
                         )"/>
                 </xh:a>
             </xh:li>

@@ -71,7 +71,7 @@
             frf:isAutosaveSupported($app, $form)                                and
             not($is-background)                                                 and
             $autosave-delay gt 0                                                and
-            xxf:non-blank(xxf:username())                                       and
+            xxf:non-blank(fr:username())                                        and
             (
                 (: In the `new` mode, don't autosave if users can't edit data,
                    as subsequent autosaves update data, and thus would fail for
@@ -347,12 +347,12 @@
                 <xf:action if="$lease-enabled">
 
                     <!-- If the lease feature is enabled but we have no user information, issue a 403 -->
-                    <xf:action if="xxf:is-blank(xxf:username())" type="xpath">
+                    <xf:action if="xxf:is-blank(fr:username())" type="xpath">
                         frf:sendError(403)
                     </xf:action>
 
                     <!-- Keep track of user, lease duration, and thresholds -->
-                    <xf:setvalue ref="instance('fr-lockinfo-request')/d:owner/fr:username" value="xxf:username()"/>
+                    <xf:setvalue ref="instance('fr-lockinfo-request')/d:owner/fr:username" value="fr:username()"/>
                     <xf:setvalue
                         ref="$lease-duration-elem"
                         value="xxf:property(string-join(('oxf.fr.detail.lease.duration.*', $app, $form), '.'))"/>
@@ -1228,7 +1228,7 @@
         <!-- Show summary button if users have the read permission (obviously), but also if they are logged in, as in
              that case they might be able to see data based on ownership -->
         <xf:bind ref="can-access-summary"
-                 relevant="fr:can-read() or xxf:non-blank(xxf:username())"/>
+                 relevant="fr:can-read() or xxf:non-blank(fr:username())"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
                  relevant="not((xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')) or fr:is-pe()"

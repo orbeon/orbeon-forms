@@ -139,23 +139,6 @@ object Utils extends js.Object {
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : html.Element = js.native
 }
 
-// Minimal facades for the Broadcast Channel API
-
-@js.native
-@JSGlobal("BroadcastChannel")
-class BroadcastChannel(channelName: String) extends js.Object {
-  def name: String = js.native
-  def postMessage(message: js.Any): Unit = js.native
-  def close(): Unit = js.native
-  var onmessage: js.Function1[MessageEvent, Unit] = js.native
-  var onmessageerror: js.Function1[MessageEvent, Unit] = js.native
-}
-
-@js.native
-trait MessageEvent extends js.Object {
-  val data: js.Any = js.native
-}
-
 // Minimal facades for Bootstrap 5 and helpers for Bootstrap 2/5 modal dialogs
 
 @js.native

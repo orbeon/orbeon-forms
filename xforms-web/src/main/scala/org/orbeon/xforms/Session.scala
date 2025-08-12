@@ -3,13 +3,15 @@ package org.orbeon.xforms
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
-import org.orbeon.xforms.facade.{BroadcastChannel, MessageEvent}
+import org.orbeon.oxf.util.CoreUtils.*
+import org.scalajs.dom.{BroadcastChannel, MessageEvent}
 
 import scala.collection.mutable
 import scala.scalajs.js
 
 object Session {
-  import Private._
+
+  import Private.*
 
   sealed trait SessionStatus
   case object SessionActive        extends SessionStatus
@@ -63,15 +65,15 @@ object Session {
     var configurationOpt: Option[Configuration]  = None
     var sessionStatus: SessionStatus             = SessionActive
 
+    val broadcastChannelAvailable: Boolean = ! js.isUndefined(js.Dynamic.global.window.BroadcastChannel)
+
     private var maxNewestEventTimeAmongAllPages: Long = -1L
 
-    private lazy val sessionActivityBroadcastChannelOpt = {
-      val broadcastChannelAvailable = ! js.isUndefined(js.Dynamic.global.window.BroadcastChannel)
+    private lazy val sessionActivityBroadcastChannelOpt =
+      broadcastChannelAvailable.option { // 2025-08-19: not available with JSDOM/Node 16 yet
+        val sessionActivityBroadcastChannel = new BroadcastChannel("orbeon-session-activity")
 
-      if (broadcastChannelAvailable) {
-        val broadcastChannel = new BroadcastChannel("orbeon-session-activity")
-
-        broadcastChannel.onmessage = (event: MessageEvent) => {
+        sessionActivityBroadcastChannel.onmessage = (event: MessageEvent) => {
           for {
             sessionMessage <- sessionMessageFromJson(event.data.asInstanceOf[String])
             configuration <- configurationOpt
@@ -84,11 +86,8 @@ object Session {
           }
         }
 
-        Some(broadcastChannel)
-      } else {
-        None
+        sessionActivityBroadcastChannel
       }
-    }
 
     private def sessionMessageFromJson(jsonString: String): Either[Error, SessionMessage] = {
       // This could be done in a cleaner way by using circe's discriminator feature, but it is not available in JS.

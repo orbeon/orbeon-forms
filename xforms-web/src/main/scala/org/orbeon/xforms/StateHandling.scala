@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.scalajs.dom
 
 import scala.collection.immutable
-import scala.scalajs.js.annotation.JSExport
 
 object StateHandling {
 
@@ -56,14 +55,12 @@ object StateHandling {
         }
     }
 
-  @JSExport
   def getSequence(formId: String): String =
     XFormsSessionStorage.get(formId) match {
         case Some(sequence) => sequence.toString
         case None           => throw new IllegalArgumentException(s"Sequence for form `$formId` not found")
       }
 
-  @JSExport
   def updateSequence(formId: String, newSequence: Int): Unit =
     XFormsSessionStorage.set(formId, newSequence)
 

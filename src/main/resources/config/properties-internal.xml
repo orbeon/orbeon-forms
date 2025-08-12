@@ -647,7 +647,7 @@
         +/forms/orbeon/builder/resources/form-builder.css
         +/xbl/orbeon/buttons-bar/buttons-bar.css <!-- Form Builder doesn't yet use `fr:buttons-bar` but needs the styling -->
 
-        +/ops/dragula/dragula.min.js
+        +/webjars/dragula/3.7.3/dist/dragula.min.js
         -/ops/javascript/scalajs/orbeon-xforms-web.js
         -/apps/fr/resources/scalajs/orbeon-form-runner-web.js
         +/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js

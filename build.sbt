@@ -162,6 +162,7 @@ val CoreLibraryDependencies = Seq(
   "org.orbeon"                  % "kaptcha"                         % "2.3.3-SNAPSHOT",
 
   "org.webjars.npm"             % "codemirror"                      % "5.65.19",
+  "org.webjars.npm"             % "dragula"                         % "3.7.3",
 
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,

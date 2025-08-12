@@ -526,6 +526,18 @@ trait CreateUpdateDelete {
       httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified))
     }
 
+    if (req.forDataNotAttachment) {
+      for {
+        id           <- storeResult.idOpt
+        lastModified <- storeResult.lastModifiedOpt
+      } {
+        httpResponse.setHeader(
+          Headers.ETag,
+          ETag.eTag(tableName = SqlSupport.tableName(req), id = id, lastModified = lastModified)
+        )
+      }
+    }
+
     // "If the target resource does not have a current representation and the PUT successfully creates one, then the
     // origin server MUST inform the user agent by sending a 201 (Created) response. If the target resource does have
     // a current representation and that representation is successfully modified in accordance with the state of the

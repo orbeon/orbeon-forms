@@ -39,6 +39,27 @@
                     <xf:label ref="$resources/dialog-keyboard-shortcuts/dialog-title"/>
                     <xh:div class="fb-dialog-body">
                         <xh:div class="fb-dialog-keyboard-shortcuts-tables">
+                            <xf:var
+                                name="controls-with-keyboard-shortcut"
+                                value="
+                                    for $binding in xxf:instance('fb-components-instance')//xbl:binding
+                                    return
+                                        let $keyboard-shortcut :=
+                                            xxf:property(
+                                                concat(
+                                                    'oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-',
+                                                    $binding/@fb:binding-class-name
+                                                )
+                                            )
+                                        return
+                                            if (exists($keyboard-shortcut))
+                                            then
+                                                xf:element('_', (
+                                                    xf:attribute('keyboard-shortcut', $keyboard-shortcut),
+                                                    xf:attribute('display-name'     , string($binding/fb:metadata/fb:display-name[@lang = 'en']))
+                                                ))
+                                            else ()
+                                    "/>
                             <xh:table class="table table-condensed table-bordered">
                                 <xh:tbody>
                                     <xh:tr>
@@ -169,71 +190,15 @@
                                         <xh:td><xh:kbd>I F R</xh:kbd></xh:td>
                                         <xh:td>Insert a new repeated grid</xh:td>
                                     </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="16">Inserting Form Controls</xh:td>
-                                        <xh:td><xh:kbd>I C I</xh:kbd></xh:td>
-                                        <xh:td>Insert Text Field</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I C T</xh:kbd></xh:td>
-                                        <xh:td>Insert Text Area</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I C F</xh:kbd></xh:td>
-                                        <xh:td>Insert Formatted Text Area</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I U E</xh:kbd></xh:td>
-                                        <xh:td>Insert Explanatory Text</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I U C</xh:kbd></xh:td>
-                                        <xh:td>Insert Calculated Value</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I U H</xh:kbd></xh:td>
-                                        <xh:td>Insert Hidden Field</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I T N</xh:kbd></xh:td>
-                                        <xh:td>Insert Number</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I T E</xh:kbd></xh:td>
-                                        <xh:td>Insert Email Field</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I T D</xh:kbd></xh:td>
-                                        <xh:td>Insert Date Field</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I T T</xh:kbd></xh:td>
-                                        <xh:td>Insert Time Field</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I S D</xh:kbd></xh:td>
-                                        <xh:td>Insert Dropdown</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I S R</xh:kbd></xh:td>
-                                        <xh:td>Insert Radio Buttons</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I S C</xh:kbd></xh:td>
-                                        <xh:td>Insert Checkboxes</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I A F</xh:kbd></xh:td>
-                                        <xh:td>Insert Attachment</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I A I</xh:kbd></xh:td>
-                                        <xh:td>Insert Image Attachment</xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I A V</xh:kbd></xh:td>
-                                        <xh:td>Insert Video Attachment</xh:td>
-                                    </xh:tr>
+                                    <xf:repeat ref="$controls-with-keyboard-shortcut">
+                                        <xh:tr>
+                                            <xf:group ref="if (position() = 1) then . else ()">
+                                                <xh:td rowspan="{count($controls-with-keyboard-shortcut)}">Inserting Form Controls</xh:td>
+                                            </xf:group>
+                                            <xh:td><xh:kbd><xf:output value="@keyboard-shortcut"/></xh:kbd></xh:td>
+                                            <xh:td><xf:output value="@display-name"/></xh:td>
+                                        </xh:tr>
+                                    </xf:repeat>
                                     <xh:tr>
                                         <xh:td>Reloading the Toolbox</xh:td>
                                         <xh:td><xh:kbd>⌘⇧R</xh:kbd>/<xh:kbd>⌃⇧R</xh:kbd></xh:td>

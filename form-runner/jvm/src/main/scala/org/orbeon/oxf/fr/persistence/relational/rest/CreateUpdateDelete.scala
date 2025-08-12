@@ -193,8 +193,7 @@ trait CreateUpdateDelete {
     req            : CrudRequest,
     reqBodyOpt     : Option[RequestReader.Body],
     delete         : Boolean,
-    versionToSet   : Int,
-    forSingleton   : Boolean
+    versionToSet   : Int
   )(implicit
     externalContext: ExternalContext
   ): StoreResult = {
@@ -301,11 +300,6 @@ trait CreateUpdateDelete {
       }
 
       // TODO: delete draft attachments also in filesystem/S3
-
-      // We used to do a `commit()` here for #4515
-      // But we must not commit for singletons at least, as that breaks what should be a single transaction
-      if (! forSingleton)
-        connection.commit()
     }
 
     def doForceDelete(dataPart: DataPart): Unit = {
@@ -483,7 +477,7 @@ trait CreateUpdateDelete {
             if (count > 0)
               throw HttpStatusCodeException(StatusCode.Conflict)
 
-            val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet, forSingleton = true)
+            val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
             reindex(Some(connection))
             storeResult
           }
@@ -494,11 +488,18 @@ trait CreateUpdateDelete {
             // Can we do better?
             throw HttpStatusCodeException(StatusCode.Conflict)
         }
+      } else if (req.forData) {
+        // We must reindex only the data for a single document, so do it in the same transaction
+        RelationalUtils.withConnection { connection =>
+          val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
+          reindex(Some(connection))
+          storeResult
+        }
       } else {
-        // This is the normal case, which doesn't require any special locking
+        // Other cases, including for the form definition
         val storeResult =
           RelationalUtils.withConnection { connection =>
-            store(connection, req, reqBodyOpt, delete, versionToSet, forSingleton = false)
+            store(connection, req, reqBodyOpt, delete, versionToSet)
           }
         reindex(None)
         storeResult

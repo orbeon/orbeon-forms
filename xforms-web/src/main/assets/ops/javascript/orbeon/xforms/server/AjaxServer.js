@@ -52,10 +52,6 @@
                         return ORBEON.util.Utils.getLocalName(childElement) == "control-values";
                     });
 
-                    function findRepeatInsertionPoint(repeatPrefixedId, parentIndexes) {
-                        return document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatPrefixedId, parentIndexes));
-                    }
-
                     if (ORBEON.xforms.XFormsUi.isIOS() && ORBEON.xforms.XFormsUi.getZoomLevel() != 1.0) {
                         var dialogsToShowArray = ORBEON.xforms.XFormsUi.findDialogsToShow(controlValuesElements);
                         if (dialogsToShowArray.length > 0) {
@@ -71,110 +67,6 @@
 
                         var recreatedInputs = {};
 
-                        function handleInnerHtml(elem) {
-
-                            var innerHTML    = ORBEON.util.Dom.getStringValue(ORBEON.xforms.XFormsUi.firstChildWithLocalName(elem, 'value'));
-                            var initElem     = ORBEON.xforms.XFormsUi.firstChildWithLocalName(elem, 'init');
-                            var initValue    = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
-                            var destroyElem  = ORBEON.xforms.XFormsUi.firstChildWithLocalName(elem, 'destroy');
-                            var destroyValue = _.isUndefined(destroyElem) ? null : ORBEON.util.Dom.getStringValue(destroyElem);
-                            var controlId    = ORBEON.util.Dom.getAttribute(elem, "id");
-
-                            var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(controlId);
-
-                            function endsWith(text, suffix) {
-                              var index = text.lastIndexOf(suffix);
-                              return index !== -1 && index + suffix.length === text.length;
-                            }
-
-                            if (destroyValue) {
-                                ORBEON.xforms.InitSupport.destroyJavaScriptControlsFromSerialized(destroyValue);
-                            }
-
-                            if (endsWith(prefixedId, "~iteration")) {
-                                // The HTML is the content of a repeat iteration
-
-                                var repeatPrefixedId = prefixedId.substring(0, prefixedId.length - "~iteration".length);
-
-                                var parentRepeatIndexes = ORBEON.util.Utils.getRepeatIndexes(controlId);
-                                parentRepeatIndexes.pop();
-
-                                // NOTE: New iterations are added always at the end so we don't yet need the value of the current index.
-                                // This will be either the separator before the template, or the end element.
-                                var afterInsertionPoint = findRepeatInsertionPoint(repeatPrefixedId, parentRepeatIndexes.join("-"));
-
-                                var tagName = afterInsertionPoint.tagName;
-
-                                $(afterInsertionPoint).before(
-                                    '<' + tagName + ' class="xforms-repeat-delimiter"></' + tagName + '>',
-                                    innerHTML
-                                );
-
-                            } else {
-
-                                var documentElement = document.getElementById(controlId);
-                                if (documentElement != null) {
-                                    // Found container
-                                    // Detaching children to avoid nodes becoming disconnected
-                                    // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-In-IE-nodes-become-disconnected-when-removed-from-the-DOM-with-an-innerHTML
-                                    $(documentElement).children().detach();
-                                    documentElement.innerHTML = innerHTML;
-                                    ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
-                                    // Special case for https://github.com/orbeon/orbeon-forms/issues/3707
-                                    ORBEON.xforms.Controls.fullUpdateEvent.fire({control: documentElement});
-                                } else {
-                                    // Insertion between delimiters
-                                    function insertBetweenDelimiters(prefix) {
-                                        // Some elements don't support innerHTML on IE (table, tr...). So for those, we create a div, and
-                                        // complete the table with the missing parent elements.
-                                        var SPECIAL_ELEMENTS = {
-                                            "table": { opening: "<table>", closing: "</table>", level: 1 },
-                                            "thead": { opening: "<table><thead>", closing: "</thead></table>", level: 2 },
-                                            "tbody": { opening: "<table><tbody>", closing: "</tbody></table>", level: 2 },
-                                            "tr":    { opening: "<table><tr>", closing: "</tr></table>", level: 2 }
-                                        };
-                                        var delimiterBegin = document.getElementById(prefix + "-begin-" + controlId);
-                                        if (delimiterBegin != null) {
-                                            // Remove content between begin and end marker
-                                            while (delimiterBegin.nextSibling.nodeType != ELEMENT_TYPE || delimiterBegin.nextSibling.id != prefix + "-end-" + controlId)
-                                                delimiterBegin.parentNode.removeChild(delimiterBegin.nextSibling);
-                                            // Insert content
-                                            var delimiterEnd = delimiterBegin.nextSibling;
-                                            var specialElementSpec = SPECIAL_ELEMENTS[delimiterBegin.parentNode.tagName.toLowerCase()];
-                                            var dummyElement = document.createElement(specialElementSpec == null ? delimiterBegin.parentNode.tagName : "div");
-                                            dummyElement.innerHTML = specialElementSpec == null ? innerHTML : specialElementSpec.opening + innerHTML + specialElementSpec.closing;
-                                            // For special elements, the parent is nested inside the dummyElement
-                                            var dummyParent = specialElementSpec == null ? dummyElement
-                                                : specialElementSpec.level == 1 ? YAHOO.util.Dom.getFirstChild(dummyElement)
-                                                : specialElementSpec.level == 2 ? YAHOO.util.Dom.getFirstChild(YAHOO.util.Dom.getFirstChild(dummyElement))
-                                                : null;
-                                            // Move nodes to the real DOM
-                                            while (dummyParent.firstChild != null)
-                                                YAHOO.util.Dom.insertBefore(dummyParent.firstChild, delimiterEnd);
-                                            return true;
-                                        } else {
-                                            return false;
-                                        }
-                                    }
-                                    // First try inserting between group delimiters, and if it doesn't work between repeat delimiters
-                                    if (! insertBetweenDelimiters("group"))
-                                        if (! insertBetweenDelimiters("repeat"))
-                                            insertBetweenDelimiters("xforms-case");
-                                }
-                            }
-
-                            if (initValue) {
-                                ORBEON.xforms.InitSupport.initializeJavaScriptControlsFromSerialized(initValue);
-                            }
-
-                            // If the element that had the focus is not in the document anymore, it might have been replaced by
-                            // setting the innerHTML, so set focus it again
-                            if (! YAHOO.util.Dom.inDocument(ORBEON.xforms.Globals.currentFocusControlElement, document)) {
-                                var focusControl = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
-                                if (focusControl != null) ORBEON.xforms.Controls.setFocus(ORBEON.xforms.Globals.currentFocusControlId);
-                            }
-                        }
-
                         _.each(controlValuesElements, function(controlValuesElement) {
                             _.each(controlValuesElement.childNodes, function(childNode) {
                                 switch (ORBEON.util.Utils.getLocalName(childNode)) {
@@ -185,7 +77,7 @@
                                         ORBEON.xforms.XFormsUi.handleInit(childNode, controlsWithUpdatedItemsets);
                                         break;
                                     case 'inner-html':
-                                        handleInnerHtml(childNode);
+                                        ORBEON.xforms.XFormsUi.handleInnerHtml(childNode);
                                         break;
                                     case 'attribute':
                                         ORBEON.xforms.XFormsUi.handleAttribute(childNode);

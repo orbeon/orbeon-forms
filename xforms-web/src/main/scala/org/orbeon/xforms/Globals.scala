@@ -13,6 +13,8 @@
  */
 package org.orbeon.xforms
 
+import org.scalajs.dom.html
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -23,9 +25,8 @@ object Globals {
   // TODO: Most of these should be removed
   var maskFocusEvents             : Boolean                   = _ // avoid catching focus event when we do call setfocus upon server request
   var currentFocusControlId       : String                    = _ // id of the control that got the focus last
-  var currentFocusControlElement  : js.Object                 = _ // element for the control that got the focus last
+  var currentFocusControlElement  : html.Element              = _ // element for the control that got the focus last
 
-  var activeControl               : js.Object                 = _ // the currently active control, used to disable hint
   var hintTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
   var alertTooltipForControl      : js.Dictionary[js.Any]     = _ // map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
   var helpTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
@@ -39,7 +40,6 @@ object Globals {
     currentFocusControlId      = null
     currentFocusControlElement = null
 
-    activeControl              = null
     hintTooltipForControl      = js.Dictionary.empty
     alertTooltipForControl     = js.Dictionary.empty
     helpTooltipForControl      = js.Dictionary.empty

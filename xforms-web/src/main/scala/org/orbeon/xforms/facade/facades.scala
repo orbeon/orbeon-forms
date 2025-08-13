@@ -157,7 +157,6 @@ class Property[T] extends js.Object {
 @JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {
-  def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : Element          = js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
 }

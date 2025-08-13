@@ -153,8 +153,6 @@ object XFormsUI {
   @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
 
-  // 2022-03-16: AjaxServer.js
-  @JSExport
   def firstChildWithLocalName(node: dom.Element, name: String): js.UndefOr[dom.Element] =
     node.childNodes.collectFirst {
       case n: dom.Element if n.localName == name => n
@@ -790,6 +788,85 @@ object XFormsUI {
       controlsWithUpdatedItemsets,
       relevantOpt
     )
+  }
+
+  private val IterationSuffix = "~iteration"
+
+  @JSExport
+  def handleInnerHtml(elem: dom.Element): Unit = {
+
+    val innerHTML    = firstChildWithLocalName(elem, "value").get.textContent
+    val initValue    = firstChildWithLocalName(elem, "init").map(_.textContent)
+    val destroyValue = firstChildWithLocalName(elem, "destroy").map(_.textContent)
+    val controlId    = attValueOrThrow(elem, "id")
+
+    val controlXFormsId = XFormsId.fromEffectiveId(controlId)
+
+    val prefixedId = controlXFormsId.toPrefixedId
+
+    destroyValue
+      .foreach(InitSupport.destroyJavaScriptControlsFromSerialized)
+
+    if (prefixedId.endsWith(IterationSuffix)) {
+      // The HTML is the content of a repeat iteration
+
+      val repeatPrefixedId = prefixedId.substring(0, prefixedId.length - IterationSuffix.length)
+
+      val parentRepeatIndexes = controlXFormsId.iterations.init
+
+      // NOTE: New iterations are added always at the end so we don't yet need the value of the current index.
+      // This will be either the separator before the template, or the end element.
+      val afterInsertionPoint =
+        dom.document.getElementByIdT("repeat-end-" + appendRepeatSuffix(repeatPrefixedId, parentRepeatIndexes.mkString("-")))
+
+      val tagName = afterInsertionPoint.tagName
+
+      afterInsertionPoint.insertAdjacentHTML("beforebegin", s"""<$tagName class="xforms-repeat-delimiter"></$tagName>$innerHTML""")
+
+    } else {
+
+      dom.document.getElementByIdOpt(controlId) match {
+        case Some(documentElement) =>
+          documentElement.replaceChildren() // probably obsolete
+          documentElement.innerHTML = innerHTML
+        case None =>
+
+          def insertBetweenDelimiters(prefix: String): Boolean =
+            dom.document.getElementByIdOpt(prefix + "-begin-" + controlId) match {
+              case Some(delimiterBegin) =>
+
+                val EndMarker = prefix + "-end-" + controlId
+
+                def nodeMatches(e: dom.Node): Boolean =
+                  e match {
+                    case e: html.Element => e.id != EndMarker
+                    case _               => true
+                  }
+
+                while (nodeMatches(delimiterBegin.nextSibling))
+                  delimiterBegin.parentNode.removeChild(delimiterBegin.nextSibling)
+
+                delimiterBegin.insertAdjacentHTML("afterend", innerHTML)
+                true
+              case None =>
+                false
+            }
+
+          insertBetweenDelimiters("group")  ||
+          insertBetweenDelimiters("repeat") ||
+          insertBetweenDelimiters("xforms-case")
+        }
+    }
+
+    initValue
+      .foreach(InitSupport.initializeJavaScriptControlsFromSerialized)
+
+    // If the element that had the focus is not in the document anymore, it might have been replaced by
+    // setting the innerHTML, so set focus it again
+    if (
+      ! dom.document.contains(Globals.currentFocusControlElement) &&
+        dom.document.getElementByIdOpt(Globals.currentFocusControlId).isDefined
+    ) Controls.setFocus(Globals.currentFocusControlId)
   }
 
   @JSExport

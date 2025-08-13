@@ -17,8 +17,7 @@ import enumeratum.*
 import enumeratum.EnumEntry.Hyphencase
 import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.Utils
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.{KeyboardEvent, document, html}
 
@@ -189,7 +188,7 @@ trait GridSectionMenus {
       event.targetT.closestT(s".fr-$componentName-repeat-iteration")
 
     def findIterationForElemWithId(elemWithId: html.Element): Option[Int] =
-      Utils.getRepeatIndexes(elemWithId.id).lastOption.map(_.toInt)
+      XFormsId.fromEffectiveId(elemWithId.id).iterations.lastOption
 
     private def componentElem(event: dom.Event): Option[html.Element] =
       event.targetT.closestOpt(s".xbl-fr-$componentName")

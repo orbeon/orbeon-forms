@@ -306,21 +306,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             /**
-             * For example: getRepeatIndexes("foo⊙1-2") returns ["1", "2"]
-             */
-            getRepeatIndexes: function(effectiveId) {
-                if (effectiveId == null)
-                    return null;
-
-                var suffixIndex = effectiveId.indexOf(XF_REPEAT_SEPARATOR);
-                if (suffixIndex != -1) {
-                    return effectiveId.substring(suffixIndex + 1).split(XF_REPEAT_INDEX_SEPARATOR);
-                } else {
-                    return [];
-                }
-            },
-
-            /**
              * For example: getEffectiveIdNoSuffix("foo⊙1-2") returns "⊙1-2"
              */
             getEffectiveIdSuffixWithSeparator: function(effectiveId) {
@@ -359,21 +344,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             // Escape a literal search string so it can be used in String.replace()
             escapeRegex: function(value) {
                 return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
-            },
-
-            appendRepeatSuffix: function(id, suffix) {
-                if (suffix == "")
-                    return id;
-
-                // Remove "-" at the beginning of the suffix, if any
-                if (suffix.charAt(0) == XF_REPEAT_INDEX_SEPARATOR)
-                    suffix = suffix.substring(1);
-
-                // Add suffix with the right separator
-                id += id.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
-                id += suffix;
-
-                return id;
             },
 
             /**
@@ -1169,7 +1139,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         typeChangedEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-        fullUpdateEvent:  new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
         /**
          * Find the beginning of a case.
@@ -1904,9 +1873,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         // 2023-01-09: This is only for backward compatibility with old code that doesn't use `javascript-lifecycle`.
         ORBEON.xforms.FullUpdate = {
 
-            /** @private @type {Object.<string, Array.<string>>} */                 _fullUpdateToComponents: {},
             /** @private @type {Object.<string, boolean>} */                        _knownComponents: {},
-            /** @private @type {Object.<string, function(HTMLElement): Object>} */  _componentsXblClass: {},
 
             clinit: function () {
                 ORBEON.xforms.XBL.componentInitialized.subscribe(this.onComponentInitialized, this, true);
@@ -1920,54 +1887,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
              */
             onComponentInitialized: function (containerAndConstructor) {
                 if (! this._knownComponents[containerAndConstructor.container.id]) {
-
-                    // Find if this instance is in a full update container
-                    /** @type {HTMLElement} */ var fullUpdate = null;
-                    ORBEON.util.Dom.existsAncestorOrSelf(containerAndConstructor.container, function (node) {
-                        if ($(node).is('.xforms-update-full, .xxforms-dynamic-control')) {
-                            fullUpdate = node;
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    });
-
-                    // This component is inside a full update
-                    if (fullUpdate != null) {
-                        // Remember that component is associated with full update
-                        if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
-                        this._fullUpdateToComponents[fullUpdate.id].push(containerAndConstructor.container.id);
-                        // Remember factory for this component
-                        this._componentsXblClass[containerAndConstructor.container.id] = containerAndConstructor.constructor;
-                    }
-
                     // Remember we looked at this one, so we don't have to do it again
                     this._knownComponents[containerAndConstructor.container.id] = true;
-                }
-            },
-
-            /**
-             * Called when a full update is performed.
-             *
-             * @param {!string} fullUpdateId    Id of the control that contains the section that was updated.
-             */
-            onFullUpdateDone: function (fullUpdateId) {
-
-                // Re-initialize all the existing XBL components inside the this container
-                var me = this;
-                var componentIds = this._fullUpdateToComponents[fullUpdateId];
-                if (componentIds) {
-                    _.each(componentIds, function (componentId) {
-                        /** @type {HTMLElement} */ var componentContainer = document.getElementById(componentId);
-                        if (componentContainer != null) {
-                            // Call instance which will call init if necessary
-                            var component = me._componentsXblClass[componentId].instance(componentContainer);
-
-                            // Legacy
-                            if (_.isFunction(component.enabled))
-                                component.enabled();
-                        }
-                    });
                 }
             }
         };
@@ -2091,12 +2012,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     return instance;
                 }
             };
-
-            // For backward compatibility only (4.10 and earlier components):
-            // - used internally for full updates code
-            // - documented for 4.10 and earlier components
-            // We can remove this once we remove backward compatibility support for 4.10 and earlier components.
-            xblClass.instance = this._cssClassesToConstructors[cssClass];
         },
 
         componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)

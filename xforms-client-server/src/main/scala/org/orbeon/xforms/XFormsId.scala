@@ -20,8 +20,11 @@ import org.orbeon.oxf.util.StringUtils.*
 // Structured representation of an id
 case class XFormsId(staticId: String, containers: List[String], iterations: List[Int]) {
 
+  def toPrefixedId: String =
+    (containers :+ staticId).mkString(Constants.ComponentSeparatorString)
+
   def toEffectiveId: String =
-    (containers :+ staticId).mkString(Constants.ComponentSeparatorString) +
+    toPrefixedId +
       (if (iterations.isEmpty) "" else Constants.RepeatSeparatorString + iterations.mkString(Constants.RepeatIndexSeparatorString))
 
   def isSamePrefixedId(other: XFormsId): Boolean =

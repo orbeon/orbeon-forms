@@ -561,7 +561,7 @@ private object FormRunnerFunctions {
   // Cannot change between design-time and non-design-time over the course of the form's lifetime
   class FRIsDesignTime extends DefaultFunctionSupport with AddToPathMap {
     override def evaluateItem(context: XPathContext): BooleanValue =
-      FormRunner.isDesignTime(FormRunnerParams())
+      FormRunnerParamsOpt().exists(FormRunner.isDesignTime(_))
   }
 
   // Cannot change between readonly and non-readonly mode over the course of the form's lifetime

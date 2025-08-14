@@ -100,7 +100,7 @@ object XFormsUI {
 
   // Returns an `IO` containing `true` if a submission or load causes navigation AND showing progress hasn't
   // been disabled
-  private def handleActions(formID: String, actionElement: dom.Element): IO[Boolean] = {
+  private def handleActions(formId: String, actionElement: dom.Element): IO[Boolean] = {
 
     val controlValuesElements = childrenWithLocalName(actionElement, "control-values").toList
 
@@ -111,8 +111,8 @@ object XFormsUI {
     def actionsIo: IO[Boolean] =
       IO.fromTry(
         Try {
-          handleControlDetails(formID, controlValuesElements)
-          handleOtherActions(formID, actionElement)
+          handleControlDetails(formId, controlValuesElements)
+          handleOtherActions(formId, actionElement)
         }
       )
 
@@ -132,7 +132,7 @@ object XFormsUI {
   }
 
   // Returns `true` if a submission or load will cause navigation AND showing progress hasn't been disabled
-  private def handleOtherActions(formID: String, actionElement: dom.Element): Boolean = {
+  private def handleOtherActions(formId: String, actionElement: dom.Element): Boolean = {
 
     var newDynamicStateTriggersReplace = false
 
@@ -141,12 +141,12 @@ object XFormsUI {
 
         // Update repeat hierarchy
         case "repeat-hierarchy" =>
-          InitSupport.processRepeatHierarchyUpdateForm(formID, childElem.textContent)
+          InitSupport.processRepeatHierarchyUpdateForm(formId, childElem.textContent)
 
         // Change highlighted section in repeat
         case "repeat-indexes" =>
 
-          val form = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
+          val form = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
           val repeatTreeParentToAllChildren = form.repeatTreeParentToAllChildren
           val repeatIndexes                 = form.repeatIndexes
 
@@ -206,7 +206,7 @@ object XFormsUI {
               .get(repeatId)
               .filter(_ != 0)
               .foreach { oldIndex =>
-                val oldItemDelimiter = Utils.findRepeatDelimiter(formID, repeatId, oldIndex)
+                val oldItemDelimiter = Utils.findRepeatDelimiter(formId, repeatId, oldIndex)
                 if (oldItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
                   oldItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
                     case elem: html.Element => elem.classList.remove(getClassForRepeatId(repeatId))
@@ -223,7 +223,7 @@ object XFormsUI {
           // Highlight item at new index
           newRepeatIndexes.foreach { case (repeatId, newIndex) =>
             if (newIndex != 0) {
-              val newItemDelimiter = Utils.findRepeatDelimiter(formID, repeatId, newIndex)
+              val newItemDelimiter = Utils.findRepeatDelimiter(formId, repeatId, newIndex)
               if (newItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
                 newItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
                   case elem: html.Element => elem.classList.add(getClassForRepeatId(repeatId))
@@ -234,11 +234,11 @@ object XFormsUI {
 
         case "poll" =>
           val delay = attValueOpt(childElem, "delay").map(_.toDouble).getOrElse(0.0)
-          AjaxClient.createDelayedPollEvent(delay, formID)
+          AjaxClient.createDelayedPollEvent(delay, formId)
 
         // Submit form
         case "submission" =>
-          handleSubmission(formID, childElem, () => newDynamicStateTriggersReplace = true)
+          handleSubmission(formId, childElem, () => newDynamicStateTriggersReplace = true)
 
         // Display modal message
         case "message" =>
@@ -286,11 +286,11 @@ object XFormsUI {
 
         // Run JavaScript code
         case "script" =>
-          handleScriptElem(formID, childElem)
+          handleScriptElem(formId, childElem)
 
         // Run JavaScript code
         case "callback" =>
-          handleCallbackElem(formID, childElem)
+          handleCallbackElem(formId, childElem)
 
         // Show help message for specified control
         case "help" =>
@@ -301,7 +301,7 @@ object XFormsUI {
     newDynamicStateTriggersReplace
   }
 
-  private def handleControlDetails(formID: String, controlValuesElements: Iterable[dom.Element]): Unit = {
+  private def handleControlDetails(formId: String, controlValuesElements: Iterable[dom.Element]): Unit = {
 
     val recreatedInputs             = js.Dictionary.empty[html.Element]
     val controlsWithUpdatedItemsets = js.Dictionary.empty[Boolean]
@@ -310,7 +310,7 @@ object XFormsUI {
       controlValuesElement.childrenT.foreach { childElem =>
         childElem.localName match {
           case "control" =>
-            handleControl(childElem, recreatedInputs, controlsWithUpdatedItemsets, formID)
+            handleControl(childElem, recreatedInputs, controlsWithUpdatedItemsets, formId)
           case "init" =>
             handleInit(childElem, controlsWithUpdatedItemsets)
           case "inner-html" =>
@@ -320,9 +320,9 @@ object XFormsUI {
           case "text" =>
             handleText(childElem)
           case "repeat-iteration" =>
-            handleRepeatIteration(childElem, formID)
+            handleRepeatIteration(childElem, formId)
           case "dialog" =>
-            handleDialog(childElem, formID)
+            handleDialog(childElem, formId)
           case _ => // handled by `handleOtherActions()`
         }
       }
@@ -446,7 +446,7 @@ object XFormsUI {
     } yield
       idValue
 
-  private def handleScriptElem(formID: String, scriptElem: dom.Element): Unit = {
+  private def handleScriptElem(formId: String, scriptElem: dom.Element): Unit = {
 
     val functionName  = attValueOrThrow(scriptElem, "name")
     val targetId      = attValueOrThrow(scriptElem, "target-id")
@@ -455,11 +455,11 @@ object XFormsUI {
 
     val paramValues = paramElements map (_.textContent.asInstanceOf[js.Any])
 
-    ServerAPI.callUserScript(formID, functionName, targetId, observerId, paramValues.toList*)
+    ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramValues.toList*)
   }
 
-  private def handleCallbackElem(formID: String, callbackElem: dom.Element): Unit =
-    ServerAPI.callUserCallback(formID, attValueOrThrow(callbackElem, "name"))
+  private def handleCallbackElem(formId: String, callbackElem: dom.Element): Unit =
+    ServerAPI.callUserCallback(formId, attValueOrThrow(callbackElem, "name"))
 
   private def handleDeleteRepeatElements(controlValuesElems: Iterable[dom.Element]): Unit =
     controlValuesElems.iterator foreach { controlValuesElem =>
@@ -602,7 +602,7 @@ object XFormsUI {
 
   private def handleRepeatIteration(
     controlElem : dom.Element,
-    formID      : String
+    formId      : String
   ): Unit = {
 
     val repeatId    = controlElem.getAttribute("id")
@@ -612,7 +612,7 @@ object XFormsUI {
     // Remove or add `xforms-disabled` on elements after this delimiter
     relevantOpt
       .map(_.toBoolean)
-      .foreach(Controls.setRepeatIterationRelevance(formID, repeatId, iteration, _))
+      .foreach(Controls.setRepeatIterationRelevance(formId, repeatId, iteration, _))
   }
 
   def maybeFutureToScalaFuture(promiseOrUndef: js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]]): Future[Unit] = {
@@ -720,7 +720,7 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def handleErrorsElem(formID: String, ignoreErrors: Boolean, errorsElem: dom.Element): Unit = {
+  def handleErrorsElem(formId: String, ignoreErrors: Boolean, errorsElem: dom.Element): Unit = {
 
     val serverErrors =
       errorsElem.childNodes collect { case n: dom.Element => n } map { errorElem =>
@@ -743,13 +743,13 @@ object XFormsUI {
     AjaxClient.showError(
       titleString   = "Non-fatal error",
       detailsString = ServerError.errorsAsHtmlString(serverErrors),
-      formId        = formID,
+      formId        = formId,
       ignoreErrors  = ignoreErrors
     )
   }
 
   private def handleSubmission(
-    formID           : String,
+    formId           : String,
     submissionElement: dom.Element,
     notifyReplace    : js.Function0[Unit]
   ): Unit = {
@@ -760,7 +760,7 @@ object XFormsUI {
     val showProgressOpt = booleanAttValueOpt(submissionElement, "show-progress")
     val targetOpt       = attValueOpt(submissionElement, "target")
 
-    val form  = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
+    val form  = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
 
     // When the target is an iframe, we add a `?t=id` to work around a Chrome bug happening  when doing a POST to the
     // same page that was just loaded, gut that the POST returns a PDF. See:
@@ -935,7 +935,7 @@ object XFormsUI {
     elem                       : dom.Element,
     recreatedInputs            : js.Dictionary[html.Element],
     controlsWithUpdatedItemsets: js.Dictionary[Boolean],
-    formID                     : String
+    formId                     : String
   ): Unit = {
 
     val controlId           = attValueOrThrow(elem, "id")
@@ -988,7 +988,7 @@ object XFormsUI {
     if (relevantOpt.contains(true))
       Controls.setRelevant(documentElement, relevant = true)
 
-    val recreatedInput = maybeUpdateSchemaType(documentElement, controlId, newSchemaTypeOpt, formID)
+    val recreatedInput = maybeUpdateSchemaType(documentElement, controlId, newSchemaTypeOpt, formId)
     if (recreatedInput)
       recreatedInputs(controlId) = documentElement
 
@@ -1457,7 +1457,7 @@ object XFormsUI {
     documentElement: html.Element,
     controlId      : String,
     newSchemaType  : Option[String],
-    formID         : String,
+    formId         : String,
   ): Boolean =
     newSchemaType match  {
         case Some(newSchemaType) =>
@@ -1483,7 +1483,7 @@ object XFormsUI {
           documentElement.classList.contains("xforms-input") && existingInputType != newInputType
 
         if (mustUpdateInputType)
-          updateInputType(documentElement, controlId, newInputType, formID)
+          updateInputType(documentElement, controlId, newInputType, formId)
 
         // Remove existing CSS `xforms-type-*` classes
         documentElement
@@ -1508,7 +1508,7 @@ object XFormsUI {
     documentElement: html.Element,
     controlId      : String,
     newInputType   : InputType,
-    formID         : String
+    formId         : String
   ): Unit = {
 
     // Find the position of the last LHHA before the control "actual content"
@@ -1526,7 +1526,7 @@ object XFormsUI {
       case InputType.Boolean =>
         updateBooleanInput(documentElement, controlId, lastLhhaPosition, inputLabelElement)
       case InputType.String =>
-        updateStringInput(documentElement, controlId, formID, lastLhhaPosition, inputLabelElement)
+        updateStringInput(documentElement, controlId, formId, lastLhhaPosition, inputLabelElement)
     }
   }
 
@@ -1858,14 +1858,14 @@ object XFormsUI {
     }
 
     // Server telling us to hide the dialog
-    def hideDialog(id: String, formID: String): Unit = {
+    def hideDialog(id: String, formId: String): Unit = {
       val dialogElem = dom.document.getElementById(id).asInstanceOf[HTMLDialogElement]
       dialogElem.removeEventListener("cancel" , dialogCancelListener )
       dialogElem.removeEventListener("keydown", dialogKeydownListener)
       dialogElem.close()
 
       val inspectorElemOpt = dialogElem.querySelectorOpt("#orbeon-inspector")
-      val formElemOpt      = dom.document.getElementByIdOpt(formID)
+      val formElemOpt      = dom.document.getElementByIdOpt(formId)
       inspectorElemOpt.foreach(inspectorElem => formElemOpt.foreach(_.appendChild(inspectorElem)))
     }
 

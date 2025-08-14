@@ -1114,7 +1114,11 @@
                 <xf:bind ref="$i/*[local-name() = ('fr-summary-show', 'fr-allow-bulk-edit')]" name="summary-setting">
                     <xf:bind ref="@enabled"         type="xs:boolean"/>
                     <!-- Always show the 'Restrict to role' checkbox for 'Show on Summary page', only show it for 'Allow bulk edit' if enabled -->
-                    <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting/local-name() = 'fr-summary-show' or $summary-setting/@enabled = true()"/>
+                    <xf:bind
+                        ref="@role-required"
+                         type="xs:boolean"
+                        relevant="$summary-setting/local-name() = 'fr-summary-show' or $summary-setting/@enabled = true()"
+                        readonly="$i/fr-encrypt/@enabled = true()"/>
                     <xf:bind
                             ref="require-role"
                             relevant="$summary-setting/@enabled = true() and $summary-setting/@role-required = true()"
@@ -1269,14 +1273,14 @@
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"  value="."/>
                                                         <xf:var name="current-value" value="$item-to-show/value"/>
+                                                        <xf:var name="base-binding"  value="$i/*[local-name() = $current-value][1]"/>
 
                                                         <xf:var
                                                             name="checkbox-disabled"
                                                             value="
-                                                                (: Don't disable this checkbox if checked, for backward compatibility :)
                                                                 (
-                                                                    $current-value = ('fr-index', 'fr-summary-show')
-                                                                    or not($current-value = $selected-values)
+                                                                    (: Don't disable 'Encrypt data at rest' if checked, for backward compatibility :)
+                                                                    not($current-value = 'fr-encrypt') or not($current-value = $selected-values)
                                                                 ) and
                                                                 (
                                                                     (
@@ -1295,10 +1299,13 @@
                                                                         $selected-values   = ('fr-allow-bulk-edit', 'fr-default-sort-column')
                                                                         and $current-value = 'fr-summary-show'
                                                                         and xxf:is-blank($i/fr-summary-show/@legacy)
+                                                                    ) or
+                                                                    (
+                                                                        $current-value = ('fr-summary-show', 'fr-allow-bulk-edit')
+                                                                        and $base-binding/@role-required = true()
                                                                     )
                                                                 )"/>
 
-                                                        <xf:var name="base-binding" value="$i/*[local-name() = $current-value][1]"/>
                                                         <xf:var
                                                             name="checkbox-binding"
                                                             value="$base-binding/(if ($checkbox-disabled) then @enabled/string() else @enabled)"/>

@@ -92,7 +92,7 @@ object XFormsUI {
             targetId             = XFormsId.fromEffectiveId(controlElem.id)
             controlIds           <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastControlElem.id), targetId)
             controlId            <- controlIds
-            controlElem          <- Option(dom.document.getElementById(controlId))
+            controlElem          <- dom.document.getElementByIdOpt(controlId)
             checkboxValue        <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
           } locally {
             DocumentAPI.setValue(controlId, checkboxValue)
@@ -516,7 +516,7 @@ object XFormsUI {
       if (path.contains("xforms-server-submit")) {
 
         val isTargetAnIframe =
-          targetOpt.flatMap(target => Option(dom.document.getElementById(target))).exists(_.tagName.equalsIgnoreCase("iframe"))
+          targetOpt.flatMap(target => dom.document.getElementByIdOpt(target)).exists(_.tagName.equalsIgnoreCase("iframe"))
 
         if (isTargetAnIframe) {
           val url = new dom.URL(path, dom.document.location.href)

@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{Controls, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -26,7 +27,7 @@ import scala.scalajs.js.|
 
 object DocumentAPI extends js.Object {
 
-  import Private._
+  import Private.*
 
   // Dispatch an event defined by the properties on a JavaScript object
   // This is the method we document officially as of 2015-10 for JavaScript callers.
@@ -170,7 +171,7 @@ object DocumentAPI extends js.Object {
       val (resolvedControlId, resolvedControlOpt) =
         (controlIdOrElem: Any) match {
           case givenControlId: String =>
-            givenControlId -> Option(dom.document.getElementById(Support.adjustIdNamespace(formElem, givenControlId)._2))
+            givenControlId -> dom.document.getElementByIdOpt(Support.adjustIdNamespace(formElem, givenControlId)._2)
           case givenElement: html.Element =>
             givenElement.id -> Some(givenElement)
         }

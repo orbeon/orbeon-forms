@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.*
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
@@ -34,10 +35,10 @@ object ServerAPI {
     def getElementOrNull(id: String): dom.Element = {
 
       def fromId =
-        Option(dom.document.getElementById(id))
+        dom.document.getElementByIdOpt(id)
 
       def fromRepeat =
-        Option(dom.document.getElementById(s"repeat-begin-$id")) // e.g. with `xxforms-nodeset-changed`
+        dom.document.getElementByIdOpt(s"repeat-begin-$id") // e.g. with `xxforms-nodeset-changed`
 
       def fromDelimiter =
         id.lastIndexOfOpt(RepeatSeparatorString) flatMap { lastRepeatSeparatorIndex =>

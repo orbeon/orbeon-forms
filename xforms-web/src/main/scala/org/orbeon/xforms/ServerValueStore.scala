@@ -17,6 +17,7 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import org.orbeon.web.DomSupport.*
 
 
 // Store for values as we think they are known to the server
@@ -31,8 +32,8 @@ object ServerValueStore {
   @JSExport
   def set(id: String, valueOrUndef: js.UndefOr[String]): Unit =
     for {
-      controlElem <- Option(dom.document.getElementById(id)) // unclear if callers are sure the element exists
-      value       <- valueOrUndef.toOption                   // some callers pass `undefined` (e.g. triggers)
+      controlElem <- dom.document.getElementByIdOpt(id) // unclear if callers are sure the element exists
+      value       <- valueOrUndef.toOption              // some callers pass `undefined` (e.g. triggers)
     } locally {
       idToControlValue += id -> ControlValue(controlElem, value)
     }

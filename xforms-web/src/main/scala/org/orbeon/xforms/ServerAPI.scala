@@ -18,6 +18,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.*
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -40,7 +41,7 @@ object ServerAPI {
       def fromRepeat =
         dom.document.getElementByIdOpt(s"repeat-begin-$id") // e.g. with `xxforms-nodeset-changed`
 
-      def fromDelimiter =
+      def fromDelimiter: Option[html.Element] =
         id.lastIndexOfOpt(RepeatSeparatorString) flatMap { lastRepeatSeparatorIndex =>
 
           val separatorPosition =

@@ -41,6 +41,9 @@ object DomSupport {
     def nextElementOpt: Option[T] =
       elem.nextElementSiblings.nextOption()
 
+    def nextSiblings: Iterator[dom.Node] =
+      Iterator.iterate(elem.nextSibling)(_.nextSibling).takeWhile(_ ne null)
+
     def closestT(selector: String): T =
       elem.closest(selector).asInstanceOf[T]
 

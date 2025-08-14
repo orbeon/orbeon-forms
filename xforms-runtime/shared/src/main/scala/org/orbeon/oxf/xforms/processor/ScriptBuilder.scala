@@ -151,7 +151,7 @@ object ScriptBuilder {
       uuid                           = containingDocument.uuid,
       namespacedFormId               = containingDocument.getNamespacedFormId,
       repeatTree                     = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
-      repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
+      repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument).toList,
       xformsServerPath               = rewriteResource("/xforms-server"),
       xformsServerSubmitActionPath   = xformsSubmissionPathOpt.map(rewriteAction),
       xformsServerSubmitResourcePath = xformsSubmissionPathOpt.map(rewriteResource),

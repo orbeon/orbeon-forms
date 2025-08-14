@@ -21,9 +21,7 @@ var XF_REPEAT_INDEX_SEPARATOR = "-";
 var XF_COMPONENT_SEPARATOR = "\u2261";
 var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
 
-var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
-var TEXT_TYPE = document.createTextNode("").nodeType;
 
 (function() {
 
@@ -318,27 +316,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 } else {
                     return "";
                 }
-            },
-
-            getLocalName: function(element) {
-                if (element.nodeType == 1) {
-                    return element.tagName.indexOf(":") == -1
-                            ? element.tagName
-                            : element.tagName.substr(element.tagName.indexOf(":") + 1);
-                } else {
-                    return null;
-                }
-            },
-
-            getClassForRepeatId: function(formID, repeatId) {
-                var depth = 1;
-                var currentRepeatId = repeatId;
-                while (true) {
-                    currentRepeatId = ORBEON.xforms.Page.getXFormsFormFromNamespacedIdOrThrow(formID).repeatTreeChildToParent[currentRepeatId];
-                    if (currentRepeatId == null) break;
-                    depth = (depth == 4) ? 1 : depth + 1;
-                }
-                return "xforms-repeat-selected-item-" + depth;
             },
 
             // Escape a literal search string so it can be used in String.replace()

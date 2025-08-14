@@ -250,7 +250,7 @@ object InitSupport {
             xformsServerUploadPath         = initializations.xformsServerUploadPath,
             repeatTreeChildToParent        = repeatTreeChildToParent,
             repeatTreeParentToAllChildren  = repeatTreeParentToAllChildren,
-            repeatIndexes                  = processRepeatIndexes(initializations.repeatIndexes),
+            repeatIndexes                  = js.Dictionary(initializations.repeatIndexes*),
             xblInstances                   = js.Array(),
             configuration                  = initializations.configuration
           )
@@ -386,9 +386,6 @@ object InitSupport {
 
       (childToParentMap.toJSDictionary, createParentToChildrenMap(childToParentMap).toJSDictionary)
     }
-
-    private def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
-      parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
 
     private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {

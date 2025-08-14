@@ -28,7 +28,7 @@ case class Initializations(
   uuid                          : String,
   namespacedFormId              : String,
   repeatTree                    : String,
-  repeatIndexes                 : String,
+  repeatIndexes                 : List[(String, Int)],
   xformsServerPath              : String,
   xformsServerSubmitActionPath  : Option[String],
   xformsServerSubmitResourcePath: Option[String],

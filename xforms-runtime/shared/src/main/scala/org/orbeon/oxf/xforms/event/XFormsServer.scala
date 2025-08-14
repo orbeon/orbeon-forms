@@ -608,7 +608,7 @@ object XFormsServer {
         localName = "poll",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = delayedEvent.time.toList map (time => "delay" -> (time - currentTime).toString)
+        atts      = delayedEvent.time.map(time => "delay" -> (time - currentTime).toString).toList
       )
 
     def outputMessagesInfo(

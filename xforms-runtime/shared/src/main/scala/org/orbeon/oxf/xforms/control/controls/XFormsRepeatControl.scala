@@ -592,15 +592,10 @@ object XFormsRepeatControl {
     findIndexes(doc.controls.getCurrentControlTree, doc.staticOps.repeats, _.getIndex)
 
   // Find the current repeat indexes for the given doc, as a string
-  def currentNamespacedIndexesString(doc: XFormsContainingDocument): String = {
-
+  def currentNamespacedIndexesString(doc: XFormsContainingDocument): Iterator[(String, Int)] = {
     val ns = doc.getContainerNamespace
-
-    val repeats =
-      for ((repeatId, index) <- currentIndexes(doc))
-        yield ns + repeatId + ' ' + index
-
-    repeats mkString ","
+    for ((repeatId, index) <- currentIndexes(doc).iterator)
+      yield (ns + repeatId, index)
   }
 
   // For the given control, return the matching control that follows repeat indexes

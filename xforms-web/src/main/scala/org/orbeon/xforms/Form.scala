@@ -35,13 +35,12 @@ class Form(
   val xformsServerUploadPath        : String,                          // could move to configuration
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
-  val repeatIndexes                 : js.Dictionary[String],           // for JavaScript access
+  val repeatIndexes                 : js.Dictionary[Int],              // for JavaScript access
   val xblInstances                  : js.Array[XBLCompanion],
   val configuration                 : ConfigurationProperties
 ) extends js.Object { // so that properties/methods can be accessed from JavaScript
 
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
-  private var dialogTimerIds: Map[String, SetTimeoutHandle] = Map.empty
 
   private var callbacks: Map[String, List[js.Function]] = Map.empty
 
@@ -103,14 +102,6 @@ class Form(
   def clearDiscardableTimerIds(): Unit = {
     discardableTimerIds foreach timers.clearTimeout
     discardableTimerIds = Nil
-  }
-
-  def addDialogTimerId(dialogId: String, id: SetTimeoutHandle): Unit =
-    dialogTimerIds += dialogId -> id
-
-  def removeDialogTimerId(dialogId: String): Unit = {
-    dialogTimerIds.get(dialogId) foreach timers.clearTimeout
-    dialogTimerIds -= dialogId
   }
 
   def namespaceIdIfNeeded(id: String): String =

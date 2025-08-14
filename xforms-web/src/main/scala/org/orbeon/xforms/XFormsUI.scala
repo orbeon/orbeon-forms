@@ -13,6 +13,8 @@
  */
 package org.orbeon.xforms
 
+import cats.effect.IO
+import cats.effect.unsafe.IORuntime
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
@@ -24,7 +26,7 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.LhhacSeparator
-import org.orbeon.xforms.facade.{Controls, XBL}
+import org.orbeon.xforms.facade.{Controls, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -39,8 +41,9 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.timers.{SetTimeoutHandle, setTimeout}
-import scala.scalajs.js.{Dictionary, JSON, UndefOr, timers, |}
+import scala.scalajs.js.timers.SetTimeoutHandle
+import scala.scalajs.js.{Dictionary, JSON, URIUtils, UndefOr, eval, timers, |}
+import scala.util.Try
 
 
 // Progressively migrate contents of xforms.js/AjaxServer.js here
@@ -51,8 +54,53 @@ object XFormsUI {
 
   import Private.*
 
-  @JSExport
-  def handleActions(formID: String, actionElement: dom.Element, handleOtherActions: js.Function1[dom.Element, Any]): Unit = {
+  def handleResponseDom(
+    responseXML : dom.Document,
+    formId      : String,
+    ignoreErrors: Boolean
+  ): Unit = {
+
+    // Using `IO` as we have code which handles the processing of the response asynchronously, specifically on iOS when
+    // the zoom level needs to be reset. It is unclear if this code is still useful. The JS code was using
+    // `setTimeout()`, and not properly handling return values and errors. With `IO`, we can at least ensure some
+    // sanity.
+    implicit def runtime: IORuntime = IORuntime.global
+
+    val actionsAndOrErrorsIos =
+      responseXML.documentElement.childNodes.map {
+        case actionElem: dom.Element if actionElem.localName == "action" => // only 1 possible `action` element
+          handleActions(formId, actionElem)
+            .map {
+              case true =>
+                // Display loading indicator when we go to another page.
+                // Display it even if it was not displayed before as loading the page could take time.
+                Page.loadingIndicator().showIfNotAlreadyVisible()
+              case false =>
+            }
+        case errorsElem: dom.Element if errorsElem.localName == "errors" => // only 1 possible `errors` element (can be in addition to `action`)
+          IO(handleErrorsElem(formId, ignoreErrors, errorsElem))
+        case _: dom.Element => // should not happen
+          IO.raiseError(throw new IllegalArgumentException)
+        case _ =>
+          IO.unit // ignore other nodes
+      }
+
+    actionsAndOrErrorsIos
+      .toList
+      .sequence
+      .onError {
+        case t: Throwable =>
+          // Show dialog with error to the user, as they won't be able to continue using the UI anyway
+          // Don't rethrow exception: we want the code that runs after the Ajax response is handled to run, so we have a
+          // chance to recover from this error.
+          IO(AjaxClient.logAndShowError(t, formId, ignoreErrors))
+      }
+      .unsafeToFuture()
+  }
+
+  // Returns an `IO` containing `true` if a submission or load causes navigation AND showing progress hasn't
+  // been disabled
+  private def handleActions(formID: String, actionElement: dom.Element): IO[Boolean] = {
 
     val controlValuesElements = childrenWithLocalName(actionElement, "control-values").toList
 
@@ -60,31 +108,197 @@ object XFormsUI {
       (isIOS && getZoomLevel != 1.0)
         .flatList(findDialogsToShow(controlValuesElements).toList)
 
-    if (responseDialogIdsToShowAsynchronously.nonEmpty)
-      resetIOSZoom()
+    def actionsIo: IO[Boolean] =
+      IO.fromTry(
+        Try {
+          handleControlDetails(formID, controlValuesElements)
+          handleOtherActions(formID, actionElement)
+        }
+      )
 
-    // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
-    handleDeleteRepeatElements(controlValuesElements)
+    val actionsMaybeWithDelayIo: IO[Boolean] =
+      if (responseDialogIdsToShowAsynchronously.nonEmpty)
+        for {
+          _      <- IO(resetIOSZoom())
+          _      <- IO.sleep(200.milliseconds)
+          result <- actionsIo
+        } yield
+          result
+      else
+        actionsIo
 
-    if (responseDialogIdsToShowAsynchronously.nonEmpty) {
+    IO(handleDeleteRepeatElements(controlValuesElements))
+      .flatMap(_ => actionsMaybeWithDelayIo)
+  }
 
-      val timerId = setTimeout(200.milliseconds) {
-        handleControlDetails(formID, controlValuesElements)
-        handleOtherActions(actionElement)
+  // Returns `true` if a submission or load will cause navigation AND showing progress hasn't been disabled
+  private def handleOtherActions(formID: String, actionElement: dom.Element): Boolean = {
+
+    var newDynamicStateTriggersReplace = false
+
+    actionElement.childrenT.foreach { childElem =>
+      childElem.localName match {
+
+        // Update repeat hierarchy
+        case "repeat-hierarchy" =>
+          InitSupport.processRepeatHierarchyUpdateForm(formID, childElem.textContent)
+
+        // Change highlighted section in repeat
+        case "repeat-indexes" =>
+
+          val form = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
+          val repeatTreeParentToAllChildren = form.repeatTreeParentToAllChildren
+          val repeatIndexes                 = form.repeatIndexes
+
+          // Extract data from server response
+          val newRepeatIndexes =
+            js.Dictionary[Int](
+              childElem
+                .childrenT
+                .collect {
+                  case repeatIndexElem: dom.Element if repeatIndexElem.localName == "repeat-index" =>
+                    val repeatId = attValueOrThrow(repeatIndexElem, "id")
+                    val newIndex = attValueOrThrow(repeatIndexElem, "new-index").toInt
+                    repeatId -> newIndex
+                }
+                .toList*
+            )
+
+          // For each repeat id that changes, see if all the children are also included in
+          // `newRepeatIndexes`. If they are not, add an entry with the index unchanged.
+          newRepeatIndexes.foreach { case (repeatId, _) =>
+            repeatTreeParentToAllChildren.get(repeatId).getOrElse(js.Array()).foreach { child =>
+              if (! newRepeatIndexes.contains(child))
+                repeatIndexes.get(child) match {
+                  case Some(index) => newRepeatIndexes(child) = index
+                  case None        => newRepeatIndexes.remove(child)
+                }
+            }
+          }
+
+          def isEndElem(n: dom.Node): Boolean =
+            n match {
+              case e: dom.Element
+                if e.classList.contains("xforms-repeat-delimiter") ||
+                   e.classList.contains("xforms-repeat-begin-end") => true
+              case _ => false
+            }
+
+          def getClassForRepeatId(repeatId: String): String = {
+            var currentDepth = 1
+            var currentRepeatId = repeatId
+            var done = false
+            while (! done) {
+              form.repeatTreeChildToParent.get(currentRepeatId) match {
+                case Some(id) =>
+                  currentRepeatId = id
+                  currentDepth    = if (currentDepth == 4) 1 else currentDepth + 1
+                case None =>
+                  done = true
+              }
+            }
+            s"xforms-repeat-selected-item-$currentDepth"
+          }
+
+          // Unhighlight items at old indexes
+          newRepeatIndexes.foreach { case (repeatId, _) =>
+            repeatIndexes
+              .get(repeatId)
+              .filter(_ != 0)
+              .foreach { oldIndex =>
+                val oldItemDelimiter = Utils.findRepeatDelimiter(formID, repeatId, oldIndex)
+                if (oldItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
+                  oldItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
+                    case elem: html.Element => elem.classList.remove(getClassForRepeatId(repeatId))
+                    case _ =>
+                  }
+              }
+          }
+
+          // Store new indexes
+          newRepeatIndexes.foreach { case (repeatId, newIndex) =>
+            repeatIndexes(repeatId) = newIndex
+          }
+
+          // Highlight item at new index
+          newRepeatIndexes.foreach { case (repeatId, newIndex) =>
+            if (newIndex != 0) {
+              val newItemDelimiter = Utils.findRepeatDelimiter(formID, repeatId, newIndex)
+              if (newItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
+                newItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
+                  case elem: html.Element => elem.classList.add(getClassForRepeatId(repeatId))
+                  case _ =>
+                }
+            }
+          }
+
+        case "poll" =>
+          val delay = attValueOpt(childElem, "delay").map(_.toDouble).getOrElse(0.0)
+          AjaxClient.createDelayedPollEvent(delay, formID)
+
+        // Submit form
+        case "submission" =>
+          handleSubmission(formID, childElem, () => newDynamicStateTriggersReplace = true)
+
+        // Display modal message
+        case "message" =>
+          dom.window.alert(childElem.textContent)
+
+        // Load another page
+        case "load" =>
+          val resource        = attValueOrThrow   (childElem, "resource")
+          val showOpt         = attValueOpt       (childElem, "show")
+          val targetOpt       = attValueOpt       (childElem, "target")
+          val showProgressOpt = booleanAttValueOpt(childElem, "show-progress")
+
+          if (resource.startsWith("javascript:")) {
+            val js = URIUtils.decodeURIComponent(resource.substring("javascript:".length))
+            eval(js)
+          } else if (showOpt.contains("replace")) {
+            targetOpt match {
+              case None =>
+                // Display loading indicator unless the server tells us not to display it
+                if (resource.head != '#' && ! showProgressOpt.contains(false))
+                  newDynamicStateTriggersReplace = true
+                try
+                  dom.window.location.href = resource
+                catch {
+                  case _: Throwable =>
+                    // NOP: This is to prevent the error "Unspecified error" in IE. This can
+                    // happen when navigating away is cancelled by the user pressing cancel
+                    // on a dialog displayed on unload.
+                    // 2025-08-14: Does it happen in current browsers?
+                }
+              case Some(target) =>
+                dom.window.open(resource, target, "noopener")
+            }
+          } else {
+            dom.window.open(resource, "_blank", "noopener")
+          }
+
+        // Set focus to a control
+        case "focus" =>
+          Controls.setFocus(attValueOrThrow(childElem, "control-id"))
+
+        // Remove focus from a control
+        case "blur" =>
+          Controls.removeFocus(attValueOrThrow(childElem, "control-id"))
+
+        // Run JavaScript code
+        case "script" =>
+          handleScriptElem(formID, childElem)
+
+        // Run JavaScript code
+        case "callback" =>
+          handleCallbackElem(formID, childElem)
+
+        // Show help message for specified control
+        case "help" =>
+          Help.showHelp(dom.document.getElementByIdT(attValueOrThrow(childElem, "control-id")))
+        case _ =>
       }
-
-      val form = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
-
-      responseDialogIdsToShowAsynchronously.foreach { dialogId =>
-        // TODO: `removeDialogTimerId()` is not called right now
-        form.addDialogTimerId(dialogId, timerId)
-      }
-
-    } else {
-      // Process synchronously
-      handleControlDetails(formID, controlValuesElements)
-      handleOtherActions(actionElement)
     }
+    newDynamicStateTriggersReplace
   }
 
   private def handleControlDetails(formID: String, controlValuesElements: Iterable[dom.Element]): Unit = {
@@ -232,9 +446,7 @@ object XFormsUI {
     } yield
       idValue
 
-  // 2022-03-16: AjaxServer.js
-  @JSExport
-  def handleScriptElem(formID: String, scriptElem: dom.Element): Unit = {
+  private def handleScriptElem(formID: String, scriptElem: dom.Element): Unit = {
 
     val functionName  = attValueOrThrow(scriptElem, "name")
     val targetId      = attValueOrThrow(scriptElem, "target-id")
@@ -246,9 +458,7 @@ object XFormsUI {
     ServerAPI.callUserScript(formID, functionName, targetId, observerId, paramValues.toList*)
   }
 
-  // 2023-08-14: AjaxServer.js
-  @JSExport
-  def handleCallbackElem(formID: String, callbackElem: dom.Element): Unit =
+  private def handleCallbackElem(formID: String, callbackElem: dom.Element): Unit =
     ServerAPI.callUserCallback(formID, attValueOrThrow(callbackElem, "name"))
 
   private def handleDeleteRepeatElements(controlValuesElems: Iterable[dom.Element]): Unit =
@@ -538,8 +748,7 @@ object XFormsUI {
     )
   }
 
-  @JSExport
-  def handleSubmission(
+  private def handleSubmission(
     formID           : String,
     submissionElement: dom.Element,
     notifyReplace    : js.Function0[Unit]
@@ -881,11 +1090,11 @@ object XFormsUI {
             dom.document.getElementByIdOpt(prefix + "-begin-" + controlId) match {
               case Some(delimiterBegin) =>
 
-                val EndMarker = prefix + "-end-" + controlId
+                val EndMarkerId = prefix + "-end-" + controlId
 
                 def nodeMatches(e: dom.Node): Boolean =
                   e match {
-                    case e: html.Element => e.id != EndMarker
+                    case e: html.Element => e.id != EndMarkerId
                     case _               => true
                   }
 

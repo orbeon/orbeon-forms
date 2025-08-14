@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.{AjaxServer, Events}
+import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
 import org.scalajs.dom.{EventListenerOptions, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -190,12 +190,11 @@ object AjaxClient {
     }
   }
 
-  @JSExport
   def createDelayedPollEvent(
-    delay  : js.UndefOr[Double],
+    delay  : Double,
     formId : String
   ): Unit =
-    timers.setTimeout(delay.getOrElse(0.0)) {
+    timers.setTimeout(delay) {
       fireEvent(
         AjaxEvent(
           eventName = EventNames.XXFormsPoll,
@@ -337,7 +336,7 @@ object AjaxClient {
       }
 
       logger.debug("before `handleResponseDom`")
-      AjaxServer.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
+      XFormsUI.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
       logger.debug("after `handleResponseDom`")
 
       // Reset changes, as changes are included in this batch of events

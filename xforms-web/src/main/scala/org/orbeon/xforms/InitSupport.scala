@@ -178,16 +178,15 @@ object InitSupport {
   @JSExport
   def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
-      case Left(e)  =>
+      case Left(e) =>
         logger.error(s"error decoding serialized controls for `initializeJavaScriptControlsFromSerialized`: ${e.getMessage}")
       case Right(controls) =>
         initializeJavaScriptControls(controls)
     }
 
-  @JSExport
   def destroyJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
-      case Left(e)  =>
+      case Left(e) =>
         logger.error(s"error decoding serialized controls for `destroyJavaScriptControlsFromSerialized`: ${e.getMessage}")
       case Right(controls) =>
         destroyJavaScriptControls(controls)
@@ -221,11 +220,14 @@ object InitSupport {
       val formId      = initializations.namespacedFormId
       // Form is an `Option` as it might already have been removed by the time we receive the dynamic JavaScript
       // (Should we do an error instead of a cast?)
-      val formElemOpt = Option(dom.document.getElementById(formId).asInstanceOf[html.Form])
-      formElemOpt.flatMap { formElem =>
+      dom.document
+        .getElementByIdOpt(formId)
+        .map(_.asInstanceOf[html.Form])
+        .flatMap { formElem =>
 
         // Q: Do this later?
-        $(formElem).removeClass(Constants.InitiallyHiddenClass)
+
+        formElem.classList.remove(Constants.InitiallyHiddenClass)
 
         // NOTE on paths: We switched back and forth between trusting the client or the server. Starting 2010-08-27
         // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client

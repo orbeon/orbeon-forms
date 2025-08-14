@@ -72,7 +72,6 @@ object StateHandling {
 
   private object XFormsSessionStorage {
 
-
     def get(formId: String): Option[Int] =
       Option(dom.window.sessionStorage.getItem(key(formId))).flatMap(_.toIntOption)
 

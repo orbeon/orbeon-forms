@@ -33,34 +33,11 @@
             // Whether this response has triggered a load which will replace the current page.
             var newDynamicStateTriggersReplace = false;
 
-            // Getting xforms namespace
-            var nsAttribute = _.find(responseRoot.attributes, function(attribute) {
-                return attribute.nodeValue == XXFORMS_NAMESPACE_URI;
-
-            });
-
-            var responseDialogIdsToShowAsynchronously = [];
-
             _.each(responseRoot.childNodes, function(childNode) {
 
                 if (ORBEON.util.Utils.getLocalName(childNode) == "action") {
 
                     var actionElement = childNode;
-
-                    var controlValuesElements = _.filter(actionElement.childNodes, function(childElement) {
-                        return ORBEON.util.Utils.getLocalName(childElement) == "control-values";
-                    });
-
-                    if (ORBEON.xforms.XFormsUi.isIOS() && ORBEON.xforms.XFormsUi.getZoomLevel() != 1.0) {
-                        var dialogsToShowArray = ORBEON.xforms.XFormsUi.findDialogsToShow(controlValuesElements);
-                        if (dialogsToShowArray.length > 0) {
-                            responseDialogIdsToShowAsynchronously = dialogsToShowArray;
-                            ORBEON.xforms.XFormsUi.resetIOSZoom();
-                        }
-                    }
-
-                    // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
-                    ORBEON.xforms.XFormsUi.handleDeleteRepeatElements(controlValuesElements);
 
                     function handleOtherActions(actionElement) {
 
@@ -246,23 +223,7 @@
                         });
                     }
 
-                    if (responseDialogIdsToShowAsynchronously.length > 0) {
-                        var timerId = setTimeout(function() {
-                            ORBEON.xforms.XFormsUi.handleControlDetails(formID, controlValuesElements);
-                            handleOtherActions(actionElement);
-                        }, 200);
-
-                        var form = ORBEON.xforms.Page.getXFormsFormFromNamespacedIdOrThrow(formID)
-
-                        _.each(responseDialogIdsToShowAsynchronously, function(dialogId) {
-                            form.addDialogTimerId(dialogId, timerId);
-                        });
-
-                    } else {
-                        // Process synchronously
-                        ORBEON.xforms.XFormsUi.handleControlDetails(formID, controlValuesElements);
-                        handleOtherActions(actionElement);
-                    }
+                    ORBEON.xforms.XFormsUi.handleActions(formID, actionElement, handleOtherActions);
 
                 } else if (ORBEON.util.Utils.getLocalName(childNode) == "errors") {
                     ORBEON.xforms.XFormsUi.handleErrorsElem(formID, ignoreErrors, childNode);

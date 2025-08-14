@@ -41,7 +41,7 @@ class Form(
 ) extends js.Object { // so that properties/methods can be accessed from JavaScript
 
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
-  private var dialogTimerIds: Map[String, Int] = Map.empty
+  private var dialogTimerIds: Map[String, SetTimeoutHandle] = Map.empty
 
   private var callbacks: Map[String, List[js.Function]] = Map.empty
 
@@ -105,11 +105,11 @@ class Form(
     discardableTimerIds = Nil
   }
 
-  def addDialogTimerId(dialogId: String, id: Int): Unit =
+  def addDialogTimerId(dialogId: String, id: SetTimeoutHandle): Unit =
     dialogTimerIds += dialogId -> id
 
   def removeDialogTimerId(dialogId: String): Unit = {
-    dialogTimerIds.get(dialogId) foreach dom.window.clearTimeout
+    dialogTimerIds.get(dialogId) foreach timers.clearTimeout
     dialogTimerIds -= dialogId
   }
 

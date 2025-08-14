@@ -39,7 +39,7 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.timers.SetTimeoutHandle
+import scala.scalajs.js.timers.{SetTimeoutHandle, setTimeout}
 import scala.scalajs.js.{Dictionary, JSON, UndefOr, timers, |}
 
 
@@ -52,7 +52,42 @@ object XFormsUI {
   import Private.*
 
   @JSExport
-  def handleControlDetails(formID: String, controlValuesElements: Seq[dom.Element]): Unit = {
+  def handleActions(formID: String, actionElement: dom.Element, handleOtherActions: js.Function1[dom.Element, Any]): Unit = {
+
+    val controlValuesElements = childrenWithLocalName(actionElement, "control-values").toList
+
+    val responseDialogIdsToShowAsynchronously =
+      (isIOS && getZoomLevel != 1.0)
+        .flatList(findDialogsToShow(controlValuesElements).toList)
+
+    if (responseDialogIdsToShowAsynchronously.nonEmpty)
+      resetIOSZoom()
+
+    // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
+    handleDeleteRepeatElements(controlValuesElements)
+
+    if (responseDialogIdsToShowAsynchronously.nonEmpty) {
+
+      val timerId = setTimeout(200.milliseconds) {
+        handleControlDetails(formID, controlValuesElements)
+        handleOtherActions(actionElement)
+      }
+
+      val form = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
+
+      responseDialogIdsToShowAsynchronously.foreach { dialogId =>
+        // TODO: `removeDialogTimerId()` is not called right now
+        form.addDialogTimerId(dialogId, timerId)
+      }
+
+    } else {
+      // Process synchronously
+      handleControlDetails(formID, controlValuesElements)
+      handleOtherActions(actionElement)
+    }
+  }
+
+  private def handleControlDetails(formID: String, controlValuesElements: Iterable[dom.Element]): Unit = {
 
     val recreatedInputs             = js.Dictionary.empty[html.Element]
     val controlsWithUpdatedItemsets = js.Dictionary.empty[Boolean]
@@ -74,6 +109,7 @@ object XFormsUI {
             handleRepeatIteration(childElem, formID)
           case "dialog" =>
             handleDialog(childElem, formID)
+          case _ => // handled by `handleOtherActions()`
         }
       }
     }
@@ -186,9 +222,7 @@ object XFormsUI {
       case n: dom.Element if n.localName == name => n
     } .orUndefined
 
-  // 2022-03-16: AjaxServer.js
-  @JSExport
-  def findDialogsToShow(controlValuesElems: js.Array[dom.Element]): js.Array[String] = {
+  private def findDialogsToShow(controlValuesElems: Iterable[dom.Element]): Iterator[String] =
     for {
       controlValuesElem <- controlValuesElems.iterator
       dialogElem        <- childrenWithLocalName(controlValuesElem, "dialog")
@@ -197,7 +231,6 @@ object XFormsUI {
       idValue           <- attValueOpt(dialogElem, "id")
     } yield
       idValue
-  } .toJSArray
 
   // 2022-03-16: AjaxServer.js
   @JSExport
@@ -218,11 +251,9 @@ object XFormsUI {
   def handleCallbackElem(formID: String, callbackElem: dom.Element): Unit =
     ServerAPI.callUserCallback(formID, attValueOrThrow(callbackElem, "name"))
 
-  // 2022-03-16: AjaxServer.js
-  @JSExport
-  def handleDeleteRepeatElements(controlValuesElems: js.Array[dom.Element]): Unit =
+  private def handleDeleteRepeatElements(controlValuesElems: Iterable[dom.Element]): Unit =
     controlValuesElems.iterator foreach { controlValuesElem =>
-      childrenWithLocalName(controlValuesElem, "delete-repeat-elements") foreach { deleteElem =>
+      childrenWithLocalName(controlValuesElem, "delete-repeat-elements").foreach { deleteElem =>
 
         // Extract data from server response
         val deleteId      = attValueOrThrow(deleteElem, "id")
@@ -305,7 +336,7 @@ object XFormsUI {
         callXFormsUpdateReadonlyIfNeeded()
       }
 
-      childrenWithLocalName(elem, "value") foreach { childNode =>
+      childrenWithLocalName(elem, "value").foreach { childNode =>
         handleValue(childNode, controlId, recreatedInput = false, controlsWithUpdatedItemsets)
       }
     }
@@ -317,8 +348,8 @@ object XFormsUI {
     recreatedInput              : Boolean,
     controlsWithUpdatedItemsets : js.Dictionary[Boolean]
   ): Unit =
-    childrenWithLocalName(controlElem, "value") foreach
-      (handleValue(_, controlId, recreatedInput, controlsWithUpdatedItemsets))
+    childrenWithLocalName(controlElem, "value")
+      .foreach(handleValue(_, controlId, recreatedInput, controlsWithUpdatedItemsets))
 
   private def handleDialog(
     controlElem : dom.Element,
@@ -619,7 +650,7 @@ object XFormsUI {
         }
 
       val timerIdOpt =
-        if (isIOS() && getZoomLevel() != 1.0) {
+        if (isIOS && getZoomLevel != 1.0) {
           resetIOSZoom()
             Some(
               timers.setTimeout(200.milliseconds) {
@@ -807,8 +838,7 @@ object XFormsUI {
 
   private val IterationSuffix = "~iteration"
 
-  // xxx check uses of dom.document.getElementById: should we not checked under the current `<form>` only?
-
+  // TODO: check uses of `dom.document.getElementById()`: should we not checked under the current `<form>` only?
   private def handleInnerHtml(elem: dom.Element): Unit = {
 
     val innerHTML    = firstChildWithLocalName(elem, "value").get.textContent
@@ -885,8 +915,7 @@ object XFormsUI {
     ) Controls.setFocus(Globals.currentFocusControlId)
   }
 
-  @JSExport
-  def resetIOSZoom(): Unit = {
+  private def resetIOSZoom(): Unit = {
     Option(dom.document.querySelector("meta[name = 'viewport']")).foreach { viewPortMeta =>
       attValueOpt(viewPortMeta, "content").foreach { contentAttribute =>
 
@@ -910,12 +939,10 @@ object XFormsUI {
     }
   }
 
-  @JSExport
-  def isIOS(): Boolean =
+  private def isIOS: Boolean =
     dom.document.body.classList.contains("xforms-ios")
 
-  @JSExport
-  def getZoomLevel(): Double =
+  private def getZoomLevel: Double =
     dom.document.documentElement.clientWidth.toDouble / dom.window.innerWidth
 
   private def updateControlAttributes(
@@ -1032,7 +1059,7 @@ object XFormsUI {
         val newDocumentElement = dom.document.createElementT("span")
         newDocumentElement.setAttribute("id", controlId)
 
-        newDocumentElement.classList = documentElement.classList;
+        newDocumentElement.classList = documentElement.classList
         newDocumentElement.classList.add("xforms-static")
         parentElement.replaceChild(newDocumentElement, documentElement)
 

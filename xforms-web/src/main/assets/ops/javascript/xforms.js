@@ -1138,8 +1138,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             $(control).toggleClass("xforms-filled", isRequired && emptyAttr == "false");
         },
 
-        typeChangedEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-
         /**
          * Find the beginning of a case.
          */

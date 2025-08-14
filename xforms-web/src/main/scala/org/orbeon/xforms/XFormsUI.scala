@@ -51,6 +51,34 @@ object XFormsUI {
 
   import Private.*
 
+  @JSExport
+  def handleControlDetails(formID: String, controlValuesElements: Seq[dom.Element]): Unit = {
+
+    val recreatedInputs             = js.Dictionary.empty[html.Element]
+    val controlsWithUpdatedItemsets = js.Dictionary.empty[Boolean]
+
+    controlValuesElements.foreach { controlValuesElement =>
+      controlValuesElement.childrenT.foreach { childElem =>
+        childElem.localName match {
+          case "control" =>
+            handleControl(childElem, recreatedInputs, controlsWithUpdatedItemsets, formID)
+          case "init" =>
+            handleInit(childElem, controlsWithUpdatedItemsets)
+          case "inner-html" =>
+            handleInnerHtml(childElem)
+          case "attribute" =>
+            handleAttribute(childElem)
+          case "text" =>
+            handleText(childElem)
+          case "repeat-iteration" =>
+            handleRepeatIteration(childElem, formID)
+          case "dialog" =>
+            handleDialog(childElem, formID)
+        }
+      }
+    }
+  }
+
   // Algorithm for a single repeated checkbox click:
   //
   // - always remember the last clicked checkbox, whether with shift or not or checked or not
@@ -245,9 +273,7 @@ object XFormsUI {
       }
     }
 
-  // 2022-03-16: AjaxServer.js
-  @JSExport
-  def handleInit(elem: dom.Element, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
+  private def handleInit(elem: dom.Element, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
 
     val controlId       = attValueOrThrow(elem, "id")
     val documentElement = dom.document.getElementByIdT(controlId)
@@ -285,9 +311,7 @@ object XFormsUI {
     }
   }
 
-  // 2022-03-16: AjaxServer.js
-  @JSExport
-  def handleValues(
+  private def handleValues(
     controlElem                 : dom.Element,
     controlId                   : String,
     recreatedInput              : Boolean,
@@ -296,9 +320,7 @@ object XFormsUI {
     childrenWithLocalName(controlElem, "value") foreach
       (handleValue(_, controlId, recreatedInput, controlsWithUpdatedItemsets))
 
-  // 2022-04-12: AjaxServer.js
-  @JSExport
-  def handleDialog(
+  private def handleDialog(
     controlElem : dom.Element,
     formId      : String
   ): Unit = {
@@ -316,9 +338,7 @@ object XFormsUI {
   def showDialogForInit(dialogId: String, neighborIdOpt: Option[String]): Unit =
     showDialog(dialogId, neighborIdOpt, "showDialogForInitWithNeighbor")
 
-  // 2022-04-12: AjaxServer.js
-  @JSExport
-  def handleAttribute(controlElem : dom.Element): Unit = {
+  private def handleAttribute(controlElem : dom.Element): Unit = {
 
     val newAttributeValue = controlElem.textContent
     val forAttribute      = controlElem.getAttribute("for")
@@ -329,9 +349,7 @@ object XFormsUI {
       htmlElement.setAttribute(nameAttribute, newAttributeValue) // use case: xh:html/@lang but HTML fragment produced
   }
 
-  // 2022-04-12: AjaxServer.js
-  @JSExport
-  def handleText(controlElem : dom.Element): Unit = {
+  private def handleText(controlElem: dom.Element): Unit = {
 
     val newTextValue = controlElem.textContent
     val forAttribute = controlElem.getAttribute("for")
@@ -341,9 +359,7 @@ object XFormsUI {
       dom.document.title = newTextValue
   }
 
-  // 2022-04-12: AjaxServer.js
-  @JSExport
-  def handleRepeatIteration(
+  private def handleRepeatIteration(
     controlElem : dom.Element,
     formID      : String
   ): Unit = {
@@ -675,8 +691,7 @@ object XFormsUI {
         clearChildrenOpt = Some(_.replaceChildren())
       )
 
-  @JSExport
-  def handleControl(
+  private def handleControl(
     elem                       : dom.Element,
     recreatedInputs            : js.Dictionary[html.Element],
     controlsWithUpdatedItemsets: js.Dictionary[Boolean],
@@ -792,8 +807,9 @@ object XFormsUI {
 
   private val IterationSuffix = "~iteration"
 
-  @JSExport
-  def handleInnerHtml(elem: dom.Element): Unit = {
+  // xxx check uses of dom.document.getElementById: should we not checked under the current `<form>` only?
+
+  private def handleInnerHtml(elem: dom.Element): Unit = {
 
     val innerHTML    = firstChildWithLocalName(elem, "value").get.textContent
     val initValue    = firstChildWithLocalName(elem, "init").map(_.textContent)

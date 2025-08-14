@@ -40,7 +40,6 @@
             });
 
             var responseDialogIdsToShowAsynchronously = [];
-            var controlsWithUpdatedItemsets = {};
 
             _.each(responseRoot.childNodes, function(childNode) {
 
@@ -62,45 +61,6 @@
 
                     // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
                     ORBEON.xforms.XFormsUi.handleDeleteRepeatElements(controlValuesElements);
-
-                    function handleControlDetails(controlValuesElements) {
-
-                        var recreatedInputs = {};
-
-                        _.each(controlValuesElements, function(controlValuesElement) {
-                            _.each(controlValuesElement.childNodes, function(childNode) {
-                                switch (ORBEON.util.Utils.getLocalName(childNode)) {
-                                    case 'control':
-                                        ORBEON.xforms.XFormsUi.handleControl(childNode, recreatedInputs, controlsWithUpdatedItemsets, formID);
-                                        break;
-                                    case 'init':
-                                        ORBEON.xforms.XFormsUi.handleInit(childNode, controlsWithUpdatedItemsets);
-                                        break;
-                                    case 'inner-html':
-                                        ORBEON.xforms.XFormsUi.handleInnerHtml(childNode);
-                                        break;
-                                    case 'attribute':
-                                        ORBEON.xforms.XFormsUi.handleAttribute(childNode);
-                                        break;
-                                    case 'text':
-                                        ORBEON.xforms.XFormsUi.handleText(childNode);
-                                        break;
-                                    case 'repeat-iteration':
-                                        ORBEON.xforms.XFormsUi.handleRepeatIteration(childNode, formID);
-                                        break;
-                                    case 'dialog':
-                                        ORBEON.xforms.XFormsUi.handleDialog(childNode, formID);
-                                        break;
-                                }
-
-                            });
-                        });
-
-                        // Notification event if the type changed
-                        _.each(recreatedInputs, function(documentElement, controlId) {
-                            ORBEON.xforms.Controls.typeChangedEvent.fire({control: documentElement});
-                        });
-                    }
 
                     function handleOtherActions(actionElement) {
 
@@ -288,7 +248,7 @@
 
                     if (responseDialogIdsToShowAsynchronously.length > 0) {
                         var timerId = setTimeout(function() {
-                            handleControlDetails(controlValuesElements);
+                            ORBEON.xforms.XFormsUi.handleControlDetails(formID, controlValuesElements);
                             handleOtherActions(actionElement);
                         }, 200);
 
@@ -300,7 +260,7 @@
 
                     } else {
                         // Process synchronously
-                        handleControlDetails(controlValuesElements);
+                        ORBEON.xforms.XFormsUi.handleControlDetails(formID, controlValuesElements);
                         handleOtherActions(actionElement);
                     }
 

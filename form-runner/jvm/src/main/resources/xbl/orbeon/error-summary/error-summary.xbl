@@ -439,12 +439,13 @@
                                                             if (xxf:non-blank(@label)) then
                                                                 concat(
                                                                     '&lt;span class=&quot;fr-error-label&quot;>',
+                                                                    position(), '. ',
                                                                     @label,
                                                                     '&lt;/span>'
                                                                 )
-
                                                             else
-                                                                '&lt;span/>'"/>
+                                                                '&lt;span/>'
+                                                        "/>
                                                     <xf:var
                                                         name="focusable"
                                                         value="xxf:focusable(@id, true())"/>

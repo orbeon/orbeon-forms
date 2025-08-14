@@ -56,7 +56,8 @@
             border-radius: @baseBorderRadius;
             padding: 10px;
             margin-bottom: 5px;
-            list-style-position: inside;
+            list-style: none; // Don't show list number, instead we output it in the label, otherwise the button with
+                              // the label shows below the number with long error messages.
             background-color: white;
 
             // Multiple levels can be mixed so make sure the strongest wins

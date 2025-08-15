@@ -13,13 +13,9 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.jquery.*
 import org.orbeon.xforms
-import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
-import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
-import io.udash.wrappers.jquery.JQueryEvent
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global as g}
@@ -27,7 +23,7 @@ import scala.scalajs.js.Dynamic.{newInstance, global as g}
 
 object ErrorPanel {
 
-  import Private._
+  import Private.*
 
   def initializeErrorPanel(formElem: html.Form): Option[js.Object] = {
 
@@ -58,7 +54,7 @@ object ErrorPanel {
 
       panel.render()
 
-      Utils.overlayUseDisplayHidden(panel)
+      overlayUseDisplayHidden(panel)
 
       // When the error dialog is closed, we make sure that the "details" section is closed,
       // so it will be closed the next time the dialog is opened.
@@ -88,6 +84,21 @@ object ErrorPanel {
 
       panel
     }
+  }
+
+  private def overlayUseDisplayHidden(overlay: js.Dynamic): Unit = {
+    overlay.element.style.display = "none"
+    // For why use subscribers.unshift instead of subscribe, see:
+    // http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Avoiding-scroll-when-showing-a-mess
+    overlay.beforeShowEvent.subscribers.unshift(
+      newInstance(g.YAHOO.util.Subscriber)((() => {
+          overlay.element.style.display = "block"
+        }): js.Function)
+    )
+    overlay.beforeHideEvent.subscribe((() => {
+        overlay.element.style.display = "none"
+      }): js.Function
+    )
   }
 
   def showError(currentForm: xforms.Form, detailsOrNull: String): Unit = {

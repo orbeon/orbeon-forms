@@ -428,10 +428,21 @@ object InitSupport {
             }
           } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
             // Legacy JavaScript initialization
-            Init._compactSelect(control)
+            initLegacyCompactSelect(control)
           }
         }
       }
+
+    private def initLegacyCompactSelect(control: html.Element): Unit =
+      control
+        .getElementsByTagName("select")
+        .headOption
+        .collect { case selectElem: html.Select =>
+          ServerValueStore.set(
+            id           = selectElem.id,
+            valueOrUndef = selectElem.options.filter(_.selected).map(_.value).mkString(" ")
+          )
+        }
 
     def destroyJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, _) =>

@@ -27,17 +27,6 @@ import scala.scalajs.js.|
 
 
 @js.native
-trait InitTrait extends js.Object {
-  def _range(control: html.Element)         : Unit       = js.native
-  def _compactSelect(control: html.Element) : Unit       = js.native
-  def _dialog(control: html.Element)        : js.Dynamic = js.native
-}
-
-@js.native
-@JSGlobal("ORBEON.xforms.Init")
-object Init extends InitTrait
-
-@js.native
 trait Item extends js.Object {
   val label                 : String                      = js.native
   val value                 : String                      = js.native
@@ -148,7 +137,6 @@ class Property[T] extends js.Object {
 @js.native
 object Utils extends js.Object {
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : html.Element = js.native
-  def overlayUseDisplayHidden(o: js.Object)                                 : Unit         = js.native
 }
 
 // Minimal facades for the Broadcast Channel API

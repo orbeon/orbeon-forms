@@ -28,48 +28,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
     var $ = ORBEON.jQuery;
     var _ = ORBEON._;
 
-    /**
-     * Functions we add to the awesome Underscore.js
-     *
-     * 2020-10-05: Probably no longer relevant!
-     */
-    _.mixin({
-
-        /**
-         * Allows functions not part part Underscore.js to be used in chains.
-         *
-         * @see <a href="http://jsfiddle.net/avernet/uVnu2/">Example using take()</a>
-         *
-         * @param {*}               obj             Object passed as a parameter to the object
-         * @param {function(*): *}  interceptor     Function applied to the current object
-         * @param {?*}              context         Optional object on which the function is applied
-         */
-        take: function(obj, interceptor, context) {
-            return interceptor.call(context, obj);
-        },
-
-        /**
-         * This function is an alternative to using if/then/else, and is (very!) loosely inspired by Scala's pattern
-         * matching (and very far from being as powerful!).
-         *
-         * @see <a href="http://programming-scala.labs.oreilly.com/ch03.html#PatternMatching">Pattern matching in Scala</a>
-         * @see <a href="http://jsfiddle.net/avernet/NpCmv/">Example using match()</a>
-         *
-         * @param obj
-         */
-        match: function(obj) {
-            function compareMaybe(f) { return _.isFunction(f) ? f(obj) : f == obj; }
-            function applyMaybe(f) { return _.isFunction(f) ? f(obj) : f; }
-            for (var i = 1; i < arguments.length - 1; i = i + 2)
-                if (compareMaybe(arguments[i])) return applyMaybe(arguments[i+1]);
-            return arguments.length % 2 == 0 ? applyMaybe(arguments[arguments.length - 1]) : obj;
-        },
-
-        returns: function(obj) {
-            return _.bind(_.identity, this, obj);
-        }
-    });
-
     this.ORBEON.onJavaScriptLoaded = new YAHOO.util.CustomEvent("javascript-loaded");
 
     this.ORBEON.util = {
@@ -87,115 +45,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 
             getElementsByName: function(element, localName, namespace) {
                 return element.getElementsByTagName(namespace == null ? localName : namespace + ":" + localName);
-            },
-
-            /**
-             * Return null when the attribute is not there.
-             */
-            getAttribute: function(element, name) {
-
-                // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#Notes
-                //
-                // "Essentially all web browsers (Firefox, Internet Explorer, recent versions of Opera, Safari, Konqueror,
-                // and iCab, as a non-exhaustive list) return null when the specified attribute does not exist on the specified
-                // element; this is what the current DOM specification draft specifies. The old DOM 3 Core specification, on
-                // the other hand, says that the correct return value in this case is actually the empty string, and some DOM
-                // implementations implement this behavior. The implementation of getAttribute() in XUL (Gecko) actually
-                // follows the DOM 3 Core specification and returns an empty string. Consequently, you should use
-                // element.hasAttribute() to check for an attribute's existence prior to calling getAttribute() if it is
-                // possible that the requested attribute does not exist on the specified element."
-
-                if (element.hasAttribute(name)) {
-                    return element.getAttribute(name);
-                } else {
-                    return null;
-                }
-            },
-
-            /**
-             * Return null when the attribute is not there.
-             */
-            setAttribute: function(element, name, value) {
-
-                // IE doesn't support setting the value of some attributes with setAttribute(). So for those attributes,
-                // we set the attribute directly and use this code for all the browser, to avoid having different branches
-                // run for different browsers. This list comes from jQuery (see comments for exceptions).
-                var ATTRIBUTE_SLOTS =  {
-                    "cellspacing": "cellSpacing",
-                    "class": "className",
-                    "colspan": "colSpan",
-                    "for": "htmlFor",
-                    "frameborder": "frameBorder",
-                    "maxlength": "maxLength",
-                    "readonly": "readOnly",
-                    "rowspan": "rowSpan",
-                    "tabindex": "tabIndex",
-                    "usemap": "useMap",
-                    "accesskey": "accessKey", // Not sure why jQuery doesn't include 'accesskey', but includes 'tabindex'
-                    "type": "type"            // jQuery is doing further processing for 'type'
-                };
-
-                if (ATTRIBUTE_SLOTS[name]) {
-
-                    // If the object property is of type integer and the value is an empty string, skip setting the value
-                    // to avoid an error on IE. This is a test that, surprisingly, jQuery doesn't do, which means that with
-                    // jQuery you might get different results when setting the value of an attribute depending on the
-                    // browser. This is particularly important for us as the value of attributes can come from AVTs, which
-                    // can become empty if they loose their evaluation context.
-                    var key = ATTRIBUTE_SLOTS[name];
-                    if (! (value == "" && YAHOO.lang.isNumber(element[key])))
-                        element[key] = value;
-
-                } else if (name == "style") {
-
-                    // For IE6/7 (but not IE8), using setAttribute with style doesn't work
-                    // So here we set the style as done by jQuery
-                    // https://github.com/jquery/jquery/blob/master/src/attributes.js#L600
-                    element.style.cssText = "" + value;
-
-                } else if (name == "name" && element.tagName.toLowerCase() == "input") {
-
-                    // Here we handle a bug in IE6 and IE7 where the browser doesn't support changing the name of form elements.
-                    // If changing the name doesn't work, we create the whole element with a new name and insert it into the DOM.
-                    // This behavior is documented by Microsoft: http://msdn.microsoft.com/en-us/library/ms534184(VS.85).aspx
-
-                    // Try to change the name
-                    element.setAttribute(name, value);
-
-                    // Check if changing the name worked. For this we need access to the form for this element, which
-                    // we only have if the element is inside a form (it won't if the element is detached from the document).
-                    // If we can't find the form for this element, we just hope for the best.
-                    if (YAHOO.lang.isObject(element.form)) {
-                        var controlsWithName = element.form[value];
-                        var nameChangeSuccessful = false;
-                        if (controlsWithName && YAHOO.lang.isNumber(controlsWithName.length)) {
-                            // Get around issue with YAHOO.lang.isArray, as reported in YUI list:
-                            // http://www.nabble.com/YAHOO.lang.isArray-doesn%27t-recognize-object-as-array-td22694312.html
-                            for (var controlIndex = 0; controlIndex < controlsWithName.length; controlIndex++) {
-                                if (controlsWithName[controlIndex] == element)
-                                    nameChangeSuccessful = true;
-                            }
-                        } else if (YAHOO.lang.isObject(controlsWithName)) {
-                            if (controlsWithName == element)
-                                nameChangeSuccessful = true;
-                        }
-
-                        if (! nameChangeSuccessful) {
-                            // Get HTML for the element
-                            var elementSource = element.outerHTML;
-                            // Remove the name attribute
-                            elementSource = elementSource.replace(new RegExp(" name=.*( |>)", "g"), "$1");
-                            // Add the name attribute with the new value
-                            elementSource = elementSource.replace(new RegExp(">"), " name=\"" + value + "\">");
-                            var newElement = document.createElement(elementSource);
-                            // Replacing current element by newly created one
-                            element.parentNode.insertBefore(newElement, element);
-                            element.parentNode.removeChild(element);
-                        }
-                    }
-                } else {
-                    element.setAttribute(name, value);
-                }
             },
 
             getChildElementByIndex: function(parent, position) {
@@ -244,19 +93,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                         ? root
                         : root.getElementsByTagName(tagNameOrArray)[0];
                 return _.isUndefined(result) ? null : result;
-            },
-
-            /**
-             * Test a function ancestor-or-self::* and returns true as soon as the function returns true, or false of the
-             * function always returns false.
-             */
-            existsAncestorOrSelf: function(node, fn) {
-                while (true) {
-                    if (fn(node)) return true;
-                    node = node.parentNode;
-                    if (node == null || node == document) break;
-                }
-                return false;
             }
         },
 
@@ -264,21 +100,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
          * Utility methods that don't in any other category
          */
         Utils: {
-
-            /**
-             * See: http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Problem-and-solution
-             */
-            overlayUseDisplayHidden: function(overlay) {
-                overlay.element.style.display = "none";
-                // For why use subscribers.unshift instead of subscribe, see:
-                // http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Avoiding-scroll-when-showing-a-mess
-                overlay.beforeShowEvent.subscribers.unshift(new YAHOO.util.Subscriber(function() {
-                    overlay.element.style.display = "block";
-                }));
-                overlay.beforeHideEvent.subscribe(function() {
-                    overlay.element.style.display = "none";
-                });
-            },
 
             /**
              * For example: appendToEffectiveId("foo⊙1", "bar") returns "foobar⊙1"
@@ -371,16 +192,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                 }
 
                 return cursor;
-            },
-
-            /**
-             * Applies a function to all the elements of an array, and discards the value returned by the function, if any.
-             */
-            apply: function(array, fn, obj, overrideContext) {
-                for (var arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
-                    var arrayElement = array[arrayIndex];
-                    if (overrideContext) fn.call(obj, arrayElement); else fn(arrayElement);
-                }
             }
         }
     };
@@ -1990,36 +1801,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
         },
 
         componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)
-    };
-
-    ORBEON.xforms.Init = {
-
-        /**
-         * For all the controls except list, we figure out the initial value of the control when
-         * receiving the first focus event. For the lists on Firefox, the value has already changed
-         * when we receive the focus event. So here we save the value for lists when the page loads.
-         *
-         * Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2657.
-         */
-        _compactSelect: function (list) {
-            var value = "";
-            list = ORBEON.util.Dom.getElementByTagName(list, "select");
-            for (var i = 0; i < list.options.length; i++) {
-                var option = list.options[i];
-                if (option.selected) {
-                    if (value != "") value += " ";
-                    value += option.value;
-                }
-            }
-            ORBEON.xforms.ServerValueStore.set(list.id, value);
-        },
-
-        /**
-         * Initialize dialogs
-         */
-        _dialog: function (dialog) {
-            // TODO: see how `ORBEON.xforms.Globals.dialogs[dialog.id]` is used, and if we can remove this code
-        }
     };
 
     YAHOO.util.Event.throwErrors = true;

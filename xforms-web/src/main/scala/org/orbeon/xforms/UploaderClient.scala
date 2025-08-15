@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import cats.data.NonEmptyList
 import cats.syntax.option.*
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.AjaxClient.fireEvent
 import org.scalajs.dom
@@ -123,7 +124,7 @@ object UploaderClient {
       askForProgressUpdate(currentForm)
 
       responseF.onComplete {
-        case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
+        case Success((_, _, Some(responseXml))) if responseXml.documentElement.localName == "event-response" =>
           // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
           currentEvent.upload.clear()
           // The Ajax response only contains "server events"
@@ -134,8 +135,10 @@ object UploaderClient {
           //  ...
 
           // https://github.com/orbeon/orbeon-forms/issues/6548
-          XFormsUI.firstChildWithLocalName(responseXml.documentElement, "action")
-            .flatMap(XFormsUI.firstChildWithLocalName(_, "server-events"))
+          responseXml
+            .documentElement
+            .firstChildWithLocalNameOpt("action")
+            .flatMap(_.firstChildWithLocalNameOpt("server-events"))
             .foreach(serverEventsElem =>
               fireEvent(
                 AjaxEvent.withoutTargetId(

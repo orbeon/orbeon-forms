@@ -126,7 +126,7 @@ object AjaxClient {
     }
 
     response match {
-      case Right(responseXml) if Support.getLocalName(responseXml.documentElement) == "error" =>
+      case Right(responseXml) if responseXml.documentElement.localName == "error" =>
         // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
         // we show an error to users.
         //
@@ -336,7 +336,7 @@ object AjaxClient {
       }
 
       logger.debug("before `handleResponseDom`")
-      XFormsUI.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
+      XFormsResponse.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
       logger.debug("after `handleResponseDom`")
 
       // Reset changes, as changes are included in this batch of events

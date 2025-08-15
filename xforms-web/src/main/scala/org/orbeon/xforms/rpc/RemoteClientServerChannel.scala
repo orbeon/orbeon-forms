@@ -101,7 +101,7 @@ object RemoteClientServerChannel extends ClientServerChannel {
         // Ignore response if for a form we don't have anymore on the page
         if (dom.document.body.contains(requestForm.elem)) {
           response match {
-            case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
+            case Success((_, _, Some(responseXml))) if responseXml.documentElement.localName == "event-response" =>
               // We ignore HTTP status and just check that we have a well-formed response document
               Page.loadingIndicator().requestEnded(showProgress)
               promise.success(responseXml)

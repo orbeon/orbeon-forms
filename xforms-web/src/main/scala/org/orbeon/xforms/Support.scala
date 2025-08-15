@@ -58,12 +58,6 @@ object Support {
         None
     }
 
-  def getLocalName(n: dom.Node): Option[String] =
-    Option(n) collect { case e: dom.Element => getLocalName(e)}
-
-  def getLocalName(e: dom.Element): String =
-    if (e.tagName.contains(":")) e.tagName.substringAfter(":") else e.tagName
-
   // TODO: Rename as we are returning a `dom.Document`?
   def fetchText(
     url         : String,
@@ -71,7 +65,8 @@ object Support {
     contentType : Option[String],
     acceptLang  : Option[String],
     transform   : (String, String) => String,
-    abortSignal : Option[dom.AbortSignal])(implicit
+    abortSignal : Option[dom.AbortSignal]
+  )(implicit
     executor    : ExecutionContext
   ): Future[(Int, String, Option[dom.Document])] = {
 

@@ -67,6 +67,31 @@ object DomSupport {
 
     def appendChildT[U <: dom.Node](newChild: U): U =
       elem.appendChild(newChild).asInstanceOf[U]
+
+    def childrenWithLocalName(name: String): Iterator[T] =
+      elem.childNodes.iterator collect {
+        case n: dom.Element if n.localName == name => n.asInstanceOf[T]
+      }
+
+    def firstChildWithLocalNameOpt(name: String): Option[dom.Element] =
+      childrenWithLocalName(name).nextOption()
+
+    def firstChildWithLocalNameOrThrow(name: String): dom.Element =
+      firstChildWithLocalNameOpt(name).getOrElse(throw new IllegalArgumentException(name))
+
+    // Just in case, normalize following:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
+    def attValueOpt(name: String): Option[String] =
+      if (elem.hasAttribute(name))
+        Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
+      else
+        None
+
+    def attValueOrThrow(name: String): String =
+      attValueOpt(name).getOrElse(throw new IllegalArgumentException(name))
+
+    def booleanAttValueOpt(name: String): Option[Boolean] =
+      attValueOpt(name).map(_.toBoolean)
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {

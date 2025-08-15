@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.embedding.servlet
 import org.orbeon.oxf.fr.embedding.APISupport.*
 import org.orbeon.oxf.servlet.HttpServletRequest
 
-import java.io.Writer
+import java.io.{FilterWriter, Writer}
 import java.util as ju
 import scala.jdk.CollectionConverters.*
 
@@ -31,11 +31,19 @@ object API {
    ): Unit = {
     val httpServletRequest = HttpServletRequest.fromAnyRef(req)
 
-    withSettings(httpServletRequest, writer) { settings =>
+    // https://github.com/orbeon/orbeon-forms/issues/7194
+    // There is code downstream that calls `useAndClose()`. We could track down such uses and avoid them, but it seems
+    // safer to make sure that the incoming `Writer` is not closed no matter what.
+    val neverClosingWriter =
+      new FilterWriter(writer) {
+        override def close(): Unit = ()
+      }
+
+    withSettings(httpServletRequest, neverClosingWriter) { settings =>
 
       implicit val ctx = new ServletEmbeddingContextWithResponse(
         httpServletRequest,
-        Left(writer),
+        Left(neverClosingWriter),
         nextNamespace(httpServletRequest),
         settings.orbeonPrefix,
         settings.httpClient

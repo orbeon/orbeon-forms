@@ -722,11 +722,11 @@ object XFormsResponse {
 
     val itemsetTree     = Option(JSON.parse(elem.textContent).asInstanceOf[js.Array[ItemsetItem]]).getOrElse(js.Array())
     val documentElement = dom.document.getElementByIdT(controlId)
-    val groupName       = elem.attValueOpt("group")
+    val groupNameOpt    = elem.attValueOpt("group")
 
     controlsWithUpdatedItemsets(controlId) = true
 
-    updateItemset(documentElement, controlId, itemsetTree, groupName)
+    updateItemset(documentElement, controlId, itemsetTree, groupNameOpt)
 
     // Call legacy global custom listener if any
     if (js.typeOf(g.xformsItemsetUpdatedListener) != "undefined")
@@ -819,18 +819,18 @@ object XFormsResponse {
       // Set values in DOM
       val upload = Page.getUploadControl(documentElement)
 
-      val state     = elem.attValueOpt("state")
-      val fileName  = elem.attValueOpt("filename")
-      val mediatype = elem.attValueOpt("mediatype")
-      val size      = elem.attValueOpt("size")
-      val accept    = elem.attValueOpt("accept")
+      val stateOpt     = elem.attValueOpt("state")
+      val fileNameOpt  = elem.attValueOpt("filename")
+      val mediatypeOpt = elem.attValueOpt("mediatype")
+      val sizeOpt      = elem.attValueOpt("size")
+      val acceptOpt    = elem.attValueOpt("accept")
 
-      state.foreach(upload.setState)
-      fileName .foreach(fileNameSpan .textContent = _)
-      mediatype.foreach(mediatypeSpan.textContent = _)
-      size     .foreach(sizeSpan     .textContent = _)
+      stateOpt.foreach(upload.setState)
+      fileNameOpt .foreach(fileNameSpan .textContent = _)
+      mediatypeOpt.foreach(mediatypeSpan.textContent = _)
+      sizeOpt     .foreach(sizeSpan     .textContent = _)
       // NOTE: Server can send a space-separated value but `accept` expects a comma-separated value
-      accept.foreach(a => uploadSelect.accept = a.splitTo[List]().mkString(","))
+      acceptOpt.foreach(a => uploadSelect.accept = a.splitTo[List]().mkString(","))
 
     } else if (documentElement.classList.contains("xforms-output") || documentElement.classList.contains("xforms-static")) {
 
@@ -853,32 +853,35 @@ object XFormsResponse {
     } else if (documentElement.classList.contains("xforms-input") || documentElement.classList.contains("xforms-secret")) {
         // Additional attributes for xf:input and xf:secret
 
-      val inputSize         = elem.attValueOpt("size")
-      val maxlength         = elem.attValueOpt("maxlength")
-      val inputAutocomplete = elem.attValueOpt("autocomplete")
+      val inputSizeOpt         = elem.attValueOpt("size")
+      val maxlengthOpt         = elem.attValueOpt("maxlength")
+      val inputAutocompleteOpt = elem.attValueOpt("autocomplete")
 
       // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be
       // the best thing to do.
+      // 2025-08-15: We used to remove the attribute to indicate no limit, but this is probably not correct: if you
+      // remove the attribute, then set the property, then remove the attribute again, the property is not reset. It is
+      // better to set the property to its documented (MDN) default.
 
       val input = documentElement.querySelector("input").asInstanceOf[html.Input]
 
-      inputSize.foreach { size =>
+      inputSizeOpt.foreach { size =>
         if (size.isEmpty)
-          input.removeAttribute("size")
+          input.size = 20
         else
           input.size = size.toInt
       }
 
-      maxlength.foreach { maxlength =>
+      maxlengthOpt.foreach { maxlength =>
         if (maxlength.isEmpty)
-          input.removeAttribute("maxlength")
+          input.maxLength = -1
         else
           input.maxLength = maxlength.toInt
       }
 
-      inputAutocomplete.foreach { inputAutocomplete =>
+      inputAutocompleteOpt.foreach { inputAutocomplete =>
         if (inputAutocomplete.isEmpty)
-          input.removeAttribute("autocomplete")
+          input.autocomplete = ""
         else
           input.autocomplete = inputAutocomplete
       }
@@ -886,31 +889,31 @@ object XFormsResponse {
     } else if (documentElement.classList.contains("xforms-textarea")) {
       // Additional attributes for xf:textarea
 
-      val maxlength    = elem.attValueOpt("maxlength")
-      val textareaCols = elem.attValueOpt("cols")
-      val textareaRows = elem.attValueOpt("rows")
+      val maxlengthOpt    = elem.attValueOpt("maxlength")
+      val textareaColsOpt = elem.attValueOpt("cols")
+      val textareaRowsOpt = elem.attValueOpt("rows")
 
       val textarea = documentElement.querySelector("textarea").asInstanceOf[html.TextArea]
 
       // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be
       // the best thing to do.
-      maxlength.foreach { maxlength =>
+      maxlengthOpt.foreach { maxlength =>
         if (maxlength.isEmpty)
-          textarea.removeAttribute("maxlength")
+          textarea.maxLength = -1
         else
           textarea.maxLength = maxlength.toInt
       }
 
-      textareaCols.foreach { textareaCols =>
+      textareaColsOpt.foreach { textareaCols =>
         if (textareaCols.isEmpty)
-          textarea.removeAttribute("cols")
+          textarea.cols = 20
         else
           textarea.cols = textareaCols.toInt
       }
 
-      textareaRows.foreach { textareaRows =>
+      textareaRowsOpt.foreach { textareaRows =>
         if (textareaRows.isEmpty)
-          textarea.removeAttribute("rows")
+          textarea.rows = 2
         else
           textarea.rows = textareaRows.toInt
       }
@@ -1334,10 +1337,9 @@ object XFormsResponse {
             controlsWithUpdatedItemsets.get(controlId).contains(true) ||
             (
               // Update only if the new value is different from the value already have in the HTML area
-              normalizedCurrentValue != normalizedNewControlValue
+              normalizedCurrentValue != normalizedNewControlValue && (
                 // Update only if the value in the control is the same now as it was when we sent it to the server,
                 // so not to override a change done by the user since the control value was last sent to the server
-                && (
                   normalizedPreviousServerValueOpt.isEmpty ||
                   normalizedPreviousServerValueOpt.contains(normalizedCurrentValue) ||
                   // For https://github.com/orbeon/orbeon-forms/issues/3130

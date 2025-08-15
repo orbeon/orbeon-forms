@@ -34,7 +34,6 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{timers, |}
 
 
-// Progressively migrate contents of xforms.js/AjaxServer.js here
 @JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
 

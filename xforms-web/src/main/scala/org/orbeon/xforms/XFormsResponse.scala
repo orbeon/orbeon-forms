@@ -390,14 +390,14 @@ object XFormsResponse {
     val relevantOpt     = elem.booleanAttValueOpt("relevant")
     val readonlyOpt     = elem.booleanAttValueOpt("readonly")
 
-    Option(XBL.instanceForControl(documentElement)) foreach { instance =>
+    Option(XBL.instanceForControl(documentElement)) foreach { companionInstance =>
 
       val becomesRelevant    = relevantOpt.contains(true)
       val becomesNonRelevant = relevantOpt.contains(false)
 
       def callXFormsUpdateReadonlyIfNeeded(): Unit =
-        if (readonlyOpt.isDefined && XFormsXbl.isObjectWithMethod(instance, "xformsUpdateReadonly"))
-          instance.xformsUpdateReadonly(readonlyOpt.contains(true))
+        if (readonlyOpt.isDefined && XFormsXbl.isObjectWithMethod(companionInstance, "xformsUpdateReadonly"))
+          companionInstance.xformsUpdateReadonly(readonlyOpt.contains(true))
 
       if (becomesRelevant) {
         // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
@@ -409,7 +409,7 @@ object XFormsResponse {
       } else if (becomesNonRelevant) {
         // We ignore `readonly` when we become non-relevant
         // Our component subclass's `destroy()` removes "xforms-xbl-object" data as well
-        instance.destroy()
+        companionInstance.destroy()
       } else {
         // Stays relevant or non-relevant (but we should never be here if we are non-relevant)
         callXFormsUpdateReadonlyIfNeeded()

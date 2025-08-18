@@ -445,9 +445,9 @@ object InitSupport {
         dom.document.getElementByIdOpt(id) foreach { control =>
           if (XFormsXbl.isComponent(control)) {
             for {
-              instance <- Option(XBL.instanceForControl(control))
+              companionInstance <- Option(XBL.instanceForControl(control))
             } locally {
-              instance.destroy()
+              companionInstance.destroy()
             }
           }
         }

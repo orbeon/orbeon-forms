@@ -117,15 +117,15 @@ object DocumentAPI extends js.Object {
       if (XFormsXbl.isJavaScriptLifecycle(control)) {
         // Handle XBL components with JavaScript lifecycle
 
-        val companion = XBL.instanceForControl(control)
+        val companionInstance = XBL.instanceForControl(control)
 
-        val hasXformsUpdateValue = XFormsXbl.isObjectWithMethod(companion, "xformsUpdateValue")
-        val hasSetUserValue      = XFormsXbl.isObjectWithMethod(companion, "setUserValue")
+        val hasXformsUpdateValue = XFormsXbl.isObjectWithMethod(companionInstance, "xformsUpdateValue")
+        val hasSetUserValue      = XFormsXbl.isObjectWithMethod(companionInstance, "setUserValue")
 
         if (hasSetUserValue)
-          companion.setUserValue(newStringValue) // https://github.com/orbeon/orbeon-forms/issues/5383
+          companionInstance.setUserValue(newStringValue) // https://github.com/orbeon/orbeon-forms/issues/5383
         else if (hasXformsUpdateValue)
-          companion.xformsUpdateValue(newStringValue)
+          companionInstance.xformsUpdateValue(newStringValue)
         else
           js.undefined
       } else {

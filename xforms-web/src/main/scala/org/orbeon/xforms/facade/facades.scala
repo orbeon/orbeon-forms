@@ -79,8 +79,6 @@ object XBL extends js.Object {
 @JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {
-  def isReadonly(control: html.Element)                                                                  : Boolean                                      = js.native
-  def setCurrentValue(control: html.Element, newControlValue: String, force: Boolean)                    : js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = js.native
   def getCurrentValue(elem: html.Element)                                                                : js.UndefOr[String]                           = js.native
   def setFocus(controlId: String)                                                                        : Unit                                         = js.native
   def removeFocus(controlId: String)                                                                     : Unit                                         = js.native
@@ -101,6 +99,8 @@ object Controls extends js.Object {
 
   def toggleCase(id: String, visible: Boolean)                                                           : Unit                                         = js.native
 
+  val beforeValueChange                                                                                  : YUICustomEvent                               = js.native
+  val valueChange                                                                                        : YUICustomEvent                               = js.native
   val afterValueChange                                                                                   : YUICustomEvent                               = js.native
 }
 

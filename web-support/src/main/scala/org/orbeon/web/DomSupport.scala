@@ -7,6 +7,7 @@ import org.scalajs.dom.{DocumentReadyState, Event, HTMLCollection, MutationObser
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
+import scala.reflect.ClassTag
 import scala.scalajs.js
 
 
@@ -92,6 +93,23 @@ object DomSupport {
 
     def booleanAttValueOpt(name: String): Option[Boolean] =
       attValueOpt(name).map(_.toBoolean)
+
+    def queryNestedElems[U <: html.Element : ClassTag](selector: String, includeSelf: Boolean = false): LazyList[U] = {
+
+      def fromDescendants =
+        elem
+          .querySelectorAllT(selector)
+          .view
+          .collect { case e: U => e }
+
+      if (includeSelf)
+        elem match {
+          case e: U if e.matches(selector) => LazyList(e).lazyAppendedAll(fromDescendants)
+          case _                           => fromDescendants.to(LazyList)
+        }
+      else
+        fromDescendants.to(LazyList)
+    }
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {

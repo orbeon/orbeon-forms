@@ -52,11 +52,11 @@ object XFormsUI {
   def handleShiftSelection(clickEvent: dom.MouseEvent, controlElem: html.Element): Unit =
     if (controlElem.classList.contains("xforms-select-appearance-full")) {
       // Only for "checkbox" controls
-      val checkboxInputs = controlElem.getElementsByTagName("input")
+      val checkboxInputs = controlElem.queryNestedElems[html.Input]("input", includeSelf = false)
       if (XFormsId.hasEffectiveIdSuffix(controlElem.id) && checkboxInputs.length == 1) {
         // Click on a single repeated checkbox
 
-        val checkboxElem = checkboxInputs.head.asInstanceOf[html.Input]
+        val checkboxElem = checkboxInputs.head
 
         if (clickEvent.getModifierState("Shift")) {
           // Just got shift-selected
@@ -83,7 +83,11 @@ object XFormsUI {
             controlIds           <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastControlElem.id), targetId)
             controlId            <- controlIds
             controlElem          <- dom.document.getElementByIdOpt(controlId)
-            checkboxValue        <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
+            checkboxValue        <-
+              if (newCheckboxChecked)
+                controlElem.queryNestedElems[html.Input]("input", includeSelf = false).headOption.map(_.value)
+              else
+                Some("")
           } locally {
             DocumentAPI.setValue(controlId, checkboxValue)
           }
@@ -92,7 +96,7 @@ object XFormsUI {
         // Update selection no matter what
         lastCheckboxChecked = Some(controlElem -> checkboxElem)
 
-      } else if (checkboxInputs.length > 1) {
+      } else if (checkboxInputs.nonEmpty) {
         // Within a single group of checkboxes
 
         // LATER: could support click on `<span>` inside `<label>`
@@ -101,7 +105,7 @@ object XFormsUI {
             for {
               (lastControlElem, lastCheckboxElem) <- lastCheckboxChecked
               if lastControlElem.id == controlElem.id
-              allCheckboxes                       = checkboxInputs.toList.map(_.asInstanceOf[html.Input])
+              allCheckboxes                       = checkboxInputs.toList
               lastIndex                           = allCheckboxes.indexWhere(_.value == lastCheckboxElem.value)
               if lastIndex >= 0
               currentIndex                        = allCheckboxes.indexWhere(_.value == currentCheckboxElem.value)
@@ -122,21 +126,24 @@ object XFormsUI {
       lastCheckboxChecked = None
     }
 
+  // TODO: remove once removed from xforms.js.
   // Update `xforms-selected`/`xforms-deselected` classes on the parent `<span>` element
   @JSExport
-  def setRadioCheckboxClasses(target: html.Element): Unit = {
-    for (checkboxInput <- nestedInputElems(target)) {
-      var parentSpan = checkboxInput.parentElement // boolean checkboxes are directly inside a `span`
-      if (parentSpan.tagName.equalsIgnoreCase("label"))
-        parentSpan = parentSpan.parentElement      // while `xf:select` checkboxes have a `label` in between
+  def setRadioCheckboxClasses(target: html.Element): Unit =
+    for (checkboxInput <- target.queryNestedElems[html.Input]("input[type = 'checkbox'], input[type = 'radio']", includeSelf = false))
+      setOneRadioCheckboxClasses(checkboxInput)
 
-      if (checkboxInput.checked) {
-        parentSpan.classList.add("xforms-selected")
-        parentSpan.classList.remove("xforms-deselected")
-      } else {
-        parentSpan.classList.add("xforms-deselected")
-        parentSpan.classList.remove("xforms-selected")
-      }
+  def setOneRadioCheckboxClasses(checkboxInput: html.Input): Unit = {
+    var parentSpan = checkboxInput.parentElement // boolean checkboxes are directly inside a `span`
+    if (parentSpan.tagName.equalsIgnoreCase("label"))
+      parentSpan = parentSpan.parentElement      // while `xf:select` checkboxes have a `label` in between
+
+    if (checkboxInput.checked) {
+      parentSpan.classList.add("xforms-selected")
+      parentSpan.classList.remove("xforms-deselected")
+    } else {
+      parentSpan.classList.add("xforms-deselected")
+      parentSpan.classList.remove("xforms-selected")
     }
   }
 
@@ -283,9 +290,6 @@ object XFormsUI {
     // Global information about the last checkbox to check
     // TODO: This be by form.
     var lastCheckboxChecked: Option[(html.Element, html.Input)] = None
-
-    def nestedInputElems(target: dom.Element): collection.Seq[html.Input] =
-      target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
     private def findLoaderElem: Option[dom.Element] =
       Option(dom.document.querySelector(".orbeon-loader"))

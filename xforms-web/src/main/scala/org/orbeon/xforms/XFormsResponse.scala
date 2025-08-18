@@ -1152,7 +1152,7 @@ object XFormsResponse {
 
     // - https://github.com/orbeon/orbeon-forms/issues/5595
     // - https://github.com/orbeon/orbeon-forms/issues/5427
-    val isReadonly = Controls.isReadonly(documentElement)
+    val isReadonly = XFormsControls.isReadonly(documentElement)
 
     // Remember currently-checked values
     val checkedValues: Set[String] =
@@ -1324,7 +1324,7 @@ object XFormsResponse {
       ServerValueStore.set(controlId, newControlValue)
 
       if (containsAnyOf(documentElement, HandleValueOutputOnlyControls))
-        Controls.setCurrentValue(documentElement, normalizedNewControlValue, force = false)
+        XFormsControls.setCurrentValue(documentElement, normalizedNewControlValue, force = false)
       else
         Controls.getCurrentValue(documentElement) foreach { currentValue =>
 
@@ -1354,7 +1354,7 @@ object XFormsResponse {
               )
 
           if (doUpdate) {
-            val promiseOrUndef = Controls.setCurrentValue(documentElement, normalizedNewControlValue, force = true)
+            val promiseOrUndef = XFormsControls.setCurrentValue(documentElement, normalizedNewControlValue, force = true)
 
             // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
             //

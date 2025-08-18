@@ -424,7 +424,7 @@ object InitSupport {
               _     <- Option(XBL.instanceForControl(control))
               value <- valueOpt
             } locally {
-              Controls.setCurrentValue(control, value, force = false)
+              XFormsControls.setCurrentValue(control, value, force = false)
             }
           } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
             // Legacy JavaScript initialization

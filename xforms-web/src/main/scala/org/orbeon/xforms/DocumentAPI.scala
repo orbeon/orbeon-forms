@@ -130,7 +130,7 @@ object DocumentAPI extends js.Object {
           js.undefined
       } else {
         // This handles the native XForms controls
-        Controls.setCurrentValue(control, newStringValue, force = false)
+        XFormsControls.setCurrentValue(control, newStringValue, force = false)
       }
 
     // If setting the value was synchronous, fire the event right away

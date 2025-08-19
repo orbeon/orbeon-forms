@@ -34,55 +34,71 @@ object StateHandling {
     case object Reloaded    extends StateResult
   }
 
-  def initializeState(formId: String, revisitHandling: String): StateResult =
-    XFormsSessionStorage.get(formId) match {
-      case None =>
-        logger.debug("no state found, setting initial state")
-        XFormsSessionStorage.set(formId, 1)
+  def getStateResult(uuid: String, revisitHandling: String): StateResult =
+    XFormsSessionStorage.hasClientState(uuid) match {
+      case false =>
+        logger.debug("no state found")
         StateResult.Initialized
-      case Some(_) =>
+      case true =>
         if (BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload) {
-          logger.debug("state found upon reload, setting initial state")
-          XFormsSessionStorage.set(formId, 1)
+          logger.debug("state found upon reload")
           StateResult.Initialized
         } else if (revisitHandling == "reload") {
-          logger.debug("state found with `revisitHandling` set to `reload`, reloading page")
-          clearClientState(formId)
+          logger.debug("state found with `revisitHandling` set to `reload`")
           StateResult.Reloaded
         } else {
-          logger.debug("state found, assuming back/forward/navigate, requesting all events")
+          logger.debug("state found, assuming back/forward/navigate")
           StateResult.Restored
         }
     }
 
-  def getSequence(formId: String): String =
-    XFormsSessionStorage.get(formId) match {
+  def initializeState(namespacedFormId: String, stateResult: StateResult): Unit =
+    stateResult match {
+      case StateResult.Initialized =>
+        logger.debug("setting initial state")
+        XFormsSessionStorage.set(namespacedFormId, 1)
+      case StateResult.Reloaded =>
+        logger.debug("clearing initial state")
+        clearClientState(namespacedFormId)
+      case StateResult.Restored =>
+        logger.debug("will request all events")
+    }
+
+  def getSequence(namespacedFormId: String): String =
+    XFormsSessionStorage.get(namespacedFormId) match {
         case Some(sequence) => sequence.toString
-        case None           => throw new IllegalArgumentException(s"Sequence for form `$formId` not found")
+        case None           => throw new IllegalArgumentException(s"Sequence for form `$namespacedFormId` not found")
       }
 
-  def updateSequence(formId: String, newSequence: Int): Unit =
-    XFormsSessionStorage.set(formId, newSequence)
+  def updateSequence(namespacedFormId: String, newSequence: Int): Unit =
+    XFormsSessionStorage.set(namespacedFormId, newSequence)
 
-  def clearClientState(formId: String): Unit =
-    XFormsSessionStorage.remove(formId)
+  def clearClientState(namespacedFormId: String): Unit =
+    XFormsSessionStorage.remove(namespacedFormId)
 
   private object XFormsSessionStorage {
 
-    def get(formId: String): Option[Int] =
-      Option(dom.window.sessionStorage.getItem(key(formId))).flatMap(_.toIntOption)
+    def hasClientState(uuid: String): Boolean =
+      Option(dom.window.sessionStorage.getItem(keyFromUuid(uuid))).isDefined
 
-    def set(formId: String, sequence: Int): Unit =
-      dom.window.sessionStorage.setItem(key(formId), sequence.toString)
+    def get(namespacedFormId: String): Option[Int] =
+      Option(dom.window.sessionStorage.getItem(keyFromNamespacedFormId(namespacedFormId))).flatMap(_.toIntOption)
 
-    def remove(formId: String): Unit =
-      dom.window.sessionStorage.removeItem(key(formId))
+    def set(namespacedFormId: String, sequence: Int): Unit =
+      dom.window.sessionStorage.setItem(keyFromNamespacedFormId(namespacedFormId), sequence.toString)
+
+    def remove(namespacedFormId: String): Unit =
+      dom.window.sessionStorage.removeItem(keyFromNamespacedFormId(namespacedFormId))
 
     private val KeyPrefix = "xf-"
-    private def key(formId: String): String =
-      Page.findXFormsFormFromNamespacedId(formId) match {
-        case Some(form) => KeyPrefix + form.uuid
-        case None       => throw new IllegalArgumentException(s"UUID for form `$formId` not found")
+
+    private def keyFromNamespacedFormId(namespacedFormId: String): String =
+      Page.findXFormsFormFromNamespacedId(namespacedFormId) match {
+        case Some(form) => keyFromUuid(form.uuid)
+        case None       => throw new IllegalArgumentException(s"UUID for form `$namespacedFormId` not found")
       }
+
+    private def keyFromUuid(uuid: String): String =
+      KeyPrefix + uuid
   }
 }

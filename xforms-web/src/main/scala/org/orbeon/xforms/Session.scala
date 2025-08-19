@@ -1,5 +1,6 @@
 package org.orbeon.xforms
 
+import cats.effect.IO
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
@@ -8,6 +9,7 @@ import org.scalajs.dom.{BroadcastChannel, MessageEvent}
 
 import scala.collection.mutable
 import scala.scalajs.js
+
 
 object Session {
 
@@ -49,7 +51,99 @@ object Session {
   def addSessionUpdateListener(listener: SessionUpdateListener): Unit    = sessionUpdateListeners += listener
   def removeSessionUpdateListener(listener: SessionUpdateListener): Unit = sessionUpdateListeners -= listener
 
+  private val TabActivityBroadcastChannel  = "orbeon-tab-activity"
+  private val TabOpenPingMessageType  = "tab-open-ping"
+  private val TabOpenReplyMessageType = "tab-open-reply"
+
+  // Use a JavaScript object for message as we cannot guarantee that serialization will work across
+  // Scala.js/Orbeon Forms versions.
+  private trait TabMessage extends js.Object {
+    val messageType     : String
+    val namespacedFormId: String
+    val uuid            : String
+  }
+
+  def registerPlainDuplicatedTabHandlers(namespacedFormId: String, uuid: String): Unit =
+    if (broadcastChannelAvailable) { // 2025-08-19: not available with JSDOM/Node 16 yet
+
+      val _namespacedFormId = namespacedFormId
+      val _uuid = uuid
+
+      val tabActivityBroadcastChannel = new BroadcastChannel(TabActivityBroadcastChannel)
+
+      tabActivityBroadcastChannel.onmessage =
+        (event: MessageEvent) => {
+          val tabMessage = event.data.asInstanceOf[TabMessage]
+          if (tabMessage.namespacedFormId == namespacedFormId && tabMessage.uuid == uuid)
+            tabMessage.messageType match {
+              case TabOpenPingMessageType =>
+                // Another tab has opened with the same namespacedFormId and uuid.
+                // We need to send back a message to the channel to indicate that we are the original tab.
+                tabActivityBroadcastChannel.postMessage(new TabMessage {
+                  override val messageType     : String = TabOpenReplyMessageType
+                  override val namespacedFormId: String = _namespacedFormId
+                  override val uuid            : String = _uuid
+                })
+              case _ =>
+            }
+        }
+    }
+
+  def registerDuplicatedTabHandlers(namespacedFormId: String, uuid: String): Option[(BroadcastChannel, IO[Unit])] =
+    broadcastChannelAvailable.option { // 2025-08-19: not available with JSDOM/Node 16 yet
+
+      val _namespacedFormId = namespacedFormId
+      val _uuid = uuid
+
+      val tabActivityBroadcastChannel = new BroadcastChannel(TabActivityBroadcastChannel)
+
+      val io =
+        IO.async_[Unit] { callback =>
+          tabActivityBroadcastChannel.onmessage =
+            (event: MessageEvent) => {
+              val tabMessage = event.data.asInstanceOf[TabMessage]
+              if (tabMessage.namespacedFormId == namespacedFormId && tabMessage.uuid == uuid)
+                tabMessage.messageType match {
+                  case TabOpenPingMessageType =>
+                    // Another tab has opened with the same namespacedFormId and uuid.
+                    // We need to send back a message to the channel to indicate that we are the original tab.
+                    tabActivityBroadcastChannel.postMessage(new TabMessage {
+                      override val messageType     : String = TabOpenReplyMessageType
+                      override val namespacedFormId: String = _namespacedFormId
+                      override val uuid            : String = _uuid
+                    })
+                  case TabOpenReplyMessageType =>
+                    // Another tab has replied to our ping, meaning that it is the original tab and we are not
+                    tabActivityBroadcastChannel.close() // channel is no longer needed
+                    callback(Right(()))
+                  case other =>
+                }
+            }
+        }
+
+      (tabActivityBroadcastChannel, io)
+    }
+
+  def postTabOpenPingMessage(
+    tabActivityBroadcastChannel: BroadcastChannel,
+    namespacedFormId           : String,
+    uuid                       : String
+  ): Unit = {
+
+    val _namespacedFormId = namespacedFormId
+    val _uuid = uuid
+
+    // If we think we may have been cloned, we send a message to the channel to reach other tabs with the same
+    // namespacedFormId/uuid.
+    tabActivityBroadcastChannel.postMessage(new TabMessage {
+      override val messageType     : String = TabOpenPingMessageType
+      override val namespacedFormId: String = _namespacedFormId
+      override val uuid            : String = _uuid
+    })
+  }
+
   private object Private {
+
     case class Configuration(
       sessionId                     : String,
       sessionHeartbeatEnabled       : Boolean,

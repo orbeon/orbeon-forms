@@ -46,7 +46,7 @@ object AjaxClient {
 
   import Private.*
 
-  def initialize(configuration: rpc.ConfigurationProperties): Unit = {
+  def configureDelays(configuration: rpc.ConfigurationProperties): Unit = {
     EventQueue.shortDelay       = configuration.internalShortDelay.millis
     EventQueue.incrementalDelay = configuration.delayBeforeIncrementalRequest.millis
   }

@@ -13,6 +13,8 @@
   */
 package org.orbeon.xforms
 
+import cats.effect.IO
+import cats.effect.unsafe.IORuntime
 import io.circe.generic.auto.*
 import io.circe.parser.decode
 import org.log4s.Logger
@@ -32,10 +34,10 @@ import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import java.io.StringWriter
 import scala.collection.mutable as m
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -133,22 +135,69 @@ object InitSupport {
 
     logger.debug(s"initialization data is ready for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
-    AjaxClient.initialize(initializations.configuration)
+    // Lookup the state in the tab session storage
+    val stateResult =
+      StateHandling.getStateResult(initializations.uuid, initializations.configuration.revisitHandling)
 
-    pageContainsFormsMarkupF foreach { _ =>
-
-      val formOpt = initializeForm(initializations, contextAndNamespaceOpt)
-      namespaceOrUndef.toOption.foreach { namespace =>
-        completeNamespacePromise(namespace, formOpt)
+    // Depending on the state result, we may or may not need to check for duplicated tabs
+    val tabDuplicationReplyIoOpt =
+      stateResult match {
+        case StateResult.Initialized =>
+          // We know we are not a duplicate tab, but we need to listen to duplicated tab messages
+          Session.registerPlainDuplicatedTabHandlers(initializations.namespacedFormId, initializations.uuid)
+          None
+        case StateResult.Restored =>
+          // We *may* be a duplicated tab, but not necessarily
+          // We register handlers to listen to duplicated tab messages, but also to respond to a duplicated time ping
+          // reply, which we obtain as an `IO`.
+          Session.registerDuplicatedTabHandlers(initializations.namespacedFormId, initializations.uuid).map {
+            case (broadcastChannel, replyIo) =>
+              IO(Session.postTabOpenPingMessage(broadcastChannel, initializations.namespacedFormId, initializations.uuid))
+                .flatMap(_ => replyIo)
+          }
+        case StateResult.Reloaded =>
+          // Reload and early return as there is no need to continue form initialization at all
+          dom.window.location.reload()
+          return
       }
 
-      initializeReactWhenSessionAboutToExpire(initializations.configuration)
+    val pageContainsFormsMarkupIo =
+      IO.fromFuture(IO.pure(pageContainsFormsMarkupF))
 
-      if (Page.countInitializedForms == Support.allFormElems.size) {
-        logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
-        scheduleOrbeonLoadedEventIfNeeded(initializations.configuration)
+    def initializeFormIo(allEvents: Boolean) =
+      IO {
+        val formOpt = initializeForm(initializations, contextAndNamespaceOpt, stateResult, allEvents)
+        namespaceOrUndef.toOption.foreach { namespace =>
+          completeNamespacePromise(namespace, formOpt)
+        }
+
+        initializeReactWhenSessionAboutToExpire(initializations.configuration)
+
+        if (Page.countInitializedForms == Support.allFormElems.size) {
+          logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
+          scheduleOrbeonLoadedEventIfNeeded(initializations.configuration)
+        }
       }
-    }
+
+    val initIo =
+      tabDuplicationReplyIoOpt match {
+        case Some(tabDuplicationReplyIo) =>
+          tabDuplicationReplyIo
+            .timeoutTo(
+              initializations.configuration.internalShortDelay.millis,
+              pageContainsFormsMarkupIo.flatMap(_ => initializeFormIo(allEvents = true))
+            )
+            .map { _ =>
+              // TODO: show dialog to user
+              println(s"tab duplication detected for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
+            }
+        case None =>
+          pageContainsFormsMarkupIo.flatMap(_ => initializeFormIo(allEvents = false))
+      }
+
+    // Actually Run the initialization
+    implicit def runtime: IORuntime = IORuntime.global
+    initIo.unsafeToFuture()
   }
 
   def liferayF: Future[Unit] = {
@@ -214,7 +263,12 @@ object InitSupport {
 
     var formNamespacesToPromise : Map[String, Promise[Option[xforms.Form]]] = Map.empty
 
-    def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
+    def initializeForm(
+      initializations        : Initializations,
+      contextAndNamespaceOpt : Option[(String, String)],
+      stateResult            : StateResult,
+      allEvents              : Boolean
+    ): Option[Form] = {
 
       logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
       val namespacedFormId = initializations.namespacedFormId
@@ -223,7 +277,7 @@ object InitSupport {
       dom.document
         .getElementByIdOpt(namespacedFormId)
         .map(_.asInstanceOf[html.Form])
-        .flatMap { formElem =>
+        .map { formElem =>
 
         // Q: Do this later?
 
@@ -260,20 +314,17 @@ object InitSupport {
           newForm
         )
 
-        StateHandling.initializeState(namespacedFormId, initializations.configuration.revisitHandling) match {
-          case StateResult.Initialized => //nop
-          case StateResult.Restored =>
-            AjaxClient.fireEvent(
-              AjaxEvent.withoutTargetId(
-                eventName = EventNames.XXFormsAllEventsRequired,
-                form      = formElem
-              )
-            )
-          case StateResult.Reloaded =>
-            dom.window.location.reload()
-            return None
-        }
+        StateHandling.initializeState(namespacedFormId, stateResult)
 
+        if (allEvents)
+          AjaxClient.fireEvent(
+            AjaxEvent.withoutTargetId(
+              eventName = EventNames.XXFormsAllEventsRequired,
+              form      = formElem
+            )
+          )
+
+        AjaxClient.configureDelays(initializations.configuration) // this is global to all forms, behavior should be clarified
         initializeJavaScriptControls(initializations.controls)
         initializeKeyListeners(initializations.listeners, formElem)
         dispatchInitialServerEvents(initializations.pollEvent, namespacedFormId)
@@ -314,7 +365,7 @@ object InitSupport {
         if (hasOtherScripts)
           js.special.fileLevelThis.asInstanceOf[js.Dynamic].applyDynamic(xformsPageLoadedServerName)()
 
-        Some(newForm)
+        newForm
       }
     }
 

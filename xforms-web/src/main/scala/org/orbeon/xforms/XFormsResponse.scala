@@ -750,7 +750,7 @@ object XFormsResponse {
       if (isLeafControl) {
         val parentElement = documentElement.parentElement
         val newDocumentElement = dom.document.createElementT("span")
-        newDocumentElement.setAttribute("id", controlId)
+        newDocumentElement.id = controlId
 
         newDocumentElement.classList = documentElement.classList
         newDocumentElement.classList.add("xforms-static")

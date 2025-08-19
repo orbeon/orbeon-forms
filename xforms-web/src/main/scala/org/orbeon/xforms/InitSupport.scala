@@ -351,13 +351,6 @@ object InitSupport {
     def pageContainsFormsMarkupF: Future[Unit] =
       pageContainsFormsMarkupPromise.future
 
-    private def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
-      for {
-        repeatIndexes <- repeatIndexesString.splitTo[List](",")
-        repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
-      } yield
-        repeatInfos.head -> repeatInfos.last
-
     private def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
       for {
        repeatTree  <- repeatTreeString.splitTo[List](",")

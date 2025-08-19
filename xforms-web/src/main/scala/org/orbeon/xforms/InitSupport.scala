@@ -217,11 +217,11 @@ object InitSupport {
     def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
 
       logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
-      val formId      = initializations.namespacedFormId
+      val namespacedFormId = initializations.namespacedFormId
       // Form is an `Option` as it might already have been removed by the time we receive the dynamic JavaScript
       // (Should we do an error instead of a cast?)
       dom.document
-        .getElementByIdOpt(formId)
+        .getElementByIdOpt(namespacedFormId)
         .map(_.asInstanceOf[html.Form])
         .flatMap { formElem =>
 
@@ -242,7 +242,7 @@ object InitSupport {
           new Form(
             uuid                           = initializations.uuid,
             elem                           = formElem,
-            ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
+            ns                             = namespacedFormId.substring(0, namespacedFormId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
             contextAndNamespaceOpt         = contextAndNamespaceOpt,
             xformsServerPath               = initializations.xformsServerPath,
             xformsServerSubmitActionPath   = initializations.xformsServerSubmitActionPath,
@@ -256,11 +256,11 @@ object InitSupport {
           )
 
         Page.registerForm(
-          formId,
+          namespacedFormId,
           newForm
         )
 
-        StateHandling.initializeState(formId, initializations.configuration.revisitHandling) match {
+        StateHandling.initializeState(namespacedFormId, initializations.configuration.revisitHandling) match {
           case StateResult.Initialized => //nop
           case StateResult.Restored =>
             AjaxClient.fireEvent(
@@ -276,7 +276,7 @@ object InitSupport {
 
         initializeJavaScriptControls(initializations.controls)
         initializeKeyListeners(initializations.listeners, formElem)
-        dispatchInitialServerEvents(initializations.pollEvent, formId)
+        dispatchInitialServerEvents(initializations.pollEvent, namespacedFormId)
         initializeGlobalEventListenersIfNeeded()
 
         // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
@@ -293,7 +293,7 @@ object InitSupport {
 
         // Run user scripts
         initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>
-          ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues.map(_.asInstanceOf[js.Any])*)
+          ServerAPI.callUserScript(namespacedFormId, functionName, targetId, observerId, paramsValues.map(_.asInstanceOf[js.Any])*)
         }
 
         // Run other code sent by server

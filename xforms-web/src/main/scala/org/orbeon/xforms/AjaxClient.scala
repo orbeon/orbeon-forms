@@ -455,9 +455,9 @@ object AjaxClient {
 
     def processEvents(currentHtmlForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
-      val eventsAsList  = events.toList
-      val currentFormId = currentHtmlForm.id
-      val currentForm   = Page.getXFormsFormFromNamespacedIdOrThrow(currentFormId)
+      val eventsAsList            = events.toList
+      val currentNamespacedFormId = currentHtmlForm.id
+      val currentForm             = Page.getXFormsFormFromNamespacedIdOrThrow(currentNamespacedFormId)
 
       currentForm.ajaxFieldChangeTracker.beforeRequestSent(eventsAsList)
 
@@ -520,7 +520,7 @@ object AjaxClient {
           ! EventNames.EventsWithoutSequence(event.eventName)
         }
 
-      val sequenceNumberOpt = mustIncludeSequence option StateHandling.getSequence(currentFormId).toInt
+      val sequenceNumberOpt = mustIncludeSequence option StateHandling.getSequence(currentNamespacedFormId).toInt
 
       XFormsApp.clientServerChannel.sendEvents(
         requestFormId     = currentForm,

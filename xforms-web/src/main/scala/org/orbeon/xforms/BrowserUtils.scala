@@ -13,26 +13,39 @@
   */
 package org.orbeon.xforms
 
-import enumeratum.values.{IntEnum, IntEnumEntry}
+import enumeratum.{Enum, EnumEntry}
 import org.scalajs.dom
+
+import scala.scalajs.js
 
 
 object BrowserUtils {
 
-  sealed abstract class NavigationType(val value: Int) extends IntEnumEntry
-  object NavigationType extends IntEnum[NavigationType] {
+  sealed abstract class NavigationType extends EnumEntry
+  object NavigationType extends Enum[NavigationType] {
 
     val values = findValues
 
-    case object Navigate    extends NavigationType(value = 0)
-    case object Reload      extends NavigationType(value = 1)
-    case object BackForward extends NavigationType(value = 2)
-    case object Reserved    extends NavigationType(value = 255)
+    case object Navigate    extends NavigationType
+    case object Reload      extends NavigationType
+    case object BackForward extends NavigationType
+    case object Reserved    extends NavigationType
   }
 
-  // https://stackoverflow.com/questions/5004978/check-if-page-gets-reloaded-or-refreshed-in-javascript/53307588#53307588
-  // https://www.w3.org/TR/navigation-timing/
-  // https://www.w3.org/TR/resource-timing-2/
+  // 2025-08-19:
+  // - `dom.window.performance.navigation` is deprecated.
+  // - Moving to `dom.window.performance.getEntriesByType()`.
+  // - Neither `dom.window.performance.getEntriesByType()` nor `dom.window.performance.navigation` seem to
+  //   work with JSDOM.
+  // - https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming/type#navigate
+  // - https://stackoverflow.com/questions/5004978/check-if-page-gets-reloaded-or-refreshed-in-javascript/53307588#53307588
+  // - https://www.w3.org/TR/navigation-timing/
+  // - https://www.w3.org/TR/resource-timing-2/
   def getNavigationType: NavigationType =
-    NavigationType.withValue(dom.window.performance.navigation.`type`)
+    dom.window.performance.getEntriesByType("navigation").head.asInstanceOf[js.Dynamic].`type`.asInstanceOf[String] match {
+      case "navigate"     => NavigationType.Navigate
+      case "reload"       => NavigationType.Reload
+      case "back_forward" => NavigationType.BackForward
+      case _              => NavigationType.Reserved
+    }
 }

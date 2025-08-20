@@ -50,7 +50,7 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
         hideIfAlreadyVisible()  // so we don't flash the indicator.
       }
 
-  // Public for `AjaxServer.js`
+  // Public from `XFormsResponse`
   def showIfNotAlreadyVisible(): Unit = {
     showRequests += 1
     if (showRequests == 1)

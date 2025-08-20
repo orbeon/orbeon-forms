@@ -19,17 +19,12 @@ import org.orbeon.oxf.util.StringUtils.*
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("OrbeonMarkupUtils") // AjaxServer.js/xforms.js, remove when possible
+@JSExportTopLevel("OrbeonMarkupUtils") // xforms.js, remove when possible
 object MarkupUtils {
 
-  @JSExport // xforms.js, remove when possible
+  // 2025-08-19: 1 usage in xforms.js, remove when possible
+  @JSExport
   def escapeXmlMinimal(s: String): String = s.escapeXmlMinimal
-
-  @JSExport // AjaxServer.js, remove when possible
-  def escapeXmlForAttribute(s: String): String = s.escapeXmlForAttribute
-
-  @JSExport // AjaxServer.js, remove when possible
-  def normalizeSerializedHtml(s: String): String = s.normalizeSerializedHtml
 
   // Java callers
   def encodeHRRI(s: String, processSpace: Boolean): String = s.encodeHRRI(processSpace)

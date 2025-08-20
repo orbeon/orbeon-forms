@@ -406,7 +406,7 @@ object InitSupport {
           DomEventNames.PageHide,
           (ev: dom.PageTransitionEvent) => {
             if (ev.persisted)
-              Page.loadingIndicator().hideIfAlreadyVisible()
+              Page.loadingIndicator.hideIfAlreadyVisible()
           }
         )
 

@@ -50,7 +50,7 @@ object XFormsResponse {
               case true =>
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                Page.loadingIndicator().showIfNotAlreadyVisible()
+                Page.loadingIndicator.showIfNotAlreadyVisible()
               case false =>
             }
         case errorsElem: dom.Element if errorsElem.localName == "errors" => // only 1 possible `errors` element (can be in addition to `action`)
@@ -1089,8 +1089,8 @@ object XFormsResponse {
     documentElement: html.Element,
     itemsetTree    : js.Array[ItemsetItem]
   ): Unit =
-    ((documentElement.getElementsByTagName("select")(0): js.UndefOr[dom.Element]): Any) match {
-      case select: html.Select =>
+    documentElement.queryNestedElems[html.Select]("select", includeSelf = false).headOption match {
+      case Some(select) =>
 
         val selectedValues =
           select.options.filter(_.selected).map(_.value)
@@ -1129,8 +1129,8 @@ object XFormsResponse {
 
       case _ =>
         // This should not happen but if it does we'd like to know about it without entirely stopping the
-        // update process so we give the user a chance to recover the form. This should be generalized
-        // once we have migrated `AjaxServer.js` entirely to Scala.
+        // update process so we give the user a chance to recover the form.
+        // TODO: Generalize. 2025-08-19: Not sure what that was meant to mean.
         logger.error(s"`<select>` element not found when attempting to update itemset")
     }
 

@@ -28,10 +28,7 @@ object Page {
 
   import Private.*
 
-  @JSExport
-  // Make the `lazy val` accessible to JavaScript through a function
-  // We can remove the `()` once we got rid of the call in `AjaxServer.js`
-  def loadingIndicator(): LoadingIndicator = Private.loadingIndicator
+  def loadingIndicator: LoadingIndicator = Private.loadingIndicator
 
   def registerForm(namespacedFormId: String, form: xforms.Form): Unit = {
     formsByNamespacedFormId += namespacedFormId -> form

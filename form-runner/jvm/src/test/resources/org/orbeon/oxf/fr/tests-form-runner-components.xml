@@ -721,7 +721,8 @@
                             <xxf:case id="my-summary≡xf-88⊙1" visibility="visible"/>
                             <xxf:case id="my-summary≡xf-96⊙1" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-89⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid note&lt;/span&gt;"/>
+                        <xxf:control id="my-summary≡xf-89⊙1"
+                            label="&lt;span class=&quot;fr-error-label&quot;&gt;1. Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid note&lt;/span&gt;"/>
                         <xxf:control id="my-summary≡xf-97⊙1" relevant="false"/>
                         <xxf:control id="my-summary≡xf-98⊙1" relevant="false"/>
                         <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-83⊙2"/>
@@ -729,7 +730,8 @@
                             <xxf:case id="my-summary≡xf-88⊙2" visibility="visible"/>
                             <xxf:case id="my-summary≡xf-96⊙2" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-89⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid last name&lt;/span&gt;"/>
+                        <xxf:control id="my-summary≡xf-89⊙2"
+                            label="&lt;span class=&quot;fr-error-label&quot;&gt;2. Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid last name&lt;/span&gt;"/>
                         <xxf:control id="my-summary≡xf-97⊙2" relevant="false"/>
                         <xxf:control id="my-summary≡xf-98⊙2" relevant="false"/>
                         <xxf:control id="my-summary≡xf-99" class="fr-show-more-errors" relevant="false"/>

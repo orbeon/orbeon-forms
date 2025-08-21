@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr.persistence.attachments
 import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.fr.{AppForm, FormOrData, Version}
 import org.orbeon.oxf.http.{HttpMethod, HttpRanges, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
@@ -29,8 +28,6 @@ import scala.util.{Failure, Success}
 object CRUDRoute extends NativeRoute {
 
   private val logger = LoggerFactory.createLogger(CRUDRoute.getClass)
-
-  import CRUD.*
 
   def process(
     matchResult: MatchResult
@@ -46,15 +43,15 @@ object CRUDRoute extends NativeRoute {
     try {
       info(s"Attachments provider service: ${httpRequest.getMethod} ${httpRequest.getRequestPath}")
 
-      val (provider, attachmentInformation) = providerAndAttachmentInformation(httpRequest)
+      val (provider, pathInformation) = PathInformation.providerAndPathInformation(httpRequest)
 
       HttpRanges(httpRequest) match {
         case Success(ranges) =>
           httpRequest.getMethod match {
-            case HttpMethod.HEAD   => provider.head  (attachmentInformation, ranges)
-            case HttpMethod.GET    => provider.get   (attachmentInformation, ranges)
-            case HttpMethod.PUT    => provider.put   (attachmentInformation)
-            case HttpMethod.DELETE => provider.delete(attachmentInformation)
+            case HttpMethod.HEAD   => provider.head  (pathInformation, ranges)
+            case HttpMethod.GET    => provider.get   (pathInformation, ranges)
+            case HttpMethod.PUT    => provider.put   (pathInformation)
+            case HttpMethod.DELETE => provider.delete(pathInformation)
             case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
           }
 
@@ -65,61 +62,6 @@ object CRUDRoute extends NativeRoute {
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)
-    }
-  }
-}
-
-private[attachments] object CRUD {
-
-  private val FormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
-  private val DataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
-
-  case class AttachmentInformation(
-    appForm    : AppForm,
-    formOrData : FormOrData,
-    draft      : Boolean,
-    documentId : Option[String],
-    version    : Option[Int],
-    filename   : String
-  ) {
-    // Fixed path to the attachment file (same for local filesystem and S3)
-    lazy val pathSegments: List[String] =
-      List(
-        appForm.app,
-        appForm.form,
-        if (draft) "draft" else formOrData.entryName
-      ) :++
-        documentId :++
-        version.map(_.toString) :+
-        filename
-  }
-
-  def providerAndAttachmentInformation(httpRequest: Request): (Provider, AttachmentInformation) = {
-    val versionFromHeaders = httpRequest.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
-
-    httpRequest.getRequestPath match {
-      case FormPath(providerName, app, form, filename) =>
-        (Provider.withName(providerName), AttachmentInformation(
-          appForm    = AppForm(app, form),
-          formOrData = FormOrData.Form,
-          draft      = false,
-          documentId = None,
-          version    = versionFromHeaders,
-          filename   = filename
-        ))
-
-      case DataPath(providerName, app, form, dataOrDraft, documentId, filename) =>
-        (Provider.withName(providerName), AttachmentInformation(
-          appForm    = AppForm(app, form),
-          formOrData = FormOrData.Data,
-          draft      = dataOrDraft == "draft",
-          documentId = Some(documentId),
-          version    = versionFromHeaders,
-          filename   = filename
-        ))
-
-      case _ =>
-        throw HttpStatusCodeException(StatusCode.BadRequest)
     }
   }
 }

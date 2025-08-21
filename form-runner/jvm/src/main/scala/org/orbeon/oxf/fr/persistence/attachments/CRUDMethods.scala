@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr.persistence.attachments
 import org.log4s.Logger
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.http.{HttpRange, HttpRanges, StatusCode}
 
 import java.io.InputStream
@@ -24,10 +23,10 @@ import scala.util.{Failure, Success}
 
 
 trait CRUDMethods {
-  def head  (attachmentInformation: AttachmentInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
-  def get   (attachmentInformation: AttachmentInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
-  def put   (attachmentInformation: AttachmentInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
-  def delete(attachmentInformation: AttachmentInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
+  def head  (pathInformation: PathInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
+  def get   (pathInformation: PathInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
+  def put   (pathInformation: PathInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
+  def delete(pathInformation: PathInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
 }
 
 object CRUDMethods {

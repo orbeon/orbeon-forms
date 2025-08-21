@@ -17,7 +17,6 @@ import cats.implicits.catsSyntaxOptionId
 import org.log4s.Logger
 import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{Headers, HttpRange, HttpRanges, StatusCode}
@@ -34,62 +33,64 @@ trait S3CRUD extends CRUDMethods {
   // We let exceptions propagate up to withS3Context, which will set the HTTP status code accordingly in case of error
 
   override def head(
-    attachmentInformation : AttachmentInformation,
-    httpRanges            : HttpRanges)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
-  ): Unit = withS3Context(attachmentInformation, httpRequest, httpResponse) { s3Context =>
-
-    implicit val s3Config: S3Config = s3Context.s3Config
-    implicit val s3Client: S3Client = s3Context.s3Client
-
-    val key            = s3Context.key(attachmentInformation)
-    val objectMetadata = S3.objectMetadata(s3Config.bucket, key).get
-    val objectLength   = objectMetadata.contentLength()
-    val objectTypeOpt  = Option(objectMetadata.contentType())
-
-    httpResponse.addHeaders(HttpRanges.acceptRangesHeader(objectLength))
-    objectTypeOpt.foreach(httpResponse.addHeader(Headers.ContentType, _))
-    httpResponse.setStatus(StatusCode.Ok)
-  }
-
-  override def get(
-    attachmentInformation : AttachmentInformation,
-    httpRanges            : HttpRanges)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
-  ): Unit = withS3Context(attachmentInformation, httpRequest, httpResponse) { s3Context =>
-
-    implicit val s3Config: S3Config = s3Context.s3Config
-    implicit val s3Client: S3Client = s3Context.s3Client
-
-    val key = s3Context.key(attachmentInformation)
-
-    val objectMetadata = S3.objectMetadata(s3Config.bucket, key).get
-    val objectLength   = objectMetadata.contentLength()
-    val objectTypeOpt  = Option(objectMetadata.contentType())
-
-    CRUDMethods.get(
-      httpRanges         = httpRanges,
-      length             = objectLength,
-      partialInputStream = (httpRange: HttpRange) => S3.inputStream(key, httpRange.some).get,
-      fullInputStream    = S3.inputStream(key, httpRangeOpt = None).get,
-    )
-
-    objectTypeOpt.foreach(httpResponse.addHeader(Headers.ContentType, _))
-  }
-
-  override def put(
-    attachmentInformation : AttachmentInformation)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
+    pathInformation: PathInformation,
+    httpRanges     : HttpRanges)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
   ): Unit =
-    withS3Context(attachmentInformation, httpRequest, httpResponse) { s3Context =>
+    withS3Context(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { s3Context =>
 
       implicit val s3Config: S3Config = s3Context.s3Config
       implicit val s3Client: S3Client = s3Context.s3Client
 
-      val key = s3Context.key(attachmentInformation)
+      val key            = s3Context.key(pathInformation)
+      val objectMetadata = S3.objectMetadata(s3Config.bucket, key).get
+      val objectLength   = objectMetadata.contentLength()
+      val objectTypeOpt  = Option(objectMetadata.contentType())
+
+      httpResponse.addHeaders(HttpRanges.acceptRangesHeader(objectLength))
+      objectTypeOpt.foreach(httpResponse.addHeader(Headers.ContentType, _))
+      httpResponse.setStatus(StatusCode.Ok)
+    }
+
+  override def get(
+    pathInformation: PathInformation,
+    httpRanges     : HttpRanges)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
+  ): Unit =
+    withS3Context(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { s3Context =>
+
+      implicit val s3Config: S3Config = s3Context.s3Config
+      implicit val s3Client: S3Client = s3Context.s3Client
+
+      val key = s3Context.key(pathInformation)
+
+      val objectMetadata = S3.objectMetadata(s3Config.bucket, key).get
+      val objectLength   = objectMetadata.contentLength()
+      val objectTypeOpt  = Option(objectMetadata.contentType())
+
+      CRUDMethods.get(
+        httpRanges         = httpRanges,
+        length             = objectLength,
+        partialInputStream = (httpRange: HttpRange) => S3.inputStream(key, httpRange.some).get,
+        fullInputStream    = S3.inputStream(key, httpRangeOpt = None).get,
+      )
+
+      objectTypeOpt.foreach(httpResponse.addHeader(Headers.ContentType, _))
+    }
+
+  override def put(
+    pathInformation: PathInformation)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
+  ): Unit =
+    withS3Context(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { s3Context =>
+
+      implicit val s3Config: S3Config = s3Context.s3Config
+      implicit val s3Client: S3Client = s3Context.s3Client
+
+      val key = s3Context.key(pathInformation)
 
       val content = StreamedContent(
         inputStream   = httpRequest.getInputStream,
@@ -104,36 +105,42 @@ trait S3CRUD extends CRUDMethods {
     }
 
   override def delete(
-    attachmentInformation : AttachmentInformation)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
+    pathInformation: PathInformation)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
   ): Unit =
-    withS3Context(attachmentInformation, httpRequest, httpResponse) { s3Context =>
+    withS3Context(pathInformation, mandatoryFilename = false, httpRequest, httpResponse) { s3Context =>
 
       implicit val s3Config: S3Config = s3Context.s3Config
       implicit val s3Client: S3Client = s3Context.s3Client
 
-      val key = s3Context.key(attachmentInformation)
+      val keyPrefix    = s3Context.key(pathInformation)
+      val keysToDelete = S3.objects(s3Config.bucket, keyPrefix).get.map(_.key())
 
-      S3.deleteObject(s3Config.bucket, key).get
+      if (keysToDelete.nonEmpty) {
+        S3.deleteObjects(s3Config.bucket, keysToDelete).get
+      }
 
       httpResponse.setStatus(StatusCode.NoContent)
     }
 
   private def withS3Context(
-    attachmentInformation : AttachmentInformation,
-    httpRequest           : Request,
-    httpResponse          : Response)(
-    body                  : S3CRUD.S3Context => Unit
+    pathInformation  : PathInformation,
+    mandatoryFilename: Boolean,
+    httpRequest      : Request,
+    httpResponse     : Response)(
+    body             : S3CRUD.S3Context => Unit
   ): Unit = {
 
-    val config                      = S3CRUD.config(attachmentInformation.appForm, attachmentInformation.formOrData)
+    assert(pathInformation.filenameOpt.isDefined || ! mandatoryFilename)
+
+    val config                      = S3CRUD.config(pathInformation.appForm, pathInformation.formOrData)
     implicit val s3Config: S3Config = config.s3Config
 
     S3.withS3Client { s3Client =>
 
       val s3Context  = S3CRUD.S3Context(s3Client, s3Config, config.basePath)
-      val s3Key      = s3Context.key(attachmentInformation)
+      val s3Key      = s3Context.key(pathInformation)
       val s3Location = List(s3Config.endpoint, s3Config.bucket, s3Key).mkString(" / ")
 
       logger.info(s"S3 attachments provider: ${httpRequest.getMethod} $s3Location")
@@ -161,8 +168,8 @@ object S3CRUD extends CRUDConfig {
   type C = Config
 
   case class S3Context(s3Client: S3Client, s3Config: S3Config, basePath: String) {
-    def key(attachmentInformation : AttachmentInformation): String =
-      (basePath +: attachmentInformation.pathSegments)
+    def key(pathInformation: PathInformation): String =
+      (basePath +: pathInformation.pathSegments)
         .flatMap(_.trimAllToOpt)
         .map(_.stripPrefix("/").stripSuffix("/"))
         .mkString("/")

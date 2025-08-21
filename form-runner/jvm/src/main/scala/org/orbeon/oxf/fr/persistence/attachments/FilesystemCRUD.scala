@@ -17,7 +17,6 @@ import org.log4s.Logger
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{FileRangeInputStream, HttpRange, HttpRanges, StatusCode}
 import org.orbeon.oxf.util.LoggerFactory
@@ -34,12 +33,13 @@ trait FilesystemCRUD extends CRUDMethods {
   // We let exceptions propagate up to withFile, which will set the HTTP status code accordingly in case of error
 
   override def head(
-    attachmentInformation : AttachmentInformation,
-    httpRanges            : HttpRanges)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
+    pathInformation: PathInformation,
+    httpRanges     : HttpRanges)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
   ): Unit =
-    withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
+    withFile(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { fileToAccess =>
+
       if (fileToAccess.exists()) {
         httpResponse.addHeaders(HttpRanges.acceptRangesHeader(fileToAccess.length()))
         httpResponse.setStatus(StatusCode.Ok)
@@ -49,12 +49,13 @@ trait FilesystemCRUD extends CRUDMethods {
     }
 
   override def get(
-    attachmentInformation : AttachmentInformation,
-    httpRanges            : HttpRanges)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
+    pathInformation: PathInformation,
+    httpRanges     : HttpRanges)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
   ): Unit =
-    withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
+    withFile(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { fileToRead =>
+
       CRUDMethods.get(
         httpRanges         = httpRanges,
         length             = fileToRead.length(),
@@ -64,11 +65,12 @@ trait FilesystemCRUD extends CRUDMethods {
     }
 
   override def put(
-    attachmentInformation : AttachmentInformation)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
+    pathInformation: PathInformation)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
   ): Unit =
-    withFile(attachmentInformation, httpRequest, httpResponse) { fileToWrite =>
+    withFile(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { fileToWrite =>
+
       fileToWrite.getParentFile.mkdirs()
 
       val inputStream      = httpRequest.getInputStream
@@ -80,25 +82,72 @@ trait FilesystemCRUD extends CRUDMethods {
     }
 
   override def delete(
-    attachmentInformation : AttachmentInformation)(implicit
-    httpRequest           : Request,
-    httpResponse          : Response
+    pathInformation: PathInformation)(implicit
+    httpRequest    : Request,
+    httpResponse   : Response
   ): Unit =
-    withFile(attachmentInformation, httpRequest, httpResponse) { fileToDelete =>
-      if (fileToDelete.delete()) {
-        httpResponse.setStatus(StatusCode.NoContent)
-      } else {
-        httpResponse.setStatus(StatusCode.InternalServerError)
+    withFile(pathInformation, mandatoryFilename = false, httpRequest, httpResponse) { fileOrDirectoryToDelete =>
+
+      // If directory, delete all files in directory (non-recursive), otherwise just delete the specified file
+      val filesToDelete =
+        if (fileOrDirectoryToDelete.exists()) {
+          if (fileOrDirectoryToDelete.isDirectory)
+            fileOrDirectoryToDelete.listFiles().toList.filterNot(_.isDirectory)
+          else
+            List(fileOrDirectoryToDelete)
+        } else {
+          Nil
+        }
+
+      val deleted = deleteFiles(pathInformation, filesToDelete)
+
+      httpResponse.setStatus(if (deleted) StatusCode.NoContent else StatusCode.InternalServerError)
+    }
+
+  private def deleteFiles(pathInformation: PathInformation, filesToDelete: Iterable[File]): Boolean = {
+
+    val deleted = filesToDelete.map(_.delete()).forall(identity)
+
+    if (deleted) {
+      val absoluteBasePathAsString = pathInformation.basePath.toAbsolutePath.toString
+
+      def deleteEmptyParentDirectory(directory: File): Unit = {
+        if (
+          directory.toPath.toAbsolutePath.toString != absoluteBasePathAsString && // Do not delete root path
+          directory.isDirectory                                                &&
+          directory.exists()                                                   &&
+          Option(directory.listFiles()).exists(_.isEmpty)
+        ) {
+          // Directory is empty and must be deleted
+          if (directory.delete()) {
+            Option(directory.getParentFile).foreach(deleteEmptyParentDirectory)
+          }
+        }
+      }
+
+      // Cleanup: recursively delete empty directories
+      for {
+        deletedFile              <- filesToDelete
+        directoryToDeleteIfEmpty <- Option(deletedFile.getParentFile)
+      } {
+        deleteEmptyParentDirectory(directoryToDeleteIfEmpty)
       }
     }
 
+    deleted
+  }
+
   private def withFile(
-    attachmentInformation : AttachmentInformation,
-    httpRequest           : Request,
-    httpResponse          : Response)(
-    body                  : File => Unit
+    pathInformation  : PathInformation,
+    mandatoryFilename: Boolean,
+    httpRequest      : Request,
+    httpResponse     : Response)(
+    body             : File => Unit
   ): Unit = {
-    val fileToAccess = file(attachmentInformation)
+
+    assert(pathInformation.filenameOpt.isDefined || ! mandatoryFilename)
+
+    val fileToAccess = pathInformation.file
 
     logger.info(s"Filesystem attachments provider: ${httpRequest.getMethod} ${fileToAccess.getAbsolutePath}")
 
@@ -117,11 +166,9 @@ trait FilesystemCRUD extends CRUDMethods {
     }
   }
 
-  private def file(attachmentInformation: AttachmentInformation): File = {
-    val basePath = FilesystemCRUD.basePath(attachmentInformation.appForm, attachmentInformation.formOrData)
-    val path     = Paths.get(basePath.toString, attachmentInformation.pathSegments*)
-
-    path.toFile
+  private implicit class PathInformationOps(pathInformation: PathInformation) {
+    def basePath: Path = FilesystemCRUD.basePath(pathInformation.appForm, pathInformation.formOrData)
+    def file    : File = Paths.get(this.basePath.toString, pathInformation.pathSegments*).toFile
   }
 }
 

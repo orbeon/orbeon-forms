@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.test
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom
 import org.orbeon.dom.Document
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.fr.Version.*
@@ -37,7 +38,6 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, SecureUtils}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.io.IOUtils.useAndClose
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
@@ -81,9 +81,32 @@ class RestApiTest
   }
 
   private def createForm(provider: Provider, formName: String = DefaultFormName)(implicit safeRequestCtx: SafeRequestContext): Unit = {
-    val form = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, formName, title = Some("first")))
+    val form    = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, formName, title = Some("first")))
     val formURL = HttpCall.crudURLPrefix(provider, formName) + "form/form.xhtml"
     HttpAssert.put(formURL, Unspecified, form, StatusCode.Created)
+  }
+
+  // Read filesystem/S3 base paths from oxf.fr.persistence.[provider].base-path test properties
+  private lazy val filesystemBasePath = Paths.get(providerProperty(provider = "filesystem", "base-path", defaultOpt = None))
+  private lazy val s3BasePath         =           providerProperty(provider = "s3",         "base-path", defaultOpt = None)
+
+  private var directoryToCleanAfterTest: Option[Path] = None
+
+  private def filesystemInit(): Unit = {
+    // Create the attachments base directory if needed, assuming that its parent directory exists
+    directoryToCleanAfterTest = (! Files.exists(filesystemBasePath)).option {
+      Files.createDirectory(filesystemBasePath)
+      filesystemBasePath
+    }
+  }
+
+  private def filesystemCleanup(): Unit = {
+    // Delete the base directory only if it was created by the test
+    directoryToCleanAfterTest.foreach { directory =>
+      // Delete all subdirectories and files in reverse order, so that children are deleted before parents
+      Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))
+    }
+    directoryToCleanAfterTest = None
   }
 
   private def buildFormDefinition(
@@ -417,15 +440,13 @@ class RestApiTest
   describe("Attachments") {
     def basicOperationsWithForm(
       formName : String,
-      preTest  : (AppForm, FormOrData)            => Unit = (_, _)    => (),
-      postTest : (AppForm, FormOrData, List[Int]) => Unit = (_, _, _) => ()
-    ): Unit = {
+      preTest  : ()        => Unit = () => (),
+      postTest : List[Int] => Unit = _  => ()
+    ): Unit =
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables("attachments") { (_, provider) =>
-          val appForm = AppForm(provider.entryName, formName)
-          val formOrData = FormOrData.Data
 
-          preTest(appForm, formOrData)
+          preTest()
 
           createForm(provider, formName)
 
@@ -454,9 +475,9 @@ class RestApiTest
           val sizesToTest = List(0, 1, 1024, largestSize)
 
           for ((size, position) <- sizesToTest.zipWithIndex) {
-            val bodyArray = new Array[Byte](size) |!> Random.nextBytes
-            val body      = bodyArray |> HttpCall.Binary.apply
-            val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
+            val bodyArray                  = new Array[Byte](size) |!> Random.nextBytes
+            val body                       = bodyArray |> HttpCall.Binary.apply
+            val url                        = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
             val (hashAlgorithm, hashValue) = computeHash(bodyArray)
 
             HttpAssert.put(url, Specific(1), body, StatusCode.Created, hashAlgorithm = Some(hashAlgorithm), hashValue = Some(hashValue))
@@ -549,18 +570,15 @@ class RestApiTest
             }
           }
 
-          postTest(appForm, formOrData, sizesToTest)
+          postTest(sizesToTest)
         }
       }
-    }
 
     it("must pass basic operations") {
       basicOperationsWithForm(formName = DefaultFormName)
     }
 
     it("must pass basic operations (filesystem attachments) (#4146)") {
-      def basePath(appForm: AppForm, formOrData: FormOrData): Path =
-        Paths.get(FilesystemCRUD.config(appForm, formOrData).basePath)
 
       def fileSizes(directory: Path): List[Long] =
         Files
@@ -571,22 +589,9 @@ class RestApiTest
           .asScala
           .toList
 
-      var directoryToCleanAfterTest: Option[Path] = None
+      def postTest(testSizes: List[Int]): Unit = {
 
-      def preTest(appForm: AppForm, formOrData: FormOrData): Unit = {
-        val directory = basePath(appForm, formOrData)
-
-        // Create the attachments base directory if needed, assuming that its parent directory exists
-
-        if (!Files.exists(directory)) {
-          Files.createDirectory(directory)
-          directoryToCleanAfterTest = Some(directory)
-        }
-      }
-
-      def postTest(appForm: AppForm, formOrData: FormOrData, testSizes: List[Int]): Unit = {
-        val directory     = basePath(appForm, formOrData)
-        val actualSizes   = fileSizes(directory).sorted
+        val actualSizes   = fileSizes(filesystemBasePath).sorted
         val expectedSizes = testSizes.map(_.toLong).sorted
 
         // Compare local files count and sizes
@@ -594,19 +599,13 @@ class RestApiTest
       }
 
       try {
-        basicOperationsWithForm(formName = FilesystemAttachmentsFormName, preTest = preTest, postTest = postTest)
+        basicOperationsWithForm(formName = FilesystemAttachmentsFormName, preTest = filesystemInit, postTest = postTest)
       } finally {
-        // Delete the base directory only if it was created by the test
-        directoryToCleanAfterTest.foreach { directory =>
-          // Delete all sub-directories and files in reverse order, so that children are deleted before parents
-          Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))
-        }
+        filesystemCleanup()
       }
     }
 
     it("must pass basic operations (S3 attachments) (#6948)", S3Tag) {
-      // Read S3 base path from oxf.fr.persistence.[provider].base-path test property
-      val s3BasePath = providerProperty(provider = "s3", "base-path", defaultOpt = None)
 
       S3Test.withTestS3ConfigAndPath(
         configName = "test-s3-config",
@@ -615,7 +614,7 @@ class RestApiTest
 
         S3.withS3Client { implicit s3Client =>
 
-          def postTest(appForm: AppForm, formOrData: FormOrData, testSizes: List[Int]): Unit = {
+          def postTest(testSizes: List[Int]): Unit = {
 
             val actualSizes   = S3.objects(bucketName = s3Config.bucket, prefix = s3BasePath).get.map(_.size()).sorted
             val expectedSizes = testSizes.map(_.toLong).sorted
@@ -702,6 +701,84 @@ class RestApiTest
           HttpAssert.get(draftURL, Unspecified, HttpAssert.ExpectedBody(second, AnyOperation, Some(1)))
         }
       }
+    }
+
+    def draftDeletionWithForm(
+      formName: String,
+      provider: String,
+      init    : () => Unit = () => (),
+      cleanup : () => Unit = () => ()
+    ): Unit =
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables(s"drafts deletion with $provider attachments provider") { (_, provider) =>
+
+          val version  = Specific(1)
+
+          init()
+
+          try {
+            createForm(provider, formName)
+
+            val baseURL = HttpCall.crudURLPrefix(provider, formName)
+
+            val draftData    = HttpCall.XML(<draft_data/>.toDocument)
+            val nonDraftData = HttpCall.XML(<non_draft_data/>.toDocument)
+            val draftAttach  = HttpCall.XML(<draft_attachment/>.toDocument)
+
+            val draftURL       = baseURL + "draft/123/data.xml"
+            val dataURL        = baseURL + "data/123/data.xml"
+            val draftAttachURL = baseURL + "draft/123/attach.xml"
+
+            // Add draft data and attachment
+            HttpAssert.put(draftURL, version, draftData, StatusCode.Created)
+            HttpAssert.put(draftAttachURL, version, draftAttach, StatusCode.Created)
+
+            // Draft data and attachment exist
+            HttpAssert.get(draftURL, version, HttpAssert.ExpectedBody(draftData, AnyOperation, Some(version.version)))
+            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedBody(draftAttach, AnyOperation, Some(version.version)))
+
+            // Delete draft data
+            HttpAssert.del(draftURL, version, StatusCode.NoContent)
+
+            // Draft data and attachment don't exist anymore (explicit draft data deletion)
+            HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+
+            // Add back draft data and attachment
+            HttpAssert.put(draftURL, version, nonDraftData, StatusCode.Created)
+            HttpAssert.put(draftAttachURL, version, draftAttach, StatusCode.Created)
+
+            // Draft data and attachment exist again
+            HttpAssert.get(draftURL, version, HttpAssert.ExpectedBody(nonDraftData, AnyOperation, Some(version.version)))
+            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedBody(draftAttach, AnyOperation, Some(version.version)))
+
+            // Add non-draft data
+            HttpAssert.put(dataURL, version, nonDraftData, StatusCode.Created)
+
+            // Draft data and attachment don't exist anymore (deletion triggered by non-draft data being added)
+            HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+
+          } finally {
+            cleanup()
+          }
+        }
+      }
+
+    it("must delete filesystem draft attachments when needed (#7049)") {
+      draftDeletionWithForm(
+        formName = FilesystemAttachmentsFormName,
+        provider = "filesystem",
+        init     = filesystemInit,
+        cleanup  = filesystemCleanup
+      )
+    }
+
+    it("must delete S3 draft attachments when needed (#7049)") {
+      draftDeletionWithForm(
+        formName = S3AttachmentsFormName,
+        provider = "s3"
+      )
     }
   }
 

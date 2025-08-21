@@ -298,8 +298,6 @@ trait CreateUpdateDelete {
       tablesToDeleteDraftsFrom.foreach { table =>
         doDelete(table, dataPart.documentId, isDraft = true, lastModifiedOpt = None, filenameOpt = None)
       }
-
-      // TODO: delete draft attachments also in filesystem/S3
     }
 
     def doForceDelete(dataPart: DataPart): Unit = {

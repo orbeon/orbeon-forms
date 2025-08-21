@@ -25,7 +25,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 
 import java.io.InputStream
-import scala.jdk.CollectionConverters.ListHasAsScala
+import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
 import scala.util.{Failure, Success, Try}
 
 
@@ -139,6 +139,14 @@ object S3 {
   def deleteObject(bucketName: String, key: String)(implicit s3Client: S3Client): Try[DeleteObjectResponse] = {
     val deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(key).build()
     Try(s3Client.deleteObject(deleteObjectRequest))
+  }
+
+  // Will fail for an empty list of keys
+  def deleteObjects(bucketName: String, keys: List[String])(implicit s3Client: S3Client): Try[DeleteObjectsResponse] = {
+    val objectsToDelete = keys.map(key => ObjectIdentifier.builder().key(key).build())
+    val delete          = Delete.builder().objects(objectsToDelete.asJava).build()
+    val deleteRequest   = DeleteObjectsRequest.builder().bucket(bucketName).delete(delete).build()
+    Try(s3Client.deleteObjects(deleteRequest))
   }
 
   def newS3Client()(implicit config: S3Config): S3Client = {

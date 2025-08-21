@@ -182,21 +182,25 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
-  ): Unit =
+  ): Unit = {
+
+    import HttpMethod.{DELETE, GET, POST}
+
     (request.getMethod, request.getRequestPath) match {
-      case (_,               FormPath(path, app, form, _))                       => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
-      case (_,               DataPath(path, app, form, _, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(documentId))
-      case (HttpMethod.DELETE, DataCollectionPath(path, app, form))              => BatchDelete.process        (request, response, AppForm(app, form))
-      case (HttpMethod.POST, SearchPath(path, app, form))                        => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))              => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
-      case (HttpMethod.GET,  HistoryPath(path, app, form, _, _))                 => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case (HttpMethod.POST, DistinctValuesPath(path, app, form))                => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case (_,               PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, AppFormOpt(Option(app), Option(form)))
-      case (HttpMethod.GET,  ReindexPath(null, null))                            => proxyReindex               (request, response, None)
-      case (HttpMethod.POST, ReindexPath(app, form))                             => proxyReindex               (request, response, AppForm(Option(app), Option(form)))
-      case (HttpMethod.GET,  ReEncryptStatusPath)                                => proxyReEncryptStatus       (request, response)
-      case (_, incomingPath)                                                     => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
+      case (_,      FormPath(path, app, form, _))                                 => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, isDraft = false,                  None          , path)
+      case (_,      DataPath(path, app, form, dataOrDraft, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, isDraft = dataOrDraft == "draft", Some(filename), path, Some(documentId))
+      case (DELETE, DataCollectionPath(path, app, form))                          => BatchDelete.process        (request, response, AppForm(app, form))
+      case (POST,   SearchPath(path, app, form))                                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
+      case (POST,   ReEncryptAppFormPath(path, app, form))                        => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
+      case (GET,    HistoryPath(path, app, form, _, _))                           => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
+      case (POST,   DistinctValuesPath(path, app, form))                          => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
+      case (_,      PublishedFormsMetadataPath(_, app, form))                     => proxyPublishedFormsMetadata(request, response, AppFormOpt(Option(app), Option(form)))
+      case (GET,    ReindexPath(null, null))                                      => proxyReindex               (request, response, None)
+      case (POST,   ReindexPath(app, form))                                       => proxyReindex               (request, response, AppForm(Option(app), Option(form)))
+      case (GET,    ReEncryptStatusPath)                                          => proxyReEncryptStatus       (request, response)
+      case (_,      incomingPath)                                                 => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
     }
+  }
 
   // TODO: test
   private def proxySimpleRequest(
@@ -254,6 +258,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     response       : Response,
     appForm        : AppForm,
     formOrData     : FormOrData,
+    isDraft        : Boolean,
     filename       : Option[String],
     path           : String,
     documentIdOpt  : Option[String] = None
@@ -619,6 +624,32 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       responseTransforms,
       attachmentsProviderCxrOpt
     )
+
+    // The following logic matches the logic for attachment deletion found in CreateUpdateDelete
+    if (
+      Set[HttpMethod](HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PUT).contains(request.getMethod) &&
+      formOrData == FormOrData.Data                                                                   &&
+      ! isAttachment                                                                                  &&
+      (! isDraft || request.getMethod == HttpMethod.DELETE)                                           &&
+      StatusCode.isSuccessCode(response.getStatus)
+    ) {
+      // Delete filesystem/S3 draft attachments if needed
+      val deleteDraftsCxrOpt = deleteAttachmentsProviderDraftsCxr(
+        request,
+        appForm,
+        formOrData,
+        documentIdOpt,
+        outgoingVersionHeaderOpt
+      )
+
+      for {
+        deleteDraftsCxr <- deleteDraftsCxrOpt
+        if ! StatusCode.isSuccessCode(deleteDraftsCxr.statusCode)
+      } {
+        indentedLogger.logError("", s"${deleteDraftsCxr.statusCode}: Failed to delete draft attachments")
+        response.setStatus(deleteDraftsCxr.statusCode)
+      }
+    }
   }
 
   private def bodyContent(
@@ -688,6 +719,29 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       }
     } else {
       None
+    }
+
+  private def deleteAttachmentsProviderDraftsCxr(
+    request                 : Request,
+    appForm                 : AppForm,
+    formOrData              : FormOrData,
+    documentIdOpt           : Option[String],
+    outgoingVersionHeaderOpt: Option[(String, String)]
+  )(implicit
+    indentedLogger          : IndentedLogger
+  ): Option[ConnectionResult] =
+    findAttachmentsProvider(appForm, formOrData).map { provider =>
+      val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
+      val outgoingRequest    = OutgoingRequest(HttpMethod.DELETE, OutgoingRequest.headersFromRequest(request))
+
+      // Version is included as header, not in path
+      val serviceURI =
+        baseURI.dropTrailingSlash                                                                         ::
+        "crud"                                                                                            ::
+        FormRunner.createFormDataBasePathNoPrefix(appForm, version = None, isDraft = true, documentIdOpt) ::
+        Nil mkString "/"
+
+      proxyEstablishConnection(outgoingRequest, requestContent = None, serviceURI, headers ++ outgoingVersionHeaderOpt)
     }
 
   private def compareVersionAgainstIncomingIfNeeded(

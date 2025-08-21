@@ -127,27 +127,27 @@ object XFormsResponse {
           val repeatIndexes                 = form.repeatIndexes
 
           // Extract data from server response
-          val newRepeatIndexes =
+          val newRepeatIndexesByPrefixedId =
             js.Dictionary[Int](
               childElem
                 .childrenT
                 .collect {
                   case repeatIndexElem: dom.Element if repeatIndexElem.localName == "repeat-index" =>
-                    val repeatId = repeatIndexElem.attValueOrThrow("id")
-                    val newIndex = repeatIndexElem.attValueOrThrow("new-index").toInt
-                    repeatId -> newIndex
+                    val repeatPrefixedId = repeatIndexElem.attValueOrThrow("id")
+                    val newIndex         = repeatIndexElem.attValueOrThrow("new-index").toInt
+                    repeatPrefixedId -> newIndex
                 }
                 .toList*
             )
 
           // For each repeat id that changes, see if all the children are also included in
           // `newRepeatIndexes`. If they are not, add an entry with the index unchanged.
-          newRepeatIndexes.foreach { case (repeatId, _) =>
-            repeatTreeParentToAllChildren.get(repeatId).getOrElse(js.Array()).foreach { child =>
-              if (! newRepeatIndexes.contains(child))
+          newRepeatIndexesByPrefixedId.foreach { case (repeatPrefixedId, _) =>
+            repeatTreeParentToAllChildren.get(repeatPrefixedId).getOrElse(js.Array()).foreach { child =>
+              if (! newRepeatIndexesByPrefixedId.contains(child))
                 repeatIndexes.get(child) match {
-                  case Some(index) => newRepeatIndexes(child) = index
-                  case None        => newRepeatIndexes.remove(child)
+                  case Some(index) => newRepeatIndexesByPrefixedId(child) = index
+                  case None        => newRepeatIndexesByPrefixedId.remove(child)
                 }
             }
           }
@@ -160,15 +160,15 @@ object XFormsResponse {
               case _ => false
             }
 
-          def getClassForRepeatId(repeatId: String): String = {
+          def getClassForRepeatId(repeatPrefixedId: String): String = {
             var currentDepth = 1
-            var currentRepeatId = repeatId
+            var currentRepeatPrefixedId = repeatPrefixedId
             var done = false
             while (! done) {
-              form.repeatTreeChildToParent.get(currentRepeatId) match {
-                case Some(id) =>
-                  currentRepeatId = id
-                  currentDepth    = if (currentDepth == 4) 1 else currentDepth + 1
+              form.repeatTreeChildToParent.get(currentRepeatPrefixedId) match {
+                case Some(newPrefixedId) =>
+                  currentRepeatPrefixedId = newPrefixedId
+                  currentDepth    = if (currentDepth == 4) 1 else currentDepth + 1 // so 1-based, modulo 4
                 case None =>
                   done = true
               }
@@ -177,32 +177,32 @@ object XFormsResponse {
           }
 
           // Unhighlight items at old indexes
-          newRepeatIndexes.foreach { case (repeatId, _) =>
+          newRepeatIndexesByPrefixedId.foreach { case (repeatPrefixedId, _) =>
             repeatIndexes
-              .get(repeatId)
+              .get(repeatPrefixedId)
               .filter(_ != 0)
               .foreach { oldIndex =>
-                val oldItemDelimiter = Utils.findRepeatDelimiter(formId, repeatId, oldIndex)
+                val oldItemDelimiter = Utils.findRepeatDelimiter(formId, repeatPrefixedId, oldIndex)
                 if (oldItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
                   oldItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
-                    case elem: html.Element => elem.classList.remove(getClassForRepeatId(repeatId))
+                    case elem: html.Element => elem.classList.remove(getClassForRepeatId(repeatPrefixedId))
                     case _ =>
                   }
               }
           }
 
           // Store new indexes
-          newRepeatIndexes.foreach { case (repeatId, newIndex) =>
-            repeatIndexes(repeatId) = newIndex
+          newRepeatIndexesByPrefixedId.foreach { case (repeatPrefixedId, newIndex) =>
+            repeatIndexes(repeatPrefixedId) = newIndex
           }
 
           // Highlight item at new index
-          newRepeatIndexes.foreach { case (repeatId, newIndex) =>
+          newRepeatIndexesByPrefixedId.foreach { case (repeatPrefixedId, newIndex) =>
             if (newIndex != 0) {
-              val newItemDelimiter = Utils.findRepeatDelimiter(formId, repeatId, newIndex)
+              val newItemDelimiter = Utils.findRepeatDelimiter(formId, repeatPrefixedId, newIndex)
               if (newItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
                 newItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
-                  case elem: html.Element => elem.classList.add(getClassForRepeatId(repeatId))
+                  case elem: html.Element => elem.classList.add(getClassForRepeatId(repeatPrefixedId))
                   case _ =>
                 }
             }

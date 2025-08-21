@@ -104,6 +104,8 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       .orUndefined
 
   val wizard: FormRunnerFormWizardAPI = new FormRunnerFormWizardAPI(form)
+  def isViewMode(): Boolean =
+    form.elem.querySelectorOpt(".fr-view").exists(_.classList.contains("fr-mode-view"))
 
   private def findControlMaybeNested(
     controlName: String,

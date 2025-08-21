@@ -17,12 +17,15 @@ import autowire.*
 import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
-import org.orbeon.jquery.Offset
+import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.fr.{Cell, ControlOps}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.*
+import org.orbeon.fr.FormRunnerAPI
+
+import scala.scalajs.js
 import org.orbeon.xforms.rpc.RpcClient
-import org.scalajs.dom.html
+import org.scalajs.dom.{Element, html}
 import io.udash.wrappers.jquery.JQuery
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -87,9 +90,9 @@ object ControlEditor {
       ))
     }
 
-    val controlElemWithNames =
+    val controlElemWithNames: Seq[(html.Element, String)] =
       for {
-        elem <- cell.el.children().get()
+        elem <- cell.el.children().elems
         if ! controlEditors.contains(elem)
         if ! elem.classList.contains("gu-transit")
         if elem.hasAttribute("id")
@@ -98,8 +101,9 @@ object ControlEditor {
         elem -> name
 
     val firstControlElemWithNameOpt = controlElemWithNames.headOption
+    val isView = FormRunnerAPI.getForm(cell.el.elem).isViewMode()
 
-    // Control editor is only show when the cell isn't empty
+    // Control/right editor is only show when the cell isn't empty
     firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>
 
       val jControlEl = $(controlEl)
@@ -112,24 +116,31 @@ object ControlEditor {
       val itemsetIcon = controlEditorRight().find(".fb-control-edit-items")
       itemsetIcon.toggleClass("xforms-disabled", ! controlEl.classList.contains("fb-itemset"))
 
+      if (isView)
+        controlEditorRight().find(".fb-control-delete, .fb-control-handle").hide()
+
       // Top editor
       jControlEl.append(controlEditorTop())
       positionTopEditor(controlEditorTop(), 0)
 
       controlEditorTop().children().get(0).get.textContent = controlName
     }
-    firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft())
-    positionEditor(controlEditorLeft(), 0)
 
-    // Enable/disable split/merge icons
-    val allowedDirections = {
-      val cellEl = cell.el.get(0).get.asInstanceOf[html.Element]
-      Cell.canChangeSize(cellEl)
-    }
-    for (((cssClass, direction), _) <- SplitMergeCssClassDirectionOps) {
-      val disableIcon = ! allowedDirections.contains(direction)
-      val icon = controlEditorLeft().find(s".$cssClass")
-      icon.toggleClass("disabled", disableIcon)
+    // Cell/left editor
+    if (! isView) {
+      firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft())
+      positionEditor(controlEditorLeft(), 0)
+
+      // Enable/disable split/merge icons
+      val allowedDirections = {
+        val cellEl = cell.el.get(0).get.asInstanceOf[html.Element]
+        Cell.canChangeSize(cellEl)
+      }
+      for (((cssClass, direction), _) <- SplitMergeCssClassDirectionOps) {
+        val disableIcon = ! allowedDirections.contains(direction)
+        val icon = controlEditorLeft().find(s".$cssClass")
+        icon.toggleClass("disabled", disableIcon)
+      }
     }
   }
 

@@ -119,9 +119,8 @@
     <xsl:variable
         name="is-static-readonly"
         select="
-            $mode = 'view' or (
-                $is-pdf-mode and not($use-pdf-template)
-            )"
+            ($mode = 'view' and not($is-form-builder)) or
+            ($is-pdf-mode   and not($use-pdf-template))"
         as="xs:boolean"/>
 
     <!-- Actions -->

@@ -266,7 +266,7 @@
                                             )
                                         )"/>
 
-                                <xf:select1 appearance="minimal" ref="bind('library-versions-bind')/*[name() = $elem-name]">
+                                <xf:select1 appearance="minimal" ref="bind('library-versions-bind')/*[name() = $elem-name]" readonly="$fr-mode = 'view'">
                                     <xf:label class="xforms-hidden" ref="$form-resources/library-version/label"/>
                                     <xf:itemset ref="bind('fb-toolbox-libraries-bind')/*[name() = $elem-name]/version">
                                         <xf:label ref="xxf:format-message($form-resources/library-version/item/label, xs:integer(.))"/>

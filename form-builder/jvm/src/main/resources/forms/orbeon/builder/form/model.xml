@@ -40,6 +40,7 @@
     <xf:var name="app"        value="$parameters/app/string()"/>
     <xf:var name="form"       value="$parameters/form/string()"/>
     <xf:var name="mode"       value="$parameters/mode/string()"/>
+    <xf:var name="fr-mode"    value="$parameters/mode/string()"/>
 
     <xf:var name="has-roles"  value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
@@ -503,6 +504,7 @@
                             readonly="
                                 let $versions := bind('fb-toolbox-libraries-bind')/*[name() = name($global-or-special-or-app)]
                                 return
+                                    $fr-mode = 'view' or
                                     count($versions/version) = 1"
                         />
                     </xf:bind>
@@ -858,9 +860,9 @@
         <!-- TODO: move to dialog-language.xml -->
         <xf:bind ref="new-language-trigger" readonly="xxf:is-blank(../new-language)"/>
         <!-- Make buttons readonly depending on whether items can be inserted -->
-        <xf:bind ref="section-trigger"  readonly="/ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
-        <xf:bind ref="grid-trigger"     readonly="fbf:getCurrentlySelectedCell()/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
-        <xf:bind ref="control-trigger"  readonly="fbf:getCurrentlySelectedCell()/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
+        <xf:bind ref="section-trigger"  readonly="$fr-mode = 'view' or /ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
+        <xf:bind ref="grid-trigger"     readonly="$fr-mode = 'view' or fbf:getCurrentlySelectedCell()/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
+        <xf:bind ref="control-trigger"  readonly="$fr-mode = 'view' or fbf:getCurrentlySelectedCell()/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
 
         <!-- Sum calculate and validate MIP error counts -->
         <xf:bind ref="xpath-errors" calculate="../calculate-errors + ../validate-errors"/>

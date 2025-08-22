@@ -52,7 +52,7 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
@@ -203,11 +203,15 @@ object FormRunnerPersistence {
 
   val StandardProviderProperties          = Set("uri", "autosave", "active", "permissions", "flat-view")
   val AttachmentAttributeNames            = List("filename", "mediatype", "size")
+  val JsEnvProviderName                   = "javascript"
 
   def findProvider(appForm: AppForm, formOrData: FormOrData, properties: PropertySet = CoreCrossPlatformSupport.properties): Option[String] =
-    properties.getNonBlankString(
-      PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: Nil mkString "."
-    )
+    if (CoreCrossPlatformSupport.isJsEnv)
+      JsEnvProviderName.some
+    else
+      properties.getNonBlankString(
+        PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: Nil mkString "."
+      )
 
   def findAttachmentsProvider(appForm: AppForm, formOrData: FormOrData): Option[String] =
     properties.getNonBlankString(

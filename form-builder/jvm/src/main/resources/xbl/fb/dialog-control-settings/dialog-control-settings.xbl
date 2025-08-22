@@ -909,6 +909,10 @@
                 <xf:instance id="autocomplete-values" src="oxf:/xbl/fb/dialog-control-settings/autocomplete-values.xml" xxf:readonly="true" xxf:cache="true"/>
 
                 <xf:bind
+                    ref="$i//* except (prev-control-id, next-control-id)"
+                    readonly="fr:mode() = 'view'"/>
+
+                <xf:bind
                     ref="autocomplete-allowed"
                     calculate="
                         $i/control-local-name = ('currency', 'input', 'number', 'secret', 'time', 'us-phone', 'us-state')             or

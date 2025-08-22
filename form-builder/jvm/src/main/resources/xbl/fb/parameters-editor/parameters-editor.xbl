@@ -41,21 +41,29 @@
                 </xf:instance>
 
                 <xf:var name="i" value="instance('i')"/>
+                <xf:var name="is-readonly" value="xxf:readonly(xxf:binding('fb-parameters-editor'))"/>
+
+                <xf:bind
+                    ref="*:param"
+                    readonly="$is-readonly"/>
 
                 <xf:bind
                     ref="*:param/*:name"
                     required="true()"
                     constraint="matches(., '^[A-Za-z0-9\-_]+$') and not(. = preceding::*:name)"
+                    readonly="$is-readonly"
                     xxf:whitespace="trim"/>
 
                 <xf:bind
                     ref="*:param/*:expr"
                     required="true()"
                     type="xxf:XPath2"
+                    readonly="$is-readonly"
                     xxf:whitespace="trim"/>
 
                 <xf:bind
                     ref="*:param/*:controlName"
+                    readonly="$is-readonly"
                     required="true()"/>
 
                 <xf:instance id="values-template" xxf:exclude-result-prefixes="#all">
@@ -269,7 +277,7 @@
                         </xf:switch>
 
 
-                        <xh:div class="fb-param-buttons">
+                        <xf:group ref=".[not($is-readonly)]" class="fb-param-buttons">
                             <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
                             <xf:trigger
                                 appearance="minimal"
@@ -289,7 +297,7 @@
                                         origin="$readonly-template"/>
                                 </xf:action>
                             </xf:trigger>
-                        </xh:div>
+                        </xf:group>
 
                     </xh:div>
 

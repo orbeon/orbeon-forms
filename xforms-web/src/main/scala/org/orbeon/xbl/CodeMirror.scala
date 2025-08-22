@@ -67,8 +67,8 @@ object CodeMirror {
 
     private def codeMirrorFocus(): Unit = this.hasFocus = true
 
-    private def userCmdCtrlEnter(): Unit = {
-      sendValueToXForms() foreach { _ =>
+    private def userCmdCtrlEnter(): Unit =
+      sendValueToXForms().foreach { _ =>
         AjaxClient.fireEvent(
           AjaxEvent(
             eventName = "DOMActivate",
@@ -76,7 +76,6 @@ object CodeMirror {
           )
         )
       }
-    }
 
     // We update the value on blur, not on change, to be incremental, for performance on large forms
     private def codeMirrorBlur(): Unit = {

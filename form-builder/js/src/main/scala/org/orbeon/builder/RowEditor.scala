@@ -18,12 +18,13 @@ import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{AboveBelow, Orientation}
-import org.orbeon.jquery.Offset
+import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.util.CoreUtils.{asUnit, *}
 import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import io.udash.wrappers.jquery.JQuery
+import org.orbeon.fr.FormRunnerAPI
 import org.orbeon.web.DomSupport.DomEventOps
 import org.scalajs.dom
 
@@ -70,67 +71,71 @@ object RowEditor {
 
       case class TopBottom(top: Double, bottom: Double)
 
-      // For each row track, find its top/bottom
-      val rowsTopBottom = {
-        val gridBodyTop = currentGridBody.top
-        val zero = List(TopBottom(0, gridBodyTop))
-        val rowsHeight = Position.tracksWidth(currentGridBody.el, Orientation.Horizontal)
-        rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) =>
-          val lastBottom = soFar.last.bottom
-          val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)
-          soFar :+ newTopBottom
-        }.drop(1)
-      }
+      val isView = FormRunnerAPI.getForm(currentGridBody.el.elem).isViewMode()
+      if (! isView) {
 
-      // Find top/bottom of the row track the pointer is on
-      val pointerRowTopBottomIndexOpt = {
-        val pointerTop = Position.pointerPos.top + Position.scrollTop()
-        rowsTopBottom.zipWithIndex.find { case (topBottom, _) =>
-          topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
+        // For each row track, find its top/bottom
+        val rowsTopBottom = {
+          val gridBodyTop = currentGridBody.top
+          val zero = List(TopBottom(0, gridBodyTop))
+          val rowsHeight = Position.tracksWidth(currentGridBody.el, Orientation.Horizontal)
+          rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) =>
+            val lastBottom = soFar.last.bottom
+            val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)
+            soFar :+ newTopBottom
+          }.drop(1)
         }
-      }
 
-      // Find where to position the row editor on the left
-      val gridEl = currentGridBody.el.closest(BlockCache.GridSelector)
-      val containerLeft = Offset(gridEl).left
+        // Find top/bottom of the row track the pointer is on
+        val pointerRowTopBottomIndexOpt = {
+          val pointerTop = Position.pointerPos.top + Position.scrollTop()
+          rowsTopBottom.zipWithIndex.find { case (topBottom, _) =>
+            topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
+          }
+        }
 
-      // Position row editor
-      pointerRowTopBottomIndexOpt.foreach(pointerRowTopBottom => {
+        // Find where to position the row editor on the left
+        val gridEl = currentGridBody.el.closest(BlockCache.GridSelector)
+        val containerLeft = Offset(gridEl).left
 
-        val rowTop    = pointerRowTopBottom._1.top
-        val rowBottom = pointerRowTopBottom._1.bottom
-        val rowHeight = rowBottom - rowTop
-        val rowIndex  = pointerRowTopBottom._2
+        // Position row editor
+        pointerRowTopBottomIndexOpt.foreach(pointerRowTopBottom => {
 
-        rowEditorContainer.show()
-        Offset.offset(
-          el     = rowEditorContainer,
-          offset = Offset(
-            left = containerLeft,
-            top  = rowTop - Position.scrollTop()
-          )
-        )
+          val rowTop    = pointerRowTopBottom._1.top
+          val rowBottom = pointerRowTopBottom._1.bottom
+          val rowHeight = rowBottom - rowTop
+          val rowIndex  = pointerRowTopBottom._2
 
-        rowEditorContainer.children().hide()
-
-        def positionElWithClass(selector: String, topOffset: JQuery => Double): Unit = {
-          val elem = rowEditorContainer.children(selector)
-          elem.show()
+          rowEditorContainer.show()
           Offset.offset(
-            el     = elem,
+            el     = rowEditorContainer,
             offset = Offset(
               left = containerLeft,
-              top  = topOffset(elem) - Position.scrollTop()
+              top  = rowTop - Position.scrollTop()
             )
           )
-        }
 
-        currentRowPosOpt = Some(rowIndex + 1)
-        positionElWithClass(RowEditor.InsertAbove.className, _ => rowTop)
-        if (currentGridBody.el.closest(".fr-grid").is(".fb-can-delete-row"))
-          positionElWithClass(RowEditor.Delete.className, e => rowTop + rowHeight/2 - e.height()/2)
-        positionElWithClass(RowEditor.InsertBelow.className, e => rowBottom - e.height())
-      })
+          rowEditorContainer.children().hide()
+
+          def positionElWithClass(selector: String, topOffset: JQuery => Double): Unit = {
+            val elem = rowEditorContainer.children(selector)
+            elem.show()
+            Offset.offset(
+              el     = elem,
+              offset = Offset(
+                left = containerLeft,
+                top  = topOffset(elem) - Position.scrollTop()
+              )
+            )
+          }
+
+          currentRowPosOpt = Some(rowIndex + 1)
+          positionElWithClass(RowEditor.InsertAbove.className, _ => rowTop)
+          if (currentGridBody.el.closest(".fr-grid").is(".fb-can-delete-row"))
+            positionElWithClass(RowEditor.Delete.className, e => rowTop + rowHeight/2 - e.height()/2)
+          positionElWithClass(RowEditor.InsertBelow.className, e => rowBottom - e.height())
+        })
+      }
     }
   })
 

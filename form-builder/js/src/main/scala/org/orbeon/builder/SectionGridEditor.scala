@@ -18,11 +18,12 @@ import enumeratum.EnumEntry.Hyphencase
 import enumeratum.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
-import org.orbeon.jquery.Offset
+import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import io.udash.wrappers.jquery.JQuery
+import org.orbeon.fr.FormRunnerAPI
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -59,12 +60,6 @@ object SectionGridEditor {
 
     import ContainerEditor._
 
-    val SectionGridAlwaysVisibleIcons =
-      List(
-        ContainerEditDetails,
-        ContainerCopy
-      )
-
     // Position editor when block becomes current
     Position.currentContainerChanged(
       containerCache = BlockCache.sectionGridCache,
@@ -74,6 +69,7 @@ object SectionGridEditor {
       },
       becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
+        val isViewMode        = FormRunnerAPI.getForm(sectionGridBody.el.elem).isViewMode()
 
         // Position the editor
         sectionGridEditorContainer.show()
@@ -89,44 +85,38 @@ object SectionGridEditor {
         // Start by hiding all the icons
         allIcons.hide()
 
-        def showContainerIcons(container: JQuery): Unit = {
+        def showMoveDeleteIcons(container: JQuery): Unit = {
 
-           Direction.values foreach { direction =>
-
-            val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
+          Direction.values foreach { direction =>
+            val relevant = ! isViewMode && container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
             val trigger  = allIconsWith(".fb-container-move-" + direction.entryName.toLowerCase)
-
             if (relevant)
               trigger.show()
           }
 
-          if (container.is(".fb-can-delete"))
+          if (! isViewMode && container.is(".fb-can-delete"))
             Set(ContainerDelete, ContainerCut)
               .map(_.className)
               .map(allIconsWith)
               .foreach(_.show())
         }
 
-        // Icons which are always visible
-        allIconsWith(SectionGridAlwaysVisibleIcons map (_.className) mkString ",").show()
+        // Edit and copy icons
+        allIconsWith(ContainerEditDetails.className).show()
+        if (! isViewMode) allIconsWith(ContainerCopy.className).show()
 
         // Sections
         if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
-
-          // Hide/show section move icons
           val container = sectionGridBody.el.children(".fr-section-container")
-          showContainerIcons(container)
-
-          if (container.find(".fr-section-component").length > 0)
+          showMoveDeleteIcons(container)
+          if (! isViewMode && container.find(".fr-section-component").length > 0)
             allIconsWith(ContainerMerge.className).show()
         }
 
         // Grids
         if (sectionGridBody.el.is(BlockCache.GridSelector)) {
-
           val container = sectionGridBody.el.children(".fr-grid")
-          showContainerIcons(container)
-
+          showMoveDeleteIcons(container)
           container.addClass("fb-hover")
         }
       }

@@ -101,7 +101,7 @@ object ControlEditor {
         elem -> name
 
     val firstControlElemWithNameOpt = controlElemWithNames.headOption
-    val isView = FormRunnerAPI.getForm(cell.el.elem).isViewMode()
+    val isViewMode = FormRunnerAPI.getForm(cell.el.elem).isViewMode()
 
     // Control/right editor is only show when the cell isn't empty
     firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>
@@ -116,7 +116,7 @@ object ControlEditor {
       val itemsetIcon = controlEditorRight().find(".fb-control-edit-items")
       itemsetIcon.toggleClass("xforms-disabled", ! controlEl.classList.contains("fb-itemset"))
 
-      if (isView)
+      if (isViewMode)
         controlEditorRight().find(".fb-control-delete, .fb-control-handle").hide()
 
       // Top editor
@@ -127,7 +127,7 @@ object ControlEditor {
     }
 
     // Cell/left editor
-    if (! isView) {
+    if (! isViewMode) {
       firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft())
       positionEditor(controlEditorLeft(), 0)
 

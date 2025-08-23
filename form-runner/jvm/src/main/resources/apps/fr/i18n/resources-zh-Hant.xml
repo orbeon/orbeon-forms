@@ -383,6 +383,10 @@
             <renew-button>更新會話</renew-button>
             <reload-button>重新載入</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>偵測到重複的瀏覽器分頁</title>
+            <message>您似乎重複了此瀏覽器分頁。請關閉此分頁並在原始分頁中繼續您的工作階段。</message>
+        </tab-duplication>
         <available-from>
             <message>此表單尚未可用</message>
         </available-from>

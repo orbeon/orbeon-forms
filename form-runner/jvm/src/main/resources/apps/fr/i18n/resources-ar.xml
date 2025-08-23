@@ -383,6 +383,10 @@
             <renew-button>تجديد الجلسة</renew-button>
             <reload-button>إعادة تحميل</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>تم اكتشاف علامة تبويب متصفح مكررة</title>
+            <message>يبدو أنك قمت بتكرار علامة تبويب المتصفح هذه. يرجى إغلاق علامة التبويب هذه واستئناف جلستك في علامة التبويب الأصلية.</message>
+        </tab-duplication>
         <available-from>
             <message>هذا النموذج غير متاح حاليًا</message>
         </available-from>

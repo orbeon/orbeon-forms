@@ -401,6 +401,10 @@
             <renew-button>Renovar la sessió</renew-button>
             <reload-button>Recarregar</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>S'ha detectat una pestanya del navegador duplicada</title>
+            <message>Sembla que heu duplicat aquesta pestanya del navegador. Tanqueu aquesta pestanya i repreneu la sessió a la pestanya original.</message>
+        </tab-duplication>
         <available-from>
             <message>Aquest formulari encara no està disponible</message>
         </available-from>

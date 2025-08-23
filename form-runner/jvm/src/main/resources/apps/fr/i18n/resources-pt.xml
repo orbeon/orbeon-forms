@@ -383,6 +383,10 @@
             <renew-button todo="true">[Renew Session]</renew-button>
             <reload-button>Recarregar</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Guia do navegador duplicada detectada</title>
+            <message>Parece que você duplicou esta guia do navegador. Feche esta guia e retome sua sessão na guia original.</message>
+        </tab-duplication>
         <available-from>
             <message todo="true">[This form isn't available yet]</message>
         </available-from>

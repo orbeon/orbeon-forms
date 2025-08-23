@@ -40,7 +40,6 @@ import scala.collection.mutable as m
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.Dictionary
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import org.orbeon.web.DomSupport.*
@@ -140,31 +139,27 @@ object InitSupport {
       StateHandling.getStateResult(initializations.uuid, initializations.configuration.revisitHandling)
 
     // Depending on the state result, we may or may not need to check for duplicated tabs
-    val tabDuplicationReplyIoOpt =
+    val tabDuplicationReplyIoOpt: Option[IO[Unit]] =
       stateResult match {
         case StateResult.Initialized =>
           // We know we are not a duplicate tab, but we need to listen to duplicated tab messages
-          Session.registerPlainDuplicatedTabHandlers(initializations.namespacedFormId, initializations.uuid)
+          DuplicateTab.registerPingHandler(initializations.namespacedFormId, initializations.uuid)
           None
         case StateResult.Restored =>
           // We *may* be a duplicated tab, but not necessarily
           // We register handlers to listen to duplicated tab messages, but also to respond to a duplicated time ping
           // reply, which we obtain as an `IO`.
-          Session.registerDuplicatedTabHandlers(initializations.namespacedFormId, initializations.uuid).map {
-            case (broadcastChannel, replyIo) =>
-              IO(Session.postTabOpenPingMessage(broadcastChannel, initializations.namespacedFormId, initializations.uuid))
-                .flatMap(_ => replyIo)
-          }
+          DuplicateTab.pingAndRegisterAllHandlers(initializations.namespacedFormId, initializations.uuid)
         case StateResult.Reloaded =>
           // Reload and early return as there is no need to continue form initialization at all
           dom.window.location.reload()
           return
       }
 
-    val pageContainsFormsMarkupIo =
+    val pageContainsFormsMarkupIo: IO[Unit] =
       IO.fromFuture(IO.pure(pageContainsFormsMarkupF))
 
-    def initializeFormIo(allEvents: Boolean) =
+    def initializeFormIo(allEvents: Boolean): IO[Unit] =
       IO {
         val formOpt = initializeForm(initializations, contextAndNamespaceOpt, stateResult, allEvents)
         namespaceOrUndef.toOption.foreach { namespace =>
@@ -182,15 +177,13 @@ object InitSupport {
     val initIo =
       tabDuplicationReplyIoOpt match {
         case Some(tabDuplicationReplyIo) =>
-          tabDuplicationReplyIo
-            .timeoutTo(
-              initializations.configuration.internalShortDelay.millis,
-              pageContainsFormsMarkupIo.flatMap(_ => initializeFormIo(allEvents = true))
-            )
-            .map { _ =>
-              // TODO: show dialog to user
-              println(s"tab duplication detected for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
-            }
+          DuplicateTab.waitForReplyWithTimeout(
+            tabDuplicationReplyIo = tabDuplicationReplyIo,
+            namespacedFormId      = initializations.namespacedFormId,
+            uuid                  = initializations.uuid,
+            timeout               = initializations.configuration.internalShortDelay.millis,
+            timeoutContinuation   = pageContainsFormsMarkupIo.flatMap(_ => initializeFormIo(allEvents = true))
+          )
         case None =>
           pageContainsFormsMarkupIo.flatMap(_ => initializeFormIo(allEvents = false))
       }
@@ -423,7 +416,7 @@ object InitSupport {
       parentToChildren
     }
 
-    def processRepeatHierarchy(repeatTreeString: String): (Dictionary[String], Dictionary[js.Array[String]]) = {
+    def processRepeatHierarchy(repeatTreeString: String): (js.Dictionary[String], js.Dictionary[js.Array[String]]) = {
 
       val childToParent    = parseRepeatTree(repeatTreeString)
       val childToParentMap = childToParent.toMap

@@ -386,6 +386,10 @@
             <renew-button>Renouveler la session</renew-button>
             <reload-button>Recharger</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Duplication d'onglet détectée</title>
+            <message>Il semble que vous ayez dupliqué cet onglet du navigateur. Veuillez fermer cet onglet et continuer votre session dans l'onglet original.</message>
+        </tab-duplication>
         <available-from>
             <message>Ce formulaire n'est pas encore disponible</message>
         </available-from>

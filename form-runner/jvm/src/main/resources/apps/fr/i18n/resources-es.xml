@@ -6,7 +6,7 @@
             <short-date>[D01]/[M01]/[Y01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration>La configuración de Orbeon Forms está incompleta. 
+            <incomplete-configuration>La configuración de Orbeon Forms está incompleta.
                 Para más detalles, comprueba los ficheros de logs y visita &lt;a
                 href="https://doc.orbeon.com/installation/configuration-banner"
                 target="_blank"&gt;la documentación&lt;/a&gt;.</incomplete-configuration>
@@ -413,6 +413,10 @@
             <renew-button>Renovar sesión</renew-button>
             <reload-button>Recargar</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Se detectó una pestaña duplicada del navegador</title>
+            <message>Parece que ha duplicado esta pestaña del navegador. Cierre esta pestaña y reanude su sesión en la pestaña original.</message>
+        </tab-duplication>
         <available-from>
             <message>Este formulario aún no está disponible</message>
         </available-from>

@@ -377,6 +377,10 @@
             <renew-button>续期会话</renew-button>
             <reload-button>重新加载</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>检测到重复的浏览器标签页</title>
+            <message>您似乎重复了此浏览器标签页。请关闭此标签页并在原始标签页中继续您的会话。</message>
+        </tab-duplication>
         <available-from>
             <message>此表单尚未开放</message>
         </available-from>

@@ -383,6 +383,10 @@
             <renew-button>Renew Session</renew-button>
             <reload-button>Reload</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Duplicate Web Browser Tab Detected</title>
+            <message>You appear to have duplicate this web browser tab. Please close this tab and resume your session in the original tab.</message>
+        </tab-duplication>
         <available-from>
             <message>This form isn't available yet</message>
         </available-from>

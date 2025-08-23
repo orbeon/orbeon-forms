@@ -18,6 +18,7 @@ import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl
 import org.orbeon.xforms.*
+import org.orbeon.xforms.Constants.InitiallyHiddenClass
 import org.orbeon.xforms.Session.SessionUpdate
 import org.orbeon.xforms.facade.{Bootstrap, Events}
 import org.scalajs.dom
@@ -82,6 +83,7 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar-fixed-top"            , addScrollPadding(_, "scroll-padding-top"))
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                  , addScrollPadding(_, "scroll-padding-bottom"))
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog", initSessionExpirationDialog)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog",      initDuplicateTabDialog)
     }
   }
 
@@ -212,6 +214,14 @@ object FormRunnerApp extends App {
     def hideDialog(): Unit = {
       dialog.close()
       dialogShown = false
+    }
+  }
+
+  private def initDuplicateTabDialog(dialogElem: html.Element): Unit = {
+    val dialog = dialogElem.asInstanceOf[HTMLDialogElement]
+    DuplicateTab.addDuplicateTabListener { () =>
+      dialogElem.closestOpt(s"form.$InitiallyHiddenClass").foreach(_.classList.remove(InitiallyHiddenClass))
+      dialog.showModal()
     }
   }
 

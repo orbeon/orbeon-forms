@@ -383,6 +383,10 @@
             <renew-button>Oturumu Yenile</renew-button>
             <reload-button>Yeniden yükle</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Yinelenen Tarayıcı Sekmesi Algılandı</title>
+            <message>Görünüşe göre bu tarayıcı sekmesini çoğalttınız. Lütfen bu sekmeyi kapatın ve oturumunuza orijinal sekmede devam edin.</message>
+        </tab-duplication>
         <available-from>
             <message>Bu form henüz kullanılabilir değil</message>
         </available-from>

@@ -383,6 +383,10 @@
             <renew-button>Munkamenet megújítása</renew-button>
             <reload-button>Újratöltés</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Ismétlődő böngészőlap észlelve</title>
+            <message>Úgy tűnik, megkettőzte ezt a böngészőlapot. Kérjük, zárja be ezt a lapot, és folytassa a munkamenetet az eredeti lapon.</message>
+        </tab-duplication>
         <available-from>
             <message>Ez az űrlap még nem érhető el</message>
         </available-from>

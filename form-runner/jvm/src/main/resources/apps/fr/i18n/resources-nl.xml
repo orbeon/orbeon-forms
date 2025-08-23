@@ -383,6 +383,10 @@
             <renew-button todo="true">[Renew Session]</renew-button>
             <reload-button>Herladen</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Dubbel browsertabblad gedetecteerd</title>
+            <message>Het lijkt erop dat u dit browsertabblad hebt gedupliceerd. Sluit dit tabblad en hervat uw sessie in het oorspronkelijke tabblad.</message>
+        </tab-duplication>
         <available-from>
             <message todo="true">[This form isn't available yet]</message>
         </available-from>

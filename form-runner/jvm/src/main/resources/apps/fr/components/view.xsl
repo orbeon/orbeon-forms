@@ -1292,6 +1292,16 @@
             </xh:div>
         </xh:dialog>
 
+        <!-- Duplicate tab dialog -->
+        <xh:dialog class="xforms-dialog fr-duplicate-tab-dialog">
+            <xh:div class="xxforms-dialog-head">
+                <xf:output value="$fr-resources/detail/tab-duplication/title"/>
+            </xh:div>
+            <xh:div class="xxforms-dialog-body">
+                <xf:output mediatype="text/html" value="$fr-resources/detail/tab-duplication/message"/>
+            </xh:div>
+        </xh:dialog>
+
     </xsl:template>
 
     <!-- Error summary added by Form Runner -->

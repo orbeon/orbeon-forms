@@ -383,6 +383,10 @@
             <renew-button todo="true">[Renew Session]</renew-button>
             <reload-button>Ricarica</reload-button>
         </session-expiration>
+        <tab-duplication>
+            <title>Rilevata scheda del browser duplicata</title>
+            <message>Sembra che tu abbia duplicato questa scheda del browser. Chiudi questa scheda e riprendi la sessione nella scheda originale.</message>
+        </tab-duplication>
         <available-from>
             <message todo="true">[This form isn't available yet]</message>
         </available-from>

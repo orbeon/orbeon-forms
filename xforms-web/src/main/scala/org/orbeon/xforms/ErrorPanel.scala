@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -39,9 +40,7 @@ object ErrorPanel {
 
     panelElemOpt map { panelElem =>
 
-      val jPanelElem = $(panelElem)
-
-      jPanelElem.removeClass(Constants.InitiallyHiddenClass)
+      panelElem.classList.remove(Constants.InitiallyHiddenClass)
 
       val panel = newInstance(g.YAHOO.widget.Panel)(panelElem, new js.Object {
         val modal               = true
@@ -104,17 +103,17 @@ object ErrorPanel {
   def showError(currentForm: xforms.Form, detailsOrNull: String): Unit = {
 
     val formErrorPanel  = currentForm.errorPanel.asInstanceOf[js.Dynamic]
-    val jErrorPanelElem = $(formErrorPanel.element)
+    val errorPanelElem  = formErrorPanel.element.asInstanceOf[html.Element]
 
-    jErrorPanelElem.css("display: block")
+    errorPanelElem.style.display = "block"
 
     Option(detailsOrNull) match {
       case Some(details) =>
-        jErrorPanelElem.find(".xforms-error-panel-details").html(details)
-        toggleDetails(jErrorPanelElem.get(0).get, show = true)
+        errorPanelElem.querySelectorT(".xforms-error-panel-details").innerHTML = details
+        toggleDetails(errorPanelElem, show = true)
       case None =>
-        jErrorPanelElem.find(".xforms-error-panel-details-hidden").addClass("xforms-disabled")
-        jErrorPanelElem.find(".xforms-error-panel-details-shown").addClass("xforms-disabled")
+        errorPanelElem.querySelectorT(".xforms-error-panel-details-hidden").classList.add("xforms-disabled")
+        errorPanelElem.querySelectorT(".xforms-error-panel-details-shown").classList.add("xforms-disabled")
     }
 
     formErrorPanel.show()
@@ -123,17 +122,18 @@ object ErrorPanel {
     formErrorPanel.center()
 
     // Focus within the dialog so that screen readers handle aria attributes
-    jErrorPanelElem.find(".container-close").trigger("focus")
+    errorPanelElem.querySelectorT(".container-close").focus()
   }
 
   private object Private {
 
-    def toggleDetails(errorPanelElem: dom.Element, show: Boolean): Unit = {
-
-      val jErrorPanelElem = $(errorPanelElem)
-
-      jErrorPanelElem.find(".xforms-error-panel-details-hidden").toggleClass("xforms-disabled", show)
-      jErrorPanelElem.find(".xforms-error-panel-details-shown").toggleClass("xforms-disabled", ! show)
-    }
+    def toggleDetails(errorPanelElem: html.Element, show: Boolean): Unit =
+      if (show) {
+        errorPanelElem.querySelectorT(".xforms-error-panel-details-hidden").classList.add("xforms-disabled")
+        errorPanelElem.querySelectorT(".xforms-error-panel-details-shown").classList.remove("xforms-disabled")
+      } else {
+        errorPanelElem.querySelectorT(".xforms-error-panel-details-hidden").classList.remove("xforms-disabled")
+        errorPanelElem.querySelectorT(".xforms-error-panel-details-shown").classList.add("xforms-disabled")
+      }
   }
 }

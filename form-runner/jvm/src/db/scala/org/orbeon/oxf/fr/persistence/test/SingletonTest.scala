@@ -101,13 +101,13 @@ class SingletonTest
               (1 to ConcurrentRequestsCount)
                 .map(_ -> createNextDelay)
                 .map { case (i, duration) =>
-                val dataURL = HttpCall.crudURLPrefix(provider, formName) + s"data/$i/data.xml"
-                for {
-                  _ <- IO.sleep(duration)
-                  r <- IO.blocking(HttpCall.put(dataURL, Specific(1), stage = None, formData))
-                } yield
-                  r
-              }
+                  val dataURL = HttpCall.crudURLPrefix(provider, formName) + s"data/$i/data.xml"
+                  for {
+                    _ <- IO.sleep(duration)
+                    r <- IO.blocking(HttpCall.put(dataURL, Specific(1), stage = None, formData))
+                  } yield
+                    r
+                }
 
             val responses =
               Await.result(

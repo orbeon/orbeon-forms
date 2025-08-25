@@ -299,12 +299,10 @@ object DomSupport {
     container.querySelectorAllT(selector).foreach(listener)
     val observer = new MutationObserver((mutations, _) => {
       mutations.foreach { mutation =>
-        mutation.addedNodes.foreach { node =>
-          if (node.nodeType == dom.Node.ELEMENT_NODE) {
-            val element = node.asInstanceOf[html.Element]
-            if (element.matches(selector))
-              listener(element)
-          }
+        mutation.addedNodes.foreach {
+          case element: html.Element if element.matches(selector) =>
+            listener(element)
+          case _ =>
         }
       }
     })

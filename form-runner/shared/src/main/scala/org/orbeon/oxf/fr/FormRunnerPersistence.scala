@@ -498,13 +498,6 @@ trait FormRunnerPersistence {
       case None => null
     }
 
-  // Whether the given path is an attachment path (ignoring an optional query string)
-  private def isAttachmentURLFor(basePath: String, url: String): Boolean =
-    url.startsWith(basePath) && splitQuery(url)._1.splitTo[List]("/").lastOption.exists { filename =>
-      // Since #6565 we cannot just rely on the file extension to detect attachments
-      filename != DataXml && filename != FormXhtml
-    }
-
   // For a given attachment path, return the filename
   def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =
     splitQuery(pathQuery)._1.split('/').last
@@ -668,10 +661,17 @@ trait FormRunnerPersistence {
   def collectUnsavedAttachments(
     data           : NodeInfo,
     attachmentMatch: AttachmentMatch
-  ): List[AttachmentWithHolder] =
+  ): List[AttachmentWithHolder] = {
+
+    // A more correct implementation wouldn't test all holders, but only attachment holders, so it would need access to
+    // the form definition. At the moment, if you include a correctly-formed "file:/...?mac=..." or "/fr/..." URL in a
+    // text field, for example, it will be collected as an unsaved attachment. The "file:/..." URL would need to have
+    // a correct HMAC, so this is very unlikely to happen. Including the base path for the document/data in a text field
+    // is an easier attack, but it is still very unlikely to happen by chance.
+
     for {
       holder        <- data.descendantOrSelf(Node).toList  // TODO: not efficient!
-      if holder.isAttribute || holder.isElement && ! holder.hasChildElement
+      if holder.isAttribute || (holder.isElement && ! holder.hasChildElement)
       beforeURL     = holder.stringValue.trimAllToEmpty
       if isUploadedFileURL(beforeURL) || (
         attachmentMatch match {
@@ -683,6 +683,27 @@ trait FormRunnerPersistence {
       )
     } yield
       AttachmentWithHolder(beforeURL, holder)
+  }
+
+  // Whether the given path is an attachment path (ignoring an optional query string)
+  private def isAttachmentURLFor(basePath: String, url: String): Boolean =
+    url.startsWith(basePath) && splitQuery(url)._1.splitTo[List]("/").lastOption.exists { filename =>
+
+      // 2025-08-22:
+      //  - isAttachmentURLFor is called from collectUnsavedAttachments only
+      //  - it is not called for "file:/..." URLs
+      //  - the previous version of this method was only testing the filename extension
+      //  - initially, only the .bin extension was tested
+      //  - for #1250, additional extensions were added (.jpg, .jpeg, etc.), to support the duplication of sample data,
+      //    as some of the sample attachments don't have a .bin extension but native extensions
+      //  - since #6565 (custom filenames), testing the file extension (.bin or other) is not correct anymore
+      //  - for #6565, the test has been made less restrictive: any filename different from data.xml and form.xhtml is
+      //    detected as an attachment
+      //  - if a file called data.xml or form.xhtml is attached to a form, its filename will always include the
+      //    40-character hexadecimal attachment ID, so this is not a problematic case
+
+      filename != DataXml && filename != FormXhtml
+    }
 
   // TODO: Usually, an unsaved attachment will have a unique path in a form. However, using for example a calculated
   //   value, it is possible to have the same path for multiple attachments. So far, we have saved the attachment

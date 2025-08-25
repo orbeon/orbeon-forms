@@ -369,7 +369,7 @@ object XFormsUploadControl {
   // Get the MAC from the URL
   def getMAC(url: String): Option[String] = PathUtils.getFirstQueryParameter(url, "mac")
 
-  // Check that the given URL as a correct MAC
+  // Check that the given URL has a correct MAC
   def verifyMAC(url: String): Boolean =
     getMAC(url) match {
       case Some(mac) => hmac(removeMAC(url)) == mac

@@ -52,7 +52,7 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
+import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI

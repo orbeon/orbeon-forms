@@ -96,7 +96,6 @@
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
                 <xsl:variable name="level"              select="$root/@level"/>
-                <xsl:variable name="is-paging"          select="$root/@paging"/>
 
                 <!-- Allow  -->
                 <xsl:variable

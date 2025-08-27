@@ -114,7 +114,7 @@
     <xsl:template match="xf:bind[$is-readonly-mode and parent::xf:model]"
                   mode="within-model">
         <!-- If there is an existing `readonly` formula, this will be handled by `xsl:apply-templates` below,
-             which will cause `relevant` to be annotated as `fb:relevant`. -->
+             which will cause `readonly` to be annotated as `fb:readonly`. -->
         <xsl:copy>
             <xsl:attribute name="readonly">true()</xsl:attribute>
             <xsl:apply-templates select="@* | node()" mode="#current"/>

@@ -96,7 +96,8 @@
                     'oxf:/forms/orbeon/builder/form/annotate.xpl',
                     (
                         'data',
-                        'bindings'
+                        'bindings',
+                        'parameters'
                     ),
                     (
                         xxf:call-xpl(
@@ -113,7 +114,8 @@
                             ),
                             'data'
                         ),
-                        xxf:instance('fb-components-instance')
+                        xxf:instance('fb-components-instance'),
+                        xf:element('_', fr:is-readonly-mode())
                     ),
                     'data'
                 )"

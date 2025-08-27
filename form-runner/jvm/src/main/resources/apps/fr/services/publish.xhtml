@@ -173,11 +173,14 @@
                                                     'oxf:/forms/orbeon/builder/form/annotate.xpl',
                                                     (
                                                         'data',
-                                                        'bindings'
+                                                        'bindings',
+                                                        'parameters'
                                                     ),
                                                     (
                                                         instance('fr-form-definition-instance'),
-                                                        instance('fr-components-instance')
+                                                        instance('fr-components-instance'),
+                                                        xf:element('_')
+
                                                     ),
                                                     'data'
                                                 ),

@@ -114,7 +114,8 @@ trait FormBuilderSupport extends XFormsSupport {
                     'oxf:/forms/orbeon/builder/form/annotate.xpl',
                     (
                       'data',
-                      'bindings'
+                      'bindings',
+                      'parameters'
                     ),
                     (
                       xxf:call-xpl(
@@ -131,7 +132,8 @@ trait FormBuilderSupport extends XFormsSupport {
                         ),
                         'data'
                       ),
-                      xxf:instance('fb-components-instance')
+                      xxf:instance('fb-components-instance'),
+                      xf:element('_')
                     ),
                     'data'
                   )"

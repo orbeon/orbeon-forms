@@ -31,6 +31,10 @@
     <xsl:variable name="xbl-ids"  select="/*/xh:head/xbl:xbl/generate-id()"/>
     <xsl:variable name="body"     select="/*/xh:body"/>
 
+    <xsl:variable
+        name="is-readonly-mode"
+        select="doc('input:parameters')/root()/* = 'true'"/>
+
     <!-- Whether we have "many" controls -->
     <xsl:variable
         name="many-controls"
@@ -103,6 +107,17 @@
                 <xsl:attribute name="fb:{local-name(.)}" select="."/>
             </xsl:for-each>
             <xsl:apply-templates select="(@* except @readonly) | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- https://github.com/orbeon/orbeon-forms/issues/5056 -->
+    <xsl:template match="xf:bind[$is-readonly-mode and parent::xf:model]"
+                  mode="within-model">
+        <!-- If there is an existing `readonly` formula, this will be handled by `xsl:apply-templates` below,
+             which will cause `relevant` to be annotated as `fb:relevant`. -->
+        <xsl:copy>
+            <xsl:attribute name="readonly">true()</xsl:attribute>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

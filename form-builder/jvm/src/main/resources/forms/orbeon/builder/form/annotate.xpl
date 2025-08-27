@@ -16,6 +16,7 @@
 
     <p:param type="input"  name="data"/>
     <p:param type="input"  name="bindings"/>
+    <p:param type="input"  name="parameters"/>
     <p:param type="output" name="data"/>
 
     <!--
@@ -84,8 +85,9 @@
     </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data"     href="#migrated-to-12-columns"/>
-        <p:input name="bindings" href="#bindings"/>
+        <p:input name="data"       href="#migrated-to-12-columns"/>
+        <p:input name="bindings"   href="#bindings"/>
+        <p:input name="parameters" href="#parameters"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

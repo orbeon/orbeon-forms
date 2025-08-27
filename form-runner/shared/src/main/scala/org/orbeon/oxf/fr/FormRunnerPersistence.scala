@@ -671,7 +671,8 @@ trait FormRunnerPersistence {
 
     for {
       holder        <- data.descendantOrSelf(Node).toList  // TODO: not efficient!
-      if holder.isAttribute || (holder.isElement && ! holder.hasChildElement)
+      // 2025-08-27: previous test was holder.isAttribute || (holder.isElement && ! holder.hasChildElement)
+      if holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       if isUploadedFileURL(beforeURL) || (
         attachmentMatch match {

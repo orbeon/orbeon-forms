@@ -208,15 +208,19 @@
             <css/>
             <pdf/>
             <edit-source/>
+            <reload-components/>
             <workflow/>
             <permissions/>
             <email/>
             <messages/>
             <services>
                 <http/>
+                <http-add/>
                 <database/>
+                <database-add/>
             </services>
             <actions/>
+            <actions-add/>
             <libraries>
                 <_/>
                 <orbeon/>
@@ -226,19 +230,22 @@
     </xf:instance>
 
     <xf:bind ref="instance('fb-toolbox-instance')">
-        <xf:bind ref="relevant"          id="fb-relevant-bind"/>
-        <xf:bind ref="schema"            id="fb-toolbox-schema-bind"            relevant="xxf:property('oxf.fb.menu.schema')"/>
-        <xf:bind ref="pdf"               id="fb-toolbox-pdf-bind"               relevant="xxf:property('oxf.fb.menu.pdf')"/>
-        <xf:bind ref="edit-source"       id="fb-toolbox-edit-bind"              relevant="xxf:property('oxf.fb.menu.edit-source')"/>
-        <xf:bind ref="workflow"          id="fb-toolbox-workflow-bind"          relevant="xxf:property('oxf.fb.menu.workflow')"/>
-        <xf:bind ref="permissions"       id="fb-toolbox-permissions-bind"       relevant="xxf:property('oxf.fb.menu.permissions')"/>
-        <xf:bind ref="email"             id="fb-toolbox-email-bind"             relevant="xxf:property('oxf.fb.menu.email')"/>
-        <xf:bind ref="messages"          id="fb-toolbox-messages-bind"          relevant="xxf:property('oxf.fb.menu.messages')"/>
-        <xf:bind ref="services/http"     id="fb-toolbox-services-http-bind"     relevant="xxf:property('oxf.fb.menu.services.http')"/>
-        <xf:bind ref="services/database" id="fb-toolbox-services-database-bind" relevant="xxf:property('oxf.fb.menu.services.database')"/>
-        <xf:bind ref="actions"           id="fb-toolbox-actions-bind"           relevant="xxf:property('oxf.fb.menu.actions')"/>
-
-        <xf:bind ref="libraries"         id="fb-toolbox-libraries-bind"/>
+        <xf:bind ref="relevant"              id="fb-relevant-bind"/>
+        <xf:bind ref="schema"                id="fb-toolbox-schema-bind"                 relevant="xxf:property('oxf.fb.menu.schema')"/>
+        <xf:bind ref="pdf"                   id="fb-toolbox-pdf-bind"                    relevant="xxf:property('oxf.fb.menu.pdf')"/>
+        <xf:bind ref="edit-source"           id="fb-toolbox-edit-bind"                   relevant="xxf:property('oxf.fb.menu.edit-source')"/>
+        <xf:bind ref="reload-components"     id="fb-toolbox-reload-components-bind"      readonly="fr:mode() = 'view'"/>
+        <xf:bind ref="workflow"              id="fb-toolbox-workflow-bind"               relevant="xxf:property('oxf.fb.menu.workflow')"/>
+        <xf:bind ref="permissions"           id="fb-toolbox-permissions-bind"            relevant="xxf:property('oxf.fb.menu.permissions')"/>
+        <xf:bind ref="email"                 id="fb-toolbox-email-bind"                  relevant="xxf:property('oxf.fb.menu.email')"/>
+        <xf:bind ref="messages"              id="fb-toolbox-messages-bind"               relevant="xxf:property('oxf.fb.menu.messages')"/>
+        <xf:bind ref="services/http"         id="fb-toolbox-services-http-bind"          relevant="xxf:property('oxf.fb.menu.services.http')"/>
+        <xf:bind ref="services/http-add"     id="fb-toolbox-services-http-add-bind"      readonly="fr:mode() = 'view'"/>
+        <xf:bind ref="services/database"     id="fb-toolbox-services-database-bind"      relevant="xxf:property('oxf.fb.menu.services.database')"/>
+        <xf:bind ref="services/database-add" id="fb-toolbox-services-database-add-bind"  readonly="fr:mode() = 'view'"/>
+        <xf:bind ref="actions"               id="fb-toolbox-actions-bind"                relevant="xxf:property('oxf.fb.menu.actions')"/>
+        <xf:bind ref="actions-add"           id="fb-toolbox-actions-add-bind"            readonly="fr:mode() = 'view'"/>
+        <xf:bind ref="libraries"             id="fb-toolbox-libraries-bind"/>
     </xf:bind>
 
     <!-- This contains the components available for the currently edited form

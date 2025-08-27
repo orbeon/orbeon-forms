@@ -464,7 +464,7 @@
 
                         <!-- Reload toolbox components -->
                         <fr:trigger
-                                bind="fb-relevant-bind"
+                                bind="fb-toolbox-reload-components-bind"
                                 name="toolbox.reload-components"
                                 class="fb-reload-components-button"
                                 xxf:modal="true">
@@ -546,7 +546,7 @@
                             </xh:div>
                         </fr:dnd-repeat>
                         <xh:div class="fb-tool">
-                            <xf:trigger class="fb-add-action-button">
+                            <xf:trigger class="fb-add-action-button" bind="fb-toolbox-actions-add-bind">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-plus-circle"/>
                                     <xf:output value="$form-resources/add/label"/>
@@ -580,7 +580,7 @@
                             </xh:div>
                         </fr:dnd-repeat>
                         <xh:div class="fb-tool">
-                            <xf:trigger class="fb-add-http-service-button">
+                            <xf:trigger class="fb-add-http-service-button" bind="fb-toolbox-services-http-add-bind">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-plus-circle"/>
                                     <xf:output value="$form-resources/add/label"/>
@@ -615,7 +615,7 @@
                             </xh:div>
                         </fr:dnd-repeat>
                         <xh:div class="fb-tool">
-                            <xf:trigger class="fb-add-service-database-button">
+                            <xf:trigger class="fb-add-service-database-button" bind="fb-toolbox-services-database-add-bind">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-plus-circle"/>
                                     <xf:output value="$form-resources/add/label"/>

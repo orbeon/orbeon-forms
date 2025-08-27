@@ -175,7 +175,7 @@
 
                             <!-- Add/remove language -->
                             <xf:group class="fb-language-triggers" ref=".[fr:is-pe()]">
-                                <xf:trigger appearance="minimal" id="fb-add-language">
+                                <xf:trigger appearance="minimal" id="fb-add-language" bind="fb-add-language-bind">
                                     <xf:label><xh:i class="fa fa-plus-circle" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                                 </xf:trigger>

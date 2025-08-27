@@ -838,6 +838,7 @@
             <!-- TODO: move to dialog-language.xml -->
             <new-language/>
             <new-language-trigger/>
+            <add-language/>
 
             <!-- Toolbox -->
             <section-trigger/>
@@ -856,7 +857,8 @@
     <xf:var name="selected-cell" value="$variables/selected-cell"/>
     <xf:var name="starting-cell" value="$variables/starting-cell"/>
 
-    <xf:bind ref="$variables">
+        <xf:bind ref="$variables">
+        <xf:bind ref="add-language" id="fb-add-language-bind" relevant="$fr-mode != 'view'"/>
         <!-- TODO: move to dialog-language.xml -->
         <xf:bind ref="new-language-trigger" readonly="xxf:is-blank(../new-language)"/>
         <!-- Make buttons readonly depending on whether items can be inserted -->
@@ -1134,9 +1136,9 @@
     <xf:var name="xcv"           value="instance('fb-xcv-triggers-instance')"/>
     <xf:var name="dialog-opened" value="xxf:open-dialogs() > 0"/>
     <xf:bind ref="$xcv">
-        <xf:bind ref="cut-trigger"    readonly="$dialog-opened or empty(fbf:getCurrentlySelectedCell()/*)"/>
-        <xf:bind ref="copy-trigger"   readonly="$dialog-opened or empty(fbf:getCurrentlySelectedCell()/*)"/>
-        <xf:bind ref="paste-trigger"  readonly="$dialog-opened"/>
+        <xf:bind ref="cut-trigger"    readonly="$fr-mode = 'view' or $dialog-opened or empty(fbf:getCurrentlySelectedCell()/*)"/>
+        <xf:bind ref="copy-trigger"   readonly="$fr-mode = 'view' or $dialog-opened or empty(fbf:getCurrentlySelectedCell()/*)"/>
+        <xf:bind ref="paste-trigger"  readonly="$fr-mode = 'view' or $dialog-opened"/>
     </xf:bind>
 
     <!-- Undo stack -->
@@ -1150,8 +1152,8 @@
     </xf:instance>
     <xf:var name="undo" value="instance('fb-undo-instance')"/>
     <xf:bind ref="$undo">
-        <xf:bind ref="undo-trigger" readonly="$dialog-opened or empty($undo/undos/*)"/>
-        <xf:bind ref="redo-trigger" readonly="$dialog-opened or empty($undo/redos/*)"/>
+        <xf:bind ref="undo-trigger" readonly="$fr-mode = 'view' or $dialog-opened or empty($undo/undos/*)"/>
+        <xf:bind ref="redo-trigger" readonly="$fr-mode = 'view' or $dialog-opened or empty($undo/redos/*)"/>
     </xf:bind>
 
     <!-- List of PDF templates field names -->

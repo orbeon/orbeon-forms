@@ -16,12 +16,13 @@ package org.orbeon.builder
 import autowire.*
 import io.udash.wrappers.jquery.JQuery
 import org.orbeon.builder.rpc.FormBuilderRpcApi
-import org.orbeon.jquery.Offset
+import org.orbeon.jquery.{Offset, JqueryOps}
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.fr.FormRunnerAPI
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -181,7 +182,11 @@ object LabelEditor {
               container.className = "fb-section-label-editor-click-interceptor"
               container.addEventListener(
                 "click",
-                (e: dom.Event) => { showLabelEditor($(e.target.asInstanceOf[dom.Element])) }
+                (e: dom.Event) => {
+                  val isViewMode = FormRunnerAPI.getForm(e.targetT).isViewMode()
+                  if (! isViewMode)
+                    showLabelEditor($(e.targetT))
+                }
               )
               container.addEventListener(
                 "mouseover",

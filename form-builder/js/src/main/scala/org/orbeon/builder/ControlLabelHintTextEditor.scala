@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
+import org.orbeon.fr.FormRunnerAPI
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
@@ -83,23 +84,23 @@ object ControlLabelHintTextEditor {
       // Click on label/hint
       document.addEventListener(DomEventNames.Click, (event: dom.Event) => {
         event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
-          // Close current editor, if there is one open
-          resourceEditorEndEdit()
-          jResourceEditorCurrentLabelHint = $(labelHint)
-          // Find control for this label
-          resourceEditorCurrentControlOpt =
-            Some(
-              labelHint.ancestorOrSelfElem(".fr-grid-th").nextOption() match {
-                case Some(_) =>
-                  // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
-                  jResourceEditorCurrentLabelHint
-                case None =>
-                  labelHint.closestOpt(ExplanationSelector)
-                    .getOrElse(labelHint.closest(ControlSelector))
-                    .pipe($(_))
-              }
-            )
-          resourceEditorStartEdit(jResourceEditorCurrentLabelHint)
+          val isViewMode = FormRunnerAPI.getForm(labelHint).isViewMode()
+          if (! isViewMode) {
+            resourceEditorEndEdit()
+            jResourceEditorCurrentLabelHint = $(labelHint)
+            resourceEditorCurrentControlOpt =
+              Some(
+                labelHint.ancestorOrSelfElem(".fr-grid-th").nextOption() match {
+                  case Some(_) =>
+                    jResourceEditorCurrentLabelHint
+                  case None =>
+                    labelHint.closestOpt(ExplanationSelector)
+                      .getOrElse(labelHint.closest(ControlSelector))
+                      .pipe($(_))
+                }
+              )
+            resourceEditorStartEdit(jResourceEditorCurrentLabelHint)
+          }
         }
       })
 

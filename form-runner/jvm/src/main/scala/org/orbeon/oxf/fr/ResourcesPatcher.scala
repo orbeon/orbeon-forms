@@ -149,7 +149,7 @@ object ResourcesPatcher {
     def resourceForLang(lang: String): Option[dom.Element] =
       resourcesDocument.getRootElement.elements.find(_.attributeValue(XMLNames.XMLLangQName) == lang)
 
-    def resourceToCopy: Element =
+    lazy val resourceToCopy: Element =
       resourceForLang(defaultLang)
         .orElse(resourceForLang("en"))
         .getOrElse(throw new OXFException(s"Could not find resource for default language $defaultLang or English"))

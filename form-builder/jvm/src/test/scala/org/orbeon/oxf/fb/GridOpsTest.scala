@@ -47,7 +47,7 @@ class GridOpsTest
       """.stripMargin.trim
 
     val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false))
-    assert(expected === actual)
+    assert(expected == actual)
     newMapping
   }
 
@@ -78,7 +78,7 @@ class GridOpsTest
             |LMN
           """.stripMargin.trim
 
-       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+       assert(after == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
       }
     }
   }
@@ -110,7 +110,7 @@ class GridOpsTest
             |dFG
           """.stripMargin.trim
 
-       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+       assert(after == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
       }
     }
   }
@@ -139,7 +139,7 @@ class GridOpsTest
 
         val actual = controls map precedingBoundControlNameInSectionForControl
 
-        assert(actual === List(None, None, Some("grid-2")))
+        assert(actual == List(None, None, Some("grid-2")))
       }
     }}
 
@@ -154,7 +154,7 @@ class GridOpsTest
         val expected = List(Some("control-11"), Some("grid-2"), Some("control-31"))
         val actual = grids map (precedingBoundControlNameInSectionForGrid(_, includeSelf = true))
 
-        assert(actual === expected)
+        assert(actual == expected)
       }
     }
   }
@@ -174,7 +174,7 @@ class GridOpsTest
 
           val actualSelectedCellId = findSelectedCell map (_.id)
 
-          assert(actualSelectedCellId === Some(afterCellId))
+          assert(actualSelectedCellId.contains(afterCellId))
         }
 
       // Test all
@@ -232,20 +232,20 @@ class GridOpsTest
         val doc = ctx.formDefinitionRootElem
 
         // Initially can insert all
-        assert(canInsertSection(doc) === true)
-        assert(canInsertGrid(doc)    === true)
-        assert(canInsertControl(doc) === true)
+        assert(canInsertSection(doc))
+        assert(canInsertGrid(doc))
+        assert(canInsertControl(doc))
 
         // Remove everything (assume top-level section with a single grid inside)
         childrenContainers(ctx.bodyElem).toList foreach  { section => // evaluate with toList otherwise the lazy iterator can fail
-          assert(isLastGridInSection(childrenGrids(section).head) === true)
+          assert(isLastGridInSection(childrenGrids(section).head))
           deleteContainer(section)
         }
 
         // After everything is removed we can only insert a section (later: can also insert grid)
-        assert(canInsertSection(doc) === true)
-        assert(canInsertGrid(doc)    === false)
-        assert(canInsertControl(doc) === false)
+        assert(canInsertSection(doc))
+        assert(! canInsertGrid(doc))
+        assert(! canInsertControl(doc))
       }
     }
   }
@@ -275,7 +275,7 @@ class GridOpsTest
         <fr:c x="1" y="1" w="13"/><fr:c x="14" y="1" w="11"/>
       </fr:grid>
 
-    import org.orbeon.scaxon.Implicits._
+    import org.orbeon.scaxon.Implicits.*
 
     it("must convert from 12 to 24 columns") {
       val result = TransformerUtils.extractAsMutableDocument(grid12).rootElement

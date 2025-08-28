@@ -13,10 +13,8 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.oxf.fr.Names
 import org.orbeon.xforms.*
 import org.scalajs.dom.html
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -104,26 +102,11 @@ object FormRunnerErrorSummaryAPI extends js.Object {
 
 object FormRunnerWizardAPI extends js.Object {
 
+  @deprecated("use `getForm().wizard.focus()`", "Orbeon Forms 2024.1.3")
   def focus(
     controlName       : String,
     repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
     elemOrNamespacedId: js.UndefOr[html.Element | String] = js.undefined
-  ): js.Promise[Unit] = {
-
-    // Separate variable due to type inference fail when put inline below
-    val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
-
-    AjaxClient.fireEvent(
-      AjaxEvent(
-        eventName  = "fr-wizard-focus",
-        targetId   = Names.ViewComponent,
-        form       = Page.findXFormsForm(elemOrNamespacedId).map(_.elem),
-        properties = Map(
-          "fr-control-name"   -> controlName,
-          "fr-repeat-indexes" -> indexesString
-        )
-      )
-    )
-    AjaxClient.allEventsProcessedF("activateControl").toJSPromise
-  }
+  ): js.Promise[Unit] =
+    FormRunnerAPI.getForm(elemOrNamespacedId).wizard.focus(controlName, repeatIndexes)
 }

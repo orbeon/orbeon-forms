@@ -1,7 +1,7 @@
 package org.orbeon.fr
 
 import org.log4s.Logger
-import org.orbeon.oxf.fr.ControlOps
+import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
@@ -105,6 +105,8 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       .flatMap(DocumentAPI.getValue(_, form.elem).toOption)
       .orUndefined
 
+  val wizard: FormRunnerFormWizardAPI = new FormRunnerFormWizardAPI(form)
+
   private def findControlMaybeNested(
     controlName: String,
     index      : js.UndefOr[Int] = js.undefined
@@ -190,5 +192,30 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       } yield new Pager(sectionElem.id.trimSuffixIfPresent("-section"), pagerElem.asInstanceOf[html.Element])
 
     pagers.toJSArray
+  }
+}
+
+class FormRunnerFormWizardAPI(private val form: xforms.Form) extends js.Object {
+
+  def focus(
+    controlName       : String,
+    repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
+  ): js.Promise[Unit] = {
+
+    // Separate variable due to type inference fail when put inline below
+    val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
+
+    AjaxClient.fireEvent(
+      AjaxEvent(
+        eventName  = "fr-wizard-focus",
+        targetId   = Names.ViewComponent,
+        form       = Some(form.elem),
+        properties = Map(
+          "fr-control-name"   -> controlName,
+          "fr-repeat-indexes" -> indexesString
+        )
+      )
+    )
+    AjaxClient.allEventsProcessedF("activateControl").toJSPromise
   }
 }

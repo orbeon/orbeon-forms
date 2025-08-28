@@ -103,7 +103,8 @@ body.orbeon {
     // Restore border and asterisk color
     // https://github.com/orbeon/orbeon-forms/issues/5554
     .fr-mode-new,
-    .fr-mode-edit {
+    .fr-mode-edit,
+    .fr-mode-view { // include `view` mode for #5056
         .fb-body {
             .xforms-invalid.xforms-visited {
                 &> input, &> textarea, &> select {
@@ -114,6 +115,15 @@ body.orbeon {
                 .xforms-label:before {
                     color: #333; // TODO: variable specifically for field border
                 }
+            }
+        }
+    }
+
+    .fr-mode-view {
+        .fb-body {
+            // https://github.com/orbeon/orbeon-forms/issues/5056
+            .xforms-invalid > .xforms-alert.xforms-active {
+                display: none;
             }
         }
     }

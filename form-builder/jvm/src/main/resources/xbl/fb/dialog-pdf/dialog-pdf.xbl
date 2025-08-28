@@ -77,9 +77,14 @@
                     </local>
                 </xf:instance>
 
-                <xf:bind
-                    ref="$i//*"
-                    readonly="fr:mode() = 'view'"/>
+                <xf:instance id="ui" xxf:exclude-result-prefixes="#all">
+                    <ui>
+                        <apply/>
+                    </ui>
+                </xf:instance>
+
+                <xf:bind ref="$i//*"                readonly="fr:is-readonly-mode()"/>
+                <xf:bind ref="instance('ui')/apply" readonly="fr:is-readonly-mode()"/>
 
                 <xf:bind id="pdfs-bind" ref="pdfs">
                     <xf:bind id="pdf-iteration-bind" name="pdf-iteration" ref="pdf">
@@ -146,6 +151,7 @@
 
                 <!-- Bindings specified on control -->
                 <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="ui" value="instance('ui')"/>
 
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-pdf-dialog">
                     <xf:label ref="$resources/dialog-pdf/label"/>
@@ -199,7 +205,7 @@
 
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <xf:trigger id="save-trigger" appearance="xxf:primary">
+                                <xf:trigger ref="$ui/apply" id="save-trigger" appearance="xxf:primary">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>

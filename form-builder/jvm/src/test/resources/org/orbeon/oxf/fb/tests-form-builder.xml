@@ -30,7 +30,7 @@
                         <p:input name="config"   href="/forms/orbeon/builder/form/annotate.xpl"/>
                         <p:input name="data"     href="template.xml"/>
                         <p:input name="bindings" href="#toolbox"/>
-                        <p:input name="parameters"><_/></p:input>
+                        <p:input name="is-readonly-mode"><_/></p:input>
                         <p:output name="data" ref="data"/>
                     </p:processor>
 

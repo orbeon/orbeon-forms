@@ -33,7 +33,7 @@
 
     <xsl:variable
         name="is-readonly-mode"
-        select="doc('input:parameters')/root()/* = 'true'"/>
+        select="doc('input:is-readonly-mode')/* = 'true'"/>
 
     <!-- Whether we have "many" controls -->
     <xsl:variable

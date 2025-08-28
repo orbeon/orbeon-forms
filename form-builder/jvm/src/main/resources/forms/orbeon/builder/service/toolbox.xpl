@@ -90,7 +90,7 @@
         <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
         <p:input name="data"       href="#global-template-form"/>
         <p:input name="bindings"   href="#components-but-not-section-templates"/>
-        <p:input name="parameters"><_/></p:input>
+        <p:input name="is-readonly-mode"><_/></p:input>
         <p:output name="data"      id="global-template-form-annotated"/>
     </p:processor>
 
@@ -117,7 +117,7 @@
         <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
         <p:input name="data"       href="#special-template-form"/>
         <p:input name="bindings"   href="#components-but-not-section-templates"/>
-        <p:input name="parameters"><_/></p:input>
+        <p:input name="is-readonly-mode"><_/></p:input>
         <p:output name="data"      id="special-template-form-annotated"/>
     </p:processor>
 
@@ -147,7 +147,7 @@
                 <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
                 <p:input name="data"       href="#app-template-form"/>
                 <p:input name="bindings"   href="#components-but-not-section-templates"/>
-                <p:input name="parameters"><_/></p:input>
+                <p:input name="is-readonly-mode"><_/></p:input>
                 <p:output name="data"      id="app-template-form-annotated"/>
             </p:processor>
 

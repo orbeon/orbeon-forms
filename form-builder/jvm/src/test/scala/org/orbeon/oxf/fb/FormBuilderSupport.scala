@@ -115,7 +115,7 @@ trait FormBuilderSupport extends XFormsSupport {
                     (
                       'data',
                       'bindings',
-                      'parameters'
+                      'is-readonly-mode'
                     ),
                     (
                       xxf:call-xpl(

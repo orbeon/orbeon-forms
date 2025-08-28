@@ -240,6 +240,19 @@
                             ref="*"
                             origin="$mutable-control-details/xf:model/*"/>
 
+                        <xf:insert
+                            if="fr:is-readonly-mode()"
+                            context="$inserted//xf:model"
+                            ref="*"
+                            origin="
+                                xf:element(
+                                    'xf:bind',
+                                    (
+                                        xf:attribute('ref', 'instance(''local'')'),
+                                        xf:attribute('readonly', 'true()')
+                                    )
+                                )"/>
+
                         <xf:var
                             name="control-metadata"
                             value="$control-details/.."/>

@@ -18,13 +18,14 @@ import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.facades.{Dragula, DragulaOptions}
-import org.orbeon.jquery.Offset
+import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQuery
 import org.scalajs.dom
+import org.orbeon.fr.FormRunnerAPI
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.collection.mutable
@@ -68,7 +69,8 @@ object GridWallDnD {
         },
         becomesCurrent = (cell: Block) => {
           currentCellOpt = Some(cell)
-          if (! DndShadow.isDragging)
+          val isViewMode = FormRunnerAPI.getForm(cell.el.elem).isViewMode()
+          if (! DndShadow.isDragging && ! isViewMode)
             DndSides.show(cell)
         }
       )

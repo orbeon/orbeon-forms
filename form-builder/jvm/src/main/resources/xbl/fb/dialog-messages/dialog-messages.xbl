@@ -141,6 +141,10 @@
                 <xf:var name="i"                   value="instance('fb-dialog-messages-instance')"/>
                 <xf:var name="ti"                  value="instance('fb-dialog-messages-template-instance')"/>
 
+                <xf:bind
+                    ref="$i//*"
+                    readonly="fr:mode() = 'view'"/>
+
                 <xf:var name="available-languages" value="frf:allLangs(fbf:resourcesRoot())"/>
 
                 <xf:var name="metadata"            value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*[1]"/>

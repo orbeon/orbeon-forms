@@ -588,12 +588,17 @@
                         <data-migration/>
                         <analysis-calculate/>
                         <xbl/>
+                        <continue-trigger/>
                     </_>
                 </xf:instance>
 
                 <xf:var
                     name="i"
                     value="instance()"/>
+
+                <xf:bind
+                    ref="$i//*"
+                    readonly="fr:mode() = 'view'"/>
 
                 <xf:var
                     name="unlikely-mediatype"
@@ -1807,7 +1812,7 @@
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
                         <!-- `autofocus="true"` so we can press ↵ on the template selection screen,
                              otherwise the scrollable `tab-content` gets the focus -->
-                        <xf:trigger id="fb-continue-button" appearance="xxf:primary" autofocus="true">
+                        <xf:trigger id="fb-continue-button" appearance="xxf:primary" autofocus="true" ref="$i/continue-trigger">
                             <xf:label mediatype="text/html" value="$resources/(if ($is-new-form or $is-app-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>

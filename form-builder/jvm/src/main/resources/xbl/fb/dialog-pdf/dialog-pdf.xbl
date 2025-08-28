@@ -77,6 +77,10 @@
                     </local>
                 </xf:instance>
 
+                <xf:bind
+                    ref="$i//*"
+                    readonly="fr:mode() = 'view'"/>
+
                 <xf:bind id="pdfs-bind" ref="pdfs">
                     <xf:bind id="pdf-iteration-bind" name="pdf-iteration" ref="pdf">
 

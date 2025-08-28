@@ -258,8 +258,8 @@
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
             <xf:bind ref="query" constraint="valid(../query-xml)" required="true()"/>
 
-            <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)"/>
-            <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
+            <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)" readonly="fr:mode() = 'view'"/>
+            <xf:bind ref="save-test-trigger" readonly="../@valid = 'false' or fr:mode() = 'view'"/>
         </xf:bind>
 
         <!-- Template for the submission -->

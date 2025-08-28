@@ -967,8 +967,8 @@
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
-            <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)"/>
-            <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
+            <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)" readonly="fr:mode() = 'view'"/>
+            <xf:bind ref="save-test-trigger" readonly="../@valid = 'false' or fr:mode() = 'view'"/>
         </xf:bind>
 
         <!-- Template for a given binding -->

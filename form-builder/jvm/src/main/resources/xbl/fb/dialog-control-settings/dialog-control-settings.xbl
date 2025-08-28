@@ -848,6 +848,7 @@
 
                         <prev-control-id/>
                         <next-control-id/>
+                        <save-button/>
                     </_>
                 </xf:instance>
 
@@ -2153,7 +2154,7 @@
                                 <xf:label ref="xxf:r('buttons.next', '|fr-fr-resources|')"/>
                             </xf:trigger>
                         </xh:div>
-                        <xf:trigger appearance="xxf:primary" id="save-button">
+                        <xf:trigger appearance="xxf:primary" id="save-button" ref="$i/save-button">
                             <xf:label ref="$resources/apply/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>

@@ -506,7 +506,8 @@
                         <xf:bind ref="body"       readonly="true()"/>
                     </xf:bind>
 
-                    <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)"/>
+                    <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)" readonly="fr:mode() = 'view'"/>
+                    <xf:bind ref="save-test-trigger" readonly="fr:mode() = 'view'"/>
                 </xf:bind>
 
                 <!-- Template for inserting a submission -->

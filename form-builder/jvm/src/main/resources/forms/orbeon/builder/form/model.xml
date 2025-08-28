@@ -1119,11 +1119,13 @@
                 <!--</xs:schema>-->
             </schema>
             <temp-type/>
+            <apply-trigger/>
         </_>
     </xf:instance>
 
     <xf:bind ref="instance('fb-schema-upload-instance')">
         <xf:bind ref="temp-type" readonly="true()"/>
+        <xf:bind ref="apply-trigger" readonly="$fr-mode = 'view'"/>
     </xf:bind>
 
     <xf:instance id="fb-xcv-triggers-instance" xxf:index="id">

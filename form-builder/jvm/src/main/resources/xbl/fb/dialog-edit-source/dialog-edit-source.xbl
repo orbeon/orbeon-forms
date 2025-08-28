@@ -65,8 +65,13 @@
                 <xf:instance id="i">
                     <source-editor>
                         <source/>
+                        <apply-trigger/>
                     </source-editor>
                 </xf:instance>
+
+                <xf:bind
+                    ref="instance('i')//*"
+                    readonly="fr:mode() = 'view'"/>
 
                 <xf:bind
                     ref="source"
@@ -94,7 +99,7 @@
                 </fr:code-mirror>
                 <xh:div class="fr-dialog-buttons">
                     <xh:span>
-                        <xf:trigger appearance="xxf:primary" id="apply-trigger">
+                        <xf:trigger appearance="xxf:primary" id="apply-trigger" ref="apply-trigger">
                             <xf:label ref="$resources/apply/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>

@@ -428,6 +428,10 @@
 
                 <xf:var name="i" value="instance()"/>
 
+                <xf:bind
+                    ref="$i//* except (prev-control-id, next-control-id)"
+                    readonly="fr:mode() = 'view'"/>
+
                 <xf:instance id="modified">
                     <modified/>
                 </xf:instance>

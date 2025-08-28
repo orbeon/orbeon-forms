@@ -70,7 +70,7 @@
                 <xh:div class="fb-dialog-section">
 
                     <!-- Delete schema button -->
-                    <xf:trigger ref=".[not($is-new-schema) and $model/xs:schema]">
+                    <xf:trigger ref=".[not($is-new-schema) and $model/xs:schema and fr:mode() != 'view']">
                         <xf:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
 
                         <xf:action ev:event="DOMActivate">
@@ -83,7 +83,7 @@
                     </xf:trigger>
 
                     <!-- Upload a schema -->
-                    <fr:attachment ref="$instance/schema-uri">
+                    <fr:attachment ref="$instance/schema-uri[fr:mode() != 'view']">
                         <xf:label
                             value="
                                 $form-resources/dialog-upload-schema/
@@ -138,7 +138,7 @@
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:group appearance="xxf:internal">
-            <xf:trigger id="fb-edit-schema-trigger" appearance="xxf:primary">
+            <xf:trigger id="fb-edit-schema-trigger" appearance="xxf:primary" ref="$instance/apply-trigger">
                 <xf:label ref="$form-resources/apply/label"/>
 
                 <xf:action ev:event="DOMActivate">

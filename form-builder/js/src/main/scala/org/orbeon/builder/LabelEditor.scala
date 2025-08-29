@@ -191,11 +191,14 @@ object LabelEditor {
               container.addEventListener(
                 "mouseover",
                 (e: dom.Event) => {
-                  updateHighlight(
-                    (cssClass: String, el: JQuery) => { el.addClass(cssClass); () },
-                    $(e.target)
-                  )
-                  showClickHintIfTitleEmpty($(e.target))
+                  val isViewMode = FormRunnerAPI.getForm(e.targetT).isViewMode()
+                  if (! isViewMode) {
+                    updateHighlight(
+                      (cssClass: String, el: JQuery) => { el.addClass(cssClass); () },
+                      $(e.target)
+                    )
+                    showClickHintIfTitleEmpty($(e.target))
+                  }
                 }
               )
 

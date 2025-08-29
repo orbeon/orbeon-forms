@@ -146,6 +146,10 @@
 
                 <xf:var name="i" value="instance('i')"/>
 
+                <xf:bind
+                    ref="$i//*"
+                    readonly="fr:is-readonly-mode()"/>
+
                 <xf:bind ref="control-type" name="control-type"/>
                 <xf:bind ref="html" type="xs:boolean"/>
                 <xf:bind ref="items/item">                                                                                      <!-- Constraints on items' value and label -->
@@ -262,10 +266,10 @@
 
                 </xh:div>
                 <xh:div class="fr-dialog-buttons">
-                    <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left">
+                    <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
                         <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>
                     </xf:trigger>
-                    <xf:trigger id="clear-value-trigger">
+                    <xf:trigger id="clear-value-trigger" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
                         <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
                     </xf:trigger>
                     <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">

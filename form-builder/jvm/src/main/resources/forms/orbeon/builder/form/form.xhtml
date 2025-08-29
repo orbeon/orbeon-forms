@@ -179,7 +179,7 @@
                                     <xf:label><xh:i class="fa fa-plus-circle" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                                 </xf:trigger>
-                                <xf:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
+                                <xf:trigger appearance="minimal" id="fb-language-remove" bind="fb-remove-language-bind">
                                     <xf:label><xh:i class="fa fa-minus-circle" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Ask confirmation -->

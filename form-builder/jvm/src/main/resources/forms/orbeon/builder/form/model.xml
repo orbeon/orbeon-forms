@@ -839,6 +839,7 @@
             <new-language/>
             <new-language-trigger/>
             <add-language/>
+            <remove-language/>
 
             <!-- Toolbox -->
             <section-trigger/>
@@ -858,7 +859,8 @@
     <xf:var name="starting-cell" value="$variables/starting-cell"/>
 
         <xf:bind ref="$variables">
-        <xf:bind ref="add-language" id="fb-add-language-bind" relevant="$fr-mode != 'view'"/>
+        <xf:bind ref="add-language"    id="fb-add-language-bind"    relevant="$fr-mode != 'view'"/>
+        <xf:bind ref="remove-language" id="fb-remove-language-bind" relevant="$fr-mode != 'view' and count($resources/resource) gt 1"/>
         <!-- TODO: move to dialog-language.xml -->
         <xf:bind ref="new-language-trigger" readonly="xxf:is-blank(../new-language)"/>
         <!-- Make buttons readonly depending on whether items can be inserted -->

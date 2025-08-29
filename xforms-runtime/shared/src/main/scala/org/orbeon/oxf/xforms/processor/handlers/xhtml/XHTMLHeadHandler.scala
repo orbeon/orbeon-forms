@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants
+import org.orbeon.xforms.Constants.InitiallyHiddenClass
 import org.xml.sax.Attributes
 
 
@@ -75,7 +76,7 @@ class XHTMLHeadHandler(
     if (containingDocument.isServeInlineResources)
       withElement("style", xhtmlPrefix, XHTML_NAMESPACE_URI, List("type" -> "text/css", "media" -> "all")) {
         text(
-          """html body form.xforms-initially-hidden, html body .xforms-form .xforms-initially-hidden {
+          s"""html body form.xforms-initially-hidden, html body .xforms-form .$InitiallyHiddenClass {
               display: none
           }"""
         )

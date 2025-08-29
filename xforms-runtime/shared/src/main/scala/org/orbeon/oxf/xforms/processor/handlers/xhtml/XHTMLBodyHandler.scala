@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as XH
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.xforms.Constants
+import org.orbeon.xforms.Constants.InitiallyHiddenClass
 import org.xml.sax.Attributes
 
 import java.lang as jl
@@ -68,7 +69,8 @@ class XHTMLBodyHandler(
     //        formattingPrefix = handlerContext().findFormattingPrefixDeclare();
 
     val formElemClasses = {
-      val sb = new jl.StringBuilder("xforms-form xforms-initially-hidden")
+      val sb = new jl.StringBuilder(s"xforms-form ")
+      sb.append(InitiallyHiddenClass)
 
       // LHHA appearance classes
       //

@@ -97,8 +97,8 @@ object FormBuilderXPathApi {
     FormBuilder
       .rowMove(
         gridId     = ops.gridForCell(currentCellElem).id,
-        fromRowPos = fromRowPos,
-        toRowPos   = if (Direction.withName(direction) == Direction.Up) fromRowPos - 1 else fromRowPos + 1
+        fromRowPos0 = fromRowPos,
+        toRowPos0   = if (Direction.withName(direction) == Direction.Up) fromRowPos - 1 else fromRowPos + 1
       )
       .foreach(Undo.pushUserUndoAction)
   }

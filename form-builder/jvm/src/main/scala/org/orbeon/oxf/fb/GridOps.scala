@@ -185,20 +185,20 @@ trait GridOps extends ContainerOps {
 
   def rowMove(
     gridId     : String,
-    fromRowPos : Int,
-    toRowPos   : Int
+    fromRowPos0: Int,
+    toRowPos0  : Int
   )(implicit
     ctx        : FormBuilderDocContext
   ): Option[UndoAction] = {
 
-    require(fromRowPos >= 0)
-    require(toRowPos >= 0)
+    require(fromRowPos0 >= 0)
+    require(toRowPos0 >= 0)
 
     val gridElem     = containerById(gridId)
     val gridModel    = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
     val allCells     = gridModel.cells
-    val adjustedFrom = fromRowPos % allCells.size
-    val adjustedTo   = toRowPos   % allCells.size
+    val adjustedFrom0 = fromRowPos0 % allCells.size
+    val adjustedTo0   = toRowPos0   % allCells.size
 
     def isSingleHeightCell(cell: Cell[NodeInfo]): Boolean =
       cell match {
@@ -211,26 +211,43 @@ trait GridOps extends ContainerOps {
     // - cells are single-height cells
     // - or if not, matching cells on both rows have the same origin cell
     // We shouldn't have holes, so no `u == None` for either cell.
-    def compatibleMove = allCells(adjustedFrom).zip(allCells(adjustedTo)).forall {
-      case (cell1, cell2) if isSingleHeightCell(cell1) && isSingleHeightCell(cell2) => true
-      case (Cell(Some(_), Some(origin1), _, _, _, _), Cell(Some(_), Some(origin2), _, _, _, _)) => origin1 eq origin2
-      case _ => false
-    }
+    def compatibleMove =
+      allCells(adjustedFrom0)
+        .zip(allCells(adjustedTo0))
+        .forall {
+          case (
+              fromCell,
+              toCell
+            ) if isSingleHeightCell(fromCell) && isSingleHeightCell(toCell) => true
+          case (
+              Cell(Some(_),        Some(fromCellOrigin),                      _, _, _, _),
+              Cell(Some(_),        Some(toCellOrigin),                        _, _, _, _)
+            ) => fromCellOrigin.u eq toCellOrigin.u
+          case (
+              Cell(Some(_),        Some(Cell(Some(fromNode), _, _, _, _, _)), _, _, _, _),
+              Cell(Some(toNode),   None,                                      _, _, _, _)
+            ) => fromNode == toNode
+          case (
+              Cell(Some(fromNode), None,                                      _, _, _, _),
+              Cell(Some(_),        Some(Cell(Some(toNode), _, _, _, _, _)),   _, _, _, _)
+            ) => fromNode == toNode
+          case _ =>
+            false
+        }
 
-    (adjustedFrom < allCells.size && adjustedTo < allCells.size && adjustedFrom != adjustedTo && compatibleMove) flatOption
+    (adjustedFrom0 < allCells.size && adjustedTo0 < allCells.size && adjustedFrom0 != adjustedTo0 && compatibleMove) flatOption
       withDebugGridOperation("move row") {
 
-        val undo = MoveRow(gridId, fromRowPos, toRowPos)
+        val undo = MoveRow(gridId, fromRowPos0, toRowPos0)
 
-        allCells(adjustedFrom).foreach {
-          case Cell(Some(u), None, _, _, _, _) => NodeInfoCellOps.updateY(u, adjustedTo + 1)
+        def updateY(from0: Int, to0: Int): Unit =
+          allCells(from0).foreach {
+          case Cell(Some(u), None, _, _, 1, _) => NodeInfoCellOps.updateY(u, to0 + 1)
           case _ =>
         }
 
-        allCells(adjustedTo).foreach {
-          case Cell(Some(u), None, _, _, _, _) => NodeInfoCellOps.updateY(u, adjustedFrom + 1)
-          case _ =>
-        }
+        updateY(adjustedFrom0, adjustedTo0)
+        updateY(adjustedTo0, adjustedFrom0)
 
         Some(undo)
       }

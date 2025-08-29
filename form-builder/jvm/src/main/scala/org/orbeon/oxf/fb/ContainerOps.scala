@@ -131,7 +131,8 @@ trait ContainerOps extends ControlOps {
   def moveContainer(
     containerElem  : NodeInfo,
     otherContainer : NodeInfo,
-    move           : (NodeInfo, NodeInfo) => NodeInfo)(implicit
+    move           : (NodeInfo, NodeInfo) => NodeInfo
+  )(implicit
     ctx            : FormBuilderDocContext
   ): Unit = {
 

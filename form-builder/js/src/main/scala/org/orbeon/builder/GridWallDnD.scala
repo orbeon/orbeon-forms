@@ -75,26 +75,26 @@ object GridWallDnD {
     }
 
     object DndSides {
-       def show(cell: Block): Unit = {
 
-         val gridBody  = HtmlElementCellOps.gridForCell(cell.underlying)
-         val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridBody, simplify = false, transpose = false)
-         val walls     = Cell.movableWalls(gridModel, cell.underlying)
-         walls.foreach { case (direction, wallPosition) =>
-           val wallOrientation = DndWall.wallOrientation(direction)
-           val index = direction match {
-             case Direction.Left  => cell.x          - 1
-             case Direction.Right => cell.x + cell.w - 1
-             case Direction.Up    => cell.y          - 1
-             case Direction.Down  => cell.y + cell.h - 1
-           }
-           val side = wallPosition match {
-             case WallPosition.Side   => Some(direction)
-             case WallPosition.Middle => None
-           }
-           DndWall.show(gridModel, index, wallOrientation, side)
-         }
-       }
+      def show(cell: Block): Unit = {
+        val gridBody  = HtmlElementCellOps.gridForCell(cell.underlying)
+        val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridBody, simplify = false, transpose = false)
+        val walls     = Cell.movableWalls(gridModel, cell.underlying)
+        walls.foreach { case (direction, wallPosition) =>
+          val wallOrientation = DndWall.wallOrientation(direction)
+          val index = direction match {
+            case Direction.Left  => cell.x          - 1
+            case Direction.Right => cell.x + cell.w - 1
+            case Direction.Up    => cell.y          - 1
+            case Direction.Down  => cell.y + cell.h - 1
+          }
+          val side = wallPosition match {
+            case WallPosition.Side   => Some(direction)
+            case WallPosition.Middle => None
+          }
+          DndWall.show(gridModel, index, wallOrientation, side)
+        }
+      }
     }
 
     // Blocks signaling where cell borders can be dragged from and to

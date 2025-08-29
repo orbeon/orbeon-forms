@@ -611,7 +611,7 @@
 
                 <xf:bind
                     ref="$i//*"
-                    readonly="fr:mode() = 'view'"/>
+                    readonly="fr:is-readonly-mode()"/>
 
                 <xf:var
                     name="unlikely-mediatype"

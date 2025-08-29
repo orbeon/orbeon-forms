@@ -430,7 +430,7 @@
 
                 <xf:bind
                     ref="$i//* except (prev-control-id, next-control-id)"
-                    readonly="fr:mode() = 'view'"/>
+                    readonly="fr:is-readonly-mode()"/>
 
                 <xf:instance id="modified">
                     <modified/>

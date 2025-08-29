@@ -126,8 +126,8 @@
         publish
         save
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.button.publish.visible.orbeon.builder"        value="fr:mode() != 'view'"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.save.visible.orbeon.builder"           value="fr:mode() != 'view'"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.publish.visible.orbeon.builder"        value="not(fr:is-readonly-mode())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.save.visible.orbeon.builder"           value="not(fr:is-readonly-mode())"/>
 
     <!-- Form Builder summary page  -->
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder">

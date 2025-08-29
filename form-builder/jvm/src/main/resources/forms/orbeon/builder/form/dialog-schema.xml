@@ -70,7 +70,7 @@
                 <xh:div class="fb-dialog-section">
 
                     <!-- Delete schema button -->
-                    <xf:trigger ref=".[not($is-new-schema) and $model/xs:schema and fr:mode() != 'view']">
+                    <xf:trigger ref=".[not($is-new-schema) and $model/xs:schema and not(fr:is-readonly-mode())]">
                         <xf:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
 
                         <xf:action ev:event="DOMActivate">
@@ -83,7 +83,7 @@
                     </xf:trigger>
 
                     <!-- Upload a schema -->
-                    <fr:attachment ref="$instance/schema-uri[fr:mode() != 'view']">
+                    <fr:attachment ref="$instance/schema-uri[not(fr:is-readonly-mode())]">
                         <xf:label
                             value="
                                 $form-resources/dialog-upload-schema/

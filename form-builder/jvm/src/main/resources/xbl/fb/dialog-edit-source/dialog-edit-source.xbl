@@ -71,7 +71,7 @@
 
                 <xf:bind
                     ref="instance('i')//*"
-                    readonly="fr:mode() = 'view'"/>
+                    readonly="fr:is-readonly-mode()"/>
 
                 <xf:bind
                     ref="source"

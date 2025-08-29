@@ -143,7 +143,7 @@
 
                 <xf:bind
                     ref="$i//*"
-                    readonly="fr:mode() = 'view'"/>
+                    readonly="fr:is-readonly-mode()"/>
 
                 <xf:var name="available-languages" value="frf:allLangs(fbf:resourcesRoot())"/>
 

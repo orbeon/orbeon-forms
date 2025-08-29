@@ -48,7 +48,7 @@
                 <xf:setvalue event="xxforms-valid"   observer="ui" ref="@valid">true</xf:setvalue>
                 <xf:bind
                     ref="instance('ui')//*"
-                    readonly="fr:mode() = 'view'"/>
+                    readonly="fr:is-readonly-mode()"/>
                 <xf:var name="show-token-permissions"       value="xxf:property('oxf.fb.menu.permissions.token')"/>
                 <xf:var name="show-owner-group-permissions" value="xxf:property('oxf.fb.menu.permissions.owner-group')"/>
                 <xf:var name="show-list-permissions"        value="xxf:property('oxf.fb.menu.permissions.list')"/>

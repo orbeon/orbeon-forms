@@ -508,7 +508,12 @@ object Cell {
       val existingValues = existingMapping.values.toSet
 
       val distinctUs  = gridModel.cells.flatten.collect{ case Cell(Some(u), None, _, _, _, _) => u }.distinct filterNot existingKeys
-      val lettersIt   = Iterator.tabulate(26)(i => ('A'.toInt + i).toChar)                                    filterNot existingValues
+
+      val lettersIt   =
+        Iterator.tabulate(26)(i => ('A'.toInt + i).toChar) ++         // Roman letters
+        Iterator.tabulate(17)(i => ('Α'.toInt + i).toChar) ++         // Greek letters
+        Iterator.tabulate(7 )(i => ('Σ'.toInt + i).toChar) filterNot  // more Greek letters
+        existingValues
 
       existingMapping ++ (distinctUs.iterator zip lettersIt)
     }

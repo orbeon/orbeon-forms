@@ -41,6 +41,9 @@ object UndoAction {
                                     xcv        : NodeInfo,
                                     rowPos     : Int)                                     extends UndoAction
   case class UndeleteRow           (gridId     : String,            rowPos: Int)          extends UndoAction
+  case class MoveRow               (gridId     : String,
+                                    fromRowPos : Int,
+                                    toRowPos   : Int)                                     extends UndoAction
   case class InsertRow             (gridId     : String,
                                     rowPos     : Int,
                                     aboveBelow : AboveBelow)                              extends UndoAction

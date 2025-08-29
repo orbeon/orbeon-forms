@@ -81,6 +81,29 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
+  def gridRowMove(
+    currentCellElem: NodeInfo,
+    direction      : String,
+  ): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    Direction.withName(direction)
+
+    val ops  = implicitly[CellOps[NodeInfo]]
+
+    val cellY      = ops.y(currentCellElem).getOrElse(1)
+    val fromRowPos = cellY - 1
+
+    FormBuilder
+      .rowMove(
+        gridId     = ops.gridForCell(currentCellElem).id,
+        fromRowPos = fromRowPos,
+        toRowPos   = if (Direction.withName(direction) == Direction.Up) fromRowPos - 1 else fromRowPos + 1
+      )
+      .foreach(Undo.pushUserUndoAction)
+  }
+
+  //@XPathFunction
   def publishForm(
     doc                  : NodeInfo,
     documentId           : String,
@@ -1365,6 +1388,8 @@ object FormBuilderXPathApi {
         Some(UndeleteRow(gridId, rowPos))
       case UndeleteRow(gridId, rowPos) =>
         FormBuilder.rowDelete(gridId, rowPos)
+      case MoveRow(gridId, fromRowPos, toRowPos) =>
+        FormBuilder.rowMove(gridId, toRowPos, fromRowPos)
       case InsertRow(gridId, rowPos, AboveBelow.Above) =>
         FormBuilder.rowDelete(gridId, rowPos)
       case InsertRow(gridId, rowPos, AboveBelow.Below) =>

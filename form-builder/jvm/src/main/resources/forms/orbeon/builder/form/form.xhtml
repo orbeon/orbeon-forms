@@ -354,9 +354,8 @@
                                 observer="#document"
                                 event="keydown"
                                 xxf:text="up"
-                                xxf:modifiers="ctrl shift"
+                                xxf:modifiers="ctrl shift option"
                                 if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell())">
-                                <xf:message>up</xf:message>
 
                                 <xf:action type="xpath">
                                     fbf:containerMove('up')
@@ -369,13 +368,40 @@
                                 observer="#document"
                                 event="keydown"
                                 xxf:text="down"
-                                xxf:modifiers="ctrl shift"
+                                xxf:modifiers="ctrl shift option"
                                 if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell())">
-                                <xf:message>up</xf:message>
 
                                 <xf:action type="xpath">
                                     fbf:containerMove('down')
                                 </xf:action>
+                            </xf:action>
+
+                            <xf:action
+                                xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="up"
+                                xxf:modifiers="ctrl shift"
+                                if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell())">
+
+                                <xf:action type="xpath">
+                                    fbf:gridRowMove(fbf:getCurrentlySelectedCell(), 'up')
+                                </xf:action>
+
+                            </xf:action>
+
+                            <xf:action
+                                xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="down"
+                                xxf:modifiers="ctrl shift"
+                                if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell())">
+
+                                <xf:action type="xpath">
+                                    fbf:gridRowMove(fbf:getCurrentlySelectedCell(), 'down')
+                                </xf:action>
+
                             </xf:action>
 
                             <!-- Open dialogs -->

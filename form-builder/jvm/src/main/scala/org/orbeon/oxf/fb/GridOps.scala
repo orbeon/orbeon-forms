@@ -183,6 +183,59 @@ trait GridOps extends ContainerOps {
     allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size
   }
 
+  def rowMove(
+    gridId     : String,
+    fromRowPos : Int,
+    toRowPos   : Int
+  )(implicit
+    ctx        : FormBuilderDocContext
+  ): Option[UndoAction] = {
+
+    require(fromRowPos >= 0)
+    require(toRowPos >= 0)
+
+    val gridElem     = containerById(gridId)
+    val gridModel    = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
+    val allCells     = gridModel.cells
+    val adjustedFrom = fromRowPos % allCells.size
+    val adjustedTo   = toRowPos   % allCells.size
+
+    def isSingleHeightCell(cell: Cell[NodeInfo]): Boolean =
+      cell match {
+        case Cell(Some(_), None,         _, _, 1, _)                  => true  // start of single-height cell
+        case Cell(Some(_), Some(origin), _, y, 1, _) if origin.y == y => true  // part of single-height cell
+        case _                                                        => false // everything else
+      }
+
+    // For now, we allow the move/swap only if:
+    // - cells are single-height cells
+    // - or if not, matching cells on both rows have the same origin cell
+    // We shouldn't have holes, so no `u == None` for either cell.
+    def compatibleMove = allCells(adjustedFrom).zip(allCells(adjustedTo)).forall {
+      case (cell1, cell2) if isSingleHeightCell(cell1) && isSingleHeightCell(cell2) => true
+      case (Cell(Some(_), Some(origin1), _, _, _, _), Cell(Some(_), Some(origin2), _, _, _, _)) => origin1 eq origin2
+      case _ => false
+    }
+
+    (adjustedFrom < allCells.size && adjustedTo < allCells.size && adjustedFrom != adjustedTo && compatibleMove) flatOption
+      withDebugGridOperation("move row") {
+
+        val undo = MoveRow(gridId, fromRowPos, toRowPos)
+
+        allCells(adjustedFrom).foreach {
+          case Cell(Some(u), None, _, _, _, _) => NodeInfoCellOps.updateY(u, adjustedTo + 1)
+          case _ =>
+        }
+
+        allCells(adjustedTo).foreach {
+          case Cell(Some(u), None, _, _, _, _) => NodeInfoCellOps.updateY(u, adjustedFrom + 1)
+          case _ =>
+        }
+
+        Some(undo)
+      }
+  }
+
   def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
 
     require(rowPos >= 0)

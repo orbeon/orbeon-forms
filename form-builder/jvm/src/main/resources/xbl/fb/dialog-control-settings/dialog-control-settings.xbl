@@ -399,6 +399,18 @@
                     <xf:insert
                         context="instance('dynamic')//xh:body"
                         origin="$mutable-control-details/(* except xf:model)"/>
+                    <xf:insert
+                        if="fr:is-readonly-mode()"
+                        context="instance('dynamic')//xf:model[@id = 'custom-model']"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'xf:bind',
+                                (
+                                    xf:attribute('ref', 'instance(''local'')'),
+                                    xf:attribute('readonly', 'true()')
+                                )
+                            )"/>
 
                 </xf:action>
             </xbl:handler>
@@ -911,7 +923,7 @@
 
                 <xf:bind
                     ref="$i//* except (prev-control-id, next-control-id)"
-                    readonly="fr:mode() = 'view'"/>
+                    readonly="fr:is-readonly-mode()"/>
 
                 <xf:bind
                     ref="autocomplete-allowed"

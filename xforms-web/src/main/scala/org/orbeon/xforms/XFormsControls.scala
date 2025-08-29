@@ -64,11 +64,11 @@ object XFormsControls {
         }
       }
     } else if (control.matches(".xforms-label, .xforms-hint, .xforms-help, .xforms-alert")) {
-        // External LHH
-        if (control.classList.contains("xforms-mediatype-text-html"))
-          control.innerHTML = newControlValue
-        else
-          control.innerText = newControlValue
+      // External LHH
+      if (control.classList.contains("xforms-mediatype-text-html"))
+        control.innerHTML = newControlValue
+      else
+        control.innerText = newControlValue
     } else if (control.classList.contains("xforms-output") || isStaticReadonly) {
       // XForms output or other field in "static readonly" mode
       control.childrenT(".xforms-output-output, .xforms-field").headOption.foreach {

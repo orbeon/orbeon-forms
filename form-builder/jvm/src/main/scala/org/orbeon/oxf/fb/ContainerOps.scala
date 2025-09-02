@@ -320,7 +320,7 @@ trait ContainerOps extends ControlOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(control).to(Set))
 
       } else if (repeat) {
-        // Template should already exists an should have already been renamed if needed
+        // Template should already exist and should have already been renamed if needed
         // MAYBE: Ensure template just in case.
 
         val newInitialIterationsAttribute = FormRunnerTemplatesOps.getInitialIterationsAttribute(control)

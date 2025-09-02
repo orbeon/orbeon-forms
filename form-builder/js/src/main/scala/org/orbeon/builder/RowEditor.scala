@@ -71,8 +71,8 @@ object RowEditor {
 
       case class TopBottom(top: Double, bottom: Double)
 
-      val isView = FormRunnerAPI.getForm(currentGridBody.el.elem).isViewMode()
-      if (! isView) {
+      val form = FormRunnerAPI.getForm(currentGridBody.el.elem)
+      if (form != null && ! form.isViewMode()) {
 
         // For each row track, find its top/bottom
         val rowsTopBottom = {

@@ -43,6 +43,9 @@
                     </xsl:copy>
                 </xsl:template>
 
+                <!-- Remove `xf:bind/@readonly` added by `annotate-design-time.xsl` in view mode -->
+                <xsl:template match="xf:bind/@readonly[. = 'true()']"/>
+
                 <!-- Restore read-only instances -->
                 <xsl:template match="xf:instance[@fb:readonly = 'true']">
                     <xsl:copy>

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.datatypes.Orientation.Horizontal
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.*
 import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
@@ -248,6 +249,20 @@ trait GridOps extends ContainerOps {
 
         updateY(adjustedFrom0, adjustedTo0)
         updateY(adjustedTo0, adjustedFrom0)
+
+        // We want the underlying elements to be in the correct order in the XML, so re-sort all cells
+        val sortedOriginCells =
+          Cell.originCells(
+            Cell.sort(
+              Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false),
+              firstOrientation = Horizontal
+            )
+          ).toList
+
+        val sortedElems = sortedOriginCells.flatMap(_.u)
+
+        delete(sortedElems)
+        insert(into = gridElem, after = gridElem / *, origin = sortedElems)
 
         Some(undo)
       }

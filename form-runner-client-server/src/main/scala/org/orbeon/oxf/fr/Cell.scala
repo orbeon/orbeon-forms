@@ -201,9 +201,30 @@ object Cell {
         xyToList(xy, maxGridWidth)
 
     if (transpose)
-      Private.transpose(simplified)
+      sort(simplified, firstOrientation = Orientation.Vertical)
     else
       simplified
+  }
+
+  // Can be used for:
+  // - creating a transposed grid, i.e. a grid with the same cells but with rows and columns swapped
+  // - fixing/updating the order of cells in a grid which lost its order
+  def sort[Underlying](grid: GridModel[Underlying], firstOrientation: Orientation): GridModel[Underlying] = {
+
+    val allCells = grid.cells.flatten
+
+    val (getFirst, getSecond) = firstOrientation match {
+      case Orientation.Horizontal => ((c: Cell[Underlying]) => c.x, (c: Cell[Underlying]) => c.y)
+      case Orientation.Vertical   => ((c: Cell[Underlying]) => c.y, (c: Cell[Underlying]) => c.x)
+    }
+
+    val columnsOrRows = allCells.map(getSecond).distinct.sorted
+
+    val transposedCells = columnsOrRows.map { column =>
+      allCells.filter(getSecond(_) == column).sortBy(getFirst)
+    }
+
+    grid.copy(cells = transposedCells)
   }
 
   def originCells[Underlying](gridModel: GridModel[Underlying]): Iterator[Cell[Underlying]] =
@@ -481,18 +502,6 @@ object Cell {
         )
       } else
         xyToList(xy, maxGridWidth)
-    }
-
-    // Create a transposed grid, i.e. a grid with the same cells but with rows and columns swapped
-    def transpose[Underlying](grid: GridModel[Underlying]): GridModel[Underlying] = {
-      val cells = grid.cells.flatten
-      val columns = cells.map(_.x).distinct.sorted
-
-      val transposedCells = columns.map { column =>
-        cells.filter(_.x == column).sortBy(_.y)
-      }
-
-      grid.copy(cells = transposedCells)
     }
   }
 

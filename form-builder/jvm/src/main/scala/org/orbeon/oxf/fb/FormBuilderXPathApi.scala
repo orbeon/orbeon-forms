@@ -87,8 +87,6 @@ object FormBuilderXPathApi {
   ): Unit = {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
-    Direction.withName(direction)
-
     val ops  = implicitly[CellOps[NodeInfo]]
 
     val cellY      = ops.y(currentCellElem).getOrElse(1)
@@ -96,7 +94,7 @@ object FormBuilderXPathApi {
 
     FormBuilder
       .rowMove(
-        gridId     = ops.gridForCell(currentCellElem).id,
+        gridId      = ops.gridForCell(currentCellElem).id,
         fromRowPos0 = fromRowPos,
         toRowPos0   = if (Direction.withName(direction) == Direction.Up) fromRowPos - 1 else fromRowPos + 1
       )

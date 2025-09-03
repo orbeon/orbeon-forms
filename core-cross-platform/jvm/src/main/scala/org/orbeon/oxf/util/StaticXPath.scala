@@ -87,7 +87,7 @@ object StaticXPath extends StaticXPathTrait {
     override def setAllowExternalFunctions(allowExternalFunctions: Boolean)       : Unit = throwException()
     override def setConfigurationProperty(name: String, value: AnyRef)            : Unit = throwException()
 
-    private def throwException() = throw new IllegalStateException("Global XPath configuration is read-only")
+    private def throwException(): Nothing = throw new IllegalStateException("Global XPath configuration is read-only")
   }
 
   def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType = {

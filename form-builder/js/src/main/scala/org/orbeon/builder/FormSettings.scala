@@ -53,19 +53,19 @@ object FormSettings {
           val templateCardsActive =
             containerElem.querySelectorAllT(".tab-pane.active .fb-template-cards").nonEmpty
           if (templateCardsActive)
-            KeyMapping.get(e.key).foreach { direction =>
-              // Only react to arrow keys on the template selection page (first page of wizard)
-              if (containerElem.querySelectorOpt(".fb-template-cards-container").nonEmpty) {
-                findCardsForDirections(direction).foreach { card =>
-                  moveIntoViewIfNeeded(
-                    containerElem.querySelectorOpt(".fb-template-cards-container").get,
-                    containerElem.querySelectorOpt(".fb-template-cards").get,
-                    card,
-                    margin = 10
-                  )
-                  card.click()
-                }
-              }
+            for {
+              direction              <- KeyMapping.get(e.key)
+              templateCardsContainer <- containerElem.querySelectorOpt(".fb-template-cards-container")
+              templateCards          <- containerElem.querySelectorOpt(".fb-template-cards")
+              card                   <- findCardsForDirections(direction)
+            } {
+              moveIntoViewIfNeeded(
+                templateCardsContainer,
+                templateCards,
+                card,
+                margin = 10
+              )
+              card.click()
             }
         })
       }

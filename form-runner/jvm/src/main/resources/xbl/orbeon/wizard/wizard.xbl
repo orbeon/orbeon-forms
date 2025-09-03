@@ -120,7 +120,7 @@
                 <xf:var
                     xxbl:scope="outer"
                     name="first-repeat-index-opt"
-                    value="xxf:split(event('fr-repeat-indexes'))[1]/xs:integer(.)">
+                    value="xs:integer(xxf:split(event('fr-repeat-indexes'))[1])">
                 </xf:var>
                 <xf:action if="xxf:instance('local')/validate/data(.) = 'free'">
                     <xf:setfocus

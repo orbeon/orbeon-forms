@@ -69,7 +69,8 @@ object SectionGridEditor {
       },
       becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
-        val isViewMode        = FormRunnerAPI.getForm(sectionGridBody.el.elem).isViewMode()
+        val formRunnerFormOpt = Option(FormRunnerAPI.getForm(sectionGridBody.el.elem))
+        val isViewMode        = formRunnerFormOpt.exists(_.isViewMode())
 
         // Position the editor
         sectionGridEditorContainer.show()

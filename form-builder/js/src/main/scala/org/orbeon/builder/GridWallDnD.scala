@@ -69,7 +69,8 @@ object GridWallDnD {
         },
         becomesCurrent = (cell: Block) => {
           currentCellOpt = Some(cell)
-          val isViewMode = FormRunnerAPI.getForm(cell.el.elem).isViewMode()
+          val formRunnerFormOpt = Option(FormRunnerAPI.getForm(cell.el.elem))
+          val isViewMode        = formRunnerFormOpt.exists(_.isViewMode())
           if (! DndShadow.isDragging && ! isViewMode)
             DndSides.show(cell)
         }

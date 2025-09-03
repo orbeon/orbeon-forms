@@ -214,5 +214,37 @@ class PdfProductionTest
         }
       }
     }
+
+    it("#7214: automatic PDF must contain correct Unicode diacritics") {
+
+      // Form data:         U+0054 U+0068 U+006F U+006D U+0061 U+0073 U+030C U+0063 U+0068 U+000A ("Thomašch")
+      // Normalized output: U+0054 U+0068 U+006F U+006D U+0061 U+0161        U+0063 U+0068 U+000A ("Thomašch")
+
+      // Using code points below to make sure the string is not modified by tools (editors, etc.)
+      val ExpectedDataMatches = List(
+        String.valueOf(
+          Array("0054", "0068", "006F", "006D", "0061", "0161", "0063", "0068", "000A")
+            .map(Integer.parseInt(_, 16))
+            .flatMap(Character.toChars)
+        ),
+      )
+
+      val (_, content, _) =
+        runFormRunnerReturnContent("issue", "7214", "pdf", documentId = "6c989a0cb3e3e2d9334c5a2e985b4bc9a27e164c".some)
+
+      withTestExternalContext { _ =>
+
+        val extractedText =
+          useAndClose(PDDocument.load(content.stream)) { pdd =>
+            (new PDFTextStripper)
+              .tap(_.setSortByPosition(true))
+              .pipe(_.getText(pdd))
+          }
+
+        ExpectedDataMatches.iterator foreach { word =>
+          assert(extractedText.contains(word))
+        }
+      }
+    }
   }
 }

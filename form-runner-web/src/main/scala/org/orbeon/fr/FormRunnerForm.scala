@@ -202,9 +202,6 @@ class FormRunnerFormWizardAPI(private val form: xforms.Form) extends js.Object {
     repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
   ): js.Promise[Unit] = {
 
-    // Separate variable due to type inference fail when put inline below
-    val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
-
     AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = "fr-wizard-focus",
@@ -212,7 +209,7 @@ class FormRunnerFormWizardAPI(private val form: xforms.Form) extends js.Object {
         form       = Some(form.elem),
         properties = Map(
           "fr-control-name"   -> controlName,
-          "fr-repeat-indexes" -> indexesString
+          "fr-repeat-indexes" -> (repeatIndexes.map(_.mkString(" ")).getOrElse(""): String)
         )
       )
     )

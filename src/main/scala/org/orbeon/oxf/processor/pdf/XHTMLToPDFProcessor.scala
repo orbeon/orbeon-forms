@@ -24,10 +24,16 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, TransformerUtils, XMLParsing, XMLReceiver}
+import org.w3c.dom.Document
+import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 import java.io.{FileInputStream, OutputStream}
+import java.text.Normalizer
+import javax.xml.transform.dom.DOMResult
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -96,7 +102,7 @@ private object XHTMLToPDFProcessor {
 
 class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
-  import XHTMLToPDFProcessor._
+  import XHTMLToPDFProcessor.*
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
 
@@ -152,7 +158,43 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
       val baseUri = requestOpt.map(_.getRequestURI)
 
       pdfRendererBuilder.withW3cDocument(
-        readInputAsDOM(pipelineContext, input),
+        readInputAsDOM(
+          pipelineContext,
+          input,
+          rcv => new ForwardingXMLReceiver(rcv) {
+
+            // Ensure characters are normalized to NFC in order to avoid issues with incorrect rendering of diacritics
+            // by the PDF renderer. It should be very rare to have non-normalized attribute values that actually matter
+            // in the PDF output, but we check for this anyway.
+            // https://github.com/orbeon/orbeon-forms/issues/7214
+
+            override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
+              val cs = java.nio.CharBuffer.wrap(chars, start, length)
+              if (Normalizer.isNormalized(cs, Normalizer.Form.NFC)) {
+                super.characters(chars, start, length)
+              } else {
+                val normalized = Normalizer.normalize(cs, Normalizer.Form.NFC)
+                super.characters(normalized.toCharArray, 0, normalized.length)
+              }
+            }
+
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
+              if ((0 until attributes.getLength)
+                .forall(i => Normalizer.isNormalized(attributes.getValue(i), Normalizer.Form.NFC))) {
+                super.startElement(uri, localname, qName, attributes)
+              } else {
+                val newAttributes = new AttributesImpl(attributes)
+                (0 until attributes.getLength).foreach { i =>
+                  val value = attributes.getValue(i)
+                  if (! Normalizer.isNormalized(value, Normalizer.Form.NFC)) {
+                    val normalized = Normalizer.normalize(value, Normalizer.Form.NFC)
+                    newAttributes.setValue(i, normalized)
+                  }
+                }
+                super.startElement(uri, localname, qName, newAttributes)
+              }
+          }
+        ),
         baseUri.orNull // no base URL if can't get request URL from context
       )
 
@@ -172,5 +214,13 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
           pdfBoxRenderer.createPDF()
       }
     }
+  }
+
+  def readInputAsDOM(context: PipelineContext, input: ProcessorInput, filter: XMLReceiver => XMLReceiver): Document = {
+    val identity = TransformerUtils.getIdentityTransformerHandler
+    val domResult = new DOMResult(XMLParsing.createDocument)
+    identity.setResult(domResult)
+    ProcessorImpl.readInputAsSAX(context, input, filter(identity))
+    domResult.getNode.asInstanceOf[Document]
   }
 }

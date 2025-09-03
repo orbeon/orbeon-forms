@@ -101,7 +101,8 @@ object ControlEditor {
         elem -> name
 
     val firstControlElemWithNameOpt = controlElemWithNames.headOption
-    val isViewMode = FormRunnerAPI.getForm(cell.el.elem).isViewMode()
+    val formRunnerFormOpt           = Option(FormRunnerAPI.getForm(cell.el.elem))
+    val isViewMode                  = formRunnerFormOpt.exists(_.isViewMode())
 
     // Control/right editor is only show when the cell isn't empty
     firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>

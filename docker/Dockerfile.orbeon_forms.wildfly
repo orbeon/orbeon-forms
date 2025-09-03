@@ -14,8 +14,7 @@ COPY docker-entrypoint-wildfly.sh /
 RUN chmod +x /docker-entrypoint-wildfly.sh
 
 # Create the directory where users can place their config
-RUN mkdir -p /docker-entrypoint-wildfly.d \
-    && chown -R jboss:jboss /docker-entrypoint-wildfly.d
+RUN mkdir -p /docker-entrypoint-wildfly.d
 
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
@@ -46,13 +45,12 @@ COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
 RUN rm -rf /tmp/orbeon_forms
 
 # Prevent permission errors at runtime (Ehcache, etc.)
-RUN mkdir -p /tmp/orbeon \
-    && chown -R jboss:jboss /tmp
+RUN mkdir -p /tmp/orbeon
 
 # Use jboss user at runtime
-RUN chown -R jboss:jboss $WILDFLY_HOME
-RUN chown -R jboss:jboss /docker-entrypoint-wildfly.d
-RUN chown jboss:jboss /docker-entrypoint-wildfly.sh
+# Make it arbitrary-UID friendly, OpenShift's restricted security policy, which launches containers as a random, non-root UID
+RUN chown -R jboss:0 $WILDFLY_HOME /docker-entrypoint-wildfly.d /docker-entrypoint-wildfly.sh /tmp
+RUN chmod -R g=u     $WILDFLY_HOME /docker-entrypoint-wildfly.d /docker-entrypoint-wildfly.sh /tmp
 USER jboss
 
 EXPOSE 8080

@@ -78,6 +78,7 @@ object FormRunnerApp extends App {
     xbl.FriendlyCaptcha
     xbl.ClipboardCopy
     xbl.Trigger
+    xbl.Pager
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar-fixed-top"            , addScrollPadding(_, "scroll-padding-top"))

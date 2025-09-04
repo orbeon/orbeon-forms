@@ -10,7 +10,32 @@
     <xbl:binding
         id="fr-pager"
         element="fr|pager"
-        xxbl:mode="">
+        xxf:external-events="fr-set-current-page"
+        xxbl:mode="javascript-lifecycle">
+
+        <xbl:handlers>
+            <!-- Used by the pager API -->
+            <xbl:handler event="fr-set-current-page" phase="target">
+                <xf:var name="previous-page" value="instance('fr-paging-instance')/page-number/xs:integer(.)"/>
+                <xf:var name="current-page"  value="event('page-number')"/>
+
+                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="$current-page"/>
+            </xbl:handler>
+
+            <xbl:handler event="fr-page-number-changed" phase="target">
+                <xf:var name="current-page" value="instance('fr-paging-instance')/page-number/xs:integer(.)"/>
+                <xf:action type="javascript">
+                    <xf:param name="previousPage" value="instance('fr-paging-instance')/previous-page-number/xs:integer(.)"/>
+                    <xf:param name="currentPage"  value="$current-page"/>
+                    <xf:param name="pageCount"    value="instance('fr-paging-instance')/page-count"/>
+                    <xf:body>
+                        ORBEON.xforms.XBL.instanceForControl(this).onPageChange(Number(previousPage), Number(currentPage), Number(pageCount));
+                    </xf:body>
+                </xf:action>
+                <!-- Keep track of the previous value of the page number -->
+                <xf:setvalue ref="instance('fr-paging-instance')/previous-page-number" value="$current-page"/>
+            </xbl:handler>
+        </xbl:handlers>
 
         <xbl:implementation>
             <xf:model>
@@ -25,6 +50,7 @@
                         <to>0</to>
                         <prev-trigger/>
                         <next-trigger/>
+                        <previous-page-number>1</previous-page-number>
                     </_>
                 </xf:instance>
 
@@ -43,7 +69,18 @@
         </xbl:implementation>
 
         <xbl:template>
-            <xh:div class="pagination">
+            <xh:div
+                class="pagination"
+                data-search-total="{instance('fr-paging-instance')/search-total}"
+                data-page-size="{instance('fr-paging-instance')/page-size}"
+                data-page-number="{instance('fr-paging-instance')/page-number}"
+                data-page-count="{instance('fr-paging-instance')/page-count}"
+                data-from="{instance('fr-paging-instance')/from}"
+                data-to="{instance('fr-paging-instance')/to}">
+
+                <xf:var name="page-number" as="xs:integer" value="instance('fr-paging-instance')/page-number/xs:integer(.)">
+                    <xf:dispatch event="xforms-enabled xforms-value-changed" name="fr-page-number-changed" targetid="fr-pager"/>
+                </xf:var>
 
                 <xf:group ref="()" xbl:attr="model context ref=total-value" appearance="xxf:internal" xxbl:scope="outer">
                     <xf:var name="value" as="item()?" xxbl:scope="inner">

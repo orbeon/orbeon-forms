@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
 import org.log4s
+import org.orbeon.fr.rpc.Router
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*
@@ -595,6 +596,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   //@XPathFunction
   def sanitizeHtml(html: String): String =
     HtmlParsing.sanitizeHtmlString(html)
+
+  //@XPathFunction
+  def processRequest(id: String, path: String, argsString: String): Unit =
+    Router.processRequest(id, path, argsString)
 }
 
 object FormRunnerBaseOps {

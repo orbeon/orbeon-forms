@@ -1,9 +1,17 @@
 package org.orbeon.fr
 
+import autowire.*
+import org.log4s.Logger
+import org.orbeon.fr.rpc.{FormRunnerRpcApi, FormRunnerRpcClient}
 import org.orbeon.oxf.fr.ControlOps
+import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xbl.Pager
+import org.orbeon.xbl.Pager.PagerCompanion
 import org.orbeon.xforms
 import org.orbeon.xforms.*
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -11,6 +19,7 @@ import org.scalajs.dom.html.Element
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichIterableOnce, JSRichOption}
+import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.|
 
 
@@ -113,4 +122,84 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       case e =>
         Some(e)
     }
+
+  class Pager(_repeatedSectionName: String, pagerElem: Element) {
+
+    private val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.FormRunnerForm.Pager")
+
+    @JSExport def repeatedSectionName: String          = _repeatedSectionName
+    @JSExport def itemFrom           : js.UndefOr[Int] = undefOrInt("from")
+    @JSExport def itemTo             : js.UndefOr[Int] = undefOrInt("to")
+    @JSExport def itemCount          : js.UndefOr[Int] = undefOrInt("search-total")
+    @JSExport def pageSize           : js.UndefOr[Int] = undefOrInt("page-size")
+    @JSExport def pageNumber         : js.UndefOr[Int] = undefOrInt("page-number")
+    @JSExport def pageCount          : js.UndefOr[Int] = undefOrInt("page-count")
+
+    // Method 1: direct event
+    @JSExport
+    def setCurrentPage(page: Int): Unit =
+      AjaxClient.fireEvent(
+        AjaxEvent(
+          eventName  = "fr-set-current-page",
+          targetId   = pagerElem.id,
+          properties = Map("page-number" -> page),
+        )
+      )
+
+    // Method 2: RPC call
+    /*@JSExport
+    def setCurrentPage(page: Int): js.Promise[Unit] =
+      FormRunnerRpcClient[FormRunnerRpcApi]
+        .setCurrentPage(pagerElem.id, page)
+        .call()
+        .toJSPromise*/
+
+    @JSExport
+    def addPageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =
+      pagerCompanionOpt.foreach(_.addPageChangeListener(listener))
+
+    @JSExport
+    def removePageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =
+      pagerCompanionOpt.foreach(_.removePageChangeListener(listener))
+
+    private def pagerCompanionOpt: Option[PagerCompanion] =
+      XBL.instanceForControl(pagerElem) match {
+        case pagerCompanion: PagerCompanion =>
+          Some(pagerCompanion)
+        case _ =>
+          logger.error(s"Couldn't find pager companion for section ${_repeatedSectionName}")
+          None
+      }
+
+    private def pagerDiv: Element =
+      pagerElem.querySelector(".pagination").asInstanceOf[Element]
+
+    private def undefOrInt(value: String): js.UndefOr[Int] =
+      Option(pagerDiv.getAttribute(s"data-$value"))
+        .filter(_.nonEmpty)
+        .flatMap(_.toIntOption)
+        .orUndefined
+  }
+
+  def getPager(repeatedSectionName: String): js.UndefOr[Pager] = {
+    val pagerOpt =
+      for {
+        sectionElem <- dom.document.querySelectorOpt(s"#$repeatedSectionName-section")
+        if ! sectionElem.classList.contains("xforms-disabled")
+        pagerElem   <- sectionElem .querySelectorOpt(".xbl-fr-pager")
+      } yield new Pager(repeatedSectionName, pagerElem)
+
+    pagerOpt.orUndefined
+  }
+
+  def getPagers(): js.Array[Pager] = {
+    val pagers =
+      for {
+        sectionElem <- dom.document.querySelectorAll("[id $= '-section']").toSeq
+        if ! sectionElem.classList.contains("xforms-disabled")
+        pagerElem   <- sectionElem.querySelectorOpt(".xbl-fr-pager")
+      } yield new Pager(sectionElem.id.trimSuffixIfPresent("-section"), pagerElem.asInstanceOf[html.Element])
+
+    pagers.toJSArray
+  }
 }

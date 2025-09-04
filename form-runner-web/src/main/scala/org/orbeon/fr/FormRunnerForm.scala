@@ -1,8 +1,6 @@
 package org.orbeon.fr
 
-import autowire.*
 import org.log4s.Logger
-import org.orbeon.fr.rpc.{FormRunnerRpcApi, FormRunnerRpcClient}
 import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
@@ -135,7 +133,6 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     @JSExport def pageNumber         : js.UndefOr[Int] = undefOrInt("page-number")
     @JSExport def pageCount          : js.UndefOr[Int] = undefOrInt("page-count")
 
-    // Method 1: direct event
     @JSExport
     def setCurrentPage(page: Int): Unit =
       AjaxClient.fireEvent(
@@ -145,14 +142,6 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
           properties = Map("page-number" -> page),
         )
       )
-
-    // Method 2: RPC call
-    /*@JSExport
-    def setCurrentPage(page: Int): js.Promise[Unit] =
-      FormRunnerRpcClient[FormRunnerRpcApi]
-        .setCurrentPage(pagerElem.id, page)
-        .call()
-        .toJSPromise*/
 
     @JSExport
     def addPageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =

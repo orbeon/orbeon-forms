@@ -50,6 +50,12 @@
             <xbl:handler event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove" phase="target">
                 <xf:dispatch name="{event('xxf:type')}" targetid="repeat-group" xxf:repeat-indexes="{event('row')}"/>
             </xbl:handler>
+            <!-- Event dispatched by `fr:wizard` -->
+            <xbl:handler event="fr-setindex" phase="target">
+                <xf:dispatch targetid="repeat-group" name="fr-setindex">
+                    <xf:property name="index" value="event('index') treat as xs:integer"/>
+                </xf:dispatch>
+            </xbl:handler>
         </xbl:handlers>
 
         <!-- Keep a single global copy of the grid row menu. It is moved around as needed. -->
@@ -616,6 +622,17 @@
 
                                         <!-- Run row operations, checking that they are allowed first -->
                                         <xsl:if test="not($readonly)">
+
+                                            <!-- This is just a trampoline, needed because we can't find `$repeat-id` from the `xbl:handler` -->
+                                            <xf:action
+                                                event="fr-setindex"
+                                                target="#observer">
+                                                <xf:setindex
+                                                    xxbl:scope="outer"
+                                                    repeat="{$repeat-id}"
+                                                    index="event('index')"/>
+                                            </xf:action>
+
                                             <xf:action
                                                 event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove"
                                                 target="#observer"

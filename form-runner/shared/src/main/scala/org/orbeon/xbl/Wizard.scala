@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.*
-import org.orbeon.oxf.fr.library.FRComponentParamSupport.{ancestorContainerNamesIt, closestAncestorSectionName}
+import org.orbeon.oxf.fr.library.FRComponentParamSupport.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.StringUtils.*
@@ -36,7 +36,7 @@ import shapeless.syntax.typeable.*
 
 object Wizard {
 
-  import Private._
+  import Private.*
 
   //@XPathFunction
   def normalizeWizardMode(mode: String): String =
@@ -141,6 +141,17 @@ object Wizard {
     inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, controlId).iterator.collect {
       case control: XFormsControl => ancestorContainerNamesIt(control)
     }.flatten.toArray
+
+  // TODO: We could do this using the static state only.
+  //@XPathFunction
+  def findAncestorRepeatedContainerStaticIds(controlId: String): Array[String] =
+    inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, controlId).iterator.collect {
+      case control: XFormsControl =>
+        ancestorRepeatedContainersIt(control)
+    }
+    .flatten
+    .map(_.staticControl.staticId)
+    .toArray
 
   case class SectionStatus(
     name                       : String,

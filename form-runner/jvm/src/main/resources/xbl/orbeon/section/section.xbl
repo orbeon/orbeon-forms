@@ -43,6 +43,13 @@
                 <!-- For attributes, see https://github.com/orbeon/orbeon-forms/issues/4790 -->
                 <xf:toggle case="case-closed" xxf:deferred-updates="false" xxf:toggle-ancestors="false"/>
             </xbl:handler>
+            <!-- Event dispatched by `fr:wizard` -->
+            <xbl:handler event="fr-setindex" phase="target">
+                <xf:toggle case="case-open"/>
+                <xf:dispatch targetid="repeat-group" name="fr-setindex">
+                    <xf:property name="index" value="event('index') treat as xs:integer"/>
+                </xf:dispatch>
+            </xbl:handler>
         </xbl:handlers>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -184,16 +191,33 @@
                                     <xf:case id="case-closed" selected="{{not($initially-open)}}"/>
                                     <!-- Open section -->
                                     <xf:case id="case-open" selected="{{$initially-open}}">
+                                        <xsl:variable
+                                            name="repeater-id"
+                                            select="concat($root/@id, '-repeater')"/>
+                                        <xsl:if test="$is-repeat">
+
+                                            <!-- This group should be around the following one for consistency, but for now it is only used for
+                                                 trampolining events so that's fine. -->
+                                            <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
+                                                <!-- This is just a trampoline, needed because we can't find `$repeater-id` from the `xbl:handler` -->
+                                                <xf:action
+                                                    event="fr-setindex"
+                                                    target="#observer">
+                                                    <xf:dispatch
+                                                        xxbl:scope="outer"
+                                                        name="fr-setindex"
+                                                        targetid="{$repeater-id}">
+                                                        <xf:property name="index" value="event('index')"/>
+                                                    </xf:dispatch>
+                                                </xf:action>
+                                            </xf:group>
+                                        </xsl:if>
                                         <xf:group
                                             class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}"
                                             xxbl:scope="outer"
                                             xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
-
-                                                    <xsl:variable
-                                                        name="repeater-id"
-                                                        select="concat($root/@id, '-repeater')"/>
 
                                                     <xsl:variable
                                                         name="child-path"

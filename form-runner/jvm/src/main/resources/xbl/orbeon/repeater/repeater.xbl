@@ -39,6 +39,12 @@
             <xbl:handler event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove" phase="target">
                 <xf:dispatch name="{event('xxf:type')}" targetid="repeat-group" xxf:repeat-indexes="{event('row')}"/>
             </xbl:handler>
+            <!-- Event dispatched by `fr:wizard` via `fr:section` -->
+            <xbl:handler event="fr-setindex" phase="target">
+                <xf:dispatch targetid="repeat-group" name="fr-setindex">
+                    <xf:property name="index" value="event('index') treat as xs:integer"/>
+                </xf:dispatch>
+            </xbl:handler>
         </xbl:handlers>
 
         <xbl:implementation>
@@ -240,6 +246,7 @@
 
                                 <xsl:if test="$use-pager">
                                     <fr:pager
+                                        id="pager"
                                         page-size="{$root/@page-size}"
                                         total-value="count($repeat-sequence)"
                                         from-ref="instance('local')/from"
@@ -268,6 +275,31 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
+
+                                <!-- This is just a trampoline, needed because we can't find `$repeat-id` from the `xbl:handler` -->
+                                <xf:action
+                                    event="fr-setindex"
+                                    target="#observer">
+                                    <xsl:choose>
+                                        <xsl:when test="$use-pager">
+                                            <xf:dispatch name="fr-set-current-page" targetid="pager">
+                                                <xf:property
+                                                    name="page-number"
+                                                    value="(event('index') - 1) idiv {$root/@page-size} + 1"/>
+                                            </xf:dispatch>
+                                            <xf:setindex
+                                                xxbl:scope="outer"
+                                                repeat="{$repeat-id}"
+                                                index="(event('index') - 1) mod {$root/@page-size} + 1"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xf:setindex
+                                                xxbl:scope="outer"
+                                                repeat="{$repeat-id}"
+                                                index="event('index')"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xf:action>
 
                                 <!-- Run row operations, checking that they are allowed first -->
                                 <xf:action

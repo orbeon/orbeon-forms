@@ -119,14 +119,41 @@
                 </xf:var>
                 <xf:var
                     xxbl:scope="outer"
-                    name="first-repeat-index-opt"
-                    value="xs:integer(xxf:split(event('fr-repeat-indexes'))[1])">
+                    name="repeat-indexes"
+                    value="for $i in xxf:split(event('fr-repeat-indexes')) return xs:integer($i)">
                 </xf:var>
                 <xf:action if="xxf:instance('local')/validate/data(.) = 'free'">
-                    <xf:setfocus
-                        xxbl:scope="outer"
-                        control="{$control-id}"
-                        xxf:repeat-indexes="{event('fr-repeat-indexes')}"/>
+                    <!-- Start by focusing following repeat indexes -->
+                    <xf:action xxbl:scope="outer">
+                        <xf:action if="empty($repeat-indexes)">
+                            <!-- Case where caller does not specify repeat indexes and we just follow existing indexes -->
+                            <xf:setfocus
+                                control="{$control-id}"/>
+                        </xf:action>
+                        <xf:action if="exists($repeat-indexes)">
+
+                            <!-- Adjust the index of all ancestor repeated containers -->
+                            <xf:var
+                                name="ancestor-repeated-containers-static-ids"
+                                value="reverse(Wizard:findAncestorRepeatedContainerStaticIds($control-id))"/>
+                            <xf:action
+                                if="exists($ancestor-repeated-containers-static-ids)"
+                                iterate="$ancestor-repeated-containers-static-ids">
+                                <xf:var name="p"                   value="position()"/>
+                                <xf:var name="container-static-id" value="."/>
+
+                                <xf:dispatch
+                                    name="fr-setindex"
+                                    targetid="{$container-static-id}">
+                                    <xf:property name="index" value="$repeat-indexes[$p]"/>
+                                </xf:dispatch>
+                            </xf:action>
+
+                            <!-- Set the focus following adjusted repeat indexes -->
+                            <xf:setfocus
+                                control="{$control-id}"/>
+                        </xf:action>
+                    </xf:action>
                 </xf:action>
                 <xf:action if="not(xxf:instance('local')/validate/data(.) = 'free')">
                     <xf:dispatch
@@ -134,7 +161,7 @@
                         name="fr-toggle-section-validate"
                         targetid="fr-wizard-outer-group">
                         <xf:property name="requested-control-id-opt" value="$control-id"/>
-                        <xf:property name="requested-page-index-opt" value="$first-repeat-index-opt"/>
+                        <xf:property name="requested-page-index-opt" value="$repeat-indexes[1]"/>
                         <xf:property name="setfocus-control-id"      value="$control-id"/>
                         <xf:property name="setfocus-repeat-indexes"  value="event('fr-repeat-indexes')"/>
                     </xf:dispatch>

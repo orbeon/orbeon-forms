@@ -308,6 +308,19 @@ object FRComponentParamSupport {
   def ancestorContainerNamesIt(control: XFormsControl): Iterator[String] =
     ancestorContainersIt(control).map(s => frc.controlNameFromId(s.staticControl.staticId))
 
+  def ancestorRepeatedContainersIt(control: XFormsControl): Iterator[XFormsComponentControl] =
+    ancestorContainersIt(control)
+      .collect {
+        case cc if cc.staticControl.element.attributeValueOpt("repeat").contains("content") => cc
+      }
+
+  def ancestorRepeatedContainerNamesIt(control: XFormsControl): Iterator[String] =
+    ancestorContainersIt(control)
+      .collect {
+        case s if s.staticControl.element.attributeValueOpt("repeat").contains("content") =>
+          frc.controlNameFromId(s.staticControl.staticId)
+      }
+
   def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
     inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId))
       .flatMap(topLevelAncestorSectionName)

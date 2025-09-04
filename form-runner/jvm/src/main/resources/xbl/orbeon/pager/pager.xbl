@@ -82,7 +82,10 @@
                     <xf:dispatch event="xforms-enabled xforms-value-changed" name="fr-page-number-changed" targetid="fr-pager"/>
                 </xf:var>
 
-                <xf:group ref="()" xbl:attr="model context ref=total-value" appearance="xxf:internal" xxbl:scope="outer">
+                <xf:group
+                    fr:keep-if-param-non-blank="total-value"
+                    xbl:attr="model context ref=total-value" appearance="xxf:internal" xxbl:scope="outer"
+                >
                     <xf:var name="value" as="item()?" xxbl:scope="inner">
                         <xxf:value value="string(.)" xxbl:scope="outer"/>
                         <xf:setvalue
@@ -92,7 +95,10 @@
                     </xf:var>
                 </xf:group>
 
-                <xf:group ref="()" xbl:attr="model context ref=from-ref" appearance="xxf:internal" xxbl:scope="outer">
+                <xf:group
+                    fr:keep-if-param-non-blank="from-ref"
+                    xbl:attr="model context ref=from-ref" appearance="xxf:internal" xxbl:scope="outer"
+                >
                     <xf:group ref="instance('fr-paging-instance')/from" xxbl:scope="inner" appearance="xxf:internal">
                         <xf:var name="ref" as="item()?">
                             <xxf:value value="." xxbl:scope="outer"/>
@@ -103,7 +109,10 @@
                     </xf:group>
                 </xf:group>
 
-                <xf:group ref="()" xbl:attr="model context ref=to-ref" appearance="xxf:internal" xxbl:scope="outer">
+                <xf:group
+                    fr:keep-if-param-non-blank="to-ref"
+                    xbl:attr="model context ref=to-ref" appearance="xxf:internal" xxbl:scope="outer"
+                >
                     <xf:group ref="instance('fr-paging-instance')/to" xxbl:scope="inner" appearance="xxf:internal">
                         <xf:var name="ref" as="item()?">
                             <xxf:value value="." xxbl:scope="outer"/>
@@ -114,7 +123,10 @@
                     </xf:group>
                 </xf:group>
 
-                <xf:group ref="()" xbl:attr="model context ref=page-number-ref" appearance="xxf:internal" xxbl:scope="outer">
+                <xf:group
+                    fr:keep-if-param-non-blank="page-number-ref"
+                    xbl:attr="model context ref=page-number-ref" appearance="xxf:internal" xxbl:scope="outer"
+                >
                     <xf:group ref="instance('fr-paging-instance')/page-number" xxbl:scope="inner" appearance="xxf:internal">
                         <xf:var name="ref" as="item()?">
                             <xxf:value value="." xxbl:scope="outer"/>

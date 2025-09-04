@@ -309,7 +309,10 @@
                             <xsl:variable name="level" select="."/>
 
                             <!-- Write out the alerts counts -->
-                            <xf:group ref="()" xbl:attr="model context ref={$level}s-count-ref" appearance="xxf:internal">
+                            <xf:group
+                                fr:keep-if-param-non-blank="{$level}s-count-ref"
+                                xbl:attr="model context ref={$level}s-count-ref" appearance="xxf:internal"
+                            >
                                 <xf:group ref="$state/counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
                                     <xf:var name="ref" as="item()?">
                                         <xxf:value value="." xxbl:scope="outer"/>
@@ -321,7 +324,10 @@
                             </xf:group>
 
                             <!-- Write out the visible alerts counts -->
-                            <xf:group ref="()" xbl:attr="model context ref=visible-{$level}s-count-ref" appearance="xxf:internal">
+                            <xf:group
+                                fr:keep-if-param-non-blank="visible-{$level}s-count-ref"
+                                xbl:attr="model context ref=visible-{$level}s-count-ref" appearance="xxf:internal"
+                            >
                                 <xf:group ref="$state/visible-counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
                                     <xf:var name="ref" as="item()?">
                                         <xxf:value value="." xxbl:scope="outer"/>
@@ -334,7 +340,10 @@
                         </xsl:for-each>
 
                         <!-- Write out the validity -->
-                        <xf:group ref="()" xbl:attr="model context ref=valid-ref" appearance="xxf:internal">
+                        <xf:group
+                            fr:keep-if-param-non-blank="valid-ref"
+                            xbl:attr="model context ref=valid-ref" appearance="xxf:internal"
+                        >
                             <xf:group ref="$state/valid" xxbl:scope="inner" appearance="xxf:internal">
                                 <xf:var name="ref" as="item()?">
                                     <xxf:value value="." xxbl:scope="outer"/>

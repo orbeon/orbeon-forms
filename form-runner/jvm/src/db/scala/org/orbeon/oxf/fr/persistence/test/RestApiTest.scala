@@ -360,37 +360,81 @@ class RestApiTest
       }
     }
 
-    it("must allow attachment creation with update permission because owner (#7145)") {
-      withTestSafeRequestContext { implicit safeRequestCtx =>
-        Connect.withOrbeonTables("attachment-permissions") { (_, provider) =>
-          val formURL            = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-          val dataURL            = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
-          val attachment1URL     = HttpCall.crudURLPrefix(provider) + "data/123/attachment1"
-          val attachment2URL     = HttpCall.crudURLPrefix(provider) + "data/123/attachment2"
-          val data               = <data/>.toDocument
-          val createReadUpdate   = SpecificOperations(Set(Create, Read, Update))
-          val readUpdate         = SpecificOperations(Set(        Read, Update))
-          val attachmentBody     = HttpCall.Binary(Array[Byte](1, 2, 3, 4, 5))
-          val user               = Some(Credentials(UserAndGroup("user", None), Nil, Nil))
+    describe("Attachments based on permissions for data (#7145)") {
 
-          def storeForm(formPermissions: Permissions, isUpdate: Boolean = false): Unit =
-            HttpAssert.put(formURL, Specific(1), HttpCall.XML(buildFormDefinition(provider, formPermissions)), if (isUpdate) StatusCode.NoContent else StatusCode.Created)
+      val data             = <data/>.toDocument
+      val attachmentBody   = HttpCall.Binary(Array[Byte](1, 2, 3, 4, 5))
 
-          // Anyone can create, owners can read and update
-          storeForm(Permissions.Defined(List(
-            Permission(Nil, SpecificOperations(Set(Create))),
-            Permission(List(Condition.Owner), SpecificOperations(Set(Read, Update)))
-          )))
-          HttpAssert.put(dataURL       , Specific(1), HttpCall.XML(data), StatusCode.Created  , user) // Create initial data
-          HttpAssert.put(attachment1URL, Specific(1), attachmentBody    , StatusCode.Created, user) // Can attach
-          HttpAssert.get(attachment1URL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, createReadUpdate, Some(1)), user)
+      def storeForm(
+        provider: Provider,
+        formURL: String,
+        formPermissions: Permissions,
+        isUpdate: Boolean = false,
+        safeRequestCtx: SafeRequestContext
+      ): Unit = {
+        implicit val ctx: SafeRequestContext = safeRequestCtx
+        HttpAssert.put(
+          formURL,
+          Specific(1),
+          HttpCall.XML(buildFormDefinition(provider, formPermissions)),
+          if (isUpdate) StatusCode.NoContent else StatusCode.Created
+        )
+      }
 
-          // Now we change the permissions, and only owners can read and update
-          storeForm(Permissions.Defined(List(
-            Permission(List(Condition.Owner), SpecificOperations(Set(Read, Update)))
-          )), isUpdate = true)
-          HttpAssert.put(attachment2URL, Specific(1), attachmentBody    , StatusCode.Created, user) // Can still attach
-          HttpAssert.get(attachment2URL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, readUpdate, Some(1)), user)
+
+      it("must allow attachment creation with update permission (#7145)") {
+        withTestSafeRequestContext { implicit safeRequestCtx =>
+          Connect.withOrbeonTables("attachment-permissions") { (_, provider) =>
+            val formURL          = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+            val dataURL          = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+            val attachment1URL   = HttpCall.crudURLPrefix(provider) + "data/123/attachment1"
+            val attachment2URL   = HttpCall.crudURLPrefix(provider) + "data/123/attachment2"
+            val createReadUpdate = SpecificOperations(Set(Create, Read, Update))
+            val readUpdate       = SpecificOperations(Set(        Read, Update))
+            val user             = Some(Credentials(UserAndGroup("user", None), Nil, Nil))
+            val anyoneCreate     = Permissions.Defined(List(
+                                     Permission(Nil, SpecificOperations(Set(Create))),
+                                     Permission(List(Condition.Owner), SpecificOperations(Set(Read, Update))),
+                                   ))
+            val ownersOnly       = Permissions.Defined(List(
+                                     Permission(List(Condition.Owner), SpecificOperations(Set(Read, Update)))
+                                   ))
+
+            // Anyone can create, owners can read and update
+            storeForm(provider, formURL, anyoneCreate, isUpdate = false, safeRequestCtx)
+            HttpAssert.put(dataURL       , Specific(1), HttpCall.XML(data), StatusCode.Created  , user) // Create initial data
+            HttpAssert.put(attachment1URL, Specific(1), attachmentBody    , StatusCode.Created, user) // Can attach
+            HttpAssert.get(attachment1URL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, createReadUpdate, Some(1)), user)
+
+            // Now we change the permissions, and only owners can read and update
+            storeForm(provider, formURL, ownersOnly, isUpdate = true, safeRequestCtx)
+            HttpAssert.put(attachment2URL, Specific(1), attachmentBody    , StatusCode.Created, user) // Can still attach
+            HttpAssert.get(attachment2URL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, readUpdate, Some(1)), user)
+
+          }
+        }
+      }
+
+      it("must allow access to attachment created by other user (#7145)") {
+        withTestSafeRequestContext { implicit safeRequestCtx =>
+          Connect.withOrbeonTables("attachment-permissions") { (_, provider) =>
+            val formURL                = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+            val dataURL                = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+            val attachmentURL          = HttpCall.crudURLPrefix(provider) + "data/123/attachment"
+            val user1                  = Some(Credentials(UserAndGroup("user1", None), Nil, Nil))
+            val adminUser              = Some(Credentials(UserAndGroup("user2", None), List(SimpleRole("admin")), Nil))
+            val createReadUpdateDelete = SpecificOperations(Set(Create, Read, Update, Delete))
+            val ownerAndAdminOnly      = Permissions.Defined(List(
+                                           Permission(List(Condition.Owner)                    , createReadUpdateDelete),
+                                           Permission(List(Condition.RolesAnyOf(List("admin"))), createReadUpdateDelete)
+                                         ))
+
+            storeForm(provider, formURL, Permissions.Undefined, isUpdate = false, safeRequestCtx)
+            HttpAssert.put(dataURL, Specific(1), HttpCall.XML(data), StatusCode.Created, user1)
+            storeForm(provider, formURL, ownerAndAdminOnly, isUpdate = true, safeRequestCtx)
+            HttpAssert.put(attachmentURL, Specific(1), attachmentBody, StatusCode.Created, adminUser)
+            HttpAssert.get(attachmentURL, Unspecified, HttpAssert.ExpectedBody(attachmentBody, createReadUpdateDelete, Some(1)), user1)
+          }
         }
       }
     }

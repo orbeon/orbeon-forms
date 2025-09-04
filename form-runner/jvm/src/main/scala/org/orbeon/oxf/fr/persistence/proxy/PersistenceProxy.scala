@@ -370,8 +370,9 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                   queryForToken              = queryForToken
                 )
 
-              val responseHeadersForPermissionsOpt = responseHeadersOpt.orElse(
-                isAttachment.flatOption {
+              val responseHeadersForPermissionsOpt =
+                if (isAttachment) {
+                  // Always use username/groupname from data.xml to determine permissions on attachments
                   val dataXmlPath = path.substring(0, path.lastIndexOf('/') + 1) + DataXml
                   val dataXmlServiceUri = buildServiceUri(dataXmlPath)
                   val dataResult = connectToObtainHeadersAndCheckPreconditions(
@@ -382,8 +383,9 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                     queryForToken              = queryForToken
                   )
                   dataResult._3
+                } else {
+                  responseHeadersOpt
                 }
-              )
 
               // 2024-07-23: Here, we read the form permissions by calling `/fr/service/persistence/form`, then we
               // extract the `<permissions>` element if any, and obtain a `Permissions` object. I wondered why we

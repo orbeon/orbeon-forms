@@ -3,7 +3,6 @@ package org.orbeon.fr
 import org.log4s.Logger
 import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.Pager
 import org.orbeon.xbl.Pager.PagerCompanion
@@ -127,13 +126,13 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
 
     private val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.FormRunnerForm.Pager")
 
-    @JSExport def repeatedSectionName: String          = _repeatedSectionName
-    @JSExport def itemFrom           : js.UndefOr[Int] = undefOrInt("from")
-    @JSExport def itemTo             : js.UndefOr[Int] = undefOrInt("to")
-    @JSExport def itemCount          : js.UndefOr[Int] = undefOrInt("search-total")
-    @JSExport def pageSize           : js.UndefOr[Int] = undefOrInt("page-size")
-    @JSExport def pageNumber         : js.UndefOr[Int] = undefOrInt("page-number")
-    @JSExport def pageCount          : js.UndefOr[Int] = undefOrInt("page-count")
+    def repeatedSectionName: String = _repeatedSectionName
+    def itemFrom           : Int    = pagerDiv.dataset("from").toInt
+    def itemTo             : Int    = pagerDiv.dataset("to").toInt
+    def itemCount          : Int    = pagerDiv.dataset("searchTotal").toInt
+    def pageSize           : Int    = pagerDiv.dataset("pageSize").toInt
+    def pageNumber         : Int    = pagerDiv.dataset("pageNumber").toInt
+    def pageCount          : Int    = pagerDiv.dataset("pageCount").toInt
 
     @JSExport
     def setCurrentPage(page: Int): Unit =
@@ -164,12 +163,6 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
 
     private def pagerDiv: Element =
       pagerElem.querySelector(".pagination").asInstanceOf[Element]
-
-    private def undefOrInt(value: String): js.UndefOr[Int] =
-      Option(pagerDiv.getAttribute(s"data-$value"))
-        .filter(_.nonEmpty)
-        .flatMap(_.toIntOption)
-        .orUndefined
   }
 
   def getPager(repeatedSectionName: String): js.UndefOr[Pager] = {

@@ -186,10 +186,10 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   def getPagers(): js.Array[Pager] = {
     val pagers =
       for {
-        sectionElem <- dom.document.querySelectorAll("[id $= '-section']").toSeq
-        if ! sectionElem.classList.contains("xforms-disabled")
-        pagerElem   <- sectionElem.querySelectorOpt(".xbl-fr-pager")
-      } yield new Pager(sectionElem.id.trimSuffixIfPresent("-section"), pagerElem.asInstanceOf[html.Element])
+        sectionElem         <- form.elem.querySelectorAll(".xbl-fr-section:not(.xforms-disabled)").toSeq
+        pagerElem           <- sectionElem.querySelectorOpt(".xbl-fr-pager") // TODO: what if nesting?
+        repeatedSectionName <- ControlOps.controlNameFromIdOpt(sectionElem.id)
+      } yield new Pager(repeatedSectionName, pagerElem.asInstanceOf[html.Element])
 
     pagers.toJSArray
   }

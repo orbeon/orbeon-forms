@@ -247,6 +247,7 @@
                                 <xsl:if test="$use-pager">
                                     <fr:pager
                                         id="pager"
+                                        show="pages"
                                         page-size="{$root/@page-size}"
                                         total-value="count($repeat-sequence)"
                                         from-ref="instance('local')/from"

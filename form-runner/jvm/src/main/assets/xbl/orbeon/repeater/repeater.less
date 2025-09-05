@@ -103,6 +103,26 @@
             .xforms-trigger-appearance-minimal.xforms-readonly a {
                 color: rgb(127,127,127); // try to match color of icon with opacity
             }
+
+            & > .xbl-fr-pager {
+                .xforms-select1-appearance-search {
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                }
+                .select2-container .select2-selection--single {
+                    height: 26px;
+                }
+                .select2-selection__rendered {
+                    min-width: 2em;
+                    text-align: end;
+                }
+                .select2-results__option {
+                    display: list-item;
+                }
+                .select2-selection__clear {
+                    display: none;
+                }
+            }
         }
 
         .fr-repeater-bottom-buttons {

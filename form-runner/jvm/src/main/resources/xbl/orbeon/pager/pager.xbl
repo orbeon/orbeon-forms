@@ -14,7 +14,7 @@
         xxbl:mode="javascript-lifecycle">
 
         <xbl:handlers>
-            <!-- Used by the pager API -->
+            <!-- Used by the client-side pager API -->
             <xbl:handler event="fr-set-current-page" phase="target">
                 <xf:var name="previous-page" value="instance('fr-paging-instance')/page-number/xs:integer(.)"/>
                 <xf:var name="current-page"  value="event('page-number')"/>
@@ -58,7 +58,7 @@
                     <xf:bind ref="* except (prev-trigger, next-trigger)" type="xs:integer"/>
                     <xf:bind ref="page-size"    calculate="(fr:component-param-value('page-size'), 10)[. castable as xs:integer][1]"/>
                     <xf:bind ref="page-count"   calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
-                    <xf:bind ref="page-number"  calculate="max((1, min((., ../page-count))))"/>
+                    <xf:bind ref="page-number"  calculate="if (xxf:is-blank(string(.))) then 1 else max((1, min((., ../page-count))))" readonly="false()"/>
                     <xf:bind ref="from"         calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
                     <xf:bind ref="to"           calculate="min((../page-number * ../page-size, ../search-total))"/>
                     <xf:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
@@ -161,17 +161,26 @@
                         <xh:li role="presentation">
                             <xf:output
                                 value="
-                                    concat(
-                                        string(max((instance('fr-paging-instance')/from, 0))),
-                                        ' ',
-                                        xxf:r('summary.paging.to', '|fr-fr-resources|'),
-                                        ' ',
-                                        string(max((instance('fr-paging-instance')/to, 0))),
-                                        ' ',
-                                        xxf:r('summary.paging.of', '|fr-fr-resources|'),
-                                        ' ',
-                                        instance('fr-paging-instance')/search-total
-                                    )"/>
+                                    if (fr:component-param-value('show') = 'pages') then
+                                        concat(
+                                            string(max((instance('fr-paging-instance')/page-number, 0))),
+                                            ' ',
+                                            xxf:r('summary.paging.of', '|fr-fr-resources|'),
+                                            ' ',
+                                            instance('fr-paging-instance')/page-count
+                                        )
+                                    else
+                                        concat(
+                                            string(max((instance('fr-paging-instance')/from, 0))),
+                                            ' ',
+                                            xxf:r('summary.paging.to', '|fr-fr-resources|'),
+                                            ' ',
+                                            string(max((instance('fr-paging-instance')/to, 0))),
+                                            ' ',
+                                            xxf:r('summary.paging.of', '|fr-fr-resources|'),
+                                            ' ',
+                                            instance('fr-paging-instance')/search-total
+                                        )"/>
                         </xh:li>
                     </xf:group>
                     <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
@@ -194,6 +203,14 @@
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
+                    </xh:li>
+                    <xh:li>
+                        <xf:select1 appearance="search" ref="instance('fr-paging-instance')/page-number">
+                            <xf:itemset ref="1 to instance('fr-paging-instance')/page-count">
+                                <xf:label ref="."/>
+                                <xf:value ref="."/>
+                            </xf:itemset>
+                        </xf:select1>
                     </xh:li>
                 </xh:ul>
             </xh:div>

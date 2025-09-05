@@ -29,7 +29,8 @@
                     <xf:param name="currentPage"  value="$current-page"/>
                     <xf:param name="pageCount"    value="instance('fr-paging-instance')/page-count"/>
                     <xf:body>
-                        ORBEON.xforms.XBL.instanceForControl(this).onPageChange(Number(previousPage), Number(currentPage), Number(pageCount));
+                        var i = ORBEON.xforms.XBL.instanceForControl(this);
+                        if (i) i.onPageChange(Number(previousPage), Number(currentPage), Number(pageCount));
                     </xf:body>
                 </xf:action>
                 <!-- Keep track of the previous value of the page number -->

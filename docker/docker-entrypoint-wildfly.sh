@@ -8,6 +8,7 @@ DEPLOYMENT_DIR=$WILDFLY_HOME/standalone/deployments
 if [ "$EMBEDDING_WAR" = "1" ] || [ "${EMBEDDING_WAR,,}" = "true" ]; then
     if [ -e /docker-entrypoint-wildfly.d/orbeon-embedding.war ]; then
         mv /docker-entrypoint-wildfly.d/orbeon-embedding.war $DEPLOYMENT_DIR/
+        touch $DEPLOYMENT_DIR/orbeon-embedding.war.dodeploy
     fi
 fi
 

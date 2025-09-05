@@ -36,8 +36,11 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && rm orbeon-embedding.war \
     && popd
 
-# Enable compression and auto-deployment of exploded WAR files
-COPY standalone.gzip.auto-deploy-exploded.xml $CONFIG_DIR/standalone.xml
+# Mark orbeon.war for deployment
+RUN touch $DEPLOYMENT_DIR/orbeon.war.dodeploy \
+
+# Enable gzip compression
+COPY standalone.gzip.xml $CONFIG_DIR/standalone.xml
 
 # We might want to use WildFly's deployment overlays to customize the Orbeon Forms WAR instead of exploding it
 

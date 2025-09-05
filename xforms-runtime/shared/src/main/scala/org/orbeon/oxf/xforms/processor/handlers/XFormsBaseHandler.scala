@@ -76,7 +76,7 @@ object XFormsBaseHandler {
       // This is the standard XForms attribute
       var value = srcAttributes.getValue("navindex")
       if (value == null) {
-        // Try the the XHTML attribute
+        // Try the XHTML attribute
         value = srcAttributes.getValue(XFormsNames.TABINDEX_QNAME.localName)
       }
       if (value != null)

@@ -166,16 +166,10 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       pagerElem.querySelector(".pagination").asInstanceOf[Element]
   }
 
-  def getPager(repeatedSectionName: String): js.UndefOr[Pager] = {
-    val pagerOpt =
-      for {
-        sectionElem <- dom.document.querySelectorOpt(s"#$repeatedSectionName-section")
-        if ! sectionElem.classList.contains("xforms-disabled")
-        pagerElem   <- sectionElem .querySelectorOpt(".xbl-fr-pager")
-      } yield new Pager(repeatedSectionName, pagerElem)
-
-    pagerOpt.orUndefined
-  }
+  def getPager(repeatedSectionName: String): js.UndefOr[Pager] =
+    getPagers()
+      .find(_.repeatedSectionName == repeatedSectionName)
+      .orUndefined
 
   def getPagers(): js.Array[Pager] = {
     val pagers =

@@ -16,7 +16,6 @@ import org.scalajs.dom.html.Element
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichIterableOnce, JSRichOption}
-import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.|
 
 
@@ -122,7 +121,11 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
         Some(e)
     }
 
-  class Pager(_repeatedSectionName: String, pagerElem: Element) {
+  class Pager(
+    private val form                : xforms.Form,
+    private val _repeatedSectionName: String,
+    private val pagerElem           : Element
+  ) extends js.Object {
 
     private val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.FormRunnerForm.Pager")
 
@@ -134,21 +137,19 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     def pageNumber         : Int    = pagerDiv.dataset("pageNumber").toInt
     def pageCount          : Int    = pagerDiv.dataset("pageCount").toInt
 
-    @JSExport
     def setCurrentPage(page: Int): Unit =
       AjaxClient.fireEvent(
         AjaxEvent(
           eventName  = "fr-set-current-page",
           targetId   = pagerElem.id,
+          form       = Some(form.elem),
           properties = Map("page-number" -> page),
         )
       )
 
-    @JSExport
     def addPageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =
       pagerCompanionOpt.foreach(_.addPageChangeListener(listener))
 
-    @JSExport
     def removePageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =
       pagerCompanionOpt.foreach(_.removePageChangeListener(listener))
 
@@ -182,7 +183,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
         sectionElem         <- form.elem.querySelectorAll(".xbl-fr-section:not(.xforms-disabled)").toSeq
         pagerElem           <- sectionElem.querySelectorOpt(".xbl-fr-pager") // TODO: what if nesting?
         repeatedSectionName <- ControlOps.controlNameFromIdOpt(sectionElem.id)
-      } yield new Pager(repeatedSectionName, pagerElem.asInstanceOf[html.Element])
+      } yield new Pager(form, repeatedSectionName, pagerElem.asInstanceOf[html.Element])
 
     pagers.toJSArray
   }

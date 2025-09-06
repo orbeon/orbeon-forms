@@ -381,7 +381,6 @@ class RestApiTest
         )
       }
 
-
       it("must allow attachment creation with update permission (#7145)") {
         withTestSafeRequestContext { implicit safeRequestCtx =>
           Connect.withOrbeonTables("attachment-permissions") { (_, provider) =>

@@ -19,8 +19,10 @@
             .fr-component-group {
                 width: 100%;
                 display: flex;
-                .xforms-select1 { max-width: 50%; margin-right: 10px }
-                .xforms-input   { flex: 1 1 }
+                column-gap: 1em;
+                .xforms-select1 { flex-grow: 0; }
+                .xforms-select1:has(~ .xforms-input.xforms-disabled) { flex-grow: 1; } // allow the input to grow when the input field is disabled (view mode)
+                .xforms-input   { flex-grow: 1; }
             }
         }
 
@@ -37,23 +39,33 @@
     @media print {
         .xbl-fr-open-select1 {
             .fr-component-group {
+
                 .xforms-select1-appearance-full .xforms-items {
-                    // Remove floats for Flying Saucer, which otherwise shows the input over the radio buttons
+                    // Remove floats for the PDF renderer, which otherwise shows the input over the radio buttons
+                    // 2025-09-05: Still needed.
                     float: none;
                     .xforms-selected,
                     .xforms-deselected {
                         float: none;
                     }
                 }
-                .xforms-select1-appearance-full, .xforms-select1-appearance-minimal {
-                    &.xforms-static.xforms-readonly {
-                        width: auto; // works without
+            }
+
+            &.xforms-open-select1-appearance-minimal {
+                .fr-component-group {
+                    display: table; // flex is not supported by the PDF renderer
+                    width: 100%;
+
+                    & > * {
+                        display: table-cell; // flex is not supported by the PDF renderer
+                    }
+
+                    .xforms-input {
+                        padding-left: 1em;
                     }
                 }
-                .xforms-input {
-                    width: auto;
-                }
             }
+
         }
     }
 }

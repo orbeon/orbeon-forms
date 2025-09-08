@@ -1,0 +1,1573 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <contact-information>
+                        <grid-5>
+                            <contact-information-first-name/>
+                            <contact-information-last-name/>
+                            <contact-information-phone/><date-of-birth/><contact-information-email/>
+                            
+                            <email/>
+                            
+                        </grid-5>
+                        <grid-1>
+                            <reason-for-your-visit/>
+                        </grid-1>
+                    </contact-information>
+                    <personal-medical-history>
+                        <grid-2>
+                            <constitutional/>
+                            <constitutional-comment/>
+                            <psychiatric/>
+                            <psychiatric-comment/>
+                            <blood-lymphatic/>
+                            <blood-lymphatic-comment/>
+                            <skin/>
+                            <skin-comment/>
+                            <cancer/>
+                            <cancer-comment/>
+                            <allergic-immunologic/>
+                            <allergic-immunologic-comment/>
+                            <hormones-endocrine/>
+                            <hormones-endocrine-comment/>
+                            <major-illnesses-hospitalizations/>
+                            <major-illnesses-hospitalizations-comment/>
+                            <surgeries/>
+                            <surgeries-comment/>
+                            <neurological/>
+                            <neurological-comment/>
+                            <ear-nose-throat/>
+                            <ear-nose-throat-comment/>
+                            <heart-cardiovascular/>
+                            <heart-cardiovascular-comment/>
+                            <lungs-respiratory/>
+                            <lungs-respiratory-comment/>
+                            <digestion-gastrointestinal/>
+                            <digestion-gastrointestinal-comment/>
+                            <muscles-and-bones-musculoskeletal/>
+                            <muscles-and-bones-musculoskeletal-comment/>
+                            <urological/>
+                            <urological-comment/>
+                            <gynecological/>
+                            <gynecological-comment/>
+                            <breast/>
+                            <breast-comment/>
+                        </grid-2>
+                        <grid-3>
+                            <year-of-diagnosis/>
+                            <result-time-of-last-blood-sugar/>
+                            <last-hemoglobin-a1c/>
+                            <treatments/>
+                        </grid-3>
+                    </personal-medical-history>
+                    <family-history>
+                        <grid-4>
+                            <systemic-disease/>
+                            <other-systemic-diseases/>
+                        </grid-4>
+                    </family-history>
+                    <section-1>
+                        <grid-6>
+                            <marital-status/>
+                            <living-arrangements/>
+                            <venereal-disease_sexually-transmitted-infection/>
+                            <pregnant/>
+                            <occupations/>
+                            <occupational-exposure/>
+                            <recent-travel/>
+                            <tobacco-use/>
+                            <alcohol-use/>
+                            <recreational-drug-use/>
+                        </grid-6>
+                    </section-1>
+                    <medications>
+                        <grid-7>
+                            <control-4/>
+                        </grid-7>
+                        <grid-8>
+                            <grid-8-iteration>
+                                <medication-name/>
+                                <medication-dose/>
+                                <medication-frequency/>
+                                <medication-other-information/>
+                            </grid-8-iteration>
+                        </grid-8>
+                    </medications>
+                    <allergies>
+                        <grid-9>
+                            <control-9/>
+                        </grid-9>
+                        <grid-10>
+                            <grid-10-iteration>
+                                <allergy-name/>
+                                <allergy-severity/>
+                                <allergy-reaction/>
+                                <allergy-treatment-information/>
+                            </grid-10-iteration>
+                        </grid-10>
+                    </allergies>
+                    <pharmacy>
+                        <grid-11>
+                            <pharmacy-name/>
+                            <pharmacy-phone/>
+                        </grid-11>
+                        <pharmacy-grid-3>
+                            <pharmacy-us-address-street-1/>
+                            <pharmacy-us-address-city/>
+
+
+                            <pharmacy-us-address-street-2/>
+                            <pharmacy-us-address-state/>
+                            <pharmacy-us-address-zip/>
+
+
+                            
+
+                        </pharmacy-grid-3>
+                    </pharmacy>
+                    <signature-and-date>
+                        <grid-12>
+                            <signature/>
+                            <signature-date/>
+                            <signature-printed-name/>
+                        </grid-12>
+                    </signature-and-date>
+                </form>
+            </xf:instance>
+
+            
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="contact-information-bind" ref="contact-information" name="contact-information">
+                    <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                        <xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/>
+                        
+                        <xf:bind id="email-bind" ref="email" name="email" type="xf:email" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/>
+                        <xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')" required="true()"/><xf:bind id="date-of-birth-bind" ref="date-of-birth" name="date-of-birth" type="xs:date" required="true()"/>
+                    </xf:bind>
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="reason-for-your-visit-bind" ref="reason-for-your-visit" name="reason-for-your-visit" required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="personal-medical-history-bind" ref="personal-medical-history" name="personal-medical-history">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="constitutional-bind" ref="constitutional" name="constitutional" type="xs:boolean" required="true()"/>
+                        <xf:bind id="constitutional-comment-bind" ref="constitutional-comment" name="constitutional-comment"/>
+                        <xf:bind id="psychiatric-comment-bind" ref="psychiatric-comment" name="psychiatric-comment"/>
+                        <xf:bind id="blood-lymphatic-comment-bind" ref="blood-lymphatic-comment" name="blood-lymphatic-comment"/>
+                        <xf:bind id="skin-comment-bind" ref="skin-comment" name="skin-comment"/>
+                        <xf:bind id="cancer-comment-bind" ref="cancer-comment" name="cancer-comment"/>
+                        <xf:bind id="allergic-immunologic-comment-bind" ref="allergic-immunologic-comment" name="allergic-immunologic-comment"/>
+                        <xf:bind id="hormones-endocrine-comment-bind" ref="hormones-endocrine-comment" name="hormones-endocrine-comment"/>
+                        <xf:bind id="neurological-comment-bind" ref="neurological-comment" name="neurological-comment"/>
+                        <xf:bind id="ear-nose-throat-comment-bind" ref="ear-nose-throat-comment" name="ear-nose-throat-comment"/>
+                        <xf:bind id="heart-cardiovascular-comment-bind" ref="heart-cardiovascular-comment" name="heart-cardiovascular-comment"/>
+                        <xf:bind id="lungs-respiratory-comment-bind" ref="lungs-respiratory-comment" name="lungs-respiratory-comment"/>
+                        <xf:bind id="psychiatric-bind" ref="psychiatric" name="psychiatric" type="xs:boolean" required="true()"/>
+                        <xf:bind id="blood-lymphatic-bind" ref="blood-lymphatic" name="blood-lymphatic" type="xs:boolean" required="true()"/>
+                        <xf:bind id="skin-bind" ref="skin" name="skin" type="xs:boolean" required="true()"/>
+                        <xf:bind id="cancer-bind" ref="cancer" name="cancer" type="xs:boolean" required="true()"/>
+                        <xf:bind id="allergic-immunologic-bind" ref="allergic-immunologic" name="allergic-immunologic" type="xs:boolean" required="true()"/>
+                        <xf:bind id="hormones-endocrine-bind" ref="hormones-endocrine" name="hormones-endocrine" type="xs:boolean" required="true()"/>
+                        <xf:bind id="neurological-bind" ref="neurological" name="neurological" type="xs:boolean" required="true()"/>
+                        <xf:bind id="ear-nose-throat-bind" ref="ear-nose-throat" name="ear-nose-throat" type="xs:boolean" required="true()"/>
+                        <xf:bind id="heart-cardiovascular-bind" ref="heart-cardiovascular" name="heart-cardiovascular" type="xs:boolean" required="true()"/>
+                        <xf:bind id="lungs-respiratory-bind" ref="lungs-respiratory" name="lungs-respiratory" type="xs:boolean" required="true()"/>
+                        <xf:bind id="digestion-gastrointestinal-comment-bind" ref="digestion-gastrointestinal-comment" name="digestion-gastrointestinal-comment"/>
+                        <xf:bind id="muscles-and-bones-musculoskeletal-comment-bind" ref="muscles-and-bones-musculoskeletal-comment" name="muscles-and-bones-musculoskeletal-comment"/>
+                        <xf:bind id="urological-comment-bind" ref="urological-comment" name="urological-comment"/>
+                        <xf:bind id="gynecological-comment-bind" ref="gynecological-comment" name="gynecological-comment"/>
+                        <xf:bind id="breast-comment-bind" ref="breast-comment" name="breast-comment"/>
+                        <xf:bind id="digestion-gastrointestinal-bind" ref="digestion-gastrointestinal" name="digestion-gastrointestinal" type="xs:boolean" required="true()"/>
+                        <xf:bind id="muscles-and-bones-musculoskeletal-bind" ref="muscles-and-bones-musculoskeletal" name="muscles-and-bones-musculoskeletal" type="xs:boolean" required="true()"/>
+                        <xf:bind id="urological-bind" ref="urological" name="urological" type="xs:boolean" required="true()"/>
+                        <xf:bind id="gynecological-bind" ref="gynecological" name="gynecological" type="xs:boolean" required="true()"/>
+                        <xf:bind id="breast-bind" ref="breast" name="breast" type="xs:boolean" required="true()"/>
+                        <xf:bind id="major-illnesses-hospitalizations-bind" ref="major-illnesses-hospitalizations" name="major-illnesses-hospitalizations" type="xs:boolean" required="true()"/>
+                        <xf:bind id="major-illnesses-hospitalizations-comment-bind" ref="major-illnesses-hospitalizations-comment" name="major-illnesses-hospitalizations-comment"/>
+                        <xf:bind id="surgeries-bind" ref="surgeries" name="surgeries" type="xs:boolean" required="true()"/>
+                        <xf:bind id="surgeries-comment-bind" ref="surgeries-comment" name="surgeries-comment"/>
+                    </xf:bind>
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="year-of-diagnosis-bind" ref="year-of-diagnosis" name="year-of-diagnosis" type="xf:date"/>
+                        <xf:bind id="result-time-of-last-blood-sugar-bind" ref="result-time-of-last-blood-sugar" name="result-time-of-last-blood-sugar" xxf:whitespace="trim"/>
+                        <xf:bind id="last-hemoglobin-a1c-bind" ref="last-hemoglobin-a1c" name="last-hemoglobin-a1c" xxf:whitespace="trim"/>
+                        <xf:bind id="treatments-bind" ref="treatments" name="treatments" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="family-history-bind" ref="family-history" name="family-history">
+                    <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+                        <xf:bind id="systemic-disease-bind" ref="systemic-disease" name="systemic-disease"/>
+                        <xf:bind id="other-systemic-diseases-bind" ref="other-systemic-diseases" name="other-systemic-diseases"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
+                        <xf:bind id="marital-status-bind" ref="marital-status" name="marital-status" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="living-arrangements-bind" ref="living-arrangements" name="living-arrangements" xxf:whitespace="trim"/>
+                        <xf:bind id="venereal-disease_sexually-transmitted-infection-bind" ref="venereal-disease_sexually-transmitted-infection" name="venereal-disease_sexually-transmitted-infection" type="xs:boolean" required="true()"/>
+                        <xf:bind id="pregnant-bind" ref="pregnant" name="pregnant" type="xs:boolean" required="true()"/>
+                        <xf:bind id="occupations-bind" ref="occupations" name="occupations" xxf:whitespace="trim"/>
+                        <xf:bind id="occupational-exposure-bind" ref="occupational-exposure" name="occupational-exposure" type="xs:boolean" required="true()"/>
+                        <xf:bind id="recent-travel-bind" ref="recent-travel" name="recent-travel" type="xs:boolean" required="true()"/>
+                        <xf:bind id="tobacco-use-bind" ref="tobacco-use" name="tobacco-use" required="true()"/>
+                        <xf:bind id="alcohol-use-bind" ref="alcohol-use" name="alcohol-use" required="true()"/>
+                        <xf:bind id="recreational-drug-use-bind" ref="recreational-drug-use" name="recreational-drug-use" required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="medications-bind" ref="medications" name="medications">
+                    <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"/>
+                    </xf:bind>
+                    <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
+                        <xf:bind id="grid-8-iteration-bind" ref="grid-8-iteration" name="grid-8-iteration">
+                            <xf:bind id="medication-name-bind" ref="medication-name" name="medication-name" xxf:whitespace="trim"/>
+                            <xf:bind id="medication-dose-bind" ref="medication-dose" name="medication-dose" xxf:whitespace="trim"/>
+                            <xf:bind id="medication-frequency-bind" ref="medication-frequency" name="medication-frequency" xxf:whitespace="trim"/>
+                            <xf:bind id="medication-other-information-bind" ref="medication-other-information" name="medication-other-information" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="allergies-bind" ref="allergies" name="allergies">
+                    <xf:bind id="grid-9-bind" ref="grid-9" name="grid-9">
+                        <xf:bind id="control-9-bind" ref="control-9" name="control-9"/>
+                    </xf:bind>
+                    <xf:bind id="grid-10-bind" ref="grid-10" name="grid-10">
+                        <xf:bind id="grid-10-iteration-bind" ref="grid-10-iteration" name="grid-10-iteration">
+                            <xf:bind id="allergy-name-bind" ref="allergy-name" name="allergy-name" xxf:whitespace="trim"/>
+                            <xf:bind id="allergy-severity-bind" ref="allergy-severity" name="allergy-severity" xxf:whitespace="trim"/>
+                            <xf:bind id="allergy-reaction-bind" ref="allergy-reaction" name="allergy-reaction" xxf:whitespace="trim"/>
+                            <xf:bind id="allergy-treatment-information-bind" ref="allergy-treatment-information" name="allergy-treatment-information" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="pharmacy-bind" ref="pharmacy" name="pharmacy">
+                    <xf:bind id="grid-11-bind" ref="grid-11" name="grid-11">
+                        <xf:bind id="pharmacy-name-bind" ref="pharmacy-name" name="pharmacy-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="pharmacy-phone-bind" ref="pharmacy-phone" name="pharmacy-phone" constraint=". = '' or matches(., '^\d{10}$')"/>
+                    </xf:bind>
+                    <xf:bind id="pharmacy-grid-3-bind" ref="pharmacy-grid-3" name="pharmacy-grid-3">
+                        <xf:bind id="pharmacy-us-address-street-1-bind" ref="pharmacy-us-address-street-1" name="pharmacy-us-address-street-1" xxf:whitespace="trim"/>
+                        <xf:bind id="pharmacy-us-address-street-2-bind" ref="pharmacy-us-address-street-2" name="pharmacy-us-address-street-2" xxf:whitespace="trim"/>
+
+
+
+                        
+                        <xf:bind id="pharmacy-us-address-zip-bind" ref="pharmacy-us-address-zip" name="pharmacy-us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                        <xf:bind id="pharmacy-us-address-state-bind" ref="pharmacy-us-address-state" name="pharmacy-us-address-state"/>
+                        <xf:bind id="pharmacy-us-address-city-bind" ref="pharmacy-us-address-city" name="pharmacy-us-address-city" xxf:whitespace="trim" required="true()"/>
+
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="signature-and-date-bind" ref="signature-and-date" name="signature-and-date">
+                    <xf:bind id="grid-12-bind" ref="grid-12" name="grid-12">
+                        <xf:bind id="signature-bind" ref="signature" name="signature" type="xs:anyURI" required="true()"/>
+                        <xf:bind id="signature-date-bind" ref="signature-date" name="signature-date" type="xs:date" required="true()"/>
+                        <xf:bind id="signature-printed-name-bind" ref="signature-printed-name" name="signature-printed-name" xxf:whitespace="trim" required="true()"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>health-history</form-name>
+                    <title xml:lang="en">Orbeon Demo: Health History</title>
+                    <description xml:lang="en" mediatype="text/html">&lt;div&gt;This healthcare form shows how to:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;&lt;li&gt;capture basic patient information&lt;/li&gt;&lt;li&gt;ask multiple questions with required answers&lt;/li&gt;&lt;li&gt;aks for the user's signature&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</description>
+                    
+                    <library-versions>
+                        
+                        <orbeon>2</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    
+                    
+                <thumbnail filename="screenshot.webp" mediatype="image/webp" size="82154">/fr/service/persistence/crud/orbeon/health-history/form/ac0b81abeb051a3e01bbdf99b516cdf72250e114.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "medications/grid-8", "iteration-name": "grid-8-iteration" },{ "path": "allergies/grid-10", "iteration-name": "grid-10-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"date-of-birth"},{"value":"contact-information-email"},{"value":"email"}],"topLevel":true},{"containerPath":[{"value":"contact-information"}],"newGridElem":{"value":"grid-1"},"afterElem":{"value":"grid-5"},"content":[{"value":"reason-for-your-visit"}],"topLevel":true},{"containerPath":[{"value":"personal-medical-history"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"constitutional"},{"value":"constitutional-comment"},{"value":"psychiatric"},{"value":"psychiatric-comment"},{"value":"blood-lymphatic"},{"value":"blood-lymphatic-comment"},{"value":"skin"},{"value":"skin-comment"},{"value":"cancer"},{"value":"cancer-comment"},{"value":"allergic-immunologic"},{"value":"allergic-immunologic-comment"},{"value":"hormones-endocrine"},{"value":"hormones-endocrine-comment"},{"value":"major-illnesses-hospitalizations"},{"value":"major-illnesses-hospitalizations-comment"},{"value":"surgeries"},{"value":"surgeries-comment"},{"value":"neurological"},{"value":"neurological-comment"},{"value":"ear-nose-throat"},{"value":"ear-nose-throat-comment"},{"value":"heart-cardiovascular"},{"value":"heart-cardiovascular-comment"},{"value":"lungs-respiratory"},{"value":"lungs-respiratory-comment"},{"value":"digestion-gastrointestinal"},{"value":"digestion-gastrointestinal-comment"},{"value":"muscles-and-bones-musculoskeletal"},{"value":"muscles-and-bones-musculoskeletal-comment"},{"value":"urological"},{"value":"urological-comment"},{"value":"gynecological"},{"value":"gynecological-comment"},{"value":"breast"},{"value":"breast-comment"}],"topLevel":true},{"containerPath":[{"value":"personal-medical-history"}],"newGridElem":{"value":"grid-3"},"afterElem":{"value":"grid-2"},"content":[{"value":"year-of-diagnosis"},{"value":"result-time-of-last-blood-sugar"},{"value":"last-hemoglobin-a1c"},{"value":"treatments"}],"topLevel":true},{"containerPath":[{"value":"family-history"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"systemic-disease"},{"value":"other-systemic-diseases"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"marital-status"},{"value":"living-arrangements"},{"value":"venereal-disease_sexually-transmitted-infection"},{"value":"pregnant"},{"value":"occupations"},{"value":"occupational-exposure"},{"value":"recent-travel"},{"value":"tobacco-use"},{"value":"alcohol-use"},{"value":"recreational-drug-use"}],"topLevel":true},{"containerPath":[{"value":"medications"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"control-4"}],"topLevel":true},{"containerPath":[{"value":"allergies"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"control-9"}],"topLevel":true},{"containerPath":[{"value":"pharmacy"}],"newGridElem":{"value":"grid-11"},"afterElem":null,"content":[{"value":"pharmacy-name"},{"value":"pharmacy-phone"}],"topLevel":true},{"containerPath":[{"value":"pharmacy"}],"newGridElem":{"value":"pharmacy-grid-3"},"afterElem":{"value":"grid-11"},"content":[{"value":"pharmacy-us-address-street-1"},{"value":"pharmacy-us-address-city"},{"value":"pharmacy-us-address-street-2"},{"value":"pharmacy-us-address-state"},{"value":"pharmacy-us-address-zip"}],"topLevel":true},{"containerPath":[{"value":"signature-and-date"}],"newGridElem":{"value":"grid-12"},"afterElem":null,"content":[{"value":"signature"},{"value":"signature-date"},{"value":"signature-printed-name"}],"topLevel":true}]}</migration></metadata>
+            </xf:instance>
+
+            
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <signature>
+                            <label>Signature</label>
+                            <hint/>
+                        </signature>
+                        <signature-date>
+                            <label>Date</label>
+                            <hint/>
+                        </signature-date>
+                        <signature-printed-name>
+                            <label>Printed name</label>
+                            <hint/>
+                        </signature-printed-name>
+                        <pharmacy-grid-3/>
+                        <pharmacy-us-address-street-1>
+                            <label>Street address</label>
+                            <hint/>
+                            
+                            
+                        </pharmacy-us-address-street-1>
+                        <pharmacy-us-address-street-2>
+                            <label>Street address line 2</label>
+                            <hint/>
+                            
+                            
+                        </pharmacy-us-address-street-2>
+                        <pharmacy-us-address-zip>
+                            <label>Zip code</label>
+                            <hint/>
+                            
+                            
+                        </pharmacy-us-address-zip>
+                        <pharmacy-us-address-state>
+                            <label>State, territory, or military post</label>
+                            <hint/>
+                            
+                            
+                        </pharmacy-us-address-state>
+                        <pharmacy-us-address-city>
+                            <label>City</label>
+                            <hint/>
+                            
+                            
+                        </pharmacy-us-address-city>
+                        <pharmacy-name>
+                            <label>Name</label>
+                            <hint/>
+                        </pharmacy-name>
+                        <pharmacy-phone>
+                            <label>Phone</label>
+                            <hint/>
+                        </pharmacy-phone>
+                        <allergy-name>
+                            <label>Allergy</label>
+                            <hint/>
+                        </allergy-name>
+                        <allergy-severity>
+                            <label>Severity</label>
+                            <hint/>
+                        </allergy-severity>
+                        <allergy-reaction>
+                            <label>Reaction</label>
+                            <hint/>
+                        </allergy-reaction>
+                        <allergy-treatment-information>
+                            <label>Treatment information</label>
+                            <hint/>
+                        </allergy-treatment-information>
+                        <control-9>
+                            <text>&lt;div&gt;
+&lt;p class="p1"&gt;&lt;span class="s1"&gt;&lt;strong&gt;Allergies: &lt;/strong&gt;&lt;/span&gt;&lt;em&gt;Please list ALL allergies&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;</text>
+                        </control-9>
+                        <medication-name>
+                            <label>Name</label>
+                            <hint/>
+                        </medication-name>
+                        <medication-dose>
+                            <label>Dose</label>
+                            <hint/>
+                        </medication-dose>
+                        <medication-frequency>
+                            <label>Frequency</label>
+                            <hint/>
+                        </medication-frequency>
+                        <medication-other-information>
+                            <label>Other information</label>
+                            <hint/>
+                        </medication-other-information>
+                        <control-4>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;
+&lt;p class="p1"&gt;&lt;span class="s1"&gt;&lt;strong&gt;Medications:&lt;/strong&gt; &lt;/span&gt;&lt;em&gt;List ALL medications you are CURRENTLY taking. (Include all herbals, vitamins and supplements)&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;</text>
+                        </control-4>
+                        <marital-status>
+                            <label>Marital status</label>
+                            <hint/>
+                        </marital-status>
+                        <living-arrangements>
+                            <label>Living arrangements</label>
+                            <hint/>
+                        </living-arrangements>
+                        <venereal-disease_sexually-transmitted-infection>
+                            <label>Have you been exposed to venereal disease/sexually transmitted infection?</label>
+                            <hint/>
+                        </venereal-disease_sexually-transmitted-infection>
+                        <pregnant>
+                            <label>Are you pregnant</label>
+                            <hint/>
+                        </pregnant>
+                        <occupations>
+                            <label>Occupation(s)</label>
+                            <hint/>
+                        </occupations>
+                        <occupational-exposure>
+                            <label>Occupational exposure</label>
+                            <hint/>
+                        </occupational-exposure>
+                        <recent-travel>
+                            <label>Recent travel</label>
+                            <hint/>
+                        </recent-travel>
+                        <tobacco-use>
+                            <label>Tobacco use</label>
+                            <hint/>
+                            <item>
+                                <label>Never</label>
+                                <hint/>
+                                <value>never</value>
+                            </item>
+                            <item>
+                                <label>Current everyday use</label>
+                                <hint/>
+                                <value>current-everyday-use</value>
+                            </item>
+                            <item>
+                                <label>Current intermittent use</label>
+                                <hint/>
+                                <value>current-intermittent-use</value>
+                            </item>
+                            <item>
+                                <label>Former use</label>
+                                <hint/>
+                                <value>former-use</value>
+                            </item>
+                            <item>
+                                <label>Status unknown</label>
+                                <hint/>
+                                <value>status-unknown</value>
+                            </item>
+                        </tobacco-use>
+                        <alcohol-use>
+                            <label>Alcohol use</label>
+                            <hint/>
+                            <item>
+                                <label>Never</label>
+                                <hint/>
+                                <value>never</value>
+                            </item>
+                            <item>
+                                <label>Current everyday use</label>
+                                <hint/>
+                                <value>current-everyday-use</value>
+                            </item>
+                            <item>
+                                <label>Current intermittent use</label>
+                                <hint/>
+                                <value>current-intermittent-use</value>
+                            </item>
+                            <item>
+                                <label>Former use</label>
+                                <hint/>
+                                <value>former-use</value>
+                            </item>
+                            <item>
+                                <label>Status unknown</label>
+                                <hint/>
+                                <value>status-unknown</value>
+                            </item>
+                        </alcohol-use>
+                        <recreational-drug-use>
+                            <label>Recreational drug use</label>
+                            <hint/>
+                            <item>
+                                <label>Never</label>
+                                <hint/>
+                                <value>never</value>
+                            </item>
+                            <item>
+                                <label>Current everyday use</label>
+                                <hint/>
+                                <value>current-everyday-use</value>
+                            </item>
+                            <item>
+                                <label>Current intermittent use</label>
+                                <hint/>
+                                <value>current-intermittent-use</value>
+                            </item>
+                            <item>
+                                <label>Former use</label>
+                                <hint/>
+                                <value>former-use</value>
+                            </item>
+                            <item>
+                                <label>Status unknown</label>
+                                <hint/>
+                                <value>status-unknown</value>
+                            </item>
+                        </recreational-drug-use>
+                        <systemic-disease>
+                            <label>Systemic Disease</label>
+                            <hint/>
+                            <item>
+                                <label>Diabetes</label>
+                                <hint/>
+                                <value>diabetes</value>
+                            </item>
+                            <item>
+                                <label>Cancer</label>
+                                <hint/>
+                                <value>cancer</value>
+                            </item>
+                            <item>
+                                <label>Heart disease</label>
+                                <hint/>
+                                <value>heart-disease</value>
+                            </item>
+                            <item>
+                                <label>Hypertension</label>
+                                <hint/>
+                                <value>hypertension</value>
+                            </item>
+                            <item>
+                                <label>Arthritis</label>
+                                <hint/>
+                                <value>arthritis</value>
+                            </item>
+                        </systemic-disease>
+                        <other-systemic-diseases>
+                            <label>Other systemic diseases</label>
+                            <hint/>
+                        </other-systemic-diseases>
+                        <year-of-diagnosis>
+                            <label>If diabetic: Year of diagnosis</label>
+                            <hint/>
+                        </year-of-diagnosis>
+                        <result-time-of-last-blood-sugar>
+                            <label>If diabetic: Result/Time of last blood sugar</label>
+                            <hint/>
+                        </result-time-of-last-blood-sugar>
+                        <last-hemoglobin-a1c>
+                            <label>If diabetic: Last hemoglobin A1C</label>
+                            <hint/>
+                        </last-hemoglobin-a1c>
+                        <treatments>
+                            <label>If diabetic: Treatments</label>
+                            <hint/>
+                        </treatments>
+                        <constitutional>
+                            <label>Constitutional</label>
+                            <hint>fever, heat stroke, weight loss, weight gain, unusually tired, etc.</hint>
+                        </constitutional>
+                        <constitutional-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </constitutional-comment>
+                        <psychiatric>
+                            <label>Psychiatric</label>
+                            <hint>depression, anxiety, mood swings, insomnia, hallucinations, disorientation, etc.</hint>
+                        </psychiatric>
+                        <psychiatric-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </psychiatric-comment>
+                        <blood-lymphatic>
+                            <label>Blood/Lymphatic</label>
+                            <hint>high cholesterol, anemia, blood disorders, leukemia, prolonged bleeding, etc.</hint>
+                        </blood-lymphatic>
+                        <blood-lymphatic-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </blood-lymphatic-comment>
+                        <skin>
+                            <label>Skin</label>
+                            <hint>itching, rash, infection, ulcer, tumors or growths, warts, excessive dryness, etc.</hint>
+                        </skin>
+                        <skin-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </skin-comment>
+                        <cancer>
+                            <label>Cancer</label>
+                            <hint>fever, heat stroke, weight loss, weight gain, unusually tired, etc.</hint>
+                        </cancer>
+                        <cancer-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </cancer-comment>
+                        <allergic-immunologic>
+                            <label>Allergic/Immunologic</label>
+                            <hint>recurrent infections, hay fever, food allergy, drug sensitivity, hives, redness, itching, etc.</hint>
+                        </allergic-immunologic>
+                        <allergic-immunologic-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </allergic-immunologic-comment>
+                        <hormones-endocrine>
+                            <label>Hormones (Endocrine)</label>
+                            <hint>diabetes, thyroid problems, fatigue, hair loss, hot/cold intolerance, etc.</hint>
+                        </hormones-endocrine>
+                        <hormones-endocrine-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </hormones-endocrine-comment>
+                        <major-illnesses-hospitalizations>
+                            <label>Major illnesses/hospitalizations</label>
+                            <hint/>
+                        </major-illnesses-hospitalizations>
+                        <major-illnesses-hospitalizations-comment><label>Comment</label><hint/>
+                            
+                            
+                        </major-illnesses-hospitalizations-comment>
+                        <surgeries>
+                            <label>Surgeries</label>
+                            <hint/>
+                        </surgeries>
+                        <surgeries-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </surgeries-comment>
+                        <neurological>
+                            <label>Neurological</label>
+                            <hint>numbness, weakness, headaches, paralysis, seizures, tremors, tingling, etc.</hint>
+                        </neurological>
+                        <neurological-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </neurological-comment>
+                        <ear-nose-throat>
+                            <label>Ear/Nose/Throat</label>
+                            <hint>hard of hearing, stuffy nose, earache, cough, dry mouth, etc.</hint>
+                        </ear-nose-throat>
+                        <ear-nose-throat-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </ear-nose-throat-comment>
+                        <heart-cardiovascular>
+                            <label>Heart (Cardiovascular)</label>
+                            <hint>high blood pressure, racing pulse, chest pain, unable to exercise, etc.</hint>
+                        </heart-cardiovascular>
+                        <heart-cardiovascular-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </heart-cardiovascular-comment>
+                        <lungs-respiratory>
+                            <label>Lungs (Respiratory)</label>
+                            <hint>congestion, wheezing, shortness of breath, productive or bloody cough, asthma, etc.</hint>
+                        </lungs-respiratory>
+                        <lungs-respiratory-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </lungs-respiratory-comment>
+                        <digestion-gastrointestinal>
+                            <label>Digestion (Gastrointestinal)</label>
+                            <hint>stomach upset, diarrhea, constipation, hernia, ulcers, pain/cramps, acid reflux, etc.</hint>
+                        </digestion-gastrointestinal>
+                        <digestion-gastrointestinal-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </digestion-gastrointestinal-comment>
+                        <muscles-and-bones-musculoskeletal>
+                            <label>Muscles and bones (Musculoskeletal)</label>
+                            <hint>muscle pain/cramps, joint pain swelling, stiffness, etc.</hint>
+                        </muscles-and-bones-musculoskeletal>
+                        <muscles-and-bones-musculoskeletal-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </muscles-and-bones-musculoskeletal-comment>
+                        <urological>
+                            <label>Urological</label>
+                            <hint>painful or frequent urination, burning, impotence, incontinence, infections, etc.</hint>
+                        </urological>
+                        <urological-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </urological-comment>
+                        <gynecological>
+                            <label>Gynecological</label>
+                            <hint>pregnancies, menstrual problems, ovarian and uterine conditions, etc.</hint>
+                        </gynecological>
+                        <gynecological-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </gynecological-comment>
+                        <breast>
+                            <label>Breast</label>
+                            <hint>cysts, fibroids, pain, numbness, lumps, etc.</hint>
+                        </breast>
+                        <breast-comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </breast-comment>
+                        <reason-for-your-visit>
+                            <label>Reason for your visit</label>
+                            <hint/>
+                        </reason-for-your-visit>
+                        <contact-information>
+                            <label>Contact Information</label>
+                        </contact-information>
+                        <personal-medical-history>
+                            <label>Personal Medical History</label>
+                        </personal-medical-history>
+                        <family-history>
+                            <label>Family History</label>
+                        </family-history>
+                        <section-1>
+                            <label>Personal Social History</label>
+                            <help/>
+                        </section-1>
+                        <medications>
+                            <label>Medications</label>
+                        </medications>
+                        <allergies>
+                            <label>Allergies</label>
+                        </allergies>
+                        <pharmacy>
+                            <label>Preferred pharmacy</label>
+                        </pharmacy>
+                        <signature-and-date>
+                            <label>Signature and date</label>
+                        </signature-and-date>
+                        <contact-information-first-name>
+                            <label>First Name</label>
+                            <hint/>
+                        </contact-information-first-name>
+                        <contact-information-phone>
+                            <label>Last Name</label>
+                            <hint/>
+                            
+                            
+                        </contact-information-phone><date-of-birth>
+                            <label>Date of Birth</label>
+                            <hint/>
+                        </date-of-birth><contact-information-email>
+                            <label>Phone number</label>
+                            <hint/>
+                            
+                            
+                        </contact-information-email>
+                        
+                        <email>
+                            <label>Email</label>
+                            <hint/>
+                            
+                            
+                        </email>
+                        
+                        <contact-information-last-name>
+                            <label>Middle initial</label>
+                            <hint/>
+                            
+                            
+                        </contact-information-last-name>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-8-template"><grid-8-iteration><medication-name/><medication-dose/><medication-frequency/><medication-other-information/></grid-8-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-10-template"><grid-10-iteration><allergy-name/><allergy-severity/><allergy-reaction/><allergy-treatment-information/></grid-10-iteration></xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="contact-information-section" bind="contact-information-bind">
+                    <xf:label ref="$form-resources/contact-information/label"/>
+                    <fr:grid id="grid-5-grid" bind="grid-5-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
+                                <xf:label ref="$form-resources/contact-information-first-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-first-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="2" h="1">
+                            <xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
+                                <xf:label ref="$form-resources/contact-information-last-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-last-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="contact-information-phone-control" bind="contact-information-phone-bind">
+                                <xf:label ref="$form-resources/contact-information-phone/label"/>
+                                <xf:hint ref="$form-resources/contact-information-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="3"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-of-birth-control" bind="date-of-birth-bind">
+                                <xf:label ref="$form-resources/date-of-birth/label"/>
+                                <xf:hint ref="$form-resources/date-of-birth/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:date>
+                            
+                        </fr:c><fr:c x="4" y="2" w="3" h="1"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-email-control" bind="contact-information-email-bind">
+                                <xf:label ref="$form-resources/contact-information-email/label"/>
+                                <xf:hint ref="$form-resources/contact-information-email/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </fr:us-phone></fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="email-control" bind="email-bind">
+                                <xf:label ref="$form-resources/email/label"/>
+                                <xf:hint ref="$form-resources/email/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                
+                            </xf:input>
+                        </fr:c>
+                        
+                        
+                    </fr:grid>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="reason-for-your-visit-control" bind="reason-for-your-visit-bind">
+                                <xf:label ref="$form-resources/reason-for-your-visit/label"/>
+                                <xf:hint ref="$form-resources/reason-for-your-visit/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="personal-medical-history-section" bind="personal-medical-history-bind">
+                    <xf:label ref="$form-resources/personal-medical-history/label"/>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="constitutional-control" bind="constitutional-bind">
+                                <xf:label ref="$form-resources/constitutional/label"/>
+                                <xf:hint ref="$form-resources/constitutional/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="constitutional-comment-control" bind="constitutional-comment-bind">
+                                <xf:label ref="$form-resources/constitutional-comment/label"/>
+                                <xf:hint ref="$form-resources/constitutional-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="11" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="psychiatric-control" bind="psychiatric-bind">
+                                <xf:label ref="$form-resources/psychiatric/label"/>
+                                <xf:hint ref="$form-resources/psychiatric/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="11" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="psychiatric-comment-control" bind="psychiatric-comment-bind">
+                                <xf:label ref="$form-resources/psychiatric-comment/label"/>
+                                <xf:hint ref="$form-resources/psychiatric-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="12" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="blood-lymphatic-control" bind="blood-lymphatic-bind">
+                                <xf:label ref="$form-resources/blood-lymphatic/label"/>
+                                <xf:hint ref="$form-resources/blood-lymphatic/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="12" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="blood-lymphatic-comment-control" bind="blood-lymphatic-comment-bind">
+                                <xf:label ref="$form-resources/blood-lymphatic-comment/label"/>
+                                <xf:hint ref="$form-resources/blood-lymphatic-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="13" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="skin-control" bind="skin-bind">
+                                <xf:label ref="$form-resources/skin/label"/>
+                                <xf:hint ref="$form-resources/skin/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="13" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="skin-comment-control" bind="skin-comment-bind">
+                                <xf:label ref="$form-resources/skin-comment/label"/>
+                                <xf:hint ref="$form-resources/skin-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="14" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="cancer-control" bind="cancer-bind">
+                                <xf:label ref="$form-resources/cancer/label"/>
+                                <xf:hint ref="$form-resources/cancer/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="14" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="cancer-comment-control" bind="cancer-comment-bind">
+                                <xf:label ref="$form-resources/cancer-comment/label"/>
+                                <xf:hint ref="$form-resources/cancer-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="15" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="allergic-immunologic-control" bind="allergic-immunologic-bind">
+                                <xf:label ref="$form-resources/allergic-immunologic/label"/>
+                                <xf:hint ref="$form-resources/allergic-immunologic/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="15" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="allergic-immunologic-comment-control" bind="allergic-immunologic-comment-bind">
+                                <xf:label ref="$form-resources/allergic-immunologic-comment/label"/>
+                                <xf:hint ref="$form-resources/allergic-immunologic-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="16" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hormones-endocrine-control" bind="hormones-endocrine-bind">
+                                <xf:label ref="$form-resources/hormones-endocrine/label"/>
+                                <xf:hint ref="$form-resources/hormones-endocrine/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="16" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="hormones-endocrine-comment-control" bind="hormones-endocrine-comment-bind">
+                                <xf:label ref="$form-resources/hormones-endocrine-comment/label"/>
+                                <xf:hint ref="$form-resources/hormones-endocrine-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="17" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="major-illnesses-hospitalizations-control" bind="major-illnesses-hospitalizations-bind">
+                                <xf:label ref="$form-resources/major-illnesses-hospitalizations/label"/>
+                                <xf:hint ref="$form-resources/major-illnesses-hospitalizations/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="17" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="major-illnesses-hospitalizations-comment-control" bind="major-illnesses-hospitalizations-comment-bind">
+                                <xf:label ref="$form-resources/major-illnesses-hospitalizations-comment/label"/>
+                                <xf:hint ref="$form-resources/major-illnesses-hospitalizations-comment/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="18" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="surgeries-control" bind="surgeries-bind">
+                                <xf:label ref="$form-resources/surgeries/label"/>
+                                <xf:hint ref="$form-resources/surgeries/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="18" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="surgeries-comment-control" bind="surgeries-comment-bind">
+                                <xf:label ref="$form-resources/surgeries-comment/label"/>
+                                <xf:hint ref="$form-resources/surgeries-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="10" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="neurological-control" bind="neurological-bind">
+                                <xf:label ref="$form-resources/neurological/label"/>
+                                <xf:hint ref="$form-resources/neurological/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="10" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="neurological-comment-control" bind="neurological-comment-bind">
+                                <xf:label ref="$form-resources/neurological-comment/label"/>
+                                <xf:hint ref="$form-resources/neurological-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="ear-nose-throat-control" bind="ear-nose-throat-bind">
+                                <xf:label ref="$form-resources/ear-nose-throat/label"/>
+                                <xf:hint ref="$form-resources/ear-nose-throat/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="ear-nose-throat-comment-control" bind="ear-nose-throat-comment-bind">
+                                <xf:label ref="$form-resources/ear-nose-throat-comment/label"/>
+                                <xf:hint ref="$form-resources/ear-nose-throat-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="heart-cardiovascular-control" bind="heart-cardiovascular-bind">
+                                <xf:label ref="$form-resources/heart-cardiovascular/label"/>
+                                <xf:hint ref="$form-resources/heart-cardiovascular/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="heart-cardiovascular-comment-control" bind="heart-cardiovascular-comment-bind">
+                                <xf:label ref="$form-resources/heart-cardiovascular-comment/label"/>
+                                <xf:hint ref="$form-resources/heart-cardiovascular-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="lungs-respiratory-control" bind="lungs-respiratory-bind">
+                                <xf:label ref="$form-resources/lungs-respiratory/label"/>
+                                <xf:hint ref="$form-resources/lungs-respiratory/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="4" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="lungs-respiratory-comment-control" bind="lungs-respiratory-comment-bind">
+                                <xf:label ref="$form-resources/lungs-respiratory-comment/label"/>
+                                <xf:hint ref="$form-resources/lungs-respiratory-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="digestion-gastrointestinal-control" bind="digestion-gastrointestinal-bind">
+                                <xf:label ref="$form-resources/digestion-gastrointestinal/label"/>
+                                <xf:hint ref="$form-resources/digestion-gastrointestinal/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="5" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="digestion-gastrointestinal-comment-control" bind="digestion-gastrointestinal-comment-bind">
+                                <xf:label ref="$form-resources/digestion-gastrointestinal-comment/label"/>
+                                <xf:hint ref="$form-resources/digestion-gastrointestinal-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="6" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="muscles-and-bones-musculoskeletal-control" bind="muscles-and-bones-musculoskeletal-bind">
+                                <xf:label ref="$form-resources/muscles-and-bones-musculoskeletal/label"/>
+                                <xf:hint ref="$form-resources/muscles-and-bones-musculoskeletal/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="6" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="muscles-and-bones-musculoskeletal-comment-control" bind="muscles-and-bones-musculoskeletal-comment-bind">
+                                <xf:label ref="$form-resources/muscles-and-bones-musculoskeletal-comment/label"/>
+                                <xf:hint ref="$form-resources/muscles-and-bones-musculoskeletal-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="7" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="urological-control" bind="urological-bind">
+                                <xf:label ref="$form-resources/urological/label"/>
+                                <xf:hint ref="$form-resources/urological/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="7" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="urological-comment-control" bind="urological-comment-bind">
+                                <xf:label ref="$form-resources/urological-comment/label"/>
+                                <xf:hint ref="$form-resources/urological-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="8" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="gynecological-control" bind="gynecological-bind">
+                                <xf:label ref="$form-resources/gynecological/label"/>
+                                <xf:hint ref="$form-resources/gynecological/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="8" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="gynecological-comment-control" bind="gynecological-comment-bind">
+                                <xf:label ref="$form-resources/gynecological-comment/label"/>
+                                <xf:hint ref="$form-resources/gynecological-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="9" w="4">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="breast-control" bind="breast-bind">
+                                <xf:label ref="$form-resources/breast/label"/>
+                                <xf:hint ref="$form-resources/breast/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="5" y="9" w="8">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="breast-comment-control" bind="breast-comment-bind">
+                                <xf:label ref="$form-resources/breast-comment/label"/>
+                                <xf:hint ref="$form-resources/breast-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="year-of-diagnosis-control" bind="year-of-diagnosis-bind">
+                                <xf:label ref="$form-resources/year-of-diagnosis/label"/>
+                                <xf:hint ref="$form-resources/year-of-diagnosis/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="result-time-of-last-blood-sugar-control" bind="result-time-of-last-blood-sugar-bind">
+                                <xf:label ref="$form-resources/result-time-of-last-blood-sugar/label"/>
+                                <xf:hint ref="$form-resources/result-time-of-last-blood-sugar/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="last-hemoglobin-a1c-control" bind="last-hemoglobin-a1c-bind">
+                                <xf:label ref="$form-resources/last-hemoglobin-a1c/label"/>
+                                <xf:hint ref="$form-resources/last-hemoglobin-a1c/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="treatments-control" bind="treatments-bind">
+                                <xf:label ref="$form-resources/treatments/label"/>
+                                <xf:hint ref="$form-resources/treatments/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="family-history-section" bind="family-history-bind">
+                    <xf:label ref="$form-resources/family-history/label"/>
+                    <fr:grid id="grid-4-grid" bind="grid-4-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="systemic-disease-control" appearance="full" bind="systemic-disease-bind">
+                                <xf:label ref="$form-resources/systemic-disease/label"/>
+                                <xf:hint ref="$form-resources/systemic-disease/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                                <xf:itemset ref="$form-resources/systemic-disease/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="other-systemic-diseases-control" bind="other-systemic-diseases-bind">
+                                <xf:label ref="$form-resources/other-systemic-diseases/label"/>
+                                <xf:hint ref="$form-resources/other-systemic-diseases/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-6-grid" bind="grid-6-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="marital-status-control" bind="marital-status-bind">
+                                <xf:label ref="$form-resources/marital-status/label"/>
+                                <xf:hint ref="$form-resources/marital-status/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="living-arrangements-control" bind="living-arrangements-bind">
+                                <xf:label ref="$form-resources/living-arrangements/label"/>
+                                <xf:hint ref="$form-resources/living-arrangements/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="7">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="venereal-disease_sexually-transmitted-infection-control" bind="venereal-disease_sexually-transmitted-infection-bind">
+                                <xf:label ref="$form-resources/venereal-disease_sexually-transmitted-infection/label"/>
+                                <xf:hint ref="$form-resources/venereal-disease_sexually-transmitted-infection/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="8" y="2" w="5"/>
+                        <fr:c x="1" y="3" w="7">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="pregnant-control" bind="pregnant-bind">
+                                <xf:label ref="$form-resources/pregnant/label"/>
+                                <xf:hint ref="$form-resources/pregnant/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="8" y="3" w="5"/>
+                        <fr:c x="1" y="4" w="12">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="occupations-control" bind="occupations-bind">
+                                <xf:label ref="$form-resources/occupations/label"/>
+                                <xf:hint ref="$form-resources/occupations/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="12">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="occupational-exposure-control" bind="occupational-exposure-bind">
+                                <xf:label ref="$form-resources/occupational-exposure/label"/>
+                                <xf:hint ref="$form-resources/occupational-exposure/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="1" y="6" w="12">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="recent-travel-control" bind="recent-travel-bind">
+                                <xf:label ref="$form-resources/recent-travel/label"/>
+                                <xf:hint ref="$form-resources/recent-travel/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="1" y="7" w="12">
+                            <fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="tobacco-use-control" bind="tobacco-use-bind" appearance="full">
+                                <xf:label ref="$form-resources/tobacco-use/label"/>
+                                <xf:hint ref="$form-resources/tobacco-use/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                                <xf:itemset ref="$form-resources/tobacco-use/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </fr:c>
+                        <fr:c x="1" y="8" w="12">
+                            <fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="alcohol-use-control" bind="alcohol-use-bind" appearance="full">
+                                <xf:label ref="$form-resources/alcohol-use/label"/>
+                                <xf:hint ref="$form-resources/alcohol-use/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                                <xf:itemset ref="$form-resources/alcohol-use/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </fr:c>
+                        <fr:c x="1" y="9" w="12">
+                            <fr:open-select1 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="recreational-drug-use-control" bind="recreational-drug-use-bind" appearance="full">
+                                <xf:label ref="$form-resources/recreational-drug-use/label"/>
+                                <xf:hint ref="$form-resources/recreational-drug-use/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                                <xf:itemset ref="$form-resources/recreational-drug-use/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="medications-section" bind="medications-bind">
+                    <xf:label ref="$form-resources/medications/label"/>
+                    <fr:grid id="grid-7-grid" bind="grid-7-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control" bind="control-4-bind">
+                                <fr:text ref="$form-resources/control-4/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-8-grid" bind="grid-8-bind" repeat="content" min="1" template="instance('grid-8-template')" apply-defaults="true" fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="3">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="medication-name-control" bind="medication-name-bind">
+                                <xf:label ref="$form-resources/medication-name/label"/>
+                                <xf:hint ref="$form-resources/medication-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="4" y="1" w="2">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="medication-dose-control" bind="medication-dose-bind">
+                                <xf:label ref="$form-resources/medication-dose/label"/>
+                                <xf:hint ref="$form-resources/medication-dose/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="6" y="1" w="2" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="medication-frequency-control" bind="medication-frequency-bind">
+                                <xf:label ref="$form-resources/medication-frequency/label"/>
+                                <xf:hint ref="$form-resources/medication-frequency/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="8" y="1" w="5" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="medication-other-information-control" bind="medication-other-information-bind">
+                                <xf:label ref="$form-resources/medication-other-information/label"/>
+                                <xf:hint ref="$form-resources/medication-other-information/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="allergies-section" bind="allergies-bind">
+                    <xf:label ref="$form-resources/allergies/label"/>
+                    <fr:grid id="grid-9-grid" bind="grid-9-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-9-control" bind="control-9-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/control-9/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="grid-10-grid" bind="grid-10-bind" repeat="content" min="1" template="instance('grid-10-template')" apply-defaults="true" fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="3">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="allergy-name-control" bind="allergy-name-bind">
+                                <xf:label ref="$form-resources/allergy-name/label"/>
+                                <xf:hint ref="$form-resources/allergy-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="4" y="1" w="2">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="allergy-severity-control" bind="allergy-severity-bind">
+                                <xf:label ref="$form-resources/allergy-severity/label"/>
+                                <xf:hint ref="$form-resources/allergy-severity/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="6" y="1" w="2" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="allergy-reaction-control" bind="allergy-reaction-bind">
+                                <xf:label ref="$form-resources/allergy-reaction/label"/>
+                                <xf:hint ref="$form-resources/allergy-reaction/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="8" y="1" w="5" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="allergy-treatment-information-control" bind="allergy-treatment-information-bind">
+                                <xf:label ref="$form-resources/allergy-treatment-information/label"/>
+                                <xf:hint ref="$form-resources/allergy-treatment-information/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="pharmacy-section" bind="pharmacy-bind">
+                    <xf:label ref="$form-resources/pharmacy/label"/>
+                    <fr:grid id="grid-11-grid" bind="grid-11-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="pharmacy-name-control" bind="pharmacy-name-bind">
+                                <xf:label ref="$form-resources/pharmacy-name/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="pharmacy-phone-control" bind="pharmacy-phone-bind">
+                                <xf:label ref="$form-resources/pharmacy-phone/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:us-phone>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="pharmacy-grid-3-grid" bind="pharmacy-grid-3-bind" tab-order="columns">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="pharmacy-us-address-street-1-control" bind="pharmacy-us-address-street-1-bind" autocomplete="address-line1">
+                                <xf:label ref="$form-resources/pharmacy-us-address-street-1/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-us-address-street-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="pharmacy-us-address-city-control" bind="pharmacy-us-address-city-bind" autocomplete="address-line3">
+                                <xf:label ref="$form-resources/pharmacy-us-address-city/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-us-address-city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+
+                        </fr:c>
+
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input id="pharmacy-us-address-street-2-control" bind="pharmacy-us-address-street-2-bind" autocomplete="address-line2">
+                                <xf:label ref="$form-resources/pharmacy-us-address-street-2/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-us-address-street-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="4">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="pharmacy-us-address-state-control" bind="pharmacy-us-address-state-bind">
+                                <xf:label ref="$form-resources/pharmacy-us-address-state/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-us-address-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </fr:us-state>
+
+
+                        </fr:c>
+                        <fr:c x="11" y="2" w="2" h="1">
+                            <xf:input id="pharmacy-us-address-zip-control" bind="pharmacy-us-address-zip-bind" autocomplete="postal-code">
+                                <xf:label ref="$form-resources/pharmacy-us-address-zip/label"/>
+                                <xf:hint ref="$form-resources/pharmacy-us-address-zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+                        </fr:c>
+                        
+                        
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="signature-and-date-section" bind="signature-and-date-bind">
+                    <xf:label ref="$form-resources/signature-and-date/label"/>
+                    <fr:grid id="grid-12-grid" bind="grid-12-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="signature-control" bind="signature-bind">
+                                <xf:label ref="$form-resources/signature/label"/>
+                                <xf:hint ref="$form-resources/signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="signature-date-control" bind="signature-date-bind">
+                                <xf:label ref="$form-resources/signature-date/label"/>
+                                <xf:hint ref="$form-resources/signature-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="signature-printed-name-control" bind="signature-printed-name-bind">
+                                <xf:label ref="$form-resources/signature-printed-name/label"/>
+                                <xf:hint ref="$form-resources/signature-printed-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

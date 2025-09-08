@@ -37,7 +37,7 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && popd
 
 # Mark orbeon.war for deployment
-RUN touch $DEPLOYMENT_DIR/orbeon.war.dodeploy \
+RUN touch $DEPLOYMENT_DIR/orbeon.war.dodeploy
 
 # Enable gzip compression
 COPY standalone.gzip.xml $CONFIG_DIR/standalone.xml

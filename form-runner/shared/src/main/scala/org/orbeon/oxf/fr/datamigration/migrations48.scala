@@ -22,7 +22,9 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
+import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert, ensureAttribute}
+import org.orbeon.oxf.xforms.model.InstanceData
+import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits.*
@@ -124,6 +126,13 @@ object MigrationOps48 extends MigrationOps {
 
         val contentForEachIteration =
           (container / * toList) map (iteration => (iteration /@ @*) ++ (iteration / Node) toList) // force
+
+        // Mark non-relevant children of removed iteration with `fr:relevant="false"` (#7223)
+        for {
+          saxonNode <- contentForEachIteration.flatten
+          domNode   <- unwrapNode(saxonNode)
+          if ! InstanceData.getInheritedRelevant(domNode)
+        } ensureAttribute(saxonNode, org.orbeon.oxf.fr.XMLNames.FRRelevantQName, "false")
 
         insert(
           after                             = container,

@@ -1,0 +1,133 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+  <xh:head>
+    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+      <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+        <form>
+          <config-section>
+            <config-grid>
+              <show-section>true</show-section>
+              <show-grid>true</show-grid>
+            </config-grid>
+          </config-section>
+          <section>
+            <grid>
+              <control/>
+            </grid>
+          </section>
+        </form>
+      </xf:instance>
+      <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xf:bind id="config-section-bind" ref="config-section" name="config-section">
+          <xf:bind id="config-grid-bind" ref="config-grid" name="config-grid">
+            <xf:bind id="show-grid-bind" ref="show-grid" name="show-grid" type="xf:boolean"/>
+            <xf:bind id="show-section-bind" ref="show-section" name="show-section" type="xf:boolean"/>
+          </xf:bind>
+        </xf:bind>
+        <xf:bind id="section-bind" name="section" ref="section" relevant="$show-section/string() = 'true'">
+          <xf:bind id="grid-bind" ref="grid" name="grid" relevant="$show-grid/string() = 'true'">
+            <xf:bind id="control-bind" ref="control" name="control" type="xf:anyURI"/>
+          </xf:bind>
+        </xf:bind>
+      </xf:bind>
+      <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <metadata>
+          <application-name>{app}</application-name>
+          <form-name>{form}</form-name>
+          <title xml:lang="en">Form Data Attachments API to also include `fr:relevant="false"` if non-relevant through ancestor #6859</title>
+          <description xml:lang="en"/>
+          <grid-tab-order>default</grid-tab-order>
+          <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+          <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+          <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"config-section"}],"newGridElem":{"value":"config-grid"},"afterElem":null,"content":[{"value":"show-section"},{"value":"show-grid"}],"topLevel":true},{"containerPath":[{"value":"section"}],"newGridElem":{"value":"grid"},"afterElem":null,"content":[{"value":"control"}],"topLevel":true}]}</migration>
+          <email>
+            <templates>
+              <template name="default">
+                <headers/>
+                <exclude-from-all-control-values/>
+              </template>
+            </templates>
+            <parameters/>
+          </email>
+        </metadata>
+      </xf:instance>
+      <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+        <resources>
+          <resource xml:lang="en">
+            <show-section>
+              <label>Show section with attachment</label>
+              <hint/>
+            </show-section>
+            <show-grid>
+              <label>Show grid with attachment</label>
+              <hint/>
+            </show-grid>
+            <config-section/>
+            <section>
+              <label>Dynamic Section with Dynamic Grid</label>
+            </section>
+            <grid/>
+            <control>
+              <label>Attachment</label>
+              <hint/>
+            </control>
+            <config-grid/>
+          </resource>
+        </resources>
+      </xf:instance>
+    </xf:model>
+  </xh:head>
+  <xh:body>
+    <fr:view>
+      <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+        <fr:section id="config-section-section" bind="config-section-bind">
+          <fr:grid id="config-grid-grid" bind="config-grid-bind">
+            <fr:c x="1" y="1" w="6">
+              <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="show-section-control" bind="show-section-bind">
+                <xf:label ref="$form-resources/show-section/label"/>
+                <xf:hint ref="$form-resources/show-section/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </xf:input>
+            </fr:c>
+            <fr:c x="7" y="1" w="6"/>
+            <fr:c x="1" y="2" w="6">
+              <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="show-grid-control" bind="show-grid-bind">
+                <xf:label ref="$form-resources/show-grid/label"/>
+                <xf:hint ref="$form-resources/show-grid/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </xf:input>
+            </fr:c>
+            <fr:c x="7" y="2" w="6"/>
+          </fr:grid>
+        </fr:section>
+        <fr:section id="section-section" bind="section-bind">
+          <xf:label ref="$form-resources/section/label"/>
+          <fr:grid id="grid-grid" bind="grid-bind">
+            <fr:c y="1" x="1" w="6">
+              <fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-control" bind="control-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/control/label"/>
+                <xf:hint ref="$form-resources/control/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:attachment>
+            </fr:c>
+            <fr:c y="1" x="7" w="6"/>
+          </fr:grid>
+        </fr:section>
+      </fr:body>
+    </fr:view>
+  </xh:body>
+</xh:html>

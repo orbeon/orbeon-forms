@@ -23,6 +23,8 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
+import org.orbeon.oxf.xforms.model.InstanceData
+import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -116,6 +118,13 @@ object MigrationOps20191 extends MigrationOps {
         result = MigrationResult.Some
 
         val gridContent = content flatMap (p => gridElem child p.value)
+
+        // Mark non-relevant children of removed grid with `fr:relevant="false"` (#7223)
+        for {
+          saxonNode <- gridContent
+          domNode   <- unwrapNode(saxonNode)
+          if ! InstanceData.getInheritedRelevant(domNode)
+        } ensureAttribute(saxonNode, org.orbeon.oxf.fr.XMLNames.FRRelevantQName, "false")
 
         insert(
           after                             = gridElem,

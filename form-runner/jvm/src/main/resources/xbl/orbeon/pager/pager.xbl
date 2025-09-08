@@ -205,7 +205,7 @@
                             </xf:action>
                         </xf:trigger>
                     </xh:li>
-                    <xh:li>
+                    <xh:li class="{'xforms-disabled'[not(fr:component-param-value('show') = 'pages')]}">
                         <xf:select1 appearance="search" ref="instance('fr-paging-instance')/page-number">
                             <xf:itemset ref="1 to instance('fr-paging-instance')/page-count">
                                 <xf:label ref="."/>

@@ -1163,7 +1163,7 @@
 
                             <fr:tab visible="$is-new-form or $is-app-form or $is-form-settings">
 <!--                            <fr:tab visible="$is-app-form or $is-form-settings">-->
-                                <fr:label ref="$resources/general-settings[$is-form-settings]"/>
+                                <fr:label ref="$resources/general-settings[$is-form-settings]/label"/>
 
                                 <xh:div class="alert alert-{{if ($is-new-form or $is-form-settings) then 'info' else 'error'}}">
                                     <xf:output

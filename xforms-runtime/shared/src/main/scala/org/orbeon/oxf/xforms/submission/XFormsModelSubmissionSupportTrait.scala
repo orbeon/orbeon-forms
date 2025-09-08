@@ -146,10 +146,15 @@ trait XFormsModelSubmissionSupportTrait {
   ): Unit = {
     // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
     // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3568.
-    val isNonRelevantSupportAnnotationIfPresent: Node => Boolean =
-      relevantAttOpt                          map
-        isLocallyNonRelevantSupportAnnotation getOrElse
-        isLocallyNonRelevant _
+    def isNonRelevantSupportAnnotationIfPresent(node: Node): Boolean = {
+      def nonRelevantDirectly     : Boolean = ! InstanceData.getLocalRelevant(node)
+      def nonRelevantByAnnotation : Boolean =
+        (relevantAttOpt, node) match {
+          case (Some(relevantAtt), element: Element) => element.attributeValueOpt(relevantAtt).contains(false.toString)
+          case _ => false
+        }
+      nonRelevantDirectly || nonRelevantByAnnotation
+    }
 
     relevanceHandling match {
       case RelevanceHandling.Keep | RelevanceHandling.Empty =>
@@ -334,17 +339,6 @@ trait XFormsModelSubmissionSupportTrait {
                   httpMethod == HttpMethod.LOCK || httpMethod == HttpMethod.UNLOCK => ContentTypes.XmlContentType
         case _ if httpMethod == HttpMethod.GET  || httpMethod == HttpMethod.DELETE => "application/x-www-form-urlencoded"
       }
-
-    def isLocallyNonRelevant(node: Node): Boolean =
-      ! InstanceData.getLocalRelevant(node)
-
-    // NOTE: Optimize by not calling `getInheritedRelevant`, as we go from root to leaf. Also, we know
-    // that MIPs are not stored on `Document` and other nodes.
-    def isLocallyNonRelevantSupportAnnotation(attQname: QName): Node => Boolean = {
-      case e: Element   => ! InstanceData.getLocalRelevant(e) || (e.attributeValueOpt(attQname) contains false.toString)
-      case a: Attribute => ! InstanceData.getLocalRelevant(a)
-      case _            => false
-    }
 
     def pruneNonRelevantNodes(doc: Document, isLocallyNonRelevant: Node => Boolean): Unit = {
 

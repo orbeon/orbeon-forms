@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import scala.async.Async.*
-import scala.concurrent.duration.{FiniteDuration, _}
+import scala.concurrent.duration.{FiniteDuration, *}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success, Try}

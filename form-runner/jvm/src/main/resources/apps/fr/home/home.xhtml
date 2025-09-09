@@ -145,7 +145,15 @@
                             ref="instance()/search-options/local/form-name/@match"
                             value="$fr-search-form-match"/>
                     </xf:action>
-                    <xf:action if="exists($fr-search-app-opt) or exists($fr-search-form-opt)">
+
+                    <xf:var
+                        name="show-search-options-because-property"
+                        value="xs:string(xxf:property('oxf.fr.home.search-options-opened-on-load')) = 'true'"/>
+                    <xf:var
+                        name="show-search-options-because-app-form-provided"
+                        value="exists($fr-search-app-opt) or exists($fr-search-form-opt)"/>
+
+                    <xf:action if="$show-search-options-because-property or $show-search-options-because-app-form-provided">
                         <xf:toggle case="fr-search-options-shown"/>
                     </xf:action>
 

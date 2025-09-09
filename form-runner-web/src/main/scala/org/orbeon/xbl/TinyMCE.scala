@@ -17,6 +17,7 @@ import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.facades.TinyMce.*
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport.*
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
@@ -115,8 +116,13 @@ object TinyMCE {
 
         withInitializedTinyMce { tinyMceObject =>
 
-          // Send value to the server on blur
+          // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
           tinyMceObject.on("blur", _ => clientToServer())
+          tinyMceObject.getBody().addEventListener(
+            DomEventNames.KeyDown,
+            (e: dom.KeyboardEvent) =>
+              if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
+          )
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
           tinyMceInitialized = true

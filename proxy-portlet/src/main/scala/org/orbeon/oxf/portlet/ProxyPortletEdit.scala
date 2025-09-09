@@ -103,7 +103,7 @@ trait ProxyPortletEdit extends GenericPortlet {
     getPreference(request, pref).getOrElse(throw new PortletException(s"Preference `${pref.nameLabel.name}` not set"))
 
   def getBooleanPreference(request: PortletRequest, pref: Pref): Boolean =
-    getPreference(request, pref).contains("true")
+    getPreference(request, pref).contains(true.toString)
 
   // Very simple preferences editor
   override def doEdit(request: RenderRequest, response: RenderResponse): Unit =

@@ -16,6 +16,8 @@ package org.orbeon.oxf.portlet
 import org.orbeon.oxf.fr.embedding.APISupport
 import org.scalatest.funspec.AnyFunSpec
 
+import scala.util.Try
+
 
 class EmbeddingApiSupportTest extends AnyFunSpec {
 
@@ -114,5 +116,56 @@ class EmbeddingApiSupportTest extends AnyFunSpec {
       it(s"must reject `$r`") {
         assert(sanitizeResourceId(r, FormRunnerResourcePath).isEmpty)
       }
+  }
+
+  describe("#7227: Proxy portlet: filter out non-configured paths") {
+
+    val Configurations = List(
+      ("home",    "acme", "sales") -> List(
+        "/"                         -> false,
+        "/fr/"                      -> true,
+        "/fr/acme/sales/new"        -> true,
+        "/fr/acme/sales/summary"    -> true,
+        "/fr/acme/sales/edit/12345" -> true,
+        "/fr/acme/sales/view/12345" -> true,
+        "/fr/acme/sales/import"     -> false,
+        "/fr/admin"                 -> false,
+        "/fr/forms"                 -> false,
+      ),
+      ("summary", "acme", "sales") -> List(
+        "/"                         -> false,
+        "/fr/"                      -> false,
+        "/fr/acme/sales/new"        -> true,
+        "/fr/acme/sales/summary"    -> true,
+        "/fr/acme/sales/edit/12345" -> true,
+        "/fr/acme/sales/view/12345" -> true,
+        "/fr/acme/sales/import"     -> false,
+        "/fr/admin"                 -> false,
+        "/fr/forms"                 -> false,
+      ),
+      ("new",     "acme", "sales") -> List(
+        "/"                         -> false,
+        "/fr/"                      -> false,
+        "/fr/acme/sales/new"        -> true,
+        "/fr/acme/sales/summary"    -> false,
+        "/fr/acme/sales/edit/12345" -> false,
+        "/fr/acme/sales/view/12345" -> false,
+        "/fr/acme/sales/import"     -> false,
+        "/fr/admin"                 -> false,
+        "/fr/forms"                 -> false,
+      ),
+    )
+
+    for {
+      ((configuredPage, configuredAppName, configuredFormName), paths) <- Configurations
+      (incomingPath, expected)                                         <- paths
+      configuredReadonly                                               <- List(true, false)
+    } locally {
+      it(s"must return $expected for incoming path `$incomingPath` with configuration page=`$configuredPage`, app=`$configuredAppName`, form=`$configuredFormName`, readonly=`$configuredReadonly`") {
+        assert(
+          Try(OrbeonProxyPortlet.makePath(incomingPath, configuredPage, Some(configuredAppName), Some(configuredFormName), configuredReadonly)).isSuccess == expected
+        )
+      }
+    }
   }
 }

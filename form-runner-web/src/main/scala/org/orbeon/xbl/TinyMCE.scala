@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI, Page}
+import org.orbeon.xforms.{$, DocumentAPI, Page, EventListenerSupport}
 import org.scalajs.dom
 import org.scalajs.dom.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -72,6 +72,7 @@ object TinyMCE {
 
     var tinyMceObjectOpt  : Option[TinyMceEditor] = None
     var tinyMceInitialized: Boolean               = false
+    private object EventSupport extends EventListenerSupport
 
     override def init(): Unit = {
 
@@ -118,10 +119,10 @@ object TinyMCE {
 
           // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
           tinyMceObject.on("blur", _ => clientToServer())
-          tinyMceObject.getBody().addEventListener(
+          EventSupport.addListener[dom.KeyboardEvent](
+            tinyMceObject.getBody(),
             DomEventNames.KeyDown,
-            (e: dom.KeyboardEvent) =>
-              if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
+            (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
           )
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
@@ -145,10 +146,12 @@ object TinyMCE {
       }
     }
 
-    override def destroy(): Unit =
-      tinyMceObjectOpt foreach { tinyMceObject =>
+    override def destroy(): Unit = {
+      EventSupport.clearAllListeners()
+      tinyMceObjectOpt foreach { _ =>
         // TODO: How to clean-up? API is unclear. `remove()`?
       }
+    }
 
     // Send value in MCE to server
     private def clientToServer(): Unit =

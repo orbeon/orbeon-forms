@@ -375,7 +375,7 @@ class PropertySet private (
   def getDateOpt       (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDateQname)    .map(_.asInstanceOf[ju.Date])
   def getDateTimeOpt   (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDatetimeQname).map(_.asInstanceOf[ju.Date])
   def getQNameOpt      (name: String): Option[QName]          = getPropertyValueOpt(name, SomeXsQnameQname)   .map(_.asInstanceOf[QName])
-  def getObjectOpt     (name: String): Option[AnyRef]         = getPropertyValueOpt(name, null)
+  def getObjectOpt     (name: String): Option[AnyRef]         = getPropertyValueOpt(name, None)
 
   def getPattern(propertyName: String, default: String): Pattern =
     getPatternOpt(propertyName)

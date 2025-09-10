@@ -34,34 +34,7 @@ object XFormsFunction extends CommonFunctionSupport {
   def currentLocale(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Locale =
     currentLangOpt match {
       case Some(lang) =>
-        // Not sure how xml:lang should be parsed, see:
-        //
-        // XML spec points to:
-        //
-        // - http://tools.ietf.org/html/rfc4646
-        // - http://tools.ietf.org/html/rfc4647
-        //
-        // NOTES:
-        //
-        // - IETF BCP 47 replaces RFC 4646 (and includes RFC 5646 and RFC 4647)
-        // - Java 7 has an improved Locale class which supports parsing BCP 47
-        //
-        // http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html#forLanguageTag(java.lang.String)
-        // http://www.w3.org/International/articles/language-tags/
-        // http://sites.google.com/site/openjdklocale/design-specification
-        // IETF BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
-
-        def getLocale(lang: String) = {
-          val hyphen = lang.indexOf("-")
-          val (language, country) =
-            if (hyphen < 1)
-              (lang, "")
-            else
-              (lang.substring(1, hyphen), lang.substring(hyphen + 1))
-          new Locale(language, country)
-        }
-
-        getLocale(lang)
+        Locale.forLanguageTag(lang)
       case None =>
         Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
   }

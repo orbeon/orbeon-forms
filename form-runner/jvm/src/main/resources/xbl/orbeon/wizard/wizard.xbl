@@ -310,7 +310,7 @@
 
                 <xsl:variable
                     name="static-sections-with-paging-section-ids"
-                    select="/*//fr:section[@page-size = '1']/@id/string()"/>
+                    select="/*//fr:section[@page-size = '1' and not(@wizard-paging = 'false')]/@id/string()"/>
 
                 <xsl:variable
                     name="static-sections-with-paging-case-ids"

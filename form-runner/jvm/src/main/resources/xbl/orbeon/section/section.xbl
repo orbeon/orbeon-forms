@@ -245,7 +245,7 @@
 
                                                         <!-- Paging is only available at runtime, not design-time -->
                                                         <xsl:if test="not($editable)">
-                                                            <xsl:copy-of select="$root/@page-size"/>
+                                                            <xsl:copy-of select="$root/@page-size | $root/@wizard-paging"/>
                                                         </xsl:if>
 
                                                         <xsl:apply-templates select="fr:short-label | fr:iteration-label | fr:add-iteration-label"/>

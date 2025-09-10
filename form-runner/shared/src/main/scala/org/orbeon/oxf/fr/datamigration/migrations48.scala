@@ -18,11 +18,12 @@ import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.*
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext}
+import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert, ensureAttribute}
+import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, ensureAttribute, insert}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.saxon.om.NodeInfo
@@ -129,9 +130,10 @@ object MigrationOps48 extends MigrationOps {
 
         // Mark non-relevant children of removed iteration with `fr:relevant="false"` (#7223)
         for {
-          saxonNode <- contentForEachIteration.flatten
-          domNode   <- unwrapNode(saxonNode)
-          if ! InstanceData.getInheritedRelevant(domNode)
+          saxonNode  <- contentForEachIteration.flatten
+          domNode    <- unwrapNode(saxonNode)
+          domElement <- CollectionUtils.collectByErasedType[org.orbeon.dom.Element](domNode)
+          if ! InstanceData.getInheritedRelevant(domElement)
         } ensureAttribute(saxonNode, org.orbeon.oxf.fr.XMLNames.FRRelevantQName, "false")
 
         insert(

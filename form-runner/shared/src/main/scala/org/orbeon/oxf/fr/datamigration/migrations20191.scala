@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.*
 import org.orbeon.oxf.fr.{DataFormatVersion, InDocFormRunnerDocContext}
+import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
@@ -121,9 +122,10 @@ object MigrationOps20191 extends MigrationOps {
 
         // Mark non-relevant children of removed grid with `fr:relevant="false"` (#7223)
         for {
-          saxonNode <- gridContent
-          domNode   <- unwrapNode(saxonNode)
-          if ! InstanceData.getInheritedRelevant(domNode)
+          saxonNode  <- gridContent
+          domNode    <- unwrapNode(saxonNode)
+          domElement <- CollectionUtils.collectByErasedType[org.orbeon.dom.Element](domNode)
+          if ! InstanceData.getInheritedRelevant(domElement)
         } ensureAttribute(saxonNode, org.orbeon.oxf.fr.XMLNames.FRRelevantQName, "false")
 
         insert(

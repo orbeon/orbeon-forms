@@ -32,6 +32,7 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.BasicNamespaceMapping
 import org.orbeon.xforms.XFormsNames.{XFBindQName, XFORMS_BIND_QNAME, XFORMS_SHORT_PREFIX}
+import shapeless.syntax.typeable.typeableOps
 
 
 
@@ -132,7 +133,7 @@ object MigrationOps48 extends MigrationOps {
         for {
           saxonNode  <- contentForEachIteration.flatten
           domNode    <- unwrapNode(saxonNode)
-          domElement <- CollectionUtils.collectByErasedType[org.orbeon.dom.Element](domNode)
+          domElement <- domNode.cast[org.orbeon.dom.Element]
           if ! InstanceData.getInheritedRelevant(domElement)
         } ensureAttribute(saxonNode, org.orbeon.oxf.fr.XMLNames.FRRelevantQName, "false")
 

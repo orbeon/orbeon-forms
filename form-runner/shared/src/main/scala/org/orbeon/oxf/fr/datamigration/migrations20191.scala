@@ -30,6 +30,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.*
+import shapeless.syntax.typeable.typeableOps
 
 import scala.util.{Failure, Success}
 
@@ -124,7 +125,7 @@ object MigrationOps20191 extends MigrationOps {
         for {
           saxonNode  <- gridContent
           domNode    <- unwrapNode(saxonNode)
-          domElement <- CollectionUtils.collectByErasedType[org.orbeon.dom.Element](domNode)
+          domElement <- domNode.cast[org.orbeon.dom.Element]
           if ! InstanceData.getInheritedRelevant(domElement)
         } ensureAttribute(saxonNode, org.orbeon.oxf.fr.XMLNames.FRRelevantQName, "false")
 

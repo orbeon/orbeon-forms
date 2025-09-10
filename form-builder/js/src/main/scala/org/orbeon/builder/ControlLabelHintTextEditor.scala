@@ -34,6 +34,7 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import org.orbeon.fr.FormRunnerUtils
 
 import scala.scalajs.js
 
@@ -84,7 +85,7 @@ object ControlLabelHintTextEditor {
       // Click on label/hint
       document.addEventListener(DomEventNames.Click, (event: dom.Event) => {
         event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
-          val isViewMode = FormBuilderPrivateAPI.isViewMode(labelHint)
+          val isViewMode = FormRunnerUtils.isViewMode(labelHint)
           if (! isViewMode) {
             // Close current editor, if there is one open
             resourceEditorEndEdit()

@@ -26,6 +26,7 @@ import io.udash.wrappers.jquery.JQuery
 
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import org.orbeon.fr.FormRunnerUtils
 
 
 object SectionGridEditor {
@@ -69,7 +70,7 @@ object SectionGridEditor {
       },
       becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
-        val isViewMode        = FormBuilderPrivateAPI.isViewMode(sectionGridBody.el.elem)
+        val isViewMode        = FormRunnerUtils.isViewMode(sectionGridBody.el.elem)
 
         // Position the editor
         sectionGridEditorContainer.show()

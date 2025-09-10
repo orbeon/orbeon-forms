@@ -23,6 +23,7 @@ import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.orbeon.fr.FormRunnerAPI
+import org.orbeon.fr.FormRunnerUtils
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -183,7 +184,7 @@ object LabelEditor {
               container.addEventListener(
                 "click",
                 (e: dom.Event) => {
-                  val isViewMode = FormBuilderPrivateAPI.isViewMode(e.targetT)
+                  val isViewMode = FormRunnerUtils.isViewMode(e.targetT)
                   if (! isViewMode)
                     showLabelEditor($(e.targetT))
                 }
@@ -191,7 +192,7 @@ object LabelEditor {
               container.addEventListener(
                 "mouseover",
                 (e: dom.Event) => {
-                  val isViewMode = FormBuilderPrivateAPI.isViewMode(e.targetT)
+                  val isViewMode = FormRunnerUtils.isViewMode(e.targetT)
                   if (! isViewMode) {
                     updateHighlight(
                       (cssClass: String, el: JQuery) => { el.addClass(cssClass); () },

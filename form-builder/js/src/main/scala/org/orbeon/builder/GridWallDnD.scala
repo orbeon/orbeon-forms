@@ -27,6 +27,7 @@ import io.udash.wrappers.jquery.JQuery
 import org.scalajs.dom
  
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import org.orbeon.fr.FormRunnerUtils
 
 import scala.collection.mutable
 import scala.scalajs.js
@@ -69,7 +70,7 @@ object GridWallDnD {
         },
         becomesCurrent = (cell: Block) => {
           currentCellOpt = Some(cell)
-          val isViewMode        = FormBuilderPrivateAPI.isViewMode(cell.el.elem)
+          val isViewMode        = FormRunnerUtils.isViewMode(cell.el.elem)
           if (! DndShadow.isDragging && ! isViewMode)
             DndSides.show(cell)
         }

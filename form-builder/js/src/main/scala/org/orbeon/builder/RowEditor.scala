@@ -30,6 +30,7 @@ import org.scalajs.dom
 
 import scala.collection.immutable
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import org.orbeon.fr.FormRunnerUtils
 
 
 object RowEditor {
@@ -71,7 +72,7 @@ object RowEditor {
 
       case class TopBottom(top: Double, bottom: Double)
 
-      if (! FormBuilderPrivateAPI.isViewMode(currentGridBody.el.elem)) {
+      if (! FormRunnerUtils.isViewMode(currentGridBody.el.elem)) {
 
         // For each row track, find its top/bottom
         val rowsTopBottom = {

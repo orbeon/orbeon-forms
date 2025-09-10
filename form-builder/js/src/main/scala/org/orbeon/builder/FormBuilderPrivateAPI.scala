@@ -70,7 +70,4 @@ object FormBuilderPrivateAPI extends js.Object {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
     }
 
-  def isViewMode(formElement: html.Element): Boolean =
-    formElement.closestOpt(".fr-mode-view").nonEmpty
-
 }

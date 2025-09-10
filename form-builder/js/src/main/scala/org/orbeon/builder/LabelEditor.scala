@@ -183,7 +183,7 @@ object LabelEditor {
               container.addEventListener(
                 "click",
                 (e: dom.Event) => {
-                  val isViewMode = FormRunnerAPI.getForm(e.targetT).isViewMode()
+                  val isViewMode = FormBuilderPrivateAPI.isViewMode(e.targetT)
                   if (! isViewMode)
                     showLabelEditor($(e.targetT))
                 }
@@ -191,7 +191,7 @@ object LabelEditor {
               container.addEventListener(
                 "mouseover",
                 (e: dom.Event) => {
-                  val isViewMode = FormRunnerAPI.getForm(e.targetT).isViewMode()
+                  val isViewMode = FormBuilderPrivateAPI.isViewMode(e.targetT)
                   if (! isViewMode) {
                     updateHighlight(
                       (cssClass: String, el: JQuery) => { el.addClass(cssClass); () },

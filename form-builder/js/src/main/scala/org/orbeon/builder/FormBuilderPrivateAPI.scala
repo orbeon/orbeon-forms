@@ -17,6 +17,7 @@ import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Support}
 import org.scalajs.dom
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -68,4 +69,8 @@ object FormBuilderPrivateAPI extends js.Object {
     } locally {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
     }
+
+  def isViewMode(formElement: html.Element): Boolean =
+    formElement.closestOpt(".fr-mode-view").nonEmpty
+
 }

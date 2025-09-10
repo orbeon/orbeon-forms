@@ -24,7 +24,7 @@ import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import io.udash.wrappers.jquery.JQuery
-import org.orbeon.fr.FormRunnerAPI
+ 
 import org.orbeon.web.DomSupport.DomEventOps
 import org.scalajs.dom
 
@@ -71,8 +71,7 @@ object RowEditor {
 
       case class TopBottom(top: Double, bottom: Double)
 
-      val form = FormRunnerAPI.getForm(currentGridBody.el.elem)
-      if (form != null && ! form.isViewMode()) {
+      if (! FormBuilderPrivateAPI.isViewMode(currentGridBody.el.elem)) {
 
         // For each row track, find its top/bottom
         val rowsTopBottom = {

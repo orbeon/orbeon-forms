@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import io.udash.wrappers.jquery.JQuery
-import org.orbeon.fr.FormRunnerAPI
+
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -69,8 +69,7 @@ object SectionGridEditor {
       },
       becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
-        val formRunnerFormOpt = Option(FormRunnerAPI.getForm(sectionGridBody.el.elem))
-        val isViewMode        = formRunnerFormOpt.exists(_.isViewMode())
+        val isViewMode        = FormBuilderPrivateAPI.isViewMode(sectionGridBody.el.elem)
 
         // Position the editor
         sectionGridEditorContainer.show()

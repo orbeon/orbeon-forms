@@ -25,7 +25,7 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQuery
 import org.scalajs.dom
-import org.orbeon.fr.FormRunnerAPI
+ 
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.collection.mutable
@@ -69,8 +69,7 @@ object GridWallDnD {
         },
         becomesCurrent = (cell: Block) => {
           currentCellOpt = Some(cell)
-          val formRunnerFormOpt = Option(FormRunnerAPI.getForm(cell.el.elem))
-          val isViewMode        = formRunnerFormOpt.exists(_.isViewMode())
+          val isViewMode        = FormBuilderPrivateAPI.isViewMode(cell.el.elem)
           if (! DndShadow.isDragging && ! isViewMode)
             DndSides.show(cell)
         }

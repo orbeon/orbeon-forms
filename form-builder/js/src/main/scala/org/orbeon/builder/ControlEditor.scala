@@ -21,7 +21,7 @@ import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.fr.{Cell, ControlOps}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.*
-import org.orbeon.fr.FormRunnerAPI
+ 
 
 import scala.scalajs.js
 import org.orbeon.xforms.rpc.RpcClient
@@ -101,8 +101,7 @@ object ControlEditor {
         elem -> name
 
     val firstControlElemWithNameOpt = controlElemWithNames.headOption
-    val formRunnerFormOpt           = Option(FormRunnerAPI.getForm(cell.el.elem))
-    val isViewMode                  = formRunnerFormOpt.exists(_.isViewMode())
+    val isViewMode                  = FormBuilderPrivateAPI.isViewMode(cell.el.elem)
 
     // Control/right editor is only show when the cell isn't empty
     firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>

@@ -27,7 +27,7 @@ package object jquery {
 
     @inline private def asJsAny(body: => Any): js.Any = { body; () }
 
-    def elem          : html.Element                   = j.get(0).asInstanceOf[html.Element]
+    def elem          : html.Element                   = headElem.get
     def headElem      : Option[html.Element]           = j.get(0).map(_.asInstanceOf[html.Element])
     def elems         : List[html.Element]             = j.get().toList.collect { case e: html.Element => e }
     def headJQuery    : Option[JQuery]                 = j.length > 0 option j.first()

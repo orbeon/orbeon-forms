@@ -84,7 +84,7 @@ object ControlLabelHintTextEditor {
       // Click on label/hint
       document.addEventListener(DomEventNames.Click, (event: dom.Event) => {
         event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
-          val isViewMode = FormRunnerAPI.getForm(labelHint).isViewMode()
+          val isViewMode = FormBuilderPrivateAPI.isViewMode(labelHint)
           if (! isViewMode) {
             // Close current editor, if there is one open
             resourceEditorEndEdit()

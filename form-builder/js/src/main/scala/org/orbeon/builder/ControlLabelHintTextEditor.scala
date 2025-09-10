@@ -86,12 +86,15 @@ object ControlLabelHintTextEditor {
         event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
           val isViewMode = FormRunnerAPI.getForm(labelHint).isViewMode()
           if (! isViewMode) {
+            // Close current editor, if there is one open
             resourceEditorEndEdit()
             jResourceEditorCurrentLabelHint = $(labelHint)
+            // Find control for this label
             resourceEditorCurrentControlOpt =
               Some(
                 labelHint.ancestorOrSelfElem(".fr-grid-th").nextOption() match {
                   case Some(_) =>
+                    // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
                     jResourceEditorCurrentLabelHint
                   case None =>
                     labelHint.closestOpt(ExplanationSelector)

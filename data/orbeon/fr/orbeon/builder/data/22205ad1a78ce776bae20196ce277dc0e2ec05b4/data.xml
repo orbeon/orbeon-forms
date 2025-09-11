@@ -288,7 +288,6 @@
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
                     <library-versions>
-                        <orbeon>1</orbeon>
                         <_>1</_>
                     </library-versions>
 

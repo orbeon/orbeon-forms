@@ -33,7 +33,7 @@
                     <updated-with-version>2021.1.4.202208011854 PE</updated-with-version>
                     <updated-with-version>2021.1.6.202211071741 PE</updated-with-version><updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
-                    <library-versions><_>1</_><orbeon>1</orbeon></library-versions>
+                    <library-versions><_>1</_></library-versions>
 
                 <thumbnail filename="screenshot.webp" mediatype="image/webp" size="78406">/fr/service/persistence/crud/orbeon/builder/data/8fcdfe4ff49218923b6599ec9c7bb91488fcdf1a/9337d06aa456ea8ffa32b35544e56a084eab0f94.bin</thumbnail><data-migration>enabled</data-migration><email><templates><template name="default" xml:lang="en"><headers><header name="to" type="control-value">treasurer-email-address</header><header name="cc" type="control-value">payee-email</header></headers><subject>Payment authorization/request for reimbursement</subject><body mediatype="text/html">&lt;div&gt;Please find attached the PDF of the
                                 request. Make sure to check with the requester that the request is legitimate, and to

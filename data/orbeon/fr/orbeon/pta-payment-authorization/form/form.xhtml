@@ -29,12 +29,12 @@
 &lt;ul&gt;&lt;li&gt;the use of a PDF template&lt;/li&gt;&lt;li&gt;setting checkboxes in a PDF template&lt;/li&gt;&lt;li&gt;handwritten signatures&lt;/li&gt;&lt;li&gt;the use of the Multiple Attachments form control&lt;/li&gt;&lt;li&gt;a closed-by-default section, which could be entirely hidden if you add permissions to this form&lt;/li&gt;&lt;/ul&gt;
 &lt;/div&gt;</description>
                     <created-with-version>2019.2.2.202003311635 PE</created-with-version>
-                    
-                    
-                    
-                    
-                    <library-versions><orbeon>1</orbeon></library-versions>
-                    
+
+
+
+
+                    <library-versions/>
+
                 <thumbnail filename="screenshot.webp" mediatype="image/webp" size="78406">/fr/service/persistence/crud/orbeon/pta-payment-authorization/form/9337d06aa456ea8ffa32b35544e56a084eab0f94.bin</thumbnail><data-migration>enabled</data-migration><email><templates><template name="default" xml:lang="en"><headers><header name="to" type="control-value">treasurer-email-address</header><header name="cc" type="control-value">payee-email</header></headers><subject>Payment authorization/request for reimbursement</subject><body mediatype="text/html">&lt;div&gt;Please find attached the PDF of the
                                 request. Make sure to check with the requester that the request is legitimate, and to
                                 obtain the documentation such as invoices and receipts. You can &lt;a href="{$link}"&gt;view
@@ -67,8 +67,8 @@
                             <label>Payee</label>
                         </payee><school-section><label>School</label></school-section><expenditure><label>Expenditure</label></expenditure><treasurer><label>For PTA Treasurer Use</label></treasurer>
                         <payee-name><label>Name of Payee</label><hint/>
-                            
-                            
+
+
 
                         </payee-name><pta-position><label>PTA Position</label><hint/></pta-position><payee-address><label>Address</label><hint/></payee-address><payee-city><label>City</label><hint/></payee-city><payee-zip><label>Zip</label><hint/></payee-zip><payee-phone><label>Phone</label><hint/></payee-phone><payee-email><label>Email</label><hint>An email will be sent to the payee</hint></payee-email><grid-3/>
                     </resource>
@@ -85,13 +85,13 @@
               <fr:c x="1" y="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="school-control" bind="school-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/school/label"/>
                         <xf:hint ref="$form-resources/school/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c><fr:c x="7" y="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="treasurer-email-address-control" bind="treasurer-email-address-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/treasurer-email-address/label"/>
                         <xf:hint ref="$form-resources/treasurer-email-address/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c>
             </fr:grid></fr:section><fr:section id="payee-section" bind="payee-bind">
                     <xf:label ref="$form-resources/payee/label"/>

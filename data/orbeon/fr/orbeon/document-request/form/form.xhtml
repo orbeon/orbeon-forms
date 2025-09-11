@@ -7,20 +7,31 @@
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <requester-section>
-                        <contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5>
+                        <contact-information><grid-5>
+                            <contact-information-first-name/>
+                            <contact-information-middle-initial/>
+                            <contact-information-last-name/>
+                            <contact-information-phone/>
+                            <contact-information-email/>
+                        </grid-5>
+
 
 
                         </contact-information>
                         <address-us><grid-3>
-                            <us-address-street-1/><us-address-city/>
+                            <us-address-street-1/>
+                            <us-address-city/>
 
 
-                            <us-address-street-2/><us-address-state/><us-address-zip/>
+                            <us-address-street-2/>
+                            <us-address-state/>
+                            <us-address-zip/>
 
 
                             <us-address-urbanization/>
 
                         </grid-3>
+
 
 
                         </address-us>
@@ -65,7 +76,10 @@
 
 
 
-                <thumbnail filename="document-request.webp" mediatype="image/webp" size="32358">/fr/service/persistence/crud/orbeon/document-request/form/af03cda4bc3749f5b545d9b23ea715ae53d3a383.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"requested-documents"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"document-type"},{"value":"quantity"}],"topLevel":true},{"containerPath":[{"value":"requester-section"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"},{"value":"control-4"}],"topLevel":false},{"containerPath":[{"value":"requester-section"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false}]}</migration></metadata>
+                    <thumbnail filename="document-request.webp" mediatype="image/webp" size="32358">/fr/service/persistence/crud/orbeon/document-request/form/af03cda4bc3749f5b545d9b23ea715ae53d3a383.bin</thumbnail>
+                    <allow-template-use>true</allow-template-use>
+
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"requested-documents"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"document-type"},{"value":"quantity"}],"topLevel":true},{"containerPath":[{"value":"requester-section"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-middle-initial"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"}],"topLevel":false},{"containerPath":[{"value":"requester-section"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false}]}</migration></metadata>
             </xf:instance>
 
 
@@ -77,7 +91,9 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
-                        <document-type><label>Document Type</label><hint/>
+                        <document-type>
+                            <label>Document Type</label>
+                            <hint/>
 
 
                             <item>
@@ -96,7 +112,9 @@
                                 <value>privacy-policies</value>
                             </item>
                         </document-type>
-                        <quantity><label>Number of documents</label><hint/>
+                        <quantity>
+                            <label>Number of documents</label>
+                            <hint/>
 
 
                             <item>
@@ -143,12 +161,15 @@
                 </resources>
             </xf:instance>
 
-        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" id="_-address-us-component" element="component|address-us" class="fr-section-component"><xbl:implementation><xf:model id="address-us-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><address-us>
+        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"><xbl:binding xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" id="_-address-us-component" element="component|address-us" class="fr-section-component"><xbl:implementation><xf:model id="address-us-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><address-us>
                         <grid-3>
-                            <us-address-street-1/><us-address-city/>
+                            <us-address-street-1/>
+                            <us-address-city/>
 
 
-                            <us-address-street-2/><us-address-state/><us-address-zip/>
+                            <us-address-street-2/>
+                            <us-address-state/>
+                            <us-address-zip/>
 
 
                             <us-address-urbanization/>
@@ -160,7 +181,10 @@
 
 
 
-                        <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/><xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/><xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state"/><xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/>
+                        <xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                        <xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state"/>
+                        <xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
 
                     </xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><address-us>
                             <label>US address</label>
@@ -183,7 +207,7 @@
                         </us-address-state><us-address-city>
                             <label>City</label>
                             <hint/>
-                        </us-address-city></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-us-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-address-us-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / address-us / v</xh:div><xf:label ref="$form-resources/address-us/label"/><fr:grid id="grid-3-grid" bind="grid-3-bind" tab-order="columns">
+                        </us-address-city></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-us-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-address-us-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / address-us / v</xh:div><fr:grid id="grid-3-grid" bind="grid-3-bind" tab-order="columns">
                         <fr:c x="1" y="1" w="6">
                             <xf:input id="us-address-street-1-control" bind="us-address-street-1-bind" autocomplete="address-line1">
                                 <xf:label ref="$form-resources/us-address-street-1/label"/>
@@ -193,7 +217,8 @@
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="1" w="6"><xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
                                 <xf:label ref="$form-resources/us-address-city/label"/>
                                 <xf:hint ref="$form-resources/us-address-city/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -212,7 +237,8 @@
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="2" w="4"><fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="us-address-state-control" bind="us-address-state-bind">
+                        <fr:c x="7" y="2" w="4">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="us-address-state-control" bind="us-address-state-bind">
                                 <xf:label ref="$form-resources/us-address-state/label"/>
                                 <xf:hint ref="$form-resources/us-address-state/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -221,17 +247,21 @@
                             </fr:us-state>
 
 
-                        </fr:c><fr:c x="11" y="2" w="2" h="1"><xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
+                        </fr:c>
+                        <fr:c x="11" y="2" w="2" h="1">
+                            <xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
                                 <xf:label ref="$form-resources/us-address-zip/label"/>
                                 <xf:hint ref="$form-resources/us-address-zip/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:input></fr:c>
+                            </xf:input>
+                        </fr:c>
                         <fr:c x="1" y="3" w="6">
 
                         </fr:c>
-                        <fr:c x="7" y="3" w="6"><xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
+                        <fr:c x="7" y="3" w="6">
+                            <xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
                                 <xf:label ref="$form-resources/us-address-urbanization/label"/>
                                 <xf:hint ref="$form-resources/us-address-urbanization/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -240,34 +270,83 @@
                             </xf:input>
 
                         </fr:c>
-                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" id="_-contact-information-component" element="component|contact-information" class="fr-section-component"><xbl:implementation><xf:model id="contact-information-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5></contact-information></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:email" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/></xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><contact-information><label>Contact information</label></contact-information><contact-information-first-name><label>First Name</label><hint/></contact-information-first-name><contact-information-phone><label>Last Name</label><hint/></contact-information-phone><contact-information-email><label>Phone number</label><hint/></contact-information-email><control-4><label>Email</label><hint/></control-4><contact-information-last-name><label>Middle initial</label><hint/></contact-information-last-name></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="contact-information-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-contact-information-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / contact-information / v</xh:div><xf:label ref="$form-resources/contact-information/label"/><fr:grid id="grid-5-grid" bind="grid-5-bind">
-              <fr:c x="1" y="1" w="4"><xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
-                        <xf:label ref="$form-resources/contact-information-first-name/label"/>
-                        <xf:hint ref="$form-resources/contact-information-first-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" id="_-contact-information-component" element="component|contact-information" class="fr-section-component"><xbl:implementation><xf:model id="contact-information-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><contact-information>
+                        <grid-5>
+                            <contact-information-first-name/>
+                            <contact-information-middle-initial/>
+                            <contact-information-last-name/>
+                            <contact-information-phone/>
+                            <contact-information-email/>
+                        </grid-5>
+                    </contact-information></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                        <xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" constraint=". = '' or matches(., '^\d{10}$')"/>
+                        <xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" type="xf:email" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-middle-initial-bind" ref="contact-information-middle-initial" name="contact-information-middle-initial" xxf:whitespace="trim"/>
+                    </xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><contact-information>
+                            <label>Contact information</label>
+                        </contact-information><contact-information-first-name>
+                            <label>First Name</label>
+                            <hint/>
+                        </contact-information-first-name><contact-information-last-name><label>Last Name</label><hint/>
 
 
-                    </xf:input></fr:c><fr:c x="5" y="1" w="2" h="1"><xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
-                        <xf:label ref="$form-resources/contact-information-last-name/label"/>
-                        <xf:hint ref="$form-resources/contact-information-last-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        </contact-information-last-name><contact-information-phone><label>Phone number</label><hint/>
 
 
-                    </xf:input></fr:c><fr:c x="7" y="1" w="6"><xf:input id="contact-information-phone-control" bind="contact-information-phone-bind">
-                        <xf:label ref="$form-resources/contact-information-phone/label"/>
-                        <xf:hint ref="$form-resources/contact-information-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        </contact-information-phone><contact-information-email><label>Email</label><hint/>
 
 
-                    </xf:input></fr:c><fr:c x="1" y="2" w="6"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-email-control" bind="contact-information-email-bind">
-                        <xf:label ref="$form-resources/contact-information-email/label"/>
-                        <xf:hint ref="$form-resources/contact-information-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        </contact-information-email><contact-information-middle-initial><label>Middle initial</label><hint/>
 
 
-                    </fr:us-phone></fr:c><fr:c x="7" y="2" w="6"><xf:input id="control-4-control" bind="control-4-bind">
-                        <xf:label ref="$form-resources/control-4/label"/>
-                        <xf:hint ref="$form-resources/control-4/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        </contact-information-middle-initial></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/><xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"/></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"/><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())" ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="contact-information-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('_-contact-information-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"/>_ / contact-information / v</xh:div><fr:grid id="grid-5-grid" bind="grid-5-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
+                                <xf:label ref="$form-resources/contact-information-first-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-first-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </xf:input></fr:c>
-            </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="2" h="1">
+                            <xf:input id="contact-information-middle-initial-control" bind="contact-information-middle-initial-bind">
+                                <xf:label ref="$form-resources/contact-information-middle-initial/label"/>
+                                <xf:hint ref="$form-resources/contact-information-middle-initial/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
+                                <xf:label ref="$form-resources/contact-information-last-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-last-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-phone-control" bind="contact-information-phone-bind">
+                                <xf:label ref="$form-resources/contact-information-phone/label"/>
+                                <xf:hint ref="$form-resources/contact-information-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="contact-information-email-control" bind="contact-information-email-bind">
+                                <xf:label ref="$form-resources/contact-information-email/label"/>
+                                <xf:hint ref="$form-resources/contact-information-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
     </xh:head>
     <xh:body>
         <fr:view>
@@ -290,7 +369,8 @@
                                     <fr:summary-show/>
                                 </fr:index>
                                 <xf:label ref="$form-resources/document-type/label"/>
-                                <xf:hint ref="$form-resources/document-type/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/document-type/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                                 <xf:itemset ref="$form-resources/document-type/item">
@@ -306,7 +386,8 @@
                                     <fr:summary-show/>
                                 </fr:index>
                                 <xf:label ref="$form-resources/quantity/label"/>
-                                <xf:hint ref="$form-resources/quantity/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/quantity/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
                                 <xf:itemset ref="$form-resources/quantity/item">
@@ -315,7 +396,8 @@
                                     <xf:hint ref="hint"/>
                                 </xf:itemset>
                             </xf:select1>
-                        </fr:c><fr:c x="10" y="1" w="3" h="1"/>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="3" h="1"/>
                     </fr:grid>
                 </fr:section>
             </fr:body>

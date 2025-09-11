@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
                     <requester-section>
-                        <contact-information><contact-information-first-name>Homer</contact-information-first-name><contact-information-last-name/><contact-information-phone>Simpson</contact-information-phone><contact-information-email/><control-4>chunkylover53@aol.com</control-4>
+                        <contact-information><contact-information-first-name>Homer</contact-information-first-name><contact-information-middle-initial/><contact-information-last-name>Simpson</contact-information-last-name><contact-information-phone/><contact-information-email>chunkylover53@aol.com</contact-information-email>
 
 
                         </contact-information>
@@ -10,7 +10,7 @@
                         </address-us>
 
                     </requester-section>
-                    <requested-documents>
-                        <document-type>product-brochure</document-type><quantity>3</quantity>
+                    <requested-documents><document-type>product-brochure</document-type><quantity>3</quantity>
+
                     </requested-documents>
                 </form>

@@ -54,9 +54,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   override def init(): Unit = {
     val isStaticReadonly = containerElem.querySelector(".xforms-static") != null
-    if (! isStaticReadonly)
+    val elementWithData  = queryElementWithData
+    if (! isStaticReadonly && ! elementWithData.classList.contains("xforms-disabled"))
       for (select <- Option(querySelect)) {
-        val elementWithData = queryElementWithData
         val isDatabound     = containerElem.classList.contains(DataboundClass)
 
         // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,

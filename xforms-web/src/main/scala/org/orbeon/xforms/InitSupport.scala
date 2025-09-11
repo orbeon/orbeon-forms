@@ -34,6 +34,7 @@ import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import java.io.StringWriter
 import scala.collection.mutable as m
@@ -190,7 +191,12 @@ object InitSupport {
 
     // Actually Run the initialization
     implicit def runtime: IORuntime = IORuntime.global
-    initIo.unsafeToFuture()
+    initIo.unsafeToFuture().onComplete {
+      case scala.util.Failure(t) =>
+        logger.error(s"error during form initialization for `${initializations.namespacedFormId}`/`${initializations.uuid}`")
+        throw t
+      case scala.util.Success(_) =>
+    }
   }
 
   def liferayF: Future[Unit] = {

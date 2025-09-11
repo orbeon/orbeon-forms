@@ -42,7 +42,7 @@ private object Property {
 
 class Property extends XFormsFunction with RuntimeDependentFunction with AddToPathMap {
 
-  import Property._
+  import Property.*
 
   private var arg: Either[(String, String), Map[String, String]] = null
 

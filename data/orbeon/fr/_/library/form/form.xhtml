@@ -8,10 +8,13 @@
                 <form>
                     <address-us>
                         <grid-3>
-                            <us-address-street-1/><us-address-city/>
+                            <us-address-street-1/>
+                            <us-address-city/>
 
 
-                            <us-address-street-2/><us-address-state/><us-address-zip/>
+                            <us-address-street-2/>
+                            <us-address-state/>
+                            <us-address-zip/>
 
 
                             <us-address-urbanization/>
@@ -28,7 +31,16 @@
 
 
                         </grid-2>
-                    </address-uk><contact-information><grid-5><contact-information-first-name/><contact-information-last-name/><contact-information-phone/><contact-information-email/><control-4/></grid-5></contact-information>
+                    </address-uk>
+                    <contact-information>
+                        <grid-5>
+                            <contact-information-first-name/>
+                            <contact-information-middle-initial/>
+                            <contact-information-last-name/>
+                            <contact-information-phone/>
+                            <contact-information-email/>
+                        </grid-5>
+                    </contact-information>
                 </form>
             </xf:instance>
 
@@ -41,7 +53,10 @@
 
 
 
-                        <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/><xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/><xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state"/><xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/>
+                        <xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                        <xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state"/>
+                        <xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
 
                     </xf:bind>
                 </xf:bind>
@@ -55,7 +70,16 @@
                         <xf:bind id="uk-address-town-bind" ref="uk-address-town" name="uk-address-town" xxf:whitespace="trim" required="true()" constraint="xxf:max-length(35)" calculate="upper-case(.)" readonly="false()"/>
                         <xf:bind id="uk-address-postcode-bind" ref="uk-address-postcode" name="uk-address-postcode" xxf:whitespace="trim" required="true()" constraint="xxf:max-length(8)" calculate="upper-case(.)" readonly="false()"/>
                     </xf:bind>
-                </xf:bind><xf:bind id="contact-information-bind" ref="contact-information" name="contact-information"><xf:bind id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" constraint=". = '' or matches(., '^\d{10}$')"/><xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:email" xxf:whitespace="trim" required="true()"/><xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim"/></xf:bind></xf:bind>
+                </xf:bind>
+                <xf:bind id="contact-information-bind" ref="contact-information" name="contact-information">
+                    <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                        <xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" constraint=". = '' or matches(., '^\d{10}$')"/>
+                        <xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" type="xf:email" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-middle-initial-bind" ref="contact-information-middle-initial" name="contact-information-middle-initial" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
             </xf:bind>
 
 
@@ -68,8 +92,13 @@
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
 
                     <grid-tab-order>default</grid-tab-order>
-                    <library-versions/>
-                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":true},{"containerPath":[{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":true},{"containerPath":[{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"},{"value":"control-4"}],"topLevel":true}]}</migration></metadata>
+                    <library-versions><orbeon>2</orbeon><_>1</_>
+
+                    </library-versions>
+
+
+
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":true},{"containerPath":[{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":true},{"containerPath":[{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-middle-initial"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
 
@@ -80,11 +109,32 @@
 
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
-                    <resource xml:lang="en"><contact-information-first-name><label>First Name</label><hint/></contact-information-first-name><contact-information-last-name><label>Middle initial</label><hint/></contact-information-last-name><contact-information-phone><label>Last Name</label><hint/></contact-information-phone><contact-information-email><label>Phone number</label><hint/></contact-information-email><control-4><label>Email</label><hint/></control-4>
+                    <resource xml:lang="en">
+                        <contact-information-first-name>
+                            <label>First Name</label>
+                            <hint/>
+                        </contact-information-first-name>
+                        <contact-information-middle-initial><label>Middle initial</label><hint/>
+
+
+                        </contact-information-middle-initial>
+                        <contact-information-last-name><label>Last Name</label><hint/>
+
+
+                        </contact-information-last-name>
+                        <contact-information-phone><label>Phone number</label><hint/>
+
+
+                        </contact-information-phone>
+                        <contact-information-email><label>Email</label><hint/>
+
+
+                        </contact-information-email>
                         <us-address-street-1>
                             <label>Street address</label>
                             <hint/>
-                        </us-address-street-1><us-address-city>
+                        </us-address-street-1>
+                        <us-address-city>
                             <label>City</label>
                             <hint/>
                         </us-address-city>
@@ -93,10 +143,12 @@
                         <us-address-street-2>
                             <label>Street address line 2</label>
                             <hint/>
-                        </us-address-street-2><us-address-state>
+                        </us-address-street-2>
+                        <us-address-state>
                             <label>State, territory, or military post</label>
                             <hint/>
-                        </us-address-state><us-address-zip>
+                        </us-address-state>
+                        <us-address-zip>
                             <label>Zip code</label>
                             <hint/>
                         </us-address-zip>
@@ -135,7 +187,10 @@
                         <uk-address-locality>
                             <label>Locality</label>
                             <hint/>
-                        </uk-address-locality><contact-information><label>Contact information</label></contact-information>
+                        </uk-address-locality>
+                        <contact-information>
+                            <label>Contact information</label>
+                        </contact-information>
                         <grid-3/>
                         <grid-2/>
 
@@ -148,8 +203,9 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                <fr:section id="address-us-section" bind="address-us-bind"><xf:label ref="$form-resources/address-us/label"/>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="address-us-section" bind="address-us-bind">
+                    <xf:label ref="$form-resources/address-us/label"/>
 
 
                     <fr:grid id="grid-3-grid" bind="grid-3-bind" tab-order="columns">
@@ -162,7 +218,8 @@
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="1" w="6"><xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
                                 <xf:label ref="$form-resources/us-address-city/label"/>
                                 <xf:hint ref="$form-resources/us-address-city/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -181,7 +238,8 @@
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="2" w="4"><fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-address-state-control" bind="us-address-state-bind">
+                        <fr:c x="7" y="2" w="4">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="us-address-state-control" bind="us-address-state-bind">
                                 <xf:label ref="$form-resources/us-address-state/label"/>
                                 <xf:hint ref="$form-resources/us-address-state/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -190,17 +248,21 @@
                             </fr:us-state>
 
 
-                        </fr:c><fr:c x="11" y="2" w="2" h="1"><xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
+                        </fr:c>
+                        <fr:c x="11" y="2" w="2" h="1">
+                            <xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
                                 <xf:label ref="$form-resources/us-address-zip/label"/>
                                 <xf:hint ref="$form-resources/us-address-zip/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:input></fr:c>
+                            </xf:input>
+                        </fr:c>
                         <fr:c x="1" y="3" w="6">
 
                         </fr:c>
-                        <fr:c x="7" y="3" w="6"><xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
+                        <fr:c x="7" y="3" w="6">
+                            <xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
                                 <xf:label ref="$form-resources/us-address-urbanization/label"/>
                                 <xf:hint ref="$form-resources/us-address-urbanization/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -266,34 +328,56 @@
 
 
                     </fr:grid>
-                </fr:section><fr:section id="contact-information-section" bind="contact-information-bind"><xf:label ref="$form-resources/contact-information/label"/><fr:grid id="grid-5-grid" bind="grid-5-bind">
-              <fr:c x="1" y="1" w="4"><xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
-                        <xf:label ref="$form-resources/contact-information-first-name/label"/>
-                        <xf:hint ref="$form-resources/contact-information-first-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </xf:input></fr:c><fr:c x="5" y="1" w="2" h="1"><xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
-                        <xf:label ref="$form-resources/contact-information-last-name/label"/>
-                        <xf:hint ref="$form-resources/contact-information-last-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </xf:input></fr:c><fr:c x="7" y="1" w="6"><xf:input id="contact-information-phone-control" bind="contact-information-phone-bind">
-                        <xf:label ref="$form-resources/contact-information-phone/label"/>
-                        <xf:hint ref="$form-resources/contact-information-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </xf:input></fr:c><fr:c x="1" y="2" w="6"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="contact-information-email-control" bind="contact-information-email-bind">
-                        <xf:label ref="$form-resources/contact-information-email/label"/>
-                        <xf:hint ref="$form-resources/contact-information-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:us-phone></fr:c><fr:c x="7" y="2" w="6"><xf:input id="control-4-control" bind="control-4-bind">
-                        <xf:label ref="$form-resources/control-4/label"/>
-                                <xf:hint ref="$form-resources/control-4/hint"/>
-
+                </fr:section>
+                <fr:section id="contact-information-section" bind="contact-information-bind">
+                    <xf:label ref="$form-resources/contact-information/label"/>
+                    <fr:grid id="grid-5-grid" bind="grid-5-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind">
+                                <xf:label ref="$form-resources/contact-information-first-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-first-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xf:input></fr:c>
-            </fr:grid></fr:section>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="2" h="1">
+                            <xf:input id="contact-information-middle-initial-control" bind="contact-information-middle-initial-bind">
+                                <xf:label ref="$form-resources/contact-information-middle-initial/label"/>
+                                <xf:hint ref="$form-resources/contact-information-middle-initial/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind">
+                                <xf:label ref="$form-resources/contact-information-last-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-last-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="contact-information-phone-control" bind="contact-information-phone-bind">
+                                <xf:label ref="$form-resources/contact-information-phone/label"/>
+                                <xf:hint ref="$form-resources/contact-information-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="contact-information-email-control" bind="contact-information-email-bind">
+                                <xf:label ref="$form-resources/contact-information-email/label"/>
+                                <xf:hint ref="$form-resources/contact-information-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
             </fr:body>
         </fr:view>
     </xh:body>

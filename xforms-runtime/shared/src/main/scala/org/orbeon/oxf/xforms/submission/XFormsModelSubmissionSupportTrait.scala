@@ -147,13 +147,13 @@ trait XFormsModelSubmissionSupportTrait {
     // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
     // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3568.
     def isNonRelevantSupportAnnotationIfPresent(node: Node): Boolean = {
-      def nonRelevantDirectly     : Boolean = ! InstanceData.getLocalRelevant(node)
+      def nonRelevantLocally      : Boolean = ! InstanceData.getLocalRelevant(node)
       def nonRelevantByAnnotation : Boolean =
         (relevantAttOpt, node) match {
           case (Some(relevantAtt), element: Element) => element.attributeValueOpt(relevantAtt).contains(false.toString)
           case _ => false
         }
-      nonRelevantDirectly || nonRelevantByAnnotation
+      nonRelevantLocally || nonRelevantByAnnotation
     }
 
     relevanceHandling match {

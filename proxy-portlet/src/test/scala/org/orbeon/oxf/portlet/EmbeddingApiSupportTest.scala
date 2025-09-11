@@ -16,12 +16,10 @@ package org.orbeon.oxf.portlet
 import org.orbeon.oxf.fr.embedding.APISupport
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.util.Try
-
 
 class EmbeddingApiSupportTest extends AnyFunSpec {
 
-  import APISupport._
+  import APISupport.*
 
   val Versioned = "0f55c3fc5685f7ed8e45e4e18f1ab8912ecb227c/"
 
@@ -122,48 +120,100 @@ class EmbeddingApiSupportTest extends AnyFunSpec {
 
     val Configurations = List(
       ("home",    "acme", "sales") -> List(
-        "/"                         -> false,
-        "/fr/"                      -> true,
-        "/fr/acme/sales/new"        -> true,
-        "/fr/acme/sales/summary"    -> true,
-        "/fr/acme/sales/edit/12345" -> true,
-        "/fr/acme/sales/view/12345" -> true,
-        "/fr/acme/sales/import"     -> false,
-        "/fr/admin"                 -> false,
-        "/fr/forms"                 -> false,
+        // Root pages
+        "/"                                -> (false, false),
+        "/fr/"                             -> (true,  false),
+        // Configured form
+        "/fr/acme/sales/new"               -> (true,  false),
+        "/fr/acme/sales/summary"           -> (true,  false),
+        "/fr/acme/sales/edit/12345"        -> (true,  false),
+        "/fr/acme/sales/view/12345"        -> (true,  false),
+        "/fr/acme/sales/pdf/12345"         -> (false, true),
+        "/fr/service/acme/sales/pdf/12345" -> (false, false),
+        "/fr/acme/sales/import"            -> (false, false),
+        // Other app/form
+        "/fr/acme/order/new"               -> (true,  false),
+        "/fr/acme/order/summary"           -> (true,  false),
+        "/fr/acme/order/edit/12345"        -> (true,  false),
+        "/fr/acme/order/view/12345"        -> (true,  false),
+        "/fr/acme/order/pdf/12345"         -> (false, true),
+        "/fr/service/acme/order/pdf/12345" -> (false, false),
+        // Other pages
+        "/fr/acme/order/import"            -> (false, false),
+        "/fr/admin"                        -> (false, false),
+        "/fr/forms"                        -> (false, false),
       ),
       ("summary", "acme", "sales") -> List(
-        "/"                         -> false,
-        "/fr/"                      -> false,
-        "/fr/acme/sales/new"        -> true,
-        "/fr/acme/sales/summary"    -> true,
-        "/fr/acme/sales/edit/12345" -> true,
-        "/fr/acme/sales/view/12345" -> true,
-        "/fr/acme/sales/import"     -> false,
-        "/fr/admin"                 -> false,
-        "/fr/forms"                 -> false,
+         // Root pages
+        "/"                                -> (false, false),
+        "/fr/"                             -> (false, false),
+        // Configured form
+        "/fr/acme/sales/new"               -> (true,  false),
+        "/fr/acme/sales/summary"           -> (true,  false),
+        "/fr/acme/sales/edit/12345"        -> (true,  false),
+        "/fr/acme/sales/view/12345"        -> (true,  false),
+        "/fr/acme/sales/pdf/12345"         -> (false, true),
+        "/fr/service/acme/sales/pdf/12345" -> (false, false),
+        // Other app/form
+        "/fr/acme/order/new"               -> (false, false),
+        "/fr/acme/order/summary"           -> (false, false),
+        "/fr/acme/order/edit/12345"        -> (false, false),
+        "/fr/acme/order/view/12345"        -> (false, false),
+        "/fr/acme/order/pdf/12345"         -> (false, false),
+        "/fr/service/acme/order/pdf/12345" -> (false, false),
+        // Other pages
+        "/fr/acme/sales/import"            -> (false, false),
+        "/fr/admin"                        -> (false, false),
+        "/fr/forms"                        -> (false, false),
       ),
       ("new",     "acme", "sales") -> List(
-        "/"                         -> false,
-        "/fr/"                      -> false,
-        "/fr/acme/sales/new"        -> true,
-        "/fr/acme/sales/summary"    -> false,
-        "/fr/acme/sales/edit/12345" -> false,
-        "/fr/acme/sales/view/12345" -> false,
-        "/fr/acme/sales/import"     -> false,
-        "/fr/admin"                 -> false,
-        "/fr/forms"                 -> false,
+         // Root pages
+        "/"                                -> (false, false),
+        "/fr/"                             -> (false, false),
+        // Configured form
+        "/fr/acme/sales/new"               -> (true,  false),
+        "/fr/acme/sales/summary"           -> (false, false),
+        "/fr/acme/sales/edit/12345"        -> (false, false),
+        "/fr/acme/sales/view/12345"        -> (false, false),
+        "/fr/acme/sales/pdf/12345"         -> (false, false),
+        "/fr/service/acme/sales/pdf/12345" -> (false, false),
+        // Other app/form
+        "/fr/acme/order/new"               -> (false, false),
+        "/fr/acme/order/summary"           -> (false, false),
+        "/fr/acme/order/edit/12345"        -> (false, false),
+        "/fr/acme/order/view/12345"        -> (false, false),
+        "/fr/acme/order/pdf/12345"         -> (false, false),
+        "/fr/service/acme/order/pdf/12345" -> (false, false),
+        // Other pages
+        "/fr/acme/sales/import"            -> (false, false),
+        "/fr/admin"                        -> (false, false),
+        "/fr/forms"                        -> (false, false),
       ),
     )
 
     for {
       ((configuredPage, configuredAppName, configuredFormName), paths) <- Configurations
-      (incomingPath, expected)                                         <- paths
+      (incomingPath, (expectedForRender, expectedForResource))         <- paths
       configuredReadonly                                               <- List(true, false)
     } locally {
-      it(s"must return $expected for incoming path `$incomingPath` with configuration page=`$configuredPage`, app=`$configuredAppName`, form=`$configuredFormName`, readonly=`$configuredReadonly`") {
+      it(s"must return $expectedForRender/$expectedForResource for incoming path `$incomingPath` with configuration page=`$configuredPage`, app=`$configuredAppName`, form=`$configuredFormName`, readonly=`$configuredReadonly`") {
         assert(
-          Try(OrbeonProxyPortlet.makePath(incomingPath, configuredPage, Some(configuredAppName), Some(configuredFormName), configuredReadonly)).isSuccess == expected
+          OrbeonProxyPortlet.sanitizeRenderPath(
+            incomingPath       = incomingPath,
+            configuredPage     = configuredPage,
+            configuredAppName  = Some(configuredAppName),
+            configuredFormName = Some(configuredFormName),
+            configuredReadonly = configuredReadonly
+          ).isDefined == expectedForRender
+        )
+        assert(
+          OrbeonProxyPortlet.sanitizeResourcePath(
+            incomingPath       = incomingPath,
+            resourcePathRegex  = APISupport.DefaultFormRunnerResourcePath.r,
+            configuredPage     = configuredPage,
+            configuredAppName  = Some(configuredAppName),
+            configuredFormName = Some(configuredFormName)
+          ).isDefined == expectedForResource
         )
       }
     }

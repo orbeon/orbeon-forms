@@ -380,20 +380,23 @@ object APISupport {
       )
     """
 
-  // Resources are whitelisted to prevent unauthorized access to pages
-  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[String] = {
+  // First level of sanitation: parse, normalize and keep the path only
+  def sanitizeAsUrlNoParents(s: String): Option[String] = {
 
-    // First level of sanitation: parse, normalize and keep the path only
-    def sanitizeResourcePath(s: String) =
+    def sanitizeResourcePath(s: String): String =
       new java.net.URI(s).normalize().getPath
 
-    def hasNoParent(s: String) =
+    def hasNoParent(s: String): Boolean =
       ! s.contains("/..") && ! s.contains("../")
 
-    Option(s).map(sanitizeResourcePath).filter(hasNoParent).collect {
+    Option(s).map(sanitizeResourcePath).filter(hasNoParent)
+  }
+
+  // Resources are whitelisted to prevent unauthorized access to pages
+  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[String] =
+    sanitizeAsUrlNoParents(s).collect {
       case FormRunnerResourcePath(resourcePath) => resourcePath
     }
-  }
 
   private object Private {
 

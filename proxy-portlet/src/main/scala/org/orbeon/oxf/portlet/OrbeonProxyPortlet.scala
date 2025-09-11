@@ -20,9 +20,9 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.embedding.*
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
@@ -41,7 +41,7 @@ import scala.util.matching.Regex
  */
 class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with BufferedPortlet {
 
-  import OrbeonProxyPortlet._
+  import OrbeonProxyPortlet.*
 
   private case class PortletSettings(
     forwardHeaders     : Map[String, String], // lowercase name -> original name
@@ -136,7 +136,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     settingsOpt foreach { settings =>
       withRootException("view render", new PortletException(_)) {
 
-        implicit val ctx = new ProxyPortletEmbeddingContextWithResponse(
+        implicit val ctx: ProxyPortletEmbeddingContextWithResponse = new ProxyPortletEmbeddingContextWithResponse(
           settings,
           getPortletContext,
           request,
@@ -171,7 +171,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   private def doViewAction(request: ActionRequest, response: ActionResponse): Unit =
     settingsOpt foreach { settings =>
       withRootException("view action", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContext(
+        implicit val ctx: PortletEmbeddingContext = new PortletEmbeddingContext(
           getPortletContext,
           request,
           response,
@@ -191,7 +191,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       withRootException("resource", new PortletException(_)) {
 
         // Use this context so that URLs in XML responses are rewritten with `keep-parameters` as well
-        implicit val ctx = new ProxyPortletEmbeddingContextWithResponse(
+        implicit val ctx: ProxyPortletEmbeddingContextWithResponse = new ProxyPortletEmbeddingContextWithResponse(
           settings,
           getPortletContext,
           request,
@@ -199,7 +199,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings.httpClient
         )
 
-        APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePathRegex) match {
+        sanitizeResourcePath(
+          request.getResourceID,
+          settings.FormRunnerResourcePathRegex,
+          getPreferenceOrRequestedOrThrow(request, Page),
+          getPreferenceOrRequested       (request, AppName),
+          getPreferenceOrRequested       (request, FormName)
+        )  match {
           case Some(sanitizedResourcePath) =>
             val url = APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
 
@@ -250,13 +256,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       .getOrElse(throw new PortletException(s"Preference `${pref.nameLabel.name}` is required"))
 
   private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
-    // Determine URL based on preferences and request
-    val path = {
+
+    val incomingOrDefaultPath = {
 
       def pathParameterOpt: Option[String] =
         Option(request.getRenderParameters.getValue(WSRPSupport.PathParameterName))
 
-      def defaultPath =
+      def defaultPath: String =
         if (getPreference(request, Page).contains("home"))
           APISupport.formRunnerHomePath(None)
         else
@@ -268,24 +274,33 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             getPreferenceOrRequested(request, Draft).map(v => s"draft=${v == true.toString}")
           )
 
-      // Note that by default, we disable evaluation of "requested" parameters, so all configurations come from
-      // preferences
-      makePath(
-        pathParameterOpt.getOrElse(defaultPath),
+      pathParameterOpt.getOrElse(defaultPath)
+    }
+
+    // Determine URL based on preferences and request
+    // Note that by default, we disable evaluation of "requested" parameters, so all configurations come from
+    // preferences
+    val sanitizedPathOpt =
+      sanitizeRenderPath(
+        incomingOrDefaultPath,
         getPreferenceOrRequestedOrThrow(request, Page),
         getPreferenceOrRequested       (request, AppName),
         getPreferenceOrRequested       (request, FormName),
         getBooleanPreference           (request, ReadOnly)
       )
-    }
 
-    newRequestDetails(
-      settings,
-      request,
-      contentFromRequest(request, namespace),
-      APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), path, embeddable = true),
-      path
-    )
+    sanitizedPathOpt match {
+      case Some(path) =>
+        newRequestDetails(
+          settings,
+          request,
+          contentFromRequest(request, namespace),
+          APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), path, embeddable = true),
+          path
+        )
+      case None =>
+        throw new PortletException(s"Unsupported incoming path: `$incomingOrDefaultPath` (for configured page `${getPreferenceOrRequestedOrThrow(request, Page)}`)")
+    }
   }
 
   // This obtains the portal query from the original servlet request. We used to use `javax.servlet.forward.query_string`, but that
@@ -432,9 +447,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 private[portlet] object OrbeonProxyPortlet {
 
   // Paths with optional query string
-  val FormRunnerHomePathRegex             : Regex = """/fr/(\?(.*))?""".r
-  val FormRunnerNewSummaryPathRegex       : Regex = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
-  val FormRunnerEditViewDocumentPathRegex : Regex = """/fr/([^/]+)/([^/]+)/(edit|view)/([^/?]+)?(\?(.*))?""".r
+  private val FormRunnerHomePathRegex             : Regex = """/fr/(\?(.*))?""".r
+  private val FormRunnerNewSummaryPathRegex       : Regex = """/fr/([^/]+)/([^/]+)/(new|summary)(?:\?(.*))?""".r
+  private val FormRunnerEditViewDocumentPathRegex : Regex = """/fr/([^/]+)/([^/]+)/(edit|view)/([^/?]+)?(?:\?(.*))?""".r
+  private val FormRunnerPdfTiffDocumentPathRegex  : Regex = """/fr/([^/]+)/([^/]+)/(pdf|tiff)/([^/?]+)?(?:\?(.*))?""".r
 
   def withRootException[T](action: String, newException: Throwable => Exception)(body: => T)(implicit ctx: PortletContext): T =
     try body
@@ -444,13 +460,13 @@ private[portlet] object OrbeonProxyPortlet {
         throw newException(Exceptions.getRootThrowable(t))
     }
 
- def makePath(
+  def sanitizeRenderPath(
     incomingPath      : String,
     configuredPage    : String,
     configuredAppName : Option[String],
     configuredFormName: Option[String],
     configuredReadonly: Boolean
-  ): String = {
+  ): Option[String] = {
 
     def filterMode(mode: FormRunnerMode): FormRunnerMode =
       if (configuredReadonly && mode == FormRunnerMode.Edit)
@@ -458,36 +474,76 @@ private[portlet] object OrbeonProxyPortlet {
       else
         mode
 
-    def checkAppFormAllowed(configuredPage: String, appName: String, formName: String): Boolean =
-      configuredPage == "home" || (
-        configuredAppName.contains(appName) &&
-          configuredFormName.contains(formName)
-        )
+    val sanitizedPath =
+      APISupport.sanitizeAsUrlNoParents(incomingPath)
+        .getOrElse(throw new PortletException(s"Invalid incoming path: `$incomingPath`"))
 
-    // LATER: Could add `/forms` page
-    val AllowedPagesForConfiguration = Map(
-      "home"    -> Set("landing", "summary", "new", "edit", "view"),
-      "summary" -> Set("summary", "new", "edit", "view"),
-      "new"     -> Set("new")
-    )
-
-    def checkPageAllowed(requestedPage: String, configuredPage: String): Boolean =
-      AllowedPagesForConfiguration.get(configuredPage).exists(_.contains(requestedPage))
-
-    (incomingPath, configuredPage) match {
-        case (path @ Constants.XFormsServerSubmit, _) =>
-          path
-        case (FormRunnerNewSummaryPathRegex(appName, formName, mode @ ("new" | "summary"), _, query), configuredPage)
-          if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, appName, formName) =>
-            APISupport.formRunnerPath(appName, formName, mode, None, Option(query))
-        case (FormRunnerEditViewDocumentPathRegex(appName, formName, mode @ ("edit" | "view"), documentId, _, query), configuredPage)
-          if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, appName, formName) =>
-            APISupport.formRunnerPath(appName, formName, filterMode(FormRunnerMode.withName(mode)).entryName, Some(documentId), Option(query))
-        case (FormRunnerHomePathRegex(_, query), "home") =>
-          APISupport.formRunnerHomePath(Option(query))
-        case otherPath =>
-          throw new PortletException(s"Unsupported incoming path: `$otherPath`")
-      }
+    (sanitizedPath, configuredPage) match {
+      case (path @ Constants.XFormsServerSubmit, _) =>
+        Some(path)
+      case (FormRunnerNewSummaryPathRegex(appName, formName, mode @ ("new" | "summary"), query), configuredPage)
+        if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName) =>
+        Some(APISupport.formRunnerPath(appName, formName, mode, None, Option(query)))
+      case (FormRunnerEditViewDocumentPathRegex(appName, formName, mode @ ("edit" | "view"), documentId, query), configuredPage)
+        if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName) =>
+        Some(APISupport.formRunnerPath(appName, formName, filterMode(FormRunnerMode.withName(mode)).entryName, Some(documentId), Option(query)))
+      case (FormRunnerHomePathRegex(_, query), "home") =>
+        Some(APISupport.formRunnerHomePath(Option(query)))
+      case _ =>
+        None
+    }
   }
 
+  def sanitizeResourcePath(
+    incomingPath      : String,
+    resourcePathRegex : Regex,
+    configuredPage    : String,
+    configuredAppName : Option[String],
+    configuredFormName: Option[String],
+  ): Option[String] =
+    APISupport.sanitizeResourceId(incomingPath, resourcePathRegex)
+      .filter(
+        rejectPdfTiffPathIfDisallowed(
+          _,
+          configuredPage,
+          configuredAppName,
+          configuredFormName
+        )
+      )
+
+  private def rejectPdfTiffPathIfDisallowed(
+    incomingPath      : String,
+    configuredPage    : String,
+    configuredAppName : Option[String],
+    configuredFormName: Option[String],
+  ): Boolean =
+    (incomingPath, configuredPage) match {
+      case (FormRunnerPdfTiffDocumentPathRegex(appName, formName, mode @ ("pdf" | "tiff"), _, _), configuredPage)
+        if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName) =>
+        true
+      case _ =>
+        false
+    }
+
+  private def checkAppFormAllowed(
+    configuredPage    : String,
+    configuredAppName : Option[String],
+    configuredFormName: Option[String],
+    appName           : String,
+    formName          : String
+  ): Boolean =
+    configuredPage == "home" || (
+      configuredAppName.contains(appName) &&
+        configuredFormName.contains(formName)
+      )
+
+  private def checkPageAllowed(requestedPage: String, configuredPage: String): Boolean =
+    AllowedPagesForConfiguration.get(configuredPage).exists(_.contains(requestedPage))
+
+  // LATER: Could add `/forms` page
+  private val AllowedPagesForConfiguration = Map(
+    "home"    -> Set("landing", "summary", "new", "edit", "view", "pdf", "tiff"),
+    "summary" -> Set("summary", "new", "edit", "view", "pdf", "tiff"),
+    "new"     -> Set("new")
+  )
 }

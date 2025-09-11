@@ -373,8 +373,7 @@ lazy val baseCommonSettings = Seq(
 
   javacOptions                  ++= Seq(
     "-encoding", "utf8",
-    "-source", "1.8",
-    "-target", "1.8"
+    "--release", "11"
   ),
 
   scalacOptions                 ++= Seq(

@@ -110,7 +110,7 @@
                 <xh:link href="/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.min.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
-                <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>
+                <xh:link href="/webjars/nprogress/0.2.0/nprogress.css" class="xforms-baseline"/>
                 <xh:link href="/ops/css-loader/css-loader.css" class="xforms-baseline"/>
                 <xh:link href="/webjars/codemirror/5.65.19/lib/codemirror.css" class="xforms-baseline"/>
                 <xh:link href="/webjars/codemirror/5.65.19/theme/solarized.css" class="xforms-baseline"/>
@@ -123,13 +123,13 @@
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css"/>
-                <xh:script src="/ops/jquery/jquery-3.6.1.min.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/jquery/3.6.1/dist/jquery.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/nprogress-0.2.0/nprogress.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/bowser/bowser.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/mousetrap/mousetrap.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/fetch/fetch.umd.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/nprogress/0.2.0/nprogress.min.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/bowser/1.9.1/bowser.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/mousetrap/1.6.2/mousetrap.min.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js" class="xforms-baseline"/>
                 <xh:script src="/ops/dialog-polyfill-0.5.6/dialog-polyfill.js" class="xforms-baseline"/>
                 <xh:script src="/ops/web-streams-polyfill/ponyfill.es2018.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo.min.js" class="xforms-baseline"/>

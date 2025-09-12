@@ -214,7 +214,7 @@
 <!--        +fr:california-plate-->
 
         <!-- Extra support needed when offline -->
-        +/ops/fflate/index.js
+        +/webjars/fflate/0.6.7/umd/index.js
 
         <!-- Main offline JavaScript -->
         +/apps/fr/resources/scalajs/orbeon-form-runner-offline.js

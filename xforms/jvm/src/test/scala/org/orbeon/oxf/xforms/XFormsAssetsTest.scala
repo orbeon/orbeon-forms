@@ -37,18 +37,18 @@ class XFormsAssetsTest extends AnyFunSpec{
             { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
             { "full": "/config/theme/xforms.css",                                            "min": false },
             { "full": "/config/theme/error.css",                                             "min": false },
-            { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },
+            { "full": "/webjars/nprogress/0.2.0/nprogress.css",                              "min": false },
             { "full": "/ops/css-loader/css-loader.css",                                      "min": false }
           ],
 
           "js": [
-            { "full": "/ops/jquery/jquery-3.6.1.js",                                         "min": true  },
+            { "full": "/webjars/jquery/3.6.1/dist/jquery.js",                                "min": true  },
             { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
-            { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
-            { "full": "/ops/bowser/bowser.js",                                               "min": true  },
-            { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
-            { "full": "/ops/fetch/fetch.umd.js",                                             "min": false },
+            { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
+            { "full": "/webjars/bowser/1.9.1/bowser.js",                                     "min": false },
+            { "full": "/webjars/mousetrap/1.6.2/mousetrap.js",                               "min": true  },
+            { "full": "/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js",                       "min": false },
 
             { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
 
@@ -95,19 +95,19 @@ class XFormsAssetsTest extends AnyFunSpec{
             { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
             { "full": "/config/theme/xforms.css",                                            "min": false },
             { "full": "/config/theme/error.css",                                             "min": false },
-            { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },
+            { "full": "/webjars/nprogress/0.2.0/nprogress.css",                              "min": false },
             { "full": "/ops/css-loader/css-loader.css",                                      "min": false },
             { "full": "/apps/fr/assets/foo.css",                                             "min": false }
           ],
 
           "js": [
-            { "full": "/ops/jquery/jquery-3.6.1.js",                                         "min": true  },
+            { "full": "/webjars/jquery/3.6.1/dist/jquery.js",                                "min": true  },
             { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
-            { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
-            { "full": "/ops/bowser/bowser.js",                                               "min": true  },
-            { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
-            { "full": "/ops/fetch/fetch.umd.js",                                             "min": false },
+            { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
+            { "full": "/webjars/bowser/1.9.1/bowser.js",                                     "min": false },
+            { "full": "/webjars/mousetrap/1.6.2/mousetrap.js",                               "min": true  },
+            { "full": "/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js",                       "min": false },
 
             { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
 

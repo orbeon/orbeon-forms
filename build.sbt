@@ -161,8 +161,16 @@ val CoreLibraryDependencies = Seq(
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
   "org.orbeon"                  % "kaptcha"                         % "2.3.3-SNAPSHOT",
 
+  "org.webjars.npm"             % "bowser"                          % "1.9.1",
+  "org.webjars"                 % "clipboard.js"                    % "2.0.11",
   "org.webjars.npm"             % "codemirror"                      % "5.65.19",
   "org.webjars.npm"             % "dragula"                         % "3.7.3",
+  "org.webjars.npm"             % "fflate"                          % "0.6.7",
+  "org.webjars.npm"             % "jquery"                          % "3.6.1",
+  "org.webjars.npm"             % "mousetrap"                       % "1.6.2",
+  "org.webjars"                 % "nprogress"                       % "0.2.0",
+  "org.webjars.npm"             % "tinymce"                         % "6.8.5",
+  "org.webjars.npm"             % "whatwg-fetch"                    % "3.0.0",
 
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,

@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
+import shapeless.syntax.typeable.*
 
 /**
  * case($switch-id as xs:string) as xs:string? function.
@@ -30,7 +30,7 @@ class XFormsCase extends XFormsFunction {
 
     for {
       control      <- relevantControl(0)
-      switch       <- collectByErasedType[XFormsSwitchControl](control)
+      switch       <- control.cast[XFormsSwitchControl]
       selectedCase <- switch.selectedCaseIfRelevantOpt
     } yield
       selectedCase.getId

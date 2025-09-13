@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
+import shapeless.syntax.typeable.*
 
 import java.io.*
 import java.util.Locale
@@ -168,7 +169,7 @@ class Portlet2ExternalContext(
 
   import Portlet2ExternalContext._
 
-  private val clientDataRequestOpt = collectByErasedType[ClientDataRequest](portletRequest)
+  private val clientDataRequestOpt = portletRequest.cast[ClientDataRequest]
 
   def getWebAppContext: WebAppContext = webAppContext
 

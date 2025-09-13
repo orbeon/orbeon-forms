@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 
 import scala.collection.{AbstractIterator, Factory, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
-import scala.reflect.ClassTag
+
 
 object CollectionUtils {
 
@@ -85,9 +85,7 @@ object CollectionUtils {
   }
   implicit def fromIteratorExt(i: Iterator.type): IteratorExt.type = IteratorExt
 
-  // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
-  // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
-  def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T => t }
+
 
   implicit class IterableOnceOps[A](private val t: IterableOnce[A]) extends AnyVal {
 

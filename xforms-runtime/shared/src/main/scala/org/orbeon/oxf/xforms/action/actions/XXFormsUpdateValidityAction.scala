@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
+import shapeless.syntax.typeable.*
 
 
 class XXFormsUpdateValidityAction extends XFormsAction {
@@ -48,7 +49,7 @@ object XXFormsUpdateValidityAction {
       if (control.isRelevant && ! control.isStaticReadonly) {
 
         for {
-          singleNodeControl <- collectByErasedType[XFormsSingleNodeControl](control)
+          singleNodeControl <- control.cast[XFormsSingleNodeControl]
           if singleNodeControl.staticControl.explicitValidation
           controlValidation = singleNodeControl.getValidation
           nodeValidation    = singleNodeControl.readValidation
@@ -67,7 +68,7 @@ object XXFormsUpdateValidityAction {
         }
 
         if (recurse)
-          collectByErasedType[XFormsContainerControl](control) foreach
+          control.cast[XFormsContainerControl] foreach
             (_.children foreach updateOneThenRecurse)
       }
 

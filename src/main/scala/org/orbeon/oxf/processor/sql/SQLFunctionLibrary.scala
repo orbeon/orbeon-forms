@@ -25,6 +25,7 @@ import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.{Int64Value, StringValue}
 import org.orbeon.scaxon.Implicits.*
+import shapeless.syntax.typeable.*
 
 
 object SQLFunctionLibrary extends OrbeonFunctionLibrary {
@@ -36,7 +37,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
   abstract class Function2Base[V1, V2, R] extends ((V1, V2) => R)
 
   private def functionContextOpt =
-    XPath.functionContext flatMap CollectionUtils.collectByErasedType[SQLFunctionContext]
+    XPath.functionContext flatMap (_.cast[SQLFunctionContext])
 
   Namespace(SQLProcessor.SQL_NAMESPACE_URI) {
     Fun("current",    classOf[CurrentFunction],  op = 0, min = 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE)

@@ -37,6 +37,7 @@ import org.orbeon.xforms.Namespaces
 
 
 import scala.jdk.CollectionConverters.*
+import shapeless.syntax.typeable.*
 
 
 /**
@@ -237,7 +238,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   def `case`(caseId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     for {
       control      <- relevantControl(caseId)
-      switch       <- collectByErasedType[XFormsSwitchControl](control)
+      switch       <- control.cast[XFormsSwitchControl]
       selectedCase <- switch.selectedCaseIfRelevantOpt
     } yield
       selectedCase.getId

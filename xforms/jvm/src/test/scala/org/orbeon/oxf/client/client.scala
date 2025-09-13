@@ -29,6 +29,7 @@ import org.scalatest.concurrent.Eventually.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.*
 import org.scalatestplus.selenium.WebBrowser
+import shapeless.syntax.typeable.*
 
 import java.net.URL
 import scala.jdk.CollectionConverters.*
@@ -118,7 +119,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
 
   def assertJSExpression(expression: String): Unit = {
     val result = executeScript(s"return $expression")
-    assert(collectByErasedType[java.lang.Boolean](result).contains(java.lang.Boolean.TRUE))
+    assert(result.cast[java.lang.Boolean].contains(java.lang.Boolean.TRUE))
   }
 
   // Functions from xforms.js we must provide access to:

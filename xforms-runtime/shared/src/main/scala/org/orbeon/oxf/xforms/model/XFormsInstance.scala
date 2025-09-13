@@ -633,7 +633,7 @@ object XFormsInstance extends Logging {
 
     def findAbsolute =
       if (XFormsId.isAbsoluteId(instanceId))
-        collectByErasedType[XFormsInstance](findObjectByAbsoluteId(instanceId)) map (_.rootElement)
+        findObjectByAbsoluteId(instanceId).cast[XFormsInstance] map (_.rootElement)
       else
         None
 

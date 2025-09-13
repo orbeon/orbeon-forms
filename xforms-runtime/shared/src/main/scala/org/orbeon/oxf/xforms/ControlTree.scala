@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsNames.*
+import shapeless.syntax.typeable.*
 
 import java.util as ju
 import scala.collection.mutable as m
@@ -307,7 +308,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def findControl(effectiveId: String): Option[XFormsControl] = effectiveIdsToControls.get(effectiveId)
 
   def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
-    findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]
+    findControl(effectiveId) flatMap (_.cast[XFormsRepeatControl])
 
   def getRelevantUploadControls  : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](XFORMS_UPLOAD_QNAME).filter(_.isRelevant)
   def getVisibleDialogControls   : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_QNAME).filter(_.isDialogVisible)

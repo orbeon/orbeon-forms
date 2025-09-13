@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.scalatest.funspec.AnyFunSpec
+import shapeless.syntax.typeable.*
 
 import scala.collection.mutable
 import scala.util.{Success, Try}
@@ -128,21 +129,6 @@ class SharedUtilsTest extends AnyFunSpec {
       assert(None == false.option({invoked = true; "foo"}))
       assert(! invoked)
     }
-  }
-
-  describe("The `collectByErasedType()` function") {
-
-    class Foo
-    class Bar extends Foo
-
-    assert(collectByErasedType[Foo](new Foo).isDefined)
-    assert(collectByErasedType[Foo](new Bar).isDefined)
-    assert(collectByErasedType[Bar](new Bar).isDefined)
-    assert(collectByErasedType[Bar](new Foo).isEmpty)
-    assert(collectByErasedType[Foo](new String).isEmpty)
-
-    assert(collectByErasedType[Seq[String]](Seq("a")).isDefined)
-    assert(collectByErasedType[Seq[String]](Seq(42)).isDefined) // erasure!
   }
 
   describe("The `splitTo()` function with space separator") {

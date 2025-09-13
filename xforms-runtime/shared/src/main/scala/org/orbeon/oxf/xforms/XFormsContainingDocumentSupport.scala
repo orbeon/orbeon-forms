@@ -55,7 +55,7 @@ import java.net.URI
 import java.util.concurrent.locks.Lock
 import scala.annotation.tailrec
 import scala.collection.{immutable, mutable}
-import scala.reflect.ClassTag
+import shapeless.Typeable
 import scala.util.{Failure, Success, Try}
 
 
@@ -191,8 +191,8 @@ trait ContainingDocumentTransientState {
   def setTransientState[T](name: String, value: T): Unit =
     transientState.byName += name -> value
 
-  def getTransientState[T: ClassTag](name: String): Option[T] =
-    transientState.byName.get(name) flatMap collectByErasedType[T]
+  def getTransientState[T: Typeable](name: String): Option[T] =
+    transientState.byName.get(name) flatMap (_.cast[T])
 
   def removeTransientState(name: String): Unit =
     transientState.byName -= name
@@ -286,7 +286,7 @@ trait ContainingDocumentUpload {
   // See also https://github.com/orbeon/orbeon-forms/issues/3721.
   private def customMipForControl(controlEffectiveId: String, mipName: String) =
     controls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
-      CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
+      (_.cast[XFormsSingleNodeControl])    flatMap
       (_.boundNodeOpt) flatMap (InstanceData.findCustomMip(_, mipName))
 
   private object UploadChecker extends UploadCheckerLogic {

@@ -93,7 +93,7 @@ abstract class XFormsAction extends Logging {
   }
 
   def resolveControl(controlId: String)(implicit context: DynamicActionContext): Option[XFormsControl] =
-    collectByErasedType[XFormsControl](context.interpreter.resolveObject(context.analysis, controlId))
+    context.interpreter.resolveObject(context.analysis, controlId).cast[XFormsControl]
 
   // Resolve an optional boolean AVT
   // Return `None` if there is no attribute or if the AVT cannot be evaluated

@@ -30,6 +30,7 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.mutable as m
+import shapeless.syntax.typeable.*
 
 
 class PathMapXPathDependencies(
@@ -610,7 +611,7 @@ class PathMapXPathDependencies(
     val analysesOrEmpty = {
 
       val lhhaControl = {
-        collectByErasedType[StaticLHHASupport](control) getOrElse
+        control.cast[StaticLHHASupport] getOrElse
         (throw new OXFException(s"Control ${controlIndexes.mkString("Array(", ", ", ")")} not found or doesn't support LHHA"))
       }
 

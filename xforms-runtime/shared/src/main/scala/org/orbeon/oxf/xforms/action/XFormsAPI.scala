@@ -38,8 +38,9 @@ import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
 import java.util.List as JList
 import scala.jdk.CollectionConverters.*
-import scala.reflect.ClassTag
 import scala.util.Try
+import shapeless.Typeable
+import shapeless.syntax.typeable.*
 
 object XFormsAPI {
 
@@ -405,8 +406,8 @@ object XFormsAPI {
 //      }
 
   // NOTE: There is no source id passed so we resolve relative to the document
-  def resolveAs[T: ClassTag](staticOrAbsoluteId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[T] =
-    xfcd.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
+  def resolveAs[T: Typeable](staticOrAbsoluteId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[T] =
+    xfcd.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap (_.cast[T])
 
   // xf:toggle
   def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =

@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.xml.NamespaceMapping
+import shapeless.syntax.typeable.*
 
 import java.net.URI
 import java.util.regex.Pattern
@@ -225,7 +226,7 @@ class PropertySet private (
       for {
         key          <- propertiesByName.keys
         value        <- getObjectOpt(key)
-        booleanValue <- CollectionUtils.collectByErasedType[java.lang.Boolean](value)
+        booleanValue <- value.cast[java.lang.Boolean]
       } yield
         key -> booleanValue
 

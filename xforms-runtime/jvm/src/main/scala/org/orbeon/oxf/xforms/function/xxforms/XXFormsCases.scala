@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.scaxon.Implicits.*
+import shapeless.syntax.typeable.*
 
 /**
  * Extension xxf:cases($switch-id as xs:string) as xs:string* function.
@@ -29,7 +29,7 @@ class XXFormsCases extends XFormsFunction {
     implicit val xfc = XFormsFunction.context
     stringSeqToSequenceIterator(
       relevantControl(0)                         flatMap
-        collectByErasedType[XFormsSwitchControl] map
+        (_.cast[XFormsSwitchControl])            map
         (_.getChildrenCases map (_.getId))       getOrElse
         Nil
     )

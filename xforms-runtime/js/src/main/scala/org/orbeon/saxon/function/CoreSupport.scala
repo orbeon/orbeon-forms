@@ -1,10 +1,10 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.value.AtomicValue
+import shapeless.syntax.typeable.*
 
 
 object CoreSupport {
@@ -15,7 +15,7 @@ object CoreSupport {
     else {
       CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
       SaxonUtils.convertJavaObjectToSaxonObject                      flatMap
-      collectByErasedType[AtomicValue]
+      (_.cast[AtomicValue])
     }
 
   def propertyAsString(propertyName: String): Option[String] =

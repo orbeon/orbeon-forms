@@ -240,6 +240,29 @@ class SearchTest
       )
     }
 
+    it("returns correct results with uppercase (structured text, substring)") {
+      val searchRequest =
+        <search>
+          <query/>
+          <query path={controlPath} match="substring">TEST</query>
+          <drafts>include</drafts>
+          <page-size>10</page-size>
+          <page-number>1</page-number>
+          <lang>en</lang>
+        </search>.toDocument
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest,
+        expectedDocumentNames = List("1", "3"),
+        testDocumentOrder     = false,
+        formData              = Seq(
+          FormData("1", "*test1*"),
+          FormData("2", "other"),
+          FormData("3", "preTESTpost")
+        )
+      )
+    }
+
     it("returns correct results with created by, last modified by, and workflow stage") {
 
       def searchRequest(

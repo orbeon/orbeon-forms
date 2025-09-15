@@ -493,6 +493,10 @@ class RestApiTest
 
           createForm(provider, formName)
 
+          val dataUrlForAttachments = HttpCall.crudURLPrefix(provider, formName) + "data/123/data.xml"
+          val dummyData             = HttpCall.XML(<_/>.toDocument)
+          HttpAssert.put(dataUrlForAttachments, Specific(1), dummyData, StatusCode.Created)
+
           val MiB = 1024 * 1024
 
           val largestWorkingSize =

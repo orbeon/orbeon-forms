@@ -44,7 +44,7 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import org.orbeon.web.DomSupport.*
-
+import scala.util.{Failure, Success}
 
 
 @JSExportTopLevel("OrbeonInitSupport")
@@ -192,10 +192,10 @@ object InitSupport {
     // Actually Run the initialization
     implicit def runtime: IORuntime = IORuntime.global
     initIo.unsafeToFuture().onComplete {
-      case scala.util.Failure(t) =>
+      case Failure(t) =>
         logger.error(s"error during form initialization for `${initializations.namespacedFormId}`/`${initializations.uuid}`")
         throw t
-      case scala.util.Success(_) =>
+      case Success(_) =>
     }
   }
 

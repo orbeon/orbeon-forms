@@ -41,7 +41,7 @@
                                 model="fr-resources-model"
                                 value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
 
-                            <fr:dropdown-select1-search ref="$variables/new-language" id="fb-add-language-select1" style="width: 100%">
+                            <xf:select1 ref="$variables/new-language" id="fb-add-language-select1" appearance="search">
                                 <xf:label ref="$form-resources/dialog-add-language/new-language/label"/>
                                 <!-- All the languages except the languages already selected -->
                                 <xf:choices>
@@ -58,7 +58,7 @@
                                         <xf:value ref="@code"/>
                                     </xf:itemset>
                                 </xf:choices>
-                            </fr:dropdown-select1-search>
+                            </xf:select1>
                         </xh:td>
                     </xh:tr>
                 </fr:grid>

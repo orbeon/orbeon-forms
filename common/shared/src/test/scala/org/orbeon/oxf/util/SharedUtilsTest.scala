@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.scalatest.funspec.AnyFunSpec
-import shapeless.syntax.typeable.*
 
 import scala.collection.mutable
 import scala.util.{Success, Try}

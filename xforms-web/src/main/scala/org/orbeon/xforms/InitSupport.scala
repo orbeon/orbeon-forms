@@ -52,7 +52,7 @@ object InitSupport {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.InitSupport")
 
-  import Private._
+  import Private.*
 
   def pageContainsFormsMarkup(): Unit =
     pageContainsFormsMarkupPromise.success(())

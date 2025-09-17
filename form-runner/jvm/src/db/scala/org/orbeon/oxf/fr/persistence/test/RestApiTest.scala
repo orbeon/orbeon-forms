@@ -821,7 +821,7 @@ class RestApiTest
       )
     }
 
-    it("must delete S3 draft attachments when needed (#7049)") {
+    it("must delete S3 draft attachments when needed (#7049)", S3Tag) {
       draftDeletionWithForm(
         formName = S3AttachmentsFormName,
         provider = "s3"

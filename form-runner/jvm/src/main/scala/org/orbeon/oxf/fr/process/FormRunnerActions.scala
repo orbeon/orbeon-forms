@@ -460,7 +460,7 @@ trait FormRunnerActions
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
     trySendImpl(
       SendActionParams(
-        uri                 = prependCommonFormRunnerParameters(prependUserAndStandardParamsForModeChange(path, currentDataFormatVersion), forNavigate = false),
+        uri                 = prependCommonFormRunnerParameters(prependUserAndStandardParamsForModeChangeUseInScopeDocument(path, currentDataFormatVersion), forNavigate = false),
         method              = HttpMethod.POST,
         relevanceHandling   = RelevanceHandling.Keep,
         annotateWith        = Set.empty,
@@ -560,7 +560,31 @@ trait FormRunnerActions
     InternalLastModifiedParam         +
     InternalETagParam
 
-  private def prependUserAndStandardParamsForModeChange(pathQuery: String, dataFormatVersion: DataFormatVersion): String = {
+  private def prependUserAndStandardParamsForModeChangeUseInScopeDocument(
+    pathQuery        : String,
+    dataFormatVersion: DataFormatVersion
+  ): String =
+    prependUserAndStandardParamsForModeChange(
+      pathQuery             = pathQuery,
+      requestParameters     = inScopeContainingDocument.getRequestParameters,
+      dataFormatVersion     = dataFormatVersion,
+      authorizedOperations  = frc.authorizedOperations,
+      documentWorkflowStage = FormRunner.documentWorkflowStage,
+      createdOpt            = FormRunner.documentMetadataStringOpt(Headers.Created),
+      lastModifiedOpt       = FormRunner.documentMetadataStringOpt(Headers.LastModified),
+      eTagOpt               = FormRunner.documentMetadataStringOpt(Headers.ETag)
+    )
+
+  def prependUserAndStandardParamsForModeChange(
+    pathQuery            : String,
+    requestParameters    : Map[String, List[String]],
+    dataFormatVersion    : DataFormatVersion,
+    authorizedOperations : Set[String],
+    documentWorkflowStage: Option[String],
+    createdOpt           : Option[String],
+    lastModifiedOpt      : Option[String],
+    eTagOpt              : Option[String],
+  ): String = {
 
     val (originalPath, originalParams) = splitQueryDecodeParams(pathQuery)
 
@@ -573,15 +597,18 @@ trait FormRunnerActions
     // https://github.com/orbeon/orbeon-forms/issues/5437
     // https://github.com/orbeon/orbeon-forms/issues/7157
     val internalParams = {
-      val ops      = frc.authorizedOperations
-      val opsParam = ops.nonEmpty.list(InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
+
+      val opsParam =
+        authorizedOperations
+          .nonEmpty
+          .list(InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(authorizedOperations))
 
       val documentMetadataParams = List(
-        InternalWorkflowStageParam -> FormRunner.documentWorkflowStage,
+        InternalWorkflowStageParam -> documentWorkflowStage,
         // Propagate original document metadata in order to detect concurrent data modifications (#7157)
-        InternalCreatedParam       -> FormRunner.documentMetadataStringOpt(Headers.Created),
-        InternalLastModifiedParam  -> FormRunner.documentMetadataStringOpt(Headers.LastModified),
-        InternalETagParam          -> FormRunner.documentMetadataStringOpt(Headers.ETag)
+        InternalCreatedParam       -> createdOpt,
+        InternalLastModifiedParam  -> lastModifiedOpt,
+        InternalETagParam          -> eTagOpt
       ).flatMap { case (param, valueOpt) =>
         valueOpt.map(param -> FormRunnerOperationsEncryption.encryptString(_))
       }
@@ -594,7 +621,7 @@ trait FormRunnerActions
 
     val userParams =
       for {
-        (name, values) <- filterParams(inScopeContainingDocument.getRequestParameters.toList)
+        (name, values) <- filterParams(requestParameters.toList)
         value          <- values
       } yield
         name -> value

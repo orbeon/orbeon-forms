@@ -5,21 +5,22 @@ import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrationOp}
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.permission.{ModeType, ModeTypeAndOps, Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.{IndentedLogger, PathUtils, XPath}
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
@@ -36,6 +37,8 @@ import scala.util.matching.Regex
 
 
 object ImportExportSupport {
+
+  type FormDataWithDetails = (om.DocumentInfo, DataFormatVersion, DataMigrationBehavior, Option[String])
 
   // https://github.com/orbeon/orbeon-forms/issues/5514
   val DefaultExcelNameManglingConfig =
@@ -202,7 +205,7 @@ object ImportExportSupport {
   def prepareFormRunnerDocContextOrThrow(
     form              : om.NodeInfo,
     appFormVersionOpt : Option[AppFormVersion], // for migration
-    formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
+    formDataOpt       : Option[FormDataWithDetails]
   ): FormRunnerDocContext =
     prepareFormRunnerDocContext(form, appFormVersionOpt, formDataOpt)
       .getOrElse(throw new IllegalArgumentException("data migration error"))
@@ -210,7 +213,7 @@ object ImportExportSupport {
   def prepareFormRunnerDocContext(
     form              : om.NodeInfo,
     appFormVersionOpt : Option[AppFormVersion], // for migration
-    formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
+    formDataOpt       : Option[FormDataWithDetails]
   ): NonEmptyList[DataMigrationOp] Either FormRunnerDocContext = {
 
     val (metadataRootElem, templateDataRootElem, excludeResultPrefixes) = {
@@ -236,7 +239,7 @@ object ImportExportSupport {
 
     val dataMaybeMigrated =
       (appFormVersionOpt, formDataOpt) match {
-        case (Some((appForm, _)), Some((formData, inputDataFormat, dataMigrationBehavior))) =>
+        case (Some((appForm, _)), Some((formData, inputDataFormat, dataMigrationBehavior, _))) =>
 
           // TODO: Move this to function and reuse from `persistence-model.xml`
           val dataMaybeGridMigrated =
@@ -407,7 +410,7 @@ object ImportExportSupport {
   )(implicit
     logger         : IndentedLogger,
     externalContext: ExternalContext
-  ): (DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type) = {
+  ): FormDataWithDetails = {
 
     debug(s"document id provided: `$documentId`")
 
@@ -421,8 +424,24 @@ object ImportExportSupport {
       )
     }
 
+    val operations = Operations.parseFromHeaders(headers).getOrElse(throw new IllegalStateException)
+
+    val queryStringOpt =
+      PathUtils.splitQuery(
+        org.orbeon.oxf.fr.process.SimpleProcess.prependUserAndStandardParamsForModeChange(
+          pathQuery             = "",
+          requestParameters     = Map.empty, // import uses `oxf.fr.import.forward-parameters`
+          dataFormatVersion     = DataFormatVersion.Edge,
+          authorizedOperations  = Operations.serialize(operations, normalized = true).toSet,  // checked that `fr-authorized-operations` can contain `*` at this time
+          documentWorkflowStage = Headers.firstItemIgnoreCase(headers, Headers.OrbeonWorkflowStage),
+          createdOpt            = Headers.firstItemIgnoreCase(headers, Headers.Created),      // persistence-model.xml uses those, not the `Orbeon-*` headers
+          lastModifiedOpt       = Headers.firstItemIgnoreCase(headers, Headers.LastModified), // persistence-model.xml uses those, not the `Orbeon-*` headers
+          eTagOpt               = Headers.firstItemIgnoreCase(headers, Headers.ETag),
+        )
+      )._2
+
     PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-      modeTypeAndOps        = ModeTypeAndOps.Other(modeType, Operations.parseFromHeaders(headers).getOrElse(throw new IllegalStateException)),
+      modeTypeAndOps        = ModeTypeAndOps.Other(modeType, operations),
       permissions           = permissions,
       credentialsOpt        = externalContext.getRequest.credentials,
       isSubmit              = false
@@ -431,7 +450,8 @@ object ImportExportSupport {
     (
       doc,
       FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
-      DataMigrationBehavior.Disabled
+      DataMigrationBehavior.Disabled,
+      queryStringOpt
     )
   }
 

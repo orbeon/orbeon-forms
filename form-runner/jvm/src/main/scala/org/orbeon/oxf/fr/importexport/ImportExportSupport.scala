@@ -38,7 +38,12 @@ import scala.util.matching.Regex
 
 object ImportExportSupport {
 
-  type FormDataWithDetails = (om.DocumentInfo, DataFormatVersion, DataMigrationBehavior, Option[String])
+  case class FormDataWithDetails(
+    formData             : om.DocumentInfo,
+    dataFormatVersion    : DataFormatVersion,
+    dataMigrationBehavior: DataMigrationBehavior,
+    queryStringOpt       : Option[String]
+  )
 
   // https://github.com/orbeon/orbeon-forms/issues/5514
   val DefaultExcelNameManglingConfig =
@@ -239,7 +244,7 @@ object ImportExportSupport {
 
     val dataMaybeMigrated =
       (appFormVersionOpt, formDataOpt) match {
-        case (Some((appForm, _)), Some((formData, inputDataFormat, dataMigrationBehavior, _))) =>
+        case (Some((appForm, _)), Some(FormDataWithDetails(formData, inputDataFormat, dataMigrationBehavior, _))) =>
 
           // TODO: Move this to function and reuse from `persistence-model.xml`
           val dataMaybeGridMigrated =
@@ -447,7 +452,7 @@ object ImportExportSupport {
       isSubmit              = false
     )
 
-    (
+    FormDataWithDetails(
       doc,
       FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
       DataMigrationBehavior.Disabled,

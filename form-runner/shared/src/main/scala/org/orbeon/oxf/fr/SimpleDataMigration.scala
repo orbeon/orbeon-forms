@@ -322,7 +322,8 @@ object SimpleDataMigration {
     dstDocRootElem          : om.NodeInfo,
     isElementReadonly       : om.NodeInfo => Boolean,
     ignoreBlankData         : Boolean,
-    allowMissingElemInSource: Boolean)(
+    allowMissingElemInSource: Boolean
+  )(
     formOps                 : FormOps
   ): (Int, Int) = {
 

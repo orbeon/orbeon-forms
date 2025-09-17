@@ -269,7 +269,8 @@
                     ref="xxf:instance('fr-form-instance')//(@xxf:relevant, @fr:relevant)"/>
 
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
-                     mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
+                     mode, and we can't really know if the data is clean or dirty but would like to enable the save button.
+                     Also: import data review. -->
                 <xf:setvalue
                     if="$mode = 'edit'"
                     ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>

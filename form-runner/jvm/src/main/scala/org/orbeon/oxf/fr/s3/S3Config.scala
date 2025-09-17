@@ -17,6 +17,7 @@ package org.orbeon.oxf.fr.s3
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.function.Property.evaluateAsAvt
 import org.orbeon.xml.NamespaceMapping
 import software.amazon.awssdk.regions.Region
@@ -52,6 +53,7 @@ object S3Config {
 
     config(
       valueFromName     = valueFromProperties,
+      emptyValueError   = valueName => s"Mandatory property ${propertyName(valueName)} must be non-empty",
       missingValueError = valueName => s"Mandatory property ${propertyName(valueName)} not found"
     )
   }
@@ -66,14 +68,20 @@ object S3Config {
 
     config(
       valueFromName     = valueFromEnvironmentVariables,
+      emptyValueError   = valueName => s"Mandatory environment variable ${variableName(valueName)} must be non-empty",
       missingValueError = valueName => s"Mandatory environment variable ${variableName(valueName)} not found"
     )
   }
 
-  def config(valueFromName: String => Option[String], missingValueError: String => String): Try[S3Config] = {
+  def config(
+    valueFromName    : String => Option[String],
+    emptyValueError  : String => String,
+    missingValueError: String => String
+  ): Try[S3Config] = {
 
-    def value(name: String, defaultOpt: Option[String] = None): Try[String] =
-      valueFromName(name) match {
+    def nonEmptyValue(name: String, defaultOpt: Option[String] = None): Try[String] =
+      valueFromName(name).map(_.trimAllToEmpty) match {
+        case Some("")          => Failure(new Exception(emptyValueError(name)))
         case Some(value)       => Success(value)
         case None              =>
           defaultOpt match {
@@ -83,7 +91,7 @@ object S3Config {
       }
 
     def regionTry: Try[Region] =
-      value("region", DefaultRegion.some).flatMap { regionName =>
+      nonEmptyValue("region", DefaultRegion.some).flatMap { regionName =>
         // Convert region name into Region instance
         Region.regions().asScala.find(_.id() == regionName) match {
           case Some(region) => Success(region)
@@ -92,11 +100,11 @@ object S3Config {
       }
 
     for {
-      endpoint        <- value("endpoint", DefaultEndpoint.some)
+      endpoint        <- nonEmptyValue("endpoint", DefaultEndpoint.some)
       region          <- regionTry
-      bucket          <- value("bucket")
-      accessKey       <- value("accesskey")
-      secretAccessKey <- value("secretaccesskey")
+      bucket          <- nonEmptyValue("bucket")
+      accessKey       <- nonEmptyValue("accesskey")
+      secretAccessKey <- nonEmptyValue("secretaccesskey")
     } yield
       S3Config(
         endpoint        = endpoint,

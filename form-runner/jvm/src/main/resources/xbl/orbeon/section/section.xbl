@@ -237,7 +237,7 @@
                                                         ref="{$child-path}"
                                                         level="{$level}">
 
-                                                        <xsl:copy-of select="@template | @origin | @apply-defaults | @appearance | @insert | @readonly | @view-appearance"/>
+                                                        <xsl:copy-of select="@template | @origin | @apply-defaults | @appearance | @insert | @readonly | @view-appearance | @is-pdf-mode | @is-readonly-mode"/>
 
                                                         <xsl:if test="not($editable)">
                                                             <xsl:copy-of select="@min | @max | @freeze | @remove-constraint"/>

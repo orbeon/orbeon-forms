@@ -102,6 +102,8 @@
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
                 <xsl:variable name="level"              select="$root/@level"/>
+                <xsl:variable name="is-pdf-mode"        select="$root/@is-pdf-mode      = 'true'"/>
+                <xsl:variable name="is-readonly-mode"   select="$root/@is-readonly-mode = 'true'"/>
 
                 <!-- Allow  -->
                 <xsl:variable
@@ -125,7 +127,7 @@
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
                 <xsl:variable name="page-size-opt"            select="xs:integer($root/@page-size[. castable as xs:integer])" as="xs:integer?"/>
                 <xsl:variable name="use-wizard-repeat-paging" select="$root/@view-appearance = 'wizard' and $page-size-opt = 1 and not($root/@wizard-paging = 'false')"/>
-                <xsl:variable name="use-pager"                select="not($use-wizard-repeat-paging) and exists($page-size-opt)"/>
+                <xsl:variable name="use-pager"                select="not($is-pdf-mode or $is-readonly-mode) and not($use-wizard-repeat-paging) and exists($page-size-opt)"/>
 
                 <xsl:template match="/*">
                     <xh:div xxf:control="true" class="{'fr-repeat-container', 'fr-repeater-paging'[$use-wizard-repeat-paging], @class}">

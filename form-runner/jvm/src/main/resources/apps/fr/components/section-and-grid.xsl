@@ -94,6 +94,10 @@
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
             </xsl:for-each>
 
+            <!-- Propagate for section/repeater/pager -->
+            <xsl:attribute name="is-pdf-mode"      select="$is-pdf-mode"/>
+            <xsl:attribute name="is-readonly-mode" select="$is-readonly-mode"/>
+
             <xsl:apply-templates select="@* except (@page-size | @min | @max | @freeze | @remove-constraint | @clear-constraint | @class)" mode="#current"/>
             <xsl:apply-templates select="node()" mode="#current">
                 <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>

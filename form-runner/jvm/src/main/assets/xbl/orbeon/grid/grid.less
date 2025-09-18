@@ -594,6 +594,9 @@
                         display: inline;
                     }
 
+                    // See https://github.com/orbeon/orbeon-forms/issues/7238
+                    overflow-wrap: anywhere;
+
                     // Don't go on a new line after a required '*'
                 }
 
@@ -840,6 +843,15 @@
     }
 
     @media print {
+
+        .fr-mode-pdf {
+            .xbl-fr-grid .fr-grid .xforms-label {
+                // https://github.com/orbeon/orbeon-forms/issues/7238
+                // We want this to apply only to the PDF mode in the PDF renderer, and to be absent from any screen
+                // rendering, so we can't just use `@media print`.
+                word-wrap: break-word;
+            }
+        }
 
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
 

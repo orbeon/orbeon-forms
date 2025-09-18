@@ -18,8 +18,7 @@ import org.orbeon.fr.rpc.FormRunnerRpcClient
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.DomElemOps
-import org.orbeon.xbl.Wizard
-import org.orbeon.xbl.Wizard.WizardCompanion
+import org.orbeon.xbl.FrWizard
 import org.orbeon.xforms
 import org.orbeon.xforms.Page
 import org.orbeon.xforms.facade.XBL
@@ -135,9 +134,9 @@ object FormRunnerPrivateAPI extends js.Object {
     XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
 
     XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
-      .asInstanceOf[WizardCompanion]
+      .asInstanceOf[FrWizard.WizardCompanion]
       ._dispatchPageChangeEvent(
-        new Wizard.PageChangeEvent {
+        new FrWizard.PageChangeEvent {
           override val pageName : UndefOr[String] = pageNamePart
           override val pageIndex: UndefOr[Int]    = pageIndexOptPart.orUndefined
         }

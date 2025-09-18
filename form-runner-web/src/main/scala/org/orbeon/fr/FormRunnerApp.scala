@@ -79,7 +79,7 @@ object FormRunnerApp extends App {
     xbl.ClipboardCopy
     xbl.Trigger
     xbl.Pager
-    xbl.Wizard
+    xbl.FrWizard
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar-fixed-top"            , addScrollPadding(_, "scroll-padding-top"))

@@ -6,7 +6,7 @@ import org.scalajs.dom.html
 import scala.scalajs.js
 
 
-object Wizard {
+object FrWizard { // otherwise this conflicts with the server-side `xbl.Wizard`
 
   XBL.declareCompanion("fr|wizard", js.constructorOf[WizardCompanion])
 

@@ -1,17 +1,17 @@
 package org.orbeon.fr
 
+import org.orbeon.fr.FormRunnerPrivateAPI.logger
 import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xbl.FrWizard.WizardCompanion
 import org.orbeon.xbl.Pager.PagerCompanion
-import org.orbeon.xbl.Wizard.WizardCompanion
-import org.orbeon.xbl.{Pager, Wizard}
+import org.orbeon.xbl.{FrWizard, Pager}
 import org.orbeon.xforms
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import FormRunnerPrivateAPI.logger
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
@@ -202,10 +202,10 @@ class FormRunnerFormWizardAPI(private val form: xforms.Form) extends js.Object {
     AjaxClient.allEventsProcessedF("activateControl").toJSPromise
   }
 
-  def addPageChangeListener(listener: js.Function1[Wizard.PageChangeEvent, Any]): Unit =
+  def addPageChangeListener(listener: js.Function1[FrWizard.PageChangeEvent, Any]): Unit =
     companionOpt.foreach(_.addPageChangeListener(listener))
 
-  def removePageChangeListener(listener: js.Function1[Wizard.PageChangeEvent, Any]): Unit =
+  def removePageChangeListener(listener: js.Function1[FrWizard.PageChangeEvent, Any]): Unit =
     companionOpt.foreach(_.removePageChangeListener(listener))
 
   private def companionOpt: Option[WizardCompanion] =

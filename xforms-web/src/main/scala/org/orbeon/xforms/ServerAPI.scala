@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms
 import org.orbeon.xforms.Constants.*
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
@@ -33,7 +34,7 @@ object ServerAPI {
     rest         : js.Any*
   ): Unit = {
 
-    def getElementOrNull(id: String): dom.Element = {
+    def getElementOrNull(id: String): html.Element = {
 
       def fromId =
         dom.document.getElementByIdOpt(id)
@@ -78,8 +79,11 @@ object ServerAPI {
         fn.call(
           thisArg = getElementOrNull(observerId),
           (
-            new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
-            rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`
+            new js.Object {
+              val target: html.Element = getElementOrNull(targetId)
+              val form  : xforms.Form  = Page.findXFormsFormFromNamespacedId(formId).orNull
+            } +: // `event.target`
+            rest // custom arguments passed with `<xxf:param>` in `<xf:action>`
           )*
         ): Unit
     }

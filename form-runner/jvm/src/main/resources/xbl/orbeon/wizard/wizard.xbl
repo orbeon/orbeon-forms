@@ -30,6 +30,7 @@
     <xbl:binding
         id="fr-wizard"
         element="fr|wizard"
+        xxbl:mode="javascript-lifecycle"
         xxf:external-events="fr-wizard-focus">
 
         <xbl:resources>
@@ -502,7 +503,7 @@
                                     event="xforms-enabled xforms-value-changed"
                                     if="$current-page-name-with-index">
                                 <xf:param name="pageNameWithIndex" value="$current-page-name-with-index"/>
-                                <xf:body>ORBEON.fr.private.API.updateWizardPageName(pageNameWithIndex)</xf:body>
+                                <xf:body>ORBEON.fr.private.API.updateWizardPageName(event.form, pageNameWithIndex)</xf:body>
                             </xf:action>
                         </xf:var>
 

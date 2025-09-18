@@ -13,18 +13,28 @@
   */
 package org.orbeon.fr
 
+import org.log4s.Logger
 import org.orbeon.fr.rpc.FormRunnerRpcClient
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.xbl.Wizard
+import org.orbeon.xbl.Wizard.WizardCompanion
+import org.orbeon.xforms
 import org.orbeon.xforms.Page
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.{HTMLFormElement, URLSearchParams}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
+import scala.scalajs.js.UndefOr
 
 
 object FormRunnerPrivateAPI extends js.Object {
+
+  // Placing this here because we don't want this to be visible in `FormRunnerAPI`, which is a `js.Object`
+  val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.FormRunnerAPI")
 
   private val ErrorScrollOffset = -100
 
@@ -113,8 +123,26 @@ object FormRunnerPrivateAPI extends js.Object {
     }
   }
 
-  def updateWizardPageName(pageNameWithIndex: String): Unit =
+  def updateWizardPageName(form: xforms.Form, pageNameWithIndex: String): Unit = {
+
     removeReplaceOrAddUrlParameter("fr-wizard-page", Some(pageNameWithIndex))
+
+    val (pageNamePart: String, pageIndexOptPart: Option[Int]) = {
+      val parts = pageNameWithIndex.splitTo[List]("/")
+      parts.head -> parts.lift(1).flatMap(s => s.toIntOption)
+    }
+
+    XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
+
+    XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
+      .asInstanceOf[WizardCompanion]
+      ._dispatchPageChangeEvent(
+        new Wizard.PageChangeEvent {
+          override val pageName : UndefOr[String] = pageNamePart
+          override val pageIndex: UndefOr[Int]    = pageIndexOptPart.orUndefined
+        }
+      )
+  }
 
   // For Summary page when changing the form version
   def updateLocationFormVersion(version: Int): Unit =

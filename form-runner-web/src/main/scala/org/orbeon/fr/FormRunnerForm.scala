@@ -1,17 +1,17 @@
 package org.orbeon.fr
 
-import org.log4s.Logger
 import org.orbeon.oxf.fr.{ControlOps, Names}
-import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xbl.Pager
 import org.orbeon.xbl.Pager.PagerCompanion
+import org.orbeon.xbl.Wizard.WizardCompanion
+import org.orbeon.xbl.{Pager, Wizard}
 import org.orbeon.xforms
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
+import FormRunnerPrivateAPI.logger
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
@@ -127,8 +127,6 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     private val pagerElem           : Element
   ) extends js.Object {
 
-    private val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.FormRunnerForm.Pager")
-
     def repeatedSectionName: String = _repeatedSectionName
     def itemFrom           : Int    = pagerDiv.dataset("from").toInt
     def itemTo             : Int    = pagerDiv.dataset("to").toInt
@@ -148,17 +146,17 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       )
 
     def addPageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =
-      pagerCompanionOpt.foreach(_.addPageChangeListener(listener))
+      companionOpt.foreach(_.addPageChangeListener(listener))
 
     def removePageChangeListener(listener: js.Function1[Pager.PageChangeEvent, Any]): Unit =
-      pagerCompanionOpt.foreach(_.removePageChangeListener(listener))
+      companionOpt.foreach(_.removePageChangeListener(listener))
 
-    private def pagerCompanionOpt: Option[PagerCompanion] =
+    private def companionOpt: Option[PagerCompanion] =
       XBL.instanceForControl(pagerElem) match {
         case pagerCompanion: PagerCompanion =>
           Some(pagerCompanion)
         case _ =>
-          logger.error(s"Couldn't find pager companion for section ${_repeatedSectionName}")
+          logger.error(s"Pager: Couldn't find pager companion for section `${_repeatedSectionName}`")
           None
       }
 
@@ -203,4 +201,23 @@ class FormRunnerFormWizardAPI(private val form: xforms.Form) extends js.Object {
     )
     AjaxClient.allEventsProcessedF("activateControl").toJSPromise
   }
+
+  def addPageChangeListener(listener: js.Function1[Wizard.PageChangeEvent, Any]): Unit =
+    companionOpt.foreach(_.addPageChangeListener(listener))
+
+  def removePageChangeListener(listener: js.Function1[Wizard.PageChangeEvent, Any]): Unit =
+    companionOpt.foreach(_.removePageChangeListener(listener))
+
+  private def companionOpt: Option[WizardCompanion] =
+    XBL.instanceForControl(
+      form.elem.querySelectorOpt(".xbl-fr-wizard")
+        .getOrElse(throw new IllegalArgumentException("no wizard element found"))
+    ) match {
+      case pagerCompanion: WizardCompanion =>
+        Some(pagerCompanion)
+      case _ =>
+        logger.error(s"Wizard: Couldn't find wizard companion")
+        None
+    }
 }
+

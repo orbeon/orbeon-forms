@@ -196,8 +196,7 @@
     .xforms-visited > .xforms-alert.xforms-active, // inline alert
     .xforms-visited.xforms-alert.xforms-active,    // external alert
     .fr-mode-view  .xforms-alert.xforms-active,    // `view` mode
-    .fr-mode-pdf   .xforms-alert.xforms-active,    // `pdf` mode
-    .fr-mode-email .xforms-alert.xforms-active     // `email` mode
+    .fr-mode-pdf   .xforms-alert.xforms-active     // `pdf` mode
     {
         display: block;
         clear: both;
@@ -400,7 +399,7 @@
 
     .xforms-form {
         // Make rule a bit stronger to make sure help/alert are hidden (hint are now not output at all)
-        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .fr-mode-view, .fr-mode-pdf {
 
             .fr-body {                                          // Stronger rule for https://github.com/orbeon/orbeon-forms/issues/3705
                 // 2017-05-22: removed `.xforms-hint` for https://github.com/orbeon/orbeon-forms/issues/3118
@@ -417,7 +416,7 @@
         }
     }
 
-    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+    .fr-mode-view, .fr-mode-pdf {
 
         .xforms-textarea.xforms-static > pre, .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
 
@@ -454,7 +453,7 @@
 
     // In print modes, we obviously don't want a scrollbar. So we must wrap even the content of `pre` elements.
     // https://github.com/orbeon/orbeon-forms/issues/3974
-    .fr-mode-pdf, .fr-mode-email {
+    .fr-mode-pdf {
         .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output pre {
             white-space: normal;
             overflow-wrap: break-word;

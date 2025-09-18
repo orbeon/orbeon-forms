@@ -20,12 +20,12 @@
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:exf="http://www.exforms.org/exf/1-0">
 
-    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.core.min.js"/>
-    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.widget.min.js"/>
-    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.mouse.min.js"/>
-    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.draggable.min.js"/>
-    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.js"/>
-    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/wPaint.js"/>
+    <xbl:script src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/inc/jquery.ui.core.min.js"/>
+    <xbl:script src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/inc/jquery.ui.widget.min.js"/>
+    <xbl:script src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/inc/jquery.ui.mouse.min.js"/>
+    <xbl:script src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/inc/jquery.ui.draggable.min.js"/>
+    <xbl:script src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/inc/wColorPicker.js"/>
+    <xbl:script src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/wPaint.js"/>
     <xbl:script src="/ops/javascript/imagesloaded/imagesloaded.pkgd.min.js"/>
 
     <xbl:binding
@@ -35,8 +35,8 @@
         xxf:external-events="fr-update-annotation">
 
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.css"/>
-            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/wPaint.css"/>
+            <xbl:style src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/inc/wColorPicker.css"/>
+            <xbl:style src="/webjars/orbeon__wpaint/1.13.1-orbeon.1/wPaint.css"/>
             <xbl:style src="/xbl/orbeon/wpaint/wpaint.css"/>
         </xbl:resources>
 

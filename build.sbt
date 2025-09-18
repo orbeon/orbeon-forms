@@ -169,6 +169,7 @@ val CoreLibraryDependencies = Seq(
   "org.webjars.npm"             % "jquery"                          % "3.6.1",
   "org.webjars.npm"             % "mousetrap"                       % "1.6.2",
   "org.webjars"                 % "nprogress"                       % "0.2.0",
+  "org.webjars.npm"             % "orbeon__wpaint"                  % "1.13.1-orbeon.1",
   "org.webjars.npm"             % "tinymce"                         % "6.8.5",
   "org.webjars.npm"             % "whatwg-fetch"                    % "3.0.0",
 

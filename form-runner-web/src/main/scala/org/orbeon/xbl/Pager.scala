@@ -20,6 +20,7 @@ import org.scalajs.dom.html
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichOption
 
+
 object Pager {
 
   XBL.declareCompanion("fr|pager", js.constructorOf[PagerCompanion])
@@ -28,9 +29,8 @@ object Pager {
 
     private var repeatedSectionNameOpt: Option[String] = None
 
-    override def init(): Unit = {
+    override def init(): Unit =
       repeatedSectionNameOpt = Option(containerElem.closest("[id$='-section']")).map(_.id.trimSuffixIfPresent("-section"))
-    }
 
     override def destroy(): Unit = ()
 
@@ -43,13 +43,15 @@ object Pager {
       listeners = listeners.filterNot(_ eq listener)
 
     def onPageChange(_previousPage: Int, _currentPage: Int, pageCount: Int): Unit =
-      listeners foreach (_(new PageChangeEvent {
-        val repeatedSectionName: js.UndefOr[String] = repeatedSectionNameOpt.orUndefined
-        val previousPage       : Int                = _previousPage
-        val currentPage        : Int                = _currentPage
-        val isStart            : Boolean            = _currentPage == 1
-        val isEnd              : Boolean            = _currentPage == pageCount
-      }))
+      listeners.foreach(_.apply(
+        new PageChangeEvent {
+          val repeatedSectionName: js.UndefOr[String] = repeatedSectionNameOpt.orUndefined
+          val previousPage: Int = _previousPage
+          val currentPage: Int = _currentPage
+          val isStart: Boolean = _currentPage == 1
+          val isEnd: Boolean = _currentPage == pageCount
+        }
+      ))
   }
 
   trait PageChangeEvent extends js.Object {

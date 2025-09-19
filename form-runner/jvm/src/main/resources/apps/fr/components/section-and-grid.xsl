@@ -95,7 +95,11 @@
             </xsl:for-each>
 
             <!-- Propagate for section/repeater/pager -->
-            <xsl:attribute name="is-pdf-mode"      select="$is-pdf-mode"/>
+            <!-- If we pass `$is-pdf-mode`, the view and PDF pages will be different from a caching perspective. Now, in case we want to use
+                 this information to disable paging, the PDF and view pages will be different, and that is ok. However, the simple presence of
+                 this different attribute value will cause caching to be different, and that is not desirable. So we'll have to find a better
+                 solution in that case. -->
+<!--            <xsl:attribute name="is-pdf-mode"      select="$is-pdf-mode"/>-->
             <xsl:attribute name="is-readonly-mode" select="$is-readonly-mode"/>
 
             <xsl:apply-templates select="@* except (@page-size | @min | @max | @freeze | @remove-constraint | @clear-constraint | @class)" mode="#current"/>

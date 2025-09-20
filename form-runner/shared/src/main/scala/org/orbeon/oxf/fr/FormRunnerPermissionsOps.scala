@@ -104,36 +104,43 @@ trait FormRunnerPermissionsOps {
     // In initial edit/view modes that read data from the database, we use `operationsFromData` which is the result of
     // headers returned by the the database `GET`. When we change modes from there, we propagate and use
     // `encryptedOperationsFromData` instead.
-    val modeTypeAndOps =
+    val modeTypeAndOpsOpt =
       formRunnerParams.modeType match {
-        case modeType @ (ModeType.Edition | ModeType.Readonly) =>
-          val ops =
+        case modeType: ModeType.ForExistingData =>
+          val opsOpt =
             Operations.parseFromString(operationsFromPersistence)
               .orElse(
                 if (isSubmit)
                   encryptedOperationsFromModeChangeOrNull.trimAllToOpt match {
                     case Some(encrypted) =>
                       FormRunnerOperationsEncryption.decryptOperations(encrypted)
-                    case None if modeType == ModeType.Readonly =>
-                      Some(SpecificOperations(Set(Operation.Read))) // case of a `POST` to `view` mode!
                     case _ =>
                       None
                   }
                 else
                   None
               )
-          ModeTypeAndOps.Other(modeType, ops.getOrElse(throw new IllegalStateException))
+          opsOpt.map(ModeTypeAndOps(modeType, _))
         case ModeType.Creation =>
-          ModeTypeAndOps.Creation
+          None
       }
 
     Operations.serialize(
-      PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-        modeTypeAndOps        = modeTypeAndOps,
-        permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), formRunnerParams.appForm),
-        credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
-        isSubmit              = isSubmit
-      ),
+      modeTypeAndOpsOpt match {
+        case Some(modeTypeAndOps) =>
+          PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
+            modeTypeAndOps = modeTypeAndOps,
+            isSubmit       = isSubmit
+          )
+        case None =>
+          // This means that we found operations associated with data neither from persistence nor from mode change.
+          // The scenario is an external `POST` to `edit`/`view`. In that case, we fall back to permissions without
+          // checking the data.
+          PermissionsAuthorization.authorizedOperationsForNoData(
+            permissions    = permissionsFromElemOrProperties(Option(permissionsElemOrNull), formRunnerParams.appForm),
+            credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession,
+          )
+      },
       normalized = true
     ).mkString(" ")
   }

@@ -24,9 +24,11 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 sealed trait ModeType
 object ModeType {
 
+  trait ForExistingData extends ModeType // `type ForExistingData = Edition | Readonly`
+
   case object Creation extends ModeType
-  case object Edition  extends ModeType
-  case object Readonly extends ModeType
+  case object Edition  extends ModeType with ForExistingData
+  case object Readonly extends ModeType with ForExistingData
 
   // NOTE: `tiff` and `test-pdf` are reduced to `pdf` at the XForms level, but not at the XSLT level. We don't
   // yet expose this to XSLT, but we might in the future, so check on those modes as well.
@@ -46,11 +48,7 @@ object ModeType {
       None
 }
 
-sealed trait ModeTypeAndOps { val modeType: ModeType }
-object ModeTypeAndOps {
-  case object Creation                                   extends ModeTypeAndOps { val modeType: ModeType = ModeType.Creation }
-  case class  Other(modeType: ModeType, ops: Operations) extends ModeTypeAndOps
-}
+case class ModeTypeAndOps(modeType: ModeType.ForExistingData, ops: Operations)
 
 object PermissionsAuthorization {
 
@@ -133,29 +131,18 @@ object PermissionsAuthorization {
   }
 
   def authorizedOperationsForDetailModeOrThrow(
-    modeTypeAndOps       : ModeTypeAndOps,
-    permissions          : Permissions,
-    credentialsOpt       : Option[Credentials],
-    isSubmit             : Boolean
+    modeTypeAndOps: ModeTypeAndOps,
+    isSubmit      : Boolean
   )(implicit
-    logger               : IndentedLogger
+    logger        : IndentedLogger
   ): Operations = {
 
-    val resultingAuthorizedOperations =
-      modeTypeAndOps match {
-        case ModeTypeAndOps.Creation =>
-          authorizedOperationsForNoData(
-            permissions,
-            credentialsOpt
-          )
-        case ModeTypeAndOps.Other(_, ops) =>
-          ops
-      }
+    val resultingAuthorizedOperations = modeTypeAndOps.ops
 
     isUserAuthorizedBasedOnOperationsAndMode(
       operations = resultingAuthorizedOperations,
       modeType   = modeTypeAndOps.modeType,
-      isSubmit   = modeTypeAndOps.modeType != ModeType.Creation && isSubmit
+      isSubmit   = isSubmit
     ) option resultingAuthorizedOperations match {
       case None =>
         debug(s"UNAUTHORIZED USER")

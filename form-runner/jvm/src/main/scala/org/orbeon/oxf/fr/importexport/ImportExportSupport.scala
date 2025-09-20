@@ -410,8 +410,7 @@ object ImportExportSupport {
   def readFormDataIfDocumentIdPresentAndAuthorizedOrThrow(
     appForm        : AppForm,
     documentId     : String,
-    form           : om.DocumentInfo,
-    modeType       : ModeType
+    modeType       : ModeType.ForExistingData
   )(implicit
     logger         : IndentedLogger,
     externalContext: ExternalContext
@@ -420,14 +419,6 @@ object ImportExportSupport {
     debug(s"document id provided: `$documentId`")
 
     val (doc, headers) = Transforms.readFormData(appForm, documentId)
-
-    val permissions = {
-      val ctx = new InDocFormRunnerDocContext(form.rootElement)
-      FormRunnerPermissionsOps.permissionsFromElemOrProperties(
-        ctx.metadataRootElem.firstChildOpt(Names.Permissions),
-        appForm
-      )
-    }
 
     val operations = Operations.parseFromHeaders(headers).getOrElse(throw new IllegalStateException)
 
@@ -446,10 +437,8 @@ object ImportExportSupport {
       )._2
 
     PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-      modeTypeAndOps        = ModeTypeAndOps.Other(modeType, operations),
-      permissions           = permissions,
-      credentialsOpt        = externalContext.getRequest.credentials,
-      isSubmit              = false
+      modeTypeAndOps = ModeTypeAndOps(modeType, operations),
+      isSubmit       = false
     )
 
     FormDataWithDetails(

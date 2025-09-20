@@ -154,7 +154,7 @@ object ControlLabelHintTextEditor {
       }
 
     // Called when users press enter or tab out
-    def resourceEditorEndEdit(): Unit = {
+    def resourceEditorEndEdit(): Unit =
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
       if (Private.containerDiv.is(":visible")) {
         resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
@@ -186,7 +186,6 @@ object ControlLabelHintTextEditor {
           jResourceEditorCurrentLabelHint = null
         }
       }
-    }
 
     object Private {
 

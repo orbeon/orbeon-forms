@@ -347,7 +347,7 @@
             <item id="1">Fluid View</item>
         </form-builder-page-layout>
         <suggestion>
-            <label>Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -1960,7 +1960,7 @@
             <item id="1">Vue fluide</item>
         </form-builder-page-layout>
         <suggestion>
-            <label>Utiliser la suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Utiliser la suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -3558,7 +3558,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -5182,7 +5182,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -6806,7 +6806,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -8394,7 +8394,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -9985,7 +9985,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -11601,7 +11601,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -13218,7 +13218,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -14814,7 +14814,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -16437,7 +16437,7 @@
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">Use suggestion: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -18080,7 +18080,7 @@
             <item id="1">عرض مرن</item>
         </form-builder-page-layout>
         <suggestion>
-            <label>استخدام الاقتراح: "{0}" &lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt;</label>
+            <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; استخدام الاقتراح: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>

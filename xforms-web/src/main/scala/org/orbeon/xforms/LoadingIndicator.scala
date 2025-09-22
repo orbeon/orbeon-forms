@@ -49,6 +49,8 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
       js.timers.setTimeout(1) { // Defer hiding the indicator to give a chance to next request to start,
         hideIfAlreadyVisible()  // so we don't flash the indicator.
       }
+    else
+      showRequests -= 1
 
   // Public from `XFormsResponse`
   def showIfNotAlreadyVisible(): Unit = {

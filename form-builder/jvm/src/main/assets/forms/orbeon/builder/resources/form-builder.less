@@ -12,6 +12,7 @@
 
 @import (reference) "../../../../../../../../../bootstrap-src/less/variables";
 @import (reference) "../../../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-common";
+@import (reference) "../../../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-dialog";
 
 @fbGutter: 10px;
 @fbToolbarWidth: 208px;
@@ -643,9 +644,11 @@ body.orbeon {
                 .navbar-inner {
                     padding-top: 0;
                     padding-bottom: 0;
+                    padding-right: 10px;
                     background-color: transparent;
                     .nav > li > a {
-                        padding: 5px;
+                        padding: 5px 10px;
+                        background-color: @dialogTitleBackgroundColor;  // To show over text of a long label
                     }
                 }
             }

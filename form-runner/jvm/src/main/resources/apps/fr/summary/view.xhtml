@@ -354,12 +354,12 @@
                 <xf:bind
                     ref="$app-query/@match"
                     readonly="false()"
-                    xxf:initial="if ($app-is-dropdown) then 'exact' else 'substring'"/>
+                    calculate="if ($app-is-dropdown) then 'exact' else 'substring'"/>
                 <!-- Force exact query match if there is a form constraint -->
                 <xf:bind
                     ref="$form-query/@match"
                     readonly="false()"
-                    xxf:initial="if ($form-is-dropdown) then 'exact' else 'substring'"/>
+                    calculate="if ($form-is-dropdown) then 'exact' else 'substring'"/>
             </xf:bind>
 
             <xf:instance id="fr-bulk-edit-instance">

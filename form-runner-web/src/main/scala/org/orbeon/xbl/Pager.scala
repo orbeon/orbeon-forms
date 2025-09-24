@@ -46,10 +46,10 @@ object Pager {
       listeners.foreach(_.apply(
         new PageChangeEvent {
           val repeatedSectionName: js.UndefOr[String] = repeatedSectionNameOpt.orUndefined
-          val previousPage: Int = _previousPage
-          val currentPage: Int = _currentPage
-          val isStart: Boolean = _currentPage == 1
-          val isEnd: Boolean = _currentPage == pageCount
+          val previousPage       : Int                = _previousPage
+          val currentPage        : Int                = _currentPage
+          val isStart            : Boolean            = _currentPage == 1
+          val isEnd              : Boolean            = _currentPage == pageCount
         }
       ))
   }

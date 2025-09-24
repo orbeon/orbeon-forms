@@ -103,6 +103,11 @@
     -->
     <xf:action event="xxforms-instances-ready" observer="fr-form-model">
 
+        <!-- Reject unsupported modes right away -->
+        <xf:action if="not(frf:isSupportedMode($mode))" type="xpath">
+            frf:sendError(404)
+        </xf:action>
+
         <!-- For new documents, see if we have drafts -->
         <xf:action if="$mode = 'new'">
 

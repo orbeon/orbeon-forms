@@ -426,7 +426,15 @@
                     <!-- Insert appropriate XBL component -->
                     <!-- NOTE: Once we support XBL matching on @appearance, use instead
                          <fr:view appearance="{$view-appearance}">. -->
-                    <xsl:element name="fr:{$view-appearance}">
+                    <xsl:element
+                        name="{$view-appearance}"
+                        namespace="{
+                            if (starts-with($view-appearance, 'fr:')) then
+                                'http://orbeon.org/oxf/xml/form-runner'
+                            else if (starts-with($view-appearance, 'fb:')) then
+                                'http://orbeon.org/oxf/xml/form-builder'
+                            else
+                                $mode-namespace-uri-opt}">
                         <xsl:attribute name="id"              select="'fr-view-component'"/>
                         <xsl:attribute name="class"           select="concat('fr-view-appearance-', $view-appearance)"/>
 
@@ -515,7 +523,9 @@
                 class="container{
                     '-fluid'[$fluid]
                 } fr-view fr-mode-{{
-                    fr:mode()
+                    replace(fr:mode(), ':', '-')
+                }}{{
+                    ' fr-mode-custom'[contains(fr:mode(), ':')]
                 }}{{
                     ' fr-static-readonly-required'[
                         fr:is-readonly-mode() and (

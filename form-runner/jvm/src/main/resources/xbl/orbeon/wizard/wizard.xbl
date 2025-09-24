@@ -1534,7 +1534,7 @@
                                             <xf:group appearance="xxf:internal"><!-- Q: Why this group? -->
                                                 <!-- This is where the original section's attribute are being copied, including `id` and `bind` -->
                                                 <xsl:copy><!-- `<fr:section>` -->
-                                                    <xsl:attribute name="view-appearance">wizard</xsl:attribute>
+                                                    <xsl:attribute name="view-appearance">fr:wizard</xsl:attribute>
                                                     <xsl:attribute name="collapsible">false</xsl:attribute>
                                                     <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
                                                     <!-- Tell the section whether it needs to be initially open or not (optimization).
@@ -1590,7 +1590,7 @@
                                                                         <xf:group appearance="xxf:internal">
                                                                             <xsl:copy>
                                                                                 <xsl:if test="self::fr:section">
-                                                                                    <xsl:attribute name="view-appearance">wizard</xsl:attribute>
+                                                                                    <xsl:attribute name="view-appearance">fr:wizard</xsl:attribute>
                                                                                     <xsl:attribute name="collapsible">false</xsl:attribute>
                                                                                 </xsl:if>
                                                                                 <xsl:if test="not(@id)">

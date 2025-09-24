@@ -55,10 +55,10 @@
                     let $buttons-property :=
                             if (exists($buttons-property-opt)) then
                                 $buttons-property-opt
-                            else if ($fr-mode = 'view') then
-                                'oxf.fr.detail.buttons.view'
                             else if ($fr-mode = 'import') then
                                 'oxf.fr.import.buttons'
+                            else if ($fr-mode = 'view' or contains($fr-mode, ':')) then
+                                concat('oxf.fr.detail.buttons.', $fr-mode)
                             else
                                 'oxf.fr.detail.buttons',
                         $visibility-property-prefix :=

@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.definitions.ModeType
+import org.orbeon.oxf.fr.definitions.{FormRunnerDetailMode, ModeType}
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
@@ -58,8 +58,9 @@ case class FormRunnerParams(
   def appFormVersion: FormRunnerParams.AppFormVersion =
     (appForm, formVersion)
 
-  def modeType: ModeType =
-    ModeType.unapply(mode).getOrElse(throw new IllegalArgumentException(s"Invalid mode: `$mode`"))
+  def modeType(customModes: Iterable[FormRunnerDetailMode.Custom]): ModeType =
+    ModeType.modeTypeFromQualifiedName(mode, excludeSecondaryModes = true, customModes)
+      .getOrElse(throw new IllegalArgumentException(s"Invalid mode: `$mode`"))
 }
 
 object FormRunnerParams {
@@ -376,6 +377,37 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       case _               => throw new IllegalArgumentException(s"cannot match property name `$requestedName` with `${property.name}`")
     }
 
+  //@XPathFunction
+  def isSupportedMode(modeString: String): Boolean =
+    FormRunnerDetailMode.isSupportedNonDetailMode(modeString) ||
+      isSupportedDetailMode(modeString, excludeSecondaryModes = false)
+
+  def isSupportedDetailMode(modeString: String, excludeSecondaryModes: Boolean): Boolean =
+    ModeType.modeFromQualifiedName(modeString, excludeSecondaryModes, customModes(FormRunnerParams())).isDefined
+
+  // XSLT only
+  //@XPathFunction
+  def isReadonlyModeFromString(app: String, form: String, modeString: String): Boolean =
+    ModeType.modeTypeFromQualifiedName(modeString, excludeSecondaryModes = false, customModes(FormRunnerParams(AppForm(app, form), modeString)))
+      .contains(ModeType.Readonly)
+
+  // Find the configured custom modes if any, throw if error in configuration
+  def customModes(implicit p: FormRunnerParams): Seq[FormRunnerDetailMode.Custom] =
+    formRunnerRawProperty("oxf.fr.detail.custom-modes") match {
+      case Some(p) if p.stringValue.nonAllBlank =>
+        p.associatedValue { _ =>
+          CustomModesJSON.parseString(p.stringValue, p.namespaceMapping).get
+        }
+      case _ => Nil
+    }
+
+  // XSLT only
+  //@XPathFunction
+  def customModeNamespace(app: String, form: String, modeString: String): String =
+    customModes(FormRunnerParams(AppForm(app, form), modeString))
+      .collectFirst { case m if m.name.qualifiedName == modeString => m.name.namespace.uri }
+      .orNull
+
   // Interrupt current processing and send an error code to the client.
   // NOTE: This could be done through ExternalContext
   //@XPathFunction
@@ -412,7 +444,8 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   private val DeleteOps = Set("*", "delete")
   private val ListOps   = Set("*", "list")
 
-  def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
+  def authorizedOperationsString: String = authorizedOperationsInstance.rootElement.stringValue
+  def authorizedOperations: Set[String] = authorizedOperationsString.splitTo[Set]()
 
   // Used by user XPath functions
   def canCreate: Boolean = (authorizedOperations intersect CreateOps).nonEmpty
@@ -527,7 +560,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   }
 
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
-  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ModeType.ReadonlyModes(p.mode)
+  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = isReadonlyModeFromString(p.app, p.form, p.mode)
 
   // https://github.com/orbeon/orbeon-forms/issues/5323
   // https://github.com/orbeon/orbeon-forms/issues/5325

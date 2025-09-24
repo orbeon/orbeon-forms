@@ -82,10 +82,10 @@
             </xsl:if>
 
             <xsl:choose>
-                <xsl:when test="$use-view-appearance and $view-appearance = 'wizard' and not($is-readonly-mode)">
+                <xsl:when test="$use-view-appearance and $view-appearance = 'fr:wizard' and not($is-readonly-mode)">
                     <xsl:copy-of select="@page-size"/>
                 </xsl:when>
-                <xsl:when test="not($use-view-appearance and $view-appearance = 'wizard')">
+                <xsl:when test="not($use-view-appearance and $view-appearance = 'fr:wizard')">
                     <xsl:copy-of select="@page-size"/>
                 </xsl:when>
             </xsl:choose>

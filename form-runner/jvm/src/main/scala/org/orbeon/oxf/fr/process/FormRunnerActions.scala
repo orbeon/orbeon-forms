@@ -482,14 +482,14 @@ trait FormRunnerActions
 
   def tryNavigateToReview(params: ActionParams): ActionResult =
     ActionResult.trySync {
-      val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
+      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/view/$document", formRunnerParams.modeType(frc.customModes))
     }
 
   def tryNavigateToEdit(params: ActionParams): ActionResult =
     ActionResult.trySync {
-      val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
+      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/edit/$document", formRunnerParams.modeType(frc.customModes))
     }
 
   def tryOpenRenderedFormat(params: ActionParams): ActionResult =
@@ -527,7 +527,7 @@ trait FormRunnerActions
       tryChangeMode(
         replace            = ReplaceType.All,
         path               = path,
-        sourceModeType     = frParams.modeType,
+        sourceModeType     = frParams.modeType(frc.customModes),
         showProgress       = false,
         formTargetOpt      = formTargetOpt,
         responseIsResource = true
@@ -689,7 +689,7 @@ trait FormRunnerActions
               currentFormLang = currentFormLang
             )
 
-          tryChangeMode(ReplaceType.Instance, path, sourceModeType = frParams.modeType).get
+          tryChangeMode(ReplaceType.Instance, path, sourceModeType = frParams.modeType(frc.customModes)).get
 
           locally {
 

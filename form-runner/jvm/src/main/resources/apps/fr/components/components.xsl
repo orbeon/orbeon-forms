@@ -44,6 +44,14 @@
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
     <xsl:variable
+        name="mode-namespace-uri-opt"
+        select="
+            for $m in $mode
+            return
+                frf:customModeNamespace($app, $form, $mode)"
+        as="xs:string?"/>
+
+    <xsl:variable
         name="is-pdf-mode"
         select="$mode = ('pdf', 'tiff', 'test-pdf')"
         as="xs:boolean"/>
@@ -51,7 +59,7 @@
     <xsl:variable
         name="is-readonly-mode"
         as="xs:boolean"
-        select="$is-pdf-mode or $mode = ('view', 'controls')"/>
+        select="$is-pdf-mode or frf:isReadonlyModeFromString($app, $form, $mode)"/>
 
     <!-- Same logic as `fr:is-service-path()` -->
     <xsl:variable
@@ -290,7 +298,7 @@
             not($is-form-builder)     and                 (: Form Builder never has a TOC               :)
             not(
                 $use-view-appearance and
-                $view-appearance = 'wizard'
+                $view-appearance = 'fr:wizard'
             )                         and                 (: Wizard view never has a separate TOC       :)
             $toc-min-sections ge 0    and                 (: negative value disables the TOC            :)
             exists($toc-position-opt) and                 (: missing position disables the TOC          :)
@@ -437,23 +445,32 @@
         as="xs:string"
         select="
             (
-                'formula-debugger'[$fr-form-metadata/formula-debugger = 'true'],
-                'wizard'[$fr-form-metadata/wizard = 'true' or $mode = 'import'],
-                p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.'))[
-                    normalize-space() and not($fr-form-metadata/wizard = 'false')
-                ],
-                'full'
+                $mode[contains(., ':')],
+                'fr:formula-debugger'[$fr-form-metadata/formula-debugger = 'true'],
+                'fr:wizard'[$fr-form-metadata/wizard = 'true' or $mode = 'import'],
+                for $p in
+                    p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.'))[
+                        normalize-space() and not($fr-form-metadata/wizard = 'false')
+                    ]
+                return
+                    if (contains($p, ':')) then
+                        $p
+                    else
+                        concat('fr:', $p)
+                ,
+                'fr:full'
             )[1]"/>
 
     <xsl:variable
         name="use-view-appearance"
         as="xs:boolean"
         select="
-            $mode = 'import' or
+            contains($mode, ':') or
+            $mode = 'import'     or
             not(
                 not($mode = ('edit', 'new', 'test', 'compile')) or (: intentionally no test on 'test-pdf' :)
                 $is-form-builder                                or
-                $view-appearance = 'full'
+                $view-appearance = 'fr:full'
             )"/>
 
     <xsl:variable

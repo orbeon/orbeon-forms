@@ -100,13 +100,13 @@ trait FormRunnerPermissionsOps {
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
 
-    val formRunnerParams = FormRunnerParams()
+    implicit val formRunnerParams = FormRunnerParams()
 
     // In initial edit/view modes that read data from the database, we use `operationsFromData` which is the result of
     // headers returned by the the database `GET`. When we change modes from there, we propagate and use
     // `encryptedOperationsFromData` instead.
     val modeTypeAndOpsOpt =
-      formRunnerParams.modeType match {
+      formRunnerParams.modeType(frc.customModes) match {
         case modeType: ModeType.ForExistingData =>
           val opsOpt =
             Operations.parseFromString(operationsFromPersistence)

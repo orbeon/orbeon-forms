@@ -225,8 +225,8 @@
         <setvalue ref="/*/mode">summary</setvalue>
     </page>
 
-    <!-- New, edit or view document (supports POST of XML, or GET)  -->
-    <page path="/fr/([^/^.]+)/([^/^.]+)/(new|edit|view)(/([^/^.]+))?"
+    <!-- New, edit or view document (supports `POST` of XML, or `GET`) -->
+    <page path="/fr/([^/^.]+)/([^/^.]+)/(new|edit|view|[^/^.]+:[^/^.]+)(/([^/^.]+))?"
           model="detail/detail-model.xpl" view="html-view.xpl">
     </page>
 

@@ -126,7 +126,7 @@
                 <xsl:variable name="insert"                   select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
                 <xsl:variable name="page-size-opt"            select="xs:integer($root/@page-size[. castable as xs:integer])" as="xs:integer?"/>
-                <xsl:variable name="use-wizard-repeat-paging" select="$root/@view-appearance = 'wizard' and $page-size-opt = 1 and not($root/@wizard-paging = 'false')"/>
+                <xsl:variable name="use-wizard-repeat-paging" select="$root/@view-appearance = 'fr:wizard' and $page-size-opt = 1 and not($root/@wizard-paging = 'false')"/>
                 <xsl:variable name="use-pager"                select="not($is-pdf-mode or $is-readonly-mode) and not($use-wizard-repeat-paging) and exists($page-size-opt)"/>
 
                 <xsl:template match="/*">

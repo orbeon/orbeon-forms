@@ -132,8 +132,6 @@ object FormRunnerPrivateAPI extends js.Object {
     }
 
     XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
-
-    XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
       .asInstanceOf[FrWizard.WizardCompanion]
       ._dispatchPageChangeEvent(
         new FrWizard.PageChangeEvent {

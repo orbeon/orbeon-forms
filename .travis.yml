@@ -62,7 +62,7 @@ install:
   export NODE_OPTIONS="--no-deprecation" # Avoid warnings shown as errors running UglifyJS, to be removed when #6642 is done
 before_script:
 - sudo /etc/init.d/mysql stop # We use MySQL through Docker, so avoid conflict with port 3306
-- if [ "$TARGET" == "test-unit"                              ]; then docker pull tomcat:8.5-jdk8-openjdk-slim; fi
+- if [ "$TARGET" == "test-unit"                              ]; then docker pull tomcat:9.0.109-jdk11-temurin-noble; fi
 - if [ "$TARGET" == "test-unit"                              ]; then docker pull kennethreitz/httpbin; fi
 - if [ "$TARGET" == "test-unit"                              ]; then docker run -d --name httpbin -p 8084:80 kennethreitz/httpbin; fi
 - if [ "$TARGET" == "test-db"                                ]; then echo $DOCKER_PASSWORD | docker login -u orbeon --password-stdin; fi

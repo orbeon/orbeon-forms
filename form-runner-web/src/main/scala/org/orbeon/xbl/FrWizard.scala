@@ -28,7 +28,7 @@ object FrWizard { // otherwise this conflicts with the server-side `xbl.Wizard`
   }
 
   trait PageChangeEvent extends js.Object {
-    val pageName : js.UndefOr[String]
+    val pageName : String
     val pageIndex: js.UndefOr[Int]
   }
 }

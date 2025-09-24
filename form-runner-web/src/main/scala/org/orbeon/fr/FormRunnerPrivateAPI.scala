@@ -137,8 +137,8 @@ object FormRunnerPrivateAPI extends js.Object {
       .asInstanceOf[FrWizard.WizardCompanion]
       ._dispatchPageChangeEvent(
         new FrWizard.PageChangeEvent {
-          override val pageName : UndefOr[String] = pageNamePart
-          override val pageIndex: UndefOr[Int]    = pageIndexOptPart.orUndefined
+          override val pageName : String       = pageNamePart
+          override val pageIndex: UndefOr[Int] = pageIndexOptPart.orUndefined
         }
       )
   }

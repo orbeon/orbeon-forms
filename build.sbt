@@ -167,6 +167,7 @@ val CoreLibraryDependencies = Seq(
   "org.webjars.npm"             % "dragula"                         % "3.7.3",
   "org.webjars.npm"             % "fflate"                          % "0.6.7",
   "org.webjars.npm"             % "jquery"                          % "3.6.1",
+  "org.webjars.npm"             % "jquery.fancytree"                % "2.21.0",
   "org.webjars.npm"             % "mousetrap"                       % "1.6.2",
   "org.webjars"                 % "nprogress"                       % "0.2.0",
   "org.webjars.npm"             % "orbeon__wpaint"                  % "1.13.1-orbeon.1",
@@ -1375,6 +1376,7 @@ lazy val core = (project in file("src"))
   .settings(commonScalaJvmSettings)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(assetsSettings: _*)
+  .settings(WebJarPatcher.coreSettings: _*)
   .settings(
     name                               := "orbeon-core",
 
@@ -1437,6 +1439,7 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
   )
 
 lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
+  .settings(WebJarPatcher.warSettings: _*)
   .settings(
     name := "orbeon-war",
     exportJars := false

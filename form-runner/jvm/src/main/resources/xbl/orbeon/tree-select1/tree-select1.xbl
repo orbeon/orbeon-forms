@@ -22,7 +22,7 @@
 
     <!-- See https://cdnjs.com/libraries/jquery.fancytree -->
     <xbl:script src="/xbl/orbeon/tree-select1/fancytree/jquery-ui.min.js"/>
-    <xbl:script src="/xbl/orbeon/tree-select1/fancytree/jquery.fancytree-all.min.js"/>
+    <xbl:script src="/webjars/jquery.fancytree/2.21.0/dist/jquery.fancytree-all.min.js"/>
 
     <!-- NOTE: When using this component outside of Form Runner, the supporting JavaScript must be explicitly included. -->
 

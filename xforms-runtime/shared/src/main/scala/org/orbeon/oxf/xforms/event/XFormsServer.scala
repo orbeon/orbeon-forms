@@ -269,10 +269,35 @@ object XFormsServer {
         case None =>
           // This is most likely the case of a retry if the initial request was long-running
           // See https://github.com/orbeon/orbeon-forms/issues/1984
-          info("Ajax update lock timeout exceeded, returning error to client")
+          info("Ajax update lock timeout exceeded, telling client the document is busy")
 
-          // Using 503 based on http://stackoverflow.com/questions/17862015/http-statuscode-to-retry-same-request
-          ClientEvents.errorResponse(StatusCode.ServiceUnavailable)
+          // Return explicit busy marker to trigger client retry
+          xmlReceiverOpt match {
+            case Some(xmlReceiver) =>
+
+              // The client the document is busy, which will cause it to retry after a delay.
+              externalContext.getResponse.setContentType(ContentTypes.XmlContentType)
+              val helper = new XMLReceiverHelper(xmlReceiver)
+              helper.startDocument()
+              helper.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
+              helper.startElement(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI, "document-busy")
+              helper.endElement()
+              helper.endPrefixMapping(XXFORMS_SHORT_PREFIX)
+              helper.endDocument()
+
+            case None =>
+
+              // This is not an Ajax request; it appears to be the second phase of a two-pass submission. We end up
+              // here because an Ajax request held a lock on the document for more than 30 seconds (the default for
+              // `oxf.xforms.delay-before-ajax-timeout`). What are the options?
+              //
+              // - Returning a 503 is undesirable, as it may cause load balancers to route subsequent requests from
+              //   the same user to a different server, which we want to avoid.
+              // - We could remove the lock timeout or greatly extend it, but we don't want to block
+              //   threads "unnecessarily."
+              // - We chose to return a 500.
+              ClientEvents.errorResponse(StatusCode.InternalServerError)
+          }
 
           Success(None)
       }

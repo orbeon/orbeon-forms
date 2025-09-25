@@ -111,14 +111,9 @@ object RemoteClientServerChannel extends ClientServerChannel {
               Page.loadingIndicator.requestEnded(showProgress)
               // The `Failure` is ignored by the caller of `sendEvents()`
               promise.failure(new Throwable("login detected"))
-            case Success((ServiceUnavailable, _, _)) =>
-              // The server returns an explicit 503 when the Ajax server is still busy
-              retryRequestAfterDelay(requestForm, () =>
-                asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
-                  promise.complete
-              )
             case Success((_, responseText, responseXmlOpt)) =>
-              // Retry if we DON'T have an explicit error doc or a login
+              // Retry if we DON'T have an explicit error doc or a login. This includes the case where the server
+              // answers with a 200 `<xxf:document-busy/>`.
               if (! handleFailure(responseXmlOpt.toRight(responseText), requestForm.namespacedFormId, ignoreErrors)) {
                 retryRequestAfterDelay(requestForm, () =>
                   asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete

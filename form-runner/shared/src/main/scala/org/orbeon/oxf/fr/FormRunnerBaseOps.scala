@@ -21,8 +21,8 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
-import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.PathUtils.*

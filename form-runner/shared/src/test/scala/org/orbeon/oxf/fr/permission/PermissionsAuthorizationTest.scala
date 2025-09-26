@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.permission
 
 import cats.syntax.option.*
 import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.fr.definitions.{ModeType, ModeTypeAndOps}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Read, Update}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.scalatest.funspec.AnyFunSpec

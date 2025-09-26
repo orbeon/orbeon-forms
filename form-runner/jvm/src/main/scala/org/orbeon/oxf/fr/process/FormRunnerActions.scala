@@ -20,9 +20,9 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
+import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.email.{EmailContent, EmailTransport}
-import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.fr.s3.{S3, S3Config}

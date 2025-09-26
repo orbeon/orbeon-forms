@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.definitions.{ModeType, ModeTypeAndOps}
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.util.StringUtils.*

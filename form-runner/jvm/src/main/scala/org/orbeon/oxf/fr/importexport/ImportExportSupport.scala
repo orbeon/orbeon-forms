@@ -11,7 +11,8 @@ import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrationOp}
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.permission.{ModeType, ModeTypeAndOps, Operations, PermissionsAuthorization}
+import org.orbeon.oxf.fr.definitions.{ModeType, ModeTypeAndOps}
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.resources.ResourceManagerWrapper

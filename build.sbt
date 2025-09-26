@@ -1,5 +1,5 @@
 import org.orbeon.sbt.OrbeonSupport.*
-import org.orbeon.sbt.{OrbeonSupport, OrbeonWebappPlugin}
+import org.orbeon.sbt.{OrbeonSupport, OrbeonWebappPlugin, WebJarPatcher}
 import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
@@ -160,19 +160,6 @@ val CoreLibraryDependencies = Seq(
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
   "org.orbeon"                  % "kaptcha"                         % "2.3.3-SNAPSHOT",
-
-  "org.webjars.npm"             % "bowser"                          % "1.9.1",
-  "org.webjars"                 % "clipboard.js"                    % "2.0.11",
-  "org.webjars.npm"             % "codemirror"                      % "5.65.19",
-  "org.webjars.npm"             % "dragula"                         % "3.7.3",
-  "org.webjars.npm"             % "fflate"                          % "0.6.7",
-  "org.webjars.npm"             % "jquery"                          % "3.6.1",
-  "org.webjars.npm"             % "jquery.fancytree"                % "2.21.0",
-  "org.webjars.npm"             % "mousetrap"                       % "1.6.2",
-  "org.webjars"                 % "nprogress"                       % "0.2.0",
-  "org.webjars.npm"             % "orbeon__wpaint"                  % "1.13.1-orbeon.1",
-  "org.webjars.npm"             % "tinymce"                         % "6.8.5",
-  "org.webjars.npm"             % "whatwg-fetch"                    % "3.0.0",
 
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,
@@ -764,6 +751,7 @@ lazy val formRunnerJVM = formRunner.jvm
   )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
+  .settings(WebJarPatcher.compilePatchingSettings: _*)
   .configs(DatabaseTest, DebugDatabaseTest, DebugTest)
   .settings(scala2CommonSettings: _*)
   .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
@@ -792,7 +780,22 @@ lazy val formRunnerJVM = formRunner.jvm
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser"
-    ).map(_ % CirceVersion)
+    ).map(_ % CirceVersion),
+
+    libraryDependencies ++= Seq(
+      "org.webjars.npm" % "bowser"           % "1.9.1",
+      "org.webjars"     % "clipboard.js"     % "2.0.11",
+      "org.webjars.npm" % "codemirror"       % "5.65.19",
+      "org.webjars.npm" % "dragula"          % "3.7.3",
+      "org.webjars.npm" % "fflate"           % "0.6.7",
+      "org.webjars.npm" % "jquery"           % "3.6.1",
+      "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
+      "org.webjars.npm" % "mousetrap"        % "1.6.2",
+      "org.webjars"     % "nprogress"        % "0.2.0",
+      "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
+      "org.webjars.npm" % "tinymce"          % "6.8.5",
+      "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
+    )
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
@@ -1376,7 +1379,6 @@ lazy val core = (project in file("src"))
   .settings(commonScalaJvmSettings)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(assetsSettings: _*)
-  .settings(WebJarPatcher.coreSettings: _*)
   .settings(
     name                               := "orbeon-core",
 
@@ -1439,7 +1441,7 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
   )
 
 lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
-  .settings(WebJarPatcher.warSettings: _*)
+  .settings(WebJarPatcher.runtimeFullClasspathSettings: _*)
   .settings(
     name := "orbeon-war",
     exportJars := false

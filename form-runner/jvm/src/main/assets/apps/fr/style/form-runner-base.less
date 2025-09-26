@@ -507,6 +507,11 @@
         }
     }
 
+    // https://github.com/orbeon/orbeon-forms/issues/7255
+    .orbeon .fr-mode-pdf .navbar .navbar-brand img {
+        max-height: none;
+    }
+
     .navbar img {
         position: running(logo);
         height: @pageTopAndBottomHeight; // 2022-12-02: needed so the image shows!

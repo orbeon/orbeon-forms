@@ -135,16 +135,14 @@ trait FormRunnerActions
       // S3 tests disable the actual sending of email (this parameter is not documented)
       val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
 
-      if (sendEmail) {
+      if (sendEmail)
         emailContentsFromTemplates.headOption.foreach(EmailTransport.send(_).get)
-      }
 
       val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
 
-      if (s3Store) {
-        // Only store email contents to S3 if enabled by parameter
+      // Only store email contents to S3 if enabled by parameter
+      if (s3Store)
         storeEmailContentsToS3(params, emailContentsFromTemplates).get
-      }
     }
 
   def emailsToSend(
@@ -152,7 +150,8 @@ trait FormRunnerActions
     templateMatch           : TemplateMatch,
     language                : String,
     templateNameOpt         : Option[String],
-    pdfParams               : ActionParams)(implicit
+    pdfParams               : ActionParams
+  )(implicit
     formRunnerParams        : FormRunnerParams
   ): List[EmailContent] = {
 
@@ -694,7 +693,7 @@ trait FormRunnerActions
 
           locally {
 
-            val response = topLevelInstance(FormModel, "fr-send-submission-response").get
+            val responseInstance = topLevelInstance(FormModel, "fr-send-submission-response").get
 
             val node =
               getOrCreateRenderedFormatPathElemOpt(
@@ -705,7 +704,7 @@ trait FormRunnerActions
                 create               = true
               ).get
 
-            response.rootElement.stringValue.trimAllToOpt foreach { pathToTmpFile =>
+            responseInstance.rootElement.stringValue.trimAllToOpt foreach { pathToTmpFile =>
               setvalue(
                 ref   = node,
                 value = pathToTmpFile

@@ -311,7 +311,7 @@ trait ProcessInterpreter extends Logging {
     }
 
   // Id of the currently running process
-  def runningProcessId: Option[String] = processStackDyn.value map (_.processId)
+  def runningProcessId: Option[String] = processStackDyn.value.map(_.processId)
 
   // Interrupt the process and complete with a success
   private def tryTerminateWithSuccess(params: ActionParams): ActionResult =

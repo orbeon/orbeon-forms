@@ -522,19 +522,18 @@ trait FormRunnerActions
 
       ensureDataCalculationsAreUpToDate()
 
-      val renderedFormat = (
+      val renderedFormat =
         paramByNameUseAvt(params, "format")
-        flatMap   trimAllToOpt
-        flatMap   RenderedFormat.withNameOption
-        getOrElse RenderedFormat.Pdf
-      )
+          .flatMap(trimAllToOpt)
+          .flatMap(RenderedFormat.withNameOption)
+          .getOrElse(RenderedFormat.Pdf)
 
       // Q: Noticing we use `EscapeURI`, while `buildContentDispositionHeader` uses `URLEncoder.encode`. Any good
       // reason for this?
       val filename =
         EscapeURI.escape(FormRunnerActionsSupport.filenameForRenderedFormat(renderedFormat), "-_.~").toString
 
-      val path =
+      val pathQuery =
         buildRenderedFormatPath(
           params          = params,
           renderedFormat  = renderedFormat,
@@ -550,7 +549,7 @@ trait FormRunnerActions
 
       tryChangeModeImpl(
         replace            = ReplaceType.All,
-        pathQuery          = path,
+        pathQuery          = pathQuery,
         sourceModeType     = frParams.modeType(frc.customModes),
         showProgress       = false,
         formTargetOpt      = formTargetOpt,
@@ -714,7 +713,7 @@ trait FormRunnerActions
         case Some(pathToTmpFileWithKey) => pathToTmpFileWithKey
         case None =>
 
-          val path =
+          val pathQuery =
             buildRenderedFormatPath(
               params          = params,
               renderedFormat  = renderedFormat,
@@ -722,7 +721,7 @@ trait FormRunnerActions
               currentFormLang = currentFormLang
             )
 
-          tryChangeModeImpl(ReplaceType.Instance, path, sourceModeType = frParams.modeType(frc.customModes)).get
+          tryChangeModeImpl(ReplaceType.Instance, pathQuery, sourceModeType = frParams.modeType(frc.customModes)).get
 
           locally {
 

@@ -453,14 +453,14 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def formModelOpt: Option[XFormsModel] = topLevelModel(FormModel)
 
   // Return specific Form Runner instances
-  def formInstance                : XFormsInstance         = topLevelInstance(FormModel,        FormInstance)                 get
+  def formInstance                : XFormsInstance         = topLevelInstance(FormModel,        FormInstance).get
   def metadataInstance            : Option[XFormsInstance] = topLevelInstance(FormModel,        MetadataInstance)
   def urlsInstance                : Option[XFormsInstance] = topLevelInstance(PersistenceModel, "fr-urls-instance")
   def formAttachmentsInstance     : Option[XFormsInstance] = topLevelInstance(FormModel,        "fr-form-attachments")
 
   def parametersInstance          : Option[XFormsInstance] = topLevelInstance(ParametersModel,   "fr-parameters-instance")
-  def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
-  def persistenceInstance         : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
+  def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance").get
+  def persistenceInstance         : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-persistence-instance").get
 
   def getMode: String =
     (parametersInstance.get.rootElement / "mode").stringValue

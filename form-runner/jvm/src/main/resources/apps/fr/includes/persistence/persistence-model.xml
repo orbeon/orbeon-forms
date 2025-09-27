@@ -1366,7 +1366,6 @@
                         seconds-from-duration($wait-duration)
                     ) * 1000"/>
                 <xf:dispatch
-                    if="not($autosave-now)"
                     name="maybe-autosave"
                     targetid="fr-persistence-model"
                     delay="{$wait-milliseconds}"

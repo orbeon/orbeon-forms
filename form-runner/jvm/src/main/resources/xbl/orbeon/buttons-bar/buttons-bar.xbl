@@ -67,7 +67,7 @@
                             else
                                 'oxf.fr.detail.button',
                         $buttons-names :=
-                            if (empty($buttons-property-opt) and $fr-mode = ('pdf', 'email')) then
+                            if (empty($buttons-property-opt) and $fr-mode = 'pdf') then
                                 ()
                             else if (empty($buttons-property-opt) and $fr-mode = 'test') then
                                 (

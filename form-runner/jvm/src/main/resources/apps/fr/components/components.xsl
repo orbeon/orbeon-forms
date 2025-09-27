@@ -45,7 +45,7 @@
 
     <xsl:variable
         name="is-pdf-mode"
-        select="$mode = ('pdf', 'tiff', 'test-pdf', 'email')"
+        select="$mode = ('pdf', 'tiff', 'test-pdf')"
         as="xs:boolean"/>
 
     <xsl:variable
@@ -903,7 +903,7 @@
             }}"
             xxf:no-updates="{{
                 (:
-                    This covers at least: 'email', 'pdf', 'test-pdf', 'tiff', 'controls', 'validate', 'import',
+                    This covers at least: 'pdf', 'test-pdf', 'tiff', 'controls', 'validate', 'import',
                     'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when used in background
                     mode, see https://github.com/orbeon/orbeon-forms/issues/3318, as well as exports.
                     The idea is that all services and exports are non-interactive.
@@ -948,7 +948,7 @@
                 else
                     '{
                         let $mode := fr:mode(),
-                            $use-pdf-template := $mode = (''pdf'', ''email'') and fr:use-pdf-template(),
+                            $use-pdf-template := $mode = ''pdf'' and fr:use-pdf-template(),
                             $p :=
                                 xxf:property(
                                     string-join(
@@ -985,7 +985,7 @@
                 else
                     '{
                         let $mode := fr:mode(),
-                            $use-pdf-template := $mode = (''pdf'', ''email'') and fr:use-pdf-template(),
+                            $use-pdf-template := $mode = ''pdf'' and fr:use-pdf-template(),
                             $p :=
                                 xxf:property(
                                     string-join(

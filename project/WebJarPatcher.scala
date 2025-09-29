@@ -109,16 +109,16 @@ object WebJarPatcher {
     }
 
     for {
-      jarFile <- jarFiles
-      patch   <- patches
-      if patch.matchesJarPath(jarFile)
+      jarFile           <- jarFiles
+      patchesForJarFile = patches.filter(_.matchesJarPath(jarFile))
+      if patchesForJarFile.nonEmpty
     } yield {
       // Apply all patches for this JAR file
-      patchJarFile(jarFile, patch, destinationDir)
+      patchJarFile(jarFile, patchesForJarFile, destinationDir)
     }
   }
 
-  private def patchJarFile(originalJar: File, patch: JarPatch, patchDir: File): File = {
+  private def patchJarFile(originalJar: File, patches: Seq[JarPatch], patchDir: File): File = {
     val patchedJar = patchedJarFile(originalJar, patchDir)
     val jarInput   = new JarInputStream (new FileInputStream (originalJar))
     val jarOutput  = new JarOutputStream(new FileOutputStream(patchedJar))
@@ -130,23 +130,26 @@ object WebJarPatcher {
         case None        => patchedFileCount // All entries have been processed
         case Some(entry) =>
 
-          val entryName = entry.getName // We always get / as path separator here
-          val mustPatch = patch.matchesPathInJar(entryName)
+          val entryName        = entry.getName                               // We always get / as path separator here
+          val patchForEntryOpt = patches.find(_.matchesPathInJar(entryName)) // Support only a single patch for now
 
-          if (mustPatch) {
-            // Read and patch content
-            val originalContent = new String(IO.readBytes(jarInput), "UTF-8")
-            val patchedContent  = patch.replacement(originalContent)
+          patchForEntryOpt match {
+            case Some(patchForEntry) =>
 
-            val newEntry = new JarEntry(entryName)
-            newEntry.setTime(entry.getTime)
+              // Read and patch content
+              val originalContent = new String(IO.readBytes(jarInput), "UTF-8")
+              val patchedContent  = patchForEntry.replacement(originalContent)
 
-            jarOutput.putNextEntry(newEntry)
-            jarOutput.write(patchedContent.getBytes("UTF-8"))
-          } else {
-            // No patching, copy entry
-            jarOutput.putNextEntry(new JarEntry(entry))
-            IO.transfer(jarInput, jarOutput)
+              val newEntry = new JarEntry(entryName)
+              newEntry.setTime(entry.getTime)
+
+              jarOutput.putNextEntry(newEntry)
+              jarOutput.write(patchedContent.getBytes("UTF-8"))
+
+            case None =>
+              // No patching, copy entry
+              jarOutput.putNextEntry(new JarEntry(entry))
+              IO.transfer(jarInput, jarOutput)
           }
 
           jarOutput.closeEntry()
@@ -155,7 +158,7 @@ object WebJarPatcher {
           // Process next entry
           patchEntryIfNeeded(
             entryOpt         = Option(jarInput.getNextJarEntry),
-            patchedFileCount = if (mustPatch) patchedFileCount + 1 else patchedFileCount
+            patchedFileCount = if (patchForEntryOpt.isDefined) patchedFileCount + 1 else patchedFileCount
           )
       }
 

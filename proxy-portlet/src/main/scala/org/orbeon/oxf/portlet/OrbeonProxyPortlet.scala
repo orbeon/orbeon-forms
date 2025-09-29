@@ -518,11 +518,10 @@ private[portlet] object OrbeonProxyPortlet {
     configuredFormName: Option[String],
   ): Boolean =
     (incomingPath, configuredPage) match {
-      case (FormRunnerPdfTiffDocumentPathRegex(appName, formName, mode @ ("pdf" | "tiff"), _, _), configuredPage)
-        if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName) =>
-        true
+      case (FormRunnerPdfTiffDocumentPathRegex(appName, formName, mode @ ("pdf" | "tiff"), _, _), configuredPage) =>
+        checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName)
       case _ =>
-        false
+        true
     }
 
   private def checkAppFormAllowed(

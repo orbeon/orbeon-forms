@@ -1,0 +1,31 @@
+--- original/js//select2.full.js	2020-02-09 11:35:28
++++ patched/js//select2.full.js	2025-09-19 11:12:35
+@@ -29,7 +29,7 @@
+     };
+   } else {
+     // Browser globals
+-    factory(jQuery);
++    factory(ORBEON.jQuery);
+   }
+ } (function (jQuery) {
+   // This is needed so we can catch the AMD loader configuration and use it
+@@ -4120,14 +4120,17 @@
+       self.handleSearch(evt);
+     });
+ 
++    // Patch for compatibility with jQuery 3.6.0
++    // https://github.com/select2/select2/issues/5993#issuecomment-928052372
+     container.on('open', function () {
+       self.$search.attr('tabindex', 0);
+       self.$search.attr('aria-controls', resultsId);
+ 
+-      self.$search.trigger('focus');
++      // self.$search.trigger('focus');
+ 
+       window.setTimeout(function () {
+-        self.$search.trigger('focus');
++        //self.$search.trigger('focus');
++        self.$search.get(0)?.focus();
+       }, 0);
+     });
+ 

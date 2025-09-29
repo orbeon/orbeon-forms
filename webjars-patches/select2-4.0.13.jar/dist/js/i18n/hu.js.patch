@@ -1,0 +1,9 @@
+--- original/js/i18n//hu.js	2020-02-09 11:35:28
++++ patched/js/i18n//hu.js	2025-09-19 11:12:35
+@@ -1,3 +1,3 @@
+ /*! Select2 4.0.13 | https://github.com/select2/select2/blob/master/LICENSE.md */
+ 
+-!function(){if(jQuery&&jQuery.fn&&jQuery.fn.select2&&jQuery.fn.select2.amd)var e=jQuery.fn.select2.amd;e.define("select2/i18n/hu",[],function(){return{errorLoading:function(){return"Az eredmények betöltése nem sikerült."},inputTooLong:function(e){return"Túl hosszú. "+(e.input.length-e.maximum)+" karakterrel több, mint kellene."},inputTooShort:function(e){return"Túl rövid. Még "+(e.minimum-e.input.length)+" karakter hiányzik."},loadingMore:function(){return"Töltés…"},maximumSelected:function(e){return"Csak "+e.maximum+" elemet lehet kiválasztani."},noResults:function(){return"Nincs találat."},searching:function(){return"Keresés…"},removeAllItems:function(){return"Távolítson el minden elemet"}}}),e.define,e.require}();
+\ No newline at end of file
++!function(){if(ORBEON.jQuery&&ORBEON.jQuery.fn&&ORBEON.jQuery.fn.select2&&ORBEON.jQuery.fn.select2.amd)var e=ORBEON.jQuery.fn.select2.amd;e.define("select2/i18n/hu",[],function(){return{errorLoading:function(){return"Az eredmények betöltése nem sikerült."},inputTooLong:function(e){return"Túl hosszú. "+(e.input.length-e.maximum)+" karakterrel több, mint kellene."},inputTooShort:function(e){return"Túl rövid. Még "+(e.minimum-e.input.length)+" karakter hiányzik."},loadingMore:function(){return"Töltés…"},maximumSelected:function(e){return"Csak "+e.maximum+" elemet lehet kiválasztani."},noResults:function(){return"Nincs találat."},searching:function(){return"Keresés…"},removeAllItems:function(){return"Távolítson el minden elemet"}}}),e.define,e.require}();
+\ No newline at end of file

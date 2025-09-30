@@ -20,12 +20,13 @@ import io.circe.parser.decode
 import org.log4s.Logger
 import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.liferay.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
@@ -43,7 +44,6 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import org.orbeon.web.DomSupport.*
 import scala.util.{Failure, Success}
 
 
@@ -180,8 +180,6 @@ object InitSupport {
         case Some(tabDuplicationReplyIo) =>
           DuplicateTab.waitForReplyWithTimeout(
             tabDuplicationReplyIo = tabDuplicationReplyIo,
-            namespacedFormId      = initializations.namespacedFormId,
-            uuid                  = initializations.uuid,
             timeout               = initializations.configuration.internalShortDelay.millis,
             timeoutContinuation   = pageContainsFormsMarkupIo.flatMap(_ => initializeFormIo(allEvents = true))
           )

@@ -5,19 +5,18 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.Session.broadcastChannelAvailable
 import org.scalajs.dom.{BroadcastChannel, MessageEvent}
 
-import scala.collection.mutable
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.util.Success
 
 
 object DuplicateTab {
 
   import Private.*
 
-  type DuplicateTabListener = () => Unit
-
-  def addDuplicateTabListener(listener: DuplicateTabListener): Unit    = duplicateTabListeners += listener
-  def removeDuplicateTabListener(listener: DuplicateTabListener): Unit = duplicateTabListeners -= listener
+  // `Future` used so we can register a callback
+  val duplicateTabDetectedF: Future[Unit] = duplicateTabDetectedP.future
 
   def pingAndRegisterAllHandlers(namespacedFormId: String, uuid: String): Option[IO[Unit]] =
     newBroadcastChannel(TabActivityBroadcastChannel).map { broadcastChannel =>
@@ -25,15 +24,13 @@ object DuplicateTab {
         .flatMap(_ => registerDuplicatedTabHandlers(broadcastChannel, namespacedFormId, uuid))
     }
 
-  def waitForReplyWithTimeout[T](tabDuplicationReplyIo: IO[T], namespacedFormId: String, uuid: String, timeout: Duration, timeoutContinuation: IO[Unit]): IO[Unit] =
+  def waitForReplyWithTimeout[T](tabDuplicationReplyIo: IO[T], timeout: Duration, timeoutContinuation: IO[Unit]): IO[Unit] =
     tabDuplicationReplyIo
       .timeoutTo(
         timeout,
         timeoutContinuation
       )
-      .map { _ =>
-        Private.fireDuplicateTabListeners()
-      }
+      .*>(IO(duplicateTabDetectedP.complete(Success(()))))
 
   def registerPingHandler(namespacedFormId: String, uuid: String): Unit =
     newBroadcastChannel(TabActivityBroadcastChannel).foreach { tabActivityBroadcastChannel =>
@@ -128,8 +125,7 @@ object DuplicateTab {
       val uuid            : String
     }
 
-    val duplicateTabListeners: mutable.ListBuffer[DuplicateTabListener] = mutable.ListBuffer.empty
-
-    def fireDuplicateTabListeners(): Unit = duplicateTabListeners.foreach(_())
+    // Use `Promise`/`Future` so we get one-time notification
+    val duplicateTabDetectedP = Promise[Unit]()
   }
 }

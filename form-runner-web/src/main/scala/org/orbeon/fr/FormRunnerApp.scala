@@ -219,13 +219,11 @@ object FormRunnerApp extends App {
     }
   }
 
-  private def initDuplicateTabDialog(dialogElem: html.Element): Unit = {
-    val dialog = dialogElem.asInstanceOf[HTMLDialogElement]
-    DuplicateTab.addDuplicateTabListener { () =>
+  private def initDuplicateTabDialog(dialogElem: html.Element): Unit =
+    DuplicateTab.duplicateTabDetectedF.foreach { _ =>
       dialogElem.closestOpt(s"form.$InitiallyHiddenClass").foreach(_.classList.remove(InitiallyHiddenClass))
-      dialog.showModal()
+      dialogElem.asInstanceOf[HTMLDialogElement].showModal()
     }
-  }
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

@@ -235,6 +235,7 @@
         <paging>
             <to>à</to>
             <of>sur</of>
+            <page>Page</page>
         </paging>
         <messages>
             <no-form-data-found>Aucun formulaire trouvé.</no-form-data-found>

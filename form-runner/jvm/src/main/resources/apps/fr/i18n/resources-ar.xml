@@ -232,6 +232,7 @@
         <paging>
             <to>إلى</to>
             <of>من</of>
+            <page>صفحة</page>
         </paging>
         <messages>
             <no-form-data-found>لم يتم العثور على بيانات النموذج.</no-form-data-found>

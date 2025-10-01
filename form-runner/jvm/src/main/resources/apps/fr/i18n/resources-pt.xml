@@ -232,6 +232,7 @@
         <paging>
             <to>a</to>
             <of>de</of>
+            <page>Página</page>
         </paging>
         <messages>
             <no-form-data-found>Não foram encontrados formulários.</no-form-data-found>

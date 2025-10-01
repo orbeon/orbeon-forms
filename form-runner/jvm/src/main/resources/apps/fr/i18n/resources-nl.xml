@@ -232,6 +232,7 @@
         <paging>
             <to>tot</to>
             <of>van</of>
+            <page>Pagina</page>
         </paging>
         <messages>
             <no-form-data-found>Er zijn geen formgegevens gevonden.</no-form-data-found>

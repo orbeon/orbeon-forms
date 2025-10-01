@@ -232,6 +232,7 @@
         <paging>
             <to>bis</to>
             <of>von</of>
+            <page>Seite</page>
         </paging>
         <messages>
             <no-form-data-found>Es wurde kein Formular gefunden.</no-form-data-found>

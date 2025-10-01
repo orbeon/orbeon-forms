@@ -232,6 +232,7 @@
         <paging>
             <to>a</to>
             <of>di</of>
+            <page>Pagina</page>
         </paging>
         <messages>
             <no-form-data-found>I dati del modulo non sono stati trovati.</no-form-data-found>

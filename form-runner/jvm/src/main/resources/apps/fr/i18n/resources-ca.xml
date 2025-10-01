@@ -235,6 +235,7 @@
         <paging>
             <to>al</to>
             <of>de</of>
+            <page>Pàgina</page>
         </paging>
         <messages>
             <no-form-data-found>No es va trobar el formulari.</no-form-data-found>

@@ -232,6 +232,7 @@
         <paging>
             <to>till</to>
             <of>av</of>
+            <page>Sida</page>
         </paging>
         <messages>
             <no-form-data-found>Inget formulär hittades.</no-form-data-found>

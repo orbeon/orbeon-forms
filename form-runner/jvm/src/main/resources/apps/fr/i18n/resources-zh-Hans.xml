@@ -226,6 +226,7 @@
         <paging>
             <to>至</to>
             <of>共</of>
+            <page>页</page>
         </paging>
         <messages>
             <no-form-data-found>未找到表单数据。</no-form-data-found>

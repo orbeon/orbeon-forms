@@ -243,6 +243,7 @@
         <paging>
             <to>al</to>
             <of>de</of>
+            <page>Página</page>
         </paging>
         <messages>
             <no-form-data-found>No se encontró el formulario.</no-form-data-found>

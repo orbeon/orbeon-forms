@@ -226,6 +226,7 @@
         <paging>
             <to>til</to>
             <of>af</of>
+            <page>Side</page>
         </paging>
         <messages>
             <no-form-data-found>Ingen blanketter fundet.</no-form-data-found>

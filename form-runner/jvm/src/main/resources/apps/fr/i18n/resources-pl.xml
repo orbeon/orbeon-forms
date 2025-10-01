@@ -232,6 +232,7 @@
         <paging>
             <to>do</to>
             <of>z</of>
+            <page>Strona</page>
         </paging>
         <messages>
             <no-form-data-found>Nie znaleziono formularzy.</no-form-data-found>

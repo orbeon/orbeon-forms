@@ -226,6 +226,7 @@
         <paging>
             <to>до</to>
             <of>из</of>
+            <page>Страница</page>
         </paging>
         <messages>
             <no-form-data-found>Форм не найдено.</no-form-data-found>

@@ -232,6 +232,7 @@
         <paging>
             <to>to</to>
             <of>of</of>
+            <page>Page</page>
         </paging>
         <messages>
             <no-form-data-found>No form data was found.</no-form-data-found>

@@ -13,6 +13,10 @@
         xxf:external-events="fr-set-current-page"
         xxbl:mode="javascript-lifecycle">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/pager/pager.css"/>
+        </xbl:resources>
+
         <xbl:handlers>
             <!-- Used by the client-side pager API -->
             <xbl:handler event="fr-set-current-page" phase="target">
@@ -161,11 +165,28 @@
                     <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
                         <xh:li role="presentation">
                             <xf:output
+                                class="fr-paging-page"
+                                ref="
+                                    if (fr:component-param-value('show') = 'pages') then
+                                        xxf:r('summary.paging.page', '|fr-fr-resources|')
+                                    else
+                                        ()"/>
+                            <xf:select1
+                                appearance="search"
+                                ref="
+                                    if (fr:component-param-value('show') = 'pages') then
+                                        instance('fr-paging-instance')/page-number
+                                    else
+                                        ()">
+                                <xf:itemset ref="1 to instance('fr-paging-instance')/page-count">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="."/>
+                                </xf:itemset>
+                            </xf:select1>
+                            <xf:output
                                 value="
                                     if (fr:component-param-value('show') = 'pages') then
                                         concat(
-                                            string(max((instance('fr-paging-instance')/page-number, 0))),
-                                            ' ',
                                             xxf:r('summary.paging.of', '|fr-fr-resources|'),
                                             ' ',
                                             instance('fr-paging-instance')/page-count
@@ -204,20 +225,6 @@
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
-                    </xh:li>
-                    <xh:li class="{'xforms-hidden'[not(fr:component-param-value('show') = 'pages')]}">
-                        <xf:select1
-                            appearance="search"
-                            ref="
-                                if (fr:component-param-value('show') = 'pages') then
-                                    instance('fr-paging-instance')/page-number
-                                else
-                                    ()">
-                            <xf:itemset ref="1 to instance('fr-paging-instance')/page-count">
-                                <xf:label ref="."/>
-                                <xf:value ref="."/>
-                            </xf:itemset>
-                        </xf:select1>
                     </xh:li>
                 </xh:ul>
             </xh:div>

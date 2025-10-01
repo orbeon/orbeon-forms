@@ -232,6 +232,7 @@
         <paging>
             <to>-</to>
             <of>/</of>
+            <page>Oldal</page>
         </paging>
         <messages>
             <no-form-data-found>Nem található űrlapadat.</no-form-data-found>

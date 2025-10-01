@@ -226,6 +226,7 @@
         <paging>
             <to>til</to>
             <of>av</of>
+            <page>Side</page>
         </paging>
         <messages>
             <no-form-data-found>Ingen skjema funnet.</no-form-data-found>

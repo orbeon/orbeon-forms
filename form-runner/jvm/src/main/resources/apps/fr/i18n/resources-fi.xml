@@ -232,6 +232,7 @@
         <paging>
             <to>-</to>
             <of>/</of>
+            <page>Sivu</page>
         </paging>
         <messages>
             <no-form-data-found>Taulukkotietoja ei löytynyt.</no-form-data-found>

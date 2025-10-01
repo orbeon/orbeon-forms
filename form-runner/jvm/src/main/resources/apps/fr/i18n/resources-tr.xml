@@ -232,6 +232,7 @@
         <paging>
             <to>-</to>
             <of>/</of>
+            <page>Sayfa</page>
         </paging>
         <messages>
             <no-form-data-found>Hiçbir form verisi bulunamadı.</no-form-data-found>

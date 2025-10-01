@@ -1,4 +1,4 @@
-package org.orbeon.oxf.xforms.route
+package org.orbeon.xforms.route
 
 import org.orbeon.dom
 import org.orbeon.dom.io.XMLWriter
@@ -7,14 +7,12 @@ import org.orbeon.oxf.controller.{PageFlowControllerProcessor, XmlNativeRoute}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.event.XFormsServer
 import org.orbeon.oxf.xforms.event.events.*
-import org.orbeon.oxf.xforms.processor.PipelineResponse
 import org.orbeon.oxf.xforms.state.RequestParameters
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
@@ -29,12 +27,7 @@ object XFormsServerRoute extends XmlNativeRoute {
 
   import Private.*
 
-  def process(
-    matchResult   : MatchResult
-  )(implicit
-    pc            : PipelineContext,
-    ec            : ExternalContext
-  ): Unit =
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit =
     doIt(
       readRequestBodyAsDomDocument,
       Some(getResponseXmlReceiverSetContentType)

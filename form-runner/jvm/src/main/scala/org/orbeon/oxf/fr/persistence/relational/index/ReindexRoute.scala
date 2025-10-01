@@ -19,7 +19,6 @@ import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*
 
 
@@ -33,12 +32,7 @@ object ReindexRoute extends NativeRoute {
 
   private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex(?:/([^/]+)/([^/]+))?""".r
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
 

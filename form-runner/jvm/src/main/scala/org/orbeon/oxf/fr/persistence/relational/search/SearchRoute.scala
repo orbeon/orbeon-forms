@@ -20,7 +20,6 @@ import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.IndentedLogger
 
 
@@ -30,12 +29,7 @@ object SearchRoute extends XmlNativeRoute {
 
   private val Path = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
 

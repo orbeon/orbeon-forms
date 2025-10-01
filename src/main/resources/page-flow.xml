@@ -11,17 +11,14 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
+<controller
+    xmlns="http://www.orbeon.com/oxf/controller"
+    matcher="regexp"
+    request-interceptor="org.orbeon.xforms.route.XFormsServerInterceptor">
 
     <!-- ==== Forward application services ========================================================================= -->
 
     <service path="/([^/]+)/service/.+" model="apps/${1}/page-flow.xml" public-methods="#all"/>
-
-    <!-- ==== XForms================================================================================================ -->
-
-    <page path="/xforms-server/upload" public-methods="POST"     methods="POST"     class="org.orbeon.oxf.xforms.processor.XFormsUploadRoute"/>
-    <page path="/xforms-server(/.*)?"  public-methods="POST"     methods="POST"     class="org.orbeon.oxf.xforms.route.XFormsServerRoute"/>
-    <page path="/xforms-server(/.*)?"  public-methods="HEAD GET" methods="HEAD GET" class="org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute"/>
 
     <!-- ==== Files ================================================================================================ -->
 

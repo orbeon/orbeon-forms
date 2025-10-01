@@ -20,7 +20,6 @@ import org.orbeon.oxf.fr.persistence.relational.form.adt.FormRequest
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.scaxon.NodeConversions
@@ -33,12 +32,7 @@ object PublishedFormMetadataRoute extends XmlNativeRoute {
 
   self =>
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 

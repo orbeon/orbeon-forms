@@ -36,13 +36,13 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
-import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.submission.ReplaceType
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames.*
+import org.orbeon.xforms.route.XFormsAssetServerRoute
 import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI

@@ -50,12 +50,7 @@ import scala.util.control.NonFatal
 
 
 trait NativeRoute {
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit
 }
 
 trait XmlNativeRoute extends NativeRoute {
@@ -230,50 +225,48 @@ class PageFlowControllerProcessor extends ProcessorImpl {
           if method.isEmpty || method.exists(route.routeElement.supportedMethods) => rm
       }
 
-    // Run the first matching entry if any
-    findRoute(path, request.getMethod.some) match {
-      case Some((route: FileRoute, matchResult)) =>
-        // Run the given route and let the caller handle errors
-        debug("processing file", logParams)
-        route.process(pc, ec, matchResult)
-      case Some((route: PageOrServiceRoute, matchResult)) if route.isPage && pageFlow.interceptor.exists(_.matches(ec.getRequest)) =>
-        pageFlow.interceptor.foreach(_.process(matchResult)(pc, ec))
-      case Some((route: PageOrServiceRoute, matchResult)) =>
-        debug("processing page/service", logParams)
-
-        // The path type, `page` or `service`, can be used by the serializer to determine the appropriate `Cache-Control` header
-        pc.setAttribute(PathTypeKey, if (route.isPage) PathType.Page else PathType.Service)
-        // Run the given route and handle "not found" and error conditions
-        try
+    if (! pageFlow.interceptor.exists(_.process()(pc, ec)))
+      findRoute(path, request.getMethod.some) match {
+        case Some((route: FileRoute, matchResult)) =>
+          // Run the given route and let the caller handle errors
+          debug("processing file", logParams)
           route.process(pc, ec, matchResult)
-        catch { case NonFatal(t) =>
-          getRootThrowable(t) match {
-            case e: HttpRedirectException =>
-              ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
-            // We don't have a "deleted" route at this point, and thus run the not found route when we
-            // found a "resource" to be deleted
-            case e: HttpStatusCodeException =>
-              e.code match {
-                case code @ (StatusCode.NotFound | StatusCode.Gone) =>
-                  if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t), code) // preserve status code for service at least
-                case StatusCode.Unauthorized | StatusCode.Forbidden =>
-                  if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
-                case _ =>
-                  sendHttpStatusCode(e)
-              }
-            case _: ResourceNotFoundException =>
-              if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-            case _ if isConnectionInterruption(t) =>
-              info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
-            case _ =>
-              if (route.isPage)     runErrorRoute(t)          else sendError(t)
+        case Some((route: PageOrServiceRoute, matchResult)) =>
+          debug("processing page/service", logParams)
+
+          // The path type, `page` or `service`, can be used by the serializer to determine the appropriate `Cache-Control` header
+          pc.setAttribute(PathTypeKey, if (route.isPage) PathType.Page else PathType.Service)
+          // Run the given route and handle "not found" and error conditions
+          try
+            route.process(pc, ec, matchResult)
+          catch { case NonFatal(t) =>
+            getRootThrowable(t) match {
+              case e: HttpRedirectException =>
+                ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
+              // We don't have a "deleted" route at this point, and thus run the not found route when we
+              // found a "resource" to be deleted
+              case e: HttpStatusCodeException =>
+                e.code match {
+                  case code @ (StatusCode.NotFound | StatusCode.Gone) =>
+                    if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t), code) // preserve status code for service at least
+                  case StatusCode.Unauthorized | StatusCode.Forbidden =>
+                    if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
+                  case _ =>
+                    sendHttpStatusCode(e)
+                }
+              case _: ResourceNotFoundException =>
+                if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+              case _ if isConnectionInterruption(t) =>
+                info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
+              case _ =>
+                if (route.isPage)     runErrorRoute(t)          else sendError(t)
+            }
           }
-        }
-      case None if findRoute(path, None).isDefined =>
-        sendMethodNotAllowed()
-      case _ =>
-        runNotFoundRoute(None)
-    }
+        case None if findRoute(path, None).isDefined =>
+          sendMethodNotAllowed()
+        case _ =>
+          runNotFoundRoute(None)
+      }
   }
 
   // Compile a controller file
@@ -667,7 +660,7 @@ object PageFlowControllerProcessor {
 
       clazzInstance match {
         case Some(route) =>
-          route.process(matchResult)(pc, ec)
+          route.process()(pc, ec)
         case None =>
 
         // PipelineConfig is reusable, but PipelineProcessor is not

@@ -11,14 +11,15 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor
+package org.orbeon.xforms.route
 
-import java.io.{OutputStream, OutputStreamWriter, PrintWriter}
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.processor.serializer.CachedSerializer
 import org.orbeon.oxf.util.{ContentHandlerOutputStream, ContentTypes}
 import org.orbeon.oxf.xml.XMLReceiver
+
+import java.io.{OutputStream, OutputStreamWriter, PrintWriter}
 
 
 object PipelineResponse {

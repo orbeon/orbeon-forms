@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, ResourceManagerTestBase, XFormsSupport}
+import org.orbeon.xforms.route.XFormsAssetServerRoute
 import org.scalatest.funspec.AnyFunSpecLike
 
 

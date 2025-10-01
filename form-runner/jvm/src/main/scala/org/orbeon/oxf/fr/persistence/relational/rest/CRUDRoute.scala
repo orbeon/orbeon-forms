@@ -21,7 +21,6 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
@@ -38,12 +37,7 @@ object CRUDRoute
 
   private val logger = LoggerFactory.createLogger(CRUDRoute.getClass)
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val indentedLogger : IndentedLogger  = new IndentedLogger(logger)
 

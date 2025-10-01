@@ -366,9 +366,6 @@ object XFormsNames {
 
   val XXFORMS_MULTIPLE_QNAME = xxformsQName("multiple")
 
-  // TODO: Move to handlers
-  val DUMMY_SCRIPT_URI   = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK"                       // empty self-calling function
-
   val XhtmlNamespace = Namespace(XHTML_SHORT_PREFIX, XHTML_NAMESPACE_URI)
   val XhtmlDivQname  = QName("div",  XhtmlNamespace)
   val XhtmlSpanQname = QName("span", XhtmlNamespace)

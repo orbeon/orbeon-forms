@@ -2,7 +2,7 @@ package org.orbeon.xbl
 
 import autowire.*
 import org.orbeon.fr.rpc.{FormRunnerRpcApi, FormRunnerRpcClient}
-import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
+import org.orbeon.xforms.Constants.DummyImageUri
 import org.orbeon.xforms.{Page, XFormsApp}
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
@@ -24,7 +24,7 @@ object ImageAttachment {
     // https://github.com/orbeon/orbeon-forms/issues/7149
     override def init(): Unit =
       if (XFormsApp.isBrowserEnvironment)
-        if (imageElOpt.exists(_.src.contains(DUMMY_IMAGE_URI)))
+        if (imageElOpt.exists(_.src.contains(DummyImageUri)))
           FormRunnerRpcClient[FormRunnerRpcApi]
             .retrieveResource(getXFormsFormOrThrow.deNamespaceIdIfNeeded(containerElem.id))
             .call()

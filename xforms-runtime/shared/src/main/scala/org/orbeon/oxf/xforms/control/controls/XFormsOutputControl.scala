@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.Constants.{DUMMY_IMAGE_URI, DUMMY_VIDEO_URI}
+import org.orbeon.xforms.Constants.{DummyImageUri, DummyVideoUri}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
@@ -122,7 +122,7 @@ class XFormsOutputControl(
       if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
         proxyValueIfNeeded(internalValueMaybeFromTmpFile, "", filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = staticControlOpt.exists(_.isDownloadAppearance))
       } else if (staticControlOpt exists (_.isImageMediatype)) {
-        proxyValueIfNeeded(internalValueMaybeFromTmpFile, DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = false)
+        proxyValueIfNeeded(internalValueMaybeFromTmpFile, DummyImageUri, filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = false)
       } else if (staticControlOpt exists (_.isHtmlMediatype)) {
         internalValue
       } else {
@@ -278,7 +278,7 @@ class XFormsOutputControl(
   override def getNonRelevantEscapedExternalValue: String =
     if (mediatype exists (_.startsWith("image/")))
       // Return rewritten URL of dummy image URL
-      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, UrlRewriteMode.AbsolutePath)
+      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DummyImageUri, UrlRewriteMode.AbsolutePath)
     else
       super.getNonRelevantEscapedExternalValue
 
@@ -346,9 +346,9 @@ object XFormsOutputControl {
       // Ask control
       control.getExternalValue(collector)
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("image/"))
-      DUMMY_IMAGE_URI
+      DummyImageUri
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("video/"))
-      DUMMY_VIDEO_URI
+      DummyVideoUri
     else
       // Default for other mediatypes
       null

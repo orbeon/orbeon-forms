@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPA
 import org.orbeon.oxf.xml.XMLReceiverHelper.*
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
-import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
+import org.orbeon.xforms.Constants.DummyImageUri
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.Attributes
@@ -224,7 +224,7 @@ class XFormsOutputImageHandler(
     // @src="..."
     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
     val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
-    containerAttributes.addOrReplace("src", if (srcValue ne null) srcValue else DUMMY_IMAGE_URI)
+    containerAttributes.addOrReplace("src", if (srcValue ne null) srcValue else DummyImageUri)
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
     currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)

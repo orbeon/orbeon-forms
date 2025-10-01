@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper.*
-import org.orbeon.xforms.Constants.{DUMMY_IFRAME_URI, DUMMY_IMAGE_URI}
+import org.orbeon.xforms.Constants.{DummyIframeUri, DummyImageUri, DummyScriptUri}
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
@@ -166,9 +166,9 @@ object XXFormsAttributeControl {
 
   private def getNonRelevantValue(attributeName: String, forName: String): String =
     attributeName match {
-      case "src" if forName == "img"    => DUMMY_IMAGE_URI
-      case "src" if forName == "iframe" => DUMMY_IFRAME_URI
-      case "src" if forName == "script" => DUMMY_SCRIPT_URI
+      case "src" if forName == "img"    => DummyImageUri
+      case "src" if forName == "iframe" => DummyIframeUri
+      case "src" if forName == "script" => DummyScriptUri
       case _                            => ""
     }
 

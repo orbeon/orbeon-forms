@@ -16,7 +16,7 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.JQuery
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
+import org.orbeon.xforms.Constants.DummyImageUri
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
@@ -47,7 +47,7 @@ object WPaint {
     def readwrite() = ()
 
     private def backgroundImageChanged(): Unit = {
-      if (imageEl.attr("src") contains DUMMY_IMAGE_URI) {
+      if (imageEl.attr("src") contains DummyImageUri) {
         wpaintElA.addClass("xforms-hidden")
         if (wpaintElC != null) {
             wpaintElC.detach()

@@ -117,8 +117,8 @@ object DomSupport {
     def documentElementT: html.Element =
       doc.documentElement.asInstanceOf[html.Element]
 
-    def activeElementT: html.Element =
-      doc.activeElement.asInstanceOf[html.Element]
+    def activeElementOpt: Option[html.Element] =
+      Option(doc.activeElement.asInstanceOf[html.Element])
 
     def getElementByIdT(elementId: String): html.Element =
       doc.getElementById(elementId).asInstanceOf[html.Element]

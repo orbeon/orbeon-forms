@@ -305,6 +305,12 @@ object XFormsUI {
     // Declared as `val` to ensure function identity, for the `removeEventListener` to work
     val dialogCancelListener: js.Function1[dom.Event, Unit] = (event: dom.Event) => {
       val dialogElem = event.target.asInstanceOf[html.Element]
+
+      // So any `blur` on a control inside the dialog comes before the dialog close event
+      dom.document.activeElementOpt.foreach(activeElement =>
+        if (dialogElem.contains(activeElement))
+          activeElement.blur())
+
       AjaxClient.fireEvent(
         AjaxEvent(
           eventName = "xxforms-dialog-close",

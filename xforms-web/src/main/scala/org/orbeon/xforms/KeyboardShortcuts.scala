@@ -100,16 +100,18 @@ object KeyboardShortcuts {
           (e: dom.KeyboardEvent, _: String) => {
             if (condition.forall(_.apply())) {
               e.preventDefault()
-              val activeElem = dom.document.activeElementT
-              if (activeElem == clickElem) {
-                clickElem.click()
-              } else {
-                // So if the focus is on a control and the user changed its value, the new value is sent to the server
-                // This is as if users clicked on the button, but without losing the focus on the control
-                activeElem.blur()
-                clickElem.focus()
-                clickElem.click()
-                activeElem.focus()
+              dom.document.activeElementOpt.foreach { activeElem =>
+                if (activeElem == clickElem) {
+                  clickElem.click()
+                } else {
+                  // So if the focus is on a control and the user changed its value, the new value is sent to the server
+                  // This is as if users clicked on the button, but without losing the focus on the control
+                  activeElem.blur()
+                  clickElem.focus()
+                  clickElem.click()
+                  activeElem.focus()
+                }
+
               }
             }
           }

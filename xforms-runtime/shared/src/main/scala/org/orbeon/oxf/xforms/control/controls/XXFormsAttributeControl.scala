@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper.*
-import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
+import org.orbeon.xforms.Constants.{DUMMY_IFRAME_URI, DUMMY_IMAGE_URI}
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
@@ -77,15 +77,7 @@ class XXFormsAttributeControl(
     XFormsId.getRelatedEffectiveId(effectiveId, attributeControl.forStaticId)
 
   override def getNonRelevantEscapedExternalValue: String =
-    attributeName match {
-      case "src" if forName == "img" =>
-        // Return rewritten URL of dummy image URL
-        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, UrlRewriteMode.AbsolutePath)
-      case "src" if forName == "script" =>
-        DUMMY_SCRIPT_URI
-      case _ =>
-        super.getNonRelevantEscapedExternalValue
-    }
+    getNonRelevantValue(attributeName, forName)
 
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
@@ -167,14 +159,17 @@ class XXFormsAttributeControl(
 object XXFormsAttributeControl {
 
   private def getExternalValueHandleSrc(controlValue: String, attributeName: String, forName: String): String =
-    if (controlValue.isAllBlank) {
-      attributeName match {
-        case "src" if forName == "img"    => DUMMY_IMAGE_URI
-        case "src" if forName == "script" => DUMMY_SCRIPT_URI // IE8 ignores it; IE9+ loads JS properly
-        case _                            => ""
-      }
-    } else {
+    if (controlValue.isAllBlank)
+      getNonRelevantValue(attributeName, forName)
+    else
       controlValue
+
+  private def getNonRelevantValue(attributeName: String, forName: String): String =
+    attributeName match {
+      case "src" if forName == "img"    => DUMMY_IMAGE_URI
+      case "src" if forName == "iframe" => DUMMY_IFRAME_URI
+      case "src" if forName == "script" => DUMMY_SCRIPT_URI
+      case _                            => ""
     }
 
   def getExternalValueHandleSrc(

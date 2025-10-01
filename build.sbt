@@ -751,7 +751,6 @@ lazy val formRunnerJVM = formRunner.jvm
   )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
-  .settings(WebJarPatcher.compilePatchingSettings: _*)
   .configs(DatabaseTest, DebugDatabaseTest, DebugTest)
   .settings(scala2CommonSettings: _*)
   .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
@@ -781,22 +780,6 @@ lazy val formRunnerJVM = formRunner.jvm
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
-
-    libraryDependencies ++= Seq(
-      "org.webjars.npm" % "bowser"           % "1.9.1",
-      "org.webjars"     % "clipboard.js"     % "2.0.11",
-      "org.webjars.npm" % "codemirror"       % "5.65.19",
-      "org.webjars.npm" % "dragula"          % "3.7.3",
-      "org.webjars.npm" % "fflate"           % "0.6.7",
-      "org.webjars.npm" % "jquery"           % "3.6.1",
-      "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
-      "org.webjars.npm" % "mousetrap"        % "1.6.2",
-      "org.webjars"     % "nprogress"        % "0.2.0",
-      "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
-      "org.webjars.npm" % "select2"          % "4.0.13",
-      "org.webjars.npm" % "tinymce"          % "6.8.5",
-      "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
-    )
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
@@ -1442,7 +1425,6 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
   )
 
 lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
-  .settings(WebJarPatcher.runtimeFullClasspathSettings: _*)
   .settings(
     name := "orbeon-war",
     exportJars := false
@@ -1463,8 +1445,25 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(
     exportJars := false
   )
+  .settings(WebJarPatcher.settings: _*)
   .settings(
-    Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue
+    Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue,
+
+    libraryDependencies ++= Seq(
+      "org.webjars.npm" % "bowser"           % "1.9.1",
+      "org.webjars"     % "clipboard.js"     % "2.0.11",
+      "org.webjars.npm" % "codemirror"       % "5.65.19",
+      "org.webjars.npm" % "dragula"          % "3.7.3",
+      "org.webjars.npm" % "fflate"           % "0.6.7",
+      "org.webjars.npm" % "jquery"           % "3.6.1",
+      "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
+      "org.webjars.npm" % "mousetrap"        % "1.6.2",
+      "org.webjars"     % "nprogress"        % "0.2.0",
+      "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
+      "org.webjars.npm" % "select2"          % "4.0.13",
+      "org.webjars.npm" % "tinymce"          % "6.8.5",
+      "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
+    )
   )
 
 lazy val orbeonWarJS = orbeonWar.js

@@ -28,22 +28,19 @@ object WebJarPatcher {
 
   // Patched JAR files are stored in a separate directory with a distinctive prefix
   private def patchesDir     = Def.task((ThisBuild / baseDirectory).value / "webjars-patches")
-  private def patchedJarsDir = Def.task((ThisBuild / baseDirectory).value / "src" / "target" / "patched-webjars")
+  private def patchedJarsDir = Def.task((ThisBuild / baseDirectory).value / "orbeon-war" / "jvm" / "target" / "patched-webjars")
 
   private def patchedJarFile(originalJar: File, patchDir: File): File =
     patchDir / s"patched-${originalJar.getName}"
 
-  def compilePatchingSettings: Seq[Setting[?]] = Seq(
-    patchWebJars                  := cachedPatchWebJarsTask.value,
-    Compile / compile             := (Compile / compile).dependsOn(patchWebJars).value,
-    Compile / dependencyClasspath := classpathWithPatchedJarFiles((Compile / dependencyClasspath).value, patchedJarsDir.value)
-  )
-
-  // webappPrepareTask uses Runtime / fullClasspath
-  def runtimeFullClasspathSettings: Seq[Setting[?]] = Seq(
+  def settings: Seq[Setting[?]] = Seq(
+    patchWebJars            := cachedPatchWebJarsTask.value,
+    Compile / compile       := (Compile / compile).dependsOn(patchWebJars).value,
+    // webappPrepareTask uses Runtime / fullClasspath
     Runtime / fullClasspath := classpathWithPatchedJarFiles((Runtime / fullClasspath).value, patchedJarsDir.value)
   )
 
+  // TODO: use a single .patch file per JAR file
   private def patchesFromPatchFiles(rootPatchesDir: File, patchFiles: Seq[File]): Seq[JarPatch] =
     patchFiles.map { patchFile =>
 
@@ -165,10 +162,9 @@ object WebJarPatcher {
       // Parse all entries in the JAR file and patch them if needed
       val patchedFileCount = patchEntryIfNeeded(entryOpt = Option(jarInput.getNextJarEntry))
 
-      if (patchedFileCount == 0) {
-        // No file could be patched, this is unexpected ⇒ make the build fail
+      // Make the build fail if all patches have not been applied
+      if (patchedFileCount != patches.size)
         throw new Exception(s"Could not apply patch to ${originalJar.getName}")
-      }
 
     } finally {
       jarInput.close()

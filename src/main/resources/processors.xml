@@ -482,7 +482,7 @@
     </processor>
 
     <processor name="oxf:assets-aggregator">
-        <class name="org.orbeon.oxf.xforms.processor.AssetsAggregator"/>
+        <class name="org.orbeon.xforms.route.AssetsAggregator"/>
     </processor>
 
     <!-- Other processors -->

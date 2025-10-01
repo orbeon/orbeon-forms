@@ -20,7 +20,6 @@ import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 
 
@@ -34,12 +33,7 @@ object DistinctValuesRoute
 
   def httpRequest: ExternalContext.Request = NetUtils.getExternalContext.getRequest
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 

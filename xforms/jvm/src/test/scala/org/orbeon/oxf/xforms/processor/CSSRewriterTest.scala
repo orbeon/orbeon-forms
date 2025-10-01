@@ -15,6 +15,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.xforms.route.XFormsResourceRewriter
 import org.scalatest.funspec.AnyFunSpecLike
 
 class CSSRewriterTest

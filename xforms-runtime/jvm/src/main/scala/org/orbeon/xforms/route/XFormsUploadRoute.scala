@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor
+package org.orbeon.xforms.route
 
 import org.apache.commons.fileupload.FileCountLimitExceededException
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
@@ -19,7 +19,6 @@ import org.orbeon.oxf.controller.XmlNativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.upload.UploaderServer
@@ -31,9 +30,7 @@ import org.orbeon.xforms.EventNames
 
 object XFormsUploadRoute extends XmlNativeRoute {
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
+  def process()(implicit
     pc         : PipelineContext,
     ec         : ExternalContext
   ): Unit = {

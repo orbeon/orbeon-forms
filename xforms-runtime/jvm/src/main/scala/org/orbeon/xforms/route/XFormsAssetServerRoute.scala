@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor
+package org.orbeon.xforms.route
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
@@ -21,7 +21,6 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.ResourceServer
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.Logging.*
@@ -29,6 +28,7 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.XFormsAssetPaths.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
+import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, GlobalBindingIndex}
 import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
@@ -47,12 +47,7 @@ object XFormsAssetServerRoute extends NativeRoute {
   // Unneeded for JVM platform
   private implicit val resourceResolver: Option[ResourceResolver] = None
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("resources")
 

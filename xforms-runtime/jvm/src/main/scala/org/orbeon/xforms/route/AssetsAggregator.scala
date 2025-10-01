@@ -12,17 +12,17 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-package org.orbeon.oxf.xforms.processor
+package org.orbeon.xforms.route
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.*
-import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -35,7 +35,7 @@ class AssetsAggregator extends ProcessorImpl {
 
   self =>
 
-  import AssetsAggregator._
+  import AssetsAggregator.*
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))

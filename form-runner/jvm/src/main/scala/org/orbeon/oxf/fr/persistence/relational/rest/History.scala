@@ -8,11 +8,10 @@ import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger}
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
 import org.orbeon.oxf.xml.DeferredXMLReceiver
 
 import scala.util.matching.Regex
@@ -22,12 +21,7 @@ object HistoryRoute extends XmlNativeRoute {
 
   import History.*
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     val httpRequest  = ec.getRequest
     val httpResponse = ec.getResponse

@@ -12,7 +12,7 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-package org.orbeon.oxf.xforms.processor
+package org.orbeon.xforms.route
 
 import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{CharsetNames, IOUtils, StringBuilderWriter}

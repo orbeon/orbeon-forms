@@ -16,12 +16,6 @@
     matcher="regexp"
     request-interceptor="org.orbeon.xforms.route.XFormsServerInterceptor">
 
-    <!-- ==== XForms================================================================================================ -->
-
-    <page path="/xforms-server/upload" public-methods="POST"     methods="POST"     class="org.orbeon.oxf.xforms.processor.XFormsUploadRoute"/>
-    <page path="/xforms-server(/.*)?"  public-methods="POST"     methods="POST"     class="org.orbeon.oxf.xforms.route.XFormsServerRoute"/>
-    <page path="/xforms-server(/.*)?"  public-methods="HEAD GET" methods="HEAD GET" class="org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute"/>
-
     <!-- ==== Files ================================================================================================ -->
 
     <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|map|png|jpg|xml|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)"/>

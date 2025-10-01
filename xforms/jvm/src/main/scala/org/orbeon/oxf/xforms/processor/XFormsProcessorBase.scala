@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.route.PipelineResponse
 
 import java.lang as jl
 import scala.util.control.NonFatal

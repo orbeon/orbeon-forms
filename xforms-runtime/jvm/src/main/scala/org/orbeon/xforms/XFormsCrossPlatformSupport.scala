@@ -31,10 +31,10 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.xforms.route.XFormsAssetServerRoute
 
 import java.io.*
 import java.net.URI

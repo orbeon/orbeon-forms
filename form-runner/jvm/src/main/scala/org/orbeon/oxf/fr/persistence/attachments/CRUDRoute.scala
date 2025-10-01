@@ -19,7 +19,6 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.{AppForm, FormOrData, Version}
 import org.orbeon.oxf.http.{HttpMethod, HttpRanges, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 
@@ -32,12 +31,7 @@ object CRUDRoute extends NativeRoute {
 
   import CRUD.*
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
     implicit val httpRequest:  Request  = ec.getRequest
     implicit val httpResponse: Response = ec.getResponse

@@ -32,7 +32,6 @@ import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -67,12 +66,7 @@ object PersistenceProxyRoute extends NativeRoute {
 
   import PersistenceProxy.*
 
-  def process(
-    matchResult: MatchResult
-  )(implicit
-    pc         : PipelineContext,
-    ec         : ExternalContext
-  ): Unit = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
     implicit val indentedLogger: IndentedLogger = new IndentedLogger(PersistenceProxy.Logger)
     proxyRequest(ec.getRequest, ec.getResponse)
   }

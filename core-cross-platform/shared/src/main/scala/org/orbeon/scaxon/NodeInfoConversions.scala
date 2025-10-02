@@ -14,7 +14,7 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom
-import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
@@ -35,6 +35,15 @@ object NodeInfoConversions {
 
   def unwrapNode(nodeInfo: om.NodeInfo): Option[dom.Node] =
     nodeInfo.narrowTo[VirtualNodeType] flatMap (_.getUnderlyingNode.cast[dom.Node])
+
+  def detachIfNeeded(nodeInfo: om.NodeInfo): om.NodeInfo =
+    nodeInfo match {
+      case vn: NodeWrapper if vn.getUnderlyingNode.getParent eq null =>
+        vn.parent = null
+        nodeInfo
+      case _ =>
+        nodeInfo
+    }
 
   def getNodeFromNodeInfoConvert(nodeInfo: om.NodeInfo): dom.Node =
     nodeInfo match {

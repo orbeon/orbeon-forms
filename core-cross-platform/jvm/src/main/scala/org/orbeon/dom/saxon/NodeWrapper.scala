@@ -44,7 +44,7 @@ private object NodeWrapper {
  */
 class NodeWrapper protected (
   val node   : Node,
-  var parent : NodeWrapper // null means unknown
+  var parent : NodeWrapper // `null` means unknown OR detached
 ) extends NodeInfo
      with VirtualNode
      with SiblingCountingNode {
@@ -187,7 +187,7 @@ class NodeWrapper protected (
               parent = makeWrapper(node.getDocument, docWrapper)
             else {
               val parentNode = node.getParent
-              // This checks the case of an element detached from a Document
+              // This checks the case of an element detached from a tree
               if (parentNode ne null)
                 parent = makeWrapper(parentNode, docWrapper)
             }

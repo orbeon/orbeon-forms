@@ -21,7 +21,7 @@ trait NodeWrapper
 
   val node       : dom.Node
   val docWrapper : DocumentWrapper
-  var parent     : NodeWrapper // null means unknown
+  var parent     : NodeWrapper // `null` means unknown OR detached
 
   override def getConfiguration: Configuration = docWrapper.getConfiguration
 
@@ -364,7 +364,7 @@ trait NodeWrapper
               makeWrapper(node.getDocument, docWrapper, null)
             else {
               val parentNode = node.getParent
-              // This checks the case of an element detached from a Document
+              // This checks the case of an element detached from a tree
               if (parentNode ne null)
                 makeWrapper(parentNode, docWrapper, null)
               else

@@ -19,7 +19,7 @@ object ConcreteNodeWrapper {
 class ConcreteNodeWrapper protected (
   val node       : dom.Node,
   val docWrapper : DocumentWrapper,
-  var parent     : NodeWrapper // null means unknown
+  var parent     : NodeWrapper // `null` means unknown OR detached
 ) extends NodeWrapper {
   treeInfo = docWrapper
 }

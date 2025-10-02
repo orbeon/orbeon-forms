@@ -86,9 +86,8 @@ object XFormsControls {
         case elem if control.classList.contains("xforms-mediatype-text-html") =>
           elem.innerHTML = newControlValue
         case elem =>
-          // Update both `textContent` and `innerText` so JSDOM can see the updated value in tests (see #7251).
+          // We want to use `textContent`, `innerText`, as we don't want the browser to add any `<br>`.
           elem.textContent = newControlValue
-          elem.innerText   = newControlValue
       }
     } else if (! force.contains(true) && AjaxFieldChangeTracker.hasChangedIdsRequest(control)) {
       // User has modified the value of this control since we sent our request so don't try to update it

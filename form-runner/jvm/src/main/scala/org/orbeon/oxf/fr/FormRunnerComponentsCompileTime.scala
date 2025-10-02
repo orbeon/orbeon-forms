@@ -6,7 +6,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ByteSizeUtils, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{ByteSizeUtils, IndentedLogger, LoggerFactory, Mediatypes}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
@@ -204,28 +204,30 @@ trait FormRunnerComponentsCompileTime {
         val mediatypes        = mediatypesStr.splitTo[List]()
         val displayMediatypes = mediatypes.flatMap { mediatype =>
 
-          val slashPosition     = mediatype.indexOf('/')
-          val isProperMediatype = slashPosition > 1 && slashPosition < mediatype.length - 1
-          isProperMediatype.flatOption {
-            val mediatypeLeft   = mediatype.substring(0, slashPosition)
-            val mediatypeRight  = mediatype.substring(slashPosition + 1)
-            if (mediatypeRight == "*") {
-              // Localized name for common wildcard media types
-              Set("image", "video", "audio")(mediatypeLeft).option(hintResourceXPath(s"upload-$mediatypeLeft"))
-            } else {
-              // Heuristic: take the part before the plus sign, and uppercase it, e.g. `image/svg+xml` → `SVG`
-              // We might want to handle few special cases
-              // - E.g. `application/msword` and
-              //        `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
-              //        → `Word`
-              // - Those could be listed in some JSON in a property file (can we avoid having to localize them,
-              //   e.g. does "Word" work in most languages?)
-              val beforePlus = mediatypeRight.substringBeforeOpt("+").getOrElse(mediatypeRight)
-              val toUpper    = beforePlus.toUpperCase
-              val toXPath    = s"'$toUpper'"
-              Some(toXPath)
-            }
+          def labelFromKnownMediatypes: Option[String] =
+            Mediatypes
+              .findLabelForMediatype(mediatype)
+              .map(l => s"'$l'")
+
+          def labelFromMediaStar: Option[String] =
+            if (mediatype.endsWith("/*")) {
+              val prefix = mediatype.substring(0, mediatype.length - 2)
+              Set("image", "video", "audio")(prefix).option(hintResourceXPath(s"upload-$prefix"))
+            } else None
+
+          def labelUsingHeuristic: Option[String] = {
+            // Take the part before the plus sign, and uppercase it, e.g. `image/svg+xml` → `SVG`
+            val slashPosition  = mediatype.indexOf('/')
+            val mediatypeRight = mediatype.substring(slashPosition + 1)
+            val beforePlus     = mediatypeRight.substringBeforeOpt("+").getOrElse(mediatypeRight)
+            val toUpper        = beforePlus.toUpperCase
+            val toXPath        = s"'$toUpper'"
+            Some(toXPath)
           }
+
+          labelFromKnownMediatypes orElse
+            labelFromMediaStar     orElse
+            labelUsingHeuristic
         }
 
         displayMediatypes match {

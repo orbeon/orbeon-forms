@@ -26,11 +26,15 @@ import scala.collection.mutable.ListBuffer
 
 object Mediatypes {
 
-  import Private._
+  import Private.*
 
-  private val (mappingsByMediatype, mappingsByExtension) = {
+  private val (
+    mappingsByMediatype: Map[String, List[Mapping]],
+    mappingsByExtension: Map[String, List[Mapping]],
+    labelsByMediatype  : Map[String, String]
+  ) = {
 
-    val list = {
+    val list: Seq[Mapping] = {
       val ch = new MimeTypesContentHandler
       val urlString = "oxf:/oxf/mime-types.xml"
       XMLParsing.inputStreamToSAX(
@@ -44,10 +48,11 @@ object Mediatypes {
       ch.resultAsList
     }
 
-    (
-      combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) => mediatype   -> m }).toMap,
-      combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         => m.extension -> m }).toMap
-    )
+    val mappingsByMediatype = combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype, _) => mediatype   -> m }).toMap
+    val mappingsByExtension = combineValues[String, Mapping, List](list map { case m @ Mapping(_, _, _)         => m.extension -> m }).toMap
+    val labelsByMediatype   = list.collect { case Mapping(_, mediatype, Some(label)) => mediatype -> label }.toMap
+
+    (mappingsByMediatype, mappingsByExtension, labelsByMediatype)
   }
 
   def findMediatypeForExtension(extension: String): Option[String] =
@@ -73,6 +78,9 @@ object Mediatypes {
       mapping   <- mappings.headOption
     } yield
       mapping.extension
+
+  def findLabelForMediatype(mediatype: String): Option[String] =
+    labelsByMediatype.get(mediatype)
 
   def getExtensionForMediatypeOrThrow(mediatype: String): String =
     findExtensionForMediatype(mediatype).getOrElse(throw new IllegalArgumentException("mediatype"))
@@ -103,6 +111,7 @@ object Mediatypes {
 
       private var state: State = DefaultState
       private var name: String = null
+      private var label: Option[String] = None
 
       private val buffer = ListBuffer[Mapping]()
 
@@ -114,19 +123,23 @@ object Mediatypes {
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
         localname match {
           case NameElement    => state = NameState
+          case LabelElement   => state = LabelState
           case PatternElement => state = PatternState
           case _              => state = DefaultState
         }
 
       override def characters(chars: Array[Char], start: Int, length: Int): Unit =
-        if (state == NameState || state == PatternState)
+        if (state == NameState || state == PatternState || state == LabelState)
           builder.append(chars, start, length)
 
       override def endElement(uri: String, localname: String, qName: String): Unit = {
         localname match {
           case NameElement     => name = builder.toString.trimAllToEmpty
-          case PatternElement  => buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
-          case MimeTypeElement => name = null
+          case LabelElement    => label = builder.toString.trimAllToOpt
+          case PatternElement  => buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase, label)
+          case MimeTypeElement =>
+            name = null
+            label = None
           case _               =>
         }
         builder.setLength(0)
@@ -138,13 +151,15 @@ object Mediatypes {
       val MimeTypeElement = "mime-type"
       val NameElement     = "name"
       val PatternElement  = "pattern"
+      val LabelElement    = "label"
 
       sealed trait State
       case object DefaultState extends State
       case object NameState    extends State
       case object PatternState extends State
+      case object LabelState   extends State
     }
 
-    case class Mapping(extension: String, mediatype: String)
+    case class Mapping(extension: String, mediatype: String, label: Option[String])
   }
 }

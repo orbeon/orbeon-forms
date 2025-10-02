@@ -231,11 +231,12 @@ object XFormsDeleteAction extends Logging {
   }
 
   private def doDeleteOneImpl(
-    nodeInfoToRemove : om.NodeInfo)(implicit
+    nodeInfoToRemove : om.NodeInfo
+  )(implicit
     indentedLogger   : IndentedLogger
 ): Option[DeletionDescriptor] = {
 
-    val nodeToRemove   = NodeInfoConversions.unwrapNode(nodeInfoToRemove) getOrElse (throw new IllegalArgumentException(CannotDeleteReadonlyMessage))
+    val nodeToRemove   = NodeInfoConversions.unwrapNode(nodeInfoToRemove).getOrElse(throw new IllegalArgumentException(CannotDeleteReadonlyMessage))
     val parentNodeInfo = nodeInfoToRemove.getParent // obtain *before* deletion
     val parentElement  = nodeToRemove.getParent
 

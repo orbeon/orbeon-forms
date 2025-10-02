@@ -193,7 +193,7 @@ object XFormsInsertAction {
 
       insertLocation match {
         case Left(_) =>
-          val insertLocationNode = NodeInfoConversions.unwrapNode(insertLocationNodeInfo) getOrElse (throw new IllegalArgumentException(CannotInsertReadonlyMessage))
+          val insertLocationNode = NodeInfoConversions.unwrapNode(insertLocationNodeInfo).getOrElse(throw new IllegalArgumentException(CannotInsertReadonlyMessage))
           val insertLocationNodeDocumentOpt = insertLocationNode.documentOpt
 
           val (insertedNodes, beforeAfterInto) =

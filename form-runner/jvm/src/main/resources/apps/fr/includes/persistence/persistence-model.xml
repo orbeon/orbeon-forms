@@ -1353,6 +1353,7 @@
                 <xf:action type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'autosave')</xf:action>
             </xf:action>
 
+            <!-- Not convinced the following is really necessary -->
             <xf:action if="not($do-autosave-now)">
                 <xf:var
                     name="autosave-timestamp"

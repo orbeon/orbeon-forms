@@ -277,13 +277,15 @@ object XFormsServer {
 
               // The client the document is busy, which will cause it to retry after a delay.
               externalContext.getResponse.setContentType(ContentTypes.XmlContentType)
-              val helper = new XMLReceiverHelper(xmlReceiver)
-              helper.startDocument()
-              helper.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
-              helper.startElement(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI, "document-busy")
-              helper.endElement()
-              helper.endPrefixMapping(XXFORMS_SHORT_PREFIX)
-              helper.endDocument()
+              implicit val receiver: XMLReceiver = xmlReceiver
+              withDocument {
+                withElement(
+                  localName = "document-busy",
+                  prefix    = XXFORMS_SHORT_PREFIX,
+                  uri       = XXFORMS_NAMESPACE_URI,
+                  extraNs   = Seq(XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI)
+                ) {}
+              }
 
             case None =>
 

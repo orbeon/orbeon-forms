@@ -65,20 +65,18 @@ object SectionLabelEditor {
     )
 
     sectionAdded.add((sectionNamespacedId: String) => {
-      if (sectionNamespacedId != null && sectionNamespacedId.nonEmpty)
-        AjaxClient.allEventsProcessedF("sectionAdded") foreach { _ =>
-          val sectionElOpt = Option(dom.document.getElementById(sectionNamespacedId))
-          sectionElOpt.foreach { sectionEl =>
-            val matchingInterceptorOpt =
-              labelClickInterceptors.find { interceptor =>
-                val offset = Position.adjustedOffset(interceptor)
-                Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).exists { block =>
-                  block.el.get().contains(sectionEl)
-                }
-              }
-            matchingInterceptorOpt.foreach(interceptor => showLabelEditor(interceptor))
+      for {
+        _           <- AjaxClient.allEventsProcessedF("sectionAdded")
+        sectionEl   <- Option(dom.document.getElementById(sectionNamespacedId))
+        interceptor <- labelClickInterceptors.find { interceptor =>
+          val offset = Position.adjustedOffset(interceptor)
+          Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).exists { block =>
+            block.el.get().contains(sectionEl)
           }
         }
+      } locally {
+        showLabelEditor(interceptor)
+      }
     })
 
     def sendNewLabelValue(): Unit = {

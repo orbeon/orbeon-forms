@@ -251,18 +251,72 @@ trait GridOps extends ContainerOps {
         updateY(adjustedTo0, adjustedFrom0)
 
         // We want the underlying elements to be in the correct order in the XML, so re-sort all cells
-        val sortedOriginCells =
-          Cell.originCells(
-            Cell.sort(
-              Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false),
-              firstOrientation = Horizontal
-            )
-          ).toList
+        locally {
+          val sortedOriginCells =
+            Cell.originCells(
+              Cell.sort(
+                Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false),
+                firstOrientation = Horizontal // no need to transpose (`Vertical`) as that's done at runtime only
+              )
+            ).toList
 
-        val sortedElems = sortedOriginCells.flatMap(_.u)
+          val sortedElems = sortedOriginCells.flatMap(_.u)
 
-        delete(sortedElems)
-        insert(into = gridElem, after = gridElem / *, origin = sortedElems)
+          delete(sortedElems)
+          insert(into = gridElem, after = gridElem / *, origin = sortedElems)
+        }
+
+        val controlNamesInDocOrder =
+          findGridControls(gridElem)
+            .flatMap(c => controlNameFromIdOpt(c.id))
+            .toList
+
+        // Reorder binds
+        locally {
+          val parentBind =
+            controlNamesInDocOrder
+              .headOption // all grid binds must have the same parent, so we just take the first one
+              .flatMap(findBindByName)
+              .flatMap(_.parentOption)
+              .toList
+
+          val allBindsInOrder =
+            controlNamesInDocOrder
+              .flatMap(findBindByName)
+
+          delete(allBindsInOrder)
+          insert(into = parentBind, after = parentBind / *, origin = allBindsInOrder)
+        }
+
+        // Reorder holders
+        // With repeated content, there can be multiple holders per control
+        locally {
+          val dataHolders =
+            controlNamesInDocOrder.map(findDataHolders)
+
+          // If the form is well-formed, the number of holders by parent should be consistent, but here we write
+          // defensively and just go group by group. `findDataHolders()` guarantees the returned nodes have a parent
+          // so we don't worry about that.
+          val holdersByParent =
+            dataHolders
+              .view
+              .flatten
+              .groupBy(_.parentOption)
+              .collect { case (Some(parentHolder), holders) => (parentHolder, holders.toList) }
+
+          // All controls must have the same number of holders
+          if (holdersByParent.map(_._2.size).toList.distinct.size > 1)
+            warn(s"found inconsistent number of holders by parent")
+
+          holdersByParent.foreach { case (parentHolder, holders) =>
+
+            val allHoldersInOrder =
+              controlNamesInDocOrder.flatMap(n => holders.find(_.localname == n))
+
+            delete(allHoldersInOrder)
+            insert(into = parentHolder, after = parentHolder / *, origin = allHoldersInOrder)
+          }
+        }
 
         Some(undo)
       }

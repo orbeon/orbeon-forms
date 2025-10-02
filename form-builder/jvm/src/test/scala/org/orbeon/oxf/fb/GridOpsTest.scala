@@ -36,8 +36,9 @@ class GridOpsTest
 
   val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
   val RowspansDoc        = "oxf:/org/orbeon/oxf/fb/template-with-rowspans.xhtml"
+  val LinesDoc           = "oxf:/org/orbeon/oxf/fb/template-with-grid-lines.xhtml"
 
-  def createAndAssertInitialGrid(gridElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Map[NodeInfo, Char] = {
+  def createAndAssertInitialGrid(gridElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Map[String, Char] = {
 
     val expected =
       """
@@ -297,6 +298,108 @@ class GridOpsTest
 
     it("must report failure to convert from 24 to 12 columns if cells are oddly aligned") {
       assert(FormBuilder.findGridColumnMigrationType(grid24Odd, from = 24, to = 12).isEmpty)
+    }
+  }
+
+  describe("#7208: Keyboard shortcuts to move a grid line up/down") {
+
+    // TODO: add more tests
+    it("must move rows as expected") {
+      withActionAndFBDoc(LinesDoc) { implicit ctx =>
+
+        val gridElem =
+          ctx.bodyElem descendant NodeInfoCell.GridTest head
+
+        val (_, mapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false))
+
+        val beforeS =
+          """
+            |ABC
+            |DEc
+            |FGc
+            |""".stripMargin.trim
+
+        FormBuilder.rowMove(
+          gridId      = gridElem.id,
+          fromRowPos0 = 0,
+          toRowPos0   = 1
+        )
+
+        val afterS1 =
+          """
+            |DEC
+            |ABc
+            |FGc
+          """.stripMargin.trim
+
+        assert(afterS1 == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+
+        FormBuilder.rowMove(
+          gridId      = gridElem.id,
+          fromRowPos0 = 1,
+          toRowPos0   = 2
+        )
+
+        val afterS2 =
+          """
+            |DEC
+            |FGc
+            |ABc
+          """.stripMargin.trim
+
+        assert(afterS2 == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+
+        FormBuilder.rowMove(
+          gridId      = gridElem.id,
+          fromRowPos0 = 2,
+          toRowPos0   = 1
+        )
+
+        assert(afterS1 == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+
+        FormBuilder.rowMove(
+          gridId      = gridElem.id,
+          fromRowPos0 = 1,
+          toRowPos0   = 0
+        )
+
+        assert(beforeS == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+      }
+    }
+
+    it("must move rows in repeated grid as expected") {
+      withActionAndFBDoc(LinesDoc) { implicit ctx =>
+
+        val gridElem =
+          findControlByName("repeated-grid").get
+
+        val (_, mapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false))
+
+        FormBuilder.rowMove(
+          gridId      = gridElem.id,
+          fromRowPos0 = 0,
+          toRowPos0   = 1
+        )
+
+        val afterS1 =
+          """
+            |CD
+            |AB
+          """.stripMargin.trim
+
+        assert(afterS1 == Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
+
+        // Check that binds were reordered
+        assert(List("my-repeated-text-area", "my-repeated-input") == findBindByName("my-repeated-input").get.getParent.child(*).map(b => controlNameFromId(b.id)))
+
+        // Check holders were reordered
+        val holderParents = findDataHolders("my-repeated-input").map(_.getParent)
+        assert(holderParents.size == 2)
+
+        holderParents.foreach { holderParent =>
+          assert(List("my-repeated-text-area", "my-repeated-input") == holderParent.child(*).map(_.localname))
+        }
+      }
     }
   }
 }

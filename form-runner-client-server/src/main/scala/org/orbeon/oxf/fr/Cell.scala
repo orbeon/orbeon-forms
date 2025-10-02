@@ -506,17 +506,26 @@ object Cell {
   }
 
   // For tests
+  // 2025-10-01: Use `id` attribute for identifying "same" underlying elements, instead of underlying object identity,
+  // as in the case of delete/insert, new underlying object can be created.
   def makeASCII[Underlying](
     gridModel       : GridModel[Underlying],
-    existingMapping : Map[Underlying, Char] = Map.empty[Underlying, Char]
-  ): (String, Map[Underlying, Char]) = {
+    existingMapping : Map[String, Char] = Map.empty[String, Char]
+  )(implicit
+    ops             : CellOps[Underlying]
+  ): (String, Map[String, Char]) = {
 
-    val usToLetters = {
+    val usToLetters: Map[String, Char] = {
 
       val existingKeys   = existingMapping.keySet
       val existingValues = existingMapping.values.toSet
 
-      val distinctUs  = gridModel.cells.flatten.collect{ case Cell(Some(u), None, _, _, _, _) => u }.distinct filterNot existingKeys
+      val distinctUs =
+        gridModel.cells
+          .flatten
+          .collect { case Cell(Some(u), None, _, _, _, _) => ops.attValueOpt(u, "id").get }
+          .distinct
+          .filterNot(existingKeys)
 
       val lettersIt   =
         Iterator.tabulate(26)(i => ('A'.toInt + i).toChar) ++         // Roman letters
@@ -530,8 +539,8 @@ object Cell {
     val charGrid =
       gridModel.cells map { row =>
         row map {
-          case Cell(Some(u), None,    _, _, _, _) => usToLetters(u)
-          case Cell(Some(u), Some(_), _, _, _, _) => usToLetters(u).toLower
+          case Cell(Some(u), None,    _, _, _, _) => usToLetters(ops.attValueOpt(u, "id").get)
+          case Cell(Some(u), Some(_), _, _, _, _) => usToLetters(ops.attValueOpt(u, "id").get).toLower
           case Cell(None,    _,       _, _, _, _) => ' '
         }
       }

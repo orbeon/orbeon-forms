@@ -1,0 +1,441 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math">
+    <xh:head>
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
+                  xxf:help-tooltip="false"
+                  xxf:xpath-analysis="true">
+
+            <xf:instance id="fr-form-instance" xxf:validation="strict" xxf:index="id">
+                <form>
+                    <details-section>
+                        <details-grid>
+                            <title/>
+                            <author/>
+                            <image filename="" mediatype="" size=""/>
+                            <language/>
+                            <link/>
+                            <rating/>
+                            <publication-year/>
+                        </details-grid>
+                        <review-grid>
+                            <review/>
+                        </review-grid>
+                    </details-section>
+                    <section-1>
+                        <repeated-grid>
+                            <repeated-grid-iteration>
+                                <my-repeated-input>1.1</my-repeated-input>
+                                <my-repeated-text-area>1.2</my-repeated-text-area>
+                            </repeated-grid-iteration>
+                            <repeated-grid-iteration>
+                                <my-repeated-input>2.1</my-repeated-input>
+                                <my-repeated-text-area>2.2</my-repeated-text-area>
+                            </repeated-grid-iteration>
+                        </repeated-grid>
+                    </section-1>
+
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="details-section-bind" ref="details-section" name="details-section">
+                    <xf:bind id="review-grid-bind" ref="review-grid" name="review-grid">
+                        <xf:bind id="review-bind" name="review" ref="review"/>
+                    </xf:bind>
+                    <xf:bind id="details-grid-bind" ref="details-grid" name="details-grid">
+                        <xf:bind id="title-bind" name="title" ref="title" required="true()"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="author-bind" name="author" ref="author" required="true()"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI" required="true()"/>
+                        <xf:bind id="language-bind" name="language" ref="language"/>
+                        <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
+                        <xf:bind id="rating-bind" name="rating" ref="rating"/>
+                        <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year"
+                                 xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="repeated-grid-bind" ref="repeated-grid" name="repeated-grid">
+                        <xf:bind id="repeated-grid-iteration-bind" ref="repeated-grid-iteration"
+                                 name="repeated-grid-iteration">
+                            <xf:bind id="my-repeated-input-bind" ref="my-repeated-input" name="my-repeated-input"
+                                     xxf:whitespace="trim"/>
+                            <xf:bind id="my-repeated-text-area-bind" ref="my-repeated-text-area"
+                                     name="my-repeated-text-area"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>test</application-name>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <form-name>7208</form-name>
+                    <title xml:lang="en">Keyboard shortcuts to move a grid line up/down #7208</title>
+                    <description xml:lang="en"/>
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>2</orbeon>
+                        <app>4</app>
+                    </library-versions>
+
+
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+
+                    <wizard>false</wizard>
+                    <density>comfortable</density>
+                    <email>
+                        <templates>
+                            <template name="default" xml:lang="en">
+                                <headers/>
+                                <subject>Bookshelf form for `{$title}` by {$author}</subject>
+                                <exclude-from-all-control-values/>
+                            </template>
+                            <template name="default" xml:lang="fr">
+                                <headers/>
+                                <subject>Formulaire Bookshelf pour `{$title}` par {$author}</subject>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters>
+                            <param type="ControlValueParam">
+                                <name>title</name>
+                                <controlName>title</controlName>
+                            </param>
+                            <param type="ControlValueParam">
+                                <name>author</name>
+                                <controlName>author</controlName>
+                            </param>
+                        </parameters>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <!-- Fix this once we have proper template -->
+                    <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- XForms instance containing all the resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-repeated-input>
+                            <label>My repeated Text field</label>
+                            <hint/>
+                        </my-repeated-input>
+                        <my-repeated-text-area>
+                            <label>My repeated Text Area</label>
+                            <hint/>
+                        </my-repeated-text-area>
+                        <details-section>
+
+
+                        </details-section>
+                        <section-1>
+                            <label/>
+                            <help/>
+                        </section-1>
+
+                        <title>
+                            <label>Title</label>
+                            <help>This input field contains the book title, for example "On the Road".</help>
+
+
+                            <hint>Book title</hint>
+                            <alert>The book title is missing</alert>
+
+                        </title>
+                        <author>
+                            <label>Author</label>
+                            <help>This input contains the book's author name, for example "Jack Kerouak".</help>
+
+                            <hint>Book author</hint>
+                            <alert>The author name is missing</alert>
+
+                        </author>
+                        <language>
+                            <label>Language</label>
+
+
+
+                            <hint>Book language</hint>
+                            <alert>The language selected is invalid</alert>
+
+                            <item>
+                                <label>Chinese</label>
+                                <value>zh</value>
+                            </item>
+                            <item>
+                                <label>English</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>French</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>German</label>
+                                <value>de</value>
+                            </item>
+                            <item>
+                                <label>Italian</label>
+                                <value>it</value>
+                            </item>
+                            <item>
+                                <label>Russian</label>
+                                <value>ru</value>
+                            </item>
+                            <item>
+                                <label>Spanish</label>
+                                <value>es</value>
+                            </item>
+                        </language>
+                        <link>
+                            <label>Link</label>
+                            <help>This input contains a link to an external resource. For example "https://en.wikipedia.org/wiki/On_the_Road".</help>
+
+
+                            <hint>Optional link to external resource</hint>
+                            <alert>The link must be a valid HTTP or HTTPS URL</alert>
+
+                        </link>
+                        <rating>
+                            <label>Rating</label>
+
+
+
+                            <hint>Your rating</hint>
+                            <alert>The rating selected is invalid</alert>
+
+
+                            <item>
+                                <label>None</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                        </rating>
+                        <publication-year>
+                            <label>Publication Year</label>
+                            <help>This is the year the book was published. For example: "1957".</help>
+                            <hint>Year the book was published</hint>
+
+
+                            <alert>The year selected is invalid</alert>
+
+                        </publication-year>
+                        <review>
+                            <label>Review</label>
+                            <help>This is your review for this book. You can use rich text.</help>
+                            <hint/>
+
+                            <alert/>
+                        </review>
+                        <image>
+                            <label>Book Cover</label>
+                            <help>&lt;div&gt;This is an optional book cover image. You can upload any image format supported by web browsers, including:&lt;/div&gt;&lt;div&gt;
+&lt;ul&gt;&lt;li&gt;JPG&lt;/li&gt;&lt;li&gt;PNG&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</help>
+
+
+                            <hint>Upload a book cover image</hint>
+                            <alert>The book cover image is invalid</alert>
+
+                        </image>
+                        <repeated-grid/>
+
+                    </resource>
+
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="repeated-grid-template"
+                         xxf:exclude-result-prefixes="#all">
+                <repeated-grid-iteration>
+                    <my-repeated-input/>
+                    <my-repeated-text-area/>
+                </repeated-grid-iteration>
+            </xf:instance>
+
+
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="details-section-section" bind="details-section-bind">
+
+
+                    <fr:grid columns="3" id="details-grid-grid" bind="details-grid-bind">
+                        <fr:c y="1" x="1" w="4">
+                                <xf:input id="title-control" bind="title-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                    <xf:label ref="$form-resources/title/label"/>
+                                <xf:help ref="$form-resources/title/help"/>
+                                    <xf:hint ref="$form-resources/title/hint"/>
+                                    <xf:alert ref="$form-resources/title/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                                <xf:input id="author-control" bind="author-bind">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                    <xf:label ref="$form-resources/author/label"/>
+                                <xf:help ref="$form-resources/author/help"/>
+                                    <xf:hint ref="$form-resources/author/hint"/>
+                                    <xf:alert ref="$form-resources/author/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="9" h="3" w="4">
+                                <fr:image-attachment id="image-control" bind="image-bind" class="fr-attachment">
+                                    <xf:label ref="$form-resources/image/label"/>
+                                <xf:help ref="$form-resources/image/help" mediatype="text/html"/>
+                                    <xf:hint ref="$form-resources/image/hint"/>
+                                    <xf:alert ref="$form-resources/image/alert"/>
+
+                                </fr:image-attachment>
+                            </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                                <xf:select1 id="language-control" bind="language-bind" appearance="dropdown">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                    <xf:label ref="$form-resources/language/label"/>
+
+                                    <xf:hint ref="$form-resources/language/hint"/>
+                                    <xf:alert ref="$form-resources/language/alert"/>
+
+                                    <xf:item>
+                                        <xf:label>Choose One...</xf:label>
+                                        <xf:value/>
+                                    </xf:item>
+                                    <xf:itemset ref="$form-resources/language/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+
+                                </xf:select1>
+                            </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                                <xf:input id="link-control" bind="link-bind">
+                                    <xf:label ref="$form-resources/link/label"/>
+                                <xf:help ref="$form-resources/link/help"/>
+                                    <xf:hint ref="$form-resources/link/hint"/>
+                                    <xf:alert ref="$form-resources/link/alert"/>
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="3" x="1" w="4">
+                            <xf:select1 id="rating-control" bind="rating-bind" appearance="full xxf:horizontal">
+                                    <xf:label ref="$form-resources/rating/label"/>
+
+                                    <xf:hint ref="$form-resources/rating/hint"/>
+                                <xf:alert ref="$form-resources/rating/alert"/>
+
+                                    <xf:itemset ref="$form-resources/rating/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </fr:c>
+                        <fr:c y="3" x="5" w="4">
+                                <xf:input id="publication-year-control" bind="publication-year-bind">
+                                    <xf:label ref="$form-resources/publication-year/label"/>
+                                <xf:help ref="$form-resources/publication-year/help"/>
+                                    <xf:hint ref="$form-resources/publication-year/hint"/>
+                                <xf:alert ref="$form-resources/publication-year/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                    </fr:grid>
+                    <fr:grid columns="1" id="review-grid-grid" bind="review-grid-bind">
+                        <fr:c y="1" x="1" w="12">
+                                <fr:tinymce id="review-control" bind="review-bind">
+                                    <xf:label ref="$form-resources/review/label"/>
+                                <xf:help ref="$form-resources/review/help"/>
+                                    <xf:hint ref="$form-resources/review/hint"/>
+                                <xf:alert ref="$form-resources/review/alert"/>
+
+
+                                </fr:tinymce>
+                            </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="repeated-grid-grid" bind="repeated-grid-bind" repeat="content" min="1"
+                             template="instance('repeated-grid-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="my-repeated-input-control"
+                                      bind="my-repeated-input-bind">
+                                <xf:label ref="$form-resources/my-repeated-input/label"/>
+                                <xf:hint ref="$form-resources/my-repeated-input/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         id="my-repeated-text-area-control"
+                                         bind="my-repeated-text-area-bind">
+                                <xf:label ref="$form-resources/my-repeated-text-area/label"/>
+                                <xf:hint ref="$form-resources/my-repeated-text-area/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"/>
+                    </fr:grid>
+                </fr:section>
+
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

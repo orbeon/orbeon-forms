@@ -107,7 +107,7 @@ trait ContainerOps extends ControlOps {
 
       val gridContent =
         if (IsGrid(container))
-          container descendant CellTest child * filter IsControl reverse
+          findGridControls(container).reverse
         else
           Nil
 
@@ -126,6 +126,9 @@ trait ContainerOps extends ControlOps {
     // Adjust selected td if needed
     newCellToSelectOpt foreach selectCell
   }
+
+  def findGridControls(containerElem: NodeInfo): NodeColl =
+    containerElem descendant CellTest child * filter IsControl
 
   // Move a container based on a move function
   def moveContainer(

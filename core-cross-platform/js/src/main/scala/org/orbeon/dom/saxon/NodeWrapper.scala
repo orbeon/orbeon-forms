@@ -98,7 +98,7 @@ trait NodeWrapper
   }
 
   // From `VirtualNode`
-  def getUnderlyingNode: AnyRef = node
+  def getUnderlyingNode: dom.Node = node
 
   // New implementation
 

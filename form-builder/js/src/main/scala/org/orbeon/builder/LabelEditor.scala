@@ -14,7 +14,7 @@
 package org.orbeon.builder
 
 import autowire.*
-import io.udash.wrappers.jquery.JQuery
+import io.udash.wrappers.jquery.{JQuery, JQueryCallbacks}
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.{Offset, JqueryOps}
 import org.orbeon.web.DomEventNames
@@ -33,12 +33,17 @@ import scala.scalajs.js
 
 object LabelEditor {
 
+  val sectionAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
+    $.callbacks[js.Function1[String, js.Any], String](flags = "")
+
   locally {
 
     val SectionTitleSelector = ".fr-section-title:first"
     val SectionLabelSelector = ".fr-section-label:first .btn-link, .fr-section-label:first .xforms-output-output"
 
-    var labelInputOpt: js.UndefOr[JQuery] = js.undefined
+    var labelInputOpt         : js.UndefOr[JQuery] = js.undefined
+    var skipNextAjaxHide      : Boolean            = false        // TODO: can we avoid this?
+    var labelClickInterceptors: List[JQuery]       = Nil
 
     // On click on a trigger inside `.fb-section-grid-editor,` send section id as a property along with the event
     AjaxClient.beforeSendingEvent.add(
@@ -60,6 +65,23 @@ object LabelEditor {
       }
     )
 
+    sectionAdded.add((sectionNamespacedId: String) => {
+      if (sectionNamespacedId != null && sectionNamespacedId.nonEmpty)
+        AjaxClient.allEventsProcessedF("sectionAdded") foreach { _ =>
+          val sectionElOpt = Option(dom.document.getElementById(sectionNamespacedId))
+          sectionElOpt.foreach { sectionEl =>
+            val matchingInterceptorOpt =
+              labelClickInterceptors.find { interceptor =>
+                val offset = Position.adjustedOffset(interceptor)
+                Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).exists { block =>
+                  block.el.get().contains(sectionEl)
+                }
+              }
+            matchingInterceptorOpt.foreach(interceptor => showLabelEditor(interceptor, skipNextHide = true))
+          }
+        }
+    })
+
     def sendNewLabelValue(): Unit = {
 
       val newLabelValue    = labelInputOpt.get.value().asInstanceOf[String]
@@ -74,9 +96,8 @@ object LabelEditor {
       labelInputOpt.get.hide()
     }
 
-    def showLabelEditor(clickInterceptor: JQuery): Unit =
+    def showLabelEditor(clickInterceptor: JQuery, skipNextHide: Boolean = false): Unit =
       AjaxClient.allEventsProcessedF("showLabelEditor") foreach { _ =>
-
         // Clear interceptor click hint, if any
         clickInterceptor.text("")
 
@@ -98,7 +119,10 @@ object LabelEditor {
           AjaxClient.ajaxResponseProcessed.add { ajaxResponseDetails =>
             val emptyAjaxResponse = ajaxResponseDetails.responseXML.documentElement.childElementCount == 0
             if (! emptyAjaxResponse)
-              labelInput.hide()
+              if (skipNextAjaxHide)
+                skipNextAjaxHide = false
+              else
+                labelInput.hide()
           }
           labelInputOpt = labelInput
           labelInput
@@ -121,6 +145,7 @@ object LabelEditor {
 
         // Populate and show input
         labelInput.value(labelAnchor.text())
+        skipNextAjaxHide = skipNextHide
         labelInput.show()
 
         // Position and size input
@@ -164,9 +189,6 @@ object LabelEditor {
 
     // Create and position click interceptors
     locally {
-
-      // This will contain at least as many interceptors as there are sections
-      var labelClickInterceptors: List[JQuery] = Nil
 
       Position.onOffsetMayHaveChanged(() => {
 

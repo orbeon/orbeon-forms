@@ -20,6 +20,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
+    xmlns:tuple3="java:scala.Tuple3"
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
     xmlns:xbl="http://www.w3.org/ns/xbl"
 
@@ -202,8 +203,13 @@
                                     <xh:i class="fa fa-fw fa-newspaper-o"/>
                                     <xf:output value="$form-resources/new-section/label"/>
                                 </xf:label>
-                                <xf:action ev:event="DOMActivate" type="xpath">
-                                    toolboxOps:insertNewSection(true(), ())
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:var name="section-insert"        value="toolboxOps:insertNewSection(true(), ())"/>
+                                    <xf:var name="section-namespaced-id" value="string(tuple3:_3($section-insert))"/>
+                                    <xf:action type="javascript">
+                                        <xf:param name="namespacedId"    value="$section-namespaced-id"/>
+                                        <xf:body>ORBEON.builder.private.API.sectionAdded.fire(namespacedId);</xf:body>
+                                    </xf:action>
                                 </xf:action>
                             </fr:trigger>
                         </xh:div>
@@ -333,8 +339,12 @@
                                             "/>
                                         </xf:label>
                                         <xf:action ev:event="DOMActivate">
-                                            <xf:action if="$is-section-component" type="xpath">
-                                                toolboxOps:insertNewSectionTemplate($binding)
+                                            <xf:action if="$is-section-component">
+                                                <xf:var name="section-namespaced-id" value="toolboxOps:insertNewSectionTemplate($binding)"/>
+                                                <xf:action type="javascript">
+                                                    <xf:param name="namespacedId" value="$section-namespaced-id"/>
+                                                    <xf:body>ORBEON.builder.private.API.sectionAdded.fire(namespacedId);</xf:body>
+                                                </xf:action>
                                             </xf:action>
                                             <xf:action if="not($is-section-component)">
                                                 <xf:action type="xpath">

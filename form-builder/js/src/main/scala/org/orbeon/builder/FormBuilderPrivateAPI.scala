@@ -38,6 +38,9 @@ object FormBuilderPrivateAPI extends js.Object {
   def controlAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
     ControlLabelHintTextEditor.controlAdded
 
+  def sectionAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
+    LabelEditor.sectionAdded
+
   def updateTestIframeAndDispatch(eventName: String): Unit = {
 
     // Reset the displayed page as the iframe might show the result from a previous test

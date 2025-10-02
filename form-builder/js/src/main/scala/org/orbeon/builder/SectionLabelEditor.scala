@@ -42,7 +42,6 @@ object SectionLabelEditor {
     val SectionLabelSelector = ".fr-section-label:first .btn-link, .fr-section-label:first .xforms-output-output"
 
     var labelInputOpt         : js.UndefOr[JQuery] = js.undefined
-    var skipNextAjaxHide      : Boolean            = false        // TODO: can we avoid this?
     var labelClickInterceptors: List[JQuery]       = Nil
 
     // On click on a trigger inside `.fb-section-grid-editor,` send section id as a property along with the event
@@ -77,7 +76,7 @@ object SectionLabelEditor {
                   block.el.get().contains(sectionEl)
                 }
               }
-            matchingInterceptorOpt.foreach(interceptor => showLabelEditor(interceptor, skipNextHide = true))
+            matchingInterceptorOpt.foreach(interceptor => showLabelEditor(interceptor))
           }
         }
     })
@@ -96,7 +95,7 @@ object SectionLabelEditor {
       labelInputOpt.get.hide()
     }
 
-    def showLabelEditor(clickInterceptor: JQuery, skipNextHide: Boolean = false): Unit =
+    def showLabelEditor(clickInterceptor: JQuery): Unit =
       AjaxClient.allEventsProcessedF("showLabelEditor") foreach { _ =>
         // Clear interceptor click hint, if any
         clickInterceptor.text("")
@@ -113,17 +112,6 @@ object SectionLabelEditor {
               sendNewLabelValue()
             }
           }))
-          // We close the editor on Ajax response as processing the response can modify the form in ways that make the
-          // label editor irrelevant, badly positioned, etc. We do this unless the response is empty, which is typically
-          // the case for heartbeat responses.
-          AjaxClient.ajaxResponseProcessed.add { ajaxResponseDetails =>
-            val emptyAjaxResponse = ajaxResponseDetails.responseXML.documentElement.childElementCount == 0
-            if (! emptyAjaxResponse)
-              if (skipNextAjaxHide)
-                skipNextAjaxHide = false
-              else
-                labelInput.hide()
-          }
           labelInputOpt = labelInput
           labelInput
         }
@@ -145,7 +133,6 @@ object SectionLabelEditor {
 
         // Populate and show input
         labelInput.value(labelAnchor.text())
-        skipNextAjaxHide = skipNextHide
         labelInput.show()
 
         // Position and size input

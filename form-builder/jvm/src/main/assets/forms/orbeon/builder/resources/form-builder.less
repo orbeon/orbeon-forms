@@ -240,9 +240,10 @@ body.orbeon {
         z-index: 2;                                                         // Display on top of click interceptor
         box-sizing: border-box;                                             // Makes relative sizing easier
         font-size: @frSectionTitleHeight;
+        .focusHighlight();
     }
 
-    h2.fr-section-title.hover {                                               // .hover added by CS on mouse over click interceptor
+    h2.fr-section-title.hover {                                             // .hover added by CS on mouse over click interceptor
         #gradient > .vertical(#ddd, #ddd);
     }
 

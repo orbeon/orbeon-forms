@@ -31,7 +31,7 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scala.scalajs.js
 
 
-object LabelEditor {
+object SectionLabelEditor {
 
   val sectionAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
     $.callbacks[js.Function1[String, js.Any], String](flags = "")

@@ -39,7 +39,7 @@ object FormBuilderPrivateAPI extends js.Object {
     ControlLabelHintTextEditor.controlAdded
 
   def sectionAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
-    LabelEditor.sectionAdded
+    SectionLabelEditor.sectionAdded
 
   def updateTestIframeAndDispatch(eventName: String): Unit = {
 

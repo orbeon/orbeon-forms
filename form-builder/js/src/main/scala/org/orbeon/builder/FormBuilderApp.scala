@@ -55,7 +55,7 @@ object FormBuilderApp extends App {
     ControlDnD
     SectionGridEditor
     RowEditor
-    LabelEditor
+    SectionLabelEditor
     ControlEditor
     ControlLabelHintTextEditor
     GridWallDnD

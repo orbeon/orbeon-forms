@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+                    <patient-details><contact-information-first-name>Homer</contact-information-first-name><contact-information-middle-initial/><contact-information-last-name>Simpson</contact-information-last-name><contact-information-phone>9395550113</contact-information-phone><contact-information-email>chunkylover53@aol.com</contact-information-email></patient-details><section-1>
+                        <medical-record-entry-date>2025-10-01</medical-record-entry-date><medical-record-language-to-amend>Eraser found lodged in brain.</medical-record-language-to-amend><medical-record-language-to-delete>Crayon found lodged in brain.</medical-record-language-to-delete><amendment-reason>Incorrect statement.</amendment-reason><control-4/><grid-2><received-name/><received-address/><received-phone-number/></grid-2><amendment-authorization>true</amendment-authorization><do-not-provide-the-information-to/>
+
+                    </section-1><section-2><amendment-status>accepted</amendment-status><reason-for-denial fr:relevant="false"/><amendment-patient>Homer Simpson</amendment-patient><amendment-date>2025-10-02</amendment-date></section-2>
+                </form>

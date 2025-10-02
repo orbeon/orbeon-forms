@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form><patient-details><grid-5>
+                            <contact-information-first-name/>
+                            <contact-information-middle-initial/>
+                            <contact-information-last-name/>
+                            <contact-information-phone/>
+                            <contact-information-email/>
+                        </grid-5></patient-details>
+                    <section-1>
+                        <grid-1><medical-record-entry-date/><medical-record-language-to-amend/><medical-record-language-to-delete/><amendment-reason/><control-4/></grid-1><grid-2><grid-2-iteration><received-name/><received-address/><received-phone-number/></grid-2-iteration></grid-2><grid-3><amendment-authorization>false</amendment-authorization><do-not-provide-the-information-to/></grid-3>
+
+                    </section-1><section-2><grid-4><amendment-status/><reason-for-denial/><amendment-patient/><amendment-date/></grid-4></section-2>
+                </form>
+            </xf:instance>
+
+            
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="medical-record-entry-date-bind" ref="medical-record-entry-date" name="medical-record-entry-date" type="xs:date" required="true()"/><xf:bind id="medical-record-language-to-amend-bind" ref="medical-record-language-to-amend" name="medical-record-language-to-amend" required="true()"/><xf:bind id="medical-record-language-to-delete-bind" ref="medical-record-language-to-delete" name="medical-record-language-to-delete" required="true()"/><xf:bind id="amendment-reason-bind" ref="amendment-reason" name="amendment-reason" xxf:whitespace="trim" required="true()"/><xf:bind id="control-4-bind" ref="control-4" name="control-4"/></xf:bind><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="grid-2-iteration-bind" ref="grid-2-iteration" name="grid-2-iteration"><xf:bind id="received-name-bind" ref="received-name" name="received-name" xxf:whitespace="trim"/><xf:bind id="received-address-bind" ref="received-address" name="received-address" xxf:whitespace="trim"/><xf:bind id="received-phone-number-bind" ref="received-phone-number" name="received-phone-number" constraint=". = '' or matches(., '^\d{10}$')"/></xf:bind></xf:bind><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="amendment-authorization-bind" ref="amendment-authorization" name="amendment-authorization" type="xf:boolean"/><xf:bind id="do-not-provide-the-information-to-bind" ref="do-not-provide-the-information-to" name="do-not-provide-the-information-to" xxf:whitespace="trim"/></xf:bind>
+
+                </xf:bind><xf:bind id="section-2-bind" ref="section-2" name="section-2"><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="amendment-status-bind" ref="amendment-status" name="amendment-status"/><xf:bind id="reason-for-denial-bind" ref="reason-for-denial" name="reason-for-denial" xxf:whitespace="trim" relevant="$amendment-status = 'denied'"/><xf:bind id="amendment-patient-bind" ref="amendment-patient" name="amendment-patient" xxf:whitespace="trim"/><xf:bind id="amendment-date-bind" ref="amendment-date" name="amendment-date" type="xf:date"/></xf:bind></xf:bind><xf:bind id="patient-details-bind" ref="patient-details" name="patient-details"><xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                        <xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-last-name-bind" ref="contact-information-last-name" name="contact-information-last-name" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-phone-bind" ref="contact-information-phone" name="contact-information-phone" constraint=". = '' or matches(., '^\d{10}$')"/>
+                        <xf:bind id="contact-information-email-bind" ref="contact-information-email" name="contact-information-email" type="xf:email" xxf:whitespace="trim" required="true()"/>
+                        <xf:bind id="contact-information-middle-initial-bind" ref="contact-information-middle-initial" name="contact-information-middle-initial" xxf:whitespace="trim"/>
+                    </xf:bind></xf:bind>
+            </xf:bind>
+
+            
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>medical-record-amendment</form-name>
+                    <title xml:lang="en">Orbeon Demo: Medical Record Amendment</title>
+                    <description xml:lang="en" mediatype="text/html">&lt;div&gt;This medical form is designed to request an amendment to a medical record. It uses:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;&lt;li&gt;a section template&lt;/li&gt;&lt;li&gt;repeated grids&lt;/li&gt;&lt;li&gt;conditionally showing form controls&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;</description>
+                    
+                    <library-versions>
+                        <orbeon>2</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                <thumbnail filename="screenshot.webp" mediatype="image/webp" size="91580">/fr/service/persistence/crud/orbeon/medical-record-amendment/form/a7d78573fc4d540041f813455dc4941d7a309de2.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "section-1/grid-2", "iteration-name": "grid-2-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"patient-details"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-middle-initial"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"medical-record-entry-date"},{"value":"medical-record-language-to-amend"},{"value":"medical-record-language-to-delete"},{"value":"amendment-reason"},{"value":"control-4"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-3"},"afterElem":{"value":"grid-2"},"content":[{"value":"amendment-authorization"},{"value":"do-not-provide-the-information-to"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"amendment-status"},{"value":"reason-for-denial"},{"value":"amendment-patient"},{"value":"amendment-date"}],"topLevel":true}]}</migration></metadata>
+            </xf:instance>
+
+            
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><patient-details><label>Patient details</label></patient-details><contact-information-first-name><label>First Name</label><hint/>
+                            
+                            
+                        </contact-information-first-name><contact-information-last-name><label>Last Name</label><hint/>
+
+
+                        </contact-information-last-name><contact-information-phone><label>Phone number</label><hint/>
+
+
+                        </contact-information-phone><contact-information-email><label>Email</label><hint/>
+
+
+                        </contact-information-email><contact-information-middle-initial><label>Middle initial</label><hint/>
+
+
+                        </contact-information-middle-initial><amendment-status><label>Amendment status</label><hint/><item>
+            <label>Accepted</label>
+            <hint/>
+            <value>accepted</value>
+          </item><item>
+            <label>Denied</label>
+            <hint/>
+            <value>denied</value>
+          </item></amendment-status><reason-for-denial><label>Reason for denial</label><hint/></reason-for-denial><amendment-patient><label>This Amendment Is to be made a part of the medical record of</label><hint/></amendment-patient><amendment-date><label>Date</label><hint/></amendment-date><amendment-authorization><label>I authorize providing the amendment information to the people or organizations listed above.</label><hint/></amendment-authorization><do-not-provide-the-information-to><label>Do not provide the information to</label><hint/></do-not-provide-the-information-to><received-name><label>Name</label><hint/></received-name><received-address><label>Address</label><hint/></received-address><received-phone-number><label>Phone Number</label><hint/></received-phone-number><medical-record-entry-date><label>Date of medical record entry to be corrected</label><hint/></medical-record-entry-date><medical-record-language-to-amend><label>Medical record language to be amended/corrected</label><hint/></medical-record-language-to-amend><medical-record-language-to-delete><label>Amendment/correction or material to be deleted</label><hint/></medical-record-language-to-delete><amendment-reason><label>Reason for the amendment/correction</label><hint/></amendment-reason><control-4><text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;Please help us identify people who may have received the original information:&lt;/div&gt;</text></control-4>
+                        <section-1><label>Amendment details</label>
+                            
+                        </section-1><section-2><label/><help/></section-2>
+
+                    </resource>
+                </resources>
+            </xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template"><grid-2-iteration><received-name/><received-address/><received-phone-number/></grid-2-iteration></xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors"><fr:section collapsible="false" id="patient-details-section" bind="patient-details-bind"><xf:label ref="$form-resources/patient-details/label"/><fr:grid id="grid-5-grid" bind="grid-5-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <xf:input id="contact-information-first-name-control" bind="contact-information-first-name-bind"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/contact-information-first-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-first-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="2" h="1">
+                            <xf:input id="contact-information-middle-initial-control" bind="contact-information-middle-initial-bind">
+                                <xf:label ref="$form-resources/contact-information-middle-initial/label"/>
+                                <xf:hint ref="$form-resources/contact-information-middle-initial/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="contact-information-last-name-control" bind="contact-information-last-name-bind"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/contact-information-last-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-last-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-phone-control" bind="contact-information-phone-bind">
+                                <xf:label ref="$form-resources/contact-information-phone/label"/>
+                                <xf:hint ref="$form-resources/contact-information-phone/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="contact-information-email-control" bind="contact-information-email-bind"><fr:index><fr:summary-show/></fr:index>
+                                <xf:label ref="$form-resources/contact-information-email/label"/>
+                                <xf:hint ref="$form-resources/contact-information-email/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid></fr:section>
+                <fr:section collapsible="false" id="section-1-section" bind="section-1-bind"><xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="5"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="medical-record-entry-date-control" bind="medical-record-entry-date-bind"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/medical-record-entry-date/label"/>
+                        <xf:hint ref="$form-resources/medical-record-entry-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:date>
+
+                            </fr:c><fr:c x="6" y="1" w="7" h="1"/>
+                        <fr:c x="1" y="2" w="12"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="medical-record-language-to-amend-control" bind="medical-record-language-to-amend-bind">
+                        <xf:label ref="$form-resources/medical-record-language-to-amend/label"/>
+                        <xf:hint ref="$form-resources/medical-record-language-to-amend/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:textarea></fr:c><fr:c x="1" y="3" w="12"><xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" id="medical-record-language-to-delete-control" bind="medical-record-language-to-delete-bind">
+                        <xf:label ref="$form-resources/medical-record-language-to-delete/label"/>
+                        <xf:hint ref="$form-resources/medical-record-language-to-delete/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:textarea></fr:c><fr:c x="1" y="4" w="12"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="amendment-reason-control" bind="amendment-reason-bind">
+                        <xf:label ref="$form-resources/amendment-reason/label"/>
+                        <xf:hint ref="$form-resources/amendment-reason/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c><fr:c x="1" y="5" w="12"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control" bind="control-4-bind">
+                        <fr:text ref="$form-resources/control-4/text" mediatype="text/html"/>
+                    </fr:explanation></fr:c>
+                    </fr:grid><fr:grid id="grid-2-grid" bind="grid-2-bind" repeat="content" min="1" template="instance('grid-2-template')" apply-defaults="true" fb:initial-iterations="first">
+          <fr:c x="1" y="1" w="3"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="received-name-control" bind="received-name-bind">
+                        <xf:label ref="$form-resources/received-name/label"/>
+                        <xf:hint ref="$form-resources/received-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c><fr:c x="4" y="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="received-address-control" bind="received-address-bind">
+                        <xf:label ref="$form-resources/received-address/label"/>
+                        <xf:hint ref="$form-resources/received-address/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c><fr:c x="10" y="1" w="3" h="1"><fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="received-phone-number-control" bind="received-phone-number-bind">
+                        <xf:label ref="$form-resources/received-phone-number/label"/>
+                        <xf:hint ref="$form-resources/received-phone-number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:us-phone></fr:c>
+        </fr:grid><fr:grid id="grid-3-grid" bind="grid-3-bind">
+          <fr:c x="1" y="1" w="12"><fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="amendment-authorization-control" bind="amendment-authorization-bind">
+                        <xf:label ref="$form-resources/amendment-authorization/label"/>
+                        <xf:hint ref="$form-resources/amendment-authorization/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:checkbox-input></fr:c><fr:c x="1" y="2" w="12"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="do-not-provide-the-information-to-control" bind="do-not-provide-the-information-to-bind">
+                        <xf:label ref="$form-resources/do-not-provide-the-information-to/label"/>
+                        <xf:hint ref="$form-resources/do-not-provide-the-information-to/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c>
+        </fr:grid>
+                </fr:section><fr:section id="section-2-section" bind="section-2-bind"><fr:grid id="grid-4-grid" bind="grid-4-bind">
+              <fr:c x="1" y="1" w="6"><xf:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" id="amendment-status-control" appearance="full" bind="amendment-status-bind"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/amendment-status/label"/>
+                        <xf:hint ref="$form-resources/amendment-status/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                        <xf:itemset ref="$form-resources/amendment-status/item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select1></fr:c><fr:c x="7" y="1" w="6"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="reason-for-denial-control" bind="reason-for-denial-bind">
+                        <xf:label ref="$form-resources/reason-for-denial/label"/>
+                        <xf:hint ref="$form-resources/reason-for-denial/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c><fr:c x="1" y="2" w="9"><xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="amendment-patient-control" bind="amendment-patient-bind">
+                        <xf:label ref="$form-resources/amendment-patient/label"/>
+                        <xf:hint ref="$form-resources/amendment-patient/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c><fr:c x="10" y="2" w="3"><fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="amendment-date-control" bind="amendment-date-bind"><fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/amendment-date/label"/>
+                        <xf:hint ref="$form-resources/amendment-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:date></fr:c>
+            </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -696,6 +696,9 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
 lazy val formRunnerProxyPortletWar = (project in file("proxy-portlet-war"))
   .settings(
     name := "orbeon-proxy-portlet-war",
+
+    // Exclude log4j JAR files to avoid conflicts with Liferay's log4j
+    Runtime / fullClasspath := (Runtime / fullClasspath).value.filterNot(_.data.getName.contains("log4j")),
   )
   .dependsOn(
     formRunnerProxyPortlet

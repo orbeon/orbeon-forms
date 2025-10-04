@@ -234,7 +234,8 @@ object ElementAnalysisTreeXPathAnalyzer {
           )
         case _: Model                                    => None
         case e: OutputControl if e.staticValue.isDefined => None
-        case e: AttributeControl                         => analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, e.attributeValue, avt = true).some
+        case e: AttributeControl                         =>
+          analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, e.attributeValue, avt = true).some
         case e: VariableAnalysisTrait =>
           e.nestedValueAnalysis match {
             case Some(valueElem) =>

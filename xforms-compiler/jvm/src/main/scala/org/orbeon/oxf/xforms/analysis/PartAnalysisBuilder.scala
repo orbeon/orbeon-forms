@@ -471,9 +471,22 @@ object PartAnalysisBuilder {
 
       // NOTE: For now, we don't analyze the XPath of nested (dynamic) parts
       if (partAnalysisCtx.isTopLevelPart && partAnalysisCtx.staticProperties.isXPathAnalysis) {
-        ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, rootControlAnalysis) // first as nested models might ask for its context
-        partAnalysisCtx.iterateModels ++ partAnalysisCtx.iterateControlsNoModels foreach
-          (ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, _))
+        ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, rootControlAnalysis)
+
+        val (langAttributes, controlsNoModels) =
+          partAnalysisCtx.iterateControlsNoModels.toList.partition {
+            case attribute: AttributeControl => attribute.attributeName == "xml:lang"
+            case _                           => false
+          }
+
+        val toAnalyzeInOrder =
+          rootControlAnalysis                  ::  // First as nested models might ask for its context (2025-10-03 unclear)
+          langAttributes                       ::: // Before model, as `xxf:lang()` in model might depend on `xml:lang`
+          partAnalysisCtx.iterateModels.toList :::
+          controlsNoModels
+
+        toAnalyzeInOrder.foreach(
+          ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, _))
       }
 
       debugResults(Seq("controls" -> partAnalysisCtx.controlAnalysisMap.size.toString))

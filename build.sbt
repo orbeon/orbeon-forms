@@ -1450,7 +1450,7 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue,
 
     libraryDependencies ++= Seq(
-      "org.webjars.npm" % "bowser"           % "1.9.1",
+      "org.webjars.npm" % "bowser"           % "1.9.4",
       "org.webjars"     % "clipboard.js"     % "2.0.11",
       "org.webjars.npm" % "codemirror"       % "5.65.19",
       "org.webjars.npm" % "dragula"          % "3.7.3",

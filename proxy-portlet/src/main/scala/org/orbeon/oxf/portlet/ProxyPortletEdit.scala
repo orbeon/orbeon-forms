@@ -14,33 +14,33 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet.*
-
 import scala.xml.Elem
+
 
 // Preference editor for the proxy portlet
 trait ProxyPortletEdit extends GenericPortlet {
 
-  import OrbeonProxyPortlet._
+  import OrbeonProxyPortlet.*
   implicit def portletContext: PortletContext = getPortletContext
 
   case class NameLabel(name: String, label: String, publicName: String)
 
-  object NameLabel {
+  private object NameLabel {
     def apply(name: String, label: String, publicName: Option[String] = None): NameLabel =
       NameLabel(name, label, publicName getOrElse name)
   }
 
   sealed trait ControlType { def render(pref: Pref, value: String): Elem }
 
-  case object InputControl extends ControlType {
-    def render(pref: Pref, value: String) =
+  private case object InputControl extends ControlType {
+    def render(pref: Pref, value: String): Elem =
       <label>{pref.nameLabel.label}
         <input type="text" name={pref.nameLabel.name} value={value}/>
       </label>
   }
 
-  case object CheckboxControl extends ControlType {
-    def render(pref: Pref, value: String) =
+  private case object CheckboxControl extends ControlType {
+    def render(pref: Pref, value: String): Elem =
       <label>{pref.nameLabel.label}
         {
           val template = <input type="checkbox" name={pref.nameLabel.name} value="true" checked="checked"/>
@@ -49,8 +49,8 @@ trait ProxyPortletEdit extends GenericPortlet {
       </label>
   }
 
-  case class SelectControl(nameLabels: List[NameLabel]) extends ControlType {
-    def render(pref: Pref, value: String) =
+  private case class SelectControl(nameLabels: List[NameLabel]) extends ControlType {
+    def render(pref: Pref, value: String): Elem =
       <label>{pref.nameLabel.label}
         <select name={pref.nameLabel.name}>
           {
@@ -65,7 +65,7 @@ trait ProxyPortletEdit extends GenericPortlet {
 
   sealed trait Pref { val tpe: ControlType; val nameLabel: NameLabel }
 
-  val PageNameLabels = List(
+  private val PageNameLabels = List(
     NameLabel("home",    "Home Page"),
     NameLabel("summary", "Summary Page"),
     NameLabel("new",     "New Page")
@@ -84,7 +84,7 @@ trait ProxyPortletEdit extends GenericPortlet {
   case object SendLiferayUser               extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("send-liferay-user",                "Send Liferay user") }
   case object Page                          extends Pref { val tpe: ControlType = SelectControl(PageNameLabels); val nameLabel = NameLabel("action",                           "Form Runner page",              Some("orbeon-page")) }
 
-  val AllEditablePreferences: List[Pref] = List(
+  private val AllEditablePreferences: List[Pref] = List(
     Page,
     FormRunnerURL,
     AppName,

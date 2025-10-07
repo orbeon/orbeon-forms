@@ -917,6 +917,20 @@
                 </xsl:copy>
                 <!-- Add new itemset which kicks in if an `@fr:itemsetid` attribute is present -->
                 <xf:itemset ref="id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item">
+                    <xsl:attribute
+                        name="ref"
+                        select="
+                            concat(
+                                'id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item',
+                                if (exists(fr:filter/fr:expr)) then
+                                    concat(
+                                        '[boolean(',
+                                        frf:replaceVarReferencesWithFunctionCallsFromString(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
+                                        ')]'
+                                    )
+                                else
+                                    ''
+                             )"/>
                     <xf:label ref="label">
                         <!-- Keep mediatype in case it is present so that service can return HTML labels -->
                         <xsl:copy-of select="xf:label/@mediatype"/>

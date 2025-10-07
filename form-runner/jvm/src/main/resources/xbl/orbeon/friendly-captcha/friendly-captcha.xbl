@@ -32,7 +32,7 @@
                     <_>
                         <solution/>
                         <secret/>
-                        <sitekey/> <!-- optional: "sitekey that you want to make sure the puzzle was generated from" -->
+                        <sitekey/>
                     </_>
                 </xf:instance>
                 <xf:instance id="verify-response">
@@ -117,7 +117,8 @@
 
                     <!-- User value entered by the user: do verification -->
                     <xf:action if="$did-enter-value">
-                        <xf:setvalue ref="instance('verify-request')/secret" value="$conf/private-key"/>
+                        <xf:setvalue ref="instance('verify-request')/secret"  value="$conf/private-key"/>
+                        <xf:setvalue ref="instance('verify-request')/sitekey" value="$conf/public-key"/>
                         <!-- Call API doing the verification -->
                         <xf:send submission="verify-submission"/>
                         <!-- Reset response, so the next time they are changed we only run the verification when both new values are updated -->
@@ -125,7 +126,7 @@
                         <!-- Parse the response -->
                         <xf:var
                             name="is-success"
-                            value="instance('verify-response')/success = 'true'"/>
+                            value="not(instance('verify-response')/success = 'false')"/>
                         <!-- Dispatch failure event -->
                         <xf:dispatch if="not($is-success)" targetid="fr-friendly-captcha" name="fr-verify-error"/>
                         <!-- Dispatch success event -->

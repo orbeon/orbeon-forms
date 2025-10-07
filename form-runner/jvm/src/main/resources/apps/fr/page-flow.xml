@@ -55,6 +55,12 @@
         methods="GET"
         class="org.orbeon.oxf.fr.persistence.relational.rest.HistoryRoute"/>
 
+    <!-- Data history diff -->
+    <service
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/history/([^/]+/[^/]+/[^/]+)/diff"
+        methods="GET"
+        class="org.orbeon.oxf.fr.persistence.relational.rest.HistoryDiffRoute"/>
+
     <!-- Create, Read, Update and Delete operations (attachments) -->
     <service
         path="/fr/service/(filesystem|s3)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/[^/]+/[^/]+))"

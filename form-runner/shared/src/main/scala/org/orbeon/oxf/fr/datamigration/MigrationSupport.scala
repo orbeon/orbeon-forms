@@ -15,17 +15,17 @@ package org.orbeon.oxf.fr.datamigration
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.GridDataMigration.updateDataFormatVersionInPlace
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext, XMLNames}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{StaticXPath, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, instanceRoot}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 
@@ -275,6 +275,32 @@ object MigrationSupport {
 
       result == MigrationResult.Some || pruned option mutableData
     }
+
+  def dataMigratedToEdge(
+    appForm             : AppForm,
+    data                : DocumentNodeInfoType,
+    metadataOpt         : Option[NodeInfo],
+    srcDataFormatVersion: DataFormatVersion
+  ): DocumentWrapper = {
+
+    val dstDataFormatVersion = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt)
+
+    val migratedOrDuplicatedData =
+      MigrationSupport.migrateDataWithFormMetadataMigrations(
+        appForm              = appForm,
+        data                 = data,
+        metadataRootElemOpt  = metadataOpt,
+        srcVersion           = srcDataFormatVersion,
+        dstVersion           = dstDataFormatVersion,
+        pruneMetadata        = false,
+        pruneTmpAttMetadata  = false //TODO: We need this for mode changes. It would be good to know if we are in a mode change and if not set this to `true`.
+      ) getOrElse
+        MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
+
+    updateDataFormatVersionInPlace(appForm, dstDataFormatVersion, migratedOrDuplicatedData.rootElement.asInstanceOf[NodeWrapper])
+
+    migratedOrDuplicatedData
+  }
 
   // TODO: This is not strictly related to migration, maybe move somewhere else.
   //  This bridges uses `NodeInfo` but also `orbeon.dom`.

@@ -126,34 +126,18 @@ object GridDataMigration {
   // Used for data submitted data to page and load from service in `persistence-model.xml`
   //@XPathFunction
   def dataMigratedToEdge(
-    app                       : String,
-    form                      : String,
-    data                      : DocumentNodeInfoType,
-    metadataOpt               : Option[DocumentNodeInfoType],
-    srcDataFormatVersionString: String
-  ): DocumentWrapper = {
-
-    val appForm              = AppForm(app, form)
-    val dstDataFormatVersion = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement))
-
-    val migratedOrDuplicatedData =
-      MigrationSupport.migrateDataWithFormMetadataMigrations(
-        appForm              = appForm,
-        data                 = data,
-        metadataRootElemOpt  = metadataOpt.map(_.rootElement),
-        srcVersion           = srcDataFormatVersionString.trimAllToOpt map
-                                 DataFormatVersion.withNameIncludeEdge getOrElse
-                                 DataFormatVersion.V400,
-        dstVersion           = dstDataFormatVersion,
-        pruneMetadata        = false,
-        pruneTmpAttMetadata  = false //TODO: We need this for mode changes. It would be good to know if we are in a mode change and if not set this to `true`.
-      ) getOrElse
-        MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
-
-    updateDataFormatVersionInPlace(appForm, dstDataFormatVersion, migratedOrDuplicatedData.rootElement.asInstanceOf[NodeWrapper])
-
-    migratedOrDuplicatedData
-  }
+    app                 : String,
+    form                : String,
+    data                : DocumentNodeInfoType,
+    metadataOpt         : Option[DocumentNodeInfoType],
+    srcDataFormatVersion: String
+  ): DocumentWrapper =
+    MigrationSupport.dataMigratedToEdge(
+      appForm              = AppForm(app, form),
+      data                 = data,
+      metadataOpt          = metadataOpt.map(_.rootElement),
+      srcDataFormatVersion = srcDataFormatVersion.trimAllToOpt.map(DataFormatVersion.withNameIncludeEdge).getOrElse(DataFormatVersion.V400)
+    )
 
   def updateDataFormatVersionInPlace(
    appForm                      : AppForm,

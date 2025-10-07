@@ -51,7 +51,7 @@ val CatsVersion                      = "2.13.0"
 val CatsFs2Version                   = "3.12.2"
 val CatsRetryVersion                 = "3.1.3"
 val ScalaTestVersion                 = "3.2.19"
-val CirceVersion                     = "0.14.14"
+val CirceVersion                     = "0.14.15"
 val EnumeratumVersion                = "1.9.0"
 val EnumeratumCirceVersion           = "1.9.0"
 val ShapelessVersion                 = "2.3.7"
@@ -696,6 +696,9 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
 lazy val formRunnerProxyPortletWar = (project in file("proxy-portlet-war"))
   .settings(
     name := "orbeon-proxy-portlet-war",
+
+    // Exclude log4j JAR files to avoid conflicts with Liferay's log4j
+    Runtime / fullClasspath := (Runtime / fullClasspath).value.filterNot(_.data.getName.contains("log4j")),
   )
   .dependsOn(
     formRunnerProxyPortlet
@@ -769,11 +772,11 @@ lazy val formRunnerJVM = formRunner.jvm
     libraryDependencies += "javax.servlet"        % "javax.servlet-api"         % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"      % "jakarta.servlet-api"       % JakartaServletApiVersion % Provided,
     libraryDependencies += "javax.portlet"        % "portlet-api"               % PortletApiVersion        % Provided,
-    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % "2.7.0.CR1"            % Provided,
+    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % "2.7.0.Final"            % Provided,
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 
-    libraryDependencies += "software.amazon.awssdk" % "s3" % "2.34.5",
+    libraryDependencies += "software.amazon.awssdk" % "s3" % "2.34.9",
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -1450,18 +1453,18 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue,
 
     libraryDependencies ++= Seq(
-      "org.webjars.npm" % "bowser"           % "1.9.1",
+      "org.webjars.npm" % "bowser"           % "1.9.4",
       "org.webjars"     % "clipboard.js"     % "2.0.11",
-      "org.webjars.npm" % "codemirror"       % "5.65.19",
+      "org.webjars.npm" % "codemirror"       % "5.65.20",
       "org.webjars.npm" % "dragula"          % "3.7.3",
-      "org.webjars.npm" % "fflate"           % "0.6.7",
+      "org.webjars.npm" % "fflate"           % "0.6.10",
       "org.webjars.npm" % "jquery"           % "3.6.1",
       "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
-      "org.webjars.npm" % "mousetrap"        % "1.6.2",
+      "org.webjars.npm" % "mousetrap"        % "1.6.5",
       "org.webjars"     % "nprogress"        % "0.2.0-1",
       "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
       "org.webjars.npm" % "select2"          % "4.0.13",
-      "org.webjars.npm" % "tinymce"          % "6.8.5",
+      "org.webjars.npm" % "tinymce"          % "6.8.6",
       "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
     )
   )

@@ -36,6 +36,7 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
+                <include>/request/method</include>
                 <include>/request/scheme</include>
                 <include>/request/server-name</include>
                 <include>/request/server-port</include>
@@ -66,7 +67,7 @@
 
                      2024-12-11: Also don't use the document id in case of `new`.
                  -->
-                <xsl:variable name="use-document-id"                 select="$params/mode != 'new' and $params/document != '' and empty(p:get-request-attribute('fr-form-data'))"/>
+                <xsl:variable name="use-document-id"                 select="$params/mode != 'new' and $params/document != '' and $request/method = 'GET'"/>
                 <xsl:variable name="specific-form-version-requested" select="$params/form-version != ''"/>
 
                 <xsl:if test="$use-document-id">

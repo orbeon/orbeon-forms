@@ -65,10 +65,13 @@
                      modes. In that case, there is no data in the database and the persistence layer must use the
                      version if any.
 
-                     2024-12-11: Also don't use the document id in case of `new`.
+                     - 2024-12-11: Also don't use the document id in case of `new`.
+                     - 2025-10-06: Changed logic to use the HTTP method instead of `fr-form-data` request attribute. We
+                       assume that when there is a `POST`, there is form data being sent.
+                       Note that the only methods allowed are `GET`, `HEAD`, and `POST`.
                  -->
-                <xsl:variable name="use-document-id"                 select="$params/mode != 'new' and $params/document != '' and $request/method = 'GET'"/>
-                <xsl:variable name="specific-form-version-requested" select="$params/form-version != ''"/>
+                <xsl:variable name="use-document-id"                 select="$params/mode != 'new' and p:non-blank($params/document) and $request/method = ('GET', 'HEAD')"/>
+                <xsl:variable name="specific-form-version-requested" select="p:non-blank($params/form-version)"/>
 
                 <xsl:if test="$use-document-id">
                     <header>

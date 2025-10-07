@@ -343,7 +343,7 @@
             <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
             <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
             <captcha-label>Sicherheitscode</captcha-label>
-            <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
+            <captcha-alert>Ungültiger Wert. Bitte versuchen Sie es erneut!</captcha-alert>
         </labels>
         <hints>
             <upload-max-size-per-file>Die maximale Dateigröße ist {0}.</upload-max-size-per-file>

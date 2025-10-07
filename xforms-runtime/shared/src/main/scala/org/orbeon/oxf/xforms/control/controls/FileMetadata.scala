@@ -41,7 +41,7 @@ trait FileMetadata extends XFormsValueControl {
 
   private class FileMetadataProperty(evaluator: Evaluator) extends MutableControlProperty[String] {
 
-    protected def evaluateValue(collector: ErrorEventCollector): String = evaluator.evaluate(self, collector)
+    protected def evaluateValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String = evaluator.evaluate(self, collector)
     override protected def nonRelevantValue: String = evaluator.default
 
     protected def isRelevant: Boolean = self.isRelevant

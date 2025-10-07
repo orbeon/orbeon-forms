@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{PathUtils, ResourceResolver, URLRewriterUtils}
+import org.orbeon.oxf.xforms.XFormsContextStack
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control.*
@@ -147,6 +148,8 @@ class XFormsOutputControl(
     getContextStack.setBinding(bindingContext)
     val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
 
+    implicit val contextStack: XFormsContextStack = getContextStack
+
     EventCollector.withFailFastCollector(
       "evaluating headers",
       this,
@@ -159,7 +162,7 @@ class XFormsOutputControl(
         headersToForward,
         this,
         failFastCollector
-      )(getContextStack)
+      )
     }
   }
 

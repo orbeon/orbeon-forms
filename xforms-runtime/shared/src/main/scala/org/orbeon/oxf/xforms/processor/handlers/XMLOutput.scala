@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHA}
 import org.orbeon.oxf.xforms.control.*
@@ -48,10 +49,12 @@ object XMLOutput {
   private val collector = EventCollector.Throw
 
   def send(
-    xfcd            : XFormsContainingDocument,
-    template        : AnnotatedTemplate,
-    externalContext : ExternalContext)(implicit
-    xmlReceiver     : XMLReceiver
+    xfcd           : XFormsContainingDocument,
+    template       : AnnotatedTemplate,
+    externalContext: ExternalContext
+  )(implicit
+    xmlReceiver    : XMLReceiver,
+    indentedLogger : IndentedLogger
   ): Unit =
     withDocument {
       xfcd.controls.getCurrentControlTree.rootOpt foreach (root => applyMatchers(root))
@@ -65,23 +68,23 @@ object XMLOutput {
     else
       element(name, text = value)
 
-  def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     for {
       lhhaType <- LHHA.values
       lhhaProp = c.lhhaProperty(lhhaType, local = true)
-      text     <- lhhaProp.valueOpt(collector)
+      text     <- lhhaProp.valueOpt(collector)(indentedLogger)
     } locally {
       writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)(xmlReceiver)
     }
 
-  def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.staticControl.cast[AppearanceTrait] foreach { c => // NOTE: `narrowTo` fails
       c.appearances.iterator map
       (AppearanceTrait.encodeAppearanceValue(new jl.StringBuilder, _).toString) foreach
       (appearance => element("appearance", text = appearance)(xmlReceiver))
     }
 
-  def matchSingleNode(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchSingleNode(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XFormsSingleNodeControl] foreach { c =>
       element(
         "mips",
@@ -95,7 +98,7 @@ object XMLOutput {
       )(xmlReceiver)
     }
 
-  def matchValue(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchValue(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XFormsValueControl] filter (_.isRelevant) foreach { c =>
 
       // XBL: Should probably do via xforms:htmlFragment and/or possibly the XBL control exposing a mediatype in
@@ -113,12 +116,12 @@ object XMLOutput {
         .foreach(writeTextOrHTML("external-value", _, isHTML))
     }
 
-  def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[VisitableTrait] filter (c => c.isRelevant && c.visited) foreach { c =>
       element("visited", text = c.visited.toString)(xmlReceiver)
     }
 
-  def matchItemset(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchItemset(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XFormsSelect1Control] filter (_.isRelevant) foreach { c =>
       implicit val _xmlReceiver = xmlReceiver
       withElement("items") {
@@ -137,37 +140,40 @@ object XMLOutput {
       }
     }
 
-  def matchContainer(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchContainer(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XFormsContainerControl] foreach { c =>
-      c.children foreach (applyMatchers(_)(xmlReceiver))
+      c.children foreach (applyMatchers(_)(xmlReceiver, indentedLogger))
     }
 
-  def matchRepeat(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchRepeat(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XFormsRepeatControl] filter (_.isRelevant) foreach { c =>
       element("repeat", atts = List("index" -> c.getIndex.toString))(xmlReceiver)
     }
 
-  def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XFormsSwitchControl] filter (_.isRelevant) foreach { c =>
-      element("switch", atts = List("selected" -> (c.selectedCaseIfRelevantOpt map (_.getId) orNull)))(xmlReceiver)
+      element("switch", atts = List("selected" -> (c.selectedCaseIfRelevantOpt.map(_.getId).orNull)))(xmlReceiver)
     }
 
-  def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[FileMetadata] foreach { c =>
 
-      val properties = c.iterateProperties(collector).collect { case (k, Some(v)) => k -> v } toList
+      val properties =
+        c.iterateProperties(collector)
+          .collect{ case (k, Some(v)) => k -> v }
+          .toList
 
       if (properties.nonEmpty)
         element("file-metadata", atts = properties)(xmlReceiver)
     }
 
-  def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+  def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver)(indentedLogger: IndentedLogger): Unit =
     c.narrowTo[XXFormsDialogControl] filter (_.isDialogVisible) foreach { _ =>
       element("visible", text = "true")(xmlReceiver)
     }
 
   val Matchers =
-    List[(XFormsControl, XMLReceiver) => Unit](
+    List[(XFormsControl, XMLReceiver) => IndentedLogger => Unit](
       matchAppearances,
       matchLHHA,
       matchSingleNode,
@@ -181,12 +187,12 @@ object XMLOutput {
       matchContainer
     )
 
-  def applyMatchers(c: XFormsControl)(implicit xmlReceiver: XMLReceiver): Unit = c match {
+  def applyMatchers(c: XFormsControl)(implicit xmlReceiver: XMLReceiver, indentedLogger: IndentedLogger): Unit = c match {
     case _: XFormsVariableControl | _: XXFormsAttributeControl | _: XFormsActionControl =>
       // Skip control and its descendants
     case c: XFormsGroupControl if c.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME) =>
       // Skip control but process descendants
-      matchContainer(c, xmlReceiver)
+      matchContainer(c, xmlReceiver)(indentedLogger)
     case _ =>
 
       val baseAttributes = List(

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option.*
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -96,7 +96,8 @@ object XFormsContextStackSupport {
     eventTarget         : XFormsEventTarget,
     collector           : ErrorEventCollector
   )(implicit
-    contextStack        : XFormsContextStack
+    contextStack        : XFormsContextStack,
+    indentedLogger      : IndentedLogger
   ): Option[String] =
     childElem.expressionOrConstant match {
       case Left(expr)   =>

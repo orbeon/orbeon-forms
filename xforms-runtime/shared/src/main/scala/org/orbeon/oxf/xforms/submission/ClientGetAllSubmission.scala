@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
-import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.xforms.UrlType
 
@@ -37,7 +37,8 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(implicit
-    refContext             : RefContext
+    refContext             : RefContext,
+    indentedLogger         : IndentedLogger
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = submission.containingDocument,

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import cats.data.NonEmptyList
 import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.*
@@ -107,7 +108,7 @@ trait ControlLHHASupport {
                       // Combine multiple values as a single HTML value using `ul`/`li`
                       new MutableLHHAProperty(self, head.lhhaAnalysis) { // NOTE: `head.lhhaAnalysis` will not be used
                         override def isHTML: Boolean = true
-                        override protected def evaluateValue(collector: ErrorEventCollector): String = combinePropertiesAsUl(head :: tail, collector)
+                        override protected def evaluateValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String = combinePropertiesAsUl(head :: tail, collector)(indentedLogger)
                         // These shouldn't need to be implemented as the aggregated value is simply set to `None` when needed
                         override protected def requireUpdate: Boolean = false
                         override def handleMarkDirty(force: Boolean): Unit = () // (head :: tail).foreach(_.handleMarkDirty(force))
@@ -225,21 +226,21 @@ trait ControlLHHASupport {
 // NOTE: Use name different from trait so that the Java compiler is happy
 object LHHASupport {
 
-  def combinePropertiesAsUl(properties: List[MutableLHHAProperty], collector: ErrorEventCollector): String =
+  def combinePropertiesAsUl(properties: List[MutableLHHAProperty], collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String =
     properties
       .map { property => if (! property.isHTML) property.value(collector).escapeXmlMinimal else property.value(collector) }
       .mkString ("<ul><li>", "</li><li>", "</li></ul>")
 
   // Immutable null LHHA property
   object NullLHHA extends ImmutableLHHAProperty(null: String, isHTML = false, locationData = null) {
-    override def escapedValue(collector: ErrorEventCollector): String = null
+    override def escapedValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String = null
   }
 
   // Control property for LHHA
   trait LHHAProperty extends ControlProperty[String] {
     def locationData: LocationData
     def isHTML: Boolean
-    def escapedValue(collector: ErrorEventCollector): String = {
+    def escapedValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String = {
       val rawValue = value(collector)
       if (isHTML)
         XFormsControl.getEscapedHTMLValue(rawValue)

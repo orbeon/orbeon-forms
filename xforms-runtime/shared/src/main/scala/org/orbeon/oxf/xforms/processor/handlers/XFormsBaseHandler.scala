@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms.processor.handlers
 
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -32,6 +33,8 @@ abstract class XFormsBaseHandler protected (
   ) {
 
   protected val containingDocument: XFormsContainingDocument = handlerContext.containingDocument
+
+  protected implicit def indentedLogger: IndentedLogger = containingDocument.indentedLogger
 
   // TODO: update to use `repeating` and `forwarding`
   override def isRepeating: Boolean = repeating

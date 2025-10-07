@@ -21,9 +21,9 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControl, SelectionControlUtil, WithExpressionOrConstantTrait}
 import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, XPathErrorDetails}
@@ -89,6 +89,8 @@ object ItemsetSupport {
   def evaluateItemset(
     select1Control: XFormsSelect1Control,
     collector     : ErrorEventCollector
+  )(implicit
+    indentedLogger     : IndentedLogger
   ): Itemset = {
 
     val staticControl = select1Control.staticControl

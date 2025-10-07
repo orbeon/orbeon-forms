@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
@@ -40,7 +40,8 @@ object SubmissionHeaders {
     eventTarget       : XFormsEventTarget,
     collector         : ErrorEventCollector
   )(implicit
-    contextStack      : XFormsContextStack         // context stack set to enclosing <xf:*> element
+    contextStack      : XFormsContextStack,        // context stack set to enclosing <xf:*> element
+    indentedLogger    : IndentedLogger
   ): Map[String, List[String]] = {
 
     val xblContainer = contextStack.container

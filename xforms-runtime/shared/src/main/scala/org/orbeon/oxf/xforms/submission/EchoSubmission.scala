@@ -18,7 +18,7 @@ import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.Connection
+import org.orbeon.oxf.util.{Connection, IndentedLogger}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -41,7 +41,8 @@ class EchoSubmission(submission: XFormsModelSubmission)
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(implicit
-    refContext             : RefContext
+    refContext             : RefContext,
+    indentedLogger         : IndentedLogger
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
     serializationParameters.messageBody match {

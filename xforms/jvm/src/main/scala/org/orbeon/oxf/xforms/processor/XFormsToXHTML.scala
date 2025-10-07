@@ -89,9 +89,9 @@ private object XFormsToXHTML {
         // 3. Regular case: produce a document
         containingDocument.hostLanguage match {
           case "xhtml" =>
-            XHTMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+            XHTMLOutput.send(containingDocument, template, externalContext)
           case "xml" =>
-            XMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+            XMLOutput.send(containingDocument, template, externalContext)
           case unknown =>
             throw new OXFException(s"Unknown host language specified: $unknown")
         }

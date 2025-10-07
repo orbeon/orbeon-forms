@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.control.MutableControlProperty
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
@@ -25,5 +26,5 @@ class MutableItemsetProperty(private val control: XFormsSelect1Control) extends 
   protected def requireUpdate                                : Boolean = control.containingDocument.xpathDependencies.requireItemsetUpdate(control.staticControl, XFormsId.getEffectiveIdSuffixParts(control.effectiveId))
   protected def notifyCompute()                              : Unit = control.containingDocument.xpathDependencies.notifyComputeItemset()
   protected def notifyOptimized()                            : Unit = control.containingDocument.xpathDependencies.notifyOptimizeItemset()
-  protected def evaluateValue(collector: ErrorEventCollector): Itemset = ItemsetSupport.evaluateItemset(control, collector)
+  protected def evaluateValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): Itemset = ItemsetSupport.evaluateItemset(control, collector)
 }

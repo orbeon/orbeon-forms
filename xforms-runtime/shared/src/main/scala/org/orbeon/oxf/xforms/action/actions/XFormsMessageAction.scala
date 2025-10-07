@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsContextStackSupport
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
 import org.orbeon.oxf.xml.dom.Extensions
@@ -67,6 +67,7 @@ class XFormsMessageAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
+
     val containingDocument = actionContext.containingDocument
 
     val levelQName =
@@ -79,6 +80,8 @@ class XFormsMessageAction extends XFormsAction {
       } getOrElse
         ModalQName // "The default is `modal` if the attribute is not specified."
 
+    implicit val contextStack: XFormsContextStack = actionContext.interpreter.actionXPathContext
+
     val messageValue =
       XFormsContextStackSupport.evaluateExpressionOrConstant(
         childElem           = actionContext.analysis.asInstanceOf[WithExpressionOrConstantTrait],
@@ -86,8 +89,8 @@ class XFormsMessageAction extends XFormsAction {
         pushContextAndModel = false, // `XFormsActionInterpreter` already handles that
         eventTarget         = actionContext.interpreter.eventObserver,
         collector           = actionContext.collector
-      )(actionContext.interpreter.actionXPathContext)
-        .getOrElse("")
+      )
+      .getOrElse("")
 
     ExtensionLevels.get(levelQName) match {
       case Some(fn) =>

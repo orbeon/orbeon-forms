@@ -17,16 +17,14 @@ import cats.effect.IO
 import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.oxf.http.{Headers, StatusCode}
-import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
-import org.orbeon.oxf.util.Logging.*
 
 
 private object CacheableSubmission {
@@ -45,10 +43,9 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(implicit
-    refContext             : RefContext
+    refContext             : RefContext,
+    indentedLogger         : IndentedLogger
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
-
-    implicit val logger: IndentedLogger = submission.getIndentedLogger
 
     val detailsLogger = submission.getDetailsLogger
 
@@ -237,7 +234,8 @@ class CacheableSubmission(submission: XFormsModelSubmission)
   )(
     instanceCaching        : InstanceCaching
   )(implicit
-    refContext          : RefContext
+    refContext          : RefContext,
+    indentedLogger      : IndentedLogger
   ): DocumentNodeInfoType =
     try {
       // Run `RegularSubmission` but force:

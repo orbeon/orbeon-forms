@@ -46,10 +46,9 @@ class RegularSubmission(submission: XFormsModelSubmission)
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(implicit
-    refContext             : RefContext
+    refContext             : RefContext,
+    indentedLogger         : IndentedLogger
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
-
-    implicit val logger: IndentedLogger = submission.getIndentedLogger
 
     val detailsLogger   = submission.getDetailsLogger
     val externalContext = XFormsCrossPlatformSupport.externalContext
@@ -91,7 +90,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
       else
         None
 
-    def createConnectResult[S](cxr: ConnectionResultT[S])(implicit logger: IndentedLogger): ConnectResultT[S] =
+    def createConnectResult[S](cxr: ConnectionResultT[S]): ConnectResultT[S] =
       withDebug("creating connect result") {
         try {
           ConnectResultT.Success(

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
@@ -24,15 +25,15 @@ import org.orbeon.xforms.XFormsId
 
 // Base trait for a control property (label, itemset, etc.)
 trait ControlProperty[T >: Null] {
-  def value(collector: ErrorEventCollector): T
+  def value(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): T
   def handleMarkDirty(force: Boolean = false): Unit
 
-  def valueOpt(collector: ErrorEventCollector): Option[T] = Option(value(collector))
+  def valueOpt(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): Option[T] = Option(value(collector))
 }
 
 // Immutable control property
 class ImmutableControlProperty[T >: Null](private val _value: T) extends ControlProperty[T] {
-  def value(collector: ErrorEventCollector): T = _value
+  def value(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): T = _value
   def handleMarkDirty(force: Boolean): Unit = ()
 }
 
@@ -49,10 +50,10 @@ trait MutableControlProperty[T >: Null] extends ControlProperty[T] with Cloneabl
   protected def notifyCompute(): Unit
   protected def notifyOptimized(): Unit
 
-  protected def evaluateValue(collector: ErrorEventCollector): T
+  protected def evaluateValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): T
   protected def nonRelevantValue: T = null
 
-  final def value(collector: ErrorEventCollector): T = {
+  final def value(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): T = {
     if (! isEvaluated) {
       _value =
         if (isRelevant) {
@@ -115,7 +116,7 @@ def locationData: LocationData =
 protected def isRelevant: Boolean = control.isRelevant
 protected def wasRelevant: Boolean = control.wasRelevant
 
-protected def evaluateValue(collector: ErrorEventCollector): String =
+protected def evaluateValue(collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String =
   evaluateOne(lhhaAnalysis, collector) match {
     case Some(value: String) =>
       value
@@ -137,7 +138,7 @@ protected def notifyOptimized(): Unit =
   control.containingDocument.xpathDependencies.notifyOptimizeLHHA()
 
 // Evaluate the value of a LHHA related to this control
-private def evaluateOne(lhhaAnalysis: LHHAAnalysis, collector: ErrorEventCollector): Option[String] =
+private def evaluateOne(lhhaAnalysis: LHHAAnalysis, collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): Option[String] =
   if (lhhaAnalysis.isLocal) {
 
     implicit val contextStack: XFormsContextStack = control.getContextStack

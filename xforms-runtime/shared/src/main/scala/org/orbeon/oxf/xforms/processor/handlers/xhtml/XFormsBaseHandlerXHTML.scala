@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.control.*
@@ -23,8 +24,8 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandl
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.dom.Extensions.*
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -237,6 +238,8 @@ abstract class XFormsBaseHandlerXHTML (
     forEffectiveIdWithNsOpt: Option[String],
     requestedElementNameOpt: Option[String],
     control                : XFormsControl
+  )(implicit
+    indentedLogger         : IndentedLogger
   ): Unit =
     if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
 

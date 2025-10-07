@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
+import org.orbeon.oxf.util.IndentedLogger
 
 
 trait Submission {
@@ -29,6 +30,7 @@ trait Submission {
     submissionParameters   : SubmissionParameters,
     serializationParameters: SerializationParameters
   )(implicit
-    refContext             : RefContext
+    refContext             : RefContext,
+    indentedLogger         : IndentedLogger
   ): Option[ConnectResult Either IO[AsyncConnectResult]]
 }

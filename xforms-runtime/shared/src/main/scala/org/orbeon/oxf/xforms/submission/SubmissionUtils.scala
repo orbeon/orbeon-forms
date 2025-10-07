@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContextStack}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
@@ -227,6 +227,8 @@ object SubmissionUtils {
     submission           : XFormsModelSubmission,
     forwardClientHeaders : Boolean,
     collector            : ErrorEventCollector
+  )(implicit
+    indentedLogger      : IndentedLogger
   ): Map[String, List[String]] =
     EventCollector.withFailFastCollector(
       "evaluating headers",
@@ -238,13 +240,14 @@ object SubmissionUtils {
         description = "processing `<header>` elements",
       )
     ) { failFastCollector =>
+    implicit val contextStack: XFormsContextStack = submission.model.getContextStack
       SubmissionHeaders.evaluateHeaders(
         parentEffectiveId  = submission.effectiveId,
         enclosingElement   = submission.staticSubmission,
         initialHeaders     = clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders),
         eventTarget        = submission,
         collector          = failFastCollector
-      )(submission.model.getContextStack)
+      )
     }
 
   def clientHeadersToForward(

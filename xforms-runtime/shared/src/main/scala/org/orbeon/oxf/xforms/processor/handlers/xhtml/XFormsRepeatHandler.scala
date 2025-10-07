@@ -46,7 +46,7 @@ class XFormsRepeatHandler(
     handlerContext,
     repeating  = true,
     forwarding = true
-  ) {
+  ) with NoLhhaHandlerTrait {
 
   // Compute user classes only once for all iterations
   private lazy val userClasses = {
@@ -220,10 +220,4 @@ class XFormsRepeatHandler(
       }
     }
   }
-
-  // Don't output any LHHA
-  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
-  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = ()
-  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
-  override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = ()
 }

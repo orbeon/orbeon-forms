@@ -37,7 +37,8 @@ object XHTMLOutput {
   def send(
     xfcd            : XFormsContainingDocument,
     template        : AnnotatedTemplate,
-    externalContext : ExternalContext)(implicit
+    externalContext : ExternalContext
+  )(implicit
     xmlReceiver     : XMLReceiver
   ): Unit = {
 

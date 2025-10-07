@@ -1,6 +1,5 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SecretControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute

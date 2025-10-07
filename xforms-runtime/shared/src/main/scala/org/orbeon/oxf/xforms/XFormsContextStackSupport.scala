@@ -33,17 +33,21 @@ import scala.util.control.NonFatal
 object XFormsContextStackSupport {
 
   def withBinding[T](
-    ref                            : Option[String],
-    context                        : Option[String],
-    modelId                        : Option[String],
-    bindId                         : Option[String],
-    bindingElement                 : Element,
-    bindingElementNamespaceMapping : NamespaceMapping,
-    sourceEffectiveId              : String,
-    scope                          : Scope,
-    eventTarget                    : XFormsEventTarget,
-    collector                      : ErrorEventCollector
-  )(body: => T)(implicit xformsContextStack: XFormsContextStack): T = {
+    ref                           : Option[String],
+    context                       : Option[String],
+    modelId                       : Option[String],
+    bindId                        : Option[String],
+    bindingElement                : Element,
+    bindingElementNamespaceMapping: NamespaceMapping,
+    sourceEffectiveId             : String,
+    scope                         : Scope,
+    eventTarget                   : XFormsEventTarget,
+    collector                     : ErrorEventCollector
+  )(
+    body                          : => T
+  )(implicit
+    xformsContextStack            : XFormsContextStack
+  ): T = {
     xformsContextStack.pushBinding(
       ref.orNull,
       context.orNull,
@@ -66,7 +70,11 @@ object XFormsContextStackSupport {
     scope             : Scope,
     eventTarget       : XFormsEventTarget,
     collector         : ErrorEventCollector
-  )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
+  )(
+    body              : BindingContext => T
+  )(implicit
+    contextStack      : XFormsContextStack
+  ): T = {
     contextStack.pushBinding(bindingElement, sourceEffectiveId, scope, eventTarget, collector)
     body(contextStack.getCurrentBindingContext) |!>
       (_ => contextStack.popBinding())
@@ -132,11 +140,15 @@ object XFormsContextStackSupport {
     }
 
   private def withContextAndModelOnly[T](
-    bindingElem       : ElementAnalysis,
-    parentEffectiveId : String,
-    eventTarget       : XFormsEventTarget,
-    collector         : ErrorEventCollector
-  )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
+    bindingElem      : ElementAnalysis,
+    parentEffectiveId: String,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector
+  )(
+    body             : BindingContext => T
+  )(implicit
+    contextStack     : XFormsContextStack
+  ): T = {
 
     contextStack.pushBinding(
       ref                            = null,

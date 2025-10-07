@@ -63,7 +63,7 @@ abstract class XFormsControlLifecycleHandler(
     forwarding
   ) {
 
-  import Private._
+  import Private.*
 
   // TODO: Should be in static hierarchy
   // By default, controls are enclosed with a <span>
@@ -259,4 +259,11 @@ abstract class XFormsControlLifecycleHandler(
     def firstLocalLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
       elementAnalysis.narrowTo[StaticLHHASupport].iterator.flatMap(_.allDirectLhha(lhhaType).iterator).find(_.isLocal)
   }
+}
+
+trait NoLhhaHandlerTrait extends XFormsControlLifecycleHandler {
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHint(lhhaAnalysis : LHHAAnalysis): Unit = ()
+  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHelp(lhhaAnalysis : LHHAAnalysis): Unit = ()
 }

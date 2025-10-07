@@ -45,7 +45,7 @@ class XXFormsComponentHandler(
     forwarding = false
   ) {
 
-  import XXFormsComponentHandler._
+  import XXFormsComponentHandler.*
 
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     matched.cast[StaticLHHASupport].flatMap(PlaceHolderInfo.placeHolderValueOpt(_, currentControl))

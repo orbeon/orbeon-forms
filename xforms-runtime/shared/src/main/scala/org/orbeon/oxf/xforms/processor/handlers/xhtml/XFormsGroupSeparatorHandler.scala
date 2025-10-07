@@ -37,7 +37,7 @@ class XFormsGroupSeparatorHandler(
     localAtts,
     matched,
     handlerContext
-  ) {
+  ) with NoLhhaHandlerTrait {
 
   private var currentSavedOutput: DeferredXMLReceiver = null
   private var outputInterceptor : OutputInterceptor   = null
@@ -120,10 +120,4 @@ class XFormsGroupSeparatorHandler(
     if (isMustGenerateBeginEndDelimiters)
       outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end", "group-end-" + containingDocument.namespaceId(getEffectiveId))
   }
-
-  // Don't output any LHHA
-  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
-  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = ()
-  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
-  override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = ()
 }

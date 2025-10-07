@@ -77,7 +77,7 @@ class XFormsMessageAction extends XFormsAction {
           unprefixedIsNoNamespace = true
         )
       } getOrElse
-        ModalQName // "The default is "modal" if the attribute is not specified."
+        ModalQName // "The default is `modal` if the attribute is not specified."
 
     val messageValue =
       XFormsContextStackSupport.evaluateExpressionOrConstant(

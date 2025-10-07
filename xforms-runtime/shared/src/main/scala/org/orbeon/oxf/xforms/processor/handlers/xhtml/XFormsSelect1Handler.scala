@@ -24,10 +24,10 @@ import org.orbeon.oxf.xforms.itemset.*
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as XHTML
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
-import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString}
 import org.orbeon.xforms.{XFormsId, XFormsNames}

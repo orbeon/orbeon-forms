@@ -48,7 +48,7 @@ class XFormsCaseHandler(
     handlerContext,
     repeating  = false,
     forwarding = true
-  ) {
+  ) with NoLhhaHandlerTrait {
 
   private var currentSavedOutput: DeferredXMLReceiver = _
   private var currentOutputInterceptorOpt: Option[OutputInterceptor] = None
@@ -190,10 +190,4 @@ class XFormsCaseHandler(
 
     handlerContext.controller.output = currentSavedOutput
   }
-
-  // Don't output any LHHA
-  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
-  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = ()
-  override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = ()
-  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
 }

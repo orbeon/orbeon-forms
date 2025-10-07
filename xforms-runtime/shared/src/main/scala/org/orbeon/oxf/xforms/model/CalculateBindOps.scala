@@ -92,7 +92,7 @@ trait CalculateBindOps {
         case NonFatal(t) =>
           handleMIPXPathException(t, bindNode, mip, mipName, collector)
 
-          ! defaultForMIP // https://github.com/orbeon/orbeon-forms/issues/835
+          (! defaultForMIP) // https://github.com/orbeon/orbeon-forms/issues/835
       }
     }
   }

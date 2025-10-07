@@ -95,8 +95,6 @@ object Log4jSupport {
         s"property `$propName` and configuration at URL `$propValue`"
 
       resultStream collectFirst { case (Right(_), propName, propValue) => (propName, propValue) } match {
-        case Some((propName, propValue)) if propName == Log4j1ConfigPropName =>
-          logger.info(s"Configured Log4j 2 in Log4j 1 backward compatibility mode using ${makePair(propName, propValue)}.")
         case Some((propName, propValue)) =>
           logger.info(s"Configured Log4j 2 using ${makePair(propName, propValue)}.")
         case None =>
@@ -162,20 +160,11 @@ object Log4jSupport {
     val DefaultLevel             = Level.INFO
     val DefaultPattern           = "%date{ISO8601} - %tid - %-5level %logger{1} - %message%n"
 
-    val Log4j1ConfigPropName     = "oxf.log4j-config"
     val Log4j2ConfigPropName     = "oxf.log4j2-config"
 
     val ConfigPropNamesWithFns: List[(String, (LoggerContext, InputStream, URL) => AbstractConfiguration)] = List(
-      Log4j1ConfigPropName -> createLog4j1XmlConfig,
       Log4j2ConfigPropName -> createLog4j2XmlConfig
     )
-
-    def createLog4j1XmlConfig(cxt: LoggerContext, is: InputStream, url: URL): AbstractConfiguration =
-      new org.apache.log4j.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url), 0) {
-        override def initializeWatchers(reconfigurable: Reconfigurable, configSource: ConfigurationSource, monitorIntervalSeconds: Int): Unit =
-          if (url.getProtocol != OXFHandler.Protocol) // https://github.com/orbeon/orbeon-forms/issues/5370
-            super.initializeWatchers(reconfigurable, configSource, monitorIntervalSeconds)
-      }
 
     def createLog4j2XmlConfig(cxt: LoggerContext, is: InputStream, url: URL): AbstractConfiguration =
       new org.apache.logging.log4j.core.config.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url)) {

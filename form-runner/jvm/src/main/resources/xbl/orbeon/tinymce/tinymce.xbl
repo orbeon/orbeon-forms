@@ -22,11 +22,11 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
-    <xbl:script src="/webjars/tinymce/6.8.5/tinymce.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.5/icons/default/icons.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.5/themes/silver/theme.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.5/plugins/lists/plugin.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.5/plugins/link/plugin.min.js"/>
+    <xbl:script src="/webjars/tinymce/6.8.6/tinymce.min.js"/>
+    <xbl:script src="/webjars/tinymce/6.8.6/icons/default/icons.min.js"/>
+    <xbl:script src="/webjars/tinymce/6.8.6/themes/silver/theme.min.js"/>
+    <xbl:script src="/webjars/tinymce/6.8.6/plugins/lists/plugin.min.js"/>
+    <xbl:script src="/webjars/tinymce/6.8.6/plugins/link/plugin.min.js"/>
     <xbl:binding
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
@@ -89,7 +89,7 @@
                  - https://github.com/orbeon/orbeon-forms/issues/3473
                  - https://github.com/orbeon/orbeon-forms/issues/5440
              -->
-            <xbl:style src="/webjars/tinymce/6.8.5/skins/ui/oxide/skin.min.css"/>
+            <xbl:style src="/webjars/tinymce/6.8.6/skins/ui/oxide/skin.min.css"/>
         </xbl:resources>
         <xbl:template>
             <xf:var
@@ -115,7 +115,7 @@
             <xh:a
                 f:url-type="resource"
                 data-tinymce-config="{fr:component-param-value('config')}"
-                href="/webjars/tinymce/6.8.51b713b2e6d7fd45753f4b8a6270b776e.js"
+                href="/webjars/tinymce/6.8.61b713b2e6d7fd45753f4b8a6270b776e.js"
                 class="tinymce-base-url xforms-hidden"/>
 
             <!-- This is a workaround for the lack of https://github.com/orbeon/orbeon-forms/issues/5366.

@@ -111,16 +111,13 @@ object SimpleDataMigration {
     def bindNameOpt(bind: BindType): Option[String]
   }
 
-  sealed trait FormDiff[BindType]
+  sealed trait FormDiff[BindType] { val bind: BindType }
   object FormDiff {
-    sealed trait BindSpecificDiff[BindType] extends FormDiff[BindType] { val bind: BindType }
-
-    case class ValueChanged    [BindType](bind: BindType, from: String, to: String) extends BindSpecificDiff[BindType]
-    case class IterationAdded  [BindType](bind: BindType, count: Int)               extends BindSpecificDiff[BindType]
-    case class IterationRemoved[BindType](bind: BindType, count: Int)               extends BindSpecificDiff[BindType]
-    case class ElementAdded    [BindType](bind: BindType)                           extends BindSpecificDiff[BindType]
-    case class ElementRemoved  [BindType](bind: BindType)                           extends BindSpecificDiff[BindType]
-    case class Unspecified     [BindType]()                                         extends FormDiff[BindType]
+    case class ValueChanged    [BindType](bind: BindType, from: String, to: String) extends FormDiff[BindType]
+    case class IterationAdded  [BindType](bind: BindType, count: Int)               extends FormDiff[BindType]
+    case class IterationRemoved[BindType](bind: BindType, count: Int)               extends FormDiff[BindType]
+    case class ElementAdded    [BindType](bind: BindType)                           extends FormDiff[BindType]
+    case class ElementRemoved  [BindType](bind: BindType)                           extends FormDiff[BindType]
   }
 
   // Attempt to fill/remove holes in an instance given:

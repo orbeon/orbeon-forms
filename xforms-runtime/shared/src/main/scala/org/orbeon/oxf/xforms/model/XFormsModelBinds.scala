@@ -15,14 +15,11 @@ package org.orbeon.oxf.xforms.model
 
 import cats.syntax.option.*
 import org.orbeon.dom.QName
-import org.orbeon.dom.saxon.TypedNodeWrapper
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.model.MipName.*
+import org.orbeon.oxf.xforms.{NonFatalCheckTypedValueException, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, Types}
 import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
@@ -170,20 +167,9 @@ object XFormsModelBinds {
     collector: ErrorEventCollector
   )(implicit
     logger   : IndentedLogger
-  ): Unit = {
-    XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
-      case e: TypedNodeWrapper.TypedValueException =>
-        // Consider validation errors as ignorable. The rationale is that if the function (the XPath
-        // expression) works on inputs that are not valid (hence the validation error), then the function cannot
-        // produce a meaningful result. We think that it is worth handling this condition slightly differently
-        // from other dynamic and static errors, so that users can just write expression without constant checks
-        // with `castable as` or `instance of`.
-        debug("typed value exception", List(
-          "node name"     -> e.nodeName,
-          "expected type" -> e.typeName,
-          "actual value"  -> e.nodeValue
-        ))
-      case t =>
+  ): Unit =
+    throwable match {
+      case NonFatalCheckTypedValueException((t, false)) =>
         // All other errors dispatch an event and will cause the usual fatal-or-not behavior
         val ve = OrbeonLocationException.wrapException(t,
           XmlExtendedLocationData(
@@ -203,6 +189,6 @@ object XFormsModelBinds {
             throwable      = ve
           )
         )
+      case _ =>
     }
-  }
 }

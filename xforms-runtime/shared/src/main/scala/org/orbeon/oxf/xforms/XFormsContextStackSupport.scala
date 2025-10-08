@@ -17,17 +17,15 @@ import cats.syntax.option.*
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.saxon.om
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xml.NamespaceMapping
-
-import scala.util.control.NonFatal
 
 
 object XFormsContextStackSupport {
@@ -90,14 +88,14 @@ object XFormsContextStackSupport {
     XFormsId.buildEffectiveId(elem.prefixedId, XFormsId.getEffectiveIdSuffixParts(parentEffectiveId))
 
   def evaluateExpressionOrConstant(
-    childElem           : WithExpressionOrConstantTrait,
-    parentEffectiveId   : String,
-    pushContextAndModel : Boolean,
-    eventTarget         : XFormsEventTarget,
-    collector           : ErrorEventCollector
+    childElem          : WithExpressionOrConstantTrait,
+    parentEffectiveId  : String,
+    pushContextAndModel: Boolean,
+    eventTarget        : XFormsEventTarget,
+    collector          : ErrorEventCollector
   )(implicit
-    contextStack        : XFormsContextStack,
-    indentedLogger      : IndentedLogger
+    contextStack       : XFormsContextStack,
+    indentedLogger     : IndentedLogger
   ): Option[String] =
     childElem.expressionOrConstant match {
       case Left(expr)   =>
@@ -124,16 +122,17 @@ object XFormsContextStackSupport {
           else
             evaluate(contextStack.getCurrentBindingContext)
         } catch {
-          case NonFatal(t) =>
-            collector(
-              new XXFormsXPathErrorEvent(
-                target         = eventTarget,
-                expression     = expr,
-                details        = XPathErrorDetails.ForOther("expression-or-constant"),
-                message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
-                throwable      = t
+          case NonFatalCheckTypedValueException((t, isTve)) =>
+            if (! isTve)
+              collector(
+                new XXFormsXPathErrorEvent(
+                  target         = eventTarget,
+                  expression     = expr,
+                  details        = XPathErrorDetails.ForOther("expression-or-constant"),
+                  message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                  throwable      = t
+                )
               )
-            )
             None
         }
       case Right(constant) =>

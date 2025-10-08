@@ -99,16 +99,17 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
                 containingDocument.getRequestStats.getReporter
               ).reduce() // not sure if reducing is required after an evaluation
             } catch {
-              case NonFatal(t) =>
-                collector(
-                  new XXFormsXPathErrorEvent(
-                    target         = eventTarget,
-                    expression     = expression,
-                    details        = XPathErrorDetails.ForVariable(staticVariable.name),
-                    message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
-                    throwable      = t
+              case NonFatalCheckTypedValueExceptionNoLogging((t, isTve)) =>
+                if (! isTve)
+                  collector(
+                    new XXFormsXPathErrorEvent(
+                      target         = eventTarget,
+                      expression     = expression,
+                      details        = XPathErrorDetails.ForVariable(staticVariable.name),
+                      message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                      throwable      = t
+                    )
                   )
-                )
                 EmptySequence.getInstance
             }
           } else {

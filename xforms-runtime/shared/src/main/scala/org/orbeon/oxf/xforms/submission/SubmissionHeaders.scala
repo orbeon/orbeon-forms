@@ -102,16 +102,17 @@ object SubmissionHeaders {
                       xblContainer.containingDocument.getRequestStats.getReporter
                     )
                 catch {
-                  case NonFatal(t) =>
-                    collector(
-                      new XXFormsXPathErrorEvent(
-                        target         = eventTarget,
-                        expression     = avtCombine,
-                        details        = XPathErrorDetails.ForOther("avt"),
-                        message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
-                        throwable      = t
+                  case NonFatalCheckTypedValueExceptionNoLogging((t, isTve)) =>
+                    if (! isTve)
+                      collector(
+                        new XXFormsXPathErrorEvent(
+                          target         = eventTarget,
+                          expression     = avtCombine,
+                          details        = XPathErrorDetails.ForOther("avt"),
+                          message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                          throwable      = t
+                        )
                       )
-                    )
                     ""
                 }
 

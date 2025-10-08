@@ -29,4 +29,21 @@ object NonFatalCheckTypedValueException {
       case _               =>
         None
     }
+}
+
+object NonFatalCheckTypedValueExceptionNoLogging {
+  def unapply(throwable: Throwable): Option[(Throwable, Boolean)] =
+    XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
+      case _: TypedNodeWrapper.TypedValueException =>
+        // Consider type validation errors as ignorable. The rationale is that if the function (the XPath
+        // expression) works on inputs that are not valid (hence the validation error), then the function cannot
+        // produce a meaningful result. We think that it is worth handling this condition slightly differently
+        // from other dynamic and static errors, so that users can just write expression without constant checks
+        // with `castable as` or `instance of`.
+        (throwable -> true).some
+      case NonFatal(_) =>
+        (throwable -> false).some
+      case _               =>
+        None
+    }
   }

@@ -380,16 +380,17 @@ object ItemsetSupport {
                           reporter           = container.containingDocument.getRequestStats.getReporter
                         )
                       } catch {
-                        case NonFatal(t) =>
-                          failFastCollector(
-                            new XXFormsXPathErrorEvent(
-                              target         = select1Control,
-                              expression     = attributeValue,
-                              details        = XPathErrorDetails.ForAttribute(attributeName.localName),
-                              message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
-                              throwable      = t
+                        case NonFatalCheckTypedValueExceptionNoLogging((t, isTve)) =>
+                          if (! isTve)
+                            failFastCollector(
+                              new XXFormsXPathErrorEvent(
+                                target         = select1Control,
+                                expression     = attributeValue,
+                                details        = XPathErrorDetails.ForAttribute(attributeName.localName),
+                                message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                                throwable      = t
+                              )
                             )
-                          )
                           ""
                       }
                     Some(attributeName -> tempResult)

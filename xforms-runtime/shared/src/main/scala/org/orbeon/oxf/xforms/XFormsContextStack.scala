@@ -564,16 +564,17 @@ class XFormsContextStack {
                 containingDocument.getRequestStats.getReporter
               )
             catch {
-              case NonFatal(t) =>
-                collector(
-                  new XXFormsXPathErrorEvent(
-                    target         = eventTarget,
-                    expression     = expression,
-                    details        = XPathErrorDetails.ForAttribute("ref"),
-                    message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
-                    throwable      = t
+              case NonFatalCheckTypedValueExceptionNoLogging((t, isTve)) =>
+                if (! isTve)
+                  collector(
+                    new XXFormsXPathErrorEvent(
+                      target         = eventTarget,
+                      expression     = expression,
+                      details        = XPathErrorDetails.ForAttribute("ref"),
+                      message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                      throwable      = t
+                    )
                   )
-                )
                 java.util.Collections.emptyList[om.Item]
             }
           newItems = result

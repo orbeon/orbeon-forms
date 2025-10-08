@@ -127,7 +127,7 @@
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon.min.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/nprogress/0.2.0/nprogress.js" class="xforms-baseline"/>
-                <xh:script src="/webjars/bowser/1.9.1/bowser.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/bowser/1.9.4/bowser.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/mousetrap/1.6.2/mousetrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js" class="xforms-baseline"/>
                 <xh:script src="/ops/dialog-polyfill-0.5.6/dialog-polyfill.js" class="xforms-baseline"/>

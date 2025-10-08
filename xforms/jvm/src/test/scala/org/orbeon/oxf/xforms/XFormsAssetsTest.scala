@@ -47,7 +47,7 @@ class XFormsAssetsTest extends AnyFunSpec{
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
             { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
             { "full": "/webjars/bowser/1.9.4/bowser.js",                                     "min": false },
-            { "full": "/webjars/mousetrap/1.6.2/mousetrap.js",                               "min": true  },
+            { "full": "/webjars/mousetrap/1.6.5/mousetrap.js",                               "min": true  },
             { "full": "/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js",                       "min": false },
 
             { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
@@ -106,7 +106,7 @@ class XFormsAssetsTest extends AnyFunSpec{
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
             { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
             { "full": "/webjars/bowser/1.9.4/bowser.js",                                     "min": false },
-            { "full": "/webjars/mousetrap/1.6.2/mousetrap.js",                               "min": true  },
+            { "full": "/webjars/mousetrap/1.6.5/mousetrap.js",                               "min": true  },
             { "full": "/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js",                       "min": false },
 
             { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },

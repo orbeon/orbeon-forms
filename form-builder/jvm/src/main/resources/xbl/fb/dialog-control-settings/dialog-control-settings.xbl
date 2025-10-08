@@ -964,7 +964,11 @@
                                 true()"/>
                 </xf:bind>
 
-                <xf:bind ref="visible-counts/@*" type="xs:integer"/>
+                <!-- https://github.com/orbeon/orbeon-forms/issues/7265 -->
+                <xf:bind
+                    ref="visible-counts/@*"
+                    type="xs:integer"
+                    calculate="if (xxf:is-blank(string(.))) then 0 else ."/>
 
                 <xf:bind ref="default-alert">
                     <xf:bind
@@ -2131,6 +2135,7 @@
                         visible-infos-count-ref="$i/visible-counts/@info"
                     >
 
+                        <!-- https://github.com/orbeon/orbeon-forms/issues/7265 -->
                         <fr:label>
                             <xf:output
                                 value="

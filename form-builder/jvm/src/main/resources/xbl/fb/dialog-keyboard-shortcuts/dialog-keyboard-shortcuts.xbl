@@ -85,7 +85,7 @@
                                         <xh:td>Paste from the toolbox</xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="3">Grid Navigation</xh:td>
+                                        <xh:td rowspan="5">Grid Navigation</xh:td>
                                         <xh:td><xh:kbd>←</xh:kbd>/<xh:kbd>→</xh:kbd></xh:td>
                                         <xh:td>Move to the previous or next grid cell, including empty cells.</xh:td>
                                     </xh:tr>
@@ -96,6 +96,14 @@
                                     <xh:tr>
                                         <xh:td><xh:kbd>↑</xh:kbd>/<xh:kbd>↓</xh:kbd></xh:td>
                                         <xh:td>Move to the previous or next grid cell vertically, including empty cells.</xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td><xh:kbd>⌃⇧↑</xh:kbd></xh:td>
+                                        <xh:td>Move the current grid line up.</xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td><xh:kbd>⌃⇧↓</xh:kbd></xh:td>
+                                        <xh:td>Move the current grid line down.</xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td rowspan="2">Undo and Redo</xh:td>

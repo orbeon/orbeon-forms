@@ -874,7 +874,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
   )
 
 lazy val formRunnerClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("form-runner-client-server"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-form-runner-client-server",
   )
@@ -897,7 +897,7 @@ lazy val formRunnerClientServerJS = formRunnerClientServer.js
   )
 
 lazy val formRunnerWeb = (project in file("form-runner-web"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-form-runner-web"
   )
@@ -931,7 +931,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
   )
 
 lazy val formBuilder = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-builder"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-form-builder"
   )
@@ -944,8 +944,8 @@ lazy val formBuilderJVM = formBuilder.jvm
     core          % "test->test;compile->compile"
   )
   .settings(commonScalaJvmSettings)
-  .settings(jUnitTestOptions: _*)
-  .settings(assetsSettings: _*)
+  .settings(jUnitTestOptions*)
+  .settings(assetsSettings*)
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
@@ -986,7 +986,7 @@ lazy val formBuilderJS = formBuilder.js
   )
 
 lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms",
 
@@ -1007,9 +1007,9 @@ lazy val xformsJVM = xforms.jvm
     core % "test->test;compile->compile"
   )
   .enablePlugins(SbtWeb)
-  .settings(assetsSettings: _*)
+  .settings(assetsSettings*)
   .settings(commonScalaJvmSettings)
-  .settings(jUnitTestOptions: _*)
+  .settings(jUnitTestOptions*)
   .settings(
 
     libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
@@ -1052,7 +1052,7 @@ lazy val xformsJS = xforms.js
   )
 
 lazy val xformsClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("xforms-client-server"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms-client-server",
     libraryDependencies += "com.lihaoyi" %%% "autowire"  % AutowireVersion,
@@ -1082,7 +1082,7 @@ lazy val xformsClientServerJS = xformsClientServer.js
   )
 
 lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-common"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms-common",
     libraryDependencies += "com.chuusai" %% "shapeless" % ShapelessVersion,
@@ -1117,7 +1117,7 @@ lazy val xformsCommonJS = xformsCommon.js
   )
 
 lazy val xformsAnalysis = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-analysis"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms-analysis",
 
@@ -1144,7 +1144,7 @@ lazy val xformsAnalysisJS = xformsAnalysis.js
   )
 
 lazy val xformsCompiler = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-compiler"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms-compiler",
 
@@ -1161,8 +1161,8 @@ lazy val xformsCompilerJVM = xformsCompiler.jvm
     core % "test->test;compile->compile",
     coreCrossPlatformJVM // implied
   )
-  .settings(scala2CommonSettings: _*)
-  .settings(jUnitTestOptions: _*)
+  .settings(scala2CommonSettings*)
+  .settings(jUnitTestOptions*)
 
 lazy val xformsCompilerJS = xformsCompiler.js
   .dependsOn(
@@ -1172,7 +1172,7 @@ lazy val xformsCompilerJS = xformsCompiler.js
   .settings(commonScalaJsSettings)
 
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms-runtime",
 
@@ -1213,7 +1213,7 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   )
 
 lazy val xformsWeb = (project in file("xforms-web"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)
   .enablePlugins(JSDependenciesPlugin)
@@ -1267,21 +1267,21 @@ lazy val xformsWeb = (project in file("xforms-web"))
 
 lazy val fileScanExample = (project in file("file-scan-example"))
   .dependsOn(xformsJVM)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "file-scan-example"
   )
 
 lazy val fileScanExample2 = (project in file("file-scan-v2-example"))
   .dependsOn(xformsJVM)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "file-scan-v2-example"
   )
 
 lazy val nodeFacades = (project in file("node-facades"))
   .enablePlugins(ScalaJSPlugin)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-node-facades",
 
@@ -1295,8 +1295,8 @@ lazy val nodeFacades = (project in file("node-facades"))
 lazy val webFacades = (project in file("web-facades"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(commonJS)
-  .settings(scala2CommonSettings: _*)
-  .settings(commonScalaJsSettings: _*)
+  .settings(scala2CommonSettings*)
+  .settings(commonScalaJsSettings*)
   .settings(
     name := "orbeon-web-facades",
 
@@ -1307,7 +1307,7 @@ lazy val webFacades = (project in file("web-facades"))
   )
 
 lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("core-cross-platform"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-core-cross-platform"
   )
@@ -1360,11 +1360,11 @@ lazy val core = (project in file("src"))
     xformsFilter // only for access to a constant
   )
   .configs(DebugTest)
-  .settings(scala2CommonSettings: _*)
-  .settings(unmanagedJarsSettings: _*)
+  .settings(scala2CommonSettings*)
+  .settings(unmanagedJarsSettings*)
   .settings(commonScalaJvmSettings)
-  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
-  .settings(assetsSettings: _*)
+  .settings(inConfig(DebugTest)(Defaults.testSettings)*)
+  .settings(assetsSettings*)
   .settings(
     name                               := "orbeon-core",
 
@@ -1379,7 +1379,7 @@ lazy val core = (project in file("src"))
 
     ThisProject / sourceDirectory      := baseDirectory.value // until we have a more standard layout
   )
-  .settings(jUnitTestOptions: _*)
+  .settings(jUnitTestOptions*)
   .settings(
     DebugTest / javaOptions            += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
     libraryDependencies                ++= CoreLibraryDependencies,
@@ -1390,7 +1390,7 @@ lazy val core = (project in file("src"))
 // Common types for Javax and Jakarta servlets
 lazy val servletSupport = (project in file("servlet-support"))
   .dependsOn(commonJVM)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-servlet-support",
     libraryDependencies += "javax.servlet"    %   "javax.servlet-api"   % JavaxServletApiVersion      % Provided,
@@ -1402,7 +1402,7 @@ lazy val servletSupport = (project in file("servlet-support"))
 // JAR file for dynamic servlet instantiation
 lazy val servletContainerInitializer = (project in file("servlet-container-initializer"))
   .dependsOn(formRunnerJVM)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "servlet-container-initializer",
     libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
@@ -1416,7 +1416,7 @@ val DemoSqliteDatabaseResourceManagerPaths = List(
 
 lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
   .dependsOn(formBuilderJVM, formRunnerJVM % "compile->db; compile->test", core % "compile->test")
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "demo-sqlite-database",
     javaOptions ++= resourceManagerProperties((ThisBuild / baseDirectory).value, DemoSqliteDatabaseResourceManagerPaths),
@@ -1442,12 +1442,12 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     formBuilderJVM,
     servletContainerInitializer
   )
-  .settings(OrbeonWebappPlugin.projectSettings: _*)
-  .settings(scala2CommonSettings: _*)
+  .settings(OrbeonWebappPlugin.projectSettings*)
+  .settings(scala2CommonSettings*)
   .settings(
     exportJars := false
   )
-  .settings(WebJarPatcher.settings: _*)
+  .settings(WebJarPatcher.settings*)
   .settings(
     Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue,
 
@@ -1470,7 +1470,7 @@ lazy val orbeonWarJVM = orbeonWar.jvm
 
 lazy val orbeonWarJS = orbeonWar.js
   .enablePlugins(BuildInfoPlugin)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .dependsOn(
     commonJS,
     nodeFacades,

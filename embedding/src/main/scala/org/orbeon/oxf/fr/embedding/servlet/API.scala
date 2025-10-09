@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.embedding.servlet
 
+import org.orbeon.fr.FormRunnerPath
 import org.orbeon.oxf.fr.embedding.APISupport.*
 import org.orbeon.oxf.servlet.HttpServletRequest
 
@@ -73,7 +74,7 @@ object API {
     embedPageJava(
       req,
       writer,
-      formRunnerPath(app, form, mode, Option(documentId), Option(query)),
+      FormRunnerPath.formRunnerPath(app, form, mode, Option(documentId), Option(query)),
       headers
     )
 }

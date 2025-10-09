@@ -577,7 +577,8 @@ lazy val embedding = (project in file("embedding"))
   .dependsOn(
     commonJVM,
     servletSupport,
-    xformsClientServerJVM
+    xformsClientServerJVM,
+    formRunnerClientServerJVM,
   )
   .settings(scala2CommonSettings: _*)
   .settings(

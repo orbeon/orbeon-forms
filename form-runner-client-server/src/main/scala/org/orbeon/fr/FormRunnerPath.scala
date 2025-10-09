@@ -1,18 +1,18 @@
 package org.orbeon.fr
 
-/**
- * Copyright (C) 2007 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-class FormRunnerPath {
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.PathUtils.PathOps
 
+
+object FormRunnerPath {
+
+  def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]): String =
+    PathUtils.appendQueryString(s"/fr/$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query.getOrElse(""))
+
+  def formRunnerHomePath(query: Option[String]): String =
+    PathUtils.appendQueryString("/fr/", query.getOrElse(""))
+
+  def formRunnerURL(baseURL: String, path: String, embeddable: Boolean): String =
+    PathUtils.appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) s"${ExternalContext.EmbeddableParam}=true" else "")
 }

@@ -19,6 +19,7 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.connection.ConnectionContextSupport.EmptyConnectionContexts
 import org.orbeon.connection.{BufferedContent, Content, StreamedContent}
+import org.orbeon.fr.FormRunnerPath
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
@@ -65,7 +66,7 @@ object APISupport {
 
     Logger.debug(s"proxying page for path = `$path`")
 
-    val url = formRunnerURL(baseURL, path, embeddable = true)
+    val url = FormRunnerPath.formRunnerURL(baseURL, path, embeddable = true)
 
     callService(RequestDetails(None, url, path, headers, params))._1 match {
       case Left(content: StreamedContent) =>
@@ -94,7 +95,7 @@ object APISupport {
       APISupport.sanitizeResourceId(resourcePath, settings.FormRunnerResourcePathRegex) match {
         case Some(sanitizedResourcePath) =>
 
-          val url = formRunnerURL(settings.formRunnerURL, sanitizedResourcePath, embeddable = false)
+          val url = FormRunnerPath.formRunnerURL(settings.formRunnerURL, sanitizedResourcePath, embeddable = false)
 
           val contentFromRequest =
             req.getMethod == "POST" option
@@ -182,15 +183,6 @@ object APISupport {
 
     useAndClose(res.content)(writeResponseBody(mediatype => mustRewriteForMediatype(mediatype) || mustRewriteForPath(requestDetails.path)))
   }
-
-  def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]) =
-    PathUtils.appendQueryString(s"/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}", query getOrElse "")
-
-  def formRunnerHomePath(query: Option[String]) =
-    PathUtils.appendQueryString("/fr/", query getOrElse "")
-
-  def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
-    PathUtils.appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) s"${ExternalContext.EmbeddableParam}=true" else "")
 
   // Match on headers in a case-insensitive way, but the header we sent follows the capitalization of the
   // header specified in the init parameter.

@@ -17,6 +17,7 @@ import cats.data.NonEmptyList
 import org.orbeon.connection.StreamedContent
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.fr.FormRunnerPath
 import org.orbeon.oxf.fr.embedding.*
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
@@ -207,7 +208,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           getPreferenceOrRequested       (request, FormName)
         )  match {
           case Some(sanitizedResourcePath) =>
-            val url = APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
+            val url = FormRunnerPath.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
 
             val requestDetails =
               newRequestDetails(
@@ -264,9 +265,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
       def defaultPath: String =
         if (getPreference(request, Page).contains("home"))
-          APISupport.formRunnerHomePath(None)
+          FormRunnerPath.formRunnerHomePath(None)
         else
-          APISupport.formRunnerPath(
+          FormRunnerPath.formRunnerPath(
             getPreferenceOrRequestedOrThrow(request, AppName),
             getPreferenceOrRequestedOrThrow(request, FormName),
             getPreferenceOrRequestedOrThrow(request, Page),
@@ -295,7 +296,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings,
           request,
           contentFromRequest(request, namespace),
-          APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), path, embeddable = true),
+          FormRunnerPath.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), path, embeddable = true),
           path
         )
       case None =>
@@ -483,12 +484,12 @@ private[portlet] object OrbeonProxyPortlet {
         Some(path)
       case (FormRunnerNewSummaryPathRegex(appName, formName, mode @ ("new" | "summary"), query), configuredPage)
         if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName) =>
-        Some(APISupport.formRunnerPath(appName, formName, mode, None, Option(query)))
+        Some(FormRunnerPath.formRunnerPath(appName, formName, mode, None, Option(query)))
       case (FormRunnerEditViewDocumentPathRegex(appName, formName, mode @ ("edit" | "view"), documentId, query), configuredPage)
         if checkPageAllowed(mode, configuredPage) && checkAppFormAllowed(configuredPage, configuredAppName, configuredFormName, appName, formName) =>
-        Some(APISupport.formRunnerPath(appName, formName, filterMode(FormRunnerMode.withName(mode)).entryName, Some(documentId), Option(query)))
+        Some(FormRunnerPath.formRunnerPath(appName, formName, filterMode(FormRunnerMode.withName(mode)).entryName, Some(documentId), Option(query)))
       case (FormRunnerHomePathRegex(_, query), "home") =>
-        Some(APISupport.formRunnerHomePath(Option(query)))
+        Some(FormRunnerPath.formRunnerHomePath(Option(query)))
       case _ =>
         None
     }

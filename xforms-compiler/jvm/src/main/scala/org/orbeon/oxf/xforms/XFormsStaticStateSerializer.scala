@@ -10,7 +10,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, StaticXPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Instance, MipName, Model, StaticBind}
@@ -44,8 +44,6 @@ import scala.jdk.CollectionConverters.*
 //   - can we find a better representation?
 //
 object XFormsStaticStateSerializer {
-
-  val Logger = LoggerFactory.createLogger(XFormsStaticStateSerializer.getClass)
 
   // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.
   implicit val encodeQName: Encoder[dom.QName] = (a: dom.QName) => {
@@ -378,13 +376,7 @@ object XFormsStaticStateSerializer {
     // https://github.com/orbeon/orbeon-forms/issues/6670
     implicit val encodeLangRef: Encoder[LangRef] = (_: LangRef) => Json.Null
 
-//    implicit val encodeNamespace         : Encoder[dom.Namespace]     = deriveEncoder
     implicit val encodeBasicCredentials  : Encoder[BasicCredentials]  = deriveEncoder
-
-//    implicit val encodeNamespaceMapping: Encoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
-//      "hash"    -> Json.fromString(a.hash),
-//      "mapping" -> a.mapping.asJson
-//    )
 
     def appendElemAndAtts(a: dom.Element, b: ListBuffer[(String, Json)]) = {
       b += "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName))

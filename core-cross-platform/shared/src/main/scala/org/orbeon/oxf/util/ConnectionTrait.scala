@@ -96,7 +96,7 @@ trait ConnectionTrait {
 
   def getHeaderFromRequest(request: ExternalContext.Request): String => Option[List[String]] =
     Option(request) match {
-      case Some(request) => name => request.getHeaderValuesMap.asScala.get(name) map (_.toList)
+      case Some(request) => name => request.getHeaderValuesMap.asScala.get(name).map(_.toList)
       case None          => _    => None
     }
 
@@ -194,7 +194,7 @@ trait ConnectionTrait {
   ): Map[String, List[String]] =
     if ((url.getScheme eq null) || UriScheme.SchemesWithHeaders(UriScheme.withName(url.getScheme))) {
 
-      // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
+      // "If a header element defines the `Content-Type` header, then this setting overrides a `Content-type` set by the
       // mediatype attribute"
       val headersWithContentTypeIfNeeded =
         mediatypeOpt match {
@@ -208,8 +208,8 @@ trait ConnectionTrait {
       def soapMediatypeWithContentType =
         firstItemIgnoreCase(headersWithContentTypeIfNeeded, ContentTypeLower) orElse mediatypeOpt
 
-      // NOTE: SOAP processing overrides Content-Type in the case of a POST
-      // So we have: @serialization -> @mediatype ->  xf:header -> SOAP
+      // NOTE: SOAP processing overrides `Content-Type` in the case of a `POST`
+      // So we have: `@serialization` -> `@mediatype` ->  `xf:header` -> `SOAP`
       val connectionHeadersCapitalized =
         buildConnectionHeadersCapitalized(
           url.normalize,

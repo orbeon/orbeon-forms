@@ -59,7 +59,7 @@ object FRComponentParamSupport {
     }
 
   // Implementation of `fr:component-param-value-by-type()`
-  // 2024-11-06: undocumented and no callers.
+  // 2025-10-08:  undocumented, called from `fr:grid-multiple`.
   def componentParamValueByType(
     paramName  : QName,
     directName : QName,

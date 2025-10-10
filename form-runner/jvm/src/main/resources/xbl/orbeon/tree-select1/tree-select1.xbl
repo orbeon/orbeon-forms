@@ -38,7 +38,7 @@
             <display-name lang="fr">Arbre de sélection</display-name>
             <display-name lang="ru" todo="true">[Tree Selector]</display-name>
             <display-name lang="de">Baum-Auswahl</display-name>
-            <display-name lang="it" todo="true">[Tree Selector]</display-name>
+            <display-name lang="it">Selettore ad albero</display-name>
             <display-name lang="sv" todo="true">[Tree Selector]</display-name>
             <display-name lang="nl" todo="true">[Tree Selector]</display-name>
             <display-name lang="pt" todo="true">[Tree Selector]</display-name>

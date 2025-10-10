@@ -37,8 +37,8 @@
             <display-name lang="fi">Paikallissyöttö</display-name>
             <display-name lang="fr">Entrée en place</display-name>
             <display-name lang="ru">Редактируемый текст</display-name>
-            <display-name lang="de" todo="true">In-place Input</display-name>
-            <display-name lang="it" todo="true">In-place Input</display-name>
+            <display-name lang="de">Direkteingabe</display-name>
+            <display-name lang="it">Inserimento in linea</display-name>
             <display-name lang="sv">Inmatning</display-name>
             <display-name lang="nl">Directe invoer</display-name>
             <display-name lang="pt">Inserir no local</display-name>

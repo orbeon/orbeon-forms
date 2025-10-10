@@ -37,7 +37,7 @@
             <display-name lang="fr">Menu déroulant avec recherche</display-name>
             <display-name lang="ru" todo="true">[Dropdown with Search]</display-name>
             <display-name lang="de">Dropdown-Menü mit Suche</display-name>
-            <display-name lang="it" todo="true">[Dropdown with Search]</display-name>
+            <display-name lang="it">Menu a tendina con ricerca</display-name>
             <display-name lang="nl" todo="true">[Dropdown with Search]</display-name>
             <display-name lang="sv" todo="true">[Dropdown with Search]</display-name>
             <display-name lang="pt" todo="true">[Dropdown with Search]</display-name>
@@ -49,7 +49,7 @@
             <appearance-display-name lang="fr">Avec recherche</appearance-display-name>
             <appearance-display-name lang="ru" todo="true">[With Search]</appearance-display-name>
             <appearance-display-name lang="de">Mit Suche</appearance-display-name>
-            <appearance-display-name lang="it" todo="true">[With Search]</appearance-display-name>
+            <appearance-display-name lang="it">Con ricerca</appearance-display-name>
             <appearance-display-name lang="nl" todo="true">[With Search]</appearance-display-name>
             <appearance-display-name lang="sv" todo="true">[With Search]</appearance-display-name>
             <appearance-display-name lang="pt" todo="true">[With Search]</appearance-display-name>

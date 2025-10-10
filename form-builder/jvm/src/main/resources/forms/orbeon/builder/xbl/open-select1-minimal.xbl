@@ -17,8 +17,8 @@
             <display-name lang="fi" todo="true">[Dropdown with "Other"]</display-name>
             <display-name lang="fr">Menu déroulant avec "Autre"</display-name>
             <display-name lang="ru" todo="true">[Dropdown with "Other"]</display-name>
-            <display-name lang="de" todo="true">[Dropdown with "Other"]</display-name>
-            <display-name lang="it" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="de">Dropdown mit "Andere"</display-name>
+            <display-name lang="it">Menu a tendina con "Altro"</display-name>
             <display-name lang="nl" todo="true">[Dropdown with "Other"]</display-name>
             <display-name lang="pt" todo="true">[Dropdown with "Other"]</display-name>
             <display-name lang="sv" todo="true">[Dropdown with "Other"]</display-name>

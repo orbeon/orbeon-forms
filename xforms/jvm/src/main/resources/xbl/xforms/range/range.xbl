@@ -20,8 +20,8 @@
             <display-name lang="fi" todo="true">[Range]</display-name>
             <display-name lang="fr" todo="true">[Range]</display-name>
             <display-name lang="ru" todo="true">[Range]</display-name>
-            <display-name lang="de" todo="true">[Range]</display-name>
-            <display-name lang="it" todo="true">[Range]</display-name>
+            <display-name lang="de">Schieberegler</display-name>
+            <display-name lang="it">Intervallo</display-name>
             <display-name lang="nl" todo="true">[Range]</display-name>
             <display-name lang="sv" todo="true">[Range]</display-name>
             <display-name lang="pt" todo="true">[Range]</display-name>

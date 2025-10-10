@@ -21,6 +21,8 @@ import java.lang as jl
 
 object PathUtils {
 
+  type PathWithParams = (String, List[(String, String)])
+
   trait UrlEncoderDecoder {
     def encode(s: String): String
     def decode(s: String): String
@@ -45,7 +47,7 @@ object PathUtils {
       (url.substring(0, index), Some(url.substring(index + 1)))
   }
 
-  def splitQueryDecodeParams(url: String)(implicit ed: UrlEncoderDecoder): (String, List[(String, String)]) = {
+  def splitQueryDecodeParams(url: String)(implicit ed: UrlEncoderDecoder): PathWithParams = {
     val index = url.indexOf('?')
     if (index == -1)
       (url, Nil)

@@ -36,10 +36,16 @@ object DateUtils {
   // NOTE: See https://tools.ietf.org/html/rfc2616#page-20
   // Q: Should we still parse format 2 and 3? That's a pain.
   def parseRFC1123(date: String): Long =
-    Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(date)).toEpochMilli
+    parseRFC1123ToInstant(date).toEpochMilli
 
   def tryParseRFC1123(date: String): Option[Long] =
-    Try(parseRFC1123(date)).toOption
+    tryParseRFC1123ToInstant(date).map(_.toEpochMilli)
+
+  def parseRFC1123ToInstant(date: String): Instant =
+    Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(date))
+
+  def tryParseRFC1123ToInstant(date: String): Option[Instant] =
+    Try(parseRFC1123ToInstant(date)).toOption
 
   // Default timezone offset in minutes
   // This is obtained once at the time the current object initializes. This searches `user.timezone`, the JDK timezone,

@@ -182,15 +182,18 @@ object RelationalUtils extends Logging {
       connection
     }
 
-  def parsePositiveIntParamOrThrow(paramValue: Option[String], default: Int): Int =
-    paramValue
+  def parsePositiveIntParamOrThrow(paramValueOpt: Option[String], default: Int): Int =
+    parsePositiveIntOptParamOrThrow(paramValueOpt).getOrElse(default)
+
+  def parsePositiveIntOptParamOrThrow(paramValueOpt: Option[String]): Option[Int] =
+    paramValueOpt
       .flatMap(_.trimAllToOpt)
-      .map(_.toIntOption).map{
+      .map(_.toIntOption)
+      .map {
         case Some(v) if v <= 0 => throw HttpStatusCodeException(StatusCode.BadRequest)
         case None              => throw HttpStatusCodeException(StatusCode.BadRequest)
         case Some(v)           => v
-    }.getOrElse(default)
-
+      }
 
   def instantFromString(string: String): Instant =
     Try {

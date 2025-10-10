@@ -1,7 +1,10 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.controller.XmlNativeRoute
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.Statement.*
@@ -11,9 +14,14 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
-import org.orbeon.oxf.xml.DeferredXMLReceiver
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, DateUtils, IndentedLogger}
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.{DeferredXMLReceiver, XMLReceiver}
+import org.xml.sax.Attributes
 
+import java.sql.{Connection, ResultSet}
+import java.time.Instant
+import scala.collection.mutable
 import scala.util.matching.Regex
 
 
@@ -55,17 +63,23 @@ object HistoryRoute extends XmlNativeRoute {
 private object History {
 
   case class Request(
-    pageSize  : Int,
-    pageNumber: Int,
-    provider  : Provider
+    pageSize         : Int,
+    pageNumber       : Int,
+    includeDiffs     : Boolean,
+    langOpt          : Option[String],
+    truncationSizeOpt: Option[Int],
+    provider         : Provider
   )
 
   case object Request {
     def apply(getParam: String => Option[String], providerString: String): Request =
       Request(
-        pageSize   = RelationalUtils.parsePositiveIntParamOrThrow(getParam(PersistenceApi.PageSizeParam),  10),
-        pageNumber = RelationalUtils.parsePositiveIntParamOrThrow(getParam(PersistenceApi.PageNumberParam), 1),
-        provider   = Provider.withName(providerString)
+        pageSize          = RelationalUtils.parsePositiveIntParamOrThrow(getParam(PersistenceApi.PageSizeParam),  10),
+        pageNumber        = RelationalUtils.parsePositiveIntParamOrThrow(getParam(PersistenceApi.PageNumberParam), 1),
+        includeDiffs      = getParam(HistoryDiff.IncludeDiffsParam).getOrElse("false").toBoolean,
+        langOpt           = getParam(HistoryDiff.LanguageParam),
+        truncationSizeOpt = RelationalUtils.parsePositiveIntOptParamOrThrow(getParam(HistoryDiff.TruncationSizeParam)),
+        provider          = Provider.withName(providerString)
       )
   }
 
@@ -139,7 +153,7 @@ private object History {
            | WHERE
            |    row_num
            |        BETWEEN ${startOffsetZeroBased + 1}
-           |        AND     ${startOffsetZeroBased + request.pageSize}
+           |        AND     ${startOffsetZeroBased + request.pageSize + (if (request.includeDiffs) 1 else 0)}
            |""".stripMargin
 
       val setters =
@@ -178,19 +192,15 @@ private object History {
 
       executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
 
-        import org.orbeon.oxf.xml.XMLReceiverSupport.*
-
-        var position = 0
-
         withDocument {
           withElement(
             "documents",
             atts =
               List(
-                "application-name"       -> app,
-                "form-name"              -> form,
-                "document-id"            -> documentId,
-                "total"                  -> searchTotal.toString
+                "application-name"         -> app,
+                "form-name"                -> form,
+                "document-id"              -> documentId,
+                "total"                    -> searchTotal.toString
               ) :::
               (searchTotal > 0).flatList(
                 List(
@@ -199,37 +209,122 @@ private object History {
                 )
               ) :::
               List(
-                "page-size"              -> request.pageSize.toString,
-                "page-number"            -> request.pageNumber.toString,
+                "page-size"                -> request.pageSize.toString,
+                "page-number"              -> request.pageNumber.toString,
               )
           ) {
-            while(rs.next()) {
 
-              if (position == 0) {
-                receiver.addAttribute("", "form-version", "form-version", rs.getString("form_version"))
-                receiver.addAttribute("", "created-time", "created-time", DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("created").toInstant))
-                receiver.addAttribute("", "created-username", "created-username", "TODO") // xxx
-              }
+            // Read all documents from the database first, as we might need to compute the revision history diffs
+            // based on the modification time of the documents
+            val (documents, formVersionOpt) = documentsAndFormVersionOpt(connection, rs, hasStage = hasStage)
 
-              val userAndGroup = UserAndGroup.fromStrings(rs.getString("username"), rs.getString("groupname"))
-              val organization = OrganizationSupport.readFromResultSet(connection, rs).map(_._2)
+            val formVersion    = formVersionOpt.getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError))
+            val appFormVersion = (AppForm(app, form), formVersion)
 
-              element(
-                "document",
-                atts =
-                  (hasStage list ("stage" -> rs.getString("stage").trimAllToEmpty)) :::
-                  List(
-                    "modified-time"     -> DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("last_modified_time").toInstant),
-                    "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
-                    "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
-                    "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),
-                    "deleted"           -> (rs.getString("deleted") == "Y").toString,
-                  )
-              )
-
-              position += 1
-            }
+            emitDocumentsWithDiffsIfRequested(request, documents, appFormVersion, documentId)
           }
+        }
+      }
+    }
+  }
+
+  private case class Document(atts: Attributes, modifiedTime: Instant)
+
+  private def documentsAndFormVersionOpt(
+    connection: Connection,
+    rs        : ResultSet,
+    hasStage  : Boolean
+  )(implicit
+    receiver  : DeferredXMLReceiver
+  ): (List[Document], Option[Int]) = {
+
+    val documents                   = mutable.ListBuffer[Document]()
+    var formVersionOpt: Option[Int] = None
+
+    var position = 0
+
+    while (rs.next()) {
+
+      if (position == 0) {
+        val formVersion = rs.getInt("form_version")
+
+        formVersionOpt = formVersion.some
+
+        receiver.addAttribute("", "form-version", "form-version", formVersion.toString)
+        receiver.addAttribute("", "created-time", "created-time", DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("created").toInstant))
+        receiver.addAttribute("", "created-username", "created-username", "TODO") // xxx
+      }
+
+      val userAndGroup = UserAndGroup.fromStrings(rs.getString("username"), rs.getString("groupname"))
+      val organization = OrganizationSupport.readFromResultSet(connection, rs).map(_._2)
+
+      val modifiedTime = rs.getTimestamp("last_modified_time").toInstant
+
+      documents += Document(
+        atts =
+          (hasStage list ("stage" -> rs.getString("stage").trimAllToEmpty)) :::
+            List(
+              "modified-time"     -> DateUtils.formatIsoDateTimeUtc(modifiedTime),
+              "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
+              "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
+              "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),
+              "deleted"           -> (rs.getString("deleted") == "Y").toString,
+            ),
+        modifiedTime = modifiedTime
+      )
+
+      position += 1
+    }
+
+    (documents.toList, formVersionOpt)
+  }
+
+  private def emitDocumentsWithDiffsIfRequested(
+    request       : Request,
+    documents     : List[Document],
+    appFormVersion: AppFormVersion,
+    documentId    : String
+  )(implicit
+    receiver      : XMLReceiver,
+    indentedLogger: IndentedLogger
+  ): Unit = {
+
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+
+    // This will be computed only if diffs are requested
+    lazy val formDefinitionAndDiffsTry =
+      for {
+        formDefinition <- HistoryDiff.formDefinition(appFormVersion, request.langOpt)
+        formDiffs      <- HistoryDiff.formDiffs(
+          appFormVersion = appFormVersion,
+          documentId     = documentId,
+          modifiedTimes  = documents.map(_.modifiedTime),
+          formDefinition = formDefinition
+        )
+      } yield (formDefinition, formDiffs)
+
+    for {
+      // If diffs are requested, we've retrieved pageSize + 1 documents from the database to get the modification
+      // date of the previous document for the last document in the page; always return pageSize documents at the most
+      (document, previousLastModifiedOpt) <- documents.zip(documents.tail.map(_.modifiedTime.some) :+ None).take(request.pageSize)
+    } {
+      withElement("document", atts = document.atts) {
+        previousLastModifiedOpt match {
+          case Some(olderModifiedTime) if request.includeDiffs =>
+
+            val newerModifiedTime                          = document.modifiedTime
+            val (formDefinition, formDiffsByModifiedTimes) = formDefinitionAndDiffsTry.get
+            val diffsOpt                                   = formDiffsByModifiedTimes((olderModifiedTime, newerModifiedTime))
+
+            Diffs.serializeToSAX(
+              diffsOpt             = diffsOpt,
+              olderModifiedTime    = olderModifiedTime,
+              newerModifiedTimeOpt = None, // Already included in document element
+              formDefinition       = formDefinition,
+              truncationSizeOpt    = request.truncationSizeOpt
+            )
+
+          case _ =>
         }
       }
     }

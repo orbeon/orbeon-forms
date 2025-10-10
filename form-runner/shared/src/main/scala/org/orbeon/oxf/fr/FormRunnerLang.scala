@@ -137,6 +137,20 @@ trait FormRunnerLang {
   def hasXPathNumberer(lang: String): Boolean =
     SaxonUtils.hasXPathNumberer(lang)
 
+
+  def selectLangUseDefault(
+    appForm       : Option[AppForm],
+    requestedLang : Option[String],
+    availableLangs: List[String]
+  ): Option[String] = {
+
+    def matchingLanguage = availableLangs.intersect(requestedLang.toList).headOption
+    def defaultLanguage  = availableLangs.intersect(List(getDefaultLang(appForm))).headOption
+    def firstLanguage    = availableLangs.headOption
+
+    matchingLanguage orElse defaultLanguage orElse firstLanguage
+  }
+
   private object FormRunnerLangPrivate {
 
     private val OldLocaleRe = "([a-z|A-Z]{2,3})(?:_.*)?".r
@@ -167,19 +181,6 @@ trait FormRunnerLang {
         case OldLocaleRe(oldLang) => oldLang
         case newLang              => newLang
       }
-
-    def selectLangUseDefault(
-      appForm       : Option[AppForm],
-      requestedLang : Option[String],
-      availableLangs: List[String]
-    ): Option[String] = {
-
-      def matchingLanguage = availableLangs.intersect(requestedLang.toList).headOption
-      def defaultLanguage  = availableLangs.intersect(List(getDefaultLang(appForm))).headOption
-      def firstLanguage    = availableLangs.headOption
-
-      matchingLanguage orElse defaultLanguage orElse firstLanguage
-    }
 
     def stringFromSession(session: ExternalContext.Session, name: String): Option[String] =
       session.getAttribute(name)

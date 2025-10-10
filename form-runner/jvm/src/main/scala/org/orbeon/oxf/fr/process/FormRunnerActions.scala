@@ -569,9 +569,9 @@ trait FormRunnerActions
       dataFormatVersion     = dataFormatVersion,
       authorizedOperations  = frc.authorizedOperations,
       documentWorkflowStage = FormRunner.documentWorkflowStage,
-      createdOpt            = FormRunner.documentMetadataStringOpt(Headers.Created),
-      lastModifiedOpt       = FormRunner.documentMetadataStringOpt(Headers.LastModified),
-      eTagOpt               = FormRunner.documentMetadataStringOpt(Headers.ETag)
+      createdOpt            = FormRunner.documentCreatedDateAsInstant,
+      lastModifiedOpt       = FormRunner.documentModifiedDateAsInstant,
+      eTagOpt               = FormRunner.documentEtag
     )
 
   def prependUserAndStandardParamsForModeChange(
@@ -580,8 +580,8 @@ trait FormRunnerActions
     dataFormatVersion    : DataFormatVersion,
     authorizedOperations : Set[String],
     documentWorkflowStage: Option[String],
-    createdOpt           : Option[String],
-    lastModifiedOpt      : Option[String],
+    createdOpt           : Option[java.time.Instant],
+    lastModifiedOpt      : Option[java.time.Instant],
     eTagOpt              : Option[String],
   ): String = {
 
@@ -605,8 +605,8 @@ trait FormRunnerActions
       val documentMetadataParams = List(
         InternalWorkflowStageParam -> documentWorkflowStage,
         // Propagate original document metadata in order to detect concurrent data modifications (#7157)
-        InternalCreatedParam       -> createdOpt,
-        InternalLastModifiedParam  -> lastModifiedOpt,
+        InternalCreatedParam       -> createdOpt.map(DateUtils.formatRfc1123DateTimeGmt),
+        InternalLastModifiedParam  -> lastModifiedOpt.map(DateUtils.formatRfc1123DateTimeGmt),
         InternalETagParam          -> eTagOpt
       ).flatMap { case (param, valueOpt) =>
         valueOpt.map(param -> FormRunnerOperationsEncryption.encryptString(_))

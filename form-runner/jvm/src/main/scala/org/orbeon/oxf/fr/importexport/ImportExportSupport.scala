@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, PathUtils, XPath}
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger, PathUtils, XPath}
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
@@ -430,8 +430,8 @@ object ImportExportSupport {
           dataFormatVersion     = DataFormatVersion.Edge,
           authorizedOperations  = Operations.serialize(operations, normalized = true).toSet,  // checked that `fr-authorized-operations` can contain `*` at this time
           documentWorkflowStage = Headers.firstItemIgnoreCase(headers, Headers.OrbeonWorkflowStage),
-          createdOpt            = Headers.firstItemIgnoreCase(headers, Headers.Created),      // persistence-model.xml uses those, not the `Orbeon-*` headers
-          lastModifiedOpt       = Headers.firstItemIgnoreCase(headers, Headers.LastModified), // persistence-model.xml uses those, not the `Orbeon-*` headers
+          createdOpt            = Headers.firstItemIgnoreCase(headers, Headers.Created).flatMap(DateUtils.tryParseRFC1123ToInstant),      // persistence-model.xml uses those, not the `Orbeon-*` headers
+          lastModifiedOpt       = Headers.firstItemIgnoreCase(headers, Headers.LastModified).flatMap(DateUtils.tryParseRFC1123ToInstant), // persistence-model.xml uses those, not the `Orbeon-*` headers
           eTagOpt               = Headers.firstItemIgnoreCase(headers, Headers.ETag),
         )
       )._2

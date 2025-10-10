@@ -421,17 +421,21 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def canDelete: Boolean = (authorizedOperations intersect DeleteOps).nonEmpty
   def canList  : Boolean = (authorizedOperations intersect ListOps).nonEmpty
 
-  private def documentMetadataDate(name: String): Option[Long] =
-    documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
-  private def documentMetadataWorkflowStageAtt: NodeInfo = documentMetadataInstance.rootElement.att(Names.WorkflowStage).head
-
-  def documentMetadataStringOpt(header: String): Option[String] =
+  private def documentMetadataStringOpt(header: String): Option[String] =
     documentMetadataInstance.rootElement.attValueOpt(header.toLowerCase).flatMap(_.trimAllToOpt)
 
-  def documentCreatedDate: Option[Long]     = documentMetadataDate(Headers.Created)
-  def documentModifiedDate: Option[Long]    = documentMetadataDate(Headers.LastModified)
+  private def documentMetadataDateToInstant(name: String): Option[java.time.Instant] =
+    documentMetadataStringOpt(name).flatMap(DateUtils.tryParseRFC1123ToInstant) // xxx check > 0L? how?
+
+  def documentCreatedDateAsInstant : Option[java.time.Instant] = documentMetadataDateToInstant(Headers.Created)
+  def documentModifiedDateAsInstant: Option[java.time.Instant] = documentMetadataDateToInstant(Headers.LastModified)
+  def documentEtag                 : Option[String]            = documentMetadataStringOpt(Headers.ETag)
+
+  private def documentMetadataWorkflowStageAtt: NodeInfo =
+    documentMetadataInstance.rootElement.att(Names.WorkflowStage).head
+
   def documentWorkflowStage: Option[String] = documentMetadataWorkflowStageAtt.stringValue.trimAllToOpt
-  def documentWorkflowStage_=(workflowStage: Option[String]) = XFormsAPI.setvalue(documentMetadataWorkflowStageAtt, workflowStage.getOrElse(""))
+  def documentWorkflowStage_=(workflowStage: Option[String]): Unit = XFormsAPI.setvalue(documentMetadataWorkflowStageAtt, workflowStage.getOrElse(""))
 
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)

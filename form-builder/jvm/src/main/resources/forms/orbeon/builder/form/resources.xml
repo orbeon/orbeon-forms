@@ -6495,27 +6495,34 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Nome dell'applicazione</label>
-            <hint todo="true">Identifica un gruppo di moduli, per esempio rappresenta una funzionalità o un dipartimento (esempio: "sales"). Se c'é solo un gruppo di moduli, il nome dell’organizzazione può essere utilizzato. Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
-            <help todo="true"/>
+            <hint>Identifica un gruppo di moduli (ad esempio «acme» o «vendite»). Compare nell'URL del modulo pubblicato; usa solo lettere minuscole.</hint>
+            <help>
+                &lt;p&gt;Il nome dell'applicazione consente di raggruppare i moduli.&lt;/p&gt;
+                &lt;p&gt;Esempi: un nome aziendale ("orbeon", "acme"), un reparto ("hr", "vendite"), oppure un progetto ("mercury").&lt;/p&gt;
+                &lt;p&gt;Questo nome compare nell'URL del modulo pubblicato; si consiglia di usare solo minuscole.&lt;/p&gt;
+            </help>
             <alert>Utilizza un massimo di 255 lettere ASCII, cifre, "-" o "_"</alert>
         </application-name>
         <form-name>
             <label>Nome del modulo</label>
-            <hint todo="true">Identifica il modulo specifico (esempio: "health-record" o "claim"). Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
-            <help todo="true"/>
+            <hint>Identifica questo specifico modulo (ad esempio «pratica»). Compare nell'URL del modulo pubblicato; usa solo lettere minuscole.</hint>
+            <help>
+                &lt;p&gt;Il nome del modulo è locale a un'applicazione, ad esempio «indirizzo» o «pratica».&lt;/p&gt;
+                &lt;p&gt;Questo nome compare nell'URL; usa solo lettere minuscole.&lt;/p&gt;
+            </help>
             <alert>Utilizza un massimo di 255 lettere ASCII, cifre, "-" o "_"</alert>
-            <no-form-alert todo="true">
-                No form with this specific application and form name in this system have been found in this system.
+            <no-form-alert>
+                In questo sistema non è stato trovato alcun modulo con questa applicazione e questo nome di modulo.
             </no-form-alert>
-            <form-published-alert todo="true">
-                {0,choice,1#One form|1&lt;{0,number,integer} forms}
-                with this application name and form name {0,choice,1#is|1&lt;are} published.
-                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            <form-published-alert>
+                {0,choice,1#Un modulo|1&lt;{0,number,integer} moduli}
+                con questo nome di applicazione e di modulo {0,choice,1#è|1&lt;sono} pubblicat{0,choice,1#o|1&lt;i}.
+                &lt;a href="{1}" target="_blank"&gt;Visualizza nella pagina Admin.&lt;/a&gt;
             </form-published-alert>
-            <form-in-progress-alert todo="true">
-                {0,choice,1#One form|1&lt;{0,number,integer} forms}
-                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
-                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            <form-in-progress-alert>
+                {0,choice,1#Un modulo|1&lt;{0,number,integer} moduli}
+                con questo nome di applicazione e di modulo {0,choice,1#è|1&lt;sono} in corso.
+                &lt;a href="{1}" target="_blank"&gt;Visualizza nella pagina Sommario di Form Builder.&lt;/a&gt;
             </form-in-progress-alert>
         </form-name>
         <title>
@@ -6531,10 +6538,10 @@
             <hint>Il logo appare nella testa del modulo</hint>
         </logo>
         <general-settings>
-            <label todo="true">[General Settings]</label>
+            <label>Impostazioni generali</label>
         </general-settings>
         <custom-settings>
-            <label todo="true">[Custom Settings]</label>
+            <label>Impostazioni personalizzate</label>
         </custom-settings>
         <!-- Toolbox -->
         <cut>
@@ -6547,28 +6554,28 @@
             <label>Incolla</label>
         </paste>
         <undo-redo>
-            <undo todo="true">[Undo {0}]</undo>
-            <redo todo="true">[Redo {0}]</redo>
+            <undo>Annulla {0}</undo>
+            <redo>Ripeti {0}</redo>
             <insert>[insert]</insert>
-            <rename todo="true">[rename]</rename>
-            <delete-control todo="true">[delete control]</delete-control>
-            <delete-container todo="true">[delete container]</delete-container>
-            <merge-section-template todo="true">[merge section template]</merge-section-template>
-            <move-control todo="true">[move control]</move-control>
-            <move-container todo="true">[move container]</move-container>
-            <update-settings todo="true">[update settings]</update-settings>
-            <insert-control todo="true">[insert control]</insert-control>
-            <insert-section todo="true">[insert section]</insert-section>
-            <insert-grid todo="true">[insert grid]</insert-grid>
-            <delete-row todo="true">[delete row]</delete-row>
-            <insert-row todo="true">[insert row]</insert-row>
-            <control-settings todo="true">[control settings]</control-settings>
-            <move-wall todo="true">[move wall]</move-wall>
-            <split-cell todo="true">[split cell]</split-cell>
-            <merge-cell todo="true">[merge cell]</merge-cell>
+            <rename>rinomina</rename>
+            <delete-control>elimina controllo</delete-control>
+            <delete-container>elimina contenitore</delete-container>
+            <merge-section-template>unisci modello di sezione</merge-section-template>
+            <move-control>sposta controllo</move-control>
+            <move-container>sposta contenitore</move-container>
+            <update-settings>aggiorna impostazioni</update-settings>
+            <insert-control>inserisci controllo</insert-control>
+            <insert-section>inserisci sezione</insert-section>
+            <insert-grid>inserisci griglia</insert-grid>
+            <delete-row>elimina riga</delete-row>
+            <insert-row>inserisci riga</insert-row>
+            <control-settings>impostazioni controllo</control-settings>
+            <move-wall>sposta separatore</move-wall>
+            <split-cell>dividi cella</split-cell>
+            <merge-cell>unisci cella</merge-cell>
         </undo-redo>
         <merge-section>
-            <label todo="true">[Merge Section Template]</label>
+            <label>Unisci modello di sezione</label>
         </merge-section>
         <form-structure>
             <label>Struttura del modulo</label>
@@ -6586,7 +6593,7 @@
             <label>Avanzato</label>
         </advanced>
         <attachments>
-            <label todo="true">[Attachments]</label>
+            <label>Allegati</label>
         </attachments>
         <services-actions>
             <label>Servizi &amp; azioni</label>
@@ -6637,9 +6644,9 @@
             <label>Ricarica Toolbox</label>
         </reload-components>
         <library-version>
-            <label todo="true">Library Version</label>
+            <label>Versione libreria</label>
             <item>
-                <label todo="true">Version {0,number,integer}</label>
+                <label>Versione {0,number,integer}</label>
             </item>
         </library-version>
         <enter-section-title>
@@ -6676,25 +6683,25 @@
             <label>Modifica scelte</label>
         </edit-items>
         <merge-right-icon>
-            <label todo="true">[Merge with cell to the right]</label>
+            <label>Unisci con la cella a destra</label>
         </merge-right-icon>
         <split-horizontally-icon>
-            <label todo="true">[Split horizontally]</label>
+            <label>Dividi orizzontalmente</label>
         </split-horizontally-icon>
         <merge-below-icon>
-            <label todo="true">[Expand vertically]</label>
+            <label>Unisci con la cella sotto</label>
         </merge-below-icon>
         <split-vertically-icon>
-            <label todo="true">[Split vertically]</label>
+            <label>Dividi verticalmente</label>
         </split-vertically-icon>
         <delete-control-icon>
             <label>Elimina controllo</label>
         </delete-control-icon>
         <move-icon>
-            <label todo="true">[Drag &amp; drop to move or copy]</label>
+            <label>Trascina e rilascia per spostare o copiare</label>
         </move-icon>
         <delete-container-icon>
-            <label todo="true">Elimina sezione</label>
+            <label>Elimina sezione</label>
         </delete-container-icon>
         <delete-row-icon>
             <label>Elimina riga</label>
@@ -6755,20 +6762,20 @@
             <label>Classi CSS personalizzati</label>
         </classes>
         <autocomplete>
-            <label todo="true">[Autocomplete attribute]</label>
+            <label>Attributo Autocomplete</label>
             <groups>
-                <general todo="true">[General]</general>
-                <name todo="true">[Name and Title]</name>
-                <credentials todo="true">[Credentials]</credentials>
-                <address todo="true">[Address]</address>
-                <contact todo="true">[Contact]</contact>
-                <payment todo="true">[Payment]</payment>
+                <general>Generale</general>
+                <name>Nome e titolo</name>
+                <credentials>Credenziali</credentials>
+                <address>Indirizzo</address>
+                <contact>Contatti</contact>
+                <payment>Pagamento</payment>
             </groups>
         </autocomplete>
         <property-yes-no>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Yes]</item>
-            <item id="2" todo="true">[No]</item>
+            <item id="0">Usa proprietà</item>
+            <item id="1">Sì</item>
+            <item id="2">No</item>
         </property-yes-no>
         <!-- Dialogs -->
         <continue>
@@ -6790,54 +6797,54 @@
             <label>o</label>
         </or>
         <errors>
-            <label todo="true">Errors</label>
+            <label>Errori</label>
         </errors>
         <error-summary>
-            <label todo="true">[{1,choice,
-                0#No message|
-                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
-                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+            <label>[{1,choice,
+                0#Nessun messaggio|
+                1#'{0,choice,0#Errore|1#Avvertimento|2#Messaggio informativo|3#Messaggio}'|
+                1&lt;'{0,choice,0#Errori|1#Avvertimenti|2#Messaggi informativi|3#Messaggi}'}]</label>
         </error-summary>
         <back-to-summary>
-            <label todo="true">Back to List of Forms</label>
+            <label>Torna all'elenco dei moduli</label>
         </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
+            <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Usa suggerimento: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
                 <name>
-                    <label todo="true">[Name]</label>
-                    <alert todo="true">[Missing or incorrect value]</alert>
+                    <label>Nome</label>
+                    <alert>Valore mancante o non corretto</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[Formula]</label>
-                    <alert todo="true">[Missing or incorrect formula]</alert>
+                    <label>Formula</label>
+                    <alert>Formula mancante o non corretta</alert>
                 </xpath>
                 <control>
-                    <label todo="true">[Control]</label>
-                    <alert todo="true">[Missing value]</alert>
+                    <label>Controllo</label>
+                    <alert>Valore mancante</alert>
                 </control>
                 <token>
-                    <label todo="true">Generate token URL parameter</label>
+                    <label>Genera parametro URL token</label>
                 </token>
                 <type>
-                    <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[Formula]</item>
-                    <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="[Link]">
-                        <item id="3" todo="true">[Edit page]</item>
-                        <item id="4" todo="true">[View page]</item>
-                        <item id="5" todo="true">[New page]</item>
-                        <item id="6" todo="true">[Summary page]</item>
-                        <item id="7" todo="true">[Home page]</item>
-                        <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Forms admin]</item>
-                        <item id="8" todo="true">[PDF file]</item>
+                    <item id="0">Valore del controllo</item>
+                    <item id="1">Formula</item>
+                    <item id="2">Tutti i valori dei controlli</item>
+                    <choice label="Collegamento">
+                        <item id="3">Pagina Modifica</item>
+                        <item id="4">Pagina Visualizza</item>
+                        <item id="5">Pagina Nuovo</item>
+                        <item id="6">Pagina Sommario</item>
+                        <item id="7">Pagina Home</item>
+                        <item id="9">Pagina Moduli pubblicati</item>
+                        <item id="10">Amministrazione moduli</item>
+                        <item id="8">File PDF</item>
                     </choice>
                 </type>
             </parameters-editor>
@@ -6846,12 +6853,12 @@
             <label>Impostazioni modulo</label>
             <save-as>Salva con nome…</save-as>
             <open><label>Impostazioni modulo</label></open>
-            <options todo="true">[Form Options]</options>
-            <view-options todo="true">[Appearance]</view-options>
-            <wizard-options todo="true">[Wizard]</wizard-options>
-            <pdf-options todo="true">[PDF]</pdf-options>
-            <control-settings todo="true">[Control Settings]</control-settings>
-            <about todo="true">[About this Form]</about>
+            <options>Opzioni del modulo</options>
+            <view-options>Aspetto</view-options>
+            <wizard-options>Procedura guidata</wizard-options>
+            <pdf-options>PDF</pdf-options>
+            <control-settings>Impostazioni controllo</control-settings>
+            <about>Informazioni su questo modulo</about>
             <stats>Statistiche del modulo</stats>
             <sections>Sezioni</sections>
             <repeats>Ripetizioni</repeats>
@@ -6859,30 +6866,30 @@
             <section-templates>Modelli di sezione</section-templates>
             <controls>Controlli</controls>
             <all>Tutti</all>
-            <use-property todo="true">[Use property]</use-property>
+            <use-property>Usa proprietà</use-property>
             <singleton>
-                <label todo="true">[Singleton form]</label>
-                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+                <label>Modulo singolo</label>
+                <hint>Impedisci agli utenti di creare nuovi dati se hanno accesso a dati esistenti per questa definizione di modulo</hint>
             </singleton>
             <allow-template-use>
-                <label todo="true">Allow use as form template</label>
-                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+                <label>Consenti uso come modello di modulo</label>
+                <hint>Se selezionato, questo modulo comparirà nell'elenco dei modelli</hint>
             </allow-template-use>
             <wizard>
-                <label todo="true">[Wizard View]</label>
-                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+                <label>Vista procedura guidata</label>
+                <hint>Mostra le sezioni di primo livello come pagine separate</hint>
             </wizard>
             <wizard-mode>
-                <label todo="true">[Wizard Navigation Validation Mode]</label>
-                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use property]</item>
-                <item todo="true" id="1">[Free]</item>
-                <item todo="true" id="2">[Lax]</item>
-                <item todo="true" id="3">[Strict]</item>
+                <label>Modalità validazione navigazione della procedura guidata</label>
+                <hint>Comportamento della navigazione quando i dati non sono validi</hint>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Libera</item>
+                <item id="2">Permissiva</item>
+                <item id="3">Rigorosa</item>
             </wizard-mode>
             <wizard-subsections-nav>
-                <label todo="true">[Wizard Subsections Navigation]</label>
-                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+                <label>Navigazione sottosezioni della procedura guidata</label>
+                <hint>Abilita la navigazione per sezioni e griglie all'interno delle sezioni di primo livello</hint>
             </wizard-subsections-nav>
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
@@ -6893,123 +6900,123 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <wizard-separate-toc>
-                <label todo="true">Wizard Separate Table of Contents</label>
+                <label>Sommario separato per procedura guidata</label>
             </wizard-separate-toc>
             <wizard-section-status>
-                <label todo="true">Always Show Wizard Section Status</label>
+                <label>Mostra sempre lo stato delle sezioni della procedura guidata</label>
             </wizard-section-status>
             <attachment-max-size-per-file>
-                <label todo="true">[Maximum Attachment Size per File]</label>
-                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+                <label>Dimensione massima allegato per file</label>
+                <hint>Può anche essere impostata per singolo controllo nelle impostazioni del controllo</hint>
             </attachment-max-size-per-file>
             <attachment-max-size-aggregate-per-form>
-                <label todo="true">[Maximum Aggregate Attachment Size]</label>
-                <hint todo="true">[Applies to all attachment controls in this form]</hint>
+                <label>Dimensione massima aggregata degli allegati</label>
+                <hint>Si applica a tutti i controlli allegato di questo modulo</hint>
             </attachment-max-size-aggregate-per-form>
             <attachment-max-files-per-control>
                 <label>Numero massimo di file per controllo allegati</label>
             </attachment-max-files-per-control>
             <attachment-mediatypes>
-                <label todo="true">[Allowed File Types]</label>
-                <hint todo="true">[For example "image/* application/pdf"]</hint>
+                <label>Tipi di file consentiti</label>
+                <hint>Ad esempio "image/* application/pdf"</hint>
             </attachment-mediatypes>
             <labels>
-                <label todo="true">[Appearance of Control Labels]</label>
+                <label>Aspetto delle etichette dei controlli</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of Control Hints]</label>
+                <label>Aspetto dei suggerimenti dei controlli</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use Automatic Hints]</label>
+                <label>Usa suggerimenti automatici</label>
             </automatic-hints>
             <appearances>
-                <item todo="true" id="0">[Use property]</item>
-                <item todo="true" id="1">[Inline]</item>
-                <item todo="true" id="2">[Tooltip]</item>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Inline</item>
+                <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
+                <label>Usa placeholder per campi e aree di testo</label>
             </placeholders>
             <data-migration>
-                <label todo="true">[Simple Data Migration]</label>
-                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Enabled]</item>
-                <item id="2" todo="true">[Disabled]</item>
-                <item id="3" todo="true">[Raise an error]</item>
+                <label>Migrazione dati semplice</label>
+                <hint>Aggiungi/rimuovi automaticamente elementi mancanti nei dati</hint>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Abilitato</item>
+                <item id="2">Disabilitato</item>
+                <item id="3">Genera un errore</item>
             </data-migration>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Ordine di tabulazione griglia</label>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Righe</item>
+                <item id="2">Colonne</item>
             </grid-tab-order>
             <time-window>
-                <label todo="true">[Time Window]</label>
+                <label>Finestra temporale</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Creating only available from specific date]</label>
-                        <date todo="true">[Start date and time]</date>
-                        <message todo="true">[Pending message]</message>
+                        <label>Creazione disponibile solo a partire da una data specifica</label>
+                        <date>Data e ora di inizio</date>
+                        <message>Messaggio in attesa</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Creating only available until specific date]</label>
-                        <date todo="true">[End date and time]</date>
-                        <message todo="true">[Expired message]</message>
+                        <label>Creazione disponibile solo fino a una data specifica</label>
+                        <date>Data e ora di fine</date>
+                        <message>Messaggio scaduto</message>
                     </available-to>
                 </available>
             </time-window>
             <rendered-page-orientation>
-                <label todo="true">[PDF page orientation]</label>
+                <label>Orientamento pagina PDF</label>
                 <hint/>
-                <item id="default" todo="true">[Use property]</item>
-                <item id="portrait" todo="true">[Portrait]</item>
-                <item id="landscape" todo="true">[Landscape]</item>
+                <item id="default">Usa proprietà</item>
+                <item id="portrait">Ritratto</item>
+                <item id="landscape">Paesaggio</item>
             </rendered-page-orientation>
             <rendered-page-size>
-                <label todo="true">[PDF page size]</label>
+                <label>Formato pagina PDF</label>
                 <hint/>
-                <item id="default" todo="true">[Use property]</item>
+                <item id="default">Usa proprietà</item>
                 <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
-                <item id="letter" todo="true">[Letter]</item>
-                <item id="a4" todo="true">[A4]</item>
-                <item id="legal" todo="true">[Legal]</item>
+                <item id="letter">Letter</item>
+                <item id="a4">A4</item>
+                <item id="legal">Legal</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
+                <label>Calcoli in modalità sola lettura (Revisione, PDF)</label>
                 <hint/>
-                <item todo="true" id="default">Use property</item>
-                <item todo="true" id="false">Enable</item>
-                <item todo="true" id="true">Disable</item>
+                <item id="default">Usa proprietà</item>
+                <item id="false">Abilita</item>
+                <item id="true">Disabilita</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser Page Layout]</label>
-                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Fixed width]</item>
-                <item id="2" todo="true">[Fluid width]</item>
+                <label>Layout della pagina del browser</label>
+                <hint>Se il modulo ha larghezza fissa o fluida</hint>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Larghezza fissa</item>
+                <item id="2">Larghezza fluida</item>
             </html-page-layout>
             <density>
-                <label todo="true">[Density]</label>
-                <hint todo="true">[Spacing between elements in the interface]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Compact]</item>
-                <item id="2" todo="true">[Comfortable]</item>
-                <item id="3" todo="true">[Roomy]</item>
+                <label>Densità</label>
+                <hint>Spaziatura tra gli elementi dell'interfaccia</hint>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Compatta</item>
+                <item id="2">Confortevole</item>
+                <item id="3">Ampia</item>
             </density>
             <analysis-calculate>
-                <label todo="true">[Automatic Calculations Dependencies]</label>
-                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+                <label>Dipendenze dei calcoli automatici</label>
+                <hint>Determina automaticamente l'ordine di valutazione per le formule "Valore calcolato" e "Valore iniziale"</hint>
             </analysis-calculate>
-            <versions todo="true">[Versions]</versions>
-            <current-version todo="true">[Current Version]</current-version>
-            <created-with-version todo="true">[Created with Version]</created-with-version>
-            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <versions>Versioni</versions>
+            <current-version>Versione corrente</current-version>
+            <created-with-version>Creato con versione</created-with-version>
+            <updated-with-versions>Aggiornato con versioni</updated-with-versions>
             <thumbnail>
-                <label todo="true">Form Thumbnail</label>
-                <hint todo="true">Used for form templates and the landing page</hint>
+                <label>Miniatura del modulo</label>
+                <hint>Usata per i modelli di modulo e la pagina di destinazione</hint>
             </thumbnail>
-            <default-template todo="true">Default Template</default-template>
+            <default-template>Modello predefinito</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Impostazioni di controllo: "{1}" / "{0}" ({2})</label>
@@ -7022,17 +7029,17 @@
                 <hint>Ad esempio: "primo nome"</hint>
             </control-name>
             <pdf-field-name>
-                <label todo="true">[Name of the PDF field]</label>
-                <alert todo="true">[Unknown PDF field name]</alert>
-                <item id="0" todo="true">Automatic</item>
-                <item id="1" todo="true">Custom</item>
+                <label>Nome del campo PDF</label>
+                <alert>Nome del campo PDF sconosciuto</alert>
+                <item id="0">Automatico</item>
+                <item id="1">Personalizzato</item>
             </pdf-field-name>
             <excel-field-name>
-                <label todo="true">[Name of the Excel range]</label>
+                <label>Nome dell'intervallo Excel</label>
             </excel-field-name>
             <options>
                 <item>
-                    <label todo="true">[Index control]</label>
+                    <label>Controllo indice</label>
                     <value>fr-index</value>
                 </item>
                 <item>
@@ -7040,47 +7047,47 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label todo="true">[Allow bulk edit]</label>
+                    <label>Consenti modifica in blocco</label>
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
-                    <label todo="true">[By default, sort by this column]</label>
+                    <label>Ordina per questa colonna per impostazione predefinita</label>
                     <value>fr-default-sort-column</value>
                 </item>
                 <item>
-                    <label todo="true">[Encrypt data at rest]</label>
+                    <label>Cifra i dati a riposo</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
             <summary-show>
-                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
-                <show todo="true">[Show on Summary page]</show>
-                <column-only todo="true">[Show column only]</column-only>
-                <search-only todo="true">[Show search only]</search-only>
+                <do-not-show>Non mostrare nella pagina Sommario</do-not-show>
+                <show>Mostra nella pagina Sommario</show>
+                <column-only>Mostra solo colonna</column-only>
+                <search-only>Mostra solo ricerca</search-only>
             </summary-show>
             <role>
-                <restrict todo="true">[Restrict to role]</restrict>
-                <all todo="true">[All]</all>
-                <any todo="true">[Any]</any>
-                <of-the-following todo="true">[of the following:]</of-the-following>
-                <empty todo="true">[Empty role]</empty>
-                <duplicate todo="true">[Duplicate role]</duplicate>
+                <restrict>Limita al ruolo</restrict>
+                <all>Tutti</all>
+                <any>Qualsiasi</any>
+                <of-the-following>dei seguenti:</of-the-following>
+                <empty>Ruolo vuoto</empty>
+                <duplicate>Ruolo duplicato</duplicate>
             </role>
             <bulk-edit-actions>
-                <save-data todo="true">[Save data]</save-data>
-                <run-process todo="true">[Run Process]</run-process>
+                <save-data>Salva dati</save-data>
+                <run-process>Esegui processo</run-process>
             </bulk-edit-actions>
             <default-sort-column>
-                <ascending todo="true">[Ascending]</ascending>
-                <descending todo="true">[Descending]</descending>
-                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
+                <ascending>Crescente</ascending>
+                <descending>Decrescente</descending>
+                <conflict>Abilitare l'ordinamento su questo controllo lo disabiliterà sul seguente controllo: {0}</conflict>
             </default-sort-column>
             <control-appearance>
-                <label todo="true">[Control Appearance]</label>
+                <label>Aspetto del controllo</label>
             </control-appearance>
             <whitespace>
                 <item>
-                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <label>Rimuovi spazi iniziali e finali</label>
                     <value>trim</value>
                 </item>
             </whitespace>
@@ -7092,7 +7099,7 @@
                 <hint>Tipi di dati integrati</hint>
 
                 <use-schema-type>Usa tipo di schema</use-schema-type>
-                <use-component-type todo="true">[Use predefined type]</use-component-type>
+                <use-component-type>Usa tipo predefinito</use-component-type>
 
                 <choices>
                     <choices>
@@ -7170,32 +7177,32 @@
                 <hint>Se è necessario immettere i dati</hint>
                 <item id="0">Sì</item>
                 <item id="1">No</item>
-                <item id="2" todo="true">XPath</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
-                <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Maximum Length]</item>
-                <item id="min-length" todo="true">[Minimum Length]</item>
-                <item id="positive" todo="true">[Positive]</item>
-                <item id="non-negative" todo="true">[Positive or Zero]</item>
-                <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Negative]</item>
-                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
-                <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
-                <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
-                <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="formula">Formula</item>
+                <item id="max-length">Lunghezza massima</item>
+                <item id="min-length">Lunghezza minima</item>
+                <item id="positive">Positivo</item>
+                <item id="non-negative">Positivo o zero</item>
+                <item id="non-positive">Negativo o zero</item>
+                <item id="negative">Negativo</item>
+                <item id="fraction-digits">Numero massimo di cifre decimali</item>
+                <item id="upload-max-size-per-file" multiple="false">Dimensione massima allegato</item>
+                <item id="upload-max-size-per-file" multiple="true">Dimensione massima allegato per file</item>
+                <item id="upload-max-size-aggregate-per-control">Dimensione massima aggregata degli allegati</item>
                 <item id="upload-max-files-per-control">Numero massimo di file per controllo</item>
-                <item id="upload-mediatypes" todo="true">[Supported File Types</item>
-                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
+                <item id="upload-mediatypes">Tipi di file supportati</item>
+                <item id="excluded-dates">Date da escludere</item>
             </constraint>
             <formula>
-                <label todo="true">[Formula]</label>
+                <label>Formula</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath booleana</hint>
             </formula>
             <integer-argument>
-                <label todo="true">[Integer Value]</label>
-                <alert todo="true">[Incorrect Value]</alert>
+                <label>Valore intero</label>
+                <alert>Valore non corretto</alert>
             </integer-argument>
             <alert-template-parameters>
                 <edit-label>Modifica parametri del modello di avviso</edit-label>
@@ -7205,114 +7212,87 @@
                 <label>Visibiltà</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath booleana</hint>
-                <help todo="true">
-                    &lt;p>
-                        This allows you to specify whether the form control is visible or not.
-                    &lt;/p>
-                    &lt;ul>
-                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
-                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
-                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
-                    &lt;/ul>
-                    &lt;p>
-                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
-                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
-                    &lt;/p>
-                    &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
-                    &lt;/p>
-                    &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
-                    &lt;/p>
+                <help>
+                    &lt;p&gt;
+                        Consente di specificare se il controllo del modulo è visibile oppure no.
+                    &lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;&lt;b&gt;Sì:&lt;/b&gt; Il controllo è visibile.&lt;/li&gt;
+                        &lt;li&gt;&lt;b&gt;No:&lt;/b&gt; Il controllo è nascosto.&lt;/li&gt;
+                        &lt;li&gt;&lt;b&gt;Formula:&lt;/b&gt; La visibilità è determinata dinamicamente da una formula.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;
+                        La formula deve restituire un valore booleano: il controllo è visibile se la formula vale &lt;code&gt;true()&lt;/code&gt; e nascosto se vale &lt;code&gt;false()&lt;/code&gt;.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        Puoi fare riferimento ad altri controlli usando i loro nomi preceduti dal simbolo &lt;code&gt;$&lt;/code&gt;; digitando &lt;code&gt;$&lt;/code&gt; viene mostrato l'elenco dei controlli disponibili.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        Per maggiori informazioni sulle formule, consulta la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentazione di Form Builder&lt;/a&gt;.
+                    &lt;/p&gt;
                 </help>
             </visibility>
             <readonly>
                 <label>Solo lettura</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath booleana</hint>
-                <help todo="true">
-                    &lt;p>
-                        This allows you to specify whether the form control is readonly or read-write.
-                    &lt;/p>
-                    &lt;ul>
-                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
-                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
-                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
-                    &lt;/ul>
-                    &lt;p>
-                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
-                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
-                    &lt;/p>
-                    &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
-                    &lt;/p>
-                    &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
-                    &lt;/p>
+                <help>
+                    &lt;p&gt;Consente di specificare se il controllo è in sola lettura oppure modificabile.&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;&lt;b&gt;Sì:&lt;/b&gt; Il controllo è in sola lettura.&lt;/li&gt;
+                        &lt;li&gt;&lt;b&gt;No:&lt;/b&gt; Il controllo è in lettura/scrittura.&lt;/li&gt;
+                        &lt;li&gt;&lt;b&gt;Formula:&lt;/b&gt; Lo stato è determinato dinamicamente da una formula.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;La formula deve restituire un booleano: &lt;code&gt;true()&lt;/code&gt; per sola lettura, &lt;code&gt;false()&lt;/code&gt; per lettura/scrittura.&lt;/p&gt;
+                    &lt;p&gt;È possibile fare riferimento ad altri controlli con &lt;code&gt;$nomeControllo&lt;/code&gt;; digitando &lt;code&gt;$&lt;/code&gt; viene mostrato l'elenco dei controlli disponibili.&lt;/p&gt;
+                    &lt;p&gt;Per maggiori informazioni, vedi la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentazione di Form Builder&lt;/a&gt;.&lt;/p&gt;
                 </help>
             </readonly>
             <default>
                 <label>Valore iniziale</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath</hint>
-                <help todo="true">
-                    &lt;p>
-                        This formula allows you to specify an initial value for the form control in "new" mode only.
-                    &lt;/p>
-                    &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
-                    &lt;/p>
-                    &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
-                    &lt;/p>
+                <help>
+                    &lt;p&gt;Consente di specificare un valore iniziale per il controllo, solo in modalità "nuovo".&lt;/p&gt;
+                    &lt;p&gt;Nella formula puoi riferirti ad altri controlli con &lt;code&gt;$&lt;/code&gt; seguito dal loro nome; digitando &lt;code&gt;$&lt;/code&gt; viene mostrato l'elenco dei controlli.&lt;/p&gt;
+                    &lt;p&gt;Per maggiori dettagli consulta la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentazione di Form Builder&lt;/a&gt;.&lt;/p&gt;
                 </help>
             </default>
             <calculate>
                 <label>Valore calcolato</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath</hint>
-                 <help todo="true">
-                    &lt;p>
-                        This formula allows you to specify a calculated value for the form control.
-                        This value is re-evaluated to remain up to date as needed.
-                    &lt;/p>
-                    &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
-                    &lt;/p>
-                    &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
-                    &lt;/p>
+                 <help>
+                    &lt;p&gt;Consente di specificare un valore calcolato per il controllo. Il valore viene rivalutato automaticamente quando necessario.&lt;/p&gt;
+                    &lt;p&gt;Puoi riferirti ad altri controlli con &lt;code&gt;$&lt;/code&gt; seguito dal nome del controllo; digitando &lt;code&gt;$&lt;/code&gt; viene mostrato l'elenco dei controlli.&lt;/p&gt;
+                    &lt;p&gt;Per ulteriori informazioni, vedi la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentazione di Form Builder&lt;/a&gt;.&lt;/p&gt;
                 </help>
             </calculate>
             <control-label>
-                <label todo="true">[Label]</label>
+                <label>Etichetta</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Hint]</label>
+                <label>Suggerimento</label>
             </control-hint>
             <control-help>
                 <label>Messaggio d'aiuto</label>
                 <hint>Visualizzato quando l'aiuto viene attivato</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanatory Text]</label>
+                <label>Testo esplicativo</label>
                 <hint/>
             </control-text>
             <control-short-label>
-                <label todo="true">[Short Label]</label>
+                <label>Etichetta breve</label>
             </control-short-label>
             <control-iteration-label>
-                <label todo="true">[Iteration Label]</label>
+                <label>Etichetta di iterazione</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Label]</label>
+                <label>Etichetta per aggiungi ripetizione</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
-                <label todo="true">[Remove Repetition Text]</label>
+                <label>Testo per rimuovere ripetizione</label>
             </control-remove-iteration-label>
             <alert>
                 <label>Messaggio di avviso</label>
@@ -7332,23 +7312,23 @@
             <validation-details><label>Dettagli di convalida</label></validation-details>
             <level><label>Livello</label></level>
             <use-html>Usa HTML</use-html>
-            <parameters todo="true">[Template Parameters]</parameters>
+            <parameters>Parametri del modello</parameters>
             <automatic-hint>
-                <label todo="true">[Use automatic hint]</label>
-                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+                <label>Usa suggerimento automatico</label>
+                <hint>Aggiunge un suggerimento basato sulla dimensione massima del file e sui tipi di file supportati specificati nella scheda Convalide e avvisi</hint>
             </automatic-hint>
             <open-selection>
-                <label todo="true">[Open selection]</label>
-                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+                <label>Selezione aperta</label>
+                <hint>Se abilitato, gli utenti possono inserire un proprio valore che verrà anche usato come etichetta mostrata nell'elenco</hint>
             </open-selection>
             <store-label>
-                <label todo="true">[Store label]</label>
-                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+                <label>Memorizza etichetta</label>
+                <hint>Se abilitato, l'etichetta selezionata viene memorizzata insieme ai dati</hint>
             </store-label>
             <default-yes-no>
-                <item id="0" todo="true">[Use default]</item>
-                <item id="1" todo="true">[Yes]</item>
-                <item id="2" todo="true">[No]</item>
+                <item id="0">Usa predefinito</item>
+                <item id="1">Sì</item>
+                <item id="2">No</item>
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
@@ -7359,21 +7339,21 @@
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
             <grid-columns>
-                <label todo="true">[Number of grid columns]</label>
+                <label>Numero di colonne della griglia</label>
             </grid-columns>
             <grid-rows>
-                <label todo="true">Number of grid rows</label>
+                <label>Numero di righe della griglia</label>
             </grid-rows>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Default]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Ordine di tabulazione griglia</label>
+                <item id="0">Predefinito</item>
+                <item id="1">Righe</item>
+                <item id="2">Colonne</item>
             </grid-tab-order>
             <options>
                 <label>Opzioni</label>
                 <item>
-                    <label todo="true">[Initially Open]</label>
+                    <label>Inizialmente aperta</label>
                     <value>fr-initially-open</value>
                 </item>
                 <item>
@@ -7382,7 +7362,7 @@
                 </item>
             </options>
             <collapsible>
-                <label todo="true">[Collapsible]</label>
+                <label>Collassabile</label>
             </collapsible>
             <visibility>
                 <label>Visibilità</label>
@@ -7398,15 +7378,15 @@
                 <label>Ripeti contenuto</label>
             </repeat>
             <user-can-add-remove>
-                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <label>Consenti all'utente di aggiungere, rimuovere o spostare ripetizioni</label>
                 <hint/>
             </user-can-add-remove>
             <number-rows>
-                <label todo="true">Show repetition number</label>
+                <label>Mostra numero di ripetizione</label>
                 <hint/>
             </number-rows>
             <use-paging>
-                <label todo="true">[Show one repetition at a time in the wizard]</label>
+                <label>Mostra una ripetizione alla volta nella procedura guidata</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -7429,20 +7409,20 @@
                 <hint>Numero positivo o espressione XPath</hint>
             </max>
             <freeze>
-                <label todo="true">[Freeze Repetitions]</label>
-                <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <label>Blocca ripetizioni</label>
+                <alert>Valore non corretto</alert>
+                <hint>Numero non negativo o espressione XPath</hint>
             </freeze>
-            <no-freeze todo="true">[No freeze]</no-freeze>
+            <no-freeze>Nessun blocco</no-freeze>
             <appearance-minimal>
-                <label todo="true">Simplified appearance</label>
-                <hint todo="true">Show basic add/remove buttons without menu or reordering</hint>
+                <label>Aspetto semplificato</label>
+                <hint>Mostra i pulsanti base aggiungi/rimuovi senza menu o riordinamento</hint>
             </appearance-minimal>
             <apply-defaults>
-                <label todo="true">[Apply initial value formulas when adding iterations]</label>
+                <label>Applica le formule di valore iniziale quando si aggiungono iterazioni</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial number of iterations uses template]</label>
+                <label>Il numero iniziale di iterazioni usa il modello</label>
             </initial-iterations>
             <other>Altro</other>
             <one>Una ripetizione</one>
@@ -7455,18 +7435,18 @@
             <label>Conferma</label>
         </dialog-confirmation>
         <dialog-ids>
-            <label todo="true">[Control Names]</label>
+            <label>Nomi dei controlli</label>
             <prefix>
-                <label todo="true">[Prefix]</label>
+                <label>Prefisso</label>
             </prefix>
             <suffix>
-                <label todo="true">[Suffix]</label>
+                <label>Suffisso</label>
             </suffix>
             <original-name>
-                <label todo="true">[Original Name]</label>
+                <label>Nome originale</label>
             </original-name>
             <new-name>
-                <label todo="true">[New Name]</label>
+                <label>Nuovo nome</label>
             </new-name>
         </dialog-ids>
         <dialog-publish>
@@ -7484,11 +7464,11 @@
                 NOTA: Questo sovrascriverà la definizione di modulo esistente. Se le modifiche apportate alla definizione di modulo sono piccole, come cambiare le etichette di controllo, la definizione del modulo sarà compatibile con i dati del modulo esistente. Ma se sono state apportate modifiche strutturali, come l'aggiunta, la rimozione, la ridenominazione, o il movimento dei controlli, la definizione di modulo potrebbe essere incompatibile con i dati esistenti. Si consiglia di essere attentiti quando sovrascrive una versione della definizione di modulo esistente. </overwrite-version-help>
             <open-summary>Elenca moduli già pubblicati</open-summary>
             <open-new>Compila nuovo modulo</open-new>
-            <version todo="true">[Version]</version>
-            <available todo="true">[Make published form available]</available>
-            <comment todo="true">[Comment]</comment>
+            <version>Versione</version>
+            <available>Rendi disponibile il modulo pubblicato</available>
+            <comment>Commento</comment>
         </dialog-publish>
-        <dialog-add-language>
+            <dialog-add-language>
             <label>Aggiungi lingua</label>
             <new-language>
                 <label>Aggiungi seguente lingue</label>
@@ -7503,9 +7483,9 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label todo="true">Search Controls</label>
+            <label>Cerca controlli</label>
             <open-settings>
-                <label todo="true">Open Settings Dialog</label>
+                <label>Apri finestra impostazioni</label>
             </open-settings>
         </dialog-search>
         <dialog-upload-schema>
@@ -7556,10 +7536,10 @@
                 <label>File PDF</label>
             </pdf-upload>
             <attachment-name>
-                <label todo="true">[Name]</label>
+                <label>Nome</label>
             </attachment-name>
             <attachment-language>
-                <label todo="true">[Language]</label>
+                <label>Lingua</label>
             </attachment-language>
         </dialog-pdf>
         <dialog-itemsets>
@@ -7577,13 +7557,13 @@
                 <label>Suggerimento</label>
             </hint-header>
             <clear-value>
-                <label todo="true">[Clear Value]</label>
+                <label>Cancella valore</label>
             </clear-value>
             <remove-all>
-                <label todo="true">[Remove All]</label>
+                <label>Rimuovi tutto</label>
             </remove-all>
             <filter>
-                <label todo="true">Filter Formula</label>
+                <label>Formula di filtro</label>
             </filter>
             <itemsetid-mode>
                 <label>Usa le scelte dai metadati</label>
@@ -7594,22 +7574,22 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore servizi HTTP</label>
-            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
-            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
-            <tab-test todo="true"><label>[Test Results]</label></tab-test>
-            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
-            <parameter-name todo="true"><label>[Name]</label></parameter-name>
-            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
-            <no-headers todo="true">[No headers received].</no-headers>
+            <tab-definition><label>Definizione</label></tab-definition>
+            <tab-advanced><label>Avanzate</label></tab-advanced>
+            <tab-test><label>Risultati test</label></tab-test>
+            <url-parameters><label>Parametri URL</label></url-parameters>
+            <parameter-name><label>Nome</label></parameter-name>
+            <parameter-default-value><label>Valore predefinito</label></parameter-default-value>
+            <no-headers>Nessuna intestazione ricevuta.</no-headers>
             <service-name>
                 <label>Nome del servizio</label>
                 <hint>Scegli un nome univoco per questo servizio</hint>
             </service-name>
             <service-performs-search>
-                <label todo="true">[Service performs search]</label>
+                <label>Il servizio esegue ricerche</label>
             </service-performs-search>
             <service-supports-paging>
-                <label todo="true">[Service supports paging]</label>
+                <label>Il servizio supporta la paginazione</label>
             </service-supports-paging>
             <resource>
                 <label>URL della fonte</label>
@@ -7644,8 +7624,8 @@
                 <hint>Dati XML (puo essere un involucro SOAP)</hint>
             </request-body>
             <is-binary-response>
-                <label todo="true">[Service Response has Binary Content]</label>
-                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+                <label>La risposta del servizio ha contenuto binario</label>
+                <hint>Seleziona se la risposta viene usata per impostare il valore di un controllo allegato</hint>
             </is-binary-response>
             <response>
                 <label>Risposta</label>
@@ -7696,7 +7676,7 @@
                 <label>Corpo della risposta</label>
             </response-body>
             <xml-response-body>
-                <label todo="true">[XML Response Body]</label>
+                <label>Corpo risposta XML</label>
             </xml-response-body>
             <save>
                 <label>Salva</label>
@@ -7726,19 +7706,19 @@
                 <label>Test</label>
             </test>
         </dialog-database-services>
-        <dialog-actions>
+            <dialog-actions>
             <label>Editore delle azioni</label>
             <service-name>
                 <label>Nome dell'azione</label>
                 <hint>Scegli un nome univoco per questa azione</hint>
             </service-name>
             <observer-type>
-                <label todo="true">[Run action when]</label>
+                <label>Esegui azione quando</label>
                 <item id="0">
-                    <label todo="true">[control]</label>
+                    <label>il controllo</label>
                 </item>
                 <item id="1">
-                    <label todo="true">[the form loads]</label>
+                    <label>il modulo si carica</label>
                 </item>
             </observer-type>
             <control-event-type>
@@ -7761,15 +7741,15 @@
             </control-event-type>
             <form-event-type>
                 <item>
-                    <label todo="true">[before the data's initial values are calculated]</label>
+                    <label>prima che siano calcolati i valori iniziali dei dati</label>
                     <value>fr-run-form-load-action-before-data</value>
                 </item>
                 <item>
-                    <label todo="true">[after the data is ready]</label>
+                    <label>dopo che i dati sono pronti</label>
                     <value>fr-run-form-load-action-after-data</value>
                 </item>
                 <item>
-                    <label todo="true">[after the controls are ready]</label>
+                    <label>dopo che i controlli sono pronti</label>
                     <value>fr-run-form-load-action-after-controls</value>
                 </item>
             </form-event-type>
@@ -7788,10 +7768,10 @@
                 <hint>Servizio da eseguire quando l'evento si verifica</hint>
             </service-to-call>
             <source>
-                <label todo="true">[Source]</label>
+                <label>Sorgente</label>
             </source>
             <destination>
-                <label todo="true">[Destination]</label>
+                <label>Destinazione</label>
             </destination>
             <source-control>
                 <label>Controllo della fonte</label>
@@ -7830,14 +7810,14 @@
                 <hint>Espressione XPath relativa a un elemento nodo</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint formula]</label>
-                <hint todo="true">[Relative to choice node]</hint>
+                <label>Formula del suggerimento</label>
+                <hint>Relativa al nodo della scelta</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page formula]</label>
+                <label>Formula ultima pagina</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label todo="true">[Auto-select unique choice]</label>
+                <label>Seleziona automaticamente scelta univoca</label>
             </auto-select-unique-choice>
             <save>
                 <label>Salva</label>
@@ -7846,20 +7826,20 @@
                 <label>Prova</label>
             </test>
 
-            <general-settings todo="true">[General Settings]</general-settings>
-            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
-            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+            <general-settings>Impostazioni generali</general-settings>
+            <service-request-actions>Azioni richiesta servizio</service-request-actions>
+            <service-response-actions>Azioni risposta servizio</service-response-actions>
 
             <set-control-value>Imposta valore di controllo</set-control-value>
-            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
-            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
-            <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-itemset>Imposta l'insieme di elementi del controllo</set-control-itemset>
+            <save-to-dataset>Salva nel dataset</save-to-dataset>
+            <dataset-name>Nome dataset</dataset-name>
             <set-control-value-unavailable>Imposta valore di controllo è disponibile solo quando è selezionato "dopo che i controlli sono pronti"</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
             <label>Anteprima del modulo</label>
-            <console todo="true">Console</console>
+            <console>Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test della produzione PDF</label>
@@ -7867,10 +7847,10 @@
             <disable-default>Disabilitare la valutazione delle formule “Valore iniziale”</disable-default>
             <disable-calculate>Disabilitare la valutazione delle formule “Valore calcolato”</disable-calculate>
             <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
-            <show-hints todo="true">Show controls hints</show-hints>
-            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
-            <show-required todo="true">Style required controls</show-required>
-            <use-pdf-template todd="true">Use PDF template</use-pdf-template>
+            <show-hints>Mostra suggerimenti dei controlli</show-hints>
+            <show-alerts>Mostra avvisi dei controlli non validi</show-alerts>
+            <show-required>Evidenzia i controlli obbligatori</show-required>
+            <use-pdf-template>Usa modello PDF</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
             <label>Funzioni di Orbeon Forms PE</label>
@@ -7882,47 +7862,47 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label todo="true">[Email Settings]</label>
-            <templates todo="true">[Email templates]</templates>
+            <label>Impostazioni email</label>
+            <templates>Modelli email</templates>
             <template-name>
-                <label todo="true">[Email template name]</label>
-                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+                <label>Nome del modello email</label>
+                <hint>Questo nome non è visibile agli utenti finali; è usato nei processi, ad esempio: email(template = "notify-user")</hint>
             </template-name>
             <language>
-                <label todo="true">[Language]</label>
-                <any-language todo="true">[Any language]</any-language>
+                <label>Lingua</label>
+                <any-language>Qualsiasi lingua</any-language>
             </language>
             <headers>
-                <from todo="true">[Sender]</from>
-                <to todo="true">[Recipient]</to>
-                <cc todo="true">[CC]</cc>
-                <bcc todo="true">[BCC]</bcc>
-                <reply-to todo="true">[Reply To]</reply-to>
+                <from>Mittente</from>
+                <to>Destinatario</to>
+                <cc>CC</cc>
+                <bcc>BCC</bcc>
+                <reply-to>Rispondi a</reply-to>
             </headers>
             <header-value-types>
-                <control-value todo="true">[Control Value]</control-value>
-                <expression todo="true">[Formula]</expression>
-                <text todo="true">[Text]</text>
+                <control-value>Valore del controllo</control-value>
+                <expression>Formula</expression>
+                <text>Testo</text>
             </header-value-types>
-            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
-            <subject todo="true">[Email Subject]</subject>
-            <body todo="true">[Email Body]</body>
-            <use-html todo="true">[Use HTML]</use-html>
-            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <enable-if-true>Abilita questo modello solo se la seguente formula vale true</enable-if-true>
+            <subject>Oggetto email</subject>
+            <body>Corpo email</body>
+            <use-html>Usa HTML</use-html>
+            <attach-form-as>Allega modulo come</attach-form-as>
             <pdf>PDF</pdf>
             <xml>XML</xml>
             <attach-files>
-                <label todo="true">[Attach files users uploaded to the form]</label>
+                <label>Allega i file caricati dagli utenti nel modulo</label>
                 <choices>
-                    <all todo="true">[All]</all>
-                    <none todo="true">[None]</none>
-                    <selected todo="true">[Selected attachments]</selected>
+                    <all>Tutti</all>
+                    <none>Nessuno</none>
+                    <selected>Allegati selezionati</selected>
                 </choices>
             </attach-files>
-            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
-            <use-default todo="true">[Use default]</use-default>
-            <delete-template todo="true">Delete template</delete-template>
-            <template-parameters todo="true">[Template parameters]</template-parameters>
+            <exclude-from-all-control-values>Escludi da Tutti i Valori dei Controlli</exclude-from-all-control-values>
+            <use-default>Usa predefinito</use-default>
+            <delete-template>Elimina modello</delete-template>
+            <template-parameters>Parametri del modello</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Autorizzazioni</label>
@@ -7931,72 +7911,72 @@
             <permissions>Autorizzazioni</permissions>
             <operations>Operazioni</operations>
             <anyone>Tutti</anyone>
-            <anyone-with-token todo="true">[Require token]</anyone-with-token>
-            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
+            <anyone-with-token>Richiede token</anyone-with-token>
+            <any-authenticated-user>Qualsiasi utente autenticato</any-authenticated-user>
             <owner>Proprietario</owner>
             <group-member>Membri del gruppo</group-member>
             <create>Crea</create>
             <read>Leggi</read>
             <update>Aggiorna</update>
             <delete>Cancella</delete>
-            <list todo="true">List</list>
+            <list>Elenco</list>
         </dialog-permissions>
         <dialog-workflow>
-            <label todo="true">[Workflow and Permissions]</label>
+            <label>Workflow e autorizzazioni</label>
 
-            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
-            <operation-label todo="true">[Label]</operation-label>
-            <predefined-label todo="true">[Predefined]</predefined-label>
-            <custom-label todo="true">[Custom]</custom-label>
-            <available-to todo="true">[Available To]</available-to>
-            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
-            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
-            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
-            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
-            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
-            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
-            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
-            <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button todo="true">[Show button on detail page]</show-button>
-            <any todo="true">[Any]</any>
-            <all todo="true">[All]</all>
-            <actions todo="true">[Actions]</actions>
-            <no-action todo="true">[No Action]</no-action>
-            <change-stage-action todo="true">[Change Stage]</change-stage-action>
-            <run-process-action todo="true">[Run Process]</run-process-action>
-            <remove-operation todo="true">[Remove Operation]</remove-operation>
-            <is todo="true">[is]</is>
-            <is-not todo="true">[is Not]</is-not>
+            <custom-operations>Definisci operazioni personalizzate per questo modulo</custom-operations>
+            <operation-label>Etichetta</operation-label>
+            <predefined-label>Predefinita</predefined-label>
+            <custom-label>Personalizzata</custom-label>
+            <available-to>Disponibile a</available-to>
+            <availability-to-anyone>Chiunque</availability-to-anyone>
+            <availability-to-no-one>Nessuno</availability-to-no-one>
+            <availability-to-users>Utenti che corrispondono alla seguente regola</availability-to-users>
+            <availability-to-users-before>Utenti che corrispondono</availability-to-users-before>
+            <availability-to-users-after>alle seguenti regole</availability-to-users-after>
+            <workflow-stage>Fase del workflow</workflow-stage>
+            <workflow-role>Ruolo del workflow</workflow-role>
+            <authentication-role>Ruolo di autenticazione</authentication-role>
+            <show-button>Mostra pulsante nella pagina di dettaglio</show-button>
+            <any>Qualsiasi</any>
+            <all>Tutti</all>
+            <actions>Azioni</actions>
+            <no-action>Nessuna azione</no-action>
+            <change-stage-action>Cambia fase</change-stage-action>
+            <run-process-action>Esegui processo</run-process-action>
+            <remove-operation>Rimuovi operazione</remove-operation>
+            <is>è</is>
+            <is-not>non è</is-not>
 
-            <stages todo="true">[Stages]</stages>
+            <stages>Fasi</stages>
 
-            <stage-name todo="true">[Stage Name]</stage-name>
-            <default-stage todo="true">[Default]</default-stage>
+            <stage-name>Nome fase</stage-name>
+            <default-stage>Predefinita</default-stage>
 
             <operations>
-                <label todo="true">[Operations]</label>
+                <label>Operazioni</label>
                 <item>
-                    <label todo="true">[Fill new form]</label>
+                    <label>Compila nuovo modulo</label>
                     <value>1</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[List and search data]</label>
+                    <label>Elenca e cerca dati</label>
                     <value>2</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for editing]</label>
+                    <label>Accedi ai dati per modifica</label>
                     <value>3</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for viewing]</label>
+                    <label>Accedi ai dati per visualizzazione</label>
                     <value>4</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access PDF/TIFF]</label>
+                    <label>Accedi a PDF/TIFF</label>
                     <value>5</value>
                     <hint/>
                 </item>
@@ -8007,33 +7987,33 @@
              <dialog-title>Scorciatoie da tastiera</dialog-title>
          </dialog-keyboard-shortcuts>
         <dialog-messages>
-            <label todo="true">[Messages]</label>
-            <language-header todo="true">[Language]</language-header>
-            <name-header todo="true">[Name]</name-header>
-            <value-header todo="true">[Value]</value-header>
+            <label>Messaggi</label>
+            <language-header>Lingua</language-header>
+            <name-header>Nome</name-header>
+            <value-header>Valore</value-header>
         </dialog-messages>
         <modes>
-            <editable todo="true">Editable modes</editable>
-            <review todo="true">Review mode</review>
-            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
-            <pdf-template todo="true">PDF template</pdf-template>
+            <editable>Modalità modificabili</editable>
+            <review>Modalità revisione</review>
+            <pdf-automatic>PDF automatico</pdf-automatic>
+            <pdf-template>Modello PDF</pdf-template>
         </modes>
         <xbl-control-settings>
-            <field-width todo="true">[Field width]</field-width>
-            <default todo="true">Use default</default>
-            <full todo="true">Full</full>
-            <natural todo="true">Natural</natural>
-            <field-align todo="true">Field alignment</field-align>
-            <left todo="true">Left</left>
-            <right todo="true">Right</right>
-            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-width>Larghezza campo</field-width>
+            <default>Usa predefinito</default>
+            <full>Intera</full>
+            <natural>Naturale</natural>
+            <field-align>Allineamento campo</field-align>
+            <left>Sinistra</left>
+            <right>Destra</right>
+            <learn-settings-below>Ulteriori informazioni sulle impostazioni sottostanti</learn-settings-below>
             <field-value-visibility>
-                <label todo="true">Field Value Visibility</label>
-                <hint todo="true">Controls how the value of the field is displayed</hint>
-                <item id="visible" todo="true">Visible</item>
+                <label>Visibilità del valore del campo</label>
+                <hint>Controlla come viene mostrato il valore del campo</hint>
+                <item id="visible">Visibile</item>
                 <item id="obscured">Obscured</item>
-                <item id="partial" todo="true">Partial</item>
-                <item id="reveal" todo="true">Allow user to reveal</item>
+                <item id="partial">Parziale</item>
+                <item id="reveal">Consenti all'utente di visualizzare</item>
             </field-value-visibility>
         </xbl-control-settings>
         <messages>
@@ -8042,20 +8022,20 @@
             <delete-column>Sei sicuro di voler cancellare la colonna attuale?</delete-column>
             <delete-row>Sei sicuro di voler cancellare la riga attuale?</delete-row>
             <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua</delete-resources>
-            <delete-service todo="true">Sei sicuro di voler cancellare il servizio "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-service>Sei sicuro di voler cancellare il servizio "{0}"?{1,choice,0# Nessuna azione lo utilizza.|1# 1 azione lo utilizza.|1&lt; {1,number,integer} azioni lo utilizzano.}</delete-service>
             <delete-action>Sei sicuro di voler cancellare l''azione "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
             <metadata-edit-title>metadati del modulo</metadata-edit-title>
-            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <select-template-output>Seleziona un modello di modulo da usare come punto di partenza.</select-template-output>
             <app-form-optional>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo.</app-form-optional>
-            <app-form-required todo="true">Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo.</app-form-required>
+            <app-form-required>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo.</app-form-required>
             <save-as-metadata-output>Inserisci un nuovo nome per l'applicazione e per il modulo che saranno usati per la copia di questo modulo:</save-as-metadata-output>
             <xpath-errors>{0,choice,1# Un errore XPath è stato trovato |1&lt; {0,number,integer} errori sono stati trovati} nel tuo modulo.</xpath-errors>
             <lhha-checkbox>Contrassegna questa casella se vuoi usare tag HTML</lhha-checkbox>
         </messages>
         <alerts>
-            <required todo="true">[Value is required]</required>
-            <xpath todo="true">[Incorrect XPath expression]</xpath>
+            <required>Il valore è obbligatorio</required>
+            <xpath>Espressione XPath non corretta</xpath>
         </alerts>
         <template>
             <untitled-form>Modulo senza nome</untitled-form>

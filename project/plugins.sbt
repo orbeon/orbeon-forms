@@ -11,7 +11,7 @@ addSbtPlugin     ("io.github.cquiroz"   % "sbt-tzdb"                 % "4.3.0")
 //addSbtPlugin     ("io.github.cquiroz"   % "sbt-locales"              % "2.0.1")
 addSbtPlugin     ("com.scalapenos"      % "sbt-prompt"               % "2.0.0")
 
-libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.1.0" // 1.1.0 "drops support for jsdom 9.x"
+libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.1.1" // 1.1.1 "drops support for jsdom 9.x"
 
 // Apparently needed for sbt-web
 resolvers += Resolver.typesafeRepo("releases")

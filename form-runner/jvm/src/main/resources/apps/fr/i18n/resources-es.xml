@@ -73,8 +73,8 @@
         <validation-dialog-continue>Continuar</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Guardar y sobrescribir</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Descartar y recargar</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Validar</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspector de formulas (Beta)</test-formulas>
@@ -152,7 +152,7 @@
         <revision-history>
             <label>Historial de revisiones</label>
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Revisión actual)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <date-format>[FNn,*-3], [D] de [MNn,*-3] de [Y] a las [h]:[m] [P,*-2]</date-format>
 
             <named-user>Usuario {0}</named-user>
             <anonymous-user>Usuario anónimo</anonymous-user>
@@ -331,16 +331,16 @@
                 archivos: "{0}".</upload-error-file-scan>
             <lost-attachments>Algunos archivos se perdieron debido a un incidente con el servidor.
                 Verifique todos los adjuntos y súbalos nuevamente si es necesario.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>Conflicto detectado</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>Los datos han cambiado desde que los cargaste. Puedes:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Guardar ahora, sobrescribiendo los datos guardados previamente.</li>
+                        <li>Descartar tus cambios actuales y recargar los datos guardados previamente.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Borrador encontrado</found-draft>
@@ -530,8 +530,8 @@
         </titles>
         <messages>
             <no-form-found>No se encontró ningún formulario desplegado.</no-form-found>
-            <publish-confirmation todo="true">Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete}
-                {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
+            <publish-confirmation>¿Está seguro de {0,choice,0#publicar|1#despublicar|2#actualizar|3#eliminar}
+                {1,choice,1#un formulario|1&lt;{1,number,integer} formularios}?</publish-confirmation>
             <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán
                 disponibles, como el Form-Runner. Por lo que se recomienda ejecutar la
                 reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la
@@ -627,7 +627,7 @@
         <invalid>Invalido</invalid>
         <imported>Importado</imported>
         <skipped>Omitido</skipped>
-        <eta todo="true">ETA</eta>
+        <eta>Tiempo estimado</eta>
         <cancel-validation>
             <label>Cancelar validación</label>
         </cancel-validation>
@@ -658,9 +658,8 @@
         <review-data>
             <label>Revisar datos</label>
         </review-data>
-        <existing-records-message todo="true">
-            El {0,choice,1#is|1&lt;are} {0,number,integer} tiene
-            {0,choice,1#documento|1&lt;documentos} en la BD para la versión {3} del formulario {1}/{2}.
+        <existing-records-message>
+            Hay {0,number,integer} {0,choice,1#documento|1&lt;documentos} en la base de datos para la versión {3} del formulario {1}/{2}.
         </existing-records-message>
         <eta-message>
             {0,choice,0#|0&lt;{0, number, integer} horas} {1,choice,0#|0&lt;{1, number, integer}
@@ -683,7 +682,7 @@
             La importación de {0,number,integer} {0,choice,1#documento|1&lt;documentos} está completa.
             {1,number,integer} invalido {1,choice,1#documento se ha|1&lt;documentos se han} omitido.
         </import-complete-message>
-        <na todo="true">N/A</na>
+        <na>N/D</na>
         <fields-found>Campos encontrados</fields-found>
         <values-found>Valores encontrados</values-found>
         <errors>Errores</errors>

@@ -775,7 +775,7 @@ lazy val formRunnerJVM = formRunner.jvm
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 
-    libraryDependencies += "software.amazon.awssdk" % "s3" % "2.34.9",
+    libraryDependencies += "software.amazon.awssdk" % "s3" % "2.35.5",
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",

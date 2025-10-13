@@ -31,6 +31,9 @@ object TestForm {
       operations       = operations
     )
 
+  def credentials(user: String): Credentials =
+    Credentials(UserAndGroup(user, None), Nil, Nil)
+
   case class Control(label: String)
 
   private def controlName(index: Int) = s"control-${index + 1}"
@@ -93,41 +96,38 @@ case class TestForm(
     safeRequestCtx: SafeRequestContext
   ): Seq[FormDataDates] =
     formData.flatMap { formData =>
-      putSingleFormData(
-        version          = version,
-        id               = formData.id,
-        values           = Seq(formData.singleControlValue),
-        createdByOpt     = formData.createdByOpt     .map(user => Credentials(UserAndGroup(user, None), Nil, Nil)),
-        modifiedByOpt    = formData.lastModifiedByOpt.map(user => Credentials(UserAndGroup(user, None), Nil, Nil)),
-        workflowStageOpt = formData.workflowStageOpt,
-        returnDates      = returnDates
-      )
+      // Create and update form data
+      List((false, formData.createdByOpt), (true, formData.lastModifiedByOpt)).flatMap { case (update, credentialsOpt) =>
+        putSingleFormData(
+          version          = version,
+          id               = formData.id,
+          values           = Seq(formData.singleControlValue),
+          update           = update,
+          credentialsOpt   = credentialsOpt.map(TestForm.credentials),
+          workflowStageOpt = formData.workflowStageOpt,
+          returnDates      = returnDates
+        )
+      }.lastOption
     }
 
   def putSingleFormData(
     version            : Version,
     id                 : String,
     values             : Seq[String],
-    createdByOpt       : Option[Credentials] = None,
-    modifiedByOpt      : Option[Credentials] = None,
+    update             : Boolean,
+    credentialsOpt     : Option[Credentials] = None,
     workflowStageOpt   : Option[String] = None,
     returnDates        : Boolean = false
   )(implicit
     logger             : IndentedLogger,
     safeRequestCtx: SafeRequestContext
   ): Option[FormDataDates] = {
-    val url            = formDataURL(id)
-    val body           = HttpCall.XML(formData(values))
-    val stageOpt       = workflowStageOpt.map(Stage( _, documentation = ""))
-    val credentialsOpt = createdByOpt.orElse(modifiedByOpt)
+    val url                = formDataURL(id)
+    val body               = HttpCall.XML(formData(values))
+    val stageOpt           = workflowStageOpt.map(Stage( _, documentation = ""))
+    val expectedStatusCode = if (update) StatusCode.NoContent else StatusCode.Created
 
-    // Create
-    HttpAssert.put(url, version, body, StatusCode.Created, credentialsOpt, stageOpt)
-
-    modifiedByOpt.foreach { modifiedBy =>
-      // Update
-      HttpAssert.put(url, version, body, StatusCode.NoContent, Some(modifiedBy), stageOpt)
-    }
+    HttpAssert.put(url, version, body, expectedStatusCode, credentialsOpt, stageOpt)
 
     returnDates.option {
       val headers = HttpCall.get(url, version)._2

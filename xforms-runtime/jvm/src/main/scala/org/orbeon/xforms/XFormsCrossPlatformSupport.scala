@@ -35,6 +35,8 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.xforms.route.XFormsAssetServerRoute
+import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath.*
 
 import java.io.*
 import java.net.URI
@@ -44,6 +46,31 @@ import javax.xml.transform.sax.TransformerHandler
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
+
+  import cats.syntax.either.*
+  import io.circe.*
+
+  // These are used by Form Builder `Undo`. It is not quite correct to use `om.NodeInfo` vs. `DocumentNodeInfoType`
+  implicit val encodeNodeInfo: Encoder[om.NodeInfo] =
+    Encoder.encodeString.contramap[om.NodeInfo](TransformerUtils.tinyTreeToString)
+
+  implicit val decodeNodeInfo: Decoder[om.NodeInfo] =
+    Decoder.decodeString.emap { encoded =>
+      Either.catchNonFatal(
+        stringToTinyTree(XPath.GlobalConfiguration, encoded, handleXInclude = false, handleLexical = false).rootElement
+      ).leftMap(_.getMessage)
+    }
+
+  // These encode/decode entire XML documents
+  implicit val encodeDocumentNodeInfoType: Encoder[DocumentNodeInfoType] =
+    Encoder.encodeString.contramap[DocumentNodeInfoType](TransformerUtils.tinyTreeToString)
+
+  implicit val decodedDocumentNodeInfoType: Decoder[DocumentNodeInfoType] =
+    Decoder.decodeString.emap { encoded =>
+      Either.catchNonFatal(
+        stringToTinyTree(XPath.GlobalConfiguration, encoded, handleXInclude = false, handleLexical = false)
+      ).leftMap(_.getMessage)
+    }
 
   def externalContext: ExternalContext = NetUtils.getExternalContext
 

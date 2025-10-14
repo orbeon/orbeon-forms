@@ -27,6 +27,19 @@ trait FormRunnerAdminTokenTrait extends FormRunnerTokenTrait {
   type TokenPayloadType = Boolean
 }
 
+trait FormRunnerExternalModeTokenTrait extends FormRunnerTokenTrait {
+
+  def encryptToken(
+    app        : String,
+    form       : String,
+    version    : Int,
+    documentOpt: Option[String],
+    validity   : java.time.Duration,
+  ): Option[String]
+
+  type TokenPayloadType = Unit
+}
+
 trait FormRunnerTokenTrait {
 
   type TokenPayloadType

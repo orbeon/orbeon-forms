@@ -141,6 +141,33 @@ trait XFormsCrossPlatformSupportTrait {
     os.toByteArray
   }
 
+  def serializeTinyTreeToByteArray(
+    document           : DocumentNodeInfoType,
+    method             : String,
+    encoding           : String,
+    versionOpt         : Option[String],
+    indent             : Boolean,
+    omitXmlDeclaration : Boolean,
+    standaloneOpt      : Option[Boolean],
+  ): Array[Byte] = {
+
+    val identity = getIdentityTransformer
+
+    applyOutputProperties(
+      identity,
+      method             = method,
+      encoding           = encoding,
+      indentAmountOpt    = indent option 4,
+      omitXmlDeclaration = omitXmlDeclaration,
+      versionOpt         = versionOpt,
+      standaloneOpt      = standaloneOpt
+    )
+
+    val os = new ByteArrayOutputStream
+    identity.transform(document, new StreamResult(os))
+    os.toByteArray
+  }
+
   def proxyURI(
     urlString      : String,
     forEffectiveId : String,

@@ -18,7 +18,8 @@ import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
-import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
+import org.orbeon.oxf.fr.definitions.ModeType
+import org.orbeon.oxf.fr.process.{FormRunnerExternalMode, FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
@@ -187,6 +188,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("attachment-control-name", classOf[FRAttachmentControlName], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("save-state", classOf[FRSaveState], op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
     )
   }
 }
@@ -619,5 +625,38 @@ private object FormRunnerFunctions {
     override val attribute = "size"
     override def evaluateItem(xpathContext: XPathContext): Int64Value =
       value(xpathContext).map(string => new Int64Value(string.toLong)).orNull
+  }
+
+  class FRSaveState extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): StringValue = {
+      implicit val xpc = xpathContext
+      implicit val xfc = XFormsFunction.context
+
+      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+      val modeQualifiedName =
+        stringArgumentOpt(0).getOrElse(formRunnerParams.mode)
+
+      val continuationMode =
+        ModeType.modeFromQualifiedName(
+          modeQualifiedName,
+          excludeSecondaryModes = true,
+          FormRunner.customModes
+        )
+        .getOrElse(throw new IllegalArgumentException(s"Unknown mode requested: `$modeQualifiedName`"))
+
+      FormRunnerExternalMode.saveState(
+        data                       = FormRunner.formInstance.root,
+        currentLang                = FormRunner.currentLang,
+        embeddable                 = xfc.containingDocument.isEmbeddedFromUrlParam,
+        continuationMode           = continuationMode,
+        continuationWorkflowStage  = stringArgumentOpt(1).orElse(FormRunner.documentWorkflowStage),
+        authorizedOperationsString = FormRunner.authorizedOperationsString,
+        created                    = FormRunner.documentCreatedDateAsInstant,
+        lastModified               = FormRunner.documentModifiedDateAsInstant,
+        eTag                       = FormRunner.documentEtag,
+        expirationDuration         = java.time.Duration.ofMinutes(15) // TODO: config/param
+      )
+    }
   }
 }

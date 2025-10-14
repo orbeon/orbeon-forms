@@ -22,6 +22,16 @@ object FormRunnerAdminToken extends FormRunnerAdminTokenTrait {
   ): Option[String] = None
 }
 
+object FormRunnerExternalModeToken extends FormRunnerExternalModeTokenTrait {
+  def encryptToken(
+    app        : String,
+    form       : String,
+    version    : Int,
+    documentOpt: Option[String],
+    validity   : java.time.Duration,
+  ): Option[String] = None
+}
+
 object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {
   def encryptOperations(operationsTokens: Set[String]): String = ???
   def decryptOperations(permissions: String): Option[Operations] = ???

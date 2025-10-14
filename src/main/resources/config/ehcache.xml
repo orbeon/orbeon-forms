@@ -82,4 +82,15 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
+    <cache name="form-runner.external-mode-store"
+           maxElementsInMemory="200"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="true"
+           diskSpoolBufferSizeMB="1"
+           eternal="true"
+           timeToLiveSeconds="0"
+           timeToIdleSeconds="0"
+           diskPersistent="false"
+           maxElementsOnDisk="0"
+           diskExpiryThreadIntervalSeconds="120"/>
 </ehcache>

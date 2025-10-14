@@ -13,7 +13,7 @@ import scala.util.{Failure, Success, Try}
 
 object FormRunnerAccessToken extends FormRunnerAccessTokenTrait with FormRunnerTokenJvmTrait {
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   case class TokenHmac(
     app     : String,
@@ -50,7 +50,7 @@ object FormRunnerAccessToken extends FormRunnerAccessTokenTrait with FormRunnerT
 
 object FormRunnerAdminToken extends FormRunnerAdminTokenTrait with FormRunnerTokenJvmTrait {
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   type TokenHmac = Unit
 
@@ -67,7 +67,33 @@ object FormRunnerAdminToken extends FormRunnerAdminTokenTrait with FormRunnerTok
       SecureUtils.KeyUsage.GeneralNoCheck
     )
 
-  def decryptToken(tokenHmac: Unit, token: String): Try[TokenPayload] =
+  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload] =
+    decryptToken(tokenHmac, token, SecureUtils.KeyUsage.GeneralNoCheck)
+}
+
+object FormRunnerExternalModeToken extends FormRunnerExternalModeTokenTrait with FormRunnerTokenJvmTrait {
+
+  import io.circe.generic.auto.*
+
+  type TokenHmac = Unit
+
+  def encryptToken(
+    app        : String,
+    form       : String,
+    version    : Int,
+    documentOpt: Option[String],
+    validity   : java.time.Duration,
+  ): Option[String] =
+    encryptToken(
+      (),
+      TokenPayload(
+        exp = java.time.Instant.now.plus(validity),
+        ops = ()
+      ),
+      SecureUtils.KeyUsage.GeneralNoCheck
+    )
+
+  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload] =
     decryptToken(tokenHmac, token, SecureUtils.KeyUsage.GeneralNoCheck)
 }
 

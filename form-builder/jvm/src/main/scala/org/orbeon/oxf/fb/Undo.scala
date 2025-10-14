@@ -17,10 +17,8 @@ package org.orbeon.oxf.fb
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
 import org.orbeon.datatypes.{AboveBelow, Coordinate1, Direction}
-import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -137,22 +135,13 @@ object Undo {
 
   object JsonConverter {
 
-    import cats.syntax.either._
-    import io.circe.generic.auto._
-    import io.circe.syntax._
-    import io.circe.{parser, _}
-
     import scala.util.{Failure, Success, Try}
 
-    // NOTE: Encoder/decoder for `NodeInfo` could be placed in a reusable location.
+    import io.circe.generic.auto.*
+    import io.circe.syntax.*
+    import io.circe.parser
 
-    implicit val encodeNodeInfo: Encoder[NodeInfo] = Encoder.encodeString.contramap[NodeInfo](TransformerUtils.tinyTreeToString)
-
-    implicit val decodeNodeInfo: Decoder[NodeInfo] = Decoder.decodeString.emap { encoded =>
-      Either.catchNonFatal(
-        TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, encoded, false, false).rootElement
-      ).leftMap(_.getMessage)
-    }
+    import org.orbeon.xforms.XFormsCrossPlatformSupport.* // for `om.NodeInfo` encoder/decoder
 
     def encode(state: UndoAction) : String          = state.asJson.noSpaces
     def decode(jsonString: String): Try[UndoAction] = parser.decode[UndoAction](jsonString).fold(Failure.apply, Success.apply)

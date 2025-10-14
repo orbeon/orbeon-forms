@@ -160,7 +160,7 @@ extends DocumentTestBase
         assert(interpreter.savedProcess.contains((ConstantProcessId, continuation)))
         assert(trace1 == interpreter.trace)
         interpreter.runProcess("", resumeAction) match {
-          case Left(_) if resumeAction == "resume-with-failure"  => assertThrows[Throwable]
+          case Left(_) if resumeAction == "resume-with-failure"  => assertThrows[Throwable] _
           case Left(t)                                           => t.get
           case Right(_)                                          => throw new IllegalStateException
         }

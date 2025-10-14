@@ -126,20 +126,20 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   }
 
   def selector: Rule1[Selector] = rule {
-    (simpleSelectorSequence ~ zeroOrMore(selectorTuple)) ~> Selector.applySeq
+    (simpleSelectorSequence ~ zeroOrMore(selectorTuple)) ~> (Selector.applySeq _)
   }
 
   def selectorTuple: Rule1[(Combinator, ElementWithFiltersSelector)] = rule {
-    combinator ~ simpleSelectorSequence ~> Tuple2[Combinator, ElementWithFiltersSelector].apply
+    combinator ~ simpleSelectorSequence ~> ((c: Combinator, e: ElementWithFiltersSelector) => (c, e))
   }
 
   def combinator: Rule1[Combinator] = rule {
-    (OptWhiteSpace ~ capture(anyOf("+>~")) ~> Combinator.apply | capture(WhiteSpace) ~> Combinator.apply) ~ OptWhiteSpace
+    (OptWhiteSpace ~ capture(anyOf("+>~")) ~> (Combinator.apply _) | capture(WhiteSpace) ~> (Combinator.apply _)) ~ OptWhiteSpace
   }
 
   def simpleSelectorSequence: Rule1[ElementWithFiltersSelector] = rule {
     ((typeSelector | universal) ~ zeroOrMore(filters) ~> ElementWithFiltersSelector.applySelectorAndFilters _) |
-      (oneOrMore(filters) ~> ElementWithFiltersSelector.applyFilters)
+      (oneOrMore(filters) ~> (ElementWithFiltersSelector.applyFilters _))
   }
 
   def filters: Rule1[Filter] = rule {
@@ -147,7 +147,7 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   }
 
   def typeSelector: Rule1[TypeSelector] = rule {
-    optional(namespacePrefix) ~ elementName ~> TypeSelector.apply
+    optional(namespacePrefix) ~ elementName ~> (TypeSelector.apply _)
   }
 
   def namespacePrefix: Rule1[Option[String]] = rule {
@@ -157,10 +157,10 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   def elementName: Rule1[String] = ident
 
   def universal: Rule1[UniversalSelector] = rule {
-    optional(namespacePrefix) ~> UniversalSelector.apply ~ "*"
+    optional(namespacePrefix) ~> (UniversalSelector.apply _) ~ "*"
   }
 
-  def className: Rule1[ClassFilter] = rule { "." ~ (ident ~> ClassFilter.apply) }
+  def className: Rule1[ClassFilter] = rule { "." ~ (ident ~> (ClassFilter.apply _)) }
 
   def attribute: Rule1[AttributeFilter] = rule {
     "[" ~
@@ -173,14 +173,14 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
           capture("^=" | "$=" | "*=" | "=" | "~=" | "|=") ~
           OptWhiteSpace ~
           (string | ident) ~
-          OptWhiteSpace ~> AttributePredicate.apply
+          OptWhiteSpace ~> (AttributePredicate.apply _)
         ) |
           push(AttributePredicate.Exist)
-      ) ~> AttributeFilter.apply ~
+      ) ~> (AttributeFilter.apply _) ~
     "]"
   }
 
-  def pseudo: Rule1[PseudoClassFilter] = rule { ":" ~ optional(":") ~ (functionalPseudo | ident ~> SimplePseudoClassFilter.apply) }
+  def pseudo: Rule1[PseudoClassFilter] = rule { ":" ~ optional(":") ~ (functionalPseudo | ident ~> (SimplePseudoClassFilter.apply _)) }
 
   // FIXME: ident must not be "not" as that's handled by the negation
   def functionalPseudo: Rule1[FunctionalPseudoClassFilter] = rule {
@@ -188,18 +188,18 @@ class CSSSelectorParser(val input: ParserInput)  extends Parser {
   }
 
   def expression: Rule1[Seq[Expr]] = rule {
-    oneOrMore((plus | minus | dimension | number ~> NumberExpr.apply | string ~> StringExpr.apply | ident ~> IdentExpr.apply) ~ OptWhiteSpace)
+    oneOrMore((plus | minus | dimension | number ~> (NumberExpr.apply _) | string ~> (StringExpr.apply _) | ident ~> (IdentExpr.apply _)) ~ OptWhiteSpace)
   }
 
   def negation: Rule1[NegationFilter] = rule {
-    ":not(" ~ OptWhiteSpace ~ negationArg ~> NegationFilter.apply ~ OptWhiteSpace ~ ")"
+    ":not(" ~ OptWhiteSpace ~ negationArg ~> (NegationFilter.apply _) ~ OptWhiteSpace ~ ")"
   }
 
   def negationArg: Rule1[SelectorNode] = rule {
     typeSelector | universal | hash | className | attribute | pseudo
   }
 
-  def hash     : Rule1[IdFilter] = rule { "#" ~ (capture(oneOrMore(nmchar)) ~> IdFilter.apply) }
+  def hash     : Rule1[IdFilter] = rule { "#" ~ (capture(oneOrMore(nmchar)) ~> (IdFilter.apply _)) }
 
   def plus     : Rule1[Expr]   = rule { OptWhiteSpace ~ "+" ~ push(PlusExpr) }
   def minus    : Rule1[Expr]   = rule { "-" ~ push(MinusExpr) }

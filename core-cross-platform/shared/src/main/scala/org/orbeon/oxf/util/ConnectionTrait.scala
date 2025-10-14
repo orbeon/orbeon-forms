@@ -80,7 +80,7 @@ trait ConnectionTrait {
   ): Option[String]
 
   def buildConnectionHeadersCapitalizedIfNeeded(
-    url             : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
+    url             : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`? 2025-10-13: disallowed by `URI`!
     hasCredentials  : Boolean,
     customHeaders   : Map[String, List[String]],
     headersToForward: Set[String],

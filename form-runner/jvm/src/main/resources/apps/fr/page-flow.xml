@@ -133,6 +133,10 @@
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf|tiff)(/([^/^.]+))?"
              view="print/print-form.xpl"/>
 
+    <page path="/fr/callback"
+          class="org.orbeon.oxf.fr.route.CallbackRoute"
+          methods="GET"/>
+
     <!-- Test form PDF "inline" (when being edited) with new empty document -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(test-pdf)"
              methods="POST"

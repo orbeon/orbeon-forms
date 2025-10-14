@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom.Document
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.db.Connect
-import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.http.HttpCall.{Check, assertCall}
+import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.{HttpMethod, StatusCode}
@@ -279,28 +280,28 @@ class SearchTest
         }</search>.toDocument
 
       val formData = Seq(
-        FormData("1", "test1", createdByOpt = Some("created-by-1"), lastModifiedByOpt = Some("last-modified-by-1"), workflowStageOpt = Some("stage-1")),
-        FormData("2", "test2", createdByOpt = Some("created-by-2"), lastModifiedByOpt = Some("last-modified-by-2"), workflowStageOpt = Some("stage-2")),
-        FormData("3", "test3", createdByOpt = Some("created-by-3"), lastModifiedByOpt = Some("last-modified-by-3"), workflowStageOpt = Some("stage-3")),
-        FormData("4", "test4", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"), workflowStageOpt = Some("stage-4"))
+        FormData("1", "test1", createdBy = "created-by-1", lastModifiedByOpt = "last-modified-by-1".some, workflowStageOpt = "stage-1".some),
+        FormData("2", "test2", createdBy = "created-by-2", lastModifiedByOpt = "last-modified-by-2".some, workflowStageOpt = "stage-2".some),
+        FormData("3", "test3", createdBy = "created-by-3", lastModifiedByOpt = "last-modified-by-3".some, workflowStageOpt = "stage-3".some),
+        FormData("4", "test4", createdBy = "created-by-4", lastModifiedByOpt = "last-modified-by-4".some, workflowStageOpt = "stage-4".some)
       )
 
       testWithSimpleValues(
-        searchRequest         = _ => searchRequest(createdByOpt = Some("created-by-1")),
+        searchRequest         = _ => searchRequest(createdByOpt = "created-by-1".some),
         expectedDocumentNames = List("1"),
         testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
-        searchRequest         = _ => searchRequest(lastModifiedByOpt = Some("last-modified-by-2")),
+        searchRequest         = _ => searchRequest(lastModifiedByOpt = "last-modified-by-2".some),
         expectedDocumentNames = List("2"),
         testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
-        searchRequest         = _ => searchRequest(workflowStageOpt = Some("stage-3")),
+        searchRequest         = _ => searchRequest(workflowStageOpt = "stage-3".some),
         expectedDocumentNames = List("3"),
         testDocumentOrder     = false,
         formData              = formData
@@ -324,10 +325,10 @@ class SearchTest
           }</search>.toDocument
 
       val formData = Seq(
-        FormData("1", "test1", createdByOpt = Some("created-by-1")),
-        FormData("2", "test2", createdByOpt = Some("created-by-2"), lastModifiedByOpt = Some("last-modified-by-2")),
-        FormData("3", "test3", createdByOpt = Some("created-by-3")),
-        FormData("4", "test4", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"))
+        FormData("1", "test1", createdBy = "created-by-1"),
+        FormData("2", "test2", createdBy = "created-by-2", lastModifiedByOpt = "last-modified-by-2".some),
+        FormData("3", "test3", createdBy = "created-by-3"),
+        FormData("4", "test4", createdBy = "created-by-4", lastModifiedByOpt = "last-modified-by-4".some)
       )
 
       testWithSimpleValues(
@@ -376,10 +377,10 @@ class SearchTest
         }</search>.toDocument
 
       val formData = Seq(
-        FormData("1", "test2", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"), workflowStageOpt = Some("workflow-stage-3")),
-        FormData("2", "test3", createdByOpt = Some("created-by-2"), lastModifiedByOpt = Some("last-modified-by-1"), workflowStageOpt = Some("workflow-stage-4")),
-        FormData("3", "test4", createdByOpt = Some("created-by-1"), lastModifiedByOpt = Some("last-modified-by-3"), workflowStageOpt = Some("workflow-stage-2")),
-        FormData("4", "test1", createdByOpt = Some("created-by-3"), lastModifiedByOpt = Some("last-modified-by-2"), workflowStageOpt = Some("workflow-stage-1"))
+        FormData("1", "test2", createdBy = "created-by-4", lastModifiedByOpt = "last-modified-by-4".some, workflowStageOpt = "workflow-stage-3".some),
+        FormData("2", "test3", createdBy = "created-by-2", lastModifiedByOpt = "last-modified-by-1".some, workflowStageOpt = "workflow-stage-4".some),
+        FormData("3", "test4", createdBy = "created-by-1", lastModifiedByOpt = "last-modified-by-3".some, workflowStageOpt = "workflow-stage-2".some),
+        FormData("4", "test1", createdBy = "created-by-3", lastModifiedByOpt = "last-modified-by-2".some, workflowStageOpt = "workflow-stage-1".some)
       )
 
       testWithSimpleValues(

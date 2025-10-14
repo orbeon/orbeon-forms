@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
-import org.orbeon.oxf.externalcontext.SafeRequestContext
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
@@ -76,9 +76,9 @@ class DistinctValuesTest
 
     it("must work with created by values") {
       val formData = Seq(
-        FormData("1", "a", createdByOpt = Some("user3")),
-        FormData("2", "b", createdByOpt = Some("user2")),
-        FormData("3", "c", createdByOpt = Some("user1"))
+        FormData("1", "a", createdBy = "user3"),
+        FormData("2", "b", createdBy = "user2"),
+        FormData("3", "c", createdBy = "user1")
       )
 
       testWithControlValues(
@@ -97,9 +97,9 @@ class DistinctValuesTest
 
     it("must work with last modified by values") {
       val formData = Seq(
-        FormData("1", "a", createdByOpt = Some("user3"), lastModifiedByOpt = Some("user6")),
-        FormData("2", "b", createdByOpt = Some("user2"), lastModifiedByOpt = Some("user5")),
-        FormData("3", "c", createdByOpt = Some("user1"), lastModifiedByOpt = Some("user4"))
+        FormData("1", "a", createdBy = "user3", lastModifiedByOpt = "user6".some),
+        FormData("2", "b", createdBy = "user2", lastModifiedByOpt = "user5".some),
+        FormData("3", "c", createdBy = "user1", lastModifiedByOpt = "user4".some)
       )
 
       testWithControlValues(
@@ -121,9 +121,9 @@ class DistinctValuesTest
 
     it("must work with workflow stage values") {
       val formData = Seq(
-        FormData("1", "a", workflowStageOpt = Some("stage-1")),
-        FormData("2", "b", workflowStageOpt = Some("stage-2")),
-        FormData("3", "c", workflowStageOpt = Some("stage-3"))
+        FormData("1", "a", workflowStageOpt = "stage-1".some),
+        FormData("2", "b", workflowStageOpt = "stage-2".some),
+        FormData("3", "c", workflowStageOpt = "stage-3".some)
       )
 
       testWithControlValues(

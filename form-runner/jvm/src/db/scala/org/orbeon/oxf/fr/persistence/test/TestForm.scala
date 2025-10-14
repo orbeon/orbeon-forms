@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr.persistence.test
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
@@ -52,7 +53,7 @@ object TestForm {
 case class FormData(
   id                : String,
   singleControlValue: String,
-  createdByOpt      : Option[String] = None,
+  createdBy         : String         = "user",
   lastModifiedByOpt : Option[String] = None,
   workflowStageOpt  : Option[String] = None
 )
@@ -96,8 +97,11 @@ case class TestForm(
     safeRequestCtx: SafeRequestContext
   ): Seq[FormDataDates] =
     formData.flatMap { formData =>
-      // Create and update form data
-      List((false, formData.createdByOpt), (true, formData.lastModifiedByOpt)).flatMap { case (update, credentialsOpt) =>
+      // Always create and update only if last modified by provided
+      val create = List((false, formData.createdBy.some))
+      val update = if (formData.lastModifiedByOpt.isDefined) List((true, formData.lastModifiedByOpt)) else Nil
+
+      (create ::: update).flatMap { case (update, credentialsOpt) =>
         putSingleFormData(
           version          = version,
           id               = formData.id,
@@ -115,7 +119,7 @@ case class TestForm(
     id                 : String,
     values             : Seq[String],
     update             : Boolean,
-    credentialsOpt     : Option[Credentials] = None,
+    credentialsOpt     : Option[Credentials],
     workflowStageOpt   : Option[String] = None,
     returnDates        : Boolean = false
   )(implicit

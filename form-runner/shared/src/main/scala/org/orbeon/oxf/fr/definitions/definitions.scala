@@ -11,7 +11,7 @@ sealed trait ModeType
 
 object ModeType {
 
-  trait ForExistingData extends ModeType // `type ForExistingData = Edition | Readonly`
+  sealed trait ForExistingData extends ModeType // `type ForExistingData = Edition | Readonly`
 
   case object Creation extends ModeType
   case object Edition  extends ModeType with ForExistingData

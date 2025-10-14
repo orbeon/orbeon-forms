@@ -25,7 +25,9 @@
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新建</new>
         <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 创建新数据</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; 复制</duplicate>
+        <sign>&lt;i class="fa fa-fw fa-file-signature"&gt;&lt;/i&gt; 标志</sign>
 
+        <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save-final>
         <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 保存进度</save-draft>

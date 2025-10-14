@@ -25,6 +25,7 @@
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nouveau</new>
         <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Créer de nouvelles données</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliquer</duplicate>
+        <sign>&lt;i class="fa fa-fw fa-file-signature"&gt;&lt;/i&gt; Signer</sign>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save>

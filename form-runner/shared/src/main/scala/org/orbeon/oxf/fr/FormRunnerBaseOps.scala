@@ -402,8 +402,8 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     setvalue(modeElement, newMode)
   }
 
-  private def authorizedOperationsInstance: XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
-  private def documentMetadataInstance    : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
+  private def authorizedOperationsInstance: XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-authorized-operations").get
+  private def documentMetadataInstance    : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-document-metadata"    ).get
 
   // See also FormRunnerHome
   private val CreateOps = Set("*", "create")

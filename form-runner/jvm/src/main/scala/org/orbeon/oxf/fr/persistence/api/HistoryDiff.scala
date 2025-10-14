@@ -11,124 +11,29 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.rest
+package org.orbeon.oxf.fr.persistence.api
 
 import cats.implicits.catsSyntaxOptionId
-import org.orbeon.oxf.controller.XmlNativeRoute
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.SimpleDataMigration.{FormDiff, diffSimilarXmlData}
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.importexport.FormDefinitionOps
-import org.orbeon.oxf.fr.persistence.api.PersistenceApi
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.persistence.relational.rest.HistoryDiff.FormDefinition
-import org.orbeon.oxf.http.{HttpMethod, HttpStatusCode, HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, StaticXPath, StringUtils, TryUtils}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, StaticXPath, StringUtils, TryUtils}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
-import org.orbeon.oxf.xml.{DeferredXMLReceiver, SaxonUtils, XMLReceiver}
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 
 import java.time.Instant
-import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 
-
-object HistoryDiffRoute extends XmlNativeRoute {
-
-  import HistoryDiff.*
-
-  def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
-
-    val httpRequest  = ec.getRequest
-    val httpResponse = ec.getResponse
-
-    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
-
-    require(httpRequest.getMethod == HttpMethod.GET)
-
-    try {
-      httpRequest.getRequestPath match {
-        case ServicePathRe(_, app, form, documentId) => process(httpRequest, AppForm(app, form), documentId)
-        case _                                       => httpResponse.setStatus(StatusCode.NotFound)
-      }
-    } catch {
-      case HttpStatusCodeWithDescription(statusCode, error) =>
-        // TODO: the API should return detailed error messages in the body itself
-        indentedLogger.logError("", s"Revision History API error: $error")
-        httpResponse.setStatus(statusCode)
-
-      case HttpStatusCodeException(statusCode, _, _) =>
-        httpResponse.setStatus(statusCode)
-    }
-  }
-
-  private val ServicePathRe: Regex = "/fr/service/([^/]+)/history/([^/]+)/([^/]+)/([^/^.]+)/diff".r
-
-  private def process(
-    httpRequest   : ExternalContext.Request,
-    appForm       : AppForm,
-    documentId    : String
-  )(implicit
-    ec            : ExternalContext,
-    indentedLogger: IndentedLogger
-  ): Unit = {
-
-    def paramValue[T](paramName: String, parser: String => T, defaultOpt: => Option[T] = None): Try[T] =
-      httpRequest.getFirstParamAsString(paramName) match {
-        case Some(s) =>
-          Try(parser(s)).recoverWith { case _ =>
-            Failure(HttpStatusCodeWithDescription(StatusCode.BadRequest, s"Invalid `$paramName` parameter"))
-          }
-
-        case None    =>
-          Try(defaultOpt) match {
-            case Success(Some(default)) => Success(default)
-            case Success(None)          => Failure(HttpStatusCodeWithDescription(StatusCode.BadRequest         , s"Missing `$paramName` parameter"))
-            case Failure(_)             => Failure(HttpStatusCodeWithDescription(StatusCode.InternalServerError, s"Could not determine default value for `$paramName` parameter"))
-          }
-      }
-
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-
-    (for {
-      formVersion       <- paramValue("form-version", _.toInt)
-      olderModifiedTime <- paramValue("older-modified-time", RelationalUtils.instantFromString)
-      newerModifiedTime <- paramValue("newer-modified-time", RelationalUtils.instantFromString)
-      truncationSizeOpt <- paramValue(TruncationSizeParam, _.toInt.some, Some(None))
-      appFormVersion    = (appForm, formVersion)
-      requestedLangOpt  = httpRequest.getFirstParamAsString(LanguageParam)
-      formDefinition    <- formDefinition(appFormVersion, requestedLangOpt)
-      diffsOpt          <- formDiffs(
-        appFormVersion    = appFormVersion,
-        documentId        = documentId,
-        olderModifiedTime = olderModifiedTime,
-        newerModifiedTime = newerModifiedTime,
-        formDefinition    = formDefinition
-      )
-    } yield {
-      implicit val receiver: DeferredXMLReceiver = getResponseXmlReceiverSetContentType
-
-      withDocument {
-        Diffs.serializeToSAX(
-          diffsOpt,
-          olderModifiedTime,
-          newerModifiedTime.some,
-          formDefinition,
-          truncationSizeOpt
-        )
-      }
-    }).get
-  }
-}
 
 object HistoryDiff {
 
@@ -314,7 +219,7 @@ object Diffs {
     diffsOpt            : Option[Diffs],
     olderModifiedTime   : Instant,
     newerModifiedTimeOpt: Option[Instant],
-    formDefinition      : FormDefinition,
+    formDefinition      : HistoryDiff.FormDefinition,
     truncationSizeOpt   : Option[Int]
   )(implicit
     receiver            : XMLReceiver

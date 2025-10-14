@@ -6,7 +6,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.api.PersistenceApi
+import org.orbeon.oxf.fr.persistence.api.{Diffs, HistoryDiff, PersistenceApi}
 import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
@@ -228,7 +228,7 @@ private object History {
     }
   }
 
-  private case class Document(atts: Attributes, modifiedTime: Instant)
+  private case class DocumentMetadata(atts: Attributes, modifiedTime: Instant)
 
   private def documentsAndFormVersionOpt(
     connection: Connection,
@@ -236,9 +236,9 @@ private object History {
     hasStage  : Boolean
   )(implicit
     receiver  : DeferredXMLReceiver
-  ): (List[Document], Option[Int]) = {
+  ): (List[DocumentMetadata], Option[Int]) = {
 
-    val documents                   = mutable.ListBuffer[Document]()
+    val documents                   = mutable.ListBuffer[DocumentMetadata]()
     var formVersionOpt: Option[Int] = None
 
     var position = 0
@@ -260,7 +260,7 @@ private object History {
 
       val modifiedTime = rs.getTimestamp("last_modified_time").toInstant
 
-      documents += Document(
+      documents += DocumentMetadata(
         atts =
           (hasStage list ("stage" -> rs.getString("stage").trimAllToEmpty)) :::
             List(
@@ -281,7 +281,7 @@ private object History {
 
   private def emitDocumentsWithDiffsIfRequested(
     request       : Request,
-    documents     : List[Document],
+    documents     : List[DocumentMetadata],
     appFormVersion: AppFormVersion,
     documentId    : String
   )(implicit

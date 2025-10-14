@@ -391,17 +391,11 @@ trait FormRunnerActionsCommon {
     (frc.FormVersionParam, () => FormRunnerParams().formVersion.toString                  , _ => false)
   )
 
-  protected val StateParamNames = StateParams.map(_._1).toSet
+  protected val StateParamNames: Set[String] = StateParams.map(_._1).toSet
 
   // Automatically prepend `fr-language`, `orbeon-embeddable` and `form-version` based on their current value unless
   // they are already specified in the given path.
-  //
-  // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
-  // are part of the state the user expects to be kept.
-  //
-  // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
-  // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
-  protected def prependCommonFormRunnerParameters(pathQueryOrUrl: String, forNavigate: Boolean): String =
+  private def prependPublicStateParamsForNavigate(pathQueryOrUrl: String): String =
     if (! PathUtils.urlHasProtocol(pathQueryOrUrl)) { // heuristic, which might not always be a right guess?
 
       val (path, params) = splitQueryDecodeParams(pathQueryOrUrl)
@@ -409,15 +403,35 @@ trait FormRunnerActionsCommon {
       val newParams =
         for {
           (name, valueFromCurrent, keepValue) <- StateParams
-          valueFromPath                         = params collectFirst { case (`name`, v) => v }
-          effectiveValue                        = valueFromPath getOrElse valueFromCurrent()
-          if ! forNavigate || forNavigate && (valueFromPath.isDefined || keepValue(effectiveValue)) // keep parameter if explicit!
+          valueFromPath                       = params collectFirst { case (`name`, v) => v }
+          effectiveValue                      = valueFromPath getOrElse valueFromCurrent()
+          if valueFromPath.isDefined || keepValue(effectiveValue) // keep parameter if explicit!
         } yield
           name -> effectiveValue
 
-      recombineQuery(path, newParams ::: (params filterNot (p => StateParamNames(p._1))))
+      recombineQuery(path, newParams ::: params filterNot (p => StateParamNames(p._1)))
     } else
       pathQueryOrUrl
+
+  // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
+  // are part of the state the user expects to be kept.
+  //
+  // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
+  // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
+  def buildPublicStateParamsFromCurrent: List[(String, String)] =
+    for ((name, valueFromCurrent, _) <- StateParams)
+      yield name -> valueFromCurrent()
+
+  def buildPublicStateParams(
+    lang       : String,
+    embeddable : Boolean,
+    formVersion: Int
+  ): List[(String, String)] =
+    List(
+      frc.LanguageParam    -> lang,
+      EmbeddableParam      -> embeddable.toString,
+      frc.FormVersionParam -> formVersion.toString
+    )
 
   // Navigate to a URL specified in parameters or indirectly in properties
   // If no URL is specified, the action fails
@@ -439,7 +453,7 @@ trait FormRunnerActionsCommon {
       val targetOpt    = params.get(Some("target")) flatMap trimAllToOpt
       val showProgress = booleanParamByNameUseAvt(params, ShowProgressName, default = false)
 
-      load(prependCommonFormRunnerParameters(location, forNavigate = true), targetOpt, showProgress = showProgress)
+      load(prependPublicStateParamsForNavigate(location), targetOpt, showProgress = showProgress)
     }
 
   // Visit/unvisit controls

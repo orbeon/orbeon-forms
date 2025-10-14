@@ -16,6 +16,7 @@ import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
@@ -423,11 +424,10 @@ object ImportExportSupport {
 
     val operations = Operations.parseFromHeaders(headers).getOrElse(throw new IllegalStateException)
 
-    val queryStringOpt =
-      PathUtils.splitQuery(
+    val queryString =
+      PathUtils.encodeSimpleQuery(
         org.orbeon.oxf.fr.process.SimpleProcess.prependUserAndStandardParamsForModeChange(
-          pathQuery             = "",
-          requestParameters     = Map.empty, // import uses `oxf.fr.import.forward-parameters`
+          requestParameters     = Nil, // import uses `oxf.fr.import.forward-parameters`
           dataFormatVersion     = DataFormatVersion.Edge,
           authorizedOperations  = Operations.serialize(operations, normalized = true).toSet,  // checked that `fr-authorized-operations` can contain `*` at this time
           documentWorkflowStage = Headers.firstItemIgnoreCase(headers, Headers.OrbeonWorkflowStage),
@@ -435,7 +435,7 @@ object ImportExportSupport {
           lastModifiedOpt       = Headers.firstItemIgnoreCase(headers, Headers.LastModified).flatMap(DateUtils.tryParseRFC1123ToInstant), // persistence-model.xml uses those, not the `Orbeon-*` headers
           eTagOpt               = Headers.firstItemIgnoreCase(headers, Headers.ETag),
         )
-      )._2
+      )
 
     PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
       modeTypeAndOps = ModeTypeAndOps(modeType, operations),
@@ -446,7 +446,7 @@ object ImportExportSupport {
       doc,
       FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
       DataMigrationBehavior.Disabled,
-      queryStringOpt
+      Some(queryString)
     )
   }
 

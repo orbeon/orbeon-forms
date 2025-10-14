@@ -1,3 +1,4 @@
+
 /**
  *  Copyright (C) 2013 Orbeon, Inc.
  *
@@ -20,7 +21,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
-import org.orbeon.oxf.fr.definitions.ModeType
+import org.orbeon.oxf.fr.definitions.{FormRunnerDetailMode, ModeType}
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.email.{EmailContent, EmailTransport}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -59,12 +60,13 @@ trait FormRunnerActions
   import FormRunnerRenderedFormat.*
 
   val AllowedFormRunnerActions: Map[String, Action] =
-    CommonAllowedFormRunnerActions                        +
-      ("email"                  -> trySendEmail _)        +
-      ("send"                   -> trySend _)             +
-      ("review"                 -> tryNavigateToReview _) +
-      ("edit"                   -> tryNavigateToEdit _)   +
-      ("open-rendered-format"   -> tryOpenRenderedFormat)
+    CommonAllowedFormRunnerActions                      +
+      ("email"                  -> trySendEmail          _) +
+      ("send"                   -> trySend               _) +
+      ("review"                 -> tryNavigateToReview   _) +
+      ("edit"                   -> tryNavigateToEdit     _) +
+      ("change-mode"            -> tryChangeMode         _) +
+      ("open-rendered-format"   -> tryOpenRenderedFormat _)
 
   case class SendActionParams(
     uri                : String,
@@ -447,9 +449,9 @@ trait FormRunnerActions
     )
   }
 
-  private def tryChangeMode(
+  private def tryChangeModeImpl(
     replace            : ReplaceType,
-    path               : String,
+    pathQuery          : PathWithParams, // may only include rendered format params
     sourceModeType     : ModeType,
     formTargetOpt      : Option[String] = None,
     showProgress       : Boolean        = true,
@@ -457,9 +459,20 @@ trait FormRunnerActions
   ): Option[XFormsSubmitDoneEvent] = {
 
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
+
+    val (path, maybeRenderFormatParams) = pathQuery
+
+    val newPathQuery =
+      PathUtils.recombineQuery(
+        path,
+        buildPublicStateParamsFromCurrent                                              :::
+          buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion) :::
+          maybeRenderFormatParams
+      )
+
     trySendImpl(
       SendActionParams(
-        uri                 = prependCommonFormRunnerParameters(prependUserAndStandardParamsForModeChangeUseInScopeDocument(path, currentDataFormatVersion), forNavigate = false),
+        uri                 = newPathQuery,
         method              = HttpMethod.POST,
         relevanceHandling   = RelevanceHandling.Keep,
         annotateWith        = Set.empty,
@@ -481,15 +494,26 @@ trait FormRunnerActions
   }
 
   def tryNavigateToReview(params: ActionParams): ActionResult =
-    ActionResult.trySync {
-      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/view/$document", formRunnerParams.modeType(frc.customModes))
-    }
+    tryChangeMode(Map(Some("mode") -> "view"))
 
   def tryNavigateToEdit(params: ActionParams): ActionResult =
+    tryChangeMode(Map(Some("mode") -> "edit"))
+
+  def tryChangeMode(params: ActionParams): ActionResult =
     ActionResult.trySync {
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      tryChangeMode(ReplaceType.All, s"/fr/$app/$form/edit/$document", formRunnerParams.modeType(frc.customModes))
+
+      val modeString = requiredParamByNameUseAvt(params, "change-mode", "mode")
+
+      // For now, we don't exclude particular modes, but note:
+      // - `new` -> `view` -> `new` should make sense
+      // - `tiff` is excluded as it is a secondary mode
+      // - `pdf` is explicitly excluded by symmetry with `tiff`
+
+      if (! isSupportedDetailMode(modeString, excludeSecondaryModes = true) || modeString == FormRunnerDetailMode.Pdf.name.qualifiedName)
+        throw new IllegalArgumentException(s"Unsupported detail mode navigation for moe: `$modeString`")
+
+      tryChangeModeImpl(ReplaceType.All, s"/fr/$app/$form/$modeString/$document" -> Nil, formRunnerParams.modeType(frc.customModes))
     }
 
   def tryOpenRenderedFormat(params: ActionParams): ActionResult =
@@ -524,15 +548,14 @@ trait FormRunnerActions
           case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => None
         }
 
-      tryChangeMode(
+      tryChangeModeImpl(
         replace            = ReplaceType.All,
-        path               = path,
+        pathQuery          = path,
         sourceModeType     = frParams.modeType(frc.customModes),
         showProgress       = false,
         formTargetOpt      = formTargetOpt,
         responseIsResource = true
       )
-
     }
 
   def clearRenderedFormatsResources(): Try[Any] =
@@ -549,7 +572,7 @@ trait FormRunnerActions
       delete(childElems)
     }
 
-  private val ParamsToExcludeUponModeChange =
+  private val ParamsToExcludeUponModeChange: Set[String] =
     StateParamNames                   +
     DataMigrationBehaviorName         +
     DataFormatVersionName             +
@@ -559,12 +582,8 @@ trait FormRunnerActions
     InternalLastModifiedParam         +
     InternalETagParam
 
-  private def prependUserAndStandardParamsForModeChangeUseInScopeDocument(
-    pathQuery        : String,
-    dataFormatVersion: DataFormatVersion
-  ): String =
+  private def buildUserAndStandardParamsForModeChangeFromCurrent(dataFormatVersion: DataFormatVersion): List[(String, String)] =
     prependUserAndStandardParamsForModeChange(
-      pathQuery             = pathQuery,
       requestParameters     = inScopeContainingDocument.getRequestParameters,
       dataFormatVersion     = dataFormatVersion,
       authorizedOperations  = frc.authorizedOperations,
@@ -574,18 +593,47 @@ trait FormRunnerActions
       eTagOpt               = FormRunner.documentEtag
     )
 
+  def filterParamsToExcludeUponModeChange[T](p: Iterable[(String, T)]): Iterable[(String, T)] =
+    p filterNot { case (name, _) => ParamsToExcludeUponModeChange(name) }
+
   def prependUserAndStandardParamsForModeChange(
-    pathQuery            : String,
-    requestParameters    : Map[String, List[String]],
+    requestParameters    : Iterable[(String, List[String])],
     dataFormatVersion    : DataFormatVersion,
     authorizedOperations : Set[String],
     documentWorkflowStage: Option[String],
     createdOpt           : Option[java.time.Instant],
     lastModifiedOpt      : Option[java.time.Instant],
     eTagOpt              : Option[String],
-  ): String = {
+  ): List[(String, String)] = {
 
-    val (originalPath, originalParams) = splitQueryDecodeParams(pathQuery)
+    val standardParams =
+      buildStandardParamsForModeChange(
+        dataFormatVersion     = dataFormatVersion,
+        authorizedOperations  = authorizedOperations,
+        documentWorkflowStage = documentWorkflowStage,
+        createdOpt            = createdOpt,
+        lastModifiedOpt       = lastModifiedOpt,
+        eTagOpt               = eTagOpt
+      )
+
+    val filteredUserParams =
+      for {
+        (name, values) <- filterParamsToExcludeUponModeChange(requestParameters)
+        value          <- values
+      } yield
+        name -> value
+
+    standardParams ::: filteredUserParams.toList
+  }
+
+  def buildStandardParamsForModeChange(
+    dataFormatVersion    : DataFormatVersion,
+    authorizedOperations : Set[String],
+    documentWorkflowStage: Option[String],
+    createdOpt           : Option[java.time.Instant],
+    lastModifiedOpt      : Option[java.time.Instant],
+    eTagOpt              : Option[String],
+  ): List[(String, String)] = {
 
     val dataMigrationParams =
       (DataMigrationBehaviorName -> DataMigrationBehavior.Disabled.entryName) ::
@@ -615,17 +663,7 @@ trait FormRunnerActions
       opsParam ::: documentMetadataParams
     }
 
-    def filterParams[T](p: List[(String, T)]): List[(String, T)] =
-      p filterNot { case (name, _) => ParamsToExcludeUponModeChange(name) }
-
-    val userParams =
-      for {
-        (name, values) <- filterParams(requestParameters.toList)
-        value          <- values
-      } yield
-        name -> value
-
-    recombineQuery(originalPath, dataMigrationParams ::: internalParams ::: userParams ::: filterParams(originalParams))
+    dataMigrationParams ::: internalParams
   }
 
   private def buildRenderedFormatPath(
@@ -635,7 +673,7 @@ trait FormRunnerActions
     currentFormLang: String
   )(implicit
     frParams       : FormRunnerParams
-  ): String = {
+  ): PathWithParams = {
 
     val FormRunnerParams(app, form, _, Some(document), _, _) = frParams
 
@@ -648,15 +686,10 @@ trait FormRunnerActions
 
     renderedFormat match {
       case RenderedFormat.Pdf | RenderedFormat.Tiff =>
-        recombineQuery(
-          s"${pathPrefix(usePagePath = fullFilename.isDefined)}/${renderedFormat.entryName}/$document",
-          urlParams
-        )
+
+        s"${pathPrefix(usePagePath = fullFilename.isDefined)}/${renderedFormat.entryName}/$document" -> urlParams
       case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData =>
-        recombineQuery(
-          s"${pathPrefix(usePagePath = false)}/export/$document?export-format=${renderedFormat.entryName}",
-          urlParams
-        )
+          s"${pathPrefix(usePagePath = false)}/export/$document?export-format=${renderedFormat.entryName}" -> urlParams
     }
   }
 
@@ -689,7 +722,7 @@ trait FormRunnerActions
               currentFormLang = currentFormLang
             )
 
-          tryChangeMode(ReplaceType.Instance, path, sourceModeType = frParams.modeType(frc.customModes)).get
+          tryChangeModeImpl(ReplaceType.Instance, path, sourceModeType = frParams.modeType(frc.customModes)).get
 
           locally {
 

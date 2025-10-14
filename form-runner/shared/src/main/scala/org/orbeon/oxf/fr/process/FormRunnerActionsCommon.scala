@@ -277,7 +277,7 @@ trait FormRunnerActionsCommon {
           }
         } .flatten
 
-      (computation, continuation)
+      (computation, continuation _)
     }
 
   def tryRelinquishLease(params: ActionParams): ActionResult = ActionResult.trySync {

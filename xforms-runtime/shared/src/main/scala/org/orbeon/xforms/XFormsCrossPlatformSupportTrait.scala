@@ -13,7 +13,6 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.dom.io.DocumentSource
@@ -29,7 +28,7 @@ import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, HtmlParsing,
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, HTMLBodyXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
 
 import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
 import java.net.URI
@@ -168,10 +167,10 @@ trait XFormsCrossPlatformSupportTrait {
     resourceResolver: Option[ResourceResolver]
   ): URI
 
- def mapSavedUri(
-   beforeUri         : String,
-   afterUri          : String
- ): Unit
+  def mapSavedUri(
+    beforeUri         : String,
+    afterUri          : String
+  ): Unit
 
   def renameAndExpireWithSession(
     existingFileURI  : URI)(implicit

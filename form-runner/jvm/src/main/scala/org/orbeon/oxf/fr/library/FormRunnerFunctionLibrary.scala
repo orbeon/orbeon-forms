@@ -655,7 +655,6 @@ private object FormRunnerFunctions {
         created                    = FormRunner.documentCreatedDateAsInstant,
         lastModified               = FormRunner.documentModifiedDateAsInstant,
         eTag                       = FormRunner.documentEtag,
-        expirationDuration         = java.time.Duration.ofMinutes(15) // TODO: config/param
       )
     }
   }

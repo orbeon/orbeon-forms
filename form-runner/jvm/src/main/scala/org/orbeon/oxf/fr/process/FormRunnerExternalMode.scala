@@ -3,12 +3,13 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.CacheSupport
 import org.orbeon.oxf.common.Defaults
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.FormRunnerDetailMode
 import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.fr.{FormRunnerExternalModeToken, FormRunnerParams}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerExternalModeToken, FormRunnerParams}
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.{LoggerFactory, SecureUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, SecureUtils}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.slf4j
 
@@ -38,7 +39,6 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
     created                   : Option[Instant],
     lastModified              : Option[Instant],
     eTag                      : Option[String],
-    expirationDuration        : java.time.Duration
   )(implicit
     formRunnerParams          : FormRunnerParams
   ): String =
@@ -68,7 +68,8 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
           eTag                 = eTag,
         )
       ),
-      expirationDuration
+      expirationDuration =
+        java.time.Duration.ofMinutes(FormRunner.intFormRunnerProperty("oxf.fr.state-token.validity").getOrElse(0).toLong)
     )
 
   def encryptPrivateModeMetadata(

@@ -277,13 +277,13 @@ trait ContainerOps extends ControlOps {
         }
 
         val controlBind   = findBindByName(controlName)
-        val iterationBind = controlBind.toList / *
+        val iterationBind = (controlBind.toList / *).toList
         insert(into = iterationBind, origin = oldNestedBinds)
 
         // Insert nested iteration data holders
         // NOTE: There can be multiple existing data holders due to enclosing repeats
         findDataHolders(controlName) foreach { holder =>
-          val nestedHolders = holder / *
+          val nestedHolders = (holder / *).toList
           delete(nestedHolders)
           insert(into = holder, origin = elementInfo(iterationName, nestedHolders))
         }
@@ -305,13 +305,13 @@ trait ContainerOps extends ControlOps {
 
         // Move bind up
         val controlBind = findBindByName(controlName).toList
-        val oldNestedBinds = controlBind / * / *
+        val oldNestedBinds = (controlBind / * / *).toList
         delete(controlBind / *)
         insert(into = controlBind, origin = oldNestedBinds)
 
         // Move data holders up and keep only the first iteration
         findDataHolders(controlName) foreach { holder =>
-          val nestedHolders = holder / * take 1 child *
+          val nestedHolders = (holder / * take 1 child *).toList
           delete(holder / *)
           insert(into = holder, origin = nestedHolders)
         }

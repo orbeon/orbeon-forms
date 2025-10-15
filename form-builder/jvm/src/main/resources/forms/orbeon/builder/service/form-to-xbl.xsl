@@ -194,8 +194,8 @@
         </xbl:xbl>
     </xsl:template>
 
-    <!-- We only want to run xxf:default in "new" mode to conform to the semantic of the top-level form. So we rewrite
-         xxf:default expressions to test on the mode. See: https://github.com/orbeon/orbeon-forms/issues/786 -->
+    <!-- We only want to run `xxf:default` in "new" mode to conform to the semantic of the top-level form. So we rewrite
+         `xxf:default` expressions to test on the mode. See: https://github.com/orbeon/orbeon-forms/issues/786 -->
     <xsl:template match="xf:bind/@xxf:default">
         <xsl:attribute name="{name()}" select="concat('if ($fr-mode = (''new'', ''test'')) then (', ., ') else .')"/>
     </xsl:template>

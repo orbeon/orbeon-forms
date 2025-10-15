@@ -13,6 +13,7 @@
   -->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -21,6 +22,7 @@
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
@@ -161,6 +163,17 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="xbl:binding" mode="within-xbl">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="#current">
+                <xsl:with-param
+                    tunnel="yes"
+                    name="library-name"
+                    select="frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', .))"/>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template
         match="fr:databound-select1[@selection] | fr:databound-select1-search[@selection]"
         mode="within-body">
@@ -168,6 +181,22 @@
             <xsl:attribute name="fb:selection" select="@selection"/>
             <xsl:apply-templates select="@* except (@selection) | node()" mode="#current"/>
         </xsl:copy>
+    </xsl:template>
+
+    <!-- https://github.com/orbeon/orbeon-forms/issues/7291 -->
+    <xsl:template
+        match="@class"
+        mode="within-xbl">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:attribute
+            name="class"
+            select="
+                (: Can happen for elements nested within `xbl:xbl` which are not nested within `xbl:binding`, as
+                   we scope it above when matching on `xbl:binding`. :)
+                if (exists($library-name)) then
+                    frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())
+                else
+                    ."/>
     </xsl:template>
 
 </xsl:stylesheet>

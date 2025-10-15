@@ -158,8 +158,12 @@ trait Read {
         }
       }
 
-      if (!req.forAttachment)
-        httpResponse.setHeader(Headers.ContentType,      ContentTypes.XmlContentType)
+      httpResponse.setHeader(
+        name  = Headers.ContentType,
+        value = if (req.forAttachment)
+          ContentTypes.OctetStreamContentType else
+          ContentTypes.XmlContentType
+      )
 
       for {
         range                <- req.ranges.singleRange

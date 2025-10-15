@@ -1137,9 +1137,7 @@ trait FormRunnerPersistence {
         hashAlgorithmOpt  = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_ALGORITHM_QNAME)
         hashValueOpt      = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_VALUE_QNAME)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
-        contentFromGet    = getCxr.contentWithTypeAndLengthFromHeadersIfMissing
-        contentWithType   = if (contentFromGet.contentType.isDefined) contentFromGet else contentFromGet.copy(contentType = Some(ContentTypes.OctetStreamContentType))
-        putCr             <- fs2.Stream.eval(saveAttachmentIo(contentWithType, pathToHolder, resolvedPutUri, formVersion, hashAlgorithmOpt, hashValueOpt, credentials))
+        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, hashAlgorithmOpt, hashValueOpt, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
         isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
       } yield

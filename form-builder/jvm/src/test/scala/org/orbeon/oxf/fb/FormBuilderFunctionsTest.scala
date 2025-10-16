@@ -17,6 +17,7 @@ import cats.syntax.option.*
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.ToolboxOps.*
+import org.orbeon.oxf.fb.XMLNames.FB
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.XMLNames.*
@@ -383,7 +384,7 @@ class FormBuilderFunctionsTest
   describe("Section template merging") {
 
     val SectionsNamesAndControls = List(
-      "section-1" -> 1,
+      "section-1" -> 2,
       "section-2" -> 3,
       "section-3" -> 0,
       "section-4" -> 0,
@@ -450,6 +451,11 @@ class FormBuilderFunctionsTest
 
           assert(expectedCount == nestedControlsStartingWithMyCount, s"for `$sectionName`")
         }
+
+        // Test that variable reference in formula was updated
+        assert(
+          findBindByName("my-control-12").flatMap(_.attValueOpt(FB -> "calculate")).exists(_.contains("$my-control-11"))
+        )
       }
     }
 
@@ -503,7 +509,7 @@ class FormBuilderFunctionsTest
         assert(findControlByName("control-11").isDefined)
 
         assert(FormBuilderXPathApi.countAllContainers(ctx.formDefinitionRootElem) == 4)
-        assert(FormBuilderXPathApi.countAllNonContainers(ctx.formDefinitionRootElem) == 3)
+        assert(FormBuilderXPathApi.countAllNonContainers(ctx.formDefinitionRootElem) == 4)
 
         assertUniqueIds()
       }

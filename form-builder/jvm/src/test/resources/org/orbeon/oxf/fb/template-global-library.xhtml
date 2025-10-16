@@ -20,6 +20,7 @@
                 <form>
                     <section-template-1>
                         <control-11/>
+                        <control-12/>
                     </section-template-1>
                     <section-template-2>
                         <control-21/>
@@ -43,6 +44,9 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-template-1-bind" name="section-template-1" ref="section-template-1">
                     <xf:bind id="control-11-bind" name="control-11" ref="control-11" xxf:whitespace="trim"/>
+                    <xf:bind id="control-12-bind" ref="control-12" name="control-12"
+                             calculate="concat('Value of control 1.1: ', $control-11)"
+                             readonly="false()"/>
                 </xf:bind>
                 <xf:bind id="section-template-2-bind" ref="section-template-2" name="section-template-2">
                     <xf:bind id="nested-section-bind" ref="nested-section" name="nested-section">
@@ -123,6 +127,10 @@
                             <hint/>
 
                         </control-11>
+                        <control-12>
+                            <label>Control 1.2</label>
+                            <hint/>
+                        </control-12>
                     </resource>
                 </resources>
             </xf:instance>
@@ -149,7 +157,17 @@
 
                                 </xf:input>
                             </fr:c>
-                        <fr:c y="1" x="7" w="6"/>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-12-control"
+                                       bind="control-12-bind"
+                                       appearance="full">
+                                <xf:label ref="$form-resources/control-12/label"/>
+                                <xf:hint ref="$form-resources/control-12/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="section-template-2-section" bind="section-template-2-bind">

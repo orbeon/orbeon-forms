@@ -203,18 +203,18 @@ trait FormRunnerHome {
   // 1. If the backward compatibility property (oxf.fr.production-server-uri) is present and not empty, try to use it
   //    and return a sequence of one string containing the server URL configured.
   // 2. Else try the JSON property (oxf.fr.home.remote-servers). If the property exists and is well-formed, return
-  //    a flattened sequence of label/url pairs.
+  //    a flattened sequence of name/label/url triplets.
   // 3. Otherwise, the empty sequence is returned.
   //@XPathFunction
   def remoteServersXPath: SequenceIterator =
     FormRunnerHome.remoteServers.flatMap { remoteServer =>
-      remoteServer.label.toSeq ++ Seq(remoteServer.url)
+      remoteServer.name.toSeq ++ remoteServer.label.toSeq ++ Seq(remoteServer.url)
     }
 }
 
 object FormRunnerHome {
 
-  case class RemoteServer(label: Option[String], url: String)
+  case class RemoteServer(name: Option[String], label: Option[String], url: String)
 
   def remoteServers: Seq[RemoteServer] = {
 
@@ -243,7 +243,10 @@ object FormRunnerHome {
             def getFieldOrThrow(key: String) =
               fields(key) flatMap (_.asString) flatMap trimAllToOpt getOrElse (throw new IllegalArgumentException)
 
-            RemoteServer(label = getFieldOrThrow("label").some, url = getFieldOrThrow("url").dropTrailingSlash)
+            def getFieldOpt(key: String) =
+              fields(key) flatMap (_.asString) flatMap trimAllToOpt
+
+            RemoteServer(name = getFieldOpt("name"), label = getFieldOpt("label"), url = getFieldOrThrow("url").dropTrailingSlash)
         }
       case _ =>
         throw new IllegalArgumentException
@@ -269,6 +272,6 @@ object FormRunnerHome {
   private def remoteServerFromCompatibilityProperty: Option[RemoteServer] = (
     properties.getStringOrURIAsStringOpt("oxf.fr.production-server-uri")
     flatMap trimAllToOpt
-    map     (url => RemoteServer(label = None, url = url.dropTrailingSlash))
+    map     (url => RemoteServer(name = None, label = None, url = url.dropTrailingSlash))
   )
 }

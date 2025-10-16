@@ -68,9 +68,9 @@
                         name="remote-servers"
                         value="frf:remoteServersXPath()"/>
 
-                    <!-- Set the available remote server label/URL when present. If we only have one item, it is
-                         just one URL. If we have two or more, it's one label, one URL, etc. -->
-                    <xf:action iterate="1 to ((count($remote-servers) + 1) idiv 2)">
+                    <!-- Set the available remote server name/label/URL when present. If we only have one item, it is
+                         just one URL (backward compatibility). If we have three or more, it's name, label, URL, etc. -->
+                    <xf:action iterate="1 to ((count($remote-servers) + 2) idiv 3)">
                         <xf:var name="p" value="."/>
                         <xf:insert
                             context="instance()/remote-servers"
@@ -79,8 +79,9 @@
                                 xf:element(
                                     'remote-server',
                                     (
-                                        xf:element('label',    if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 1] else ''),
-                                        xf:element('url',      if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 2] else $remote-servers[1]),
+                                        xf:element('name',     if (count($remote-servers) ge 3) then $remote-servers[($p - 1) * 3 + 1] else ''),
+                                        xf:element('label',    if (count($remote-servers) ge 3) then $remote-servers[($p - 1) * 3 + 2] else ''),
+                                        xf:element('url',      if (count($remote-servers) ge 3) then $remote-servers[($p - 1) * 3 + 3] else $remote-servers[1]),
                                         xf:element('username', ''),
                                         xf:element('password', '')
                                     )
@@ -222,6 +223,7 @@
                         Template:
 
                         <remote-server>
+                            <name/>
                             <label/>
                             <url/>
                             <username/>
@@ -685,11 +687,13 @@
                     local-upgrade   remote-upgrade
                     local-delete    remote-delete">
 
-                <xf:var name="local-read"              value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade', 'local-delete')"/>
-                <xf:var name="local-write"             value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade', 'local-delete')"/>
+                <xf:var name="local-to-remote"         value="event('xxf:type') = 'local-to-remote'"/>
+                <xf:var name="remote-to-local"         value="event('xxf:type') = 'remote-to-local'"/>
+                <xf:var name="use-new-api"             value="$local-to-remote or $remote-to-local"/>
+                <xf:var name="local-read"              value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-upgrade', 'local-delete')"/>
+                <xf:var name="local-write"             value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-upgrade', 'local-delete')"/>
                 <xf:var name="toggle-to-publish"       value="event('xxf:type') = ('local-publish',   'remote-publish')"/>
                 <xf:var name="toggle-to-unpublish"     value="event('xxf:type') = ('local-unpublish', 'remote-unpublish')"/>
-                <xf:var name="force-attachments"       value="event('xxf:type') = ('local-to-remote', 'remote-to-local')"/>
                 <xf:var name="upgrade-form-definition" value="event('xxf:type') = ('local-upgrade',   'remote-upgrade')"/>
                 <xf:var name="delete"                  value="event('xxf:type') = ('local-delete',    'remote-delete')"/>
 
@@ -704,58 +708,93 @@
                     <xf:var name="form"         value="xxf:split(., '/')[2]"/>
                     <xf:var name="form-version" value="xxf:split(., '/')[3]"/>
 
-                    <!-- We don't strictly need to read when `DELETE`ing, except for adjusting the version? -->
-                    <xf:send submission="read-form">
-                        <xf:property name="base-uri"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
-                        <xf:property name="app"          value="$app"/>
-                        <xf:property name="form"         value="$form"/>
-                        <xf:property name="form-version" value="$form-version"/>
-                        <xf:property name="username"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string()"/>
-                        <xf:property name="password"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string()"/>
-                    </xf:send>
-
-                    <xf:action if="instance()/error = ''">
-
-                        <!-- See https://github.com/orbeon/orbeon-forms/issues/2453 -->
-                        <!-- See https://github.com/orbeon/orbeon-forms/issues/1451 -->
+                    <xf:action if="$use-new-api">
                         <xf:var
-                            name="form-definition-version"
-                            value="normalize-space((instance()/form-definition-version[normalize-space()], '1')[1])"/>
-
+                            name="current-remote-server-element"
+                            value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
                         <xf:var
-                            name="metadata"
-                            value="frf:metadataInstanceRootOpt(instance('fr-form'))"/>
-
+                            name="remote-server-name"
+                            value="$current-remote-server-element/name/string()"/>
                         <xf:var
-                            name="current-available"
-                            value="not($metadata/available = 'false')"/>
-
+                            name="username"
+                            value="$current-remote-server-element/username/string()"/>
                         <xf:var
-                            name="new-available"
-                            value="$toggle-to-publish or ($current-available and not($toggle-to-unpublish))"/>
+                            name="password"
+                            value="$current-remote-server-element/password/string()"/>
+                        <xf:var
+                            name="remote-credentials"
+                            value="if (xxf:non-blank($username) and xxf:non-blank($password)) then concat('Basic ', saxon:string-to-base64Binary(concat($username, ':', $password), 'UTF-8')) else ''"/>
+
+                        <xf:send if="$local-to-remote" submission="push-to-remote-submission">
+                            <xf:property name="app"                value="$app"/>
+                            <xf:property name="form"               value="$form"/>
+                            <xf:property name="form-version"       value="$form-version"/>
+                            <xf:property name="remote-server"      value="$remote-server-name"/>
+                            <xf:property name="remote-credentials" value="$remote-credentials"/>
+                        </xf:send>
+
+                        <xf:send if="$remote-to-local" submission="pull-from-remote-submission">
+                            <xf:property name="app"                value="$app"/>
+                            <xf:property name="form"               value="$form"/>
+                            <xf:property name="form-version"       value="$form-version"/>
+                            <xf:property name="remote-server"      value="$remote-server-name"/>
+                            <xf:property name="remote-credentials" value="$remote-credentials"/>
+                        </xf:send>
+                    </xf:action>
+
+                    <xf:action if="not($use-new-api)">
+                        <!-- We don't strictly need to read when `DELETE`ing, except for adjusting the version? -->
+                        <xf:send submission="read-form">
+                            <xf:property name="base-uri"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
+                            <xf:property name="app"          value="$app"/>
+                            <xf:property name="form"         value="$form"/>
+                            <xf:property name="form-version" value="$form-version"/>
+                            <xf:property name="username"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string()"/>
+                            <xf:property name="password"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string()"/>
+                        </xf:send>
 
                         <xf:action if="instance()/error = ''">
-                            <xf:send if="not($delete)" submission="publish-submission">
-                                <xf:property name="doc"                      value="instance('fr-form')"/>
-                                <xf:property name="document-id"              value="''"/>
-                                <xf:property name="form-definition-version"  value="$form-definition-version"/>
-                                <xf:property name="upgrade-form-definition"  value="$upgrade-form-definition"/>
-                                <xf:property name="remote-server-url"        value="if ($local-write) then () else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
-                                <xf:property name="username"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string() else ()"/>
-                                <xf:property name="password"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string() else ()"/>
-                                <xf:property name="force-attachments"        value="$force-attachments"/>
-                                <xf:property name="available"                value="$new-available"/>
-                            </xf:send>
-                            <xf:send if="$delete" submission="delete-submission">
-                                <xf:property name="base-uri"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
-                                <xf:property name="app"          value="$app"/>
-                                <xf:property name="form"         value="$form"/>
-                                <xf:property name="form-version" value="$form-definition-version"/>
-                                <xf:property name="username"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string()"/>
-                                <xf:property name="password"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string()"/>
-                            </xf:send>
-                        </xf:action>
 
+                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2453 -->
+                            <!-- See https://github.com/orbeon/orbeon-forms/issues/1451 -->
+                            <xf:var
+                                name="form-definition-version"
+                                value="normalize-space((instance()/form-definition-version[normalize-space()], '1')[1])"/>
+
+                            <xf:var
+                                name="metadata"
+                                value="frf:metadataInstanceRootOpt(instance('fr-form'))"/>
+
+                            <xf:var
+                                name="current-available"
+                                value="not($metadata/available = 'false')"/>
+
+                            <xf:var
+                                name="new-available"
+                                value="$toggle-to-publish or ($current-available and not($toggle-to-unpublish))"/>
+
+                            <xf:action if="instance()/error = ''">
+                                <xf:send if="not($delete)" submission="publish-submission">
+                                    <xf:property name="doc"                      value="instance('fr-form')"/>
+                                    <xf:property name="document-id"              value="''"/>
+                                    <xf:property name="form-definition-version"  value="$form-definition-version"/>
+                                    <xf:property name="upgrade-form-definition"  value="$upgrade-form-definition"/>
+                                    <xf:property name="remote-server-url"        value="if ($local-write) then () else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
+                                    <xf:property name="username"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string() else ()"/>
+                                    <xf:property name="password"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string() else ()"/>
+                                    <xf:property name="available"                value="$new-available"/>
+                                </xf:send>
+                                <xf:send if="$delete" submission="delete-submission">
+                                    <xf:property name="base-uri"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
+                                    <xf:property name="app"          value="$app"/>
+                                    <xf:property name="form"         value="$form"/>
+                                    <xf:property name="form-version" value="$form-definition-version"/>
+                                    <xf:property name="username"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string()"/>
+                                    <xf:property name="password"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string()"/>
+                                </xf:send>
+                            </xf:action>
+
+                        </xf:action>
                     </xf:action>
                 </xf:action>
 
@@ -782,8 +821,6 @@
                         encode-for-uri(event('username'))
                     }&amp;password={
                         encode-for-uri(event('password'))
-                    }&amp;force-attachments={
-                        encode-for-uri(string(event('force-attachments')))
                     }&amp;available={
                         encode-for-uri(string(event('available')))
                     }"
@@ -803,6 +840,42 @@
 
                 <xf:header ref="event('form-version')[xxf:non-blank()]">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+            </xf:submission>
+
+            <xf:submission
+                id="push-to-remote-submission"
+                serialization="none"
+                method="POST"
+                resource="/fr/service/push-to-remote/{event('app')}/{event('form')}?remote-server={event('remote-server')}"
+                replace="none">
+
+                <xf:header ref="event('form-version')[xxf:non-blank()]">
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+
+                <xf:header ref="event('remote-credentials')[xxf:non-blank()]">
+                    <xf:name>Orbeon-Remote-Authorization</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+            </xf:submission>
+
+            <xf:submission
+                id="pull-from-remote-submission"
+                serialization="none"
+                method="POST"
+                resource="/fr/service/pull-from-remote/{event('app')}/{event('form')}?remote-server={event('remote-server')}"
+                replace="none">
+
+                <xf:header ref="event('form-version')[xxf:non-blank()]">
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+
+                <xf:header ref="event('remote-credentials')[xxf:non-blank()]">
+                    <xf:name>Orbeon-Remote-Authorization</xf:name>
                     <xf:value value="."/>
                 </xf:header>
             </xf:submission>

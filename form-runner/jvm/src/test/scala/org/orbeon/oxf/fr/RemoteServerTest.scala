@@ -31,9 +31,9 @@ class RemoteServerTest extends AnyFunSpecLike {
       assert(
         Success(
           List(
-            RemoteServer("Prod 1".some, "http://prod1.acme.org/orbeon"),
-            RemoteServer("Prod 2".some, "http://prod2.acme.org/orbeon"),
-            RemoteServer("Prod 3".some, "http://prod2.acme.org/orbeon")
+            RemoteServer(None, "Prod 1".some, "http://prod1.acme.org/orbeon"),
+            RemoteServer(None, "Prod 2".some, "http://prod2.acme.org/orbeon"),
+            RemoteServer(None, "Prod 3".some, "http://prod2.acme.org/orbeon")
           )
         ) === tryRemoteServersFromString(
           """
@@ -47,17 +47,34 @@ class RemoteServerTest extends AnyFunSpecLike {
       )
     }
 
+    it("must parse valid configurations with name field") {
+      assert(
+        Success(
+          List(
+            RemoteServer("prod1".some, "Prod 1".some, "http://prod1.acme.org/orbeon"),
+            RemoteServer("prod2".some, "Prod 2".some, "http://prod2.acme.org/orbeon"),
+            RemoteServer("prod3".some, "Prod 3".some, "http://prod2.acme.org/orbeon")
+          )
+        ) === tryRemoteServersFromString(
+          """
+          [
+            { "name": "prod1", "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" },
+            { "name": "prod2", "label": "Prod 2", "url": "http://prod2.acme.org/orbeon" },
+            { "name": " prod3 ", "label": " Prod 3 ", "url": " http://prod2.acme.org/orbeon/ " }
+          ]
+          """
+        )
+      )
+    }
+
     it("must return a `Failure` for invalid JSON configurations") {
 
       val Failures = Seq(
         "",
-        """[ { "label": "Prod 1", "url": "  " } ]""",
-        """[ { "label": "Prod 1", "url": "" } ]""",
-        """[ { "label": "Prod 1" } ]""",
-        """[ { "label": "  ", "url": "http://prod1.acme.org/orbeon" } ]""",
-        """[ { "label": "", "url": "http://prod1.acme.org/orbeon" } ]""",
-        """[ { "url": "http://prod1.acme.org/orbeon" } ]""",
-        """[ { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
+        """[ { "name": "prod1", "label": "Prod 1", "url": "  " } ]""",
+        """[ { "name": "prod1", "label": "Prod 1", "url": "" } ]""",
+        """[ { "name": "prod1", "label": "Prod 1" } ]""",
+        """[ { "name": "prod1", "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
       )
 
       for (json <- Failures)

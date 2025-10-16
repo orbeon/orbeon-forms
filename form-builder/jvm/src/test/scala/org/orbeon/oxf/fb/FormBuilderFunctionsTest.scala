@@ -1029,7 +1029,7 @@ class FormBuilderFunctionsTest
     withActionAndFBDoc("oxf:/forms/issue/6880/form/form.xhtml") { implicit ctx =>
 
       def findValuesContaining(s: String): LazyList[String] =
-        findLegacyActions.descendant(*).att(@*).filter(_.stringValue.contains(s)).map(_.stringValue)
+        findLegacyActions(Some(ctx.modelElem)).descendant(*).att(@*).filter(_.stringValue.contains(s)).map(_.stringValue)
 
       it("must contain non-renamed values") {
         assert(

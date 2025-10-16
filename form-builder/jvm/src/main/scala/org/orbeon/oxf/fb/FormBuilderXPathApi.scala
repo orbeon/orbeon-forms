@@ -811,10 +811,10 @@ object FormBuilderXPathApi {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
 
     val newServiceCalls =
-      findNewActions descendant FRServiceCallTest filter (_.attValue("service") == serviceName)
+      findNewActions(Some(ctx.modelElem)) descendant FRServiceCallTest filter (_.attValue("service") == serviceName)
 
     val legacyServiceCalls =
-      findLegacyActions descendant XFSendTest filter (_.attValue("submission") == s"$serviceName-submission")
+      findLegacyActions(Some(ctx.modelElem)) descendant XFSendTest filter (_.attValue("submission") == s"$serviceName-submission")
 
     legacyServiceCalls.size + newServiceCalls.size
   }

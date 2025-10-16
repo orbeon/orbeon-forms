@@ -713,19 +713,48 @@ trait ControlOps extends ResourcesOps {
     XFormsId(staticId, containerIds.toList, 1 to repeatDepth map (_ => 1) toList).toEffectiveId
   }
 
-  def findNewActions(implicit ctx: FormBuilderDocContext): NodeColl =
-    ctx.modelElem child FRActionTest
+  def findNewActions(modelElemOpt: Option[NodeInfo]): NodeColl =
+    modelElemOpt.toList child FRActionTest
 
-  def findLegacyActions(implicit ctx: FormBuilderDocContext): NodeColl =
-    ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
+  def findLegacyActions(modelElemOpt: Option[NodeInfo]): NodeColl =
+    modelElemOpt.toList child FBActionTest filter (_.id.endsWith("-binding"))
 
-  // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCallsFromString()`. Unfortunately there is
-  // duplication of logic here.
+  // Trait to restrict the context we need for renaming
+  trait RenameContext {
+    def modelElemOpt        : Option[NodeInfo] // for actions and services
+    def containerBindElemOpt: Option[NodeInfo]
+    def metadataRootElemOpt : Option[NodeInfo] // for template parameters
+    def viewContainerElem   : NodeInfo
+  }
+
   def renameControlReferences(
     oldName        : String,
     newName        : String,
-    oldControlIdOpt: Option[String] = None)(implicit // for renaming legacy actions
+    oldControlIdOpt: Option[String] = None // for renaming legacy actions
+  )(implicit
     ctx            : FormBuilderDocContext
+  ): Int =
+    renameControlReferencesWithRenameCtx(
+      oldName         = oldName,
+      newName         = newName,
+      oldControlIdOpt = oldControlIdOpt
+    )(
+      new RenameContext {
+        def modelElemOpt        : Option[NodeInfo] = Some(ctx.modelElem)
+        def containerBindElemOpt: Option[NodeInfo] = ctx.topLevelBindElem
+        def metadataRootElemOpt : Option[NodeInfo] = ctx.metadataRootElemOpt
+        def viewContainerElem   : NodeInfo         = ctx.bodyElem
+      }
+    )
+
+  // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCallsFromString()`. Unfortunately there is
+  // duplication of logic here.
+  def renameControlReferencesWithRenameCtx(
+    oldName        : String,
+    newName        : String,
+    oldControlIdOpt: Option[String] = None // for renaming legacy actions
+  )(implicit
+    ctx            : RenameContext
   ): Int = {
 
     val functionLibrary = inScopeContainingDocument.partAnalysis.functionLibrary
@@ -750,7 +779,7 @@ trait ControlOps extends ResourcesOps {
 
     // Replace formulas in binds
     locally {
-      val bindElems = ctx.topLevelBindElem.toList descendantOrSelf *
+      val bindElems = ctx.containerBindElemOpt.toList descendantOrSelf *
 
       bindElems att XMLNames.FormulaTest foreach (renameNodeContent(_, avt = false))
 
@@ -762,7 +791,7 @@ trait ControlOps extends ResourcesOps {
 
       // Below we use local name tests because within metadata, email templates now use non-namespaced elements for
       // template parameters, while in other places we used namespaced elements.
-      val params = List(ctx.bodyElem, ctx.metadataRootElem) descendant "param"
+      val params = (ctx.viewContainerElem :: ctx.metadataRootElemOpt.toList) descendant "param"
 
       params child "controlName"   filter
         (_.stringValue == oldName) foreach
@@ -772,7 +801,7 @@ trait ControlOps extends ResourcesOps {
         (renameNodeContent(_, avt = false))
     }
 
-    val emailTemplates = ctx.metadataRootElem / "email" / "templates" / "template"
+    val emailTemplates = ctx.metadataRootElemOpt.toList / "email" / "templates" / "template"
 
     // Update email headers
     // https://github.com/orbeon/orbeon-forms/issues/6741
@@ -792,7 +821,7 @@ trait ControlOps extends ResourcesOps {
     // Update new actions
     locally {
 
-      val newActions = findNewActions
+      val newActions = findNewActions(ctx.modelElemOpt)
 
       // `fr:action//(@control | @repeat)`
       newActions descendant * att
@@ -801,7 +830,7 @@ trait ControlOps extends ResourcesOps {
         updateNode(newName)
 
       // `fr:listener/@controls`
-      ctx.modelElem child FRListenerTest att ControlsTest foreach { att =>
+      ctx.modelElemOpt.toList child FRListenerTest att ControlsTest foreach { att =>
 
         val newTokens = att.stringValue.splitTo[List]() map {
           case `oldName` => newName
@@ -819,7 +848,7 @@ trait ControlOps extends ResourcesOps {
 
     // Update legacy actions
     locally {
-      val legacyActions = findLegacyActions
+      val legacyActions = findLegacyActions(ctx.modelElemOpt)
 
       oldControlIdOpt foreach { oldControlId =>
 
@@ -865,10 +894,10 @@ trait ControlOps extends ResourcesOps {
       }
 
     // In model (submissions)
-    renameInNode(ctx.modelElem, ModelRenameMappings)
+    ctx.modelElemOpt.foreach(renameInNode(_, ModelRenameMappings))
 
     // In body (controls)
-    renameInNode(ctx.bodyElem, BodyRenameMappings)
+    renameInNode(ctx.viewContainerElem, BodyRenameMappings)
 
     countOfUpdatedValues
   }

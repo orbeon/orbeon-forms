@@ -30,7 +30,7 @@ trait ActionsOps {
     existingSubmissions.foreach(e => XFormsAPI.setvalue(e.idAtt, newSubmissionId))
     existingInstances  .foreach(e => XFormsAPI.setvalue(e.idAtt, newInstanceId))
 
-    val legacyActions = FormBuilder.findLegacyActions
+    val legacyActions = FormBuilder.findLegacyActions(Some(ctx.modelElem))
 
     // Rename legacy service calls
     legacyActions                             descendant
@@ -47,7 +47,7 @@ trait ActionsOps {
       (valueAtt => XFormsAPI.setvalue(List(valueAtt), s"'$newInstanceId'"))
 
     // Rename action syntax service calls
-    findNewActions descendant
+    findNewActions(Some(ctx.modelElem)) descendant
       FRServiceCallTest          att
       "service"                  filter
       (_.stringValue == oldName) foreach

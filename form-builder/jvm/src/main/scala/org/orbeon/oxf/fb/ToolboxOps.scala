@@ -1000,8 +1000,25 @@ object ToolboxOps {
             renameBindElement(bindElem, if (isDefaultIterationName) newName + DefaultIterationSuffix else newName)
           }
         }
-      }
-    }
+
+        implicit val renameCtx: RenameContext = new RenameContext {
+          def modelElemOpt        : Option[NodeInfo] = None                                               // for now, no actions/email templates handled
+          def containerBindElemOpt: Option[NodeInfo] = (xcvElem / XcvEntry.Bind.entryName / *).headOption // only one child element can be present
+          def metadataRootElemOpt : Option[NodeInfo] = None                                               // for now, no actions/email templates handled
+          def viewContainerElem   : NodeInfo         = (xcvElem / XcvEntry.Control.entryName).head        // only one child element must be present
+        }
+
+        // Rename control references
+        // https://github.com/orbeon/orbeon-forms/issues/6937
+        oldToNewNames.foreach { case (oldName, newName) =>
+          renameControlReferencesWithRenameCtx(
+            oldName         = oldName,
+            newName         = newName,
+            oldControlIdOpt = None
+          )
+        }
+      } // end `if (oldToNewNames.nonEmpty)`
+    } // end `locally`
 
     // Rename validation ids if needed
     // NOTE: These are not names so do not really need to be stable.

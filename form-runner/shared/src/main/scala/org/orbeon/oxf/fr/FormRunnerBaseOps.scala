@@ -226,7 +226,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     ctx.bodyElemOpt.flatMap(findTryIndex(staticId, _, includeSelf = false))
 
   def findInBindsTryIndex(id: String)(implicit ctx: FormRunnerDocContext): Option[NodeInfo] =
-    findTryIndex(id, ctx.topLevelBindElem.get, includeSelf = true)
+    findTryIndex(id, ctx.topLevelBindElemOpt.get, includeSelf = true)
 
   // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
   // only called from the functions above, which search in a form's view, model, or binds, which implies the

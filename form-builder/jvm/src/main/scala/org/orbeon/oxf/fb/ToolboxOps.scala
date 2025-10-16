@@ -453,7 +453,8 @@ object ToolboxOps {
   }
 
   def controlOrContainerElemToXcv(
-    controlOrContainerElem : NodeInfo)(implicit
+    controlOrContainerElem : NodeInfo
+  )(implicit
     ctx                    : FormBuilderDocContext
   ): Option[NodeInfo] = { // returns an `<xcv>` root element
 
@@ -565,7 +566,8 @@ object ToolboxOps {
   def dndControl(
     sourceCellElem  : NodeInfo,
     targetCellElem  : NodeInfo,
-    copy            : Boolean)(implicit
+    copy            : Boolean
+  )(implicit
     ctx             : FormBuilderDocContext,
     formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {
@@ -595,7 +597,8 @@ object ToolboxOps {
   def namesToRenameForMergingSectionTemplate(
     containerId : String,
     prefix      : String,
-    suffix      : String)(implicit
+    suffix      : String
+  )(implicit
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
     for {
@@ -607,7 +610,8 @@ object ToolboxOps {
 
   def namesToRenameForClipboard(
     prefix      : String,
-    suffix      : String)(implicit
+    suffix      : String
+  )(implicit
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
     readXcvFromClipboardAndClone map
@@ -617,7 +621,8 @@ object ToolboxOps {
     xcvElem : NodeInfo,
     prefix  : String,
     suffix  : String,
-    ignore  : Set[String])(implicit
+    ignore  : Set[String]
+  )(implicit
     ctx     : FormBuilderDocContext
   ): Seq[(String, String, Boolean)] = {
 
@@ -827,7 +832,8 @@ object ToolboxOps {
   def containerMerge(
     containerId     : String,
     prefix          : String,
-    suffix          : String)(implicit
+    suffix          : String
+  )(implicit
     ctx             : FormBuilderDocContext,
     formRunnerParams: FormRunnerParams
   ): Option[UndoAction] =
@@ -1148,7 +1154,8 @@ object ToolboxOps {
   def pasteSingleControlFromXcv(
     xcvElem         : NodeInfo,
     insertPosition  : Option[ControlPosition],
-    copyAttachments : Boolean)(implicit
+    copyAttachments : Boolean
+  )(implicit
     ctx             : FormBuilderDocContext,
     formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {

@@ -618,7 +618,7 @@ class FormBuilderFunctionsTest
         it("must rename references from variables") {
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedBinds,
-            right = ctx.topLevelBindElem.toList child XFBindTest filter (_.id == "formulas-bind") head
+            right = ctx.topLevelBindElemOpt.toList child XFBindTest filter (_.id == "formulas-bind") head
           )
         }
 

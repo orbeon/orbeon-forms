@@ -585,7 +585,7 @@ class AlertsAndConstraintsTest
           writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
           val xfTypeElem =
-            ctx.topLevelBindElem.get.descendant(XF -> "type").head
+            ctx.topLevelBindElemOpt.get.descendant(XF -> "type").head
 
           assert(xfTypeElem.id == "validation-2-validation")
           assert(xfTypeElem.stringValue.isEmpty)

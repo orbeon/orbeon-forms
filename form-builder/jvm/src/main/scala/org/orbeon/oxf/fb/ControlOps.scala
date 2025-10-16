@@ -121,7 +121,7 @@ trait ControlOps extends ResourcesOps {
   def ensureBinds(names: Seq[String])(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
     // Insert bind container if needed
-    val topLevelBind = ctx.topLevelBindElem match {
+    val topLevelBind = ctx.topLevelBindElemOpt match {
       case Some(bind) =>
         bind
       case None =>
@@ -741,7 +741,7 @@ trait ControlOps extends ResourcesOps {
     )(
       new RenameContext {
         def modelElemOpt        : Option[NodeInfo] = Some(ctx.modelElem)
-        def containerBindElemOpt: Option[NodeInfo] = ctx.topLevelBindElem
+        def containerBindElemOpt: Option[NodeInfo] = ctx.topLevelBindElemOpt
         def metadataRootElemOpt : Option[NodeInfo] = ctx.metadataRootElemOpt
         def viewContainerElem   : NodeInfo         = ctx.bodyElem
       }

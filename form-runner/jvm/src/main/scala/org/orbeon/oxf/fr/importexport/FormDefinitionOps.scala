@@ -15,7 +15,7 @@ class FormDefinitionOps(form: om.NodeInfo) extends FormOps {
   private val ctx = new InDocFormRunnerDocContext(form.rootElement)
 
   def findFormBindsRoot: Option[BindType] =
-    ctx.topLevelBindElem
+    ctx.topLevelBindElemOpt
 
   def templateIterationNamesToRootElems: Map[String, om.NodeInfo] =
     (

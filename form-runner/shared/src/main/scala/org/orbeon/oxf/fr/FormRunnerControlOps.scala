@@ -411,7 +411,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
           None
 
       newURI map { uri =>
-        insert(into = ctx.topLevelBindElem.toList, origin = namespaceInfo(prefix, uri))
+        insert(into = ctx.topLevelBindElemOpt.toList, origin = namespaceInfo(prefix, uri))
         prefix -> uri
       }
     }

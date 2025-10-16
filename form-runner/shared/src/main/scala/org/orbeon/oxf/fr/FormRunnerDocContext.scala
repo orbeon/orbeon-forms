@@ -26,7 +26,7 @@ trait FormRunnerDocContext {
   lazy val dataInstanceElem        : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get
   lazy val metadataInstanceElemOpt : Option[om.NodeInfo] = frc.instanceElemFromModelElem(modelElem, Names.MetadataInstance)
   lazy val resourcesInstanceElem   : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormResources).get
-  lazy val topLevelBindElem        : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
+  lazy val topLevelBindElemOpt     : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
   lazy val bodyElemOpt             : Option[om.NodeInfo] = frc.findFormRunnerBodyElem(formDefinitionRootElem)
 
   lazy val dataRootElem            : om.NodeInfo         = dataInstanceElem      / * head
@@ -38,7 +38,7 @@ trait FormRunnerDocContext {
   def bodyElem                     : om.NodeInfo         = bodyElemOpt.get
 }
 
-
 class InDocFormRunnerDocContext(inDoc: om.NodeInfo) extends FormRunnerDocContext {
   val formDefinitionRootElem: om.NodeInfo = inDoc.rootElement
 }
+

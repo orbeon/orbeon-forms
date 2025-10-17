@@ -590,7 +590,7 @@
                                             <xf:var name="can-clear">
                                                 <!-- Evaluate the constraint in the context of the iteration -->
                                                 <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
-                                                <xxf:value value="{$clear-constraint}" xxbl:scope="outer"/>
+                                                <xxf:value value="{$clear-constraint} and not(xxf:readonly())" xxbl:scope="outer"/>
                                             </xf:var>
 
                                             <xf:var

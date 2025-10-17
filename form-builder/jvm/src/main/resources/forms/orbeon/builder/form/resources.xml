@@ -972,7 +972,7 @@
             <freeze>
                 <label>Freeze Repetitions</label>
                 <alert>Incorrect value</alert>
-                <hint>Non-negative number or XPath expression</hint>
+                <hint>Non-negative number up to the minimum number of repetitions (see above), or an XPath expression</hint>
             </freeze>
             <no-freeze>No freeze</no-freeze>
             <appearance-minimal>
@@ -2587,7 +2587,7 @@
             <freeze>
                 <label>Geler les répétitions</label>
                 <alert>Incorrect value</alert>
-                <hint>Non-negative number or XPath expression</hint>
+                <hint>Nombre non négatif jusqu'au nombre minimum de répétitions (voir ci-dessus), ou expression XPath</hint>
             </freeze>
             <no-freeze>Ne pas geler</no-freeze>
             <appearance-minimal>
@@ -4184,7 +4184,7 @@
             <freeze>
                 <label todo="true">[Freeze Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
             </freeze>
             <no-freeze todo="true">[No freeze]</no-freeze>
             <appearance-minimal>
@@ -5807,7 +5807,7 @@
             <freeze>
                 <label todo="true">[Freeze Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
             </freeze>
             <no-freeze todo="true">[No freeze]</no-freeze>
             <appearance-minimal>
@@ -7411,7 +7411,7 @@
             <freeze>
                 <label>Blocca ripetizioni</label>
                 <alert>Valore non corretto</alert>
-                <hint>Numero non negativo o espressione XPath</hint>
+                <hint>Numero non negativo fino al numero minimo di ripetizioni (vedi sopra), o espressione XPath</hint>
             </freeze>
             <no-freeze>Nessun blocco</no-freeze>
             <appearance-minimal>
@@ -8975,7 +8975,7 @@
             <freeze>
                 <label>Wiederholungen sperren</label>
                 <alert>Ungültiger Wert</alert>
-                <hint>Nicht negative Zahl oder XPath-Ausdruck</hint>
+                <hint>Nicht negative Zahl bis zur Mindestanzahl an Wiederholungen (siehe oben), oder XPath-Ausdruck</hint>
             </freeze>
             <no-freeze>Keine Sperre</no-freeze>
             <appearance-minimal>
@@ -10566,7 +10566,7 @@
             <freeze>
                 <label todo="true">[Freeze Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
             </freeze>
             <no-freeze todo="true">[No freeze]</no-freeze>
             <appearance-minimal>
@@ -12175,7 +12175,7 @@
             <freeze>
                 <label>Congelar repeticiones</label>
                 <alert>Valor incorrecto</alert>
-                <hint>Número no negativo o expresión XPath</hint>
+                <hint>Número no negativo hasta el número mínimo de repeticiones (véase arriba), o expresión XPath</hint>
             </freeze>
             <no-freeze>Sin congelar</no-freeze>
             <appearance-minimal>
@@ -13792,7 +13792,7 @@
             <freeze>
                 <label todo="true">[Freeze Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
             </freeze>
             <no-freeze todo="true">[No freeze]</no-freeze>
             <appearance-minimal>
@@ -15388,7 +15388,7 @@
             <freeze>
                 <label todo="true">[Freeze Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
             </freeze>
             <no-freeze todo="true">[No freeze]</no-freeze>
             <appearance-minimal>
@@ -17011,7 +17011,7 @@
             <freeze>
                 <label todo="true">[Freeze Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number or XPath expression]</hint>
+                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
             </freeze>
             <no-freeze todo="true">[No freeze]</no-freeze>
             <appearance-minimal>
@@ -18654,7 +18654,7 @@
             <freeze>
                 <label>تجميد التكرارات</label>
                 <alert>قيمة غير صحيحة</alert>
-                <hint>رقم غير سالب أو تعبير XPath</hint>
+                <hint>رقم غير سالب حتى العدد الأدنى من التكرارات (انظر أعلاه)، أو تعبير XPath</hint>
             </freeze>
             <no-freeze>بدون تجميد</no-freeze>
             <appearance-minimal>

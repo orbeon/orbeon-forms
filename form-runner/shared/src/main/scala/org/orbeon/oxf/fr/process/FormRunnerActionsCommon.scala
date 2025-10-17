@@ -251,7 +251,8 @@ trait FormRunnerActionsCommon {
                 "after-urls"    -> Some(putWithAttachmentsResult.savedAttachments.map(_.toPath)),
                 // The following is used to detect concurrent data modifications (see #7157)
                 "last-modified" -> Headers.firstItemIgnoreCase(putWithAttachmentsResult.headers, Headers.LastModified),
-                "etag"          -> Headers.firstItemIgnoreCase(putWithAttachmentsResult.headers, Headers.ETag)
+                "etag"          -> Headers.firstItemIgnoreCase(putWithAttachmentsResult.headers, Headers.ETag),
+                "draft"         -> isDraft.toString.some
               ))
 
               Success(())

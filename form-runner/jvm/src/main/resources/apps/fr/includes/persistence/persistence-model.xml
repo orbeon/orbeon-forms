@@ -1113,7 +1113,7 @@
         <metadata workflow-stage=""/>
     </xf:instance>
 
-    <xf:action event="fr-data-save-done" observer="fr-form-model">
+    <xf:action event="fr-data-save-done" observer="fr-form-model" if="not(event('draft') = 'true')">
         <!-- Update last modification date/time and ETag after save -->
         <xf:delete ref="instance('fr-document-metadata')/@*[name() = ('last-modified', 'etag')]"/>
         <xf:insert

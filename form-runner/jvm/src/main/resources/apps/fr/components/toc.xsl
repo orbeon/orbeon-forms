@@ -191,30 +191,24 @@
 
             <xh:li>
 
-                <xsl:attribute name="class">
-                    {
-                        'disabled'           [not($top-level-section-available)],
-                        'active'             [$section-active or $top-level-section-active],
-                        'started'            [$top-level-section-visited],
-                        $top-level-section-tokens
-                        <xsl:if test="$is-wizard">
-                            ,
-                            'first-page'         [$relevant-top-level-case-ids[1]      = '<xsl:value-of select="$static-section-id"/>-case'],
-                            'last-top-level-page'[$relevant-top-level-case-ids[last()] = '<xsl:value-of select="$static-section-id"/>-case'],
-                            'last-page'          [$relevant-nav-case-ids[last()]       = '<xsl:value-of select="$static-section-id"/>-case']
-                        </xsl:if>
-                    }
-                </xsl:attribute>
-                <xsl:attribute name="aria-current">
-                    {
-                        if ($section-active) then 'page' else 'false'
-                    }
-                </xsl:attribute>
-                <xsl:attribute name="aria-disabled">
-                    {
-                        if (not($top-level-section-available)) then 'true' else 'false'
-                    }
-                </xsl:attribute>
+                <xsl:attribute name="class">{
+                    'disabled'           [not($top-level-section-available)],
+                    'active'             [$section-active or $top-level-section-active],
+                    'started'            [$top-level-section-visited],
+                    $top-level-section-tokens
+                    <xsl:if test="$is-wizard">
+                        ,
+                        'first-page'         [$relevant-top-level-case-ids[1]      = '<xsl:value-of select="$static-section-id"/>-case'],
+                        'last-top-level-page'[$relevant-top-level-case-ids[last()] = '<xsl:value-of select="$static-section-id"/>-case'],
+                        'last-page'          [$relevant-nav-case-ids[last()]       = '<xsl:value-of select="$static-section-id"/>-case']
+                    </xsl:if>
+                }</xsl:attribute>
+                <xsl:attribute name="aria-current">{
+                    if ($section-active) then 'page' else 'false'
+                }</xsl:attribute>
+                <xsl:attribute name="aria-disabled">{
+                    if (not($top-level-section-available)) then 'true' else 'false'
+                }</xsl:attribute>
 
                 <xf:trigger appearance="minimal">
                     <xf:label>

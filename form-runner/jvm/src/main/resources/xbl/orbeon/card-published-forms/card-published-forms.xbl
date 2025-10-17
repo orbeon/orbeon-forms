@@ -11,7 +11,6 @@
         id="fr-card-published-forms"
         element="fr|card-published-forms"
         xxbl:mode="lhha custom-lhha binding"
-        class=""
     >
         <xbl:implementation>
             <xf:model>
@@ -33,7 +32,10 @@
                     id="fr-landing-read-demo-forms-submission"
                     method="get"
                     serialization="none"
-                    resource="/fr/service/persistence/form/{fr:component-param-value('app')}?all-versions=false&amp;ignore-admin-permissions=true"
+                    resource="/fr/service/persistence/form{
+                        for $app in fr:component-param-value('app')[xxf:non-blank()]
+                        return concat('/', $app)
+                    }?all-versions=false&amp;ignore-admin-permissions=true"
                     replace="none"
                     mode="asynchronous"
                     xxf:response-must-await="200ms"
@@ -103,7 +105,18 @@
                     <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
                     <!-- https://github.com/orbeon/orbeon-forms/issues/5255
                          https://github.com/orbeon/orbeon-forms/issues/5274 -->
-                    <xf:value ref="concat('/fr/forms?fr-search-app=exact:', fr:component-param-value('app'))"/>
+                    <xf:value
+                        ref="
+                            string-join(
+                                (
+                                    '/fr/forms',
+                                    if (xxf:non-blank(fr:component-param-value('app'))) then
+                                        ('?fr-search-app=exact:', fr:component-param-value('app'))
+                                    else
+                                        ()
+                                ),
+                                ''
+                            )"/>
                 </xf:itemset>
                 <fr:card-body>
                     <xh:p class="card-text lead"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>

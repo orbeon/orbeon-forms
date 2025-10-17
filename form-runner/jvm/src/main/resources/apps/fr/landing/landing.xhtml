@@ -30,10 +30,9 @@
                 name="page-size"
                 value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
 
-            <!-- published-forms form-builder-forms demo-forms quick-links -->
             <xf:var
-                name="cards-tokens"
-                value="xxf:split(xxf:property('oxf.fr.landing.cards'))"/>
+                name="cards-config-xml"
+                value="frf:landingCardsXml()/*"/>
 
             <xf:var
                 name="link-to-tokens"
@@ -80,43 +79,6 @@
                 <_ state="initial"/>
             </xf:instance>
 
-            <xf:submission
-                id="fr-landing-read-form-metadata-submission"
-                method="get"
-                serialization="none"
-                resource="/fr/service/persistence/form?all-versions=false&amp;ignore-admin-permissions=true"
-                replace="none"
-                mode="asynchronous"
-                xxf:response-must-await="200ms"
-            >
-
-                <xf:setvalue
-                    event="xforms-submit"
-                    ref="instance('fr-landing-form-metadata-instance')/@state"
-                    value="'loading'"/>
-
-                <xf:setvalue
-                    event="xforms-submit-error"
-                    ref="instance('fr-landing-form-metadata-instance')/@state"
-                    value="'error'"/>
-
-                <xf:action event="xforms-submit-done">
-                    <xf:insert
-                        ref="instance('fr-landing-form-metadata-instance')"
-                        origin="
-                            xf:element(
-                                'forms',
-                                xxf:sort(
-                                    event('response-body')/*/form,
-                                    xs:dateTime(last-modified-time),
-                                    'text',
-                                    'descending'
-                                )
-                            )"/>
-                </xf:action>
-
-            </xf:submission>
-
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
             <!-- TODO: Could we now get rid of the `<query>` elements since eXist support is no longer needed? -->
             <xf:instance id="fr-search-instance">
@@ -140,45 +102,6 @@
                 </search>
             </xf:instance>
 
-            <xf:submission
-                id="fr-landing-read-form-builder-submission"
-                ref="instance('fr-search-instance')"
-                validate="false"
-                method="post"
-                resource="/fr/service/persistence/search/orbeon/builder"
-                replace="instance"
-                targetref="instance('fr-landing-form-builder-instance')"
-                mode="asynchronous"
-                xxf:response-must-await="200ms"
-            >
-
-                <xf:header>
-                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
-                    <xf:value value="1"/>
-                </xf:header>
-
-                <xf:setvalue
-                    event="xforms-submit-error"
-                    ref="instance('fr-landing-form-metadata-instance')/@state"
-                    value="'error'"/>
-
-                <!-- Set language upon submitting -->
-                <xf:action event="xforms-submit">
-                    <xf:setvalue ref="page-size" value="$page-size + 1"/>
-                    <xf:setvalue ref="lang" value="'en'"/>
-                    <!-- NOTE: xxf:lang() doesn't seem to work here -->
-<!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
-                    <xf:setvalue
-                        ref="instance('fr-landing-form-builder-instance')/@state"
-                        value="'loading'"/>
-                </xf:action>
-            </xf:submission>
-
-            <xf:action event="xforms-model-construct-done">
-                <xf:send if="$cards-tokens = 'published-forms'"                               submission="fr-landing-read-form-metadata-submission"/>
-                <xf:send if="$is-allow-form-builder and $cards-tokens = 'form-builder-forms'" submission="fr-landing-read-form-builder-submission"/>
-            </xf:action>
-
         </xf:model>
     </xh:head>
     <xh:body>
@@ -187,7 +110,7 @@
             <fr:config-check/>
             <xh:div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 gx-2 gy-2">
 
-                <xh:div class="p-2 {'xforms-hidden'[not($cards-tokens = 'quick-links')]}">
+                <xh:div class="p-2 {'xforms-hidden'[not($cards-config-xml/_/card-type = 'quick-links')]}">
                     <xh:div class="card h-100 fr-landing-quick-links-card">
                         <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:r('landing.titles.quick-links', '|fr-fr-resources|')"/></xh:h5>
                         <xh:div>
@@ -219,150 +142,34 @@
                     </xh:div>
                 </xh:div>
 
-                <fr:card-published-forms ref=".[$cards-tokens = 'demo-forms']" app="orbeon" thumbnail="/apps/fr/style/images/orbeon/sports-car.svg">
-                    <xf:label ref="xxf:r('landing.titles.demo-forms', '|fr-fr-resources|')"/>
-                    <xf:help ref="xxf:r('landing.descriptions.demo-forms', '|fr-fr-resources|')"/>
-                </fr:card-published-forms>
-
-                <fr:card-published-forms ref=".[$cards-tokens = 'demo-forms']" app="orbeon-features" thumbnail="/apps/fr/style/images/orbeon/checkboxes.svg">
-                    <xf:label ref="xxf:r('landing.titles.demo-features', '|fr-fr-resources|')"/>
-                    <xf:help ref="xxf:r('landing.descriptions.demo-features', '|fr-fr-resources|')"/>
-                </fr:card-published-forms>
-
-                <fr:card
-                    class="{'xforms-hidden'[not($cards-tokens = 'published-forms')]}"
-                    status="{(instance('fr-landing-form-metadata-instance')/@state, 'done')[1]}"
-                >
-                    <xf:label ref="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/>
-                    <xf:itemset ref="instance('fr-landing-form-metadata-instance')/*[position() le $page-size]">
-                        <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can
-                             be in HTML and shows unescaped markup in the list. Not ideal. -->
-<!--                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[normalize-space()][1], (description[@xml:lang = xxf:lang()], description)[normalize-space()][1]), ' - ')"/>-->
-                        <xf:label ref="(title[@xml:lang = xxf:lang()], title)[normalize-space()][1]"/>
-                        <xf:value ref="
-                            let $ops                  := xxf:split(@operations),
-                                $can-navigate-summary := $ops = ('*', 'update', 'read', 'delete'),
-                                $can-navigate-new     := $ops = ('*', 'create'),
-                                $link-to              := $link-to-tokens[
-                                    (. = 'summary' and $can-navigate-summary) or
-                                    (. = 'new'     and $can-navigate-new)
-                                ][1],
-                                $link-params          :=
-                                    if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
-                                        concat('?form-version=', form-version)
-                                    else
-                                        ''
-                            return
-                                if (exists($link-to)) then
-                                    concat(
-                                        '/fr/',
-                                        application-name,
-                                        '/',
-                                        form-name,
-                                        '/',
-                                        $link-to,
-                                        $link-params
-                                    )
+                <xf:repeat ref="$cards-config-xml/_[card-type = 'published-forms']">
+                    <fr:card-published-forms
+                        id="published-form-card"
+                        ref="."
+                        app="{app}"
+                        thumbnail="{thumbnail}">
+                        <xf:label
+                            ref="
+                                if (title/@type = 'object') then
+                                    title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
                                 else
-                                    ()"/>
-                        <!-- This doesn't work because we remove the form description from the metadata -->
-<!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->
-                    </xf:itemset>
-                    <xf:itemset ref=".[count(instance('fr-landing-form-metadata-instance')/*) gt $page-size]">
-                        <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
-                        <xf:value ref="'/fr/forms'"/>
-                    </xf:itemset>
-                    <fr:card-body>
-                        <xh:p class="card-text lead"><xf:output ref="xxf:r('landing.descriptions.published-forms', '|fr-fr-resources|')"/></xh:p>
-                    </fr:card-body>
-                    <fr:card-thumbnail>
-                        <xh:img src="/apps/fr/style/images/orbeon/book.svg" class="img-thumbnail"/>
-                    </fr:card-thumbnail>
-                    <fr:card-footer>
-                        <xh:span>
-                            <xf:output value="
-                                (: TODO: Make this a reusable function :)
-                                let $date-time := max(instance('fr-landing-form-metadata-instance')/*/last-modified-time/xs:dateTime(.)),
-                                    $v :=
-                                        if (exists($tz)) then
-                                            adjust-dateTime-to-timezone(
-                                                $date-time,
-                                                $tz
-                                            )
-                                        else
-                                            adjust-dateTime-to-timezone(
-                                                $date-time
-                                            )
-                                return
-                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                    then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
-                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                    then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
-                                    else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
-                                <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
-                            </xf:output>
-                        </xh:span>
-                    </fr:card-footer>
-                </fr:card>
-                <fr:card
-                    class="{'xforms-hidden'[not($is-allow-form-builder) or not($cards-tokens = 'form-builder-forms')]}"
-                    status="{(instance('fr-landing-form-builder-instance')/@state, 'done')[1]}"
-                >
-                    <xf:label ref="xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|')"/>
-                    <xf:itemset ref="instance('fr-landing-form-builder-instance')/*[position() le $page-size]">
-                        <xf:label ref="details/detail[3]"/>
-                        <xf:value ref="
-                            concat(
-                                '/fr/orbeon/builder/edit/',
-                                @name
-                            )"/>
-                        <!-- This works but makes the card much taller -->
-                        <xf:hint ref="details/detail[4]"/>
-                    </xf:itemset>
-                    <xf:itemset ref=".[count(instance('fr-landing-form-builder-instance')/*) gt $page-size]">
-                        <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
-                        <xf:value ref="'/fr/orbeon/builder/summary'"/>
-                    </xf:itemset>
-                    <fr:card-body>
-                        <xh:p class="card-text lead"><xf:output ref="xxf:r('landing.descriptions.form-builder-forms', '|fr-fr-resources|')"/></xh:p>
-                    </fr:card-body>
-                    <fr:card-thumbnail>
-                        <xh:img src="/apps/fr/style/images/orbeon/library.svg" class="img-thumbnail"/>
-                    </fr:card-thumbnail>
-                    <fr:card-footer>
-                        <xh:span>
-                            <xf:output value="
-                                (: TODO: Make this a reusable function :)
-                                let $date-time := max(instance('fr-landing-form-builder-instance')/*/@last-modified/xs:dateTime(.)),
-                                    $v :=
-                                        if (exists($tz)) then
-                                            adjust-dateTime-to-timezone(
-                                                $date-time,
-                                                $tz
-                                            )
-                                        else
-                                            adjust-dateTime-to-timezone(
-                                                $date-time
-                                            )
-                                return
-                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                    then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
-                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                    then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
-                                    else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
-                                <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
-                            </xf:output>
-                        </xh:span>
-                    </fr:card-footer>
-                </fr:card>
+                                    xxf:r(title, '|fr-fr-resources|')"/>
+                        <xf:help
+                            ref="
+                                if (description/@type = 'object') then
+                                    description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else
+                                    xxf:r(description, '|fr-fr-resources|')"/>
+                    </fr:card-published-forms>
+                </xf:repeat>
 
-                <xf:repeat ref="$cards-tokens[matches(., '^[A-Za-z0-9\-_]+/[A-Za-z0-9\-_]+/[\d]+$')]">
-                    <xf:var name="tokens" value="xxf:split(., '/')"/>|
+                <xf:repeat ref="$cards-config-xml/_[card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))]">
                     <fr:card-form-data
-                        id="form-card"
-                        app="{$tokens[1]}"
-                        form="{$tokens[2]}"
-                        version="{$tokens[3]}"
+                        id="form-data-card"
+                        app="{app}"
+                        form="{form}"
+                        version="{version}"
+                        thumbnail="{thumbnail}"
                     />
                 </xf:repeat>
             </xh:div>

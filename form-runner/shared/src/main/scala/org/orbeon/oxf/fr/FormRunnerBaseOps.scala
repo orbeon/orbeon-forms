@@ -24,8 +24,10 @@ import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.definitions.{FormRunnerDetailMode, ModeType}
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
+import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils, HtmlParsing, IndentedLogger}
 import org.orbeon.oxf.xforms.Loggers
@@ -399,6 +401,35 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
           CustomModesJSON.parseString(p.stringValue, p.namespaceMapping).get
         }
       case _ => Nil
+    }
+
+  //@XPathFunction
+  def landingCardsXml(): Option[DocumentNodeInfoType] = {
+    implicit val p: FormRunnerParams = FormRunnerParams()
+    landingCards.map(_._2)
+  }
+
+  // Find the configured landing page cards if any, throw if error in configuration
+  def landingCards(implicit p: FormRunnerParams): Option[(Seq[LandingCard], DocumentNodeInfoType)] =
+    formRunnerRawProperty("oxf.fr.landing.cards") match {
+      case Some(p) if p.stringValue.nonAllBlank =>
+        p.associatedValue { _ =>
+          p.stringValue.trimAllToOpt match {
+            case None =>
+              // TODO: disable landing page
+              None
+            case Some(v) if v.startsWith("[") =>
+              // JSON array
+              LandingCardsJSON.parseString(v)
+                .get
+                .map { case (cards, json) => (cards, Converter.jsonToXmlDoc(json)) }
+            case Some(v) =>
+              // Legacy tokens
+              val cards = LandingCardsJSON.legacyTokensToCaseClasses(v)
+              Some(cards, Converter.jsonToXmlDoc(LandingCardsJSON.serializeToJson(cards)))
+          }
+        }
+      case _ => None
     }
 
   // XSLT only

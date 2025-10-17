@@ -63,15 +63,14 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
 
   def makeNCName(name: String): String                          = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
 
-  // Convert a JSON String to a readonly DocumentInfo
+  // Convert a JSON String to a readonly `DocumentInfo`
   def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): StaticXPath.DocumentNodeInfoType = {
     val (receiver, result) = StaticXPath.newTinyTreeReceiver
     jsonStringToXmlStream(source, receiver, rootElementName)
     result()
   }
 
-  // Convert a JSON String to a readonly DocumentInfo
-  // For tests only
+  // Convert a JSON String to a readonly `DocumentInfo`
   def jsonToXmlDoc(ast: Json): StaticXPath.DocumentNodeInfoType = {
     val (receiver, result) = StaticXPath.newTinyTreeReceiver
     jsonToXmlStream(ast, receiver)

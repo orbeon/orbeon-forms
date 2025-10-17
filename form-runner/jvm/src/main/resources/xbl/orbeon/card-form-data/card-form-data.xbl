@@ -93,6 +93,7 @@
 
                     xxf:readonly="true"
                     xxf:cache="false"
+                    xxf:xinclude="true"
 
                     mode="asynchronous"
                     xxf:response-must-await="200ms"
@@ -249,21 +250,22 @@
             <fr:card
                 status="{(instance('fr-state-instance')/@state, 'done')[1]}"
             >
-                <xf:label value="instance('fr-form-metadata-instance')/title"/>
+                <xf:label value="instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[1]"/>
 <!--                <xh:span class="badge rounded-pill bg-primary">-->
 <!--                        <xf:output value="instance('fr-search-results-instance')/@search-total" appearance="minimal"/>-->
 <!--                    </xh:span>-->
                 <fr:card-body>
-                    <xf:output value="instance('fr-form-metadata-instance')/description"/>
-<!--                    <xf:output-->
-<!--                        class="img-thumbnail"-->
-<!--                        mediatype="image/*"-->
-<!--                        ref="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]"-->
-<!--                        value="."/>-->
+                    <xf:output value="instance('fr-form-metadata-instance')/(description[@xml:lang = xxf:lang()], description)[1]"/>
                 </fr:card-body>
                 <fr:card-thumbnail>
                     <!-- https://github.com/orbeon/orbeon-forms/issues/6696 -->
-                    <xf:output mediatype="image/*" value="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]" class="img-thumbnail"/>
+                    <xf:output
+                        mediatype="image/*"
+                        ref="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]"
+                        class="img-thumbnail"/>
+                    <xh:img
+                        src="{fr:component-param-value('thumbnail')}"
+                        class="img-thumbnail"/>
                 </fr:card-thumbnail>
 
                     <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">

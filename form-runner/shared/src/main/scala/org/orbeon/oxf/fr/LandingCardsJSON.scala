@@ -2,7 +2,6 @@ package org.orbeon.oxf.fr
 
 import io.circe.parser.parse
 import io.circe.{Json, JsonObject}
-import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.StringUtils.*
 
 import scala.util.{Success, Try}

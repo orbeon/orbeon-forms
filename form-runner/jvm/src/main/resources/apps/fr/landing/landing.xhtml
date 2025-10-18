@@ -102,6 +102,10 @@
                 </search>
             </xf:instance>
 
+            <xf:action event="xforms-model-construct-done" if="empty($cards-config-xml)" type="xpath">
+                frf:sendError(404)
+            </xf:action>
+
         </xf:model>
     </xh:head>
     <xh:body>

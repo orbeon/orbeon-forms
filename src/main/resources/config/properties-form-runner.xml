@@ -637,7 +637,46 @@
     <!-- Service processes -->
     <property as="xs:string"  name="oxf.fr.service.duplicate.transform.*.*"                        value=""/>
 
-    <property as="xs:string"  name="oxf.fr.landing.cards"                                          value="quick-links published-forms form-builder-forms demo-forms orbeon/bookshelf/1"/>
+    <property as="xs:string"  name="oxf.fr.landing.cards">
+      [
+        {
+          "card-type": "quick-links"
+        },
+        {
+          "card-type": "published-forms",
+          "title": "landing.titles.demo-forms",
+          "description": "landing.descriptions.demo-forms",
+          "thumbnail": "/apps/fr/style/images/orbeon/sports-car.svg",
+          "app": "orbeon"
+        },
+        {
+          "card-type": "published-forms",
+          "title": "landing.titles.demo-features",
+          "description": "landing.descriptions.demo-features",
+          "thumbnail": "/apps/fr/style/images/orbeon/checkboxes.svg",
+          "app": "orbeon-features"
+        },
+        {
+          "card-type": "published-forms",
+          "title": "landing.titles.published-forms",
+          "description": "landing.descriptions.published-forms",
+          "thumbnail": "/apps/fr/style/images/orbeon/book.svg"
+        },
+        {
+          "card-type": "form-data",
+          "app": "orbeon",
+          "form": "builder",
+          "version": 1
+        } ,
+        {
+          "card-type": "form-data",
+          "app": "orbeon",
+          "form": "bookshelf",
+          "version": 1
+        }
+      ]
+    </property>
+
     <property as="xs:integer" name="oxf.fr.landing.page-size"                                      value="8"/>
 
     <property as="xs:integer" name="oxf.fr.home.page-size"                                         value="20"/>

@@ -416,7 +416,6 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
         p.associatedValue { _ =>
           p.stringValue.trimAllToOpt match {
             case None =>
-              // TODO: disable landing page
               None
             case Some(v) if v.startsWith("[") =>
               // JSON array

@@ -136,23 +136,6 @@
                                             <xf:repeat xxbl:scope="outer" xxf:dnd="true">
                                                 <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                                 <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
-                                                <xf:action event="xxforms-index-changed" type="javascript" target="#observer">
-                                                    <xsl:choose>
-                                                        <xsl:when test="$simple-repeat">
-                                                            <!-- E.g. template tabs in Email Settings -->
-                                                            <xf:param
-                                                                name="newIndex"
-                                                                value="event('xxf:new-index') - 1"/>
-                                                            <xf:body>
-                                                                ORBEON.xforms.XBL.instanceForControl(this).selectTab(parseInt(newIndex));
-                                                            </xf:body>
-                                                        </xsl:when>
-                                                        <xsl:otherwise>
-                                                            <!-- E.g. tabs in Control Settings, with static tabs followed by a repeat -->
-                                                            ORBEON.xforms.XBL.instanceForControl(this).maybeAdjustCurrentTab();
-                                                        </xsl:otherwise>
-                                                    </xsl:choose>
-                                                </xf:action>
                                                 <!-- NOTE: Probably wrong if there are non-repeated tabs before! -->
                                                 <xf:group xxbl:scope="inner" appearance="xxf:internal">
                                                     <xsl:copy-of select="$content"/>
@@ -191,9 +174,10 @@
                             </xf:action>
 
                             <xsl:for-each select="fr:tab">
-                                <xsl:variable name="tab"    select="."/>
-                                <xsl:variable name="pos"    select="position()"/>
-                                <xsl:variable name="repeat" select="exists($tab/(@bind | @ref))"/>
+                                <xsl:variable name="tab"           select="."/>
+                                <xsl:variable name="pos"           select="position()"/>
+                                <xsl:variable name="repeat"        select="exists($tab/(@bind | @ref))"/>
+                                <xsl:variable name="simple-repeat" select="$repeat and empty((preceding-sibling::fr:tab, following-sibling::fr:tab))"/>
 
                                 <xsl:variable name="content">
                                     <xf:group
@@ -223,6 +207,23 @@
                                     <xsl:when test="$repeat">
                                         <xf:repeat xxbl:scope="outer">
                                             <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
+                                                <xf:action event="xxforms-index-changed" type="javascript" target="#observer">
+                                                    <xsl:choose>
+                                                        <xsl:when test="$simple-repeat">
+                                                            <!-- E.g. template tabs in Email Settings -->
+                                                            <xf:param
+                                                                name="newIndex"
+                                                                value="event('xxf:new-index') - 1"/>
+                                                            <xf:body>
+                                                                ORBEON.xforms.XBL.instanceForControl(this).selectTab(parseInt(newIndex));
+                                                            </xf:body>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <!-- E.g. tabs in Control Settings, with static tabs followed by a repeat -->
+                                                            ORBEON.xforms.XBL.instanceForControl(this).maybeAdjustCurrentTab();
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </xf:action>
                                             <xsl:copy-of select="$content"/>
                                         </xf:repeat>
                                     </xsl:when>

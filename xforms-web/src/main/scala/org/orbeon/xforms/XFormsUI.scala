@@ -322,9 +322,10 @@ object XFormsUI {
     val dialogKeydownListener: js.Function1[dom.KeyboardEvent, Unit] = (event: dom.KeyboardEvent) => {
       event.targetT.closestOpt("dialog").foreach { dialogElem =>
 
-        // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
-        val supportsClose = dialogElem.classList.contains("xforms-dialog-close-true")
-        if (event.key == "Escape" && ! supportsClose) {
+        // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"` or if a help popover is open
+        val supportsClose      = dialogElem.classList.contains("xforms-dialog-close-true")
+        val hasHelpPopoverOpen = dialogElem.querySelectorOpt(".xforms-help-popover").isDefined
+        if (event.key == "Escape" && (! supportsClose || hasHelpPopoverOpen)) {
           event.preventDefault()
           event.stopPropagation()
         }

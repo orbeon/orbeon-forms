@@ -30,9 +30,6 @@
                 name="page-size"
                 value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
 
-            <xf:var
-                name="cards-config-xml"
-                value="frf:landingCardsXml()/*"/>
 
             <xf:var
                 name="link-to-tokens"
@@ -102,8 +99,20 @@
                 </search>
             </xf:instance>
 
-            <xf:action event="xforms-model-construct-done" if="empty($cards-config-xml)" type="xpath">
-                frf:sendError(404)
+            <xf:instance id="fr-cards-config-xml" xxf:exclude-result-prefixes="#all">
+                <_/>
+            </xf:instance>
+
+            <xf:action event="xforms-model-construct-done">
+                <xf:var
+                    name="cards-config-xml"
+                    value="frf:landingCardsXml()/*"/>
+                <xf:action if="empty($cards-config-xml)" type="xpath">
+                    frf:sendError(404)
+                </xf:action>
+                <xf:action if="exists($cards-config-xml)">
+                    <xf:insert ref="instance('fr-cards-config-xml')" origin="$cards-config-xml"/>
+                </xf:action>
             </xf:action>
 
         </xf:model>
@@ -114,7 +123,7 @@
             <fr:config-check/>
             <xh:div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 gx-2 gy-2">
 
-                <xh:div class="p-2 {'xforms-hidden'[not($cards-config-xml/_/card-type = 'quick-links')]}">
+                <xh:div class="p-2 {'xforms-hidden'[not(instance('fr-cards-config-xml')/_/card-type = 'quick-links')]}">
                     <xh:div class="card h-100 fr-landing-quick-links-card">
                         <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:r('landing.titles.quick-links', '|fr-fr-resources|')"/></xh:h5>
                         <xh:div>
@@ -146,7 +155,7 @@
                     </xh:div>
                 </xh:div>
 
-                <xf:repeat ref="$cards-config-xml/_[card-type = 'published-forms']">
+                <xf:repeat ref="instance('fr-cards-config-xml')/_[card-type = 'published-forms']">
                     <fr:card-published-forms
                         id="published-form-card"
                         ref="."
@@ -167,7 +176,7 @@
                     </fr:card-published-forms>
                 </xf:repeat>
 
-                <xf:repeat ref="$cards-config-xml/_[card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))]">
+                <xf:repeat ref="instance('fr-cards-config-xml')/_[card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))]">
                     <fr:card-form-data
                         id="form-data-card"
                         app="{app}"

@@ -119,9 +119,15 @@ class BinaryTextXMLReceiver(
       // Set Last-Modified, Content-Disposition and status code when available
       responsePathTypeOpt foreach { case (response, pathType) =>
 
+        val effectivePathType =
+          attributes.getValue("cache-headers-type").trimAllToOpt.map(PathType.fromString)
+            .getOrElse(pathType)
+
         // This will override caching settings which may have taken place before
-        attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
-          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity), pathType)) // TODO: determine path type based on parameter
+        // 2025-10-21: Call `setPageCaching()` even if we didn't read a `last-modified` attribute, to ensure proper
+        // cache headers are set.
+        val validity = attributes.getValue(Headers.LastModifiedLower).trimAllToOpt.map(DateUtils.parseRFC1123)
+        response.setPageCaching(validity, effectivePathType) // TODO: determine path type based on parameter
 
         attributes.getValue("filename").trimAllToOpt.foreach { fileName =>
           val isInline        = attributes.getValue("disposition-type").trimAllToOpt.contains("inline")

@@ -32,19 +32,19 @@ trait CachingResponseSupport {
   private def setDateHeader(name: String, value: Long) =
       setHeader(name, DateUtils.formatRfc1123DateTimeGmt(value))
 
-  def setPageCaching(lastModified: Long, pathType: PathType): Unit =
+  def setPageCaching(lastModifiedOpt: Option[Long], pathType: PathType): Unit =
     if (responseCachingDisabled) {
       setResponseHeaders(ServletExternalContext.nocacheCacheHeaders)
     } else {
       // Get current time and adjust lastModified
-      val now = System.currentTimeMillis
-      var _lastModified = lastModified
-      if (_lastModified <= 0)
-        _lastModified = now
-      // Set last-modified
-      setDateHeader(Headers.LastModified, _lastModified)
+      // 2025-10-21: We allow `None` to mean "now" or "unknown" explicitly, but also support non-positive values for
+      // backward compatibility.
+      val now          = System.currentTimeMillis
+      val lastModified = lastModifiedOpt.filter(_ > 0).getOrElse(now)
+      // Set `Last-Modified`
+      setDateHeader(Headers.LastModified, lastModified)
       // Make sure the client does not load from cache without revalidation
-      setDateHeader("Expires", now)
+      setDateHeader(Headers.Expires, now)
       val cacheHeaders = pathType match {
         case PathType.Service => ServletExternalContext.serviceCacheHeaders
         case PathType.Page    => ServletExternalContext.pageCacheHeaders

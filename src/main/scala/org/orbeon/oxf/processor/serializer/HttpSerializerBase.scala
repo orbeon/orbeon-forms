@@ -173,7 +173,7 @@ abstract class HttpSerializerBase protected
 
       // Set caching headers and force revalidation
       val pathTypeOpt = Option(pipelineContext.getAttribute(PageFlowControllerProcessor.PathTypeKey).asInstanceOf[PathType])
-      response.setPageCaching(lastModified, pathTypeOpt.getOrElse(PathType.Page))
+      response.setPageCaching(Some(lastModified), pathTypeOpt.getOrElse(PathType.Page))
 
       // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
       if (! URLRewriterUtils.isForwarded(externalContext.getRequest)) {

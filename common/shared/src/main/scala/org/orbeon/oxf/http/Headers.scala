@@ -43,6 +43,7 @@ object Headers {
   val ContentId                    = "Content-ID"
   val ContentLength                = "Content-Length"
   val LastModified                 = "Last-Modified"
+  val Expires                      = "Expires"
   val Authorization                = "Authorization"
   val Location                     = "Location"
   val OrbeonClient                 = "Orbeon-Client"

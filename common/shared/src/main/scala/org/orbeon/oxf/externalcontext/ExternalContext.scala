@@ -235,7 +235,7 @@ object ExternalContext {
 
     def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit
 
-    def setPageCaching(lastModified: Long, pathType: PathType): Unit
+    def setPageCaching(lastModifiedOpt: Option[Long], pathType: PathType): Unit
 
     /**
       * Set expiration headers for resources.

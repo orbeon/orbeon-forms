@@ -123,7 +123,8 @@
             <document
                 xsl:version="2.0"
                 disposition-type="inline"
-                filename="{p:get-request-parameter('fr-rendered-filename')}">
+                filename="{p:get-request-parameter('fr-rendered-filename')}"
+                cache-headers-type="page">
                 <xsl:copy-of select="/document/(@* | node())"/>
             </document>
         </p:input>

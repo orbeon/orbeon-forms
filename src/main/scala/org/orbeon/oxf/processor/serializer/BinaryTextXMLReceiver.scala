@@ -36,7 +36,7 @@ import scala.collection.mutable
  */
 class BinaryTextXMLReceiver(
   output                    : Either[(Response, PathType), OutputStream], // one of those is required
-  closeStream               : Boolean,                        // whether to close the stream upon endDocument()
+  closeStream               : Boolean,                                    // whether to close the stream upon endDocument()
   forceContentType          : Boolean,
   requestedContentType      : Option[String],
   ignoreDocumentContentType : Boolean,
@@ -116,7 +116,7 @@ class BinaryTextXMLReceiver(
         case _                     => throw new OXFException("Type xs:string or xs:base64Binary must be specified")
       }
 
-      // Set Last-Modified, Content-Disposition and status code when available
+      // Set `Last-Modified`, `Content-Disposition` and status code when available
       responsePathTypeOpt foreach { case (response, pathType) =>
 
         val effectivePathType =

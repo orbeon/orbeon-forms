@@ -28,7 +28,7 @@ import scala.jdk.CollectionConverters.*
 
 
 /*
- * Servlet-specific implementation of ExternalContext.
+ * Servlet-specific implementation of `ExternalContext`.
  */
 object ServletExternalContext {
 

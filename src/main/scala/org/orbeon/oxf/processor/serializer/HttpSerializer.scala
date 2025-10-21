@@ -41,24 +41,20 @@ class HttpSerializer extends HttpSerializerBase {
     response: ExternalContext.Response,
     input   : ProcessorInput,
     config  : HttpSerializerBase.Config
-  ): Unit = {
-    val pathType = context.getAttribute(PageFlowControllerProcessor.PathTypeKey).asInstanceOf[PathType]
+  ): Unit =
     ProcessorImpl.readInputAsSAX(
       context,
       input,
       new BinaryTextXMLReceiver(
-        response,
-        if (pathType != null) pathType else PathType.Page,
-        null,
-        true,
-        config.forceContentType,
-        config.contentTypeOrNull,
-        config.ignoreDocumentContentType,
-        config.forceEncoding,
-        config.encodingOrNull,
-        config.ignoreDocumentEncoding,
-        config.headersToForward
+        output                    = Left(response -> Option(context.getAttribute(PageFlowControllerProcessor.PathTypeKey).asInstanceOf[PathType]).getOrElse(PathType.Page)),
+        closeStream               = true,
+        forceContentType          = config.forceContentType,
+        requestedContentType      = Option(config.contentTypeOrNull),
+        ignoreDocumentContentType = config.ignoreDocumentContentType,
+        forceEncoding             = config.forceEncoding,
+        requestedEncoding         = Option(config.encodingOrNull),
+        ignoreDocumentEncoding    = config.ignoreDocumentEncoding,
+        headersToForward          = config.headersToForward
       )
     )
-  }
 }

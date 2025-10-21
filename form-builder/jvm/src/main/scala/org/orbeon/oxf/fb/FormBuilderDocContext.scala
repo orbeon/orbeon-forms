@@ -34,7 +34,7 @@ case class FormBuilderDocContext(
   lazy val undoInstance           = formBuilderModel flatMap (_.findInstance("fb-undo-instance"))
   lazy val userAgentInstance      = formBuilderModel flatMap (_.findInstance("fb-user-agent-instance"))
 
-  lazy val formDefinitionRootElem = explicitFormDefinitionInstance getOrElse formDefinitionInstance.get.rootElement
+  lazy val formDefinitionRootElem: NodeInfo = explicitFormDefinitionInstance getOrElse formDefinitionInstance.get.rootElement
 
   lazy val undoRootElem = undoInstance.get.rootElement
 

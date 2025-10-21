@@ -8,7 +8,6 @@ object IntelliJ {
 
   // Intended to be used in Data Views, so we can more easily view the value of `NodeInfo` while debugging,
   // with the following expression: `org.orbeon.oxf.xml.IntelliJ.tinyTreeToPrettyString(this)`
-  def tinyTreeToPrettyString(nodeInfo: NodeInfo): String = {
+  def tinyTreeToPrettyString(nodeInfo: NodeInfo): String =
     tinyTreeToOrbeonDom(nodeInfo).serializeToString(XMLWriter.PrettyFormat)
-  }
 }

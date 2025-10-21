@@ -21,12 +21,12 @@ object Trigger {
 
   private class TriggerCompanion(containerElem: html.Element) extends XBLCompanion {
 
-    private var registered: Option[String] = None
+    private var observerOpt: Option[dom.MutationObserver] = None
 
     private val isMinimal = containerElem.classList.contains("xforms-trigger-appearance-minimal")
 
-    private def buttonElem: Element =
-      containerElem.querySelectorT("button")
+    private def buttonOrAnchor: Element =
+      containerElem.querySelectorT("button, a")
 
     override def init(): Unit = {
 
@@ -35,26 +35,22 @@ object Trigger {
       def updateDisplay(shortcut: String, kbd: html.Element): Unit =
         if (isMinimal) {
           val suffix = s"($shortcut)"
-          if (! buttonElem.title.endsWith(suffix))
-            buttonElem.title = s"${buttonElem.title} $suffix"
+          if (! buttonOrAnchor.title.endsWith(suffix))
+            buttonOrAnchor.title = s"${buttonOrAnchor.title} $suffix"
         } else
           kbd.innerHTML = shortcut
 
-      containerElem.querySelectorOpt("kbd[data-orbeon-keyboard-shortcut]")
-        .foreach { kbd =>
-          registered = KeyboardShortcuts.bindShortcutFromKbd(
-            clickElem     = kbd.closestT("a, button"),
-            rawShortcut   = kbd.dataset("orbeonKeyboardShortcut"),
-            updateDisplay = updateDisplay(_, kbd),
-            condition     = kbd.dataset.get("orbeonKeyboardShortcutCondition")
-                              .contains("clipboard-empty").option(() => dom.window.getSelection().toString.isEmpty)
-          )
-        }
-      }
+      observerOpt = Some(
+        KeyboardShortcuts.bindShortcutFromKbd(
+          buttonOrAnchor = buttonOrAnchor,
+          updateDisplay  = updateDisplay
+        )
+      )
+    }
 
-      override def destroy(): Unit = {
-        logger.debug("destroy")
-        registered.foreach(KeyboardShortcuts.unbindShortcutFromKbd)
-      }
+    override def destroy(): Unit = {
+      logger.debug("destroy")
+      observerOpt.foreach(_.disconnect())
+    }
   }
 }

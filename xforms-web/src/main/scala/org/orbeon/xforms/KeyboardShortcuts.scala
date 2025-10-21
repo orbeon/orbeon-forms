@@ -64,7 +64,7 @@ object KeyboardShortcuts {
 
   private val ModifiersCharacters = ModifiersMap.keys.map(_.toString).toSet
 
-  // Syntax:
+  // Syntax for the keyboard shortcut in the `data-orbeon-keyboard-shortcut` attribute:
   // - The shortcut is a string with one or two tokens separated by a space.
   //   - No tokens means no shortcut.
   //   - Extra tokens are ignored.
@@ -74,58 +74,87 @@ object KeyboardShortcuts {
   //   - it is used for both Apple and other OSes.
   //   - A '⌘' is replaced by '⌃' on other OSes.
   def bindShortcutFromKbd(
-    clickElem    : html.Element,
-    rawShortcut  : String,
-    updateDisplay: String => Unit,
-    condition    : Option[js.Function0[Boolean]] = None
-  ): Option[String] =
-    rawShortcut.trimAllToOpt.flatMap { rawShortcut =>
+    buttonOrAnchor: html.Element,
+    updateDisplay : (String, html.Element) => Unit
+  ): dom.MutationObserver = {
 
-      def makeMousetrapCommand(token: String, convert: Char => Char): String =
-        if (ModifiersCharacters.exists(token.contains))
-          token.map(convert).map(c => ModifiersMap.getOrElse(c, c.toLower.toString)).mkString("+")
-        else
-          token.map(_.toLower.toString).mkString(" ")
+    var registeredMousetrapCommandOpt: Option[String] = None
 
-      def makeDisplayCommand(token: String, convert: Char => Char): String =
-        if (ModifiersCharacters.exists(token.contains))
-          token.map(convert).map(convertForDisplayIfNotApple).mkString
-        else
-          (KeyBoardIconCharacter +: token.map(_.toString)).mkString(" ")
+    def makeMousetrapCommand(token: String, convert: Char => Char): String =
+      if (ModifiersCharacters.exists(token.contains))
+        token.map(convert).map(c => ModifiersMap.getOrElse(c, c.toLower.toString)).mkString("+")
+      else
+        token.map(_.toLower.toString).mkString(" ")
 
-      def registerMouseTrapCommand(token: String, convert: Char => Char): Unit = {
-        updateDisplay(makeDisplayCommand(token, convert))
-        Mousetrap.bind(
-          makeMousetrapCommand(token, convert),
-          (e: dom.KeyboardEvent, _: String) => {
-            if (condition.forall(_.apply())) {
-              e.preventDefault()
-              dom.document.activeElementOpt.foreach { activeElem =>
-                if (activeElem == clickElem) {
-                  clickElem.click()
-                } else {
-                  // So if the focus is on a control and the user changed its value, the new value is sent to the server
-                  // This is as if users clicked on the button, but without losing the focus on the control
-                  activeElem.blur()
-                  clickElem.focus()
-                  clickElem.click()
-                  activeElem.focus()
-                }
+    def makeDisplayCommand(token: String, convert: Char => Char): String =
+      if (ModifiersCharacters.exists(token.contains))
+        token.map(convert).map(convertForDisplayIfNotApple).mkString
+      else
+        (KeyBoardIconCharacter +: token.map(_.toString)).mkString(" ")
 
+    def registerMouseTrapCommand(token: String, convert: Char => Char, condition: Option[js.Function0[Boolean]]): String = {
+      val mousetrapCommand = makeMousetrapCommand(token, convert)
+      Mousetrap.bind(
+        mousetrapCommand,
+        (e: dom.KeyboardEvent, _: String) => {
+          if (condition.forall(_.apply())) {
+            e.preventDefault()
+            dom.document.activeElementOpt.foreach { activeElem =>
+              if (activeElem == buttonOrAnchor) {
+                buttonOrAnchor.click()
+              } else {
+                // So if the focus is on a control and the user changed its value, the new value is sent to the server
+                // This is as if users clicked on the button, but without losing the focus on the control
+                activeElem.blur()
+                buttonOrAnchor.focus()
+                buttonOrAnchor.click()
+                activeElem.focus()
               }
             }
           }
-        )
-      }
-
-      rawShortcut.splitTo[List]() match {
-        case all   :: Nil                     => registerMouseTrapCommand(all,   convert = convertIfNotApple); Some(all)
-        case apple :: _     :: _ if isAppleOs => registerMouseTrapCommand(apple, convert = identity);          Some(apple)
-        case _     :: other :: _              => registerMouseTrapCommand(other, convert = identity);          Some(other)
-        case Nil                              => None
-      }
+        }
+      )
+      mousetrapCommand
     }
 
-  def unbindShortcutFromKbd(mousetrapCommand: String): Unit =
-    Mousetrap.unbind(mousetrapCommand)
+    org.orbeon.web.DomSupport.onElementFoundOrAdded(
+      container = buttonOrAnchor,
+      selector  = "kbd[data-orbeon-keyboard-shortcut]",
+      listener  = (kbd: html.Element) => {
+
+        // Unbind any previously registered shortcut
+        registeredMousetrapCommandOpt.foreach(command => Mousetrap.unbind(command))
+
+        // Read the raw shortcut from the data attribute
+        val rawShortcut = kbd.dataset("orbeonKeyboardShortcut")
+
+        // Read the optional condition
+        val condition =
+          kbd.dataset.get("orbeonKeyboardShortcutCondition")
+            .filter(_ == "clipboard-empty")
+            .map(_ => (() => dom.window.getSelection().toString.isEmpty): js.Function0[Boolean])
+
+        // Register the new shortcut if present
+        registeredMousetrapCommandOpt =
+          rawShortcut.trimAllToOpt.flatMap { rawShortcut =>
+            rawShortcut.splitTo[List]() match {
+              case all   :: Nil                     =>
+                val command = registerMouseTrapCommand(all, convert = convertIfNotApple, condition)
+                updateDisplay(makeDisplayCommand(all, convertIfNotApple), kbd)
+                Some(command)
+              case apple :: _     :: _ if isAppleOs =>
+                val command = registerMouseTrapCommand(apple, convert = identity, condition)
+                updateDisplay(makeDisplayCommand(apple, identity), kbd)
+                Some(command)
+              case _     :: other :: _              =>
+                val command = registerMouseTrapCommand(other, convert = identity, condition)
+                updateDisplay(makeDisplayCommand(other, identity), kbd)
+                Some(command)
+              case Nil                              =>
+                None
+            }
+          }
+      }
+    )
+  }
 }

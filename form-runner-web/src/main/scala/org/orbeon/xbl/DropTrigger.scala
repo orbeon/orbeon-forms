@@ -44,7 +44,7 @@ object DropTrigger {
       containerElem.addEventListener("click", onActivate)
       observers =
         containerElem.querySelectorAllT(ListenerSelector)
-          .map { buttonOrA =>
+          .flatMap { buttonOrA =>
             KeyboardShortcuts.bindShortcutFromKbd(
               buttonOrAnchor = buttonOrA,
               updateDisplay  = (shortcut, kbd) => kbd.innerHTML = shortcut

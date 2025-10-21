@@ -40,12 +40,11 @@ object Trigger {
         } else
           kbd.innerHTML = shortcut
 
-      observerOpt = Some(
+      observerOpt =
         KeyboardShortcuts.bindShortcutFromKbd(
           buttonOrAnchor = buttonOrAnchor,
           updateDisplay  = updateDisplay
         )
-      )
     }
 
     override def destroy(): Unit = {

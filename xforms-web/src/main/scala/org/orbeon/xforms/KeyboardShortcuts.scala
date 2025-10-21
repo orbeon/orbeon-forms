@@ -1,6 +1,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.facades.{Bowser, Mousetrap}
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
@@ -78,7 +79,7 @@ object KeyboardShortcuts {
   def bindShortcutFromKbd(
     buttonOrAnchor: html.Element,
     updateDisplay : (String, html.Element) => Unit
-  ): dom.MutationObserver = {
+  ): Option[dom.MutationObserver] = {
 
     var registeredMousetrapCommandOpt: Option[String] = None
 
@@ -120,44 +121,46 @@ object KeyboardShortcuts {
       mousetrapCommand
     }
 
-    org.orbeon.web.DomSupport.onElementFoundOrAdded(
-      container = buttonOrAnchor,
-      selector  = "kbd[data-orbeon-keyboard-shortcut]",
-      listener  = (kbd: html.Element) => {
+    buttonOrAnchor.querySelectorAllT("kbd[data-orbeon-keyboard-shortcut]").nonEmpty.option(
+      org.orbeon.web.DomSupport.onElementFoundOrAdded(
+        container = buttonOrAnchor,
+        selector  = "kbd[data-orbeon-keyboard-shortcut]",
+        listener  = (kbd: html.Element) => {
 
-        // Unbind any previously registered shortcut
-        registeredMousetrapCommandOpt.foreach(command => Mousetrap.unbind(command))
+          // Unbind any previously registered shortcut
+          registeredMousetrapCommandOpt.foreach(command => Mousetrap.unbind(command))
 
-        // Read the raw shortcut from the data attribute
-        val rawShortcut = kbd.dataset("orbeonKeyboardShortcut")
+          // Read the raw shortcut from the data attribute
+          val rawShortcut = kbd.dataset("orbeonKeyboardShortcut")
 
-        // Read the optional condition
-        val condition =
-          kbd.dataset.get("orbeonKeyboardShortcutCondition")
-            .filter(_ == "clipboard-empty")
-            .map(_ => (() => dom.window.getSelection().toString.isEmpty): js.Function0[Boolean])
+          // Read the optional condition
+          val condition =
+            kbd.dataset.get("orbeonKeyboardShortcutCondition")
+              .filter(_ == "clipboard-empty")
+              .map(_ => (() => dom.window.getSelection().toString.isEmpty): js.Function0[Boolean])
 
-        // Register the new shortcut if present
-        registeredMousetrapCommandOpt =
-          rawShortcut.trimAllToOpt.flatMap { rawShortcut =>
-            rawShortcut.splitTo[List]() match {
-              case all   :: Nil                     =>
-                val command = registerMouseTrapCommand(all, convert = convertIfNotApple, condition)
-                updateDisplay(makeDisplayCommand(all, convertIfNotApple), kbd)
-                Some(command)
-              case apple :: _     :: _ if isAppleOs =>
-                val command = registerMouseTrapCommand(apple, convert = identity, condition)
-                updateDisplay(makeDisplayCommand(apple, identity), kbd)
-                Some(command)
-              case _     :: other :: _              =>
-                val command = registerMouseTrapCommand(other, convert = identity, condition)
-                updateDisplay(makeDisplayCommand(other, identity), kbd)
-                Some(command)
-              case Nil                              =>
-                None
+          // Register the new shortcut if present
+          registeredMousetrapCommandOpt =
+            rawShortcut.trimAllToOpt.flatMap { rawShortcut =>
+              rawShortcut.splitTo[List]() match {
+                case all   :: Nil                     =>
+                  val command = registerMouseTrapCommand(all, convert = convertIfNotApple, condition)
+                  updateDisplay(makeDisplayCommand(all, convertIfNotApple), kbd)
+                  Some(command)
+                case apple :: _     :: _ if isAppleOs =>
+                  val command = registerMouseTrapCommand(apple, convert = identity, condition)
+                  updateDisplay(makeDisplayCommand(apple, identity), kbd)
+                  Some(command)
+                case _     :: other :: _              =>
+                  val command = registerMouseTrapCommand(other, convert = identity, condition)
+                  updateDisplay(makeDisplayCommand(other, identity), kbd)
+                  Some(command)
+                case Nil                              =>
+                  None
+              }
             }
-          }
-      }
+        }
+      )
     )
   }
 }

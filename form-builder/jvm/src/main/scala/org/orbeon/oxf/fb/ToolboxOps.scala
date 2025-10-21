@@ -1217,7 +1217,7 @@ object ToolboxOps {
 
       // Create the bind and copy all attributes and content
       val bind = ensureBinds(findContainerNamesForModel(insertCellElem) :+ name)
-      (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind =>
+      (xcvElem / XcvEntry.Bind.entryName / *).headOption.foreach { xcvBind =>
         insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
       }
 

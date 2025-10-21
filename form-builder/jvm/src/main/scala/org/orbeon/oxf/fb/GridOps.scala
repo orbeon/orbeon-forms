@@ -266,27 +266,8 @@ trait GridOps extends ContainerOps {
           insert(into = gridElem, after = gridElem / *, origin = sortedElems)
         }
 
-        val controlNamesInDocOrder =
-          findGridControls(gridElem)
-            .flatMap(c => controlNameFromIdOpt(c.id))
-            .toList
-
         // Reorder binds
-        locally {
-          val parentBind =
-            controlNamesInDocOrder
-              .headOption // all grid binds must have the same parent, so we just take the first one
-              .flatMap(findBindByName)
-              .flatMap(_.parentOption)
-              .toList
-
-          val allBindsInOrder =
-            controlNamesInDocOrder
-              .flatMap(findBindByName)
-
-          delete(allBindsInOrder)
-          insert(into = parentBind, after = parentBind / *, origin = allBindsInOrder)
-        }
+        val controlNamesInDocOrder = reorderBindsForGrid(gridElem)
 
         // Reorder holders
         // With repeated content, there can be multiple holders per control

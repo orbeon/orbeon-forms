@@ -1254,6 +1254,12 @@ object ToolboxOps {
         }
       }
 
+      // Reorder binds
+      // This is because the `<xf:bind>` insertion above doesn't guarantee order, and also the bind order might be
+      // incorrect due to previous control reordering before this code was present. So now we always reorder to ensure
+      // that the order of binds matches the order of the controls in the grid.
+      reorderBindsForGrid(getControlCellAndGrid(newControlElem)._2)
+
       // This can impact templates
       updateTemplatesCheckContainers(findAncestorRepeatNames(insertCellElem).toSet)
 

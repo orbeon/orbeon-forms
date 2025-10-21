@@ -82,13 +82,19 @@ trait ControlOps extends ResourcesOps {
       ref="instance('fr-form-instance')"
       xmlns:xf={Namespaces.XF}/>
 
-  def precedingBoundControlNameInSectionForControl(controlElem: NodeInfo): Option[String] = {
-
+  def getControlCellAndGrid(controlElem: NodeInfo): (NodeInfo, NodeInfo) = {
     val cell = controlElem parent CellTest head
     val grid = findAncestorContainersLeafToRoot(cell).head
 
     assert(cell.localname == "c")
     assert(grid.localname == "grid")
+
+    cell -> grid
+  }
+
+  def precedingBoundControlNameInSectionForControl(controlElem: NodeInfo): Option[String] = {
+
+    val (cell, grid) = getControlCellAndGrid(controlElem)
 
     val precedingCellsInGrid = cell precedingSibling CellTest
 
@@ -136,6 +142,7 @@ trait ControlOps extends ResourcesOps {
     @tailrec def ensureBind(containerElem: NodeInfo, names: Iterator[String]): NodeInfo = {
       if (names.hasNext) {
         val bindName = names.next()
+        val isLast   = ! names.hasNext
         val bind = containerElem / XFBindTest filter (isBindForName(_, bindName)) match {
           case Seq(bind: NodeInfo, _*) => bind
           case _ =>
@@ -156,6 +163,34 @@ trait ControlOps extends ResourcesOps {
 
     // Start with top-level
     ensureBind(topLevelBind, names.iterator)
+  }
+
+  def reorderBindsForGrid(gridElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Seq[String] = {
+
+    val controlNamesInDocOrder =
+      findGridControls(gridElem)
+        .flatMap(c => controlNameFromIdOpt(c.id))
+        .toList
+
+    reorderBindsInGrid(controlNamesInDocOrder)
+    controlNamesInDocOrder
+  }
+
+  private def reorderBindsInGrid(controlNamesInDocOrder: Seq[String])(implicit ctx: FormBuilderDocContext): Unit = {
+
+    val parentBind =
+      controlNamesInDocOrder
+        .headOption // all grid binds must have the same parent, so we just take the first one
+        .flatMap(findBindByName)
+        .flatMap(_.parentOption)
+        .toList
+
+    val allBindsInOrder =
+      controlNamesInDocOrder
+        .flatMap(findBindByName)
+
+    delete(allBindsInOrder)
+    insert(into = parentBind, after = parentBind / *, origin = allBindsInOrder)
   }
 
   // Iterate over the given bind followed by all of its descendants, depth-first

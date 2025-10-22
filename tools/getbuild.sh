@@ -16,7 +16,7 @@ shift $((OPTIND-1))
 
 # Check remaining required arguments
 if [[ $# -ne 2 ]] || [[ ! $1 =~ ^(ce|pe)$ ]] || [[ ! $2 =~ '^[0-9]{4,5}$' ]]; then
-  echo "Usage: $0 [-e] [-c] ce|pe <four_digit_parameter>"
+  echo "Usage: $0 [-e] [-c] ce|pe <four_or_five_digit_build_number>"
   echo "Options:"
   echo "  -e    Extract the zip file after download"
   echo "  -c    Clean up (delete) the zip file after processing"

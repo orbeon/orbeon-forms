@@ -74,6 +74,13 @@ object DocumentAPI extends js.Object {
   ): js.UndefOr[String] =
       Controls.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
 
+  private val disallowedClassesToError = List(
+    "xforms-output"   -> "an output control",
+    "xforms-upload"   -> "an upload control",
+    "xforms-disabled" -> "a disabled control",
+    "xforms-readonly" -> "a readonly control",
+  )
+
   // Set the value of an XForms control
   def setValue(
     controlIdOrElem : String | html.Element,
@@ -86,10 +93,10 @@ object DocumentAPI extends js.Object {
 
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
-    require(
-      ! (control.classList.contains("xforms-output") || control.classList.contains("xforms-upload")),
-      s"Cannot set the value of an output or upload control for id `${control.id}`"
-    )
+    // https://github.com/orbeon/orbeon-forms/issues/7319
+    for ((clazz, error) <- disallowedClassesToError)
+      if (control.classList.contains(clazz))
+        return js.Promise.reject(new js.Error(s"Cannot set the value of $error for id `${control.id}`"))
 
     def fireValueEvent(): Unit =
       Controls.getCurrentValue(control).foreach { newValue =>

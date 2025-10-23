@@ -13,17 +13,21 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
-// Case classes for information what we store in the session
+import enumeratum.{Enum, EnumEntry}
+import enumeratum.EnumEntry.Lowercase
 
-sealed trait Status { val name : String }
+sealed trait Status extends EnumEntry with Lowercase
 
-object Status {
-  case object  Stopped                                  extends { val name = "stopped"  } with Status
-  case class   Starting (providers     : List[String])  extends { val name = "starting" } with Status
-  case object  Stopping                                 extends { val name = "stopping" } with Status
+object Status extends Enum[Status] {
+
+  val values = findValues
+
+  case object  Stopped                                  extends Status
+  case class   Starting (providers     : List[String])  extends Status
+  case object  Stopping                                 extends Status
   case class   Indexing (provider      : String,
                          providerCount : Count,
-                         documentCount : Option[Count]) extends { val name = "indexing" } with Status
+                         documentCount : Option[Count]) extends Status
 }
 
 case class Count(current: Int, total: Int)

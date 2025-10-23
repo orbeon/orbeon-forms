@@ -4,18 +4,20 @@
 
 REMOTE_PUBLISH=true
 
-VERSION=${1:-'2024.1.1-pe'}
-RELEASE_TAG=${2:-'tag-release-2024.1.1-pe-pseudo'}
-FILE=${3:-'orbeon-2024.1.1.202503280040-PE.zip'}
-SQL_FILE=${4:-'2024.1/postgresql-2024_1.sql'}
-PLATFORMS=${5:-'linux/amd64,linux/arm64'}
-DEMO_FORMS_LICENSE_FILE=${6:-"$HOME/.orbeon/license.xml"}
-DEMO_FORMS_POSTGRES_NETWORK=${7:-'demo_forms_network'}
-DEMO_FORMS_ORBEON_FORMS_PORT=${8:-'18080'}
+VERSION=${1:-'2024.1.3-pe'}
+RELEASE_TAG=${2:-'tag-release-2024.1.3-pe-pseudo'}
+FILE=${3:-'orbeon-2024.1.3.202510220124-PE.zip'}
+SHA256_CHECKSUM=${4:-'61d2612e82904fd4e8e478468e8da8134871fffa85775d15353bb2dc6609e75b'}
+SQL_FILE=${5:-'2024.1/postgresql-2024_1.sql'}
+PLATFORMS=${6:-'linux/amd64,linux/arm64'}
+DEMO_FORMS_LICENSE_FILE=${7:-"$HOME/.orbeon/license.xml"}
+DEMO_FORMS_POSTGRES_NETWORK=${8:-'demo_forms_network'}
+DEMO_FORMS_ORBEON_FORMS_PORT=${9:-'18080'}
 
 echo "Version: $VERSION"
 echo "Release tag: $RELEASE_TAG"
 echo "File: $FILE"
+echo "SHA-256 checksum: $SHA256_CHECKSUM"
 echo "SQL file: $SQL_FILE"
 echo "Platforms: $PLATFORMS"
 echo "Demo forms license file: $DEMO_FORMS_LICENSE_FILE"
@@ -62,13 +64,13 @@ main() {
   fi
 
   # Build Orbeon Forms image (Tomcat, base image)
-  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_TOMCAT_BASE_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" --build-arg sha256_checksum="$SHA256_CHECKSUM" -t "$ORBEON_FORMS_TOMCAT_BASE_IMAGE" .
 
   # Build Orbeon Forms image (Tomcat, including PostgreSQL JDBC driver)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat.postgres_driver --build-arg base_image="$ORBEON_FORMS_TOMCAT_BASE_IMAGE" -t "$ORBEON_FORMS_TOMCAT_IMAGE" .
 
   # Build Orbeon Forms image (WildFly, base image)
-  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" --build-arg sha256_checksum="$SHA256_CHECKSUM" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
 
   # Build Orbeon Forms image (WildFly, including PostgreSQL JDBC driver)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .

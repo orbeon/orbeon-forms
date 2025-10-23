@@ -14,8 +14,8 @@
 package org.orbeon.xforms
 
 import cats.syntax.option.*
-import org.apache.http.entity.mime.MultipartEntity
-import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.errorified.Exceptions
@@ -270,7 +270,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
    */
   def writeMultipartFormData(document: Document, os: OutputStream): String = {
     // Visit document
-    val multipartEntity = new MultipartEntity
+    val builder = MultipartEntityBuilder.create()
     document.accept(
       new VisitorSupport {
         override final def visit(element: Element): Unit = {
@@ -286,38 +286,39 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
                 // Value is valid as per xs:anyURI
                 // Don't close the stream here, as it will get read later when the MultipartEntity
                 // we create here is written to an output stream
-                addPart(multipartEntity, XFormsCrossPlatformSupport.openUrlStream(URI.create(value)), element, value.some)
+                addPart(builder, XFormsCrossPlatformSupport.openUrlStream(URI.create(value)), element, value.some)
               } else {
                 // Value is invalid as per xs:anyURI
                 // Just use the value as is (could also ignore it)
-                multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
+                builder.addTextBody(localName, value, ContentType.create("text/plain", CharsetNames.Utf8))
               }
             } else if (XMLConstants.XS_BASE64BINARY_QNAME == nodeType) {
               // Interpret value as xs:base64Binary
               if (InstanceData.getValid(element) && value.trimAllToOpt.isDefined) {
                 // Value is valid as per xs:base64Binary
-                addPart(multipartEntity, new ByteArrayInputStream(Base64.decode(value)), element, None)
+                addPart(builder, new ByteArrayInputStream(Base64.decode(value)), element, None)
               } else {
                 // Value is invalid as per xs:base64Binary
-                multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
+                builder.addTextBody(localName, value, ContentType.create("text/plain", CharsetNames.Utf8))
               }
             } else {
               // Just use the value as is
-              multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
+              builder.addTextBody(localName, value, ContentType.create("text/plain", CharsetNames.Utf8))
             }
           }
         }
       }
     )
-    multipartEntity.writeTo(os)
-    multipartEntity.getContentType.getValue
+    val entity = builder.build()
+    entity.writeTo(os)
+    entity.getContentType.getValue
   }
 
   private def addPart(
-    multipartEntity : MultipartEntity,
-    inputStream     : InputStream,
-    element         : Element,
-    url             : Option[String]
+    builder     : MultipartEntityBuilder,
+    inputStream : InputStream,
+    element     : Element,
+    url         : Option[String]
   ): Unit = {
 
     // Gather mediatype and filename if known
@@ -363,8 +364,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
         case (filenameOpt, _)  => filenameOpt
       }
 
-    val contentBody = new InputStreamBody(inputStream, mediatype.orNull, filename.orNull)
-    multipartEntity.addPart(element.getName, contentBody)
+    val contentType = mediatype.map(ContentType.parse).getOrElse(ContentType.DEFAULT_BINARY)
+    builder.addBinaryBody(element.getName, inputStream, contentType, filename.orNull)
   }
 
   def getRootThrowable(t: Throwable): Throwable =

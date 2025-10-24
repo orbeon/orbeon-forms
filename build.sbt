@@ -318,7 +318,7 @@ def jUnitTestOptions =
   List(
     libraryDependencies                += "com.github.sbt" % "junit-interface" % JUnitInterfaceVersion % Test,
 
-    Test / testOptions                 += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((ThisBuild / baseDirectory).value): _*),
+    Test / testOptions                 += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((ThisBuild / baseDirectory).value)*),
     Test / testOptions                 += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
     Test / testOptions                 += Tests.Filter(s => s.endsWith("Test")),
     Test / testOptions                 += Tests.Filter(s => s.endsWith("Test") && ! s.contains("ClientTest")),
@@ -503,7 +503,7 @@ lazy val assetsSettings = Seq(
 // a few exceptions that are JS- or JVM-only. `common` is not a good name. On the other hand,
 // `utils` is also very general. Can we find something more telling?
 lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("common"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-common",
     libraryDependencies += ("org.typelevel"          %%% "cats-kernel"       % CatsVersion).cross(CrossVersion.for3Use2_13),
@@ -542,7 +542,7 @@ lazy val commonJS  = common.js
 
 // Custom DOM implementation. This must be cross-platform and have no dependencies.
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
-  .settings(scala3CommonSettings: _*)
+  .settings(scala3CommonSettings*)
   .settings(
     name := "orbeon-dom",
     crossScalaVersions := scala3 :: supportedScalaVersions
@@ -556,7 +556,7 @@ lazy val domJS  = dom.js.dependsOn(commonJS)
 
 lazy val webSupport = (project in file("web-support"))
   .dependsOn(commonJS)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)
   .enablePlugins(JSDependenciesPlugin)
@@ -579,7 +579,7 @@ lazy val embedding = (project in file("embedding"))
     xformsClientServerJVM,
     formRunnerClientServerJVM,
   )
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-embedding",
     libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
@@ -595,8 +595,8 @@ lazy val embeddingWar = (project in file("embedding-war"))
   .dependsOn(
     embedding
   )
-  .settings(OrbeonWebappPlugin.projectSettings: _*)
-  .settings(scala2CommonSettings: _*)
+  .settings(OrbeonWebappPlugin.projectSettings*)
+  .settings(scala2CommonSettings*)
   .settings(
     Compile / resourceGenerators ++= Seq(
       EmbeddingAngularGenerator.task.taskValue,
@@ -620,7 +620,7 @@ lazy val xformsFilter = (project in file("xforms-filter"))
     commonJVM,
     servletSupport
   )
-  .settings(scala3CommonSettings: _*)
+  .settings(scala3CommonSettings*)
   .settings(
     name := "orbeon-xforms-filter",
     libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
@@ -636,15 +636,15 @@ lazy val xformsFilterWar = (project in file("xforms-filter-war"))
   .dependsOn(
     xformsFilter
   )
-  .settings(OrbeonWebappPlugin.projectSettings: _*)
-  .settings(scala2CommonSettings: _*)
+  .settings(OrbeonWebappPlugin.projectSettings*)
+  .settings(scala2CommonSettings*)
 
 lazy val authorizer = (project in file("authorizer"))
   .dependsOn(
     commonJVM,
     servletSupport
   )
-  .settings(scala3CommonSettings: _*)
+  .settings(scala3CommonSettings*)
   .settings(
     name := "orbeon-authorizer",
     libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
@@ -658,15 +658,15 @@ lazy val authorizerWar = (project in file("authorizer-war"))
   .dependsOn(
     authorizer
   )
-  .settings(OrbeonWebappPlugin.projectSettings: _*)
-  .settings(scala2CommonSettings: _*)
+  .settings(OrbeonWebappPlugin.projectSettings*)
+  .settings(scala2CommonSettings*)
 
 lazy val fullPortlet = (project in file("full-portlet"))
   .dependsOn(
     portletSupport,
     core
   )
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-full-portlet",
     libraryDependencies += "javax.portlet"      % "portlet-api"               % PortletApiVersion           % Provided,
@@ -680,7 +680,7 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .dependsOn(
     portletSupport,
   )
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-proxy-portlet",
 
@@ -702,12 +702,12 @@ lazy val formRunnerProxyPortletWar = (project in file("proxy-portlet-war"))
   .dependsOn(
     formRunnerProxyPortlet
   )
-  .settings(OrbeonWebappPlugin.projectSettings: _*)
-  .settings(scala2CommonSettings: _*)
+  .settings(OrbeonWebappPlugin.projectSettings*)
+  .settings(scala2CommonSettings*)
 
 lazy val portletSupport = (project in file("portlet-support"))
   .dependsOn(embedding)
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-portlet-support",
     libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
@@ -718,7 +718,7 @@ lazy val portletSupport = (project in file("portlet-support"))
   )
 
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-form-runner"
   )
@@ -739,7 +739,7 @@ def s3ScalaTestArguments: Seq[String] = {
 
 lazy val s3TestSettings = Seq(
   // If not on Travis and missing required environment variables, exclude S3 tests
-  Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, s3ScalaTestArguments: _*)
+  Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, s3ScalaTestArguments*)
 )
 
 lazy val formRunnerJVM = formRunner.jvm
@@ -752,14 +752,14 @@ lazy val formRunnerJVM = formRunner.jvm
     formRunnerClientServerJVM
   )
   .enablePlugins(SbtWeb)
-  .settings(assetsSettings: _*)
+  .settings(assetsSettings*)
   .configs(DatabaseTest, DebugDatabaseTest, DebugTest)
-  .settings(scala2CommonSettings: _*)
-  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
-  .settings(inConfig(DebugDatabaseTest)(Defaults.testSettings): _*)
-  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
+  .settings(scala2CommonSettings*)
+  .settings(inConfig(DatabaseTest)(Defaults.testSettings)*)
+  .settings(inConfig(DebugDatabaseTest)(Defaults.testSettings)*)
+  .settings(inConfig(DebugTest)(Defaults.testSettings)*)
   .settings(commonScalaJvmSettings)
-  .settings(jUnitTestOptions: _*)
+  .settings(jUnitTestOptions*)
   .settings(s3TestSettings)
   .settings(
     DebugTest / sourceDirectory         := (Test / sourceDirectory).value,
@@ -831,7 +831,7 @@ lazy val formRunnerJS = formRunner.js
   )
 
 lazy val formRunnerCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("form-runner-common"))
-  .settings(scala2CommonSettings: _*)
+  .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-form-runner-common"
   )

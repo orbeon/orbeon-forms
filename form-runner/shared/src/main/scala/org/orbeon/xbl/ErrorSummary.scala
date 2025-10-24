@@ -45,7 +45,7 @@ import scala.math.Ordering
 
 object ErrorSummary {
 
-  import Private._
+  import Private.*
 
   // Return the subset of section names passed which contain errors in the global error summary
   def topLevelSectionsWithErrors(sectionNamesSet: Set[String], onlyVisible: Boolean): Map[String, (Int, Int)] =

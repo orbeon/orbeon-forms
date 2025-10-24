@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters.*
 
 object XFormsStateManager extends XFormsStateManagerTrait {
 
-  import Private._
+  import Private.*
 
   private val ReplicationEnabled = XFormsGlobalProperties.isReplication
 

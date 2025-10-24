@@ -42,7 +42,7 @@ import scala.collection.mutable
 
 trait XFormsModelSubmissionSupportTrait {
 
-  import Private._
+  import Private.*
   import RelevanceHandling._
 
   // Run the given submission. This must be for a `replace="all"` submission.

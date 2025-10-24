@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.*
 
 object XFormsStateStore {
 
-  import Private._
+  import Private.*
 
   type CacheValueMappingType = (String, Long)
 

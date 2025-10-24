@@ -43,7 +43,7 @@ object ExcelDateUtils {
     case object Other    extends FormatType
   }
 
-  import Private._
+  import Private.*
 
   def getJavaCalendar(
     date             : Double,

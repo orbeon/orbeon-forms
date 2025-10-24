@@ -66,7 +66,7 @@ class XFormsModelSubmission(
 
   thisSubmission =>
 
-  import Private._
+  import Private.*
 
   val containingDocument: XFormsContainingDocument = container.containingDocument
   def modelOpt: Option[XFormsModel] = model.modelOpt

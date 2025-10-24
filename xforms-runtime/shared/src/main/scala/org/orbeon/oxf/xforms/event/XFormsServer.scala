@@ -34,7 +34,7 @@ import scala.util.{Failure, Success, Try}
 
 object XFormsServer {
 
-  import Private._
+  import Private.*
 
   def processEvents(
     logRequestResponse      : Boolean,

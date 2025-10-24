@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsStaticState
 
 object XFormsStaticStateCache {
 
-  import Private._
+  import Private.*
 
   trait CacheTracer {
     def digestAndTemplateStatus(digestIfFound: Option[String]): Unit

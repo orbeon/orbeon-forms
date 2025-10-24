@@ -26,7 +26,7 @@ import scala.jdk.CollectionConverters.*
 
 object ControlsDebugSupport {
 
-  import Private._
+  import Private.*
 
   def controlTreeAsXmlString(control: XFormsControl): String = {
 

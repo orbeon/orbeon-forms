@@ -26,7 +26,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
 
   selfModel: XFormsModel =>
 
-  import Private._
+  import Private.*
 
   val deferredActionContext = new DeferredActionContext(container)
 

@@ -16,7 +16,7 @@ case class ServerError(
 
 object ServerError {
 
-  import Private._
+  import Private.*
 
   def apply(message: String, location : Option[LocationData], classOpt : Option[String] = None): ServerError =
     ServerError(

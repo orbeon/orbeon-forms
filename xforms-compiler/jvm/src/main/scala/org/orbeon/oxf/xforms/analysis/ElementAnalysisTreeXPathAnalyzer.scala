@@ -35,7 +35,7 @@ import scala.collection.mutable
 
 object ElementAnalysisTreeXPathAnalyzer {
 
-  import Private._
+  import Private.*
 
   def analyzeXPath(
     partAnalysisCtx : PartAnalysisContextAfterTree,

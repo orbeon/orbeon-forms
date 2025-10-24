@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 
 object PermissionsToWorkflowConfig {
 
-  import Private._
+  import Private.*
   import org.orbeon.oxf.fr.workflow.definitions20201._
 
   def convert(permissions: Permissions): WorkflowConfig = {

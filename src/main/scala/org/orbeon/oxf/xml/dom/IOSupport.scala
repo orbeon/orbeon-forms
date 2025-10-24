@@ -22,7 +22,7 @@ import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing}
 
 object IOSupport {
 
-  import Private._
+  import Private.*
 
   def prettyfy(xmlString: String): String =
     readOrbeonDom(xmlString).getRootElement.serializeToString(XMLWriter.PrettyFormat)

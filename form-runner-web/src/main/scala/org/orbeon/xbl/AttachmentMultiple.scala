@@ -39,7 +39,7 @@ object AttachmentMultiple {
 
     companion =>
 
-    import Private._
+    import Private.*
 
     override def init(): Unit = {
 

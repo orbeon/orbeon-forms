@@ -52,7 +52,7 @@ object FileItemSupport {
       fileLocationOpt.map(_.getCanonicalPath).getOrElse("[no location]")
   }
 
-  import Private._
+  import Private.*
 
   def inputStreamToAnyURI(
     inputStream : InputStream,

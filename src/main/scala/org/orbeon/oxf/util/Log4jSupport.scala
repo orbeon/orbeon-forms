@@ -22,7 +22,7 @@ import scala.util.control.NonFatal
 
 object Log4jSupport {
 
-  import Private._
+  import Private.*
 
   // Initialize a basic logging configuration until the resource manager is setup
   def initBasicLogger(): Unit = {

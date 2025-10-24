@@ -39,7 +39,7 @@ object PersistenceMetadataSupport {
 
   private type CacheKey = (String, String, Int) // app/form/version
 
-  import Private._
+  import Private.*
 
   // When publishing a form, we need to invalidate the caches. This doesn't cover cases where form definitions are
   // updated directly in the database, but it's the most frequent case.

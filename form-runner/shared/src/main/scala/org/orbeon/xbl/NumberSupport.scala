@@ -42,7 +42,7 @@ case class NumberConfig(
 // Trait abstracts over the binding type to help with unit tests
 trait NumberSupport[Binding] {
 
-  import Private._
+  import Private.*
 
   def getStringValue (binding: Binding): String
   def getDatatypeOpt (binding: Binding): Option[dom.QName]

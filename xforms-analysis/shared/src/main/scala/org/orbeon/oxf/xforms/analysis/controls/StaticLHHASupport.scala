@@ -22,7 +22,7 @@ import org.orbeon.xforms.XFormsNames
 // Control support for nested or external LHHA elements
 trait StaticLHHASupport extends ElementAnalysis {
 
-  import Private._
+  import Private.*
 
   // Because an LHHA might follow a control in the document, attachment must be deferred
   def attachDirectLhha(lhhaAnalysis: LHHAAnalysis): Unit =

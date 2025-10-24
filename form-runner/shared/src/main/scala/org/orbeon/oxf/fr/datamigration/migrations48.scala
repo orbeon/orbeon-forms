@@ -49,7 +49,7 @@ case class MigrationSet48(migrations: List[Migration48]) extends MigrationSet {
 
 object MigrationOps48 extends MigrationOps {
 
-  import Private._
+  import Private.*
 
   type M = MigrationSet48
   val version: MigrationVersion = DataFormatVersion.V480

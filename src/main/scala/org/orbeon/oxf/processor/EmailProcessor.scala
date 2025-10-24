@@ -50,7 +50,7 @@ import javax.xml.transform.stream.StreamResult
  */
 class EmailProcessor extends ProcessorImpl {
 
-  import Private._
+  import Private.*
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA, ConfigNamespaceURI))
 

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 object XFormsDocumentCache {
 
-  import Private._
+  import Private.*
 
   // Add a document to the cache using the document's UUID as cache key.
   def put(containingDocument: XFormsContainingDocument): Unit =

@@ -35,7 +35,7 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 
 trait AjaxEventQueue[EventType] {
 
-  import Private._
+  import Private.*
 
   // The event queue calls this when events are ready, that is when a delay has passed
   // and they are ready to be dispatched as a group. The implementation of this function

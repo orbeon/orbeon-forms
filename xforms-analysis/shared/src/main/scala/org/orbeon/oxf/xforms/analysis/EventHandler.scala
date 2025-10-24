@@ -183,7 +183,7 @@ class EventHandler(
 
 object EventHandler {
 
-  import Private._
+  import Private.*
 
   val PropertyQNames = Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)
 

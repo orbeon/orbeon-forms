@@ -99,7 +99,7 @@ object UndoAction {
 
 object Undo {
 
-  import Private._
+  import Private.*
 
   sealed trait UndoOrRedo extends EnumEntry with Lowercase
     object UndoOrRedo extends Enum[UndoOrRedo] {

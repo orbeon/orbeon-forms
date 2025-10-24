@@ -41,7 +41,7 @@ object Number {
 
     companion =>
 
-    import Private._
+    import Private.*
     import io.circe.generic.auto._
     import io.circe.{Decoder, Encoder}
 

@@ -34,7 +34,7 @@ trait ClientRepeatSettingsTest extends AssertionsForJUnit with FormBuilderOps wi
     val MaxInputSelector           = cssSelector(s"#${RepeatedContentTab}max-input")
   }
 
-  import Private._
+  import Private.*
 
   @Test def minMaxSettings(): Unit = {
 

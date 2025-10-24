@@ -85,7 +85,7 @@ trait MultipartLifecycle[Constraints] {
 
 object Multipart {
 
-  import Private._
+  import Private.*
 
   type UploadItem = String Either FileItem
 

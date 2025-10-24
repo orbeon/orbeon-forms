@@ -35,7 +35,7 @@ object ExecutionWait extends Enum[ExecutionWait] {
 // executed at once.
 class ExecutionQueue[T](execute: NonEmptyList[T] => Future[Unit]) {
 
-  import Private._
+  import Private.*
 
   // Add an event to the queue and executes all the events in the queue either:
   //

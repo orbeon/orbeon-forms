@@ -32,7 +32,7 @@ object SimplePath {
 
   type NodeColl = LazyList[NodeInfo]
 
-  import Private._
+  import Private.*
 
   case class URIQualifiedName(uri: String, localName: String) {
     require(Name10Checker.getInstance.isValidNCName(localName))

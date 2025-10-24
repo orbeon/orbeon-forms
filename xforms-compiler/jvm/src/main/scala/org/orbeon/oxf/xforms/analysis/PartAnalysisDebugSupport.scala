@@ -26,7 +26,7 @@ import org.orbeon.xforms.Constants
 
 object PartAnalysisDebugSupport {
 
-  import Private._
+  import Private.*
 
   def writePart(partAnalysis: PartAnalysisRuntimeOps)(implicit receiver: XMLReceiver): Unit =
     withDocument {

@@ -47,7 +47,7 @@ import java.lang as jl
  */
 object NumberToTextConverter {
 
-  import Private._
+  import Private.*
 
   /**
    * Converts the supplied <tt>value</tt> to the text representation that Excel would give if

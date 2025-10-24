@@ -28,7 +28,7 @@ class XFormsStateManagerTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  import Private._
+  import Private.*
 
   describe("Cache configurations") {
 

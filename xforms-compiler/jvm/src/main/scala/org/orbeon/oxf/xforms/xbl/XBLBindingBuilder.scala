@@ -61,7 +61,7 @@ import org.xml.sax.Attributes
  */
 object XBLBindingBuilder {
 
-  import Private._
+  import Private.*
 
   // Can return `None` if the `AbstractBinding` does not have a template.
   //

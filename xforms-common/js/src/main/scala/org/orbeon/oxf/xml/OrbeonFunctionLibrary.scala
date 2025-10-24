@@ -17,7 +17,7 @@ import java.util as ju
 // Inspired from `BuiltInFunctionSet` and modified to support multiple namespaces.
 abstract class OrbeonFunctionLibrary extends FunctionLibrary {
 
-  import Private._
+  import Private.*
 
   // (uri, prefix)
   val namespaces: List[(String, String)]

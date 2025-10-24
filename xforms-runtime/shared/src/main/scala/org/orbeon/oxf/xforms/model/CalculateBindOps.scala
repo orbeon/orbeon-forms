@@ -28,7 +28,7 @@ trait CalculateBindOps {
 
   self: XFormsModelBinds =>
 
-  import Private._
+  import Private.*
 
   def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRecalculate) {

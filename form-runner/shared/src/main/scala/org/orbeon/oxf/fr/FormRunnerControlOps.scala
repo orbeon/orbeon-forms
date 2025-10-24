@@ -42,7 +42,7 @@ import org.orbeon.xml.NamespaceMapping
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
-  import Private._
+  import Private.*
 
   val TrueExpr : String = "true()"
   val FalseExpr: String = "false()"

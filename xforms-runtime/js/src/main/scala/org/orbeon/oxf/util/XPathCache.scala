@@ -24,7 +24,7 @@ object XPathCache extends XPathCacheTrait {
 
   private val Explain             = false
 
-  import Private._
+  import Private.*
 
   def evaluateSingleKeepItems(
     contextItems       : ju.List[om.Item],

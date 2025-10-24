@@ -27,7 +27,7 @@ import org.orbeon.scaxon.NodeConversions
 
 object Transform {
 
-  import Private._
+  import Private.*
 
   sealed trait ReadDocument { def path: String }
   case class   FileReadDocument  (path: String)                                    extends ReadDocument

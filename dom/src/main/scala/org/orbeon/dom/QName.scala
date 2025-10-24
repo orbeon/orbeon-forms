@@ -16,13 +16,10 @@ object QName {
 
   def unapply(qName: QName): Option[(String, Namespace)] = Some((qName.localName, qName.namespace))
 
-  // 2017-10-27: 84 usages
   def apply(localName: String): QName = apply(localName, Namespace.EmptyNamespace, localName)
 
-  // 2017-10-27: 247 usages
   def apply(localName: String, namespaceOrNull: Namespace): QName = apply(localName, namespaceOrNull, null)
 
-  // 2017-10-27: 2 external usage
   def apply(localName: String, namespaceOrNull: Namespace, qualifiedNameOrNull: String): QName = {
 
     require((localName ne null) && localName.nonEmpty)
@@ -35,7 +32,6 @@ object QName {
     )
   }
 
-  // 2017-10-27: 17 usages
   def apply(localName: String, prefix: String, uri: String): QName =
     applyNormalize(localName, Namespace(prefix, uri), null)
 

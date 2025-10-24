@@ -15,12 +15,13 @@ package org.orbeon.oxf.fr
 
 import enumeratum.*
 
-sealed abstract class DataStatus(override val entryName: String) extends EnumEntry
+
+sealed abstract class DataStatus extends EnumEntry with EnumEntry.Lowercase
 
 object DataStatus extends Enum[DataStatus] {
 
   val values = findValues
 
-  case object Clean extends DataStatus("clean")
-  case object Dirty extends DataStatus("dirty")
+  case object Clean extends DataStatus // don't change as we want the value "clean"
+  case object Dirty extends DataStatus // don't change as we want the value "dirty"
 }

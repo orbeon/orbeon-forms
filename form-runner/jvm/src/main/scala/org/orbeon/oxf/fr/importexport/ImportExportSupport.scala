@@ -436,6 +436,7 @@ object ImportExportSupport {
               created              = Headers.firstItemIgnoreCase(headers, Headers.Created).flatMap(DateUtils.tryParseRFC1123ToInstant),      // `persistence-model.xml` does not use `Orbeon-*` headers
               lastModified         = Headers.firstItemIgnoreCase(headers, Headers.LastModified).flatMap(DateUtils.tryParseRFC1123ToInstant), // `persistence-model.xml` does not use `Orbeon-*` headers
               eTag                 = Headers.firstItemIgnoreCase(headers, Headers.ETag),
+              dataStatus           = DataStatus.Dirty
             )
         )
       )

@@ -35,12 +35,18 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
   //@XPathFunction
   def updateDocumentMetadata(
     encryptedPrivateModeMetadataOrNull: String,
+    persistenceInstanceElem           : om.NodeInfo,
     documentMetadataElem              : om.NodeInfo
   ): Unit =
     encryptedPrivateModeMetadataOrNull
       .trimAllToOpt
       .flatMap(FormRunnerExternalMode.decryptPrivateModeMetadata(_).toOption).foreach {
         privateModeMetadata =>
+
+          XFormsAPI.setvalue(
+            ref   = List(persistenceInstanceElem) / "initial-data-status",
+            value = privateModeMetadata.dataStatus.entryName
+          )
 
           val documentMetadataElemAsList = List(documentMetadataElem)
 

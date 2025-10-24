@@ -646,15 +646,11 @@ private object FormRunnerFunctions {
         .getOrElse(throw new IllegalArgumentException(s"Unknown mode requested: `$modeQualifiedName`"))
 
       FormRunnerExternalMode.saveState(
-        data                       = FormRunner.formInstance.root,
-        currentLang                = FormRunner.currentLang,
-        embeddable                 = xfc.containingDocument.isEmbeddedFromUrlParam,
-        continuationMode           = continuationMode,
-        continuationWorkflowStage  = stringArgumentOpt(1).orElse(FormRunner.documentWorkflowStage),
-        authorizedOperationsString = FormRunner.authorizedOperationsString,
-        created                    = FormRunner.documentCreatedDateAsInstant,
-        lastModified               = FormRunner.documentModifiedDateAsInstant,
-        eTag                       = FormRunner.documentEtag,
+        data                = FormRunner.formInstance.root,
+        currentLang         = FormRunner.currentLang,
+        embeddable          = xfc.containingDocument.isEmbeddedFromUrlParam,
+        continuationMode    = continuationMode,
+        privateModeMetadata = SimpleProcess.privateModeMetadataFromCurrent
       )
     }
   }

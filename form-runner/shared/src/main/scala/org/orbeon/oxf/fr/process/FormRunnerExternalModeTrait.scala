@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunnerParams
+import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.definitions.FormRunnerDetailMode
 import org.orbeon.oxf.fr.permission.Operations
@@ -24,13 +24,13 @@ trait FormRunnerExternalModeTrait {
     created             : Option[Instant],
     lastModified        : Option[Instant],
     eTag                : Option[String],
-    //dataSafe            : Boolean, // later
+    dataStatus          : DataStatus,
   )
 
   case class ModeState(
-    data          : Array[Byte],
-    publicMetadata: PublicModeMetadata,
-    privateMetadata: PrivateModeMetadata,
+    data                : Array[Byte],
+    publicMetadata      : PublicModeMetadata,
+    privateMetadata     : PrivateModeMetadata,
   )
 
   def createTokenAndStoreState(

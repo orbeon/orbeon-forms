@@ -605,13 +605,17 @@ trait FormRunnerActions
     buildUserAndStandardParamsForModeChange(
       userParams          = inScopeContainingDocument.getRequestParameters,
       dataFormatVersion   = dataFormatVersion,
-      privateModeMetadata = PrivateModeMetadata(
-        authorizedOperations  = Operations.parseFromString(FormRunner.authorizedOperationsString),
-        workflowStage         = FormRunner.documentWorkflowStage,
-        created               = FormRunner.documentCreatedDateAsInstant,
-        lastModified          = FormRunner.documentModifiedDateAsInstant,
-        eTag                  = FormRunner.documentEtag
-      )
+      privateModeMetadata = privateModeMetadataFromCurrent
+    )
+
+  def privateModeMetadataFromCurrent =
+    PrivateModeMetadata(
+      authorizedOperations = Operations.parseFromString(FormRunner.authorizedOperationsString),
+      workflowStage        = FormRunner.documentWorkflowStage,
+      created              = FormRunner.documentCreatedDateAsInstant,
+      lastModified         = FormRunner.documentModifiedDateAsInstant,
+      eTag                 = FormRunner.documentEtag,
+      dataStatus           = if (FormRunner.isFormDataSaved) DataStatus.Clean else DataStatus.Dirty
     )
 
   def filterParamsToExcludeUponModeChange[T](p: Iterable[(String, T)]): Iterable[(String, T)] =

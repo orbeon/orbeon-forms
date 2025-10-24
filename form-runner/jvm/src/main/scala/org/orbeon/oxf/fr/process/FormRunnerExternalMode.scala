@@ -6,7 +6,7 @@ import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.FormRunnerDetailMode
 import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerExternalModeToken, FormRunnerParams}
+import org.orbeon.oxf.fr.{DataStatus, FormRunner, FormRunnerExternalModeToken, FormRunnerParams}
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, SecureUtils}
@@ -34,11 +34,7 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
     currentLang               : String,
     embeddable                : Boolean,
     continuationMode          : FormRunnerDetailMode,
-    continuationWorkflowStage : Option[String],
-    authorizedOperationsString: String,
-    created                   : Option[Instant],
-    lastModified              : Option[Instant],
-    eTag                      : Option[String],
+    privateModeMetadata       : PrivateModeMetadata,
   )(implicit
     formRunnerParams          : FormRunnerParams
   ): String =
@@ -60,13 +56,7 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
           lang           = currentLang,
           embeddable     = embeddable,
         ),
-        privateMetadata = PrivateModeMetadata(
-          authorizedOperations = Operations.parseFromString(authorizedOperationsString),
-          workflowStage        = continuationWorkflowStage,
-          created              = created,
-          lastModified         = lastModified,
-          eTag                 = eTag,
-        )
+        privateMetadata = privateModeMetadata
       ),
       expirationDuration =
         java.time.Duration.ofMinutes(FormRunner.intFormRunnerProperty("oxf.fr.state-token.validity").getOrElse(0).toLong)

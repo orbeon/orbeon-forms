@@ -76,6 +76,7 @@ class XmlInitialDataTest
             created              = None,
             lastModified         = None,
             eTag                 = None,
+            dataStatus           = DataStatus.Dirty,
           )
         )
 

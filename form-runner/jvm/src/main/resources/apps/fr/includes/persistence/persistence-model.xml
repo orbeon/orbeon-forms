@@ -273,13 +273,6 @@
                 <xf:delete
                     ref="xxf:instance('fr-form-instance')//(@xxf:relevant, @fr:relevant)"/>
 
-                <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
-                     mode, and we can't really know if the data is clean or dirty but would like to enable the save button.
-                     Also: import data review. -->
-                <xf:setvalue
-                    if="$mode = 'edit'"
-                    ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
-
                 <!-- https://github.com/orbeon/orbeon-forms/issues/5437 -->
                 <xf:setvalue
                     ref="instance('fr-authorized-operations')"
@@ -294,13 +287,25 @@
                                 true()
                             )"/>
 
-                <!-- https://github.com/orbeon/orbeon-forms/issues/5984 -->
-                <!-- In the JS runtime, there is currently no need to encrypt or decrypt parameters. -->
                 <xf:action if="not(fr:is-browser-environment()) and not($is-background)" type="xpath">
+                    <!--
+                        Restore:
+                        - data status (clean/dirty)
+                        - workflow stage (https://github.com/orbeon/orbeon-forms/issues/5984)
+                        - document metadata: created date, modified date, ETag
+                    -->
                     frf:updateDocumentMetadata(
                         xxf:get-request-parameter(frf:InternalStateParam())[1],
+                        $persistence-instance,
                         instance('fr-document-metadata')
                     )
+                </xf:action>
+                <xf:action if="fr:is-browser-environment() or $is-background">
+                    <!-- In the JS runtime, there is currently no need to encrypt or decrypt parameters. -->
+                    <!-- When running in the background, we know that no internal state can be passed -->
+                    <xf:setvalue
+                        if="mode = 'edit'"
+                        ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
                 </xf:action>
 
                 <!-- Workflow stage must be available to background processes as well -->
@@ -1143,7 +1148,7 @@
             <message/>
             <!-- Error document returned -->
             <error/>
-            <!-- Flag to override data-safe -->
+            <!-- Flag to override data-safe: set just before a `send()`, reset when the `send()` submission completes -->
             <data-safe-override/>
             <!-- Whether data is safe -->
             <data-safe/>

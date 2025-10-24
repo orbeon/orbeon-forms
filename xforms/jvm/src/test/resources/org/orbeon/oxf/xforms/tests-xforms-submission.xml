@@ -2176,7 +2176,7 @@ az4K</document>
                             id="submission"
                             method="get"
                             serialization="none"
-                            resource="https://www.orbeon.com/img/orbeon-icon-16.png"
+                            resource="https://www.orbeon.com/img/orbeon-icon-64.png"
                             replace="xxf:binary"
                             targetref="instance('result-instance')"/>
 
@@ -2200,7 +2200,7 @@ az4K</document>
                     <dynamic-state>
                         <instances>
                             <instance id="result-instance" model-id="model">
-                                <file mediatype="image/png" size="4563"/>
+                                <file mediatype="image/png" size="3400"/>
                             </instance>
                         </instances>
                     </dynamic-state>

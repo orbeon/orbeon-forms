@@ -14,6 +14,7 @@ import org.slf4j
 
 import java.nio.charset.StandardCharsets
 import java.time.Instant
+import scala.util.Try
 import scala.util.control.NonFatal
 
 
@@ -42,8 +43,8 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
     formRunnerParams          : FormRunnerParams
   ): String =
     createTokenAndStoreState(
-      ModeState(
-        data     = XFormsCrossPlatformSupport.serializeTinyTreeToByteArray(
+       ModeState(
+        data = XFormsCrossPlatformSupport.serializeTinyTreeToByteArray(
           document           = data,
           method             = "xml",
           encoding           = Defaults.DefaultEncodingForModernUse,
@@ -52,12 +53,14 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
           omitXmlDeclaration = true,
           standaloneOpt      = None
         ),
-        metadata = ModeMetadata(
-          lang                 = currentLang,
-          embeddable           = embeddable,
-          appFormVersion       = formRunnerParams.appFormVersion,
-          documentId           = formRunnerParams.document,
-          mode                 = continuationMode,
+        publicMetadata = PublicModeMetadata(
+          appFormVersion = formRunnerParams.appFormVersion,
+          documentId     = formRunnerParams.document,
+          mode           = continuationMode,
+          lang           = currentLang,
+          embeddable     = embeddable,
+        ),
+        privateMetadata = PrivateModeMetadata(
           authorizedOperations = Operations.parseFromString(authorizedOperationsString),
           workflowStage        = continuationWorkflowStage,
           created              = created,
@@ -67,6 +70,30 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
       ),
       expirationDuration
     )
+
+  def encryptPrivateModeMetadata(
+    privateModeMetadata: PrivateModeMetadata
+  ): String =
+    SecureUtils.encrypt(
+      SecureUtils.KeyUsage.GeneralNoCheck,
+      privateModeMetadata.asJson.noSpaces.getBytes(StandardCharsets.UTF_8)
+    )
+
+  def decryptPrivateModeMetadata(
+    encryptedPrivateModeMetadata: String
+  ): Try[PrivateModeMetadata] = {
+
+    val decryptedBytes =
+      SecureUtils.decrypt(
+        SecureUtils.KeyUsage.GeneralNoCheck,
+        encryptedPrivateModeMetadata
+      )
+
+    val jsonString =
+      new String(decryptedBytes, StandardCharsets.UTF_8)
+
+    io.circe.parser.decode[PrivateModeMetadata](jsonString).toTry
+  }
 
   def createTokenAndStoreState(
     modeState         : ModeState,

@@ -6,7 +6,6 @@ import org.orbeon.fr.FormRunnerPath
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
-import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.process.FormRunnerExternalMode.Slf4JLogger
 import org.orbeon.oxf.fr.process.{FormRunnerExternalMode, SimpleProcess}
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerExternalModeToken}
@@ -39,18 +38,14 @@ object CallbackRoute extends NativeRoute {
 
     val queryParams =
       SimpleProcess.buildPublicStateParams(
-        lang        = modeState.metadata.lang,
-        embeddable  = modeState.metadata.embeddable,
-        formVersion = modeState.metadata.appFormVersion._2,
+        lang        = modeState.publicMetadata.lang,
+        embeddable  = modeState.publicMetadata.embeddable,
+        formVersion = modeState.publicMetadata.appFormVersion._2,
       ) :::
-      SimpleProcess.prependUserAndStandardParamsForModeChange(
-        requestParameters     = Nil, // xxx anything custom to pass? params should have been saved with `fr:save-state()`
-        dataFormatVersion     = DataFormatVersion.Edge,
-        authorizedOperations  = modeState.metadata.authorizedOperations.map(Operations.serialize(_, normalized = true).toSet).getOrElse(Set.empty),
-        documentWorkflowStage = modeState.metadata.workflowStage,
-        createdOpt            = modeState.metadata.created,
-        lastModifiedOpt       = modeState.metadata.lastModified,
-        eTagOpt               = modeState.metadata.eTag,
+      SimpleProcess.buildUserAndStandardParamsForModeChange(
+        userParams          = Nil, // xxx: anything custom to pass? params should have been saved with `fr:save-state()`
+        dataFormatVersion   = DataFormatVersion.Edge,
+        privateModeMetadata = modeState.privateMetadata,
       )
 
     val absoluteResolvedURL =
@@ -58,10 +53,10 @@ object CallbackRoute extends NativeRoute {
         URLRewriterUtils.rewriteServiceURL(
           ec.getRequest,
           FormRunnerPath.formRunnerPath(
-            app        = modeState.metadata.appFormVersion._1.app,
-            form       = modeState.metadata.appFormVersion._1.form,
-            mode       = modeState.metadata.mode.name.qualifiedName,
-            documentId = modeState.metadata.documentId,
+            app        = modeState.publicMetadata.appFormVersion._1.app,
+            form       = modeState.publicMetadata.appFormVersion._1.form,
+            mode       = modeState.publicMetadata.mode.name.qualifiedName,
+            documentId = modeState.publicMetadata.documentId,
             query      = Some(PathUtils.encodeSimpleQuery(queryParams))
           ),
           UrlRewriteMode.Absolute

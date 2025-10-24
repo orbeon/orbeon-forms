@@ -10,23 +10,27 @@ import java.time.Instant
 
 trait FormRunnerExternalModeTrait {
 
-  case class ModeMetadata(
+  case class PublicModeMetadata(
     appFormVersion      : AppFormVersion,
     documentId          : Option[String],
     mode                : FormRunnerDetailMode,
+    lang                : String,
+    embeddable          : Boolean,
+  )
+
+  case class PrivateModeMetadata(
     authorizedOperations: Option[Operations],
     workflowStage       : Option[String],
     created             : Option[Instant],
     lastModified        : Option[Instant],
     eTag                : Option[String],
-    lang                : String,
-    embeddable          : Boolean,
     //dataSafe            : Boolean, // later
   )
 
   case class ModeState(
-    data    : Array[Byte],
-    metadata: ModeMetadata,
+    data          : Array[Byte],
+    publicMetadata: PublicModeMetadata,
+    privateMetadata: PrivateModeMetadata,
   )
 
   def createTokenAndStoreState(

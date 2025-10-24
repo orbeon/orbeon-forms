@@ -14,6 +14,7 @@ import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.definitions.{ModeType, ModeTypeAndOps}
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
+import org.orbeon.oxf.fr.process.FormRunnerExternalMode.PrivateModeMetadata
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.*
@@ -22,7 +23,6 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{DateUtils, IndentedLogger, PathUtils, XPath}
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
@@ -426,14 +426,17 @@ object ImportExportSupport {
 
     val queryString =
       PathUtils.encodeSimpleQuery(
-        org.orbeon.oxf.fr.process.SimpleProcess.prependUserAndStandardParamsForModeChange(
-          requestParameters     = Nil, // import uses `oxf.fr.import.forward-parameters`
-          dataFormatVersion     = DataFormatVersion.Edge,
-          authorizedOperations  = Operations.serialize(operations, normalized = true).toSet,  // checked that `fr-authorized-operations` can contain `*` at this time
-          documentWorkflowStage = Headers.firstItemIgnoreCase(headers, Headers.OrbeonWorkflowStage),
-          createdOpt            = Headers.firstItemIgnoreCase(headers, Headers.Created).flatMap(DateUtils.tryParseRFC1123ToInstant),      // persistence-model.xml uses those, not the `Orbeon-*` headers
-          lastModifiedOpt       = Headers.firstItemIgnoreCase(headers, Headers.LastModified).flatMap(DateUtils.tryParseRFC1123ToInstant), // persistence-model.xml uses those, not the `Orbeon-*` headers
-          eTagOpt               = Headers.firstItemIgnoreCase(headers, Headers.ETag),
+        org.orbeon.oxf.fr.process.SimpleProcess.buildUserAndStandardParamsForModeChange(
+          userParams          = Nil, // import uses `oxf.fr.import.forward-parameters`
+          dataFormatVersion   = DataFormatVersion.Edge,
+          privateModeMetadata =
+            PrivateModeMetadata(
+              authorizedOperations = operations.some, // checked that `fr-authorized-operations` can contain `*` at this time
+              workflowStage        = Headers.firstItemIgnoreCase(headers, Headers.OrbeonWorkflowStage),
+              created              = Headers.firstItemIgnoreCase(headers, Headers.Created).flatMap(DateUtils.tryParseRFC1123ToInstant),      // `persistence-model.xml` does not use `Orbeon-*` headers
+              lastModified         = Headers.firstItemIgnoreCase(headers, Headers.LastModified).flatMap(DateUtils.tryParseRFC1123ToInstant), // `persistence-model.xml` does not use `Orbeon-*` headers
+              eTag                 = Headers.firstItemIgnoreCase(headers, Headers.ETag),
+            )
         )
       )
 

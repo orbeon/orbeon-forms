@@ -2,6 +2,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.fr.permission.Operations
+import org.orbeon.oxf.fr.process.FormRunnerExternalMode
+import org.orbeon.oxf.fr.process.FormRunnerExternalMode.PrivateModeMetadata
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{ContentTypes, HtmlParsing, StaticXPath, XPathCache}
 import org.orbeon.saxon.om
@@ -65,13 +68,24 @@ class XmlInitialDataTest
         )
       }
 
+      val internalStateParamWithReadUpdate =
+        FormRunnerExternalMode.encryptPrivateModeMetadata(
+          PrivateModeMetadata(
+            authorizedOperations = Operations.parseFromString("read update"),
+            workflowStage        = None,
+            created              = None,
+            lastModified         = None,
+            eTag                 = None,
+          )
+        )
+
       val Expected = List(
-        ("new",  Nil,                                                                                                                           "create"),
-        ("edit", Nil,                                                                                                                           "create"),
-        ("view", Nil,                                                                                                                           "create"),
-        ("new",  List(FormRunner.InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(Set("read", "update"))), "create"),
-        ("edit", List(FormRunner.InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(Set("read", "update"))), "read update"),
-        ("view", List(FormRunner.InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(Set("read", "update"))), "read update"),
+        ("new",  Nil,                                                                     "create"),
+        ("edit", Nil,                                                                     "create"),
+        ("view", Nil,                                                                     "create"),
+        ("new",  List(FormRunner.InternalStateParam -> internalStateParamWithReadUpdate), "create"),
+        ("edit", List(FormRunner.InternalStateParam -> internalStateParamWithReadUpdate), "read update"),
+        ("view", List(FormRunner.InternalStateParam -> internalStateParamWithReadUpdate), "read update"),
       )
 
       for {

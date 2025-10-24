@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.{ModeType, ModeTypeAndOps}
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
+import org.orbeon.oxf.fr.process.FormRunnerExternalMode
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
@@ -25,7 +26,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
 
 
-trait FormRunnerPermissionsOps {
+trait FormRunnerPermissionsOps extends FormRunnerPlatform {
 
   def permissionsFromElemOrProperties(
     permissionsElemOpt: Option[NodeInfo],
@@ -90,10 +91,10 @@ trait FormRunnerPermissionsOps {
 
   //@XPathFunction
   def authorizedOperationsForDetailModeOrThrow(
-    operationsFromPersistence              : String,
-    encryptedOperationsFromModeChangeOrNull: String,
-    permissionsElemOrNull                  : NodeInfo,
-    isSubmit                               : Boolean
+    operationsFromPersistence         : String,
+    encryptedPrivateModeMetadataOrNull: String,
+    permissionsElemOrNull             : NodeInfo,
+    isSubmit                          : Boolean
   ): String = {
 
     // Same logger that was used for the `xf:message` action before (could use something else)
@@ -112,12 +113,7 @@ trait FormRunnerPermissionsOps {
             Operations.parseFromString(operationsFromPersistence)
               .orElse(
                 if (isSubmit)
-                  encryptedOperationsFromModeChangeOrNull.trimAllToOpt match {
-                    case Some(encrypted) =>
-                      FormRunnerOperationsEncryption.decryptOperations(encrypted)
-                    case _ =>
-                      None
-                  }
+                  decryptPrivateModeOperations(encryptedPrivateModeMetadataOrNull.trimAllToOpt)
                 else
                   None
               )
@@ -174,5 +170,3 @@ trait FormRunnerPermissionsOps {
   def decryptParameterIfNeeded(parameterValue: String): String =
     parameterValue.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptString).getOrElse("")
 }
-
-object FormRunnerPermissionsOps extends FormRunnerPermissionsOps

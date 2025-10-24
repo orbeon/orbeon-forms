@@ -1,9 +1,18 @@
 package org.orbeon.oxf.fr
 
 import org.log4s
+import org.orbeon.dom.QName
+import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.process.FormRunnerExternalMode
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, SecureUtils}
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils, IndentedLogger, SecureUtils}
+import org.orbeon.oxf.xforms.NodeInfoFactory.attributeInfo
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath.*
 
 
 trait FormRunnerPlatformJVM extends FormRunnerPlatform {
@@ -18,4 +27,47 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
 
     passwordGeneral ++ passwordToken ++ passwordFieldEncryption ++ databaseConfiguration
   }
+
+  private val CreatedLowerQName      = QName(Headers.CreatedLower)
+  private val LastModifiedLowerQName = QName(Headers.LastModifiedLower)
+  private val ETagLowerQName         = QName(Headers.ETagLower)
+
+  //@XPathFunction
+  def updateDocumentMetadata(
+    encryptedPrivateModeMetadataOrNull: String,
+    documentMetadataElem              : om.NodeInfo
+  ): Unit =
+    encryptedPrivateModeMetadataOrNull
+      .trimAllToOpt
+      .flatMap(FormRunnerExternalMode.decryptPrivateModeMetadata(_).toOption).foreach {
+        privateModeMetadata =>
+
+          val documentMetadataElemAsList = List(documentMetadataElem)
+
+          // 2025-10-24: Reproducing the logic we had in `persistence-model.xml`. It's unclear why we set the value
+          // of `workflow-stage`, but we delete and create the other attributes. Shouldn't this be done consistently?
+          XFormsAPI.setvalue(
+            ref   = documentMetadataElemAsList,
+            value = privateModeMetadata.workflowStage.getOrElse("")
+          )
+
+          XFormsAPI.delete(
+            ref = documentMetadataElemAsList /@ @* filter (_.name != Names.WorkflowStage)
+          )
+
+          XFormsAPI.insert(
+            into    = documentMetadataElemAsList,
+            origin  =
+              List(
+                privateModeMetadata.created     .map(DateUtils.formatRfc1123DateTimeGmt).map(attributeInfo(CreatedLowerQName,      _)),
+                privateModeMetadata.lastModified.map(DateUtils.formatRfc1123DateTimeGmt).map(attributeInfo(LastModifiedLowerQName, _)),
+                privateModeMetadata.eTag.map(attributeInfo(ETagLowerQName, _))
+              ).flatten
+          )
+      }
+
+  protected def decryptPrivateModeOperations(encryptedPrivateModeMetadataOpt: Option[String]): Option[Operations] =
+    encryptedPrivateModeMetadataOpt
+      .flatMap(FormRunnerExternalMode.decryptPrivateModeMetadata(_).toOption)
+      .flatMap(_.authorizedOperations)
 }

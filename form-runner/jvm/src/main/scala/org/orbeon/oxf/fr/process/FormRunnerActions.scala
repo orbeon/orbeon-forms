@@ -15,6 +15,7 @@
 package org.orbeon.oxf.fr.process
 
 import cats.syntax.option.*
+import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
@@ -24,12 +25,13 @@ import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr.definitions.{FormRunnerDetailMode, ModeType}
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
 import org.orbeon.oxf.fr.email.{EmailContent, EmailTransport}
+import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
+import org.orbeon.oxf.fr.process.FormRunnerExternalMode.PrivateModeMetadata
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.*
-import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
@@ -456,23 +458,22 @@ trait FormRunnerActions
     formTargetOpt      : Option[String] = None,
     showProgress       : Boolean        = true,
     responseIsResource : Boolean        = false
+  )(implicit
+    formRunnerParams   : FormRunnerParams
   ): Option[XFormsSubmitDoneEvent] = {
 
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
 
     val (path, maybeRenderFormatParams) = pathQuery
 
-    val newPathQuery =
-      PathUtils.recombineQuery(
-        path,
-        buildPublicStateParamsFromCurrent                                              :::
-          buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion) :::
-          maybeRenderFormatParams
-      )
+    val queryParams =
+      buildPublicStateParamsFromCurrent :::
+      buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion) :::
+      maybeRenderFormatParams
 
     trySendImpl(
       SendActionParams(
-        uri                 = newPathQuery,
+        uri                 = PathUtils.recombineQuery(path, queryParams),
         method              = HttpMethod.POST,
         relevanceHandling   = RelevanceHandling.Keep,
         annotateWith        = Set.empty,
@@ -534,7 +535,7 @@ trait FormRunnerActions
         EscapeURI.escape(FormRunnerActionsSupport.filenameForRenderedFormat(renderedFormat), "-_.~").toString
 
       val pathQuery =
-        buildRenderedFormatPath(
+        buildRenderedFormatPathWithParams(
           params          = params,
           renderedFormat  = renderedFormat,
           fullFilename    = Some(filename),
@@ -575,49 +576,62 @@ trait FormRunnerActions
     StateParamNames                   +
     DataMigrationBehaviorName         +
     DataFormatVersionName             +
-    InternalAuthorizedOperationsParam +
-    InternalWorkflowStageParam        +
-    InternalCreatedParam              +
-    InternalLastModifiedParam         +
-    InternalETagParam
+    InternalStateParam
+
+  private def buildPublicStateParamsFromCurrent(implicit frParams : FormRunnerParams): List[(String, String)] =
+    buildPublicStateParams(
+      lang        = frc.currentLang,
+      embeddable  = inScopeContainingDocument.isEmbeddedFromUrlParam,
+      formVersion = frParams.formVersion,
+    )
+
+  // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
+  // are part of the state the user expects to be kept.
+  //
+  // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
+  // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
+  def buildPublicStateParams(
+    lang       : String,
+    embeddable : Boolean,
+    formVersion: Int
+  ): List[(String, String)] =
+    List(
+      frc.LanguageParam    -> lang,
+      EmbeddableParam      -> embeddable.toString,
+      frc.FormVersionParam -> formVersion.toString
+    )
 
   private def buildUserAndStandardParamsForModeChangeFromCurrent(dataFormatVersion: DataFormatVersion): List[(String, String)] =
-    prependUserAndStandardParamsForModeChange(
-      requestParameters     = inScopeContainingDocument.getRequestParameters,
-      dataFormatVersion     = dataFormatVersion,
-      authorizedOperations  = frc.authorizedOperations,
-      documentWorkflowStage = FormRunner.documentWorkflowStage,
-      createdOpt            = FormRunner.documentCreatedDateAsInstant,
-      lastModifiedOpt       = FormRunner.documentModifiedDateAsInstant,
-      eTagOpt               = FormRunner.documentEtag
+    buildUserAndStandardParamsForModeChange(
+      userParams          = inScopeContainingDocument.getRequestParameters,
+      dataFormatVersion   = dataFormatVersion,
+      privateModeMetadata = PrivateModeMetadata(
+        authorizedOperations  = Operations.parseFromString(FormRunner.authorizedOperationsString),
+        workflowStage         = FormRunner.documentWorkflowStage,
+        created               = FormRunner.documentCreatedDateAsInstant,
+        lastModified          = FormRunner.documentModifiedDateAsInstant,
+        eTag                  = FormRunner.documentEtag
+      )
     )
 
   def filterParamsToExcludeUponModeChange[T](p: Iterable[(String, T)]): Iterable[(String, T)] =
     p filterNot { case (name, _) => ParamsToExcludeUponModeChange(name) }
 
-  def prependUserAndStandardParamsForModeChange(
-    requestParameters    : Iterable[(String, List[String])],
+  def buildUserAndStandardParamsForModeChange(
+    userParams           : Iterable[(String, List[String])],
     dataFormatVersion    : DataFormatVersion,
-    authorizedOperations : Set[String],
-    documentWorkflowStage: Option[String],
-    createdOpt           : Option[java.time.Instant],
-    lastModifiedOpt      : Option[java.time.Instant],
-    eTagOpt              : Option[String],
+    privateModeMetadata  : PrivateModeMetadata,
   ): List[(String, String)] = {
 
     val standardParams =
       buildStandardParamsForModeChange(
-        dataFormatVersion     = dataFormatVersion,
-        authorizedOperations  = authorizedOperations,
-        documentWorkflowStage = documentWorkflowStage,
-        createdOpt            = createdOpt,
-        lastModifiedOpt       = lastModifiedOpt,
-        eTagOpt               = eTagOpt
+        dataFormatVersion   = dataFormatVersion,
+        privateModeMetadata = privateModeMetadata,
       )
 
     val filteredUserParams =
       for {
-        (name, values) <- filterParamsToExcludeUponModeChange(requestParameters)
+        (name, values) <- filterParamsToExcludeUponModeChange(userParams)
         value          <- values
       } yield
         name -> value
@@ -625,47 +639,19 @@ trait FormRunnerActions
     standardParams ::: filteredUserParams.toList
   }
 
+  // https://github.com/orbeon/orbeon-forms/issues/2999
+  // https://github.com/orbeon/orbeon-forms/issues/5437
+  // https://github.com/orbeon/orbeon-forms/issues/7157
   def buildStandardParamsForModeChange(
     dataFormatVersion    : DataFormatVersion,
-    authorizedOperations : Set[String],
-    documentWorkflowStage: Option[String],
-    createdOpt           : Option[java.time.Instant],
-    lastModifiedOpt      : Option[java.time.Instant],
-    eTagOpt              : Option[String],
-  ): List[(String, String)] = {
+    privateModeMetadata  : PrivateModeMetadata,
+  ): List[(String, String)] =
+    (DataMigrationBehaviorName -> DataMigrationBehavior.Disabled.entryName)                               ::
+    (DataFormatVersionName     -> dataFormatVersion.entryName)                                            ::
+    (InternalStateParam        -> FormRunnerExternalMode.encryptPrivateModeMetadata(privateModeMetadata)) ::
+    Nil
 
-    val dataMigrationParams =
-      (DataMigrationBehaviorName -> DataMigrationBehavior.Disabled.entryName) ::
-      (DataFormatVersionName     -> dataFormatVersion.entryName)              ::
-      Nil
-
-    // https://github.com/orbeon/orbeon-forms/issues/2999
-    // https://github.com/orbeon/orbeon-forms/issues/5437
-    // https://github.com/orbeon/orbeon-forms/issues/7157
-    val internalParams = {
-
-      val opsParam =
-        authorizedOperations
-          .nonEmpty
-          .list(InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(authorizedOperations))
-
-      val documentMetadataParams = List(
-        InternalWorkflowStageParam -> documentWorkflowStage,
-        // Propagate original document metadata in order to detect concurrent data modifications (#7157)
-        InternalCreatedParam       -> createdOpt.map(DateUtils.formatRfc1123DateTimeGmt),
-        InternalLastModifiedParam  -> lastModifiedOpt.map(DateUtils.formatRfc1123DateTimeGmt),
-        InternalETagParam          -> eTagOpt
-      ).flatMap { case (param, valueOpt) =>
-        valueOpt.map(param -> FormRunnerOperationsEncryption.encryptString(_))
-      }
-
-      opsParam ::: documentMetadataParams
-    }
-
-    dataMigrationParams ::: internalParams
-  }
-
-  private def buildRenderedFormatPath(
+  private def buildRenderedFormatPathWithParams(
     params         : ActionParams,
     renderedFormat : RenderedFormat,
     fullFilename   : Option[String],
@@ -685,7 +671,6 @@ trait FormRunnerActions
 
     renderedFormat match {
       case RenderedFormat.Pdf | RenderedFormat.Tiff =>
-
         s"${pathPrefix(usePagePath = fullFilename.isDefined)}/${renderedFormat.entryName}/$document" -> urlParams
       case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData =>
           s"${pathPrefix(usePagePath = false)}/export/$document?export-format=${renderedFormat.entryName}" -> urlParams
@@ -714,7 +699,7 @@ trait FormRunnerActions
         case None =>
 
           val pathQuery =
-            buildRenderedFormatPath(
+            buildRenderedFormatPathWithParams(
               params          = params,
               renderedFormat  = renderedFormat,
               fullFilename    = None,

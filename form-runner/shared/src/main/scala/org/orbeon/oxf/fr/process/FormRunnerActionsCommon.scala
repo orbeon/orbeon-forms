@@ -414,26 +414,6 @@ trait FormRunnerActionsCommon {
     } else
       pathQueryOrUrl
 
-  // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
-  // are part of the state the user expects to be kept.
-  //
-  // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
-  // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
-  def buildPublicStateParamsFromCurrent: List[(String, String)] =
-    for ((name, valueFromCurrent, _) <- StateParams)
-      yield name -> valueFromCurrent()
-
-  def buildPublicStateParams(
-    lang       : String,
-    embeddable : Boolean,
-    formVersion: Int
-  ): List[(String, String)] =
-    List(
-      frc.LanguageParam    -> lang,
-      EmbeddableParam      -> embeddable.toString,
-      frc.FormVersionParam -> formVersion.toString
-    )
-
   // Navigate to a URL specified in parameters or indirectly in properties
   // If no URL is specified, the action fails
   def tryNavigate(params: ActionParams): ActionResult =

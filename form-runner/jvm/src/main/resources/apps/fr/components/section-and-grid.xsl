@@ -81,28 +81,36 @@
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
 
-            <xsl:choose>
-                <xsl:when test="$use-view-appearance and $view-appearance = 'fr:wizard' and not($is-readonly-mode)">
+            <xsl:if
+                test="
+                    ($use-view-appearance and $view-appearance = 'fr:wizard' and not($is-readonly-mode)) or
+                    (: 2025-10-24: Which case does this cover exactly? :)
+                    not($use-view-appearance and $view-appearance = 'fr:wizard')
+                ">
+                <xsl:variable name="page-size-opt"            as="xs:integer?" select="xs:integer(@page-size[. castable as xs:integer])"/>
+                <xsl:variable name="use-wizard-repeat-paging" as="xs:boolean"  select="$view-appearance = 'fr:wizard' and $page-size-opt = 1 and not(@wizard-paging = 'false')"/>
+                <xsl:variable name="use-pager"                as="xs:boolean"  select="exists($page-size-opt) and not($is-pdf-mode) and not($use-wizard-repeat-paging)"/>
+
+                <xsl:if test="$use-wizard-repeat-paging">
                     <xsl:copy-of select="@page-size"/>
-                </xsl:when>
-                <xsl:when test="not($use-view-appearance and $view-appearance = 'fr:wizard')">
+                    <xsl:attribute name="fr-use-wizard-repeat-paging">true</xsl:attribute>
+                </xsl:if>
+                <xsl:if test="$use-pager">
                     <xsl:copy-of select="@page-size"/>
-                </xsl:when>
-            </xsl:choose>
+                    <xsl:attribute name="fr-use-pager">true</xsl:attribute>
+                </xsl:if>
+            </xsl:if>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint | @clear-constraint | @class">
-                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
+                <xsl:attribute
+                    name="{name(.)}"
+                    select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
             </xsl:for-each>
 
-            <!-- Propagate for section/repeater/pager -->
-            <!-- If we pass `$is-pdf-mode`, the view and PDF pages will be different from a caching perspective. Now, in case we want to use
-                 this information to disable paging, the PDF and view pages will be different, and that is ok. However, the simple presence of
-                 this different attribute value will cause caching to be different, and that is not desirable. So we'll have to find a better
-                 solution in that case. -->
-<!--            <xsl:attribute name="is-pdf-mode"      select="$is-pdf-mode"/>-->
-            <xsl:attribute name="is-readonly-mode" select="$is-readonly-mode"/>
+            <xsl:apply-templates
+                select="@* except (@page-size | @fr-use-wizard-repeat-paging | @fr-use-pager | @min | @max | @freeze | @remove-constraint | @clear-constraint | @class)"
+                mode="#current"/>
 
-            <xsl:apply-templates select="@* except (@page-size | @min | @max | @freeze | @remove-constraint | @clear-constraint | @class)" mode="#current"/>
             <xsl:apply-templates select="node()" mode="#current">
                 <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
             </xsl:apply-templates>

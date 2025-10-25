@@ -47,7 +47,7 @@
             select="concat($static-top-level-section-id, '-case')"/>
         <xsl:variable
             name="use-paging"
-            select="$static-current-section/@page-size = '1' and not($static-current-section/@wizard-paging = 'false')"/>
+            select="$static-current-section/@fr-use-wizard-repeat-paging = 'true'"/>
 
         <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
         <xsl:element name="xf:{if ($use-paging) then 'repeat' else 'group'}">

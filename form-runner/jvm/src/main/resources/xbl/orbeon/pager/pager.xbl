@@ -144,7 +144,7 @@
 
                 <xh:ul>
                     <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
-                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
+                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first" xxf:readonly-appearance="dynamic">
                             <xf:label><xh:i class="fa fa-fw fa-step-backward"/></xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
@@ -153,7 +153,7 @@
                         </xf:trigger>
                     </xh:li>
                     <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
-                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
+                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev" xxf:readonly-appearance="dynamic">
                             <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". - 1"/>

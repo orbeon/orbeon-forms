@@ -237,15 +237,12 @@
                                                         ref="{$child-path}"
                                                         level="{$level}">
 
-                                                        <xsl:copy-of select="@template | @origin | @apply-defaults | @appearance | @insert | @readonly | @view-appearance | @is-pdf-mode | @is-readonly-mode"/>
+                                                        <xsl:copy-of select="$root/(@template | @origin | @apply-defaults | @appearance | @insert | @readonly | @view-appearance)"/>
 
                                                         <xsl:if test="not($editable)">
-                                                            <xsl:copy-of select="@min | @max | @freeze | @remove-constraint"/>
-                                                        </xsl:if>
-
-                                                        <!-- Paging is only available at runtime, not design-time -->
-                                                        <xsl:if test="not($editable)">
-                                                            <xsl:copy-of select="$root/@page-size | $root/@wizard-paging"/>
+                                                            <xsl:copy-of select="$root/(@min | @max | @freeze | @remove-constraint)"/>
+                                                            <!-- Paging is only available at runtime, not design-time -->
+                                                            <xsl:copy-of select="$root/(@page-size | @fr-use-wizard-repeat-paging | @fr-use-pager)"/>
                                                         </xsl:if>
 
                                                         <xsl:apply-templates select="fr:short-label | fr:iteration-label | fr:add-iteration-label"/>

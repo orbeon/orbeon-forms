@@ -102,8 +102,6 @@
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
                 <xsl:variable name="level"              select="$root/@level"/>
-                <xsl:variable name="is-pdf-mode"        select="$root/@is-pdf-mode      = 'true'"/>
-                <xsl:variable name="is-readonly-mode"   select="$root/@is-readonly-mode = 'true'"/>
 
                 <!-- Allow  -->
                 <xsl:variable
@@ -126,8 +124,8 @@
                 <xsl:variable name="insert"                   select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
                 <xsl:variable name="page-size-opt"            select="xs:integer($root/@page-size[. castable as xs:integer])" as="xs:integer?"/>
-                <xsl:variable name="use-wizard-repeat-paging" select="$root/@view-appearance = 'fr:wizard' and $page-size-opt = 1 and not($root/@wizard-paging = 'false')"/>
-                <xsl:variable name="use-pager"                select="not($is-pdf-mode or $is-readonly-mode) and not($use-wizard-repeat-paging) and exists($page-size-opt)"/>
+                <xsl:variable name="use-wizard-repeat-paging" select="$root/@fr-use-wizard-repeat-paging = 'true'"/>
+                <xsl:variable name="use-pager"                select="$root/@fr-use-pager = 'true'"/>
 
                 <xsl:template match="/*">
                     <xh:div xxf:control="true" class="{'fr-repeat-container', 'fr-repeater-paging'[$use-wizard-repeat-paging], @class}">
@@ -237,16 +235,15 @@
                         <!-- Placeholder to add first iteration when empty (could have `and count($repeat-sequence) = 0`,
                              but seems fine to keep this permanently). See #1509. -->
                         <xsl:if test="$appearance = 'full' and not($readonly)">
-                            <xf:group ref=".[not($view-mode)]" class="fr-repeater-top-buttons">
+                            <xf:group class="fr-repeater-top-buttons">
                                 <xf:trigger
                                     id="fr-repeater-add"
                                     class="fr-repeater-add"
                                     appearance="xxf:small"
-                                    ref="if ($can-add) then $repeat-context else ''"
+                                    ref="if ($view-mode) then () else if ($can-add) then $repeat-context else ''"
                                     xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
                                     <xsl:copy-of select="$add-iteration-label-content"/>
                                 </xf:trigger>
-
                                 <xsl:if test="$use-pager">
                                     <fr:pager
                                         id="pager"
@@ -255,7 +252,6 @@
                                         total-value="count($repeat-sequence)"
                                         from-ref="instance('local')/from"
                                         to-ref="instance('local')/to"/>
-
                                 </xsl:if>
                             </xf:group>
                         </xsl:if>

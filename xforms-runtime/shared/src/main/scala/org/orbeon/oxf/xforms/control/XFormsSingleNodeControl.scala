@@ -325,9 +325,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // Static read-only if we are read-only and static (global or local setting)
   override def isStaticReadonly = isReadonly && hasStaticReadonlyAppearance
 
-  private def hasStaticReadonlyAppearance: Boolean =
-    containingDocument.staticReadonly ||
-      XFormsProperties.ReadonlyAppearanceStaticValue == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
+  private def hasStaticReadonlyAppearance: Boolean = {
+    val local = element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
+    containingDocument.staticReadonly && local != XFormsProperties.ReadonlyAppearanceDynamicValue ||
+      local == XFormsProperties.ReadonlyAppearanceStaticValue
+  }
 
   override def outputAjaxDiff(
     previousControlOpt    : Option[XFormsControl],

@@ -67,7 +67,7 @@ abstract class XFormsBaseHandlerXHTML (
 
   final def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
     control match {
-      case c: XFormsSingleNodeControl => c.isReadonly && ! containingDocument.staticReadonly
+      case c: XFormsSingleNodeControl => c.isReadonly && ! c.isStaticReadonly
       case _ => false
     }
 

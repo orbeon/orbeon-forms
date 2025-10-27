@@ -1,5 +1,7 @@
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <section-1>
-        <control-1>Thomašch</control-1>
+        <grid-1>
+            <control-1>Thomašch</control-1>
+        </grid-1>
     </section-1>
 </form>

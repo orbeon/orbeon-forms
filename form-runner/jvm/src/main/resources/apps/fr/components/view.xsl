@@ -1051,19 +1051,21 @@
     </xsl:template>
 
     <xsl:template match="fr:navbar-home-link">
-        <xf:group
-            class="fr-navbar-home-link"
-            ref=".[
+        <xf:switch
+            xxf:update="full"
+            caseref="
                 not(fr:mode() = 'test')                        and
                 xxf:property('oxf.fr.navbar.home-link.enable') and
-                not(fr:is-embedded())
-            ]">
-            <xh:ul class="nav">
-              <xh:li class="">
-                <xh:a href="/fr/" title="{{xxf:r('landing.title', '|fr-fr-resources|')}}"><xh:i class="fa fa-th"/></xh:a>
-              </xh:li>
-            </xh:ul>
-        </xf:group>
+                not(fr:is-embedded())">
+            <xf:case value="true()">
+                <xh:ul class="nav">
+                    <xh:li class="">
+                        <xh:a href="/fr/" title="{{xxf:r('landing.title', '|fr-fr-resources|')}}"><xh:i class="fa fa-th"/></xh:a>
+                    </xh:li>
+                </xh:ul>
+            </xf:case>
+            <xf:case value="false()"/>
+        </xf:switch>
     </xsl:template>
 
     <xsl:template match="fr:version">

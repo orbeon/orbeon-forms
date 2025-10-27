@@ -4,6 +4,7 @@ import cats.syntax.option.*
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -77,6 +78,7 @@ class PdfProductionTest
     }
 
     it("PDF template for PTA form must contain data text") {
+      assume(Version.isPE)
 
       val ExpectedMatches = List(
         "Name of PTA Unit: Springfield PTA",
@@ -114,6 +116,7 @@ class PdfProductionTest
     }
 
     it("PDF template output for most form controls must contain data text") {
+      assume(Version.isPE)
 
       val ExpectedMatches = List(
         // Text Field

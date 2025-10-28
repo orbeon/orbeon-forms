@@ -9629,27 +9629,46 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Sovelluksen nimi</label>
-            <hint todo="true">Tunnistaa ryhmän lomakkeita, esimerkiksi toiminnallisuuden tai osaston perusteella (esim. "myynnit"). Jos sinulla on lomakeryhmä, voit käyttää organisaatiosi nimeä (esim. "huippu"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
-            <help todo="true"/>
-            <alert todo="true">Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
+            <hint>Tunnistaa lomakkeiden ryhmän (esimerkiksi "acme" tai "myynti")</hint>
+            <help>
+                &lt;p>
+                Sovelluksen nimi on nimi, joka mahdollistaa lomakkeiden ryhmittelyn. Sovelluksen nimi voi olla esimerkiksi:
+                &lt;/p>
+                &lt;ul>
+                    &lt;li>yrityksen nimi kuten "orbeon" tai "acme"&lt;/li>
+                    &lt;li>yrityksen osasto kuten "hr" tai "myynti" tai "suunnittelu"&lt;/li>
+                    &lt;li>projektin nimi kuten "mercury" tai "phoenix"&lt;/li>
+                &lt;/ul>
+                &lt;p>
+                Tämä nimi näkyy käyttöönotetun lomakkeen URL-osoitteessa, joten suosittelemme käyttämään vain pieniä kirjaimia.
+                &lt;/p>
+            </help>
+            <alert>Käytä enintään 255 ASCII-kirjainta, numeroa, "-" tai "_"</alert>
         </application-name>
         <form-name>
             <label>Lomakkeen nimi</label>
-            <hint todo="true">Tunnistaa juuri tämän lomakkeen (esim. "terveysrekisteri" tai "korvausvaatimus"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
-            <help todo="true"/>
-            <alert todo="true">Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
-            <no-form-alert todo="true">
-                No form with this specific application and form name in this system have been found in this system.
+            <hint>Tunnistaa tämän tietyn lomakkeen (esimerkiksi "vaatimus")</hint>
+            <help>
+                &lt;p>
+                Lomakkeen nimi on nimi, joka on paikallinen sovelluksen nimeen nähden, esimerkiksi "osoite" tai "vaatimus".
+                &lt;/p>
+                &lt;p>
+                Tämä nimi näkyy URL-osoitteessa, joten suosittelemme käyttämään vain pieniä kirjaimia.
+                &lt;/p>
+            </help>
+            <alert>Käytä enintään 255 ASCII-kirjainta, numeroa, "-" tai "_"</alert>
+            <no-form-alert>
+                Yhtään lomaketta tällä tietyllä sovelluksen nimellä ja lomakkeen nimellä ei löytynyt tästä järjestelmästä.
             </no-form-alert>
-            <form-published-alert todo="true">
-                {0,choice,1#One form|1&lt;{0,number,integer} forms}
-                with this application name and form name {0,choice,1#is|1&lt;are} published.
-                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            <form-published-alert>
+                {0,choice,1#Yksi lomake|1&lt;{0,number,integer} lomaketta}
+                tällä sovelluksen nimellä ja lomakkeen nimellä {0,choice,1#on julkaistu|1&lt;on julkaistu}.
+                &lt;a href="{1}" target="_blank">Näytä Admin-sivulla.&lt;/a>
             </form-published-alert>
-            <form-in-progress-alert todo="true">
-                {0,choice,1#One form|1&lt;{0,number,integer} forms}
-                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
-                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            <form-in-progress-alert>
+                {0,choice,1#Yksi lomake|1&lt;{0,number,integer} lomaketta}
+                tällä sovelluksen nimellä ja lomakkeen nimellä {0,choice,1#on keskeneräinen|1&lt;on keskeneräisiä}.
+                &lt;a href="{1}" target="_blank">Näytä Form Builder yhteenvetosivulla.&lt;/a>
             </form-in-progress-alert>
         </form-name>
         <title>
@@ -9665,10 +9684,10 @@
             <hint>Logo näkyy lomakkeesi yläosassa</hint>
         </logo>
         <general-settings>
-            <label todo="true">[General Settings]</label>
+            <label>Yleiset asetukset</label>
         </general-settings>
         <custom-settings>
-            <label todo="true">[Custom Settings]</label>
+            <label>Mukautetut asetukset</label>
         </custom-settings>
         <!-- Toolbox -->
         <cut>
@@ -9681,28 +9700,28 @@
             <label>Liitä</label>
         </paste>
         <undo-redo>
-            <undo todo="true">[Undo {0}]</undo>
-            <redo todo="true">[Redo {0}]</redo>
-            <insert>[insert]</insert>
-            <rename todo="true">[rename]</rename>
-            <delete-control todo="true">[delete control]</delete-control>
-            <delete-container todo="true">[delete container]</delete-container>
-            <merge-section-template todo="true">[merge section template]</merge-section-template>
-            <move-control todo="true">[move control]</move-control>
-            <move-container todo="true">[move container]</move-container>
-            <update-settings todo="true">[update settings]</update-settings>
-            <insert-control todo="true">[insert control]</insert-control>
-            <insert-section todo="true">[insert section]</insert-section>
-            <insert-grid todo="true">[insert grid]</insert-grid>
-            <delete-row todo="true">[delete row]</delete-row>
-            <insert-row todo="true">[insert row]</insert-row>
-            <control-settings todo="true">[control settings]</control-settings>
-            <move-wall todo="true">[move wall]</move-wall>
-            <split-cell todo="true">[split cell]</split-cell>
-            <merge-cell todo="true">[merge cell]</merge-cell>
+            <undo>Kumoa {0}</undo>
+            <redo>Tee uudelleen {0}</redo>
+            <insert>lisäys</insert>
+            <rename>nimeäminen uudelleen</rename>
+            <delete-control>kontrollin poisto</delete-control>
+            <delete-container>säilön poisto</delete-container>
+            <merge-section-template>lohkomallin yhdistäminen</merge-section-template>
+            <move-control>kontrollin siirto</move-control>
+            <move-container>säilön siirto</move-container>
+            <update-settings>asetusten päivitys</update-settings>
+            <insert-control>kontrollin lisäys</insert-control>
+            <insert-section>lohkon lisäys</insert-section>
+            <insert-grid>ruudukon lisäys</insert-grid>
+            <delete-row>rivin poisto</delete-row>
+            <insert-row>rivin lisäys</insert-row>
+            <control-settings>kontrollin asetukset</control-settings>
+            <move-wall>seinän siirto</move-wall>
+            <split-cell>solun jakaminen</split-cell>
+            <merge-cell>solun yhdistäminen</merge-cell>
         </undo-redo>
         <merge-section>
-            <label todo="true">[Merge Section Template]</label>
+            <label>Yhdistä lohkomalli</label>
         </merge-section>
         <form-structure>
             <label>Lomakerakenne</label>
@@ -9720,7 +9739,7 @@
             <label>Kehittynyt</label>
         </advanced>
         <attachments>
-            <label todo="true">[Attachments]</label>
+            <label>Liitteet</label>
         </attachments>
         <services-actions>
             <label>Palvelut &amp; Toiminnot</label>
@@ -9772,9 +9791,9 @@
             <label>Lataa työkalupakki uudelleen</label>
         </reload-components>
         <library-version>
-            <label todo="true">Library Version</label>
+            <label>Kirjaston versio</label>
             <item>
-                <label todo="true">Version {0,number,integer}</label>
+                <label>Versio {0,number,integer}</label>
             </item>
         </library-version>
         <enter-section-title>
@@ -9811,25 +9830,25 @@
             <label>Muokkaa kohdetta</label>
         </edit-items>
         <merge-right-icon>
-            <label todo="true">[Expand horizontally]</label>
+            <label>Yhdistä oikeanpuoleiseen soluun</label>
         </merge-right-icon>
         <split-horizontally-icon>
-            <label todo="true">[Split horizontally]</label>
+            <label>Jaa vaakasuunnassa</label>
         </split-horizontally-icon>
         <merge-below-icon>
-            <label todo="true">[Expand vertically]</label>
+            <label>Yhdistä alapuolella olevaan soluun</label>
         </merge-below-icon>
         <split-vertically-icon>
-            <label todo="true">[Split vertically]</label>
+            <label>Jaa pystysuunnassa</label>
         </split-vertically-icon>
         <delete-control-icon>
             <label>Poista kontrolli</label>
         </delete-control-icon>
         <move-icon>
-            <label todo="true">[Drag &amp; drop to move or copy]</label>
+            <label>Vedä ja pudota siirtääksesi tai kopioidaksesi</label>
         </move-icon>
         <delete-container-icon>
-            <label todo="true">Poista lohko</label>
+            <label>Poista lohko tai ruudukko</label>
         </delete-container-icon>
         <delete-row-icon>
             <label>Poista rivi</label>
@@ -9890,20 +9909,20 @@
             <label>Mukautetut CSS luokat</label>
         </classes>
         <autocomplete>
-            <label todo="true">[Autocomplete attribute]</label>
+            <label>Automaattinen täydennys -attribuutti</label>
             <groups>
-                <general todo="true">[General]</general>
-                <name todo="true">[Name and Title]</name>
-                <credentials todo="true">[Credentials]</credentials>
-                <address todo="true">[Address]</address>
-                <contact todo="true">[Contact]</contact>
-                <payment todo="true">[Payment]</payment>
+                <general>Yleiset</general>
+                <name>Nimi ja titteli</name>
+                <credentials>Tunnistetiedot</credentials>
+                <address>Osoite</address>
+                <contact>Yhteystiedot</contact>
+                <payment>Maksu</payment>
             </groups>
         </autocomplete>
         <property-yes-no>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Yes]</item>
-            <item id="2" todo="true">[No]</item>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Kyllä</item>
+            <item id="2">Ei</item>
         </property-yes-no>
         <!-- Dialogs -->
         <continue>
@@ -9925,54 +9944,54 @@
             <label>tai</label>
         </or>
         <errors>
-            <label todo="true">Errors</label>
+            <label>Virheet</label>
         </errors>
         <error-summary>
-            <label todo="true">[{1,choice,
-                0#No message|
-                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
-                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+            <label>{1,choice,
+                0#Ei viestiä|
+                1#'{0,choice,0#Virhe|1#Varoitus|2#Tiedotusviesti|3#Viesti}'|
+                1&lt;'{0,choice,0#Virheet|1#Varoitukset|2#Tiedotusviestit|3#Viestit}'}</label>
         </error-summary>
         <back-to-summary>
-            <label todo="true">Back to List of Forms</label>
+            <label>Takaisin lomakkeiden luetteloon</label>
         </back-to-summary>
         <form-builder-page-layout>
-            <item id="0">[Fixed View]</item>
-            <item id="1">[Fluid View]</item>
+            <item id="0">Kiinteä näkymä</item>
+            <item id="1">Joustava näkymä</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
+            <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Käytä ehdotusta: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
                 <name>
-                    <label todo="true">[Name]</label>
-                    <alert todo="true">[Missing or incorrect value]</alert>
+                    <label>Nimi</label>
+                    <alert>Puuttuva tai virheellinen arvo</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[Formula]</label>
-                    <alert todo="true">[Missing or incorrect formula]</alert>
+                    <label>Kaava</label>
+                    <alert>Puuttuva tai virheellinen kaava</alert>
                 </xpath>
                 <control>
-                    <label todo="true">[Control]</label>
-                    <alert todo="true">[Missing value]</alert>
+                    <label>Kontrolli</label>
+                    <alert>Puuttuva arvo</alert>
                 </control>
                 <token>
-                    <label todo="true">Generate token URL parameter</label>
+                    <label>Luo token URL-parametri</label>
                 </token>
                 <type>
-                    <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[Formula]</item>
-                    <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="[Link]">
-                        <item id="3" todo="true">[Edit page]</item>
-                        <item id="4" todo="true">[View page]</item>
-                        <item id="5" todo="true">[New page]</item>
-                        <item id="6" todo="true">[Summary page]</item>
-                        <item id="7" todo="true">[Home page]</item>
-                        <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Forms admin]</item>
-                        <item id="8" todo="true">[PDF file]</item>
+                    <item id="0">Kontrollin arvo</item>
+                    <item id="1">Kaava</item>
+                    <item id="2">Kaikki kontrollin arvot</item>
+                    <choice label="Linkki">
+                        <item id="3">Muokkaussivu</item>
+                        <item id="4">Katselusivu</item>
+                        <item id="5">Uusi sivu</item>
+                        <item id="6">Yhteenvetosivu</item>
+                        <item id="7">Kotisivu</item>
+                        <item id="9">Julkaistut lomakkeet -sivu</item>
+                        <item id="10">Lomakkeiden ylläpito</item>
+                        <item id="8">PDF-tiedosto</item>
                     </choice>
                 </type>
             </parameters-editor>
@@ -9981,12 +10000,12 @@
             <label>Lomakeasetukset</label>
             <save-as>Tallenna nimellä</save-as>
             <open><label>Lomakeasetukset</label></open>
-            <options todo="true">[Form Options]</options>
-            <view-options todo="true">[Appearance]</view-options>
-            <wizard-options todo="true">[Wizard]</wizard-options>
-            <pdf-options todo="true">[PDF]</pdf-options>
-            <control-settings todo="true">[Control Settings]</control-settings>
-            <about todo="true">[About this Form]</about>
+            <options>Lomakkeen valinnat</options>
+            <view-options>Ulkoasu</view-options>
+            <wizard-options>Ohjattu toiminto</wizard-options>
+            <pdf-options>PDF</pdf-options>
+            <control-settings>Kontrollin asetukset</control-settings>
+            <about>Tietoja tästä lomakkeesta</about>
             <stats>Lomatilastot</stats>
             <sections>Lohkot</sections>
             <repeats>Toistot</repeats>
@@ -9994,30 +10013,30 @@
             <section-templates>Lohkomallinteet</section-templates>
             <controls>Kontrollit</controls>
             <all>Kaikki</all>
-            <use-property todo="true">[Use property]</use-property>
+            <use-property>Käytä ominaisuutta</use-property>
             <singleton>
-                <label todo="true">[Singleton form]</label>
-                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+                <label>Singleton-lomake</label>
+                <hint>Estää käyttäjiä luomasta lisälomakkeen tietoja, jos heillä on pääsy olemassa oleviin lomakkeen tietoihin tälle lomakemäärittelylle</hint>
             </singleton>
             <allow-template-use>
-                <label todo="true">Allow use as form template</label>
-                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+                <label>Salli käyttö lomakemalliena</label>
+                <hint>Jos valittu, tämä lomake näytetään lomakemallien luettelossa</hint>
             </allow-template-use>
             <wizard>
-                <label todo="true">[Wizard View]</label>
-                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+                <label>Ohjattu toiminto -näkymä</label>
+                <hint>Näytä ylätason lohkot erillisinä ohjatun toiminnon sivuina</hint>
             </wizard>
             <wizard-mode>
-                <label todo="true">[Wizard Navigation Validation Mode]</label>
-                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use property]</item>
-                <item todo="true" id="1">[Free]</item>
-                <item todo="true" id="2">[Lax]</item>
-                <item todo="true" id="3">[Strict]</item>
+                <label>Ohjatun toiminnon navigoinnin validointitila</label>
+                <hint>Miten ohjatun toiminnon navigointi toimii, kun tiedot eivät ole kelvollisia</hint>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Vapaa</item>
+                <item id="2">Lempeä</item>
+                <item id="3">Tiukka</item>
             </wizard-mode>
             <wizard-subsections-nav>
-                <label todo="true">[Wizard Subsections Navigation]</label>
-                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+                <label>Ohjatun toiminnon alalohkojen navigointi</label>
+                <hint>Mahdollistaako ohjattu toiminto navigoinnin lohkoille ja ruudukoille ylätason lohkojen sisällä</hint>
             </wizard-subsections-nav>
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
@@ -10028,123 +10047,123 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <wizard-separate-toc>
-                <label todo="true">Wizard Separate Table of Contents</label>
+                <label>Ohjatun toiminnon erillinen sisällysluettelo</label>
             </wizard-separate-toc>
             <wizard-section-status>
-                <label todo="true">Always Show Wizard Section Status</label>
+                <label>Näytä aina ohjatun toiminnon lohkon tila</label>
             </wizard-section-status>
             <attachment-max-size-per-file>
-                <label todo="true">[Maximum Attachment Size per File]</label>
-                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+                <label>Liitteen enimmäiskoko per tiedosto</label>
+                <hint>Voidaan asettaa myös kontrollikohtaisesti kontrollin asetuksissa</hint>
             </attachment-max-size-per-file>
             <attachment-max-size-aggregate-per-form>
-                <label todo="true">[Maximum Aggregate Attachment Size]</label>
-                <hint todo="true">[Applies to all attachment controls in this form]</hint>
+                <label>Liitteiden yhteenlaskettu enimmäiskoko</label>
+                <hint>Koskee kaikkia liitekontrolleja tässä lomakkeessa</hint>
             </attachment-max-size-aggregate-per-form>
             <attachment-max-files-per-control>
                 <label>Liitetiedostojen enimmäismäärä ohjausyksikköä kohden</label>
             </attachment-max-files-per-control>
             <attachment-mediatypes>
-                <label todo="true">[Allowed File Types]</label>
-                <hint todo="true">[For example "image/* application/pdf"]</hint>
+                <label>Sallitut tiedostotyypit</label>
+                <hint>Esimerkiksi "image/* application/pdf"</hint>
             </attachment-mediatypes>
             <labels>
-                <label todo="true">[Appearance of Control Labels]</label>
+                <label>Kontrollinimikkeiden ulkoasu</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of Control Hints]</label>
+                <label>Kontrollivihjeiden ulkoasu</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use Automatic Hints]</label>
+                <label>Käytä automaattisia vihjeitä</label>
             </automatic-hints>
             <appearances>
-                <item todo="true" id="0">[Use property]</item>
-                <item todo="true" id="1">[Inline]</item>
-                <item todo="true" id="2">[Tooltip]</item>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Rivissä</item>
+                <item id="2">Työkaluvihje</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
+                <label>Käytä paikkamerkkiä kentissä ja tekstialueissa</label>
             </placeholders>
             <data-migration>
-                <label todo="true">[Simple Data Migration]</label>
-                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Enabled]</item>
-                <item id="2" todo="true">[Disabled]</item>
-                <item id="3" todo="true">[Raise an error]</item>
+                <label>Yksinkertainen tietojen migraatio</label>
+                <hint>Lisää tai poista puuttuvat elementit tiedoissa automaattisesti</hint>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Käytössä</item>
+                <item id="2">Pois käytöstä</item>
+                <item id="3">Aiheuta virhe</item>
             </data-migration>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Ruudukon sarkainjärjestys</label>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Rivit</item>
+                <item id="2">Sarakkeet</item>
             </grid-tab-order>
             <time-window>
-                <label todo="true">[Time Window]</label>
+                <label>Aikaikkuna</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Creating only available from specific date]</label>
-                        <date todo="true">[Start date and time]</date>
-                        <message todo="true">[Pending message]</message>
+                        <label>Luominen mahdollista vain tietystä päivämäärästä alkaen</label>
+                        <date>Aloituspäivämäärä ja -aika</date>
+                        <message>Odottava viesti</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Creating only available until specific date]</label>
-                        <date todo="true">[End date and time]</date>
-                        <message todo="true">[Expired message]</message>
+                        <label>Luominen mahdollista vain tiettyyn päivämäärään asti</label>
+                        <date>Lopetuspäivämäärä ja -aika</date>
+                        <message>Vanhentunut viesti</message>
                     </available-to>
                 </available>
             </time-window>
             <rendered-page-orientation>
-                <label todo="true">[PDF page orientation]</label>
+                <label>PDF-sivun suunta</label>
                 <hint/>
-                <item id="default" todo="true">[Use property]</item>
-                <item id="portrait" todo="true">[Portrait]</item>
-                <item id="landscape" todo="true">[Landscape]</item>
+                <item id="default">Käytä ominaisuutta</item>
+                <item id="portrait">Pysty</item>
+                <item id="landscape">Vaaka</item>
             </rendered-page-orientation>
             <rendered-page-size>
-                <label todo="true">[PDF page size]</label>
+                <label>PDF-sivun koko</label>
                 <hint/>
-                <item id="default" todo="true">[Use property]</item>
+                <item id="default">Käytä ominaisuutta</item>
                 <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
-                <item id="letter" todo="true">[Letter]</item>
-                <item id="a4" todo="true">[A4]</item>
-                <item id="legal" todo="true">[Legal]</item>
+                <item id="letter">Letter</item>
+                <item id="a4">A4</item>
+                <item id="legal">Legal</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
+                <label>Laskutoimitukset vain luku -tiloissa (Katselu, PDF)</label>
                 <hint/>
-                <item todo="true" id="default">Use property</item>
-                <item todo="true" id="false">Enable</item>
-                <item todo="true" id="true">Disable</item>
+                <item id="default">Käytä ominaisuutta</item>
+                <item id="false">Käytä</item>
+                <item id="true">Poista käytöstä</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser Page Layout]</label>
-                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Fixed width]</item>
-                <item id="2" todo="true">[Fluid width]</item>
+                <label>Selaimen sivun asettelu</label>
+                <hint>Käyttääkö lomake kiinteää vai joustavaa leveyttä</hint>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Kiinteä leveys</item>
+                <item id="2">Joustava leveys</item>
             </html-page-layout>
             <density>
-                <label todo="true">[Density]</label>
-                <hint todo="true">[Spacing between elements in the interface]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Compact]</item>
-                <item id="2" todo="true">[Comfortable]</item>
-                <item id="3" todo="true">[Roomy]</item>
+                <label>Tiheys</label>
+                <hint>Elementtien välistys käyttöliittymässä</hint>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Tiivis</item>
+                <item id="2">Mukava</item>
+                <item id="3">Väljä</item>
             </density>
             <analysis-calculate>
-                <label todo="true">[Automatic Calculations Dependencies]</label>
-                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+                <label>Automaattiset laskentariippuvuudet</label>
+                <hint>Määritä automaattisesti arviointijärjestys "Laskettu arvo" ja "Alkuarvo" -kaavoille</hint>
             </analysis-calculate>
-            <versions todo="true">[Versions]</versions>
-            <current-version todo="true">[Current Version]</current-version>
-            <created-with-version todo="true">[Created with Version]</created-with-version>
-            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <versions>Versiot</versions>
+            <current-version>Nykyinen versio</current-version>
+            <created-with-version>Luotu versiolla</created-with-version>
+            <updated-with-versions>Päivitetty versioilla</updated-with-versions>
             <thumbnail>
-                <label todo="true">Form Thumbnail</label>
-                <hint todo="true">Used for form templates and the landing page</hint>
+                <label>Lomakkeen pikkukuva</label>
+                <hint>Käytetään lomakemalleissa ja aloitussivulla</hint>
             </thumbnail>
-            <default-template todo="true">Default Template</default-template>
+            <default-template>Oletusmalli</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Kontrolliyksityiskohdat: "{1}" / "{0}" ({2})</label>
@@ -10157,17 +10176,17 @@
                 <hint>Esim.: "etunimi"</hint>
             </control-name>
             <pdf-field-name>
-                <label todo="true">[Name of the PDF field]</label>
-                <alert todo="true">[Unknown PDF field name]</alert>
-                <item id="0" todo="true">Automatic</item>
-                <item id="1" todo="true">Custom</item>
+                <label>PDF-kentän nimi</label>
+                <alert>Tuntematon PDF-kentän nimi</alert>
+                <item id="0">Automaattinen</item>
+                <item id="1">Mukautettu</item>
             </pdf-field-name>
             <excel-field-name>
-                <label todo="true">[Name of the Excel range]</label>
+                <label>Excel-alueen nimi</label>
             </excel-field-name>
             <options>
                 <item>
-                    <label todo="true">[Index control]</label>
+                    <label>Indeksoi kontrolli</label>
                     <value>fr-index</value>
                 </item>
                 <item>
@@ -10175,47 +10194,47 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label todo="true">[Allow bulk edit]</label>
+                    <label>Salli joukkomuokkaus</label>
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
-                    <label todo="true">[By default, sort by this column]</label>
+                    <label>Lajittele oletuksena tämän sarakkeen mukaan</label>
                     <value>fr-default-sort-column</value>
                 </item>
                 <item>
-                    <label todo="true">[Encrypt data at rest]</label>
+                    <label>Salaa tallennetut tiedot</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
             <summary-show>
-                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
-                <show todo="true">[Show on Summary page]</show>
-                <column-only todo="true">[Show column only]</column-only>
-                <search-only todo="true">[Show search only]</search-only>
+                <do-not-show>Älä näytä yhteenvetosivulla</do-not-show>
+                <show>Näytä yhteenvetosivulla</show>
+                <column-only>Näytä vain sarake</column-only>
+                <search-only>Näytä vain haku</search-only>
             </summary-show>
             <role>
-                <restrict todo="true">[Restrict to role]</restrict>
-                <all todo="true">[All]</all>
-                <any todo="true">[Any]</any>
-                <of-the-following todo="true">[of the following:]</of-the-following>
-                <empty todo="true">[Empty role]</empty>
-                <duplicate todo="true">[Duplicate role]</duplicate>
+                <restrict>Rajoita rooliin</restrict>
+                <all>Kaikki</all>
+                <any>Mikä tahansa</any>
+                <of-the-following>seuraavista:]</of-the-following>
+                <empty>Tyhjä rooli</empty>
+                <duplicate>Kaksoisrooli</duplicate>
             </role>
             <bulk-edit-actions>
-                <save-data todo="true">[Save data]</save-data>
-                <run-process todo="true">[Run Process]</run-process>
+                <save-data>Tallenna tiedot</save-data>
+                <run-process>Suorita prosessi</run-process>
             </bulk-edit-actions>
             <default-sort-column>
-                <ascending todo="true">[Ascending]</ascending>
-                <descending todo="true">[Descending]</descending>
-                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
+                <ascending>Nouseva</ascending>
+                <descending>Laskeva</descending>
+                <conflict>Lajittelun ottaminen käyttöön tässä kontrollissa poistaa sen käytöstä seuraavassa kontrollissa: {0}]</conflict>
             </default-sort-column>
             <control-appearance>
-                <label todo="true">[Control Appearance]</label>
+                <label>Kontrollin ulkoasu</label>
             </control-appearance>
             <whitespace>
                 <item>
-                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <label>Poista alussa ja lopussa olevat välilyönnit</label>
                     <value>trim</value>
                 </item>
             </whitespace>
@@ -10227,7 +10246,7 @@
                 <hint>Sisäänrakennettu datatyyppi</hint>
 
                 <use-schema-type>Käytä skeeman tyyppiä</use-schema-type>
-                <use-component-type todo="true">[Use predefined type]</use-component-type>
+                <use-component-type>Käytä esimääritettyä tyyppiä</use-component-type>
 
                 <choices>
                     <choices>
@@ -10305,32 +10324,32 @@
                 <hint>Pakollinen data?</hint>
                 <item id="0">Kyllä</item>
                 <item id="1">Ei</item>
-                <item id="2" todo="true">XPath</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
-                <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Maximum Length]</item>
-                <item id="min-length" todo="true">[Minimum Length]</item>
-                <item id="positive" todo="true">[Positive]</item>
-                <item id="non-negative" todo="true">[Positive or Zero]</item>
-                <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Negative]</item>
-                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
-                <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
-                <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
-                <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="formula">Kaava</item>
+                <item id="max-length">Maksimipituus</item>
+                <item id="min-length">Vähimmäispituus</item>
+                <item id="positive">Positiivinen</item>
+                <item id="non-negative">Positiivinen tai nolla</item>
+                <item id="non-positive">Negatiivinen tai nolla</item>
+                <item id="negative">Negatiivinen</item>
+                <item id="fraction-digits">Desimaalimerkkien enimmäismäärä</item>
+                <item id="upload-max-size-per-file" multiple="false">Liitteen enimmäiskoko</item>
+                <item id="upload-max-size-per-file" multiple="true">Liitteen enimmäiskoko per tiedosto</item>
+                <item id="upload-max-size-aggregate-per-control">Liitteiden yhteenlaskettu enimmäiskoko</item>
                 <item id="upload-max-files-per-control">Enimmäismäärä tiedostoja per kontrolli</item>
-                <item id="upload-mediatypes" todo="true">[Supported File Types</item>
-                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
+                <item id="upload-mediatypes">Tuetut tiedostotyypit</item>
+                <item id="excluded-dates">Pois suljettavat päivämäärät</item>
             </constraint>
             <formula>
-                <label todo="true">[Formula]</label>
+                <label>Kaava</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
             </formula>
             <integer-argument>
-                <label todo="true">[Integer Value]</label>
-                <alert todo="true">[Incorrect Value]</alert>
+                <label>Kokonaislukuarvo</label>
+                <alert>Virheellinen arvo</alert>
             </integer-argument>
             <alert-template-parameters>
                 <edit-label>Muokkaa hälytyspohjan parametreja</edit-label>
@@ -10340,7 +10359,7 @@
                 <label>Näkyvyys</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
                         This allows you to specify whether the form control is visible or not.
                     &lt;/p>
@@ -10366,7 +10385,7 @@
                 <label>Vain luku</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
                         This allows you to specify whether the form control is readonly or read-write.
                     &lt;/p>
@@ -10392,7 +10411,7 @@
                 <label>Alkuperäinen arvo</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>XPath-lauseke</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
                         This formula allows you to specify an initial value for the form control in "new" mode only.
                     &lt;/p>
@@ -10409,7 +10428,7 @@
                 <label>Laskettu arvo</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>XPath-lauseke</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
                         This formula allows you to specify a calculated value for the form control.
                         This value is re-evaluated to remain up to date as needed.
@@ -10424,30 +10443,30 @@
                 </help>
             </calculate>
             <control-label>
-                <label todo="true">[Label]</label>
+                <label>Nimike</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Hint]</label>
+                <label>Vihje</label>
             </control-hint>
             <control-help>
                 <label>Ohjeviesti</label>
                 <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanatory Text]</label>
+                <label>Selittävä teksti</label>
                 <hint/>
             </control-text>
             <control-short-label>
-                <label todo="true">[Short Label]</label>
+                <label>Lyhyt nimike</label>
             </control-short-label>
             <control-iteration-label>
-                <label todo="true">[Iteration Label]</label>
+                <label>Iteraation nimike</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Label]</label>
+                <label>Lisää toiston nimike</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
-                <label todo="true">[Remove Repetition Text]</label>
+                <label>Poista toiston teksti</label>
             </control-remove-iteration-label>
             <alert>
                 <label>Virheviesti</label>
@@ -10467,48 +10486,48 @@
             <validation-details><label>Vahvistamisen tiedot</label></validation-details>
             <level><label>Taso</label></level>
             <use-html>Käytä HTML</use-html>
-            <parameters todo="true">[Template Parameters]</parameters>
+            <parameters>Mallin parametrit</parameters>
             <automatic-hint>
-                <label todo="true">[Use automatic hint]</label>
-                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+                <label>Käytä automaattista vihjettä</label>
+                <hint>Lisää vihjetekstin, joka perustuu enimmäistiedostokokoon ja tuettuihin tiedostotyyppeihin, jotka olet saattanut määrittää Validoinnit ja hälytykset -välilehdellä</hint>
             </automatic-hint>
             <open-selection>
-                <label todo="true">[Open selection]</label>
-                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+                <label>Avoin valinta</label>
+                <hint>Jos käytössä, käyttäjät voivat syöttää oman arvonsa, ja arvo (data on tallennettu teksti) käytetään myös nimikkeenä (teksti näytetään pudotusvalikossa)</hint>
             </open-selection>
             <store-label>
-                <label todo="true">[Store label]</label>
-                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+                <label>Tallenna nimike</label>
+                <hint>Jos käytössä, valittu nimike tallennetaan tietojen rinnalle</hint>
             </store-label>
             <default-yes-no>
-                <item id="0" todo="true">[Use default]</item>
-                <item id="1" todo="true">[Yes]</item>
-                <item id="2" todo="true">[No]</item>
+                <item id="0">Käytä oletusta</item>
+                <item id="1">Kyllä</item>
+                <item id="2">Ei</item>
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label todo="true">Lohkon yksityiskohdat: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
+            <label>Lohkon yksityiskohdat: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
             <control-name>
-                <label todo="true">Lohkon nimi</label>
+                <label>Lohkon nimi</label>
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
                 <hint>Esim.: "osoite"</hint>
             </control-name>
             <grid-columns>
-                <label todo="true">[Number of grid columns]</label>
+                <label>Ruudukon sarakkeiden määrä</label>
             </grid-columns>
             <grid-rows>
-                <label todo="true">Number of grid rows</label>
+                <label>Ruudukon rivien määrä</label>
             </grid-rows>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Default]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Ruudukon sarkainjärjestys</label>
+                <item id="0">Oletus</item>
+                <item id="1">Rivit</item>
+                <item id="2">Sarakkeet</item>
             </grid-tab-order>
             <options>
                 <label>Asetukset</label>
                 <item>
-                    <label todo="true">[Initially Open]</label>
+                    <label>Aluksi avattu</label>
                     <value>fr-initially-open</value>
                 </item>
                 <item>
@@ -10517,7 +10536,7 @@
                 </item>
             </options>
             <collapsible>
-                <label todo="true">[Collapsible]</label>
+                <label>Kutistettava</label>
             </collapsible>
             <visibility>
                 <label>Näkyvyys</label>
@@ -10530,18 +10549,18 @@
                 <hint>Boolean XPath-lauseke</hint>
             </readonly>
             <repeat>
-                <label todo="true">Toista osion sisältö</label>
+                <label>Toista osion sisältö</label>
             </repeat>
             <user-can-add-remove>
-                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <label>Salli käyttäjän lisätä, poistaa tai siirtää toistoja</label>
                 <hint/>
             </user-can-add-remove>
             <number-rows>
-                <label todo="true">Show repetition number</label>
+                <label>Näytä toiston numero</label>
                 <hint/>
             </number-rows>
             <use-paging>
-                <label todo="true">[Show one repetition at a time in the wizard]</label>
+                <label>Näytä yksi toisto kerrallaan ohjatussa toiminnossa</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -10564,20 +10583,20 @@
                 <hint>Positiivinen numero tai XPath-lauseke</hint>
             </max>
             <freeze>
-                <label todo="true">[Freeze Repetitions]</label>
-                <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
+                <label>Jäädytä toistot</label>
+                <alert>Virheellinen arvo</alert>
+                <hint>Ei-negatiivinen luku enintään toistojen vähimmäismäärään (katso yllä), tai XPath-lauseke</hint>
             </freeze>
-            <no-freeze todo="true">[No freeze]</no-freeze>
+            <no-freeze>Ei jäädytystä</no-freeze>
             <appearance-minimal>
-                <label todo="true">Simplified appearance</label>
-                <hint todo="true">Show basic add/remove buttons without menu or reordering</hint>
+                <label>Yksinkertaistettu ulkoasu</label>
+                <hint>Näytä yksinkertaiset lisää/poista-painikkeet ilman valikkoa tai uudelleenjärjestelyä</hint>
             </appearance-minimal>
             <apply-defaults>
-                <label todo="true">[Apply initial value formulas when adding iterations]</label>
+                <label>Käytä alkuarvon kaavoja lisättäessä iteraatioita</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial number of iterations uses template]</label>
+                <label>Iteraatioiden alkumäärä käyttää mallia</label>
             </initial-iterations>
             <other>Muu</other>
             <one>Yksi toisto</one>
@@ -10590,18 +10609,18 @@
             <label>Vahvista</label>
         </dialog-confirmation>
         <dialog-ids>
-            <label todo="true">[Control Names]</label>
+            <label>Kontrollien nimet</label>
             <prefix>
-                <label todo="true">[Prefix]</label>
+                <label>Etuliite</label>
             </prefix>
             <suffix>
-                <label todo="true">[Suffix]</label>
+                <label>Jälkiliite</label>
             </suffix>
             <original-name>
-                <label todo="true">[Original Name]</label>
+                <label>Alkuperäinen nimi</label>
             </original-name>
             <new-name>
-                <label todo="true">[New Name]</label>
+                <label>Uusi nimi</label>
             </new-name>
         </dialog-ids>
         <dialog-publish>
@@ -10611,7 +10630,7 @@
             <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
             <latest-published-version>Viimeisin julkaistu versio</latest-published-version>
             <create-new-version-item>luo uusi lomakemäärittely versionumerolla {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
+            <overwrite-version-item>korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer} ({1,choice,0#ei saatavilla|1#saatavilla})</overwrite-version-item>
             <create-new-version-help>
                 HUOMAA: Tämän lomakemäärittelyn julkaiseminen luo uuden lomakemäärittelyversion tietokantaan. Tietoja, jotka jo ovat tietokannassa voidaan yhä tarkastella ja editoida niillä edellisillä lomakemäärittelyversioilla, jotka liittyvät tietoihin. Uutta lomakemäärittelyversiota käytetään uusien tietojen luomiseen.
             </create-new-version-help>
@@ -10620,9 +10639,9 @@
             </overwrite-version-help>
             <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
             <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
-            <version todo="true">[Version]</version>
-            <available todo="true">[Make published form available]</available>
-            <comment todo="true">[Comment]</comment>
+            <version>Versio</version>
+            <available>Tee julkaistusta lomakkeesta saatavilla</available>
+            <comment>Kommentti</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Lisää kieli</label>
@@ -10639,9 +10658,9 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label todo="true">Search Controls</label>
+            <label>Hae kontrolleja</label>
             <open-settings>
-                <label todo="true">Open Settings Dialog</label>
+                <label>Avaa asetusikkuna</label>
             </open-settings>
         </dialog-search>
         <dialog-upload-schema>
@@ -10692,10 +10711,10 @@
                 <label>PDF-tiedosto</label>
             </pdf-upload>
             <attachment-name>
-                <label todo="true">[Name]</label>
+                <label>Nimi</label>
             </attachment-name>
             <attachment-language>
-                <label todo="true">[Language]</label>
+                <label>Kieli</label>
             </attachment-language>
         </dialog-pdf>
         <dialog-itemsets>
@@ -10713,13 +10732,13 @@
                 <label>Vihje</label>
             </hint-header>
             <clear-value>
-                <label todo="true">[Clear Value]</label>
+                <label>Tyhjennä arvo</label>
             </clear-value>
             <remove-all>
-                <label todo="true">[Remove All]</label>
+                <label>Poista kaikki</label>
             </remove-all>
             <filter>
-                <label todo="true">Filter Formula</label>
+                <label>Suodatuskaava</label>
             </filter>
             <itemsetid-mode>
                 <label>Käytä valintoja metatiedoista</label>
@@ -10730,22 +10749,22 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>
-            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
-            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
-            <tab-test todo="true"><label>[Test Results]</label></tab-test>
-            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
-            <parameter-name todo="true"><label>[Name]</label></parameter-name>
-            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
-            <no-headers todo="true">[No headers received].</no-headers>
+            <tab-definition><label>Määritelmä</label></tab-definition>
+            <tab-advanced><label>Kehittynyt</label></tab-advanced>
+            <tab-test><label>Testitulokset</label></tab-test>
+            <url-parameters><label>URL-parametrit</label></url-parameters>
+            <parameter-name><label>Nimi</label></parameter-name>
+            <parameter-default-value><label>Oletusarvo</label></parameter-default-value>
+            <no-headers>Ei otsakkeita vastaanotettu.</no-headers>
             <service-name>
                 <label>Palvelun nimi</label>
                 <hint>Valitse nimi tälle palvelulle</hint>
             </service-name>
             <service-performs-search>
-                <label todo="true">[Service performs search]</label>
+                <label>Palvelu suorittaa haun</label>
             </service-performs-search>
             <service-supports-paging>
-                <label todo="true">[Service supports paging]</label>
+                <label>Palvelu tukee sivutusta</label>
             </service-supports-paging>
             <resource>
                 <label>Resurssi URL</label>
@@ -10780,8 +10799,8 @@
                 <hint>XML-data (voi olla SOAP-kuori)</hint>
             </request-body>
             <is-binary-response>
-                <label todo="true">[Service Response has Binary Content]</label>
-                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+                <label>Palvelun vastaus sisältää binäärisistä</label>
+                <hint>Valitse tämä, jos vastaus käytetään liitekontrollin arvon asettamiseen</hint>
             </is-binary-response>
             <response>
                 <label>Vastaus</label>
@@ -10832,7 +10851,7 @@
                 <label>Ohjelmakoodin vastaus</label>
             </response-body>
             <xml-response-body>
-                <label todo="true">[XML Response Body]</label>
+                <label>XML-vastauksen runko</label>
             </xml-response-body>
             <save>
                 <label>Tallenna</label>
@@ -10869,80 +10888,52 @@
                 <hint>Valitse nimi tälle palvelulle</hint>
             </service-name>
             <observer-type>
-                <label todo="true">[Run action when]</label>
+                <label>Suorita toiminto kun</label>
                 <item id="0">
-                    <label todo="true">[control]</label>
+                    <label>kontrolli</label>
                 </item>
                 <item id="1">
-                    <label todo="true">[the form loads]</label>
+                    <label>lomake ladataan</label>
                 </item>
             </observer-type>
             <control-event-type>
                 <item>
-                    <label todo="true">[changes its value]</label>
+                    <label>muuttaa arvonsa</label>
                     <value>xforms-value-changed</value>
                 </item>
                 <item>
-                    <label todo="true">[appears]</label>
+                    <label>ilmestyy</label>
                     <value>xforms-enabled</value>
                 </item>
                 <item>
-                    <label todo="true">[disappears]</label>
+                    <label>katoaa</label>
                     <value>xforms-disabled</value>
                 </item>
                 <item>
-                    <label todo="true">[is activated]</label>
+                    <label>aktivoidaan</label>
                     <value>DOMActivate</value>
                 </item>
             </control-event-type>
             <form-event-type>
                 <item>
-                    <label todo="true">[before the data's initial values are calculated]</label>
+                    <label>ennen kuin tietojen alkuarvot lasketaan</label>
                     <value>fr-run-form-load-action-before-data</value>
                 </item>
                 <item>
-                    <label todo="true">[after the data is ready]</label>
+                    <label>kun tiedot ovat valmiit</label>
                     <value>fr-run-form-load-action-after-data</value>
                 </item>
                 <item>
-                    <label todo="true">[after the controls are ready]</label>
+                    <label>kun kontrollit ovat valmiit</label>
                     <value>fr-run-form-load-action-after-controls</value>
                 </item>
             </form-event-type>
-            <!--<event-type>-->
-                <!--<label>Reagoi</label>-->
-                <!--<hint>Tapahtuma (kontrollissa tai globaalissa) johon reagoidaan</hint>-->
-                <!--<item id="0">-->
-                    <!--<label>Arvonmuutos</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="1">-->
-                    <!--<label todo="true">FI Arvonmuutos tai lomakkeen lataus</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="2">-->
-                    <!--<label>Aktivointi</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="3">-->
-                    <!--<label todo="true">Lomakkeen lataus (after controls ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="4">-->
-                    <!--<label todo="true">Lomakkeen lataus (before data ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="5">-->
-                    <!--<label todo="true">Lomakkeen lataus (after data ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-            <!--</event-type>-->
             <event-condition>
                 <label>Tila</label>
                 <item id="always">Aja aina</item>
                 <item id="new-only">Aja vain luonnin yhteydessä</item>
-                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
-                <formula todo="true">[Formula]</formula>
+                <item id="formula">Kun kaava arvioidaan arvoon "tosi"</item>
+                <formula>Kaava</formula>
             </event-condition>
             <event-control>
                 <label>Kontrolli</label>
@@ -10952,10 +10943,10 @@
                 <hint>Palvelu johon soitetaan tapahtuman tapahtuessa</hint>
             </service-to-call>
             <source>
-                <label todo="true">[Source]</label>
+                <label>Lähde</label>
             </source>
             <destination>
-                <label todo="true">[Destination]</label>
+                <label>Kohde</label>
             </destination>
             <source-control>
                 <label>Lähdekontrolli</label>
@@ -10994,14 +10985,14 @@
                 <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint formula]</label>
-                <hint todo="true">[Relative to choice node]</hint>
+                <label>Vihjekaava</label>
+                <hint>Suhteessa valintasolmuun</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page formula]</label>
+                <label>Viimeisen sivun kaava</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label todo="true">[Auto-select unique choice]</label>
+                <label>Valitse ainutlaatuinen valinta automaattisesti</label>
             </auto-select-unique-choice>
             <save>
                 <label>Tallenna</label>
@@ -11010,30 +11001,30 @@
                 <label>Testaa</label>
             </test>
 
-            <general-settings todo="true">[General Settings]</general-settings>
-            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
-            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+            <general-settings>Yleiset asetukset</general-settings>
+            <service-request-actions>Palvelupyynnön toiminnot</service-request-actions>
+            <service-response-actions>Palveluvastauksen toiminnot</service-response-actions>
 
             <set-control-value>Aseta kontrollin arvo</set-control-value>
-            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
-            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
-            <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-itemset>Aseta kontrollin kohdejoukko</set-control-itemset>
+            <save-to-dataset>Tallenna tietojoukkoon</save-to-dataset>
+            <dataset-name>Tietojoukon nimi</dataset-name>
             <set-control-value-unavailable>Aseta kontrollin arvo on käytettävissä vain, kun "kontrollien valmistumisen jälkeen" on valittu</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
             <label>Lomakkeen esikatselu</label>
-            <console todo="true">Console</console>
+            <console>Konsoli</console>
         </dialog-test>
         <dialog-test-pdf>
-            <label todo="true">Test PDF Production</label>
-            <use-form-data todo="true">Use entered form data</use-form-data>
-            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
-            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
-            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
-            <show-hints todo="true">Show controls hints</show-hints>
-            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
-            <show-required todo="true">Style required controls</show-required>
+            <label>Testaa PDF-tuotanto</label>
+            <use-form-data>Käytä syötettyjä lomakkeen tietoja</use-form-data>
+            <disable-default>Poista "Alkuarvot"-kaavojen arviointi käytöstä</disable-default>
+            <disable-calculate>Poista "Lasketut arvot"-kaavojen arviointi käytöstä</disable-calculate>
+            <disable-relevant>Näytä kontrollit, ruudukot ja lohkot, joilla on dynaaminen näkyvyys</disable-relevant>
+            <show-hints>Näytä kontrollien vihjeet</show-hints>
+            <show-alerts>Näytä virheellisten kontrollien hälytykset</show-alerts>
+            <show-required>Tyylitä pakolliset kontrollit</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -11046,47 +11037,47 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label todo="true">[Email Settings]</label>
-            <templates todo="true">[Email templates]</templates>
+            <label>Sähköpostiasetukset</label>
+            <templates>Sähköpostimallit</templates>
             <template-name>
-                <label todo="true">[Email template name]</label>
-                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+                <label>Sähköpostimallin nimi</label>
+                <hint>Tämä nimi ei näy loppukäyttäjille; sitä käytetään prosesseissa, esimerkiksi: email(template = "notify-user")]</hint>
             </template-name>
             <language>
-                <label todo="true">[Language]</label>
-                <any-language todo="true">[Any language]</any-language>
+                <label>Kieli</label>
+                <any-language>Mikä tahansa kieli</any-language>
             </language>
             <headers>
-                <from todo="true">[Sender]</from>
-                <to todo="true">[Recipient]</to>
-                <cc todo="true">[CC]</cc>
-                <bcc todo="true">[BCC]</bcc>
-                <reply-to todo="true">[Reply To]</reply-to>
+                <from>Lähettäjä</from>
+                <to>Vastaanottaja</to>
+                <cc>Kopio</cc>
+                <bcc>Piilokopio</bcc>
+                <reply-to>Vastausosoite</reply-to>
             </headers>
             <header-value-types>
-                <control-value todo="true">[Control Value]</control-value>
-                <expression todo="true">[Formula]</expression>
-                <text todo="true">[Text]</text>
+                <control-value>Kontrollin arvo</control-value>
+                <expression>Kaava</expression>
+                <text>Teksti</text>
             </header-value-types>
-            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
-            <subject todo="true">[Email Subject]</subject>
-            <body todo="true">[Email Body]</body>
-            <use-html todo="true">[Use HTML]</use-html>
-            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <enable-if-true>Ota tämä malli käyttöön vain, jos seuraava kaava arvioidaan todeksi</enable-if-true>
+            <subject>Sähköpostin aihe</subject>
+            <body>Sähköpostin runko</body>
+            <use-html>Käytä HTML:ää</use-html>
+            <attach-form-as>Liitä lomake muodossa</attach-form-as>
             <pdf>PDF</pdf>
             <xml>XML</xml>
             <attach-files>
-                <label todo="true">[Attach files users uploaded to the form]</label>
+                <label>Liitä tiedostot, jotka käyttäjät latasivat lomakkeeseen</label>
                 <choices>
-                    <all todo="true">[All]</all>
-                    <none todo="true">[None]</none>
-                    <selected todo="true">[Selected attachments]</selected>
+                    <all>Kaikki</all>
+                    <none>Ei mitään</none>
+                    <selected>Valitut liitteet</selected>
                 </choices>
             </attach-files>
-            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
-            <use-default todo="true">[Use default]</use-default>
-            <delete-template todo="true">Delete template</delete-template>
-            <template-parameters todo="true">[Template parameters]</template-parameters>
+            <exclude-from-all-control-values>Sulje pois kaikista kontrollin arvoista</exclude-from-all-control-values>
+            <use-default>Käytä oletusta</use-default>
+            <delete-template>Poista malli</delete-template>
+            <template-parameters>Mallin parametrit</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Käyttöoikeudet</label>
@@ -11095,72 +11086,72 @@
             <permissions>Käyttöoikeudet</permissions>
             <operations>Operaatiot</operations>
             <anyone>Kuka tahansa</anyone>
-            <anyone-with-token todo="true">[Require token]</anyone-with-token>
-            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
+            <anyone-with-token>Vaadi tunniste</anyone-with-token>
+            <any-authenticated-user>Kuka tahansa todennettu käyttäjä</any-authenticated-user>
             <owner>Omistaja</owner>
             <group-member>Ryhmän jäsenet</group-member>
             <create>Luo</create>
             <read>Lue</read>
             <update>Päivitä</update>
             <delete>Poista</delete>
-            <list todo="true">List</list>
+            <list>Lista</list>
         </dialog-permissions>
         <dialog-workflow>
-            <label todo="true">[Workflow and Permissions]</label>
+            <label>Työnkulku ja käyttöoikeudet</label>
 
-            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
-            <operation-label todo="true">[Label]</operation-label>
-            <predefined-label todo="true">[Predefined]</predefined-label>
-            <custom-label todo="true">[Custom]</custom-label>
-            <available-to todo="true">[Available To]</available-to>
-            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
-            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
-            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
-            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
-            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
-            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
-            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
-            <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button todo="true">[Show button on detail page]</show-button>
-            <any todo="true">[Any]</any>
-            <all todo="true">[All]</all>
-            <actions todo="true">[Actions]</actions>
-            <no-action todo="true">[No Action]</no-action>
-            <change-stage-action todo="true">[Change Stage]</change-stage-action>
-            <run-process-action todo="true">[Run Process]</run-process-action>
-            <remove-operation todo="true">[Remove Operation]</remove-operation>
-            <is todo="true">[is]</is>
-            <is-not todo="true">[is Not]</is-not>
+            <custom-operations>Määritä mukautettuja toimintoja tälle lomakkeelle</custom-operations>
+            <operation-label>Nimike</operation-label>
+            <predefined-label>Esimääritetty</predefined-label>
+            <custom-label>Mukautettu</custom-label>
+            <available-to>Saatavilla käyttäjille</available-to>
+            <availability-to-anyone>Kuka tahansa</availability-to-anyone>
+            <availability-to-no-one>Ei kukaan</availability-to-no-one>
+            <availability-to-users>Seuraavaa sääntöä vastaavat käyttäjät</availability-to-users>
+            <availability-to-users-before>Käyttäjät, jotka vastaavat</availability-to-users-before>
+            <availability-to-users-after>seuraavista säännöistä</availability-to-users-after>
+            <workflow-stage>Työnkulun vaihe</workflow-stage>
+            <workflow-role>Työnkulun rooli</workflow-role>
+            <authentication-role>Todennusrooli</authentication-role>
+            <show-button>Näytä painike tietosivulla</show-button>
+            <any>Mikä tahansa</any>
+            <all>Kaikki</all>
+            <actions>Toiminnot</actions>
+            <no-action>Ei toimintoa</no-action>
+            <change-stage-action>Vaihda vaihetta</change-stage-action>
+            <run-process-action>Suorita prosessi</run-process-action>
+            <remove-operation>Poista toiminto</remove-operation>
+            <is>on</is>
+            <is-not>ei ole</is-not>
 
-            <stages todo="true">[Stages]</stages>
+            <stages>Vaiheet</stages>
 
-            <stage-name todo="true">[Stage Name]</stage-name>
-            <default-stage todo="true">[Default]</default-stage>
+            <stage-name>Vaiheen nimi</stage-name>
+            <default-stage>Oletus</default-stage>
 
             <operations>
-                <label todo="true">[Operations]</label>
+                <label>Toiminnot</label>
                 <item>
-                    <label todo="true">[Fill new form]</label>
+                    <label>Täytä uusi lomake</label>
                     <value>1</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[List and search data]</label>
+                    <label>Listaa ja hae tietoja</label>
                     <value>2</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for editing]</label>
+                    <label>Käytä tietoja muokkaamiseen</label>
                     <value>3</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for viewing]</label>
+                    <label>Käytä tietoja katseluun</label>
                     <value>4</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access PDF/TIFF]</label>
+                    <label>Käytä PDF/TIFF</label>
                     <value>5</value>
                     <hint/>
                 </item>
@@ -11171,33 +11162,33 @@
             <dialog-title>Pikanäppäimet</dialog-title>
         </dialog-keyboard-shortcuts>
         <dialog-messages>
-            <label todo="true">[Messages]</label>
-            <language-header todo="true">[Language]</language-header>
-            <name-header todo="true">[Name]</name-header>
-            <value-header todo="true">[Value]</value-header>
+            <label>Viestit</label>
+            <language-header>Kieli</language-header>
+            <name-header>Nimi</name-header>
+            <value-header>Arvo</value-header>
         </dialog-messages>
         <modes>
-            <editable todo="true">Editable modes</editable>
-            <review todo="true">Review mode</review>
-            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
-            <pdf-template todo="true">PDF template</pdf-template>
+            <editable>Muokattavat tilat</editable>
+            <review>Katselutila</review>
+            <pdf-automatic>Automaattinen PDF</pdf-automatic>
+            <pdf-template>PDF-malli</pdf-template>
         </modes>
         <xbl-control-settings>
-            <field-width todo="true">[Field width]</field-width>
-            <default todo="true">Use default</default>
-            <full todo="true">Full</full>
-            <natural todo="true">Natural</natural>
-            <field-align todo="true">Field alignment</field-align>
-            <left todo="true">Left</left>
-            <right todo="true">Right</right>
-            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-width>Kentän leveys</field-width>
+            <default>Käytä oletusta</default>
+            <full>Täysi</full>
+            <natural>Luonnollinen</natural>
+            <field-align>Kentän tasaus</field-align>
+            <left>Vasen</left>
+            <right>Oikea</right>
+            <learn-settings-below>Lue lisää alla olevista asetuksista</learn-settings-below>
             <field-value-visibility>
-                <label todo="true">Field Value Visibility</label>
-                <hint todo="true">Controls how the value of the field is displayed</hint>
-                <item id="visible" todo="true">Visible</item>
+                <label>Kentän arvon näkyvyys</label>
+                <hint>Hallitsee, miten kentän arvo näytetään</hint>
+                <item id="visible">Näkyvä</item>
                 <item id="obscured">Obscured</item>
-                <item id="partial" todo="true">Partial</item>
-                <item id="reveal" todo="true">Allow user to reveal</item>
+                <item id="partial">Osittainen</item>
+                <item id="reveal">Salli käyttäjän paljastaa</item>
             </field-value-visibility>
         </xbl-control-settings>
         <messages>
@@ -11206,20 +11197,20 @@
             <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
             <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
             <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
-            <delete-service todo="true">Haluatko varmasti poistaa palvelun "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
-            <delete-action todo="true">Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
+            <delete-service>Haluatko varmasti poistaa palvelun "{0}"?{1,choice,0# Yksikään toiminto ei käytä sitä.|1# 1 toiminto käyttää sitä.|1&lt; {1,number,integer} toimintoa käyttävät sitä.}</delete-service>
+            <delete-action>Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
             <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
-            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <select-template-output>Valitse lomakemalli käytettäväksi lähtökohtana.</select-template-output>
             <app-form-optional>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-optional>
-            <app-form-required todo="true">Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-required>
+            <app-form-required>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-required>
             <save-as-metadata-output>Syötä uusi nimi sekä sovellukselle että lomakkeelle. Näitä käytetään tämän lomakkeen kopiota varten:</save-as-metadata-output>
             <xpath-errors>Lomakkeestasi löytyi {0,choice,1#yksi XPath virhe|1&lt; {0,number,integer} XPath virhettä}.</xpath-errors>
             <lhha-checkbox>Merkkaa tämä valintaruutu jos haluat kirjoittaa HTML-tageja</lhha-checkbox>
         </messages>
         <alerts>
-            <required todo="true">[Value is required]</required>
-            <xpath todo="true">[Incorrect XPath expression]</xpath>
+            <required>Arvo vaaditaan</required>
+            <xpath>Virheellinen XPath-lauseke</xpath>
         </alerts>
         <template>
             <untitled-form>Nimetön lomake</untitled-form>

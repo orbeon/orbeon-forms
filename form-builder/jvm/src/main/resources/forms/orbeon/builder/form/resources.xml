@@ -1951,7 +1951,7 @@
             <label>Erreurs</label>
         </errors>
         <error-summary>
-            <label todo="true">{1,choice,
+            <label>{1,choice,
                 0#Pas de message|
                 1#'{0,choice,0#Erreur|1#Avertissement|2#Message informatif|3#Message}'|
                 1&lt;'{0,choice,0#Erreurs|1#Avertissements|2#Messages informatifs|3#Messages}'}</label>

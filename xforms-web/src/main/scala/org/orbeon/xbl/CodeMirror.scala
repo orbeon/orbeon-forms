@@ -4,6 +4,7 @@ import org.orbeon.facades
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
+import org.scalajs.dom
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.web.DomSupport.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -40,7 +41,8 @@ object CodeMirror {
           "extraKeys"    -> js.Dictionary(
             "Ctrl-Q"     -> ((cm: js.Dynamic) => cm.foldCode(cm.getCursor())),
             "Cmd-Enter"  -> js.Any.fromFunction0(userCmdCtrlEnter _),
-            "Ctrl-Enter" -> js.Any.fromFunction0(userCmdCtrlEnter _)
+            "Ctrl-Enter" -> js.Any.fromFunction0(userCmdCtrlEnter _),
+            "Esc"        -> js.Any.fromFunction0(handleEscape _)
           )
         )
       )
@@ -76,6 +78,17 @@ object CodeMirror {
           )
         )
       }
+
+    private def handleEscape(): js.Any = {
+      containerElem.closestOpt("dialog").foreach { dialogElem =>
+        AjaxClient.fireEvent(
+          AjaxEvent(
+            eventName = "xxforms-dialog-close",
+            targetId  = dialogElem.id
+          )
+        )
+      }
+    }
 
     // We update the value on blur, not on change, to be incremental, for performance on large forms
     private def codeMirrorBlur(): Unit = {

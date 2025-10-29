@@ -3151,4 +3151,96 @@
         </output>
     </test>
 
+    <test description="#7354: `analyze-string()` function" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="results">
+                            <_/>
+                        </xf:instance>
+                        <xf:action event="xforms-model-construct-done">
+                            <xf:insert
+                                context="instance()"
+                                ref="*"
+                                origin="
+                                    analyze-string(
+                                        'abc123def456ghi789',
+                                        '(\d+)'
+                                    )
+                                "/>
+                            <xf:insert
+                                context="instance()"
+                                ref="*"
+                                origin="
+                                    analyze-string(
+                                        '(a + b) * c - 42 / d',
+                                        '\s*([()*/+-])\s*'
+                                    )
+                                "/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="results" model-id="model">
+                                <_>
+                                    <analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+                                        <non-match>abc</non-match>
+                                        <match>
+                                            <group nr="1">123</group>
+                                        </match>
+                                        <non-match>def</non-match>
+                                        <match>
+                                            <group nr="1">456</group>
+                                        </match>
+                                        <non-match>ghi</non-match>
+                                        <match>
+                                            <group nr="1">789</group>
+                                        </match>
+                                    </analyze-string-result>
+                                    <analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+                                        <match>
+                                            <group nr="1">(</group>
+                                        </match>
+                                        <non-match>a</non-match>
+                                        <match>
+                                            <group nr="1">+</group>
+                                        </match>
+                                        <non-match>b</non-match>
+                                        <match>
+                                            <group nr="1">)</group>
+                                        </match>
+                                        <match>
+                                            <group nr="1">*</group>
+                                        </match>
+                                        <non-match>c</non-match>
+                                        <match>
+                                            <group nr="1">-</group>
+                                        </match>
+                                        <non-match>42</non-match>
+                                        <match>
+                                            <group nr="1">/</group>
+                                        </match>
+                                        <non-match>d</non-match>
+                                    </analyze-string-result>
+                                </_>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

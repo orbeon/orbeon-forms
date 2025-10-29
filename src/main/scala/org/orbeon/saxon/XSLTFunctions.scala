@@ -15,8 +15,9 @@ package org.orbeon.saxon
 
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty.*
-import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableEnabledByProperty}
+import org.orbeon.saxon.function.{AnalyzeString, EnvironmentVariable, EnvironmentVariableEnabledByProperty}
 import org.orbeon.saxon.functions.{FormatDate, FormatNumber}
 import org.orbeon.saxon.om.StandardNames
 
@@ -62,6 +63,12 @@ trait XSLTFunctions extends OrbeonFunctionLibrary {
 
     Fun("environment-variable", environmentVariableClass, op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("analyze-string", classOf[AnalyzeString], op = 0, min = 2, Type.NODE_TYPE, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
     )
   }
 

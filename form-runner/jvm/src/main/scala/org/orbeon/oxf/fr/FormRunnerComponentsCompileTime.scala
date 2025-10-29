@@ -228,7 +228,7 @@ trait FormRunnerComponentsCompileTime {
           labelFromKnownMediatypes orElse
             labelFromMediaStar     orElse
             labelUsingHeuristic
-        }
+        }.distinct
 
         displayMediatypes match {
           case Nil => None

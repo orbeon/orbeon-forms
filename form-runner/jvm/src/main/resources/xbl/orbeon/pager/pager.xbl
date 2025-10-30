@@ -209,7 +209,7 @@
                         <!-- No results -->
                     </xf:group>
                     <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
-                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
+                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next" xxf:readonly-appearance="dynamic">
                             <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". + 1"/>
@@ -218,7 +218,7 @@
                         </xf:trigger>
                     </xh:li>
                     <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
-                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
+                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last" xxf:readonly-appearance="dynamic">
                             <xf:label><xh:i class="fa fa-fw fa-step-forward"/></xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>

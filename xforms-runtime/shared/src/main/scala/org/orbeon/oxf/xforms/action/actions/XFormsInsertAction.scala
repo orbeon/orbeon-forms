@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, DefaultsStrategy, InstanceDataOps, XFormsInstance}
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.NodeInfoConversions
@@ -37,6 +38,7 @@ import java.util
 import java.util.Collections
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
+
 
 
 /**
@@ -91,6 +93,15 @@ object XFormsInsertAction {
           )
       )
 
+    def maybeCopyNode(originNode: Node, doClone: Boolean): Node =
+      if (doClone)
+        originNode match {
+          case e: Element => e.copyAndCopyParentNamespaces
+          case n          => n.deepCopy
+        }
+      else
+        originNode
+
     // "3. The origin node-set is determined."
     // "5. Each node in the origin node-set is cloned in the order it appears in the origin node-set."
     val clonedNodesTmp =
@@ -105,12 +116,8 @@ object XFormsInsertAction {
             case Left((collectionToUpdate, _)) =>
               // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
               // node of the Node Set Binding node-set."
-              val singleSourceNode =
-                NodeInfoConversions.getNodeFromNodeInfoConvert(collectionToUpdate.last)
-
-              // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
-
-              Iterator.single(singleSourceNode.createCopy)
+              val singleSourceNode = NodeInfoConversions.getNodeFromNodeInfoConvert(collectionToUpdate.last)
+              Iterator.single(maybeCopyNode(singleSourceNode, doClone = true))
             case Right(_) =>
               if (indentedLogger != null)
                 debug("xf:insert: origin node-set from node-set binding is empty, terminating")
@@ -131,14 +138,7 @@ object XFormsInsertAction {
               case nodeInfo: om.NodeInfo =>
                 // This is the regular case covered by XForms 1.1 / XPath 1.0
                 val sourceNode = NodeInfoConversions.getNodeFromNodeInfoConvert(nodeInfo)
-                if (doClone)
-                  sourceNode match {
-                    case elem: Element => elem.createCopy
-                    case _             => sourceNode.deepCopy
-                  }
-                else
-                  sourceNode
-
+                maybeCopyNode(sourceNode, doClone = doClone)
               case atomicValue: AtomicValue =>
                 // This is an extension: support sequences containing atomic values
                 // Convert the result to a text node

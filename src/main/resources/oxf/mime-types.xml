@@ -365,7 +365,7 @@
         <pattern>*.ods</pattern>
     </mime-type>
     <mime-type>
-        <name>application/application/vnd.oasis.opendocument.text</name>
+        <name>application/vnd.oasis.opendocument.text</name>
         <label>ODT</label>
         <pattern>*.odt</pattern>
     </mime-type>

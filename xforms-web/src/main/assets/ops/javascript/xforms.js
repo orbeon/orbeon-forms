@@ -1434,11 +1434,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                 // Click on trigger
                 event.preventDefault();
                 if (! $(controlTarget).is('.xforms-readonly')) {
-                    // If this is an anchor and we didn't get a chance to register the focus event,
-                    // send the focus event here. This is useful for anchors (we don't listen on the
-                    // focus event on those, and for buttons on Safari which does not dispatch the focus
-                    // event for buttons.
-                    ORBEON.xforms.Events.focus(event);
                     var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "DOMActivate");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
 

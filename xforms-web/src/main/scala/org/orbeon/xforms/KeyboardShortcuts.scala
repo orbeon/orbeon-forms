@@ -105,12 +105,13 @@ object KeyboardShortcuts {
               if (activeElem == buttonOrAnchor) {
                 buttonOrAnchor.click()
               } else {
-                // So if the focus is on a control and the user changed its value, the new value is sent to the server
-                // This is as if users clicked on the button, but without losing the focus on the control
-                activeElem.blur()
-                buttonOrAnchor.focus()
+                // We need to tell the server about any changes to the control that currently has focus before
+                // triggering the click. Otherwise we might lose that value change, for example if the click closes
+                // the dialog containing the control.
+                activeElem.dispatchEvent(new dom.Event("change", new dom.EventInit {
+                  bubbles = true
+                }))
                 buttonOrAnchor.click()
-                activeElem.focus()
               }
             }
           }

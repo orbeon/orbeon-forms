@@ -19,13 +19,25 @@ body.orbeon {
 
 .orbeon {
 
+    blockquote p { font-size: var(--orbeon-blockquote-font-size); }
+    code         { font-size: var(--orbeon-code-font-size); }
+    pre          { font-size: var(--orbeon-pre-font-size); }
+    sub, sup     { font-size: var(--orbeon-sub-sup-font-size); }
+
+    h1 { font-size: var(--orbeon-h1-font-size); }
+    h2 { font-size: var(--orbeon-h2-font-size); }
+    h3 { font-size: var(--orbeon-h3-font-size); }
+    h4 { font-size: var(--orbeon-h4-font-size); }
+    h5 { font-size: var(--orbeon-h5-font-size); }
+    h6 { font-size: var(--orbeon-h6-font-size); }
+
     --fr-min-gray-decoration: #ccc;
     @media (prefers-contrast: more) {
         --fr-min-gray-decoration: #949494;
     }
 
     font-family: @frBaseFontFamily;
-    font-size: @frFontSize;         // Use our own preferred font size
+    font-size: var(--orbeon-base-font-size);
     line-height: @baseLineHeight;
     color: @textColor;
 
@@ -37,12 +49,16 @@ body.orbeon {
         }
     }
 
-    label, button, .btn  {
-        font-size: @frLabelSize;
+    button, .btn, .btn-group > .btn {
+        font-size: var(--orbeon-button-font-size);
     }
 
     .btn-link[disabled] {
         cursor: default;
+    }
+
+    label, .xforms-label {
+        font-size: var(--orbeon-label-font-size);
     }
 
     a {
@@ -50,7 +66,7 @@ body.orbeon {
     }
 
     .alert {
-        margin-bottom: @baseLineHeight / 2;
+        margin-bottom: (@baseLineHeight / 2);
         padding: 8px 1em; // not sure why BS2 has different left/right padding
 
         // Increase contract for accessibility
@@ -104,7 +120,7 @@ body.orbeon {
                 h1 {
                     margin: 0 0 0 15px;                 // Space between image and title
                     padding: 0;
-                    font-size: 20px;
+                    font-size: var(--orbeon-navbar-heading-font-size);
                     font-weight: @frNavBarFontWeight;
                     text-shadow: none;
                     text-decoration: none;
@@ -158,17 +174,17 @@ body.orbeon {
     {
 
         display: inline-block;
-        box-sizing: border-box;         // So width: 100% works with the padding added by Bootstrap
+        box-sizing: border-box;                  // So width: 100% works with the padding added by Bootstrap
         width: 100%;
 
         padding: 4px 6px;
-        margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
+        margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
 
         line-height: @baseLineHeight;
-        font-size: @frFontSize;         // Use our own preferred font size
+        font-size: var(--orbeon-base-font-size); // Use our own preferred font size
 
-        color: @textColor;              // Darker than Bootstrap default of #555
-        background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
+        color: @textColor;                       // Darker than Bootstrap default of #555
+        background-image: none;                  // Liferay adds background images which don't mix well with Bootstrap
 
         // Let content wrap otherwise the user has no option to see the content
         white-space: normal;
@@ -196,13 +212,13 @@ body.orbeon {
     input[type="search"],
     input[type="tel"],
     input[type="color"],
-    .uneditable-input {                 // NOTE: .uneditable-input is removed from Bootstrap 3
-        font-size: @frFontSize;         // Use our own preferred font size
-        margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
-        color: black;                   // Make text inside the fields stand out, as this is the most important information
-        box-sizing: border-box;         // So width: 100% works with the padding added by Bootstrap
+    .uneditable-input {                          // NOTE: .uneditable-input is removed from Bootstrap 3
+        font-size: var(--orbeon-base-font-size); // Use our own preferred font size
+        margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
+        color: black;                            // Make text inside the fields stand out, as this is the most important information
+        box-sizing: border-box;                  // So width: 100% works with the padding added by Bootstrap
         height: @controlsHeight;
-        background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
+        background-image: none;                  // Liferay adds background images which don't mix well with Bootstrap
 
         background-color: @inputBackground;
         .focusHighlight();
@@ -402,7 +418,7 @@ body.orbeon {
 
         &> legend {
             line-height: inherit;
-            font-size: @frFontSize;
+            font-size: var(--orbeon-base-font-size);
             margin-bottom: 10px;
         }
     }
@@ -412,9 +428,9 @@ body.orbeon {
         &.xforms-textarea pre {
             color: @grayDark;
             display: block;
-            padding: (@baseLineHeight - 1) / 2; // We override these in form-runner-base.less, do we need this here?
-            margin: 0 0 @baseLineHeight / 2;    // We override these in form-runner-base.less, do we need this here?
-            font-size: @baseFontSize - 1;       // 14px to 13px
+            padding: ((@baseLineHeight - 1) / 2); // We override these in form-runner-base.less, do we need this here?
+            margin: 0 0 (@baseLineHeight / 2);    // We override these in form-runner-base.less, do we need this here?
+            font-size: var(--orbeon-pre-font-size);
             line-height: @baseLineHeight;
             background-color: darken(@inputBackground, 5%);
             .fieldBorder();

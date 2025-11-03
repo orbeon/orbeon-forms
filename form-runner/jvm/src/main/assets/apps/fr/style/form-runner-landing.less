@@ -12,8 +12,11 @@
 //
 @import (reference) "form-runner-common";
 
+@import "form-runner-css-variables";
+
 html {
-    font-size: 13px; // Bootstrap 5 keeps the 16px browser default
+    // The "orbeon" class on the html element in landing.xhtml makes it possible to access the CSS variable here
+    font-size: var(--orbeon-base-font-size); // Bootstrap 5 keeps the 16px browser default
 }
 
 .orbeon {

@@ -13,7 +13,6 @@
 @import (reference) "form-runner-common";
 
 @pageTopAndBottomHeight: 26px;
-@pageTopAndBottomFontSize: @frFontSize * 1.1;
 
 .orbeon {
 
@@ -58,7 +57,7 @@
     }
 
     .fa::before {
-        font-size: 12px; // with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
+        font-size: var(--orbeon-fa-icon-font-size);
     }
 
     .navbar {
@@ -372,7 +371,7 @@
         .xforms-help-popover {
             // Reset to Form Runner default, as those properties as otherwise influenced by the place where the popover
             // is used, e.g. they won't be correct when the popover is for a section title
-            font-size:   @frFontSize;
+            font-size:   var(--orbeon-base-font-size);
             line-height: @baseLineHeight;
             // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
             z-index: 1040;
@@ -532,7 +531,7 @@
             max-height: @pageTopAndBottomHeight;
             overflow: hidden;
             text-overflow: ellipsis; // not supported by Flying Saucer yet but would be nice (confirmed 2022-12-02)
-            font-size: @pageTopAndBottomFontSize;
+            font-size: var(--orbeon-header-footer-font-size);
         }
     }
 

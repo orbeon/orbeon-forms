@@ -153,6 +153,7 @@
         -/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
 
         <!-- Form Runner CSS -->
+        +/apps/fr/style/form-runner-css-variables.css
         +/apps/fr/style/form-runner-common.css
         +/apps/fr/style/form-runner-base.css
         +/apps/fr/style/form-runner-dialog.css
@@ -224,6 +225,7 @@
 
     <!-- CSS/JavaScript update to the Form Runner baseline -->
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.fr">
+        +/apps/fr/style/form-runner-css-variables.css
         +/apps/fr/style/form-runner-common.css
         +/apps/fr/style/form-runner-base.css
         +/apps/fr/style/form-runner-dialog.css

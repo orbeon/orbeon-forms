@@ -116,7 +116,7 @@ body.orbeon { background-color: @frBackground }
 .portlet .portlet-content .portlet-body .orbeon-portlet-div {
 
     color: @textColor;
-    font-size: @frFontSize;
+    font-size: var(--orbeon-base-font-size);
     line-height: @baseLineHeight;
 
     // Remove icons as content
@@ -459,7 +459,7 @@ body.orbeon { background-color: @frBackground }
                     content        : "\f005";
                     vertical-align : super;         // So the star doesn't show too high relative to the text of the label
                     line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
-                    font-size      : 60%;           // Font Awesome star is large
+                    font-size      : var(--orbeon-required-font-size);
                     margin-right   : 1ch;
                 }
             }

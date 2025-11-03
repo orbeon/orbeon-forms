@@ -1,0 +1,53 @@
+// Copyright (C) 2025 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "form-runner-common";
+
+.orbeon {
+
+  // ***** Font sizes **************************************************************************************************
+
+  // Base font size
+  --orbeon-base-font-size: 13px;
+
+  // HTML elements
+  --orbeon-blockquote-font-size: 1.35em; // ~18px
+  --orbeon-button-font-size    : 13px;   // button and .btn // TODO: cannot be made relative because of the font-size: 0 hack
+  --orbeon-code-font-size      : 0.92em; // ~12px; code and CodeMirror
+  --orbeon-label-font-size     : 1.00em; // label and .xforms-label
+  --orbeon-pre-font-size       : 1.00em;
+  --orbeon-sub-sup-font-size   : 0.75em;
+
+  // Icons
+  --orbeon-search-caret-font-size : 0.80em;
+  --orbeon-section-caret-font-size: 0.75em;
+  --orbeon-dialog-icon-font-size  : 50px;
+  --orbeon-fa-icon-font-size      : 0.92em; // ~12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
+  --orbeon-required-font-size     : 0.60em; // Font Awesome star is large
+
+  --orbeon-dialog-title-font-size  : 1.11em; // 2022-12-11: larger font size for dialog title looks better
+  --orbeon-header-footer-font-size : 1.10em;
+  --orbeon-kbd-hint-font-size      : 0.82em; // 8pt
+  --orbeon-navbar-heading-font-size: 1.54em; // ~20px
+
+  // XForms inspector
+  --orbeon-inspector-closed-font-size: 0.50em;
+  --orbeon-inspector-title-font-size : 1.67em;
+
+  // Headings
+  --orbeon-h1-font-size: 2.96em; // ~38px = 296% * 13px = 275% * 14px
+  --orbeon-h2-font-size: 2.42em; // ~32px = 242% * 13px = 225% * 14px
+  --orbeon-h3-font-size: 1.88em; // ~24px = 188% * 13px = 175% * 14px
+  --orbeon-h4-font-size: 1.35em; // ~18px = 135% * 13px = 125% * 14px
+  --orbeon-h5-font-size: 1.08em; // ~14px = 108% * 13px = 100% * 14px
+  --orbeon-h6-font-size: 0.92em; // ~12px =  92% * 13px =  85% * 14px
+}

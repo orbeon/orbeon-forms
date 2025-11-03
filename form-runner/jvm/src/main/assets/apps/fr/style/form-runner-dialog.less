@@ -53,7 +53,7 @@
             width: auto; // otherwise the icon appears under the dialog text
 
             &::before {
-                font-size: 50px;
+                font-size: var(--orbeon-dialog-icon-font-size);
             }
         }
 
@@ -63,7 +63,7 @@
             border-top-left-radius: @dialogBorderRadius;
             border-top-right-radius: @dialogBorderRadius;
             border: none;
-            font-size: .9rem; // 2022-12-11: larger font size for dialog title looks better
+            font-size: var(--orbeon-dialog-title-font-size);
             line-height: 2rem;
             padding: 0 10px;
             font-weight: bold;

@@ -12856,27 +12856,27 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Applicatienaam</label>
-            <hint todo="true">Identificeert een groep forms, bijvoorbeeld op basis van functionaliteit of afdeling (bijv. "verkoop"). Als u een groep forms hebt, kunt u uw organisatienaam (bijv. "acme") gebruiken. Deze naam komt terug in de URL van het gepubliceerde form, dus we raden u aan om alleen kleine letters gebruiken.</hint>
-            <help todo="true"/>
+            <hint>Identificeert een groep forms, bijvoorbeeld op basis van functionaliteit of afdeling (bijv. "verkoop"). Als u een groep forms hebt, kunt u uw organisatienaam (bijv. "acme") gebruiken. Deze naam komt terug in de URL van het gepubliceerde form, dus we raden u aan om alleen kleine letters gebruiken.</hint>
+            <help/>
             <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
         </application-name>
         <form-name>
             <label>Form naam</label>
-            <hint todo="true">Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
-            <help todo="true"/>
+            <hint>Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
+            <help/>
             <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
-            <no-form-alert todo="true">
-                No form with this specific application and form name in this system have been found in this system.
+            <no-form-alert>
+                Er is geen form met deze specifieke applicatie- en formnaam in dit systeem gevonden.
             </no-form-alert>
-            <form-published-alert todo="true">
-                {0,choice,1#One form|1&lt;{0,number,integer} forms}
-                with this application name and form name {0,choice,1#is|1&lt;are} published.
-                &lt;a href="{1}" target="_blank">View in the Admin page.&lt;/a>
+            <form-published-alert>
+                {0,choice,1#Eén form|1&lt;{0,number,integer} formulieren}
+                met deze applicatienaam en formnaam {0,choice,1#is|1&lt;zijn} gepubliceerd.
+                &lt;a href="{1}" target="_blank">Bekijk in de Admin-pagina.&lt;/a>
             </form-published-alert>
-            <form-in-progress-alert todo="true">
-                {0,choice,1#One form|1&lt;{0,number,integer} forms}
-                with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
-                &lt;a href="{1}" target="_blank">View in the Form Builder Summary page.&lt;/a>
+            <form-in-progress-alert>
+                {0,choice,1#Eén form|1&lt;{0,number,integer} formulieren}
+                met deze applicatienaam en formnaam {0,choice,1#is|1&lt;zijn} in behandeling.
+                &lt;a href="{1}" target="_blank">Bekijk in de Form Builder overzichtspagina.&lt;/a>
             </form-in-progress-alert>
         </form-name>
         <title>
@@ -12998,9 +12998,9 @@
             <label>Laad toolbox opnieuw</label>
         </reload-components>
         <library-version>
-            <label todo="true">Library Version</label>
+            <label>Bibliotheekversie</label>
             <item>
-                <label todo="true">Version {0,number,integer}</label>
+                <label>Versie {0,number,integer}</label>
             </item>
         </library-version>
         <enter-section-title>
@@ -13055,7 +13055,7 @@
             <label>Versleep om te verplaatsen of kopiëren</label>
         </move-icon>
         <delete-container-icon>
-            <label todo="true">Verwijder section</label>
+            <label>Verwijder sectie</label>
         </delete-container-icon>
         <delete-row-icon>
             <label>Verwijder rij</label>
@@ -13116,20 +13116,20 @@
             <label>Aangepaste CSS classes</label>
         </classes>
         <autocomplete>
-            <label todo="true">[Autocomplete attribute]</label>
+            <label>Autocomplete attribuut</label>
             <groups>
-                <general todo="true">[General]</general>
-                <name todo="true">[Name and Title]</name>
-                <credentials todo="true">[Credentials]</credentials>
-                <address todo="true">[Address]</address>
-                <contact todo="true">[Contact]</contact>
-                <payment todo="true">[Payment]</payment>
+                <general>Algemeen</general>
+                <name>Naam en titel</name>
+                <credentials>Inloggegevens</credentials>
+                <address>Adres</address>
+                <contact>Contact</contact>
+                <payment>Betaling</payment>
             </groups>
         </autocomplete>
         <property-yes-no>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Yes]</item>
-            <item id="2" todo="true">[No]</item>
+            <item id="0">Gebruik property</item>
+            <item id="1">Ja</item>
+            <item id="2">Nee</item>
         </property-yes-no>
         <!-- Dialogs -->
         <continue>
@@ -13151,23 +13151,23 @@
             <label>of</label>
         </or>
         <errors>
-            <label todo="true">Errors</label>
+            <label>Fouten</label>
         </errors>
         <error-summary>
-            <label todo="true">[{1,choice,
-                0#No message|
-                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
-                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+            <label>[{1,choice,
+                0#Geen bericht|
+                1#'{0,choice,0#Fout|1#Waarschuwing|2#Informatiebericht|3#Bericht}'|
+                1&lt;'{0,choice,0#Fouten|1#Waarschuwingen|2#Informatieberichten|3#Berichten}'}]</label>
         </error-summary>
         <back-to-summary>
-            <label todo="true">Back to List of Forms</label>
+            <label>Terug naar lijst met formulieren</label>
         </back-to-summary>
         <form-builder-page-layout>
-            <item id="0">[Fixed View]</item>
-            <item id="1">[Fluid View]</item>
+            <item id="0">Vaste weergave</item>
+            <item id="1">Vloeiende weergave</item>
         </form-builder-page-layout>
         <suggestion>
-            <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
+            <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Gebruik suggestie: "{0}"</label>
         </suggestion>
         <components>
             <parameters-editor>
@@ -13184,21 +13184,21 @@
                     <alert>Ontbrekende waarde</alert>
                 </control>
                 <token>
-                    <label todo="true">Generate token URL parameter</label>
+                    <label>Genereer token URL-parameter</label>
                 </token>
                 <type>
                     <item id="0">Control-waarde</item>
                     <item id="1">Formule</item>
                     <item id="2">Alle control-waarden</item>
-                    <choice todo="true" label="[Link]">
-                        <item id="3" todo="true">[Edit page]</item>
-                        <item id="4" todo="true">[View page]</item>
-                        <item id="5" todo="true">[New page]</item>
-                        <item id="6" todo="true">[Summary page]</item>
-                        <item id="7" todo="true">[Home page]</item>
-                        <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Forms admin]</item>
-                        <item id="8" todo="true">[PDF file]</item>
+                    <choice label="Link">
+                        <item id="3">Bewerkpagina</item>
+                        <item id="4">Weergavepagina</item>
+                        <item id="5">Nieuwe pagina</item>
+                        <item id="6">Overzichtspagina</item>
+                        <item id="7">Startpagina</item>
+                        <item id="9">Pagina met gepubliceerde formulieren</item>
+                        <item id="10">Formulieren admin</item>
+                        <item id="8">PDF-bestand</item>
                     </choice>
                 </type>
             </parameters-editor>
@@ -13208,11 +13208,11 @@
             <save-as>Bewaar als…</save-as>
             <open><label>Form-instellingen</label></open>
             <options>Form opties</options>
-            <view-options todo="true">[Appearance]</view-options>
-            <wizard-options todo="true">[Wizard]</wizard-options>
-            <pdf-options todo="true">[PDF]</pdf-options>
-            <control-settings todo="true">[Control Settings]</control-settings>
-            <about todo="true">[About this Form]</about>
+            <view-options>Weergave</view-options>
+            <wizard-options>Wizard</wizard-options>
+            <pdf-options>PDF</pdf-options>
+            <control-settings>Control-instellingen</control-settings>
+            <about>Over dit formulier</about>
             <stats>Form-statistieken</stats>
             <sections>Secties</sections>
             <repeats>Herhalingen</repeats>
@@ -13220,14 +13220,14 @@
             <section-templates>Sectie-templates</section-templates>
             <controls>Controls</controls>
             <all>Alle</all>
-            <use-property todo="true">[Use property]</use-property>
+            <use-property>Gebruik property</use-property>
             <singleton>
                 <label>Singleton form</label>
                 <hint>Sta slechts één toegankelijke instantie van de formgegevens toe voor deze formdefinitie</hint>
             </singleton>
             <allow-template-use>
-                <label todo="true">Allow use as form template</label>
-                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+                <label>Sta gebruik als formuliersjabloon toe</label>
+                <hint>Indien geselecteerd, wordt dit formulier getoond in de lijst met formuliersjablonen</hint>
             </allow-template-use>
             <wizard>
                 <label>Wizard weergave</label>
@@ -13254,10 +13254,10 @@
                 <item id="3">Toon geen subsecties</item>
             </wizard-subsections-toc>
             <wizard-separate-toc>
-                <label todo="true">Wizard Separate Table of Contents</label>
+                <label>Wizard aparte inhoudsopgave</label>
             </wizard-separate-toc>
             <wizard-section-status>
-                <label todo="true">Always Show Wizard Section Status</label>
+                <label>Toon altijd wizard sectie-status</label>
             </wizard-section-status>
             <attachment-max-size-per-file>
                 <label>Maximum bijlagegrootte per control</label>
@@ -13281,7 +13281,7 @@
                 <label>Weergave van control-hints</label>
             </hints>
             <automatic-hints>
-                <label todo="true">[Use Automatic Hints]</label>
+                <label>Gebruik automatische hints</label>
             </automatic-hints>
             <appearances>
                 <item id="0">Gebruik standaard</item>
@@ -13289,88 +13289,88 @@
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label todo="true">Gebruik placeholder voor tekstvelden en 'text areas'</label>
+                <label>Gebruik placeholder voor tekstvelden en tekstgebieden</label>
             </placeholders>
             <data-migration>
-                <label todo="true">[Simple Data Migration]</label>
-                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Enabled]</item>
-                <item id="2" todo="true">[Disabled]</item>
-                <item id="3" todo="true">[Raise an error]</item>
+                <label>Eenvoudige gegevensmigratie</label>
+                <hint>Ontbrekende elementen in gegevens automatisch toevoegen/verwijderen</hint>
+                <item id="0">Gebruik property</item>
+                <item id="1">Ingeschakeld</item>
+                <item id="2">Uitgeschakeld</item>
+                <item id="3">Geef een foutmelding</item>
             </data-migration>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Grid Tab-volgorde</label>
+                <item id="0">Gebruik property</item>
+                <item id="1">Rijen</item>
+                <item id="2">Kolommen</item>
             </grid-tab-order>
             <time-window>
-                <label todo="true">[Time Window]</label>
+                <label>Tijdvenster</label>
                 <available>
                     <available-from>
-                        <label todo="true">[Creating only available from specific date]</label>
-                        <date todo="true">[Start date and time]</date>
-                        <message todo="true">[Pending message]</message>
+                        <label>Aanmaken alleen beschikbaar vanaf specifieke datum</label>
+                        <date>Startdatum en -tijd</date>
+                        <message>In behandeling bericht</message>
                     </available-from>
                     <available-to>
-                        <label todo="true">[Creating only available until specific date]</label>
-                        <date todo="true">[End date and time]</date>
-                        <message todo="true">[Expired message]</message>
+                        <label>Aanmaken alleen beschikbaar tot specifieke datum</label>
+                        <date>Einddatum en -tijd</date>
+                        <message>Verlopen bericht</message>
                     </available-to>
                 </available>
             </time-window>
             <rendered-page-orientation>
-                <label todo="true">[PDF page orientation]</label>
+                <label>PDF-pagina oriëntatie</label>
                 <hint/>
-                <item id="default" todo="true">[Use property]</item>
-                <item id="portrait" todo="true">[Portrait]</item>
-                <item id="landscape" todo="true">[Landscape]</item>
+                <item id="default">Gebruik property</item>
+                <item id="portrait">Staand</item>
+                <item id="landscape">Liggend</item>
             </rendered-page-orientation>
             <rendered-page-size>
-                <label todo="true">[PDF page size]</label>
+                <label>PDF-paginagrootte</label>
                 <hint/>
-                <item id="default" todo="true">[Use property]</item>
+                <item id="default">Gebruik property</item>
                 <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
-                <item id="letter" todo="true">[Letter]</item>
-                <item id="a4" todo="true">[A4]</item>
-                <item id="legal" todo="true">[Legal]</item>
+                <item id="letter">Letter</item>
+                <item id="a4">A4</item>
+                <item id="legal">Legal</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
+                <label>Berekeningen in alleen-lezen modus (Review, PDF)</label>
                 <hint/>
-                <item todo="true" id="default">Use property</item>
-                <item todo="true" id="false">Enable</item>
-                <item todo="true" id="true">Disable</item>
+                <item id="default">Gebruik property</item>
+                <item id="false">Inschakelen</item>
+                <item id="true">Uitschakelen</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser Page Layout]</label>
-                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Fixed width]</item>
-                <item id="2" todo="true">[Fluid width]</item>
+                <label>Browserpagina-indeling</label>
+                <hint>Of het formulier een vaste of vloeiende breedte heeft</hint>
+                <item id="0">Gebruik property</item>
+                <item id="1">Vaste breedte</item>
+                <item id="2">Vloeiende breedte</item>
             </html-page-layout>
             <density>
-                <label todo="true">[Density]</label>
-                <hint todo="true">[Spacing between elements in the interface]</hint>
-                <item id="0" todo="true">[Use property]</item>
-                <item id="1" todo="true">[Compact]</item>
-                <item id="2" todo="true">[Comfortable]</item>
-                <item id="3" todo="true">[Roomy]</item>
+                <label>Dichtheid</label>
+                <hint>Afstand tussen elementen in de interface</hint>
+                <item id="0">Gebruik property</item>
+                <item id="1">Compact</item>
+                <item id="2">Comfortabel</item>
+                <item id="3">Ruim</item>
             </density>
             <analysis-calculate>
                 <label>Automatische afhankelijkheid calculatie</label>
                 <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>
             </analysis-calculate>
-            <versions todo="true">[Versions]</versions>
-            <current-version todo="true">[Current Version]</current-version>
-            <created-with-version todo="true">[Created with Version]</created-with-version>
-            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <versions>Versies</versions>
+            <current-version>Huidige versie</current-version>
+            <created-with-version>Gemaakt met versie</created-with-version>
+            <updated-with-versions>Bijgewerkt met versies</updated-with-versions>
             <thumbnail>
-                <label todo="true">Form Thumbnail</label>
-                <hint todo="true">Used for form templates and the landing page</hint>
+                <label>Formulier thumbnail</label>
+                <hint>Gebruikt voor formuliersjablonen en de landingspagina</hint>
             </thumbnail>
-            <default-template todo="true">Default Template</default-template>
+            <default-template>Standaardsjabloon</default-template>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control-instellingen: "{1}" / "{0}" ({2})</label>
@@ -13383,17 +13383,17 @@
                 <hint>Bijv.: "voornaam"</hint>
             </control-name>
             <pdf-field-name>
-                <label todo="true">[Name of the PDF field]</label>
-                <alert todo="true">[Unknown PDF field name]</alert>
-                <item id="0" todo="true">Automatic</item>
-                <item id="1" todo="true">Custom</item>
+                <label>Naam van het PDF-veld</label>
+                <alert>Onbekende PDF-veldnaam</alert>
+                <item id="0">Automatisch</item>
+                <item id="1">Aangepast</item>
             </pdf-field-name>
             <excel-field-name>
-                <label todo="true">[Name of the Excel range]</label>
+                <label>Naam van het Excel-bereik</label>
             </excel-field-name>
             <options>
                 <item>
-                    <label todo="true">[Index control]</label>
+                    <label>Index control</label>
                     <value>fr-index</value>
                 </item>
                 <item>
@@ -13401,11 +13401,11 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label todo="true">[Allow bulk edit]</label>
+                    <label>Sta bulkbewerking toe</label>
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
-                    <label todo="true">[By default, sort by this column]</label>
+                    <label>Standaard sorteren op deze kolom</label>
                     <value>fr-default-sort-column</value>
                 </item>
                 <item>
@@ -13414,27 +13414,27 @@
                 </item>
             </options>
             <summary-show>
-                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
-                <show todo="true">[Show on Summary page]</show>
-                <column-only todo="true">[Show column only]</column-only>
-                <search-only todo="true">[Show search only]</search-only>
+                <do-not-show>Niet tonen op overzichtspagina</do-not-show>
+                <show>Tonen op overzichtspagina</show>
+                <column-only>Alleen kolom tonen</column-only>
+                <search-only>Alleen zoeken tonen</search-only>
             </summary-show>
             <role>
-                <restrict todo="true">[Restrict to role]</restrict>
-                <all todo="true">[All]</all>
-                <any todo="true">[Any]</any>
-                <of-the-following todo="true">[of the following:]</of-the-following>
-                <empty todo="true">[Empty role]</empty>
-                <duplicate todo="true">[Duplicate role]</duplicate>
+                <restrict>Beperk tot rol</restrict>
+                <all>Alle</all>
+                <any>Elke</any>
+                <of-the-following>van de volgende:</of-the-following>
+                <empty>Lege rol</empty>
+                <duplicate>Dubbele rol</duplicate>
             </role>
             <bulk-edit-actions>
-                <save-data todo="true">[Save data]</save-data>
-                <run-process todo="true">[Run Process]</run-process>
+                <save-data>Gegevens opslaan</save-data>
+                <run-process>Proces uitvoeren</run-process>
             </bulk-edit-actions>
             <default-sort-column>
-                <ascending todo="true">[Ascending]</ascending>
-                <descending todo="true">[Descending]</descending>
-                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
+                <ascending>Oplopend</ascending>
+                <descending>Aflopend</descending>
+                <conflict>Het inschakelen van sorteren op deze control zal het uitschakelen op de volgende control: {0}</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>Control weergave</label>
@@ -13453,7 +13453,7 @@
                 <hint>Built-in data type</hint>
 
                 <use-schema-type>Gebruik schema type</use-schema-type>
-                <use-component-type todo="true">[Use predefined type]</use-component-type>
+                <use-component-type>Gebruik voorgedefinieerd type</use-component-type>
 
                 <choices>
                     <choices>
@@ -13542,12 +13542,12 @@
                 <item id="non-positive">Negatief of nul</item>
                 <item id="negative">Negatief</item>
                 <item id="fraction-digits">Maximum aantal decimalen</item>
-                <item id="upload-max-size-per-file" multiple="false" todo="true">Maximum bijlagegrootte</item>
-                <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
-                <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-size-per-file" multiple="false">Maximum bijlagegrootte</item>
+                <item id="upload-max-size-per-file" multiple="true">Maximale bijlagegrootte per bestand</item>
+                <item id="upload-max-size-aggregate-per-control">Maximale totale bijlagegrootte</item>
                 <item id="upload-max-files-per-control">Maximaal aantal bestanden per besturingselement</item>
                 <item id="upload-mediatypes">Ondersteunde bestandstypen</item>
-                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
+                <item id="excluded-dates">Uit te sluiten datums</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -13566,25 +13566,25 @@
                 <label>Zichtbaarheid</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>Boolean XPath expressie</hint>
-                 <help todo="true">
+                 <help>
                     &lt;p>
-                        This allows you to specify whether the form control is visible or not.
+                        Hiermee kunt u opgeven of de control zichtbaar is of niet.
                     &lt;/p>
                     &lt;ul>
-                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
-                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
-                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                        &lt;li>&lt;b>Ja:&lt;/b> De control is zichtbaar.&lt;/li>
+                        &lt;li>&lt;b>Nee:&lt;/b> De control is verborgen.&lt;/li>
+                        &lt;li>&lt;b>Formule:&lt;/b> De control is dynamisch zichtbaar of verborgen, afhankelijk van een formule.&lt;/li>
                     &lt;/ul>
                     &lt;p>
-                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
-                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                        De formule stelt u in staat om dynamisch op te geven of de control zichtbaar is of niet. Deze moet een boolean waarde retourneren.
+                        De control is zichtbaar als de formule evalueert naar &lt;code>true()&lt;/code>, en verborgen als deze evalueert naar &lt;code>false()&lt;/code>.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code>$&lt;/code>-teken.
+                        Bij het invoeren van het &lt;code>$&lt;/code>-teken wordt een lijst met beschikbare form controls weergegeven.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentatie&lt;/a>.
                     &lt;/p>
                 </help>
             </visibility>
@@ -13592,25 +13592,25 @@
                 <label>Alleen-lezen</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>Boolean XPath expressie</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This allows you to specify whether the form control is readonly or read-write.
+                        Hiermee kunt u opgeven of de control alleen-lezen of lezen-schrijven is.
                     &lt;/p>
                     &lt;ul>
-                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
-                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
-                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                        &lt;li>&lt;b>Ja:&lt;/b> De control is alleen-lezen.&lt;/li>
+                        &lt;li>&lt;b>Nee:&lt;/b> De control is lezen-schrijven.&lt;/li>
+                        &lt;li>&lt;b>Formule:&lt;/b> De control is dynamisch alleen-lezen of lezen-schrijven, afhankelijk van een formule.&lt;/li>
                     &lt;/ul>
                     &lt;p>
-                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
-                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                        De formule stelt u in staat om dynamisch op te geven of de control alleen-lezen of lezen-schrijven is. Deze moet een boolean waarde retourneren.
+                        De control is alleen-lezen als de formule evalueert naar &lt;code>true()&lt;/code>, en lezen-schrijven als deze evalueert naar &lt;code>false()&lt;/code>.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code>$&lt;/code>-teken.
+                        Bij het invoeren van het &lt;code>$&lt;/code>-teken wordt een lijst met beschikbare form controls weergegeven.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentatie&lt;/a>.
                     &lt;/p>
                 </help>
             </readonly>
@@ -13618,16 +13618,16 @@
                 <label>Initiële waarde</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>XPath expressie</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                        Deze formule stelt u in staat om een initiële waarde op te geven voor de control in alleen "nieuwe" modus.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code>$&lt;/code>-teken.
+                        Bij het invoeren van het &lt;code>$&lt;/code>-teken wordt een lijst met beschikbare form controls weergegeven.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentatie&lt;/a>.
                     &lt;/p>
                 </help>
             </default>
@@ -13635,17 +13635,17 @@
                 <label>Berekende waarde</label>
                 <alert>Oneldige XPath expressie</alert>
                 <hint>XPath expressie</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This formula allows you to specify a calculated value for the form control.
-                        This value is re-evaluated to remain up to date as needed.
+                        Deze formule stelt u in staat om een berekende waarde op te geven voor de control.
+                        Deze waarde wordt opnieuw geëvalueerd om indien nodig up-to-date te blijven.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code>$&lt;/code>-teken.
+                        Bij het invoeren van het &lt;code>$&lt;/code>-teken wordt een lijst met beschikbare form controls weergegeven.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentatie&lt;/a>.
                     &lt;/p>
                 </help>
             </calculate>
@@ -13660,20 +13660,20 @@
                 <hint>Wordt getoond wanneer hulp wordt geactiveerd</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanatory Text]</label>
+                <label>Verklarende tekst</label>
                 <hint/>
             </control-text>
             <control-short-label>
-                <label todo="true">[Short Label]</label>
+                <label>Kort label</label>
             </control-short-label>
             <control-iteration-label>
-                <label todo="true">[Iteration Label]</label>
+                <label>Iteratielabel</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Label]</label>
+                <label>Label voor herhaling toevoegen</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
-                <label todo="true">[Remove Repetition Text]</label>
+                <label>Tekst voor herhaling verwijderen</label>
             </control-remove-iteration-label>
             <alert>
                 <label>Waarschuwingsmelding</label>
@@ -13695,21 +13695,21 @@
             <use-html>Gebruik HTML</use-html>
             <parameters>Templateparameters</parameters>
             <automatic-hint>
-                <label todo="true">[Use automatic hint]</label>
-                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+                <label>Gebruik automatische hint</label>
+                <hint>Voegt een hint toe op basis van de maximale bestandsgrootte en ondersteunde bestandstypen die u mogelijk hebt opgegeven in het tabblad Validaties en waarschuwingen</hint>
             </automatic-hint>
             <open-selection>
-                <label todo="true">[Open selection]</label>
-                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+                <label>Open selectie</label>
+                <hint>Indien ingeschakeld, kunnen gebruikers hun eigen waarde invoeren, en de waarde (tekst opgeslagen in de gegevens) wordt ook gebruikt als het label (tekst weergegeven in de vervolgkeuzelijst)</hint>
             </open-selection>
             <store-label>
-                <label todo="true">[Store label]</label>
-                <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+                <label>Label opslaan</label>
+                <hint>Indien ingeschakeld, wordt het geselecteerde label naast de gegevens opgeslagen</hint>
             </store-label>
             <default-yes-no>
-                <item id="0" todo="true">[Use default]</item>
-                <item id="1" todo="true">[Yes]</item>
-                <item id="2" todo="true">[No]</item>
+                <item id="0">Gebruik standaard</item>
+                <item id="1">Ja</item>
+                <item id="2">Nee</item>
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
@@ -13720,16 +13720,16 @@
                 <hint>Bijv.: "adres"</hint>
             </control-name>
             <grid-columns>
-                <label todo="true">[Number of grid columns]</label>
+                <label>Aantal gridkolommen</label>
             </grid-columns>
             <grid-rows>
-                <label todo="true">Number of grid rows</label>
+                <label>Aantal gridrijen</label>
             </grid-rows>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Default]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Grid Tab-volgorde</label>
+                <item id="0">Standaard</item>
+                <item id="1">Rijen</item>
+                <item id="2">Kolommen</item>
             </grid-tab-order>
             <options>
                 <label>Opties</label>
@@ -13759,15 +13759,15 @@
                 <label>Herhaal inhoud</label>
             </repeat>
             <user-can-add-remove>
-                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <label>Sta de gebruiker toe herhalingen toe te voegen, te verwijderen of te verplaatsen</label>
                 <hint/>
             </user-can-add-remove>
             <number-rows>
-                <label todo="true">Show repetition number</label>
+                <label>Toon herhalingsnummer</label>
                 <hint/>
             </number-rows>
             <use-paging>
-                <label todo="true">[Show one repetition at a time in the wizard]</label>
+                <label>Toon één herhaling tegelijk in de wizard</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -13790,14 +13790,14 @@
                 <hint>Positief aantal of XPath expressie</hint>
             </max>
             <freeze>
-                <label todo="true">[Freeze Repetitions]</label>
-                <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
+                <label>Bevries herhalingen</label>
+                <alert>Onjuiste waarde</alert>
+                <hint>Niet-negatief getal tot het minimum aantal herhalingen (zie hierboven), of een XPath-expressie</hint>
             </freeze>
-            <no-freeze todo="true">[No freeze]</no-freeze>
+            <no-freeze>Niet bevriezen</no-freeze>
             <appearance-minimal>
-                <label todo="true">Simplified appearance</label>
-                <hint todo="true">Show basic add/remove buttons without menu or reordering</hint>
+                <label>Vereenvoudigde weergave</label>
+                <hint>Toon basis toevoegen/verwijderen knoppen zonder menu of herordenen</hint>
             </appearance-minimal>
             <apply-defaults>
                 <label>Pas initiële waarde formules toe bij toevoegen van iteraties</label>
@@ -13837,7 +13837,7 @@
             <publish-error>Er is een fout opgetreden tijdens het publiceren.</publish-error>
             <latest-published-version>Laatst gepubliceerde versie</latest-published-version>
             <create-new-version-item>maak een nieuwe formdefinitie met versienummer {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">overschrijf de huidige formdefinitie met versienummer {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
+            <overwrite-version-item>overschrijf de huidige formdefinitie met versienummer {0,number,integer} ({1,choice,0#niet beschikbaar|1#beschikbaar})</overwrite-version-item>
             <create-new-version-help>
                 MERK OP: Publiceren van deze formdefinitie maakt een nieuwe versie van de formdefinitie in de database.
                 Bestaande gegevens in de database kunnen nog wel met de vorige versies van deze formdefinitie waaraan
@@ -13872,9 +13872,9 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label todo="true">Search Controls</label>
+            <label>Zoek controls</label>
             <open-settings>
-                <label todo="true">Open Settings Dialog</label>
+                <label>Open instellingendialoog</label>
             </open-settings>
         </dialog-search>
         <dialog-upload-schema>
@@ -13952,7 +13952,7 @@
                 <label>Alles verwijderen</label>
             </remove-all>
             <filter>
-                <label todo="true">Filter Formula</label>
+                <label>Filterformule</label>
             </filter>
             <itemsetid-mode>
                 <label>Keuzes uit metadata gebruiken</label>
@@ -13975,10 +13975,10 @@
                 <hint>Kies een unieke naam voor deze service</hint>
             </service-name>
             <service-performs-search>
-                <label todo="true">[Service performs search]</label>
+                <label>Service voert zoekactie uit</label>
             </service-performs-search>
             <service-supports-paging>
-                <label todo="true">[Service supports paging]</label>
+                <label>Service ondersteunt paginering</label>
             </service-supports-paging>
             <resource>
                 <label>Resource URL</label>
@@ -14013,8 +14013,8 @@
                 <hint>XML data (kan een SOAP envelope zijn)</hint>
             </request-body>
             <is-binary-response>
-                <label todo="true">[Service Response has Binary Content]</label>
-                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+                <label>Service respons heeft binaire inhoud</label>
+                <hint>Vink dit aan als de respons wordt gebruikt om een bijlage control-waarde in te stellen</hint>
             </is-binary-response>
             <response>
                 <label>Response</label>
@@ -14065,7 +14065,7 @@
                 <label>Response body</label>
             </response-body>
             <xml-response-body>
-                <label todo="true">[XML Response Body]</label>
+                <label>XML response body</label>
             </xml-response-body>
             <save>
                 <label>Bewaar</label>
@@ -14116,15 +14116,15 @@
                     <value>xforms-value-changed</value>
                 </item>
                 <item>
-                    <label todo="true">toont</label>
+                    <label>toont</label>
                     <value>xforms-enabled</value>
                 </item>
                 <item>
-                    <label todo="true">verdwijnt</label>
+                    <label>verdwijnt</label>
                     <value>xforms-disabled</value>
                 </item>
                 <item>
-                    <label todo="true">wordt geactiveerd</label>
+                    <label>wordt geactiveerd</label>
                     <value>DOMActivate</value>
                 </item>
             </control-event-type>
@@ -14146,8 +14146,8 @@
                 <label>Conditie</label>
                 <item id="always">Start altijd</item>
                 <item id="new-only">Start alleen bij aanmaken</item>
-                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
-                <formula todo="true">[Formula]</formula>
+                <item id="formula">Wanneer formule evalueert naar "true"</item>
+                <formula>Formule</formula>
             </event-condition>
             <event-control>
                 <label>Control</label>
@@ -14157,10 +14157,10 @@
                 <hint>Service om aan te roepen bij optreden van event</hint>
             </service-to-call>
             <source>
-                <label todo="true">[Source]</label>
+                <label>Bron</label>
             </source>
             <destination>
-                <label todo="true">[Destination]</label>
+                <label>Bestemming</label>
             </destination>
             <source-control>
                 <label>Bron control</label>
@@ -14199,14 +14199,14 @@
                 <hint>Relatief aan gekozen node</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint formula]</label>
-                <hint todo="true">[Relative to choice node]</hint>
+                <label>Hint formule</label>
+                <hint>Relatief aan keuze node</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page formula]</label>
+                <label>Is laatste pagina formule</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label todo="true">[Auto-select unique choice]</label>
+                <label>Selecteer automatisch unieke keuze</label>
             </auto-select-unique-choice>
             <save>
                 <label>Bewaar</label>
@@ -14228,18 +14228,18 @@
         </dialog-actions>
         <dialog-test>
             <label>Form voorvertoning</label>
-            <console todo="true">Console</console>
+            <console>Console</console>
         </dialog-test>
         <dialog-test-pdf>
-            <label todo="true">Test PDF Production</label>
-            <use-form-data todo="true">Use entered form data</use-form-data>
-            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
-            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
-            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
-            <show-hints todo="true">Show controls hints</show-hints>
-            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
-            <show-required todo="true">Style required controls</show-required>
-            <use-pdf-template todd="true">Use PDF template</use-pdf-template>
+            <label>Test PDF-productie</label>
+            <use-form-data>Gebruik ingevoerde formgegevens</use-form-data>
+            <disable-default>Schakel de evaluatie van "Initiële waarden" formules uit</disable-default>
+            <disable-calculate>Schakel de evaluatie van "Berekende waarden" formules uit</disable-calculate>
+            <disable-relevant>Toon controls, grids en secties met dynamische zichtbaarheid</disable-relevant>
+            <show-hints>Toon control hints</show-hints>
+            <show-alerts>Toon waarschuwingen van ongeldige controls</show-alerts>
+            <show-required>Stijl verplichte controls</show-required>
+            <use-pdf-template>Gebruik PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
             <label>Orbeon Forms PE functie</label>
@@ -14251,47 +14251,47 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label todo="true">[Email Settings]</label>
-            <templates todo="true">[Email templates]</templates>
+            <label>E-mailinstellingen</label>
+            <templates>E-mailsjablonen</templates>
             <template-name>
-                <label todo="true">[Email template name]</label>
-                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+                <label>E-mailsjabloonnaam</label>
+                <hint>Deze naam is niet zichtbaar voor eindgebruikers; hij wordt gebruikt in processen, bijvoorbeeld: email(template = "notify-user")</hint>
             </template-name>
             <language>
-                <label todo="true">[Language]</label>
-                <any-language todo="true">[Any language]</any-language>
+                <label>Taal</label>
+                <any-language>Elke taal</any-language>
             </language>
             <headers>
-                <from todo="true">[Sender]</from>
-                <to todo="true">[Recipient]</to>
-                <cc todo="true">[CC]</cc>
-                <bcc todo="true">[BCC]</bcc>
-                <reply-to todo="true">[Reply To]</reply-to>
+                <from>Afzender</from>
+                <to>Ontvanger</to>
+                <cc>CC</cc>
+                <bcc>BCC</bcc>
+                <reply-to>Antwoord aan</reply-to>
             </headers>
             <header-value-types>
-                <control-value todo="true">[Control Value]</control-value>
-                <expression todo="true">[Formula]</expression>
-                <text todo="true">[Text]</text>
+                <control-value>Control-waarde</control-value>
+                <expression>Formule</expression>
+                <text>Tekst</text>
             </header-value-types>
-            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
-            <subject todo="true">[Email Subject]</subject>
-            <body todo="true">[Email Body]</body>
-            <use-html todo="true">[Use HTML]</use-html>
-            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <enable-if-true>Activeer dit sjabloon alleen als de volgende formule evalueert naar waar</enable-if-true>
+            <subject>E-mailonderwerp</subject>
+            <body>E-mailbody</body>
+            <use-html>Gebruik HTML</use-html>
+            <attach-form-as>Voeg form toe als</attach-form-as>
             <pdf>PDF</pdf>
             <xml>XML</xml>
             <attach-files>
-                <label todo="true">[Attach files users uploaded to the form]</label>
+                <label>Voeg bestanden toe die gebruikers naar het form hebben geüpload</label>
                 <choices>
-                    <all todo="true">[All]</all>
-                    <none todo="true">[None]</none>
-                    <selected todo="true">[Selected attachments]</selected>
+                    <all>Alle</all>
+                    <none>Geen</none>
+                    <selected>Geselecteerde bijlagen</selected>
                 </choices>
             </attach-files>
-            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
-            <use-default todo="true">[Use default]</use-default>
-            <delete-template todo="true">Delete template</delete-template>
-            <template-parameters todo="true">[Template parameters]</template-parameters>
+            <exclude-from-all-control-values>Sluit uit van alle control-waarden</exclude-from-all-control-values>
+            <use-default>Gebruik standaard</use-default>
+            <delete-template>Verwijder sjabloon</delete-template>
+            <template-parameters>Sjabloonparameters</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Bevoegdheden</label>
@@ -14300,15 +14300,15 @@
             <permissions>Bevoegdheden</permissions>
             <operations>Bewerkingen</operations>
             <anyone>Iedereen</anyone>
-            <anyone-with-token todo="true">[Require token]</anyone-with-token>
-            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
+            <anyone-with-token>Vereist token</anyone-with-token>
+            <any-authenticated-user>Elke geauthenticeerde gebruiker</any-authenticated-user>
             <owner>Eigenaar</owner>
             <group-member>Groepleden</group-member>
             <create>Maken</create>
             <read>Lezen</read>
             <update>Updaten</update>
             <delete>Verwijderen</delete>
-            <list todo="true">List</list>
+            <list>Lijst</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow en bevoegdheden</label>
@@ -14343,29 +14343,29 @@
             <default-stage>Standaard</default-stage>
 
             <operations>
-                <label todo="true">[Operations]</label>
+                <label>Bewerkingen</label>
                 <item>
-                    <label todo="true">[Fill new form]</label>
+                    <label>Vul nieuw form in</label>
                     <value>1</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[List and search data]</label>
+                    <label>Toon en zoek gegevens</label>
                     <value>2</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for editing]</label>
+                    <label>Toegang tot gegevens voor bewerking</label>
                     <value>3</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for viewing]</label>
+                    <label>Toegang tot gegevens voor weergave</label>
                     <value>4</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access PDF/TIFF]</label>
+                    <label>Toegang tot PDF/TIFF</label>
                     <value>5</value>
                     <hint/>
                 </item>
@@ -14376,33 +14376,33 @@
             <dialog-title>Sneltoetsen</dialog-title>
         </dialog-keyboard-shortcuts>
         <dialog-messages>
-            <label todo="true">[Messages]</label>
-            <language-header todo="true">[Language]</language-header>
-            <name-header todo="true">[Name]</name-header>
-            <value-header todo="true">[Value]</value-header>
+            <label>Berichten</label>
+            <language-header>Taal</language-header>
+            <name-header>Naam</name-header>
+            <value-header>Waarde</value-header>
         </dialog-messages>
         <modes>
-            <editable todo="true">Editable modes</editable>
-            <review todo="true">Review mode</review>
-            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
-            <pdf-template todo="true">PDF template</pdf-template>
+            <editable>Bewerkbare modi</editable>
+            <review>Beoordelingsmodus</review>
+            <pdf-automatic>Automatische PDF</pdf-automatic>
+            <pdf-template>PDF template</pdf-template>
         </modes>
         <xbl-control-settings>
-            <field-width todo="true">[Field width]</field-width>
-            <default todo="true">Use default</default>
-            <full todo="true">Full</full>
-            <natural todo="true">Natural</natural>
-            <field-align todo="true">Field alignment</field-align>
-            <left todo="true">Left</left>
-            <right todo="true">Right</right>
-            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-width>Veldbreedte</field-width>
+            <default>Gebruik standaard</default>
+            <full>Volledig</full>
+            <natural>Natuurlijk</natural>
+            <field-align>Velduitlijning</field-align>
+            <left>Links</left>
+            <right>Rechts</right>
+            <learn-settings-below>Meer informatie over de onderstaande instellingen</learn-settings-below>
             <field-value-visibility>
-                <label todo="true">Field Value Visibility</label>
-                <hint todo="true">Controls how the value of the field is displayed</hint>
-                <item id="visible" todo="true">Visible</item>
+                <label>Zichtbaarheid veldwaarde</label>
+                <hint>Bepaalt hoe de waarde van het veld wordt weergegeven</hint>
+                <item id="visible">Zichtbaar</item>
                 <item id="obscured">Obscured</item>
-                <item id="partial" todo="true">Partial</item>
-                <item id="reveal" todo="true">Allow user to reveal</item>
+                <item id="partial">Gedeeltelijk</item>
+                <item id="reveal">Sta gebruiker toe om te onthullen</item>
             </field-value-visibility>
         </xbl-control-settings>
         <messages>
@@ -14411,20 +14411,20 @@
             <delete-column>Weet u zeker dat u de huidige kolom wilt verwijderen?</delete-column>
             <delete-row>Weet u zeker dat u de huidige rij wilt verwijderen?</delete-row>
             <delete-resources>Weet u zeker dat u alle resources voor de taal wilt verwijderen</delete-resources>
-            <delete-service todo="true">Weet u zeker dat u de service wilt verwijderen "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
-            <delete-action todo="true">Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
+            <delete-service>Weet u zeker dat u de service wilt verwijderen "{0}"?{1,choice,0# Geen actie gebruikt deze.|1# 1 actie gebruikt deze.|1&lt; {1,number,integer} acties gebruiken deze.}</delete-service>
+            <delete-action>Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
             <controls-will-be-deleted>Er {0,choice,0#worden geen controls|1#wordt 1 control|1&lt;worden {0,number,integer} controls} verwijderd.</controls-will-be-deleted>
             <metadata-edit-title>Form metagegevens</metadata-edit-title>
-            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <select-template-output>Selecteer een formsjabloon om als uitgangspunt te gebruiken.</select-template-output>
             <app-form-optional>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-optional>
-            <app-form-required todo="true">Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-required>
+            <app-form-required>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-required>
             <save-as-metadata-output>Voer een nieuwe applicatienaam en formnaam in die worden gebruikt voor de kopie van dit form:</save-as-metadata-output>
             <xpath-errors>Er {0,choice,1#is een XPath fout|1&lt;zijn {0,number,integer} XPath fouten} in uw form.</xpath-errors>
             <lhha-checkbox>Activeer deze optie als u HTML tags wilt gebruiken</lhha-checkbox>
         </messages>
         <alerts>
-            <required todo="true">[Value is required]</required>
-            <xpath todo="true">[Incorrect XPath expression]</xpath>
+            <required>Waarde is verplicht</required>
+            <xpath>Onjuiste XPath expressie</xpath>
         </alerts>
         <template>
             <untitled-form>Naamloos form</untitled-form>

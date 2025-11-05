@@ -38,6 +38,9 @@ class PropertyStore(val sequence: Int, globalPropertySet: PropertySet, processor
 // Construction of a `PropertyStore` currently depends on Saxon classes.
 object PropertyStore {
 
+  // Used by:
+  // - `Properties.update()`
+  // - `XIncludeProcessor`, `SaxonXQueryProcessor`, `XSLTTransformer`
   def parse(doc: Document, sequence: Int): PropertyStore = {
 
     import PropertySet.PropertyParams

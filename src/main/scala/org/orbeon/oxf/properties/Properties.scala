@@ -149,6 +149,7 @@ class Properties private {
     ps
   }
 
+  // Used by processors and `XFormsCrossPlatformSupport.createHTMLFragmentXmlReceiver()`
   def getPropertySet(processorName: QName): PropertySet =
     propertyStore match {
       case Some(propertyStore) =>
@@ -158,6 +159,7 @@ class Properties private {
         null
     }
 
+  // Only for `SchemaRepository`
   def keySetJava: ju.Set[?] =
     propertyStore match {
       case Some(propertyStore) =>

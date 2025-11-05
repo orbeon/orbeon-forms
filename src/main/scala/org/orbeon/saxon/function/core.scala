@@ -72,18 +72,15 @@ class PropertiesStartsWith extends DefaultFunctionSupport with RuntimeDependentF
 }
 
 object PropertiesStartsWith {
-
   def propertiesStartsWith(propertyName: String): List[AtomicValue] =
     for {
       property <- CoreCrossPlatformSupport.properties.propertiesStartsWith(propertyName)
       if ! property.toLowerCase.contains("password")
     } yield
       SaxonUtils.convertJavaObjectToSaxonObject(property).asInstanceOf[AtomicValue]
-
 }
 
 class RewriteResourceURI extends DefaultFunctionSupport {
-
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
     implicit val ctx = xpathContext
     RewriteResourceURI.rewriteResourceURI(

@@ -205,7 +205,7 @@ class XFormsRepeatControl(
           insertPosition                    = insertPosition,
           insertLocation                    = Left(NonEmptyList(insertLocationNode, Nil), 1),
           originItemsOpt                    = List(deletedNodeInfo).some,
-          doClone                           = false, // do not clone the node as we know the node it is ready for insertion
+          doClone                           = false, // do not clone the node as we know the node is ready for insertion
           doDispatch                        = true,
           requireDefaultValues              = false,
           searchForInstance                 = true,

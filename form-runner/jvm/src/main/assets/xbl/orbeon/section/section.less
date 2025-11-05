@@ -31,6 +31,8 @@
                 background-color: @grayLighter;
                 font-weight: normal;
                 color: @frHeaderColor;
+                line-height: @frSectionTitleLineHeightRatio;
+                min-height: @frSectionTitleLineHeightRatio;
             }
 
             &.fr-section-title {
@@ -50,31 +52,23 @@
             }
         }
 
-        h2 {
-            &.fr-section-title {
-                font-size: @frSectionTitleHeight;
-                line-height: @frSectionTitleLineHeight;
-                min-height: @frSectionTitleLineHeight;
-            }
-
-            &.fr-section-iteration-title {
-                font-size: @frSectionTitleHeight * 0.8;
-                line-height: @frSectionTitleLineHeight * 0.8;
-                min-height: @frSectionTitleLineHeight * 0.8;
-            }
+        h2.fr-section-title {
+            font-size: var(--orbeon-section-title-font-size);
         }
 
         h3, h4, h5, h6 {
             &.fr-section-title {
-                font-size: @frSectionTitleHeight * 0.8;
-                line-height: @frSectionTitleLineHeight * 0.8;
-                min-height: @frSectionTitleLineHeight * 0.8;
+                font-size: var(--orbeon-subsection-title-font-size);
             }
+        }
 
+        h3.fr-section-iteration-title {
+            font-size: var(--orbeon-section-iteration-title-font-size);
+        }
+
+        h4, h5, h6 {
             &.fr-section-iteration-title {
-                font-size: @frSectionTitleHeight * 0.8 * 0.8;
-                line-height: @frSectionTitleLineHeight * 0.8 * 0.8;
-                min-height: @frSectionTitleLineHeight * 0.8 * 0.8;
+                font-size: var(--orbeon-subsection-iteration-title-font-size);
             }
         }
 
@@ -116,12 +110,17 @@
                 .btn-link {
                     text-decoration: none;
                     color: @frHeaderColor; // Don't use the default styling for anchors
+                    font-size: inherit;    // Inherit from .fr-section-title instead of using the global button font size
+                    line-height: inherit;  // Inherit from .fr-section-title instead of using the global button line height
+                    padding-bottom: 0;
+                    border-top: 0;
+                    border-bottom: 0;
                 }
 
                 // Override default label styles
                 label {
-                    font-size: @frSectionTitleHeight;
-                    line-height: @frSectionTitleLineHeight;
+                    font-size: var(--orbeon-section-title-font-size); // TODO: is it actually used? (was @frSectionTitleHeight: 18px)
+                    line-height: @frSectionTitleLineHeightRatio;
                     margin-bottom: 0;
                 }
 

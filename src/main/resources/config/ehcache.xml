@@ -93,4 +93,16 @@
            diskPersistent="false"
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
+
+    <cache name="orbeon.properties"
+           maxElementsInMemory="50"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="false"
+           diskSpoolBufferSizeMB="1"
+           eternal="false"
+           timeToLiveSeconds="30"
+           timeToIdleSeconds="0"
+           diskPersistent="false"
+           maxElementsOnDisk="0"
+           diskExpiryThreadIntervalSeconds="120"/>
 </ehcache>

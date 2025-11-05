@@ -17,13 +17,13 @@ import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.properties.PropertySet.*
-import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
+import org.orbeon.properties.api
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.*
 
@@ -67,34 +67,45 @@ object PropertySet {
 
   val StarToken = "*"
 
-  private case class PropertyNode(
+  trait PropertyNodeT {
+    def property: Option[Property]
+    def hasChildren: Boolean
+    def get(k: String): Option[PropertyNodeT]
+    def iterable: Iterable[(String, PropertyNodeT)] // xxx or iterator? iterate?; for propertiesMatching/propertiesStartsWith
+  }
+
+  case class MutablePropertyNode(
     var property: Option[Property] = None,
-    children    : mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
-  )
+    children    : mutable.Map[String, MutablePropertyNode] = mutable.LinkedHashMap[String, MutablePropertyNode]()
+  ) extends PropertyNodeT {
+      def hasChildren: Boolean = children.nonEmpty
+      def get(k: String): Option[PropertyNodeT] = children.get(k)
+      def iterable: Iterable[(String, PropertyNodeT)] = children.view
+    }
 
-  private val SomeXsStringQname   = XMLConstants.XS_STRING_QNAME.some
-  private val SomeXsIntegerQname  = XMLConstants.XS_INTEGER_QNAME.some
-  private val SomeXsBooleanQname  = XMLConstants.XS_BOOLEAN_QNAME.some
-  private val SomeXsNmtokensQname = XMLConstants.XS_NMTOKENS_QNAME.some
-  private val SomeXsDateQname     = XMLConstants.XS_DATE_QNAME.some
-  private val SomeXsDatetimeQname = XMLConstants.XS_DATETIME_QNAME.some
-  private val SomeXsQnameQname    = XMLConstants.XS_QNAME_QNAME.some
+  private[properties] val SomeXsStringQname   = XMLConstants.XS_STRING_QNAME.some
+  private[properties] val SomeXsIntegerQname  = XMLConstants.XS_INTEGER_QNAME.some
+  private[properties] val SomeXsBooleanQname  = XMLConstants.XS_BOOLEAN_QNAME.some
+  private[properties] val SomeXsNmtokensQname = XMLConstants.XS_NMTOKENS_QNAME.some
+  private[properties] val SomeXsDateQname     = XMLConstants.XS_DATE_QNAME.some
+  private[properties] val SomeXsDatetimeQname = XMLConstants.XS_DATETIME_QNAME.some
+  private[properties] val SomeXsQnameQname    = XMLConstants.XS_QNAME_QNAME.some
 
-  def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode, 0)
+  val empty: PropertySet = apply(Nil, "")
 
   case class PropertyParams(namespaces: Map[String, String], name: String, typeQName: QName, stringValue: String)
 
   def forTests(globalProperties: Iterable[PropertyParams]): PropertySet =
-    apply(globalProperties, sequence = 0) // prefer to keep a non-default parameter and use a special method for tests
+    apply(globalProperties, eTag = "") // prefer to keep a non-default parameter and use a special method for tests
 
-  def apply(globalProperties: Iterable[PropertyParams], sequence: Int): PropertySet = {
+  def apply(globalProperties: Iterable[PropertyParams], eTag: api.ETag): PropertySet = {
 
     var propertiesByName = Map[String, Property]()
-    val propertiesTree   = new PropertyNode
+    val propertiesTree   = new MutablePropertyNode
 
     def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef): Unit = {
 
-      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces, name) // shouldn't be null!
+      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces, name)
 
       // Store exact property name anyway
       propertiesByName += name -> property
@@ -103,17 +114,17 @@ object PropertySet {
       // that start with some token)
       var currentNode = propertiesTree
       for (currentToken <- name.splitTo[List]("."))
-        currentNode = currentNode.children.getOrElseUpdate(currentToken, new PropertyNode)
+        currentNode = currentNode.children.getOrElseUpdate(currentToken, new MutablePropertyNode)
 
       // Store value
       currentNode.property = property.some
     }
 
-    globalProperties foreach { case PropertyParams(namespaces, name, typ, stringValue) =>
+    globalProperties.foreach { case PropertyParams(namespaces, name, typ, stringValue) =>
       setProperty(namespaces, name, typ, getObjectFromStringValue(stringValue, typ, namespaces))
     }
 
-    new PropertySet(propertiesByName, propertiesTree, sequence)
+    new PropertySetImpl(propertiesByName, propertiesTree, eTag)
   }
 
   def isSupportedType(typeQName: QName): Boolean =
@@ -180,14 +191,25 @@ object PropertySet {
   }
 }
 
-class PropertySet private (
-  propertiesByName: Map[String, Property],
-  propertiesTree  : PropertyNode,  // this contains mutable nodes, but they don't mutate after construction
-  val sequence    : Int
-) {
+class PropertySetImpl private[properties] (
+  protected[orbeon] val propertiesByName: collection.Map[String, Property],
+  protected[orbeon] val propertiesTree  : PropertyNodeT,  // this contains mutable nodes, but they don't mutate after construction
+                    val eTag            : api.ETag
+) extends
+  PropertySet
 
-  def keySet: Set[String] = propertiesByName.keySet
+trait PropertySet extends PropertySetFunctions {
+  val eTag: api.ETag
+}
+
+trait PropertySetFunctions extends PropertySetGetters {
+
+  protected[orbeon] def propertiesByName: collection.Map[String, Property]
+  protected[orbeon] def propertiesTree  : PropertyNodeT
+
+  def keySet: collection.Set[String] = propertiesByName.keySet
   def size: Int = propertiesByName.size
+  def isEmpty: Boolean = size == 0
 
   // For form compilation
   def propertyParams: Iterable[PropertyParams] =
@@ -236,18 +258,21 @@ class PropertySet private (
   // Return all the properties starting with the given name
   def propertiesStartsWith(incomingPropertyName: String, matchWildcards: Boolean = true): List[String] = {
 
+    if (incomingPropertyName.contains(StarToken))
+      println(s"propertiesStartsWith: incomingPropertyName=$incomingPropertyName, matchWildcards=$matchWildcards")
+
     val result = mutable.Buffer[String]()
 
-    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): Unit =
-      (incomingTokens.headOption, propertyNode.children.isEmpty) match {
-        case (None, true) =>
+    def processNode(propertyNode: PropertyNodeT, foundTokens: List[String], incomingTokens: List[String]): Unit =
+      (incomingTokens.headOption, propertyNode.hasChildren) match {
+        case (None, false) =>
           result += foundTokens.reverse.mkString(".")
-        case (None, false) | (Some(StarToken), _) =>
-          for ((key, value) <- propertyNode.children)
+        case (None, true) | (Some(StarToken), _) =>
+          for ((key, value) <- propertyNode.iterable)
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
         case (Some(currentToken), _) =>
-          def findChild(t: String): List[(String, PropertyNode)] =
-            propertyNode.children.get(t).map(t -> _).toList
+          def findChild(t: String): List[(String, PropertyNodeT)] =
+            propertyNode.get(t).map(t -> _).toList
           for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild(StarToken)))
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
       }
@@ -262,10 +287,9 @@ class PropertySet private (
 
     def processNode(
       incomingTokens: List[String],
-      property      : Option[Property],
-      children      : collection.Map[String, PropertyNode],
+      currentNode   : PropertyNodeT,
     ): LazyList[(Property, Boolean)] =
-      (incomingTokens.headOption, property, children.isEmpty) match {
+      (incomingTokens.headOption, currentNode.property, currentNode.hasChildren) match {
         case (None, Some(property), _) =>
           // Found
 
@@ -276,30 +300,30 @@ class PropertySet private (
               }
 
           LazyList(property -> incomingAlwaysMatches)
-        case (Some(_), _, true) =>
+        case (Some(_), _, false) =>
           // Not found because requested property is longer
           LazyList.empty
-        case (None, _, false) =>
+        case (None, _, true) =>
           // Not found because requested property is shorter
           LazyList.empty
         case (Some(StarToken), _, _) =>
           // Return all branches, but first the ones that are not wildcard if any, so that the resulting list is sorted
-          (children.view.filter(_._1 != StarToken) ++ children.view.filter(_._1 == StarToken))
+          (currentNode.iterable.filter(_._1 != StarToken) ++ currentNode.iterable.filter(_._1 == StarToken))
             .map(_._2)
-            .flatMap(value => processNode(incomingTokens.drop(1), value.property, value.children))
+            .flatMap(newNode => processNode(incomingTokens.drop(1), newNode))
             .to(LazyList)
         case (Some(currentToken), _, _) =>
           // Return an exact branch if any and a wildcard branch if any
-          (children.get(currentToken) #:: children.get(StarToken) #:: LazyList.empty)
+          (currentNode.get(currentToken) #:: currentNode.get(StarToken) #:: LazyList.empty)
             .flatten
-            .flatMap(value => processNode(incomingTokens.drop(1), value.property, value.children))
-        case (None, None, true) =>
+            .flatMap(newNode => processNode(incomingTokens.drop(1), newNode))
+        case (None, None, false) =>
           // Can this happen?
           LazyList.empty
       }
 
     val allMatchingProperties =
-      processNode(allIncomingTokens, propertiesTree.property, propertiesTree.children)
+      processNode(allIncomingTokens, propertiesTree)
 
     // Take the shortest prefix ending with a property that swallows the input
     (allMatchingProperties.takeWhile(! _._2) ++ allMatchingProperties.dropWhile(! _._2).take(1))
@@ -307,10 +331,10 @@ class PropertySet private (
       .toList
   }
 
-  private def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property] = {
+  protected def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property] = {
 
     def wildcardSearch(
-      propertyNodeOpt : Option[PropertyNode],
+      propertyNodeOpt : Option[PropertyNodeT],
       tokens          : List[String]
     ): Option[Property] =
       propertyNodeOpt match {
@@ -319,11 +343,10 @@ class PropertySet private (
           tokens match {
             case Nil =>
               propertyNode.property
-            case head :: tail =>
-              propertyNode.children match {
-                case c if c.isEmpty => None
-                case c              => wildcardSearch(c.get(head), tail) orElse wildcardSearch(c.get(StarToken), tail)
-              }
+            case head :: tail if propertyNode.hasChildren =>
+              wildcardSearch(propertyNode.get(head), tail) orElse wildcardSearch(propertyNode.get(StarToken), tail)
+            case _ =>
+              None
           }
       }
 
@@ -345,8 +368,11 @@ class PropertySet private (
 
      getExact orElse getWildcard map checkType
   }
+}
 
-  /* All getters */
+trait PropertySetGetters {
+
+  protected def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property]
 
   def getPropertyOpt    (name: String): Option[Property] = getPropertyOptThrowIfTypeMismatch(name, None)
   def getPropertyOrThrow(name: String): Property         = getPropertyOpt(name).getOrElse(throw new OXFException(s"property `$name` not found"))

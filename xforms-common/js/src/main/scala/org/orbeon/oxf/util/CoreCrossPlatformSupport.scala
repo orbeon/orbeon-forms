@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import cats.effect.unsafe.IORuntime
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
 import org.scalajs.dom
 
 import scala.concurrent.ExecutionContext
@@ -33,7 +33,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   implicit def runtime: IORuntime = IORuntime.global
 
-  val logger: org.log4s.Logger = LoggerFactory.createLogger("org.orbeon.properties")
+  val logger: org.log4s.Logger = PropertyLoader.logger
 
   def isPE: Boolean = true
   def isJsEnv: Boolean = true

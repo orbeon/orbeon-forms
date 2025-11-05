@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.properties.api
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
@@ -43,7 +44,7 @@ class PathMapXPathDependencies(
 
   // The idea here is that if the properties change, we want to re-evaluate everything. If the flag is set, we will
   // re-evaluate everything until the first refresh is done.
-  private var lastPropertiesSequence: Int = 0
+  private var lastPropertiesETag: api.ETag = ""
   private var evaluateAllUntilRefreshDone: Boolean = false
 
   // Represent the state of changes to a model
@@ -376,12 +377,12 @@ class PathMapXPathDependencies(
   def bindingUpdateDone(): Unit =
     inBindingUpdate = false
 
-  def afterInitialResponse(propertiesSequence: Int): Unit = {
-    lastPropertiesSequence = propertiesSequence
+  def afterInitialResponse(eTag: api.ETag): Unit = {
+    lastPropertiesETag = eTag
     outputLHHAItemsetStats()
   }
 
-  def beforeUpdateResponse(propertiesSequence: Int): Unit = {
+  def beforeUpdateResponse(eTag: api.ETag): Unit = {
 
     lhhaEvaluationCount = 0
     lhhaOptimizedCount = 0
@@ -395,9 +396,9 @@ class PathMapXPathDependencies(
     itemsetMissCount = 0
     itemsetHitCount = 0
 
-    if (propertiesSequence > lastPropertiesSequence) {
+    if (eTag != lastPropertiesETag) {
       evaluateAllUntilRefreshDone = true
-      lastPropertiesSequence = propertiesSequence
+      lastPropertiesETag = eTag
     }
   }
 

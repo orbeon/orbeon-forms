@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControlTrait}
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
+import org.orbeon.properties.api
 import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
@@ -36,8 +37,8 @@ trait XPathDependencies {
   def bindingUpdateStart   ()                  : Unit
   def bindingUpdateDone    ()                  : Unit
 
-  def afterInitialResponse (propertiesSequence: Int): Unit
-  def beforeUpdateResponse (propertiesSequence: Int): Unit
+  def afterInitialResponse (eTag: api.ETag)    : Unit
+  def beforeUpdateResponse (eTag: api.ETag)    : Unit
   def afterUpdateResponse  ()                  : Unit
 
   def notifyComputeLHHA    ()                  : Unit

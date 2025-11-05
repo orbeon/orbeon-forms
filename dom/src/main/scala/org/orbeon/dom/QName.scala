@@ -7,11 +7,17 @@ import scala.compiletime.uninitialized
 
 object QName {
 
-  private val ClarkNamePattern = """\{(.*)}(.*)""".r
+  private val ClarkNamePattern        = """\{(.*)}(.*)""".r
+  private val UriQualifiedNamePattern = """Q\{(.*)}(.*)""".r
 
   def fromClarkName(clarkName: String): Option[QName] = clarkName match {
     case ClarkNamePattern(uri, localName) => Some(QName(localName, Namespace("", uri)))
     case _                                => None
+  }
+
+  def fromUriQualifiedName(uriQualifiedName: String): Option[QName] = uriQualifiedName match {
+    case UriQualifiedNamePattern(uri, localName) => Some(QName(localName, Namespace("", uri)))
+    case _                                       => None
   }
 
   def unapply(qName: QName): Option[(String, Namespace)] = Some((qName.localName, qName.namespace))

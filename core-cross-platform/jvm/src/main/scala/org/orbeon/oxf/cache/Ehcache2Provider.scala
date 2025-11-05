@@ -17,13 +17,13 @@ import cats.syntax.option.*
 import net.sf.ehcache
 import net.sf.ehcache.CacheManager
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CoreUtils.*
 
 import java.io
 import scala.util.control.NonFatal
 
 
+@deprecated("Use JCacheProvider instead", ";Orbeon Forms 2025.1")
 object Ehcache2Provider extends CacheProviderApi {
 
   import CacheSupport.Logger.*
@@ -60,15 +60,15 @@ object Ehcache2Provider extends CacheProviderApi {
 
   private object Private {
 
-    val EhcachePath = "oxf:/config/ehcache.xml"
+    val EhcacheResourcePath = "/config/ehcache.xml"
 
     val cacheManager =
       try
-        new CacheManager(URLFactory.createURL(EhcachePath)) |!>
-          (_ => debug(s"initialized Ehcache 2 cache manager from `$EhcachePath`"))
+        new CacheManager(getClass.getResource(EhcacheResourcePath)) |!>
+          (_ => debug(s"initialized Ehcache 2 cache manager from `$EhcacheResourcePath`"))
       catch {
         case NonFatal(t) =>
-          throw new OXFException(s"unable to initialize Ehcache 2 cache manager from `$EhcachePath`", t)
+          throw new OXFException(s"unable to initialize Ehcache 2 cache manager from `$EhcacheResourcePath`", t)
       }
   }
 }

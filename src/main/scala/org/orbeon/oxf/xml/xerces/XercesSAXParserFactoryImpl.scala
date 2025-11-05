@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xml.xerces
 
 import cats.Eval
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.xml.ParserConfiguration
@@ -54,29 +54,18 @@ class XercesSAXParserFactoryImpl(parserConfiguration: ParserConfiguration)
     features.put(name, value)
   }
 
-  import XercesSAXParserFactoryImpl._
+  import XercesSAXParserFactoryImpl.*
 
-  def newSAXParser: SAXParser =
-    Properties.withAcquiredPropertiesOrSkip {
-      // The first XML parsing takes place when we load and parse configuration properties. If we are in the process
-      // of loading configuration properties, this block will not run and we will use a default `SecurityManager`
-      // below. If this block runs, it means that we have acquired the semaphore and that the configuration properties
-      // are available, and we can safely use configuration properties, and therefore initialize the global security
-      // manager.
-      // Similarly, this will not run while updating properties.
-      trace(s"newSAXParser: obtained configuration properties semaphore, using global XML parser security manager")
-      new XercesJAXPSAXParser(this, features, parserConfiguration) |!>
-        (_.setProperty(XercesSecurityManagerProperty, securityManager))
-    } getOrElse {
-      trace(s"newSAXParser: did not obtain configuration properties semaphore, using default XML parser security manager")
-      new XercesJAXPSAXParser(this, features, parserConfiguration) |!>
-        (_.setProperty(XercesSecurityManagerProperty, DefaultSecurityManager))
-    }
+  def newSAXParser: SAXParser = {
+    trace(s"newSAXParser: obtained configuration properties semaphore, using global XML parser security manager")
+    new XercesJAXPSAXParser(this, features, parserConfiguration) |!>
+      (_.setProperty(XercesSecurityManagerProperty, securityManager))
+  }
 }
 
 private object XercesSAXParserFactoryImpl {
 
-  implicit def logger: slf4j.Logger = Properties.logger.logger
+  implicit def logger: slf4j.Logger = PropertyLoader.logger.logger
 
   private val OrbeonEntityExpansionLimitProperty = "oxf.xml-parsing.entity-expansion-limit"
   private val XercesSecurityManagerProperty      = "http://apache.org/xml/properties/security-manager"
@@ -84,15 +73,13 @@ private object XercesSAXParserFactoryImpl {
   // "0" means "one expansion allowed", etc. Off-by-one error in Xerces! So we subtract 1 from the value passed.
   private def newSecurityManager(entityExpansionLimit: Int): org.orbeon.apache.xerces.util.SecurityManager = {
     new org.orbeon.apache.xerces.util.SecurityManager |!> {
-        _.setEntityExpansionLimit((entityExpansionLimit |!>
-          (limit => info(s"newSecurityManager: setting entity expansion limit to: $limit")) ) - 1)
+      _.setEntityExpansionLimit((entityExpansionLimit |!>
+        (limit => info(s"newSecurityManager: setting entity expansion limit to: $limit")) ) - 1)
     }
   }
 
   private def getPropertiesEntityExpansionLimit: Int =
-    Properties.instance.getPropertySet.getInteger(OrbeonEntityExpansionLimitProperty, default = 0)
-
-  private val DefaultSecurityManager = newSecurityManager(0)
+    PropertyLoader.getPropertyStore(None).globalPropertySet.getInteger(OrbeonEntityExpansionLimitProperty, default = 0)
 
   @volatile private var _securityManager: Eval[org.orbeon.apache.xerces.util.SecurityManager] = Eval.later {
     newSecurityManager(getPropertiesEntityExpansionLimit)

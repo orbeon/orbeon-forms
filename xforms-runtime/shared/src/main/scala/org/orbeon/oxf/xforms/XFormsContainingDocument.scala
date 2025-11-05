@@ -264,12 +264,12 @@ class XFormsContainingDocument(
 
     clearClientState() // client state can contain e.g. focus information, etc. set during initialization
 
-    xpathDependencies.afterInitialResponse(CoreCrossPlatformSupport.properties.sequence)
+    xpathDependencies.afterInitialResponse(CoreCrossPlatformSupport.properties.eTag)
   }
 
   override def beforeExternalEvents(responseForReplaceAll: ExternalContext.Response, submissionIdOpt: Option[String]): Unit = {
 
-    xpathDependencies.beforeUpdateResponse(CoreCrossPlatformSupport.properties.sequence)
+    xpathDependencies.beforeUpdateResponse(CoreCrossPlatformSupport.properties.eTag)
     this._responseForReplaceAll = responseForReplaceAll.some
 
     if (submissionIdOpt.isEmpty)

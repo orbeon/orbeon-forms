@@ -17,11 +17,11 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertyLoader}
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{Log4jSupport, LoggerFactory}
-import org.orbeon.oxf.xml.{ParserConfiguration, XMLReaderProviderRegistry, XMLParsing}
+import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing, XMLReaderProviderRegistry}
 
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
@@ -86,7 +86,7 @@ object Orbeon {
     }
 
     logger.info(s"Using root properties file: $propertiesURL")
-    Properties.init(propertiesURL)
+    Properties.initialize(propertiesURL)
 
     // 3. Initialize Version object (depends on resource manager)
     // Better to do it here so that log messages will go to the same place as the above logs
@@ -99,7 +99,7 @@ object Orbeon {
     // 5. Log properties in debug mode *after* updated logger configuration
     try {
       val json = Properties.instance.getPropertySet.allPropertiesAsJson
-      Properties.logger.debug(s"All properties read: $json")
+      PropertyLoader.logger.debug(s"All properties read: $json")
     } catch {
       case NonFatal(t) =>
         logger.error(OrbeonFormatter.format(t))

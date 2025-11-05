@@ -69,4 +69,15 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-xml.issue.6751" value="true"/>
 
     <property as="xs:string" name="oxf.fb.email.custom-headers.issue.6848" value="X-Custom-1st X-Custom-2nd"/>
+
+    <!-- Custom property provider for `PropertiesTest` -->
+    <property
+        as="xs:string"
+        name="oxf.properties.providers.order"
+        value=".*TestPropertyProvider"/>
+
+    <property as="xs:string"  name="a.b.c"  value="a.b.c.1"/>
+    <property as="xs:string"  name="a.b.d"  value="a.b.d.1"/>
+    <property as="xs:string"  name="a.b.*"  value="a.b.*.1"/>
+
 </properties>

@@ -5,8 +5,9 @@ import org.slf4j
 import java.util.ServiceLoader
 import scala.jdk.CollectionConverters.*
 import scala.reflect.ClassTag
+import scala.util.chaining.*
 import scala.util.control.NonFatal
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 
 object ServiceProviderSupport {
@@ -45,10 +46,16 @@ object ServiceProviderSupport {
           .iterator
           .flatten(_.iterator.asScala)
           .map { provider =>
-            logger.info(s"Loading $providerName provider for class `${runtimeClass.getName}`")
+            logger.info(s"Loading $providerName provider for class `${runtimeClass.getName}`: `${provider.getClass.getName}`")
             provider.asInstanceOf[T] // it better be but we can't prove it in code!
           }
           .toList
+      }
+      .tap {
+        case Success(providers) =>
+          logger.debug(s"Loaded ${providers.size} provider(s): ${providers.map(_.getClass.getName).mkString("`", "`, `", "`")}")
+        case Failure(_) =>
+        // logged below
       }
       .recoverWith {
         case NonFatal(t) =>

@@ -55,7 +55,7 @@ trait WithResourceManagerSupport {
     ResourceManagerWrapper.init(propsMap.asJava)
 
     // Initialize properties
-    Properties.init(propertiesUrl)
+    Properties.initialize(propertiesUrl)
 
     // Initialize logger
     Log4jSupport.initLogger()

@@ -83,8 +83,7 @@ case class ActiveProviderResourceManagerSupport(
 
     if (reloadProperties) {
       // Force reload of properties
-      org.orbeon.oxf.properties.Properties.invalidate()
-      org.orbeon.oxf.properties.Properties.init(propertiesUrl)
+      org.orbeon.oxf.properties.Properties.initialize(propertiesUrl)
     }
   }
 

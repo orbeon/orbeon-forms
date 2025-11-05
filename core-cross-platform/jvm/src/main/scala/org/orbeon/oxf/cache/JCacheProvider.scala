@@ -2,7 +2,7 @@ package org.orbeon.oxf.cache
 
 import cats.data.NonEmptyList
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.util.CoreUtils.*
 
 import java.io
@@ -58,7 +58,7 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
     try {
 
       val properties =
-        Properties.instance.getPropertySetOrThrow |!>
+        PropertyLoader.getPropertyStore(None).globalPropertySet |!> // we are in the boot phase here
           (CacheSupport.logProperties(_, CacheSupport.Logger.debug))
 
       // For debugging only, indicate the default provider set using the Java system property
@@ -121,8 +121,7 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
         (_ => debug(s"initialized JCache cache manager with URI `$configUri`"))
     } catch {
       case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
-
-        Try(Properties.instance.getPropertySetOrThrow)
+        Try(PropertyLoader.getPropertyStore(None).globalPropertySet)
           .foreach(CacheSupport.logProperties(_, CacheSupport.Logger.error))
 
         throw new OXFException(s"unable to initialize JCache cache manager", t)

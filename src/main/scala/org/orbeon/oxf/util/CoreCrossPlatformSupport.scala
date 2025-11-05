@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.properties.{Properties, PropertyLoader, PropertySet}
 
 import java.util.concurrent.ExecutorService
 import javax.naming.InitialContext
@@ -82,13 +82,13 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   implicit def runtime: IORuntime = _runtime
 
-  def logger: org.log4s.Logger = Properties.logger
+  def logger: org.log4s.Logger = PropertyLoader.logger
   def isPE: Boolean = Version.isPE
   def isJsEnv: Boolean = false
   def randomHexId: String = SecureUtils.randomHexId
   def getApplicationResourceVersion: Option[String] = URLRewriterUtils.getApplicationResourceVersion
-  def properties: PropertySet = Properties.instance.getPropertySet
-  def getPropertySet(processorName: QName): PropertySet = Properties.instance.getPropertySet(processorName)
+  def properties: PropertySet = Properties.getPropertySet
+  def getPropertySet(processorName: QName): PropertySet = Properties.getPropertySet(processorName)
   def externalContext: ExternalContext = NetUtils.getExternalContext
 
   def withExternalContext[T](ec: ExternalContext)(body: => T): T =

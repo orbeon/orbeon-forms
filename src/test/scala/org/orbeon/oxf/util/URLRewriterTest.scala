@@ -48,10 +48,8 @@ class URLRewriterTest
     ).getRequest
 
   // For most tests of the suite, use `properties-versioned-all.xml`
-  override protected def beforeAll(): Unit = {
-    Properties.invalidate()
-    Properties.init("oxf:/ops/unit-tests/properties-versioned-all.xml")
-  }
+  override protected def beforeAll(): Unit =
+    Properties.initialize("oxf:/ops/unit-tests/properties-versioned-all.xml")
 
   describe("The `rewriteServiceUrl()` with a direct request") {
 
@@ -349,8 +347,7 @@ class URLRewriterTest
     for (propertiesURL <- propertiesURLs) {
 
       // Reinitialize properties
-      Properties.invalidate()
-      Properties.init(propertiesURL)
+      Properties.initialize(propertiesURL)
 
       // Check platform paths
       for (path <- platformPaths) {

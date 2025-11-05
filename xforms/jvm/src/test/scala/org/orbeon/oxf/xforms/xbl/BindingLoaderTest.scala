@@ -51,7 +51,7 @@ class BindingLoaderTest
         </property>
       </properties>.toDocument
 
-    PropertyStore.parse(properties, 0).getGlobalPropertySet
+    PropertyStore.parse(properties, "").globalPropertySet
   }
 
   class TestBindingLoader extends BindingLoader {

@@ -54,8 +54,8 @@ class XIncludeProcessor extends ProcessorImpl {
               getInputByName(AttributesInput),
               (pipelineContext: PipelineContext, input: ProcessorInput) => {
                 val preferencesDocument = readInputAsOrbeonDom(pipelineContext, input)
-                val propertyStore       = PropertyStore.parse(preferencesDocument, 0)
-                val propertySet         = propertyStore.getGlobalPropertySet
+                val propertyStore       = PropertyStore.parse(preferencesDocument, "")
+                val propertySet         = propertyStore.globalPropertySet
 
                 propertySet.getBooleanProperties.asScala map { case (k, v) => k -> v.booleanValue } toMap
               }

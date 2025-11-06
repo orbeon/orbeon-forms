@@ -1,11 +1,9 @@
 package org.orbeon.xforms
 
-import org.orbeon.jquery.Offset
-import org.scalajs.dom
 import io.udash.wrappers.jquery.JQuery
+import org.orbeon.jquery.Offset
 import org.orbeon.web.DomSupport.DomElemOps
-
-import scala.scalajs.js
+import org.scalajs.dom
 
 
 sealed trait Placement { val entryName: String }
@@ -49,7 +47,7 @@ object Placement {
       (
         el.outerWidth().getOrElse(0d),
         el.outerHeight().getOrElse(0d),
-        $(dom.document).scrollTop(), // Will this work if we"re in a scrollable area?
+        dom.window.pageYOffset, // Will this work if we're in a scrollable area?
         Offset(
           left = o.left,
           top  = o.top
@@ -94,8 +92,8 @@ object Placement {
 
           (
             overflowOffset.top,
-            $(dom.window).width()  - overflowOffset.left - overflowWidth,
-            $(dom.window).height() - overflowOffset.top  - overflowHeight,
+            dom.document.documentElement.clientWidth  - overflowOffset.left - overflowWidth,
+            dom.document.documentElement.clientHeight - overflowOffset.top  - overflowHeight,
             overflowOffset.left
           )
       }
@@ -121,9 +119,9 @@ object Placement {
   def getPlacement(pos: PositionDetails): Placement = {
 
     val left   = pos.offset.left
-    val right  = $(dom.window).width() - (pos.offset.left + pos.width)
+    val right  = dom.document.documentElement.clientWidth - (pos.offset.left + pos.width)
     val top    = pos.offset.top - pos.scrollTop
-    val bottom = $(dom.window).height() - (pos.offset.top - pos.scrollTop + pos.height)
+    val bottom = dom.document.documentElement.clientHeight - (pos.offset.top - pos.scrollTop + pos.height)
 
     if (right >= RequiredSpaceHorizontal || left >= RequiredSpaceHorizontal) {
       // If space to the left and right are the same (e.g. title with wide page), display to the left, which

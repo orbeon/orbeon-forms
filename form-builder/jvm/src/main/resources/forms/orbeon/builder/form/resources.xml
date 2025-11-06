@@ -18016,10 +18016,10 @@
             <label>أخطاء</label>
         </errors>
         <error-summary>
-            <label todo="true">[{1,choice,
-                0#No message|
-                1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
-                1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+            <label>{1,choice,
+                0#لا توجد رسالة|
+                1#'{0,choice,0#خطأ|1#تحذير|2#رسالة إعلامية|3#رسالة}'|
+                1&lt;'{0,choice,0#أخطاء|1#تحذيرات|2#رسائل إعلامية|3#رسائل}'}</label>
         </error-summary>
         <back-to-summary>
             <label>العودة إلى قائمة النماذج</label>
@@ -18267,7 +18267,7 @@
                     <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
-                    <label todo="true">[By default, sort by this column]</label>
+                    <label>افتراضياً، الفرز حسب هذا العمود</label>
                     <value>fr-default-sort-column</value>
                 </item>
                 <item>
@@ -18294,9 +18294,9 @@
                 <run-process>تنفيذ العملية</run-process>
             </bulk-edit-actions>
             <default-sort-column>
-                <ascending todo="true">[Ascending]</ascending>
-                <descending todo="true">[Descending]</descending>
-                <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
+                <ascending>تصاعدي</ascending>
+                <descending>تنازلي</descending>
+                <conflict>سيؤدي تمكين الفرز على عنصر التحكم هذا إلى تعطيله على عنصر التحكم التالي: {0}</conflict>
             </default-sort-column>
             <control-appearance>
                 <label>مظهر عنصر التحكم</label>

@@ -140,10 +140,10 @@ object Help {
         placement match {
           case Placement.Right | Placement.Left | Placement.Over =>
             // Viewport height sets the limit
-            $(dom.window).height() - 2 * padding
+            dom.document.documentElement.clientHeight - 2 * padding
           case Placement.Bottom =>
             // Space below
-            $(dom.window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height + arrowHeight + padding)
+            dom.document.documentElement.clientHeight - (elPos.offset.top - elPos.scrollTop + elPos.height + arrowHeight + padding)
           case Placement.Top =>
             // Space above
             elPos.offset.top - elPos.scrollTop - padding - arrowHeight
@@ -173,7 +173,7 @@ object Help {
               elPos.offset.top - popover.outerHeight().getOrElse(0d) - arrowHeight
             case Placement.Over =>
               // Center relative to viewport
-              Math.max(0, (($(dom.window).height() - popover.outerHeight().getOrElse(0d)) / 2) + $(dom.window).scrollTop())
+              Math.max(0, ((dom.document.documentElement.clientHeight - popover.outerHeight().getOrElse(0d)) / 2) + dom.window.pageYOffset)
             case Placement.Bottom =>
               popoverOffset.top
           }
@@ -189,7 +189,7 @@ object Help {
               elPos.offset.left
             case Placement.Over =>
               // Center relative to viewport
-              Math.max(0, (($(dom.window).width() - popover.outerWidth().getOrElse(0d)) / 2) + $(dom.window).scrollLeft())
+              Math.max(0, ((dom.document.documentElement.clientWidth - popover.outerWidth().getOrElse(0d)) / 2) + dom.window.pageXOffset)
           }
         }
 
@@ -208,7 +208,7 @@ object Help {
         case Placement.Top | Placement.Bottom =>
           popover.children(".arrow").css("left", "10%")
           // Smaller max-width to avoid popover having no padding on the right, especially for mobile
-          val altMaxWidth = $(dom.window).width() - 2 * newPopoverOffset.left
+          val altMaxWidth = dom.document.documentElement.clientWidth - 2 * newPopoverOffset.left
           if (popover.width() > altMaxWidth)
             popover.css("max-width", altMaxWidth.toString + "px")
         case _ =>

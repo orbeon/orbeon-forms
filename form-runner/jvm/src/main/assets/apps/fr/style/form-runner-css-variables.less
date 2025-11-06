@@ -24,10 +24,11 @@
   --orbeon-section-iteration-title-font-size   : 0.89em; // ~18px * 0.8 * 0.8
   --orbeon-subsection-title-font-size          : 1.11em; // ~18px * 0.8
   --orbeon-subsection-iteration-title-font-size: 0.89em; // ~18px * 0.8 * 0.8
+  --orbeon-repeater-add-button-font-size       : 1.00em;
 
   // HTML elements
   --orbeon-blockquote-font-size: 1.35em; // ~18px
-  --orbeon-button-font-size    : 13px;   // button and .btn // TODO: cannot be made relative because of the font-size: 0 hack
+  --orbeon-button-font-size    : 1.00em; // button and .btn
   --orbeon-code-font-size      : 0.92em; // ~12px; code and CodeMirror
   --orbeon-label-font-size     : 1.00em; // label and .xforms-label
   --orbeon-pre-font-size       : 1.00em;
@@ -38,16 +39,23 @@
   --orbeon-section-caret-font-size: 0.75em;
   --orbeon-dialog-icon-font-size  : 50px;
   --orbeon-fa-icon-font-size      : 0.92em; // ~12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
-  --orbeon-required-font-size     : 0.60em; // Font Awesome star is large
+  --orbeon-required-icon-font-size: 0.60em; // Font Awesome star is large
+
+  // Required icon (left)
+  --orbeon-required-icon-display-before: inline;
+  --orbeon-required-icon-display-after : none;
+
+  /*
+  // Required icon (right)
+  --orbeon-required-icon-display-before: none;
+  --orbeon-required-icon-display-after : inline;
+  */
 
   --orbeon-dialog-title-font-size  : 1.11em; // 2022-12-11: larger font size for dialog title looks better
   --orbeon-header-footer-font-size : 1.10em;
+  --orbeon-hint-font-size          : smaller;
   --orbeon-kbd-hint-font-size      : 0.82em; // 8pt
   --orbeon-navbar-heading-font-size: 1.54em; // ~20px
-
-  // XForms inspector
-  --orbeon-inspector-closed-font-size: 0.50em;
-  --orbeon-inspector-title-font-size : 1.67em;
 
   // Headings
   --orbeon-h1-font-size: 2.96em; // ~38px = 296% * 13px = 275% * 14px
@@ -56,4 +64,8 @@
   --orbeon-h4-font-size: 1.35em; // ~18px = 135% * 13px = 125% * 14px
   --orbeon-h5-font-size: 1.08em; // ~14px = 108% * 13px = 100% * 14px
   --orbeon-h6-font-size: 0.92em; // ~12px =  92% * 13px =  85% * 14px
+
+  // Popovers
+  --orbeon-popover-title-font-size  : 1.08em;
+  --orbeon-popover-content-font-size: 1.00em;
 }

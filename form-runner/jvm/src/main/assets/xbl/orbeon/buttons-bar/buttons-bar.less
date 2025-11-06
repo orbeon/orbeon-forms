@@ -3,7 +3,14 @@
 .orbeon {
 
     .fr-buttons {
-        font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
+        .xbl-fr-trigger {
+            font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
+
+            .xforms-trigger {
+                // Reset font size hack above
+                font-size: var(--orbeon-base-font-size);
+            }
+        }
 
         // Make buttons stick to the viewport
         // https://github.com/orbeon/orbeon-forms/issues/4809

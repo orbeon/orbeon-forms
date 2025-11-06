@@ -414,7 +414,7 @@ body.orbeon { background-color: @frBackground }
     }
 
     .xforms-hint {
-        font-size: smaller;
+        font-size: var(--orbeon-hint-font-size);
         color: @minGrayText;
         margin-top: .2em;
         margin-left: 0;// used to have margin here but with new colors no margin seems better
@@ -454,13 +454,23 @@ body.orbeon { background-color: @frBackground }
     .xforms-dialog {
         .xforms-required {
             &.xforms-label, .xforms-label {
-                &:before {
+                &:before,
+                &:after {
                     font-family    : FontAwesome;
-                    content        : "\f005";
                     vertical-align : super;         // So the star doesn't show too high relative to the text of the label
                     line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
-                    font-size      : var(--orbeon-required-font-size);
-                    margin-right   : 1ch;
+                    font-size      : var(--orbeon-required-icon-font-size);
+                    white-space    : nowrap;
+                }
+                &:before {
+                    content     : "\f005";
+                    display     : var(--orbeon-required-icon-display-before);
+                    margin-right: 1ch;
+                }
+                &:after {
+                    content    : "\00a0\f005";
+                    display    : var(--orbeon-required-icon-display-after);
+                    margin-left: 0;
                 }
             }
         }

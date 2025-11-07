@@ -16761,12 +16761,12 @@
                 <item id="non-positive">Negativt eller noll</item>
                 <item id="negative">Negativt</item>
                 <item id="fraction-digits">Decimaler max</item>
-                <item id="upload-max-size-per-file" multiple="false" todo="true">[Maximum Attachment Size]</item>
-                <item id="upload-max-size-per-file" multiple="true" todo="true">[Maximum Attachment Size per File]</item>
-                <item id="upload-max-size-aggregate-per-control" todo="true">[Maximum Aggregate Attachment Size]</item>
+                <item id="upload-max-size-per-file" multiple="false">Maximal bilagestorlek</item>
+                <item id="upload-max-size-per-file" multiple="true">Maximal bilagestorlek per fil</item>
+                <item id="upload-max-size-aggregate-per-control">Maximal total bilagestorlek</item>
                 <item id="upload-max-files-per-control">Maximalt antal filer per kontroll</item>
-                <item id="upload-mediatypes" todo="true">[Supported File Types</item>
-                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
+                <item id="upload-mediatypes">Tillåtna filtyper</item>
+                <item id="excluded-dates">Datum att utesluta</item>
             </constraint>
             <formula>
                 <label>Formel</label>
@@ -16785,25 +16785,25 @@
                 <label>Synlighet</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>Booleskt XPath-uttryck</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This allows you to specify whether the form control is visible or not.
+                        Detta låter dig ange om formulärkontrollen är synlig eller inte.
                     &lt;/p>
                     &lt;ul>
-                        &lt;li>&lt;b>Yes:&lt;/b> The form control is visible.&lt;/li>
-                        &lt;li>&lt;b>No:&lt;/b> The form control is hidden.&lt;/li>
-                        &lt;li>&lt;b>Formula:&lt;/b> The form control is visible or hidden dynamically depending on a formula.&lt;/li>
+                        &lt;li>&lt;b>Ja:&lt;/b> Formulärkontrollen är synlig.&lt;/li>
+                        &lt;li>&lt;b>Nej:&lt;/b> Formulärkontrollen är dold.&lt;/li>
+                        &lt;li>&lt;b>Formel:&lt;/b> Formulärkontrollen är synlig eller dold dynamiskt beroende på en formel.&lt;/li>
                     &lt;/ul>
                     &lt;p>
-                        The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
-                        The form control is visible if the formula evaluates to &lt;code>true()&lt;/code>, and hidden if it evaluates to &lt;code>false()&lt;/code>.
+                        Formeln låter dig dynamiskt ange om formulärkontrollen är synlig eller inte. Den måste returnera ett booleskt värde.
+                        Formulärkontrollen är synlig om formeln evalueras till &lt;code>true()&lt;/code>, och dold om den evalueras till &lt;code>false()&lt;/code>.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        Du kan referera till andra formulärkontroller i formeln genom att använda deras namn föregångna av ett &lt;code>$&lt;/code>-tecken.
+                        När du anger &lt;code>$&lt;/code>-tecknet visas en lista över tillgängliga formulärkontroller.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        För mer om formler, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder-dokumentationen&lt;/a>.
                     &lt;/p>
                 </help>
             </visibility>
@@ -16811,25 +16811,25 @@
                 <label>Skrivskydd</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>Booleskt XPath-uttryck</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This allows you to specify whether the form control is readonly or read-write.
+                        Detta låter dig ange om formulärkontrollen är skrivskyddad eller redigerbar.
                     &lt;/p>
                     &lt;ul>
-                        &lt;li>&lt;b>Yes:&lt;/b> The form control is readonly.&lt;/li>
-                        &lt;li>&lt;b>No:&lt;/b> The form control is read-write.&lt;/li>
-                        &lt;li>&lt;b>Formula:&lt;/b> The form control is readonly or read-write dynamically depending on a formula.&lt;/li>
+                        &lt;li>&lt;b>Ja:&lt;/b> Formulärkontrollen är skrivskyddad.&lt;/li>
+                        &lt;li>&lt;b>Nej:&lt;/b> Formulärkontrollen är redigerbar.&lt;/li>
+                        &lt;li>&lt;b>Formel:&lt;/b> Formulärkontrollen är skrivskyddad eller redigerbar dynamiskt beroende på en formel.&lt;/li>
                     &lt;/ul>
                     &lt;p>
-                        The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
-                        The form control is readonly if the formula evaluates to &lt;code>true()&lt;/code>, and read-write if it evaluates to &lt;code>false()&lt;/code>.
+                        Formeln låter dig dynamiskt ange om formulärkontrollen är skrivskyddad eller redigerbar. Den måste returnera ett booleskt värde.
+                        Formulärkontrollen är skrivskyddad om formeln evalueras till &lt;code>true()&lt;/code>, och redigerbar om den evalueras till &lt;code>false()&lt;/code>.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        Du kan referera till andra formulärkontroller i formeln genom att använda deras namn föregångna av ett &lt;code>$&lt;/code>-tecken.
+                        När du anger &lt;code>$&lt;/code>-tecknet visas en lista över tillgängliga formulärkontroller.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        För mer om formler, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder-dokumentationen&lt;/a>.
                     &lt;/p>
                 </help>
             </readonly>
@@ -16837,16 +16837,16 @@
                 <label>Förvalt värde</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>XPath-uttryck</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This formula allows you to specify an initial value for the form control in "new" mode only.
+                        Denna formel låter dig ange ett startvärde för formulärkontrollen endast i "nytt"-läge.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        Du kan referera till andra formulärkontroller i formeln genom att använda deras namn föregångna av ett &lt;code>$&lt;/code>-tecken.
+                        När du anger &lt;code>$&lt;/code>-tecknet visas en lista över tillgängliga formulärkontroller.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        För mer om formler, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder-dokumentationen&lt;/a>.
                     &lt;/p>
                 </help>
             </default>
@@ -16854,17 +16854,17 @@
 	            <label>Beräknat värde</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>XPath-uttryck</hint>
-                <help todo="true">
+                <help>
                     &lt;p>
-                        This formula allows you to specify a calculated value for the form control.
-                        This value is re-evaluated to remain up to date as needed.
+                        Denna formel låter dig ange ett beräknat värde för formulärkontrollen.
+                        Detta värde omvärderas för att hållas uppdaterat vid behov.
                     &lt;/p>
                     &lt;p>
-                        You can refer to other form controls in the formula using their names preceded by a &lt;code>$&lt;/code> sign.
-                        When entering the &lt;code>$&lt;/code> sign, a list of available form controls is displayed.
+                        Du kan referera till andra formulärkontroller i formeln genom att använda deras namn föregångna av ett &lt;code>$&lt;/code>-tecken.
+                        När du anger &lt;code>$&lt;/code>-tecknet visas en lista över tillgängliga formulärkontroller.
                     &lt;/p>
                     &lt;p>
-                        For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder documentation&lt;/a>.
+                        För mer om formler, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas">Form Builder-dokumentationen&lt;/a>.
                     &lt;/p>
                 </help>
             </calculate>
@@ -16912,7 +16912,7 @@
             <validation-details><label>Valideringsdetaljer</label></validation-details>
             <level><label>Nivå</label></level>
             <use-html>Använd HTML</use-html>
-            <parameters todo="true">[Template Parameters]</parameters>
+            <parameters>Mallparametrar</parameters>
             <automatic-hint>
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
@@ -16926,9 +16926,9 @@
                 <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
             </store-label>
             <default-yes-no>
-                <item id="0" todo="true">[Use default]</item>
-                <item id="1" todo="true">[Yes]</item>
-                <item id="2" todo="true">[No]</item>
+                <item id="0">Använd standard</item>
+                <item id="1">Ja</item>
+                <item id="2">Nej</item>
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
@@ -16945,10 +16945,10 @@
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
             <grid-tab-order>
-                <label todo="true">[Grid Tab Order]</label>
-                <item id="0" todo="true">[Default]</item>
-                <item id="1" todo="true">[Rows]</item>
-                <item id="2" todo="true">[Columns]</item>
+                <label>Tabulatorordning för rutnät</label>
+                <item id="0">Standard</item>
+                <item id="1">Rader</item>
+                <item id="2">Kolumner</item>
             </grid-tab-order>
             <options>
                 <label>Val</label>
@@ -17035,18 +17035,18 @@
             <label>Bekräfta</label>
         </dialog-confirmation>
         <dialog-ids>
-            <label todo="true">[Control Names]</label>
+            <label>Kontrollnamn</label>
             <prefix>
-                <label todo="true">[Prefix]</label>
+                <label>Prefix</label>
             </prefix>
             <suffix>
-                <label todo="true">[Suffix]</label>
+                <label>Suffix</label>
             </suffix>
             <original-name>
-                <label todo="true">[Original Name]</label>
+                <label>Ursprungligt namn</label>
             </original-name>
             <new-name>
-                <label todo="true">[New Name]</label>
+                <label>Nytt namn</label>
             </new-name>
         </dialog-ids>
         <dialog-publish>
@@ -17056,7 +17056,7 @@
             <publish-error>Ett fel inträffade under publiceringen.</publish-error>
             <latest-published-version>Senast publicerade version</latest-published-version>
             <create-new-version-item>skapa ett nytt formulär med version {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">ersätt existerande formulär med version {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
+            <overwrite-version-item>ersätt existerande formulär med version {0,number,integer} ({1,choice,0#otillgängligt|1#tillgängligt})</overwrite-version-item>
             <create-new-version-help>
 	        OBS: Publicering av detta formulär skapar en ny version av formulärdefinitionen i
 		databasen. Ifyllda formulär som redan finns i databasen visas och redigeras med de tidigare
@@ -17072,9 +17072,9 @@
             </overwrite-version-help>
             <open-summary>Öppna översikten över publicerade formulär</open-summary>
             <open-new>Öppna ny sida med publicerade formulär</open-new>
-            <version todo="true">[Version]</version>
-            <available todo="true">[Make published form available]</available>
-            <comment todo="true">[Comment]</comment>
+            <version>Version</version>
+            <available>Gör publicerat formulär tillgängligt</available>
+            <comment>Kommentar</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Tillfoga språk</label>
@@ -17091,9 +17091,9 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label todo="true">Search Controls</label>
+            <label>Sök kontroller</label>
             <open-settings>
-                <label todo="true">Open Settings Dialog</label>
+                <label>Öppna inställningsdialogruta</label>
             </open-settings>
         </dialog-search>
         <dialog-upload-schema>
@@ -17144,10 +17144,10 @@
                 <label>PDF-fil</label>
             </pdf-upload>
             <attachment-name>
-                <label todo="true">[Name]</label>
+                <label>Namn</label>
             </attachment-name>
             <attachment-language>
-                <label todo="true">[Language]</label>
+                <label>Språk</label>
             </attachment-language>
         </dialog-pdf>
         <dialog-itemsets>
@@ -17168,10 +17168,10 @@
                 <label>Rensa</label>
             </clear-value>
             <remove-all>
-                <label todo="true">[Remove All]</label>
+                <label>Ta bort alla</label>
             </remove-all>
             <filter>
-                <label todo="true">Filter Formula</label>
+                <label>Filterformel</label>
             </filter>
             <itemsetid-mode>
                 <label>Använd val från metadata</label>
@@ -17194,10 +17194,10 @@
                 <hint>Definiera ett unikt namn för denna HTTP-tjänst</hint>
             </service-name>
             <service-performs-search>
-                <label todo="true">[Service performs search]</label>
+                <label>Tjänst utför sökning</label>
             </service-performs-search>
             <service-supports-paging>
-                <label todo="true">[Service supports paging]</label>
+                <label>Tjänst stödjer sidnumrering</label>
             </service-supports-paging>
             <resource>
                 <label>URL</label>
@@ -17232,8 +17232,8 @@
                 <hint>XML-data, troligen SOAP envelope</hint>
             </request-body>
             <is-binary-response>
-                <label todo="true">[Service Response has Binary Content]</label>
-                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+                <label>Tjänstens svar har binärt innehåll</label>
+                <hint>Kryssa i denna om svaret används för att ange värdet på en bilagekontroll</hint>
             </is-binary-response>
             <response>
                 <label>Svar</label>
@@ -17284,7 +17284,7 @@
                 <label>Svar</label>
             </response-body>
             <xml-response-body>
-                <label todo="true">[XML Response Body]</label>
+                <label>XML-svarskropp</label>
             </xml-response-body>
             <save>
                 <label>Spara</label>
@@ -17321,43 +17321,43 @@
                 <hint>Definiera ett unikt namn för detta kommando</hint>
             </service-name>
             <observer-type>
-                <label todo="true">[Run action when]</label>
+                <label>Kör kommando när</label>
                 <item id="0">
-                    <label todo="true">[control]</label>
+                    <label>kontroll</label>
                 </item>
                 <item id="1">
-                    <label todo="true">[the form loads]</label>
+                    <label>formuläret laddas</label>
                 </item>
             </observer-type>
             <control-event-type>
                 <item>
-                    <label todo="true">[changes its value]</label>
+                    <label>ändrar sitt värde</label>
                     <value>xforms-value-changed</value>
                 </item>
                 <item>
-                    <label todo="true">[appears]</label>
+                    <label>visas</label>
                     <value>xforms-enabled</value>
                 </item>
                 <item>
-                    <label todo="true">[disappears]</label>
+                    <label>döljs</label>
                     <value>xforms-disabled</value>
                 </item>
                 <item>
-                    <label todo="true">[is activated]</label>
+                    <label>aktiveras</label>
                     <value>DOMActivate</value>
                 </item>
             </control-event-type>
             <form-event-type>
                 <item>
-                    <label todo="true">[before the data's initial values are calculated]</label>
+                    <label>innan datas startvärden beräknas</label>
                     <value>fr-run-form-load-action-before-data</value>
                 </item>
                 <item>
-                    <label todo="true">[after the data is ready]</label>
+                    <label>efter att data är klar</label>
                     <value>fr-run-form-load-action-after-data</value>
                 </item>
                 <item>
-                    <label todo="true">[after the controls are ready]</label>
+                    <label>efter att kontrollerna är klara</label>
                     <value>fr-run-form-load-action-after-controls</value>
                 </item>
             </form-event-type>
@@ -17393,8 +17393,8 @@
                 <label>Villkor</label>
                 <item id="always">Kör alltid</item>
                 <item id="new-only">Kör bara när nytt formulär fylls i</item>
-                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
-                <formula todo="true">[Formula]</formula>
+                <item id="formula">När formel evalueras till "true"</item>
+                <formula>Formel</formula>
             </event-condition>
             <event-control>
                 <label>Kontroll</label>
@@ -17404,10 +17404,10 @@
                 <hint>Tjänst som ska anropas när händelse triggar kommandot</hint>
             </service-to-call>
             <source>
-                <label todo="true">[Source]</label>
+                <label>Källa</label>
             </source>
             <destination>
-                <label todo="true">[Destination]</label>
+                <label>Destination</label>
             </destination>
             <source-control>
                 <label>Ursprungskontroll</label>
@@ -17446,14 +17446,14 @@
                 <hint>XPath-uttryck relativt en nod</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint formula]</label>
-                <hint todo="true">[Relative to choice node]</hint>
+                <label>Anvisningsformel</label>
+                <hint>Relativt valnod</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page formula]</label>
+                <label>Formel för sista sidan</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label todo="true">[Auto-select unique choice]</label>
+                <label>Välj automatiskt unikt val</label>
             </auto-select-unique-choice>
             <save>
                 <label>Spara</label>
@@ -17462,31 +17462,31 @@
                 <label>Testa</label>
             </test>
 
-            <general-settings todo="true">[General Settings]</general-settings>
-            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
-            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+            <general-settings>Allmänna inställningar</general-settings>
+            <service-request-actions>Tjänstbegäran-kommandon</service-request-actions>
+            <service-response-actions>Tjänstsvar-kommandon</service-response-actions>
 
             <set-control-value>Ange kontrollvärde</set-control-value>
-            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
-            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
-            <dataset-name todo="true">[Dataset Name]</dataset-name>
+            <set-control-itemset>Ange kontrollval</set-control-itemset>
+            <save-to-dataset>Spara till dataset</save-to-dataset>
+            <dataset-name>Dataset-namn</dataset-name>
             <set-control-value-unavailable>Ange kontrollvärde är endast tillgängligt när "efter att kontrollerna är klara" har valts</set-control-value-unavailable>
 
         </dialog-actions>
         <dialog-test>
             <label>Förhandsvisa formulär</label>
-            <console todo="true">Console</console>
+            <console>Konsol</console>
         </dialog-test>
         <dialog-test-pdf>
-            <label todo="true">Test PDF Production</label>
-            <use-form-data todo="true">Use entered form data</use-form-data>
-            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
-            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
-            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
-            <show-hints todo="true">Show controls hints</show-hints>
-            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
-            <show-required todo="true">Style required controls</show-required>
-            <use-pdf-template todd="true">Use PDF template</use-pdf-template>
+            <label>Testa PDF-produktion</label>
+            <use-form-data>Använd inmatad formulärdata</use-form-data>
+            <disable-default>Inaktivera evalueringen av "Startvärden"-formler</disable-default>
+            <disable-calculate>Inaktivera evalueringen av "Beräknade värden"-formler</disable-calculate>
+            <disable-relevant>Visa kontroller, rutnät och sektioner med dynamisk synlighet</disable-relevant>
+            <show-hints>Visa kontrollanvisningar</show-hints>
+            <show-alerts>Visa aviseringar för ogiltiga kontroller</show-alerts>
+            <show-required>Stil på obligatoriska kontroller</show-required>
+            <use-pdf-template>Använd PDF-mall</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
             <label>Funktioner i Orbeon Forms PE</label>
@@ -17498,47 +17498,47 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label todo="true">[Email Settings]</label>
-            <templates todo="true">[Email templates]</templates>
+            <label>E-postinställningar</label>
+            <templates>E-postmallar</templates>
             <template-name>
-                <label todo="true">[Email template name]</label>
-                <hint todo="true">[This name is not visible to end users; it is used in processes, for instance: email(template = "notify-user")]</hint>
+                <label>E-postmallsnamn</label>
+                <hint>Detta namn är inte synligt för slutanvändare; det används i processer, till exempel: email(template = "notify-user")</hint>
             </template-name>
             <language>
-                <label todo="true">[Language]</label>
-                <any-language todo="true">[Any language]</any-language>
+                <label>Språk</label>
+                <any-language>Valfritt språk</any-language>
             </language>
             <headers>
-                <from todo="true">[Sender]</from>
-                <to todo="true">[Recipient]</to>
-                <cc todo="true">[CC]</cc>
-                <bcc todo="true">[BCC]</bcc>
-                <reply-to todo="true">[Reply To]</reply-to>
+                <from>Avsändare</from>
+                <to>Mottagare</to>
+                <cc>Kopia</cc>
+                <bcc>Dold kopia</bcc>
+                <reply-to>Svara till</reply-to>
             </headers>
             <header-value-types>
-                <control-value todo="true">[Control Value]</control-value>
-                <expression todo="true">[Formula]</expression>
-                <text todo="true">[Text]</text>
+                <control-value>Kontrollvärde</control-value>
+                <expression>Formel</expression>
+                <text>Text</text>
             </header-value-types>
-            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
-            <subject todo="true">[Email Subject]</subject>
-            <body todo="true">[Email Body]</body>
-            <use-html todo="true">[Use HTML]</use-html>
-            <attach-form-as todo="true">[Attach form as]</attach-form-as>
+            <enable-if-true>Aktivera denna mall endast om följande formel evalueras till sant</enable-if-true>
+            <subject>E-postämne</subject>
+            <body>E-postinnehåll</body>
+            <use-html>Använd HTML</use-html>
+            <attach-form-as>Bifoga formulär som</attach-form-as>
             <pdf>PDF</pdf>
             <xml>XML</xml>
             <attach-files>
-                <label todo="true">[Attach files users uploaded to the form]</label>
+                <label>Bifoga filer som användare laddat upp till formuläret</label>
                 <choices>
-                    <all todo="true">[All]</all>
-                    <none todo="true">[None]</none>
-                    <selected todo="true">[Selected attachments]</selected>
+                    <all>Alla</all>
+                    <none>Inga</none>
+                    <selected>Valda bilagor</selected>
                 </choices>
             </attach-files>
-            <exclude-from-all-control-values todo="true">[Exclude from All Control Values]</exclude-from-all-control-values>
-            <use-default todo="true">[Use default]</use-default>
-            <delete-template todo="true">Delete template</delete-template>
-            <template-parameters todo="true">[Template parameters]</template-parameters>
+            <exclude-from-all-control-values>Exkludera från alla kontrollvärden</exclude-from-all-control-values>
+            <use-default>Använd standard</use-default>
+            <delete-template>Ta bort mall</delete-template>
+            <template-parameters>Mallparametrar</template-parameters>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Rättigheter</label>
@@ -17547,72 +17547,72 @@
             <permissions>Rättigheter</permissions>
             <operations>Operationer</operations>
             <anyone>Alla</anyone>
-            <anyone-with-token todo="true">[Require token]</anyone-with-token>
-            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
+            <anyone-with-token>Kräv token</anyone-with-token>
+            <any-authenticated-user>Alla autentiserade användare</any-authenticated-user>
             <owner>Ägaren</owner>
             <group-member>Grupp</group-member>
             <create>Skapa</create>
             <read>Läsa</read>
             <update>Ändra</update>
             <delete>Ta bort</delete>
-            <list todo="true">List</list>
+            <list>Lista</list>
         </dialog-permissions>
         <dialog-workflow>
-            <label todo="true">[Workflow and Permissions]</label>
+            <label>Arbetsflöde och rättigheter</label>
 
-            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
-            <operation-label todo="true">[Label]</operation-label>
-            <predefined-label todo="true">[Predefined]</predefined-label>
-            <custom-label todo="true">[Custom]</custom-label>
-            <available-to todo="true">[Available To]</available-to>
-            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
-            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
-            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
-            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
-            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
-            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
-            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
-            <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button todo="true">[Show button on detail page]</show-button>
-            <any todo="true">[Any]</any>
-            <all todo="true">[All]</all>
-            <actions todo="true">[Actions]</actions>
-            <no-action todo="true">[No Action]</no-action>
-            <change-stage-action todo="true">[Change Stage]</change-stage-action>
-            <run-process-action todo="true">[Run Process]</run-process-action>
-            <remove-operation todo="true">[Remove Operation]</remove-operation>
-            <is todo="true">[is]</is>
-            <is-not todo="true">[is Not]</is-not>
+            <custom-operations>Definiera anpassade operationer för detta formulär</custom-operations>
+            <operation-label>Etikett</operation-label>
+            <predefined-label>Fördefinierad</predefined-label>
+            <custom-label>Anpassad</custom-label>
+            <available-to>Tillgänglig för</available-to>
+            <availability-to-anyone>Alla</availability-to-anyone>
+            <availability-to-no-one>Ingen</availability-to-no-one>
+            <availability-to-users>Användare som matchar följande regel</availability-to-users>
+            <availability-to-users-before>Användare som matchar</availability-to-users-before>
+            <availability-to-users-after>av följande regler</availability-to-users-after>
+            <workflow-stage>Arbetsflödesstadium</workflow-stage>
+            <workflow-role>Arbetsflödesroll</workflow-role>
+            <authentication-role>Autentiseringsroll</authentication-role>
+            <show-button>Visa knapp på detaljsida</show-button>
+            <any>Någon</any>
+            <all>Alla</all>
+            <actions>Kommandon</actions>
+            <no-action>Inget kommando</no-action>
+            <change-stage-action>Ändra stadium</change-stage-action>
+            <run-process-action>Kör process</run-process-action>
+            <remove-operation>Ta bort operation</remove-operation>
+            <is>är</is>
+            <is-not>är inte</is-not>
 
-            <stages todo="true">[Stages]</stages>
+            <stages>Stadier</stages>
 
-            <stage-name todo="true">[Stage Name]</stage-name>
-            <default-stage todo="true">[Default]</default-stage>
+            <stage-name>Stadiumnamn</stage-name>
+            <default-stage>Standard</default-stage>
 
             <operations>
-                <label todo="true">[Operations]</label>
+                <label>Operationer</label>
                 <item>
-                    <label todo="true">[Fill new form]</label>
+                    <label>Fylla i nytt formulär</label>
                     <value>1</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[List and search data]</label>
+                    <label>Lista och sök data</label>
                     <value>2</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for editing]</label>
+                    <label>Åtkomst till data för redigering</label>
                     <value>3</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access data for viewing]</label>
+                    <label>Åtkomst till data för visning</label>
                     <value>4</value>
                     <hint/>
                 </item>
                 <item>
-                    <label todo="true">[Access PDF/TIFF]</label>
+                    <label>Åtkomst till PDF/TIFF</label>
                     <value>5</value>
                     <hint/>
                 </item>
@@ -17623,33 +17623,33 @@
             <dialog-title>Tangentbordsgenvägar</dialog-title>
         </dialog-keyboard-shortcuts>
         <dialog-messages>
-            <label todo="true">[Messages]</label>
-            <language-header todo="true">[Language]</language-header>
-            <name-header todo="true">[Name]</name-header>
-            <value-header todo="true">[Value]</value-header>
+            <label>Meddelanden</label>
+            <language-header>Språk</language-header>
+            <name-header>Namn</name-header>
+            <value-header>Värde</value-header>
         </dialog-messages>
         <modes>
-            <editable todo="true">Editable modes</editable>
-            <review todo="true">Review mode</review>
-            <pdf-automatic todo="true">Automatic PDF</pdf-automatic>
-            <pdf-template todo="true">PDF template</pdf-template>
+            <editable>Redigerbara lägen</editable>
+            <review>Granskningsläge</review>
+            <pdf-automatic>Automatisk PDF</pdf-automatic>
+            <pdf-template>PDF-mall</pdf-template>
         </modes>
         <xbl-control-settings>
-            <field-width todo="true">[Field width]</field-width>
-            <default todo="true">Use default</default>
-            <full todo="true">Full</full>
-            <natural todo="true">Natural</natural>
-            <field-align todo="true">Field alignment</field-align>
-            <left todo="true">Left</left>
-            <right todo="true">Right</right>
-            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <field-width>Fältbredd</field-width>
+            <default>Använd standard</default>
+            <full>Full</full>
+            <natural>Naturlig</natural>
+            <field-align>Fältjustering</field-align>
+            <left>Vänster</left>
+            <right>Höger</right>
+            <learn-settings-below>Läs mer om inställningarna nedan</learn-settings-below>
             <field-value-visibility>
-                <label todo="true">Field Value Visibility</label>
-                <hint todo="true">Controls how the value of the field is displayed</hint>
-                <item id="visible" todo="true">Visible</item>
+                <label>Fältvärdesynlighet</label>
+                <hint>Styr hur fältets värde visas</hint>
+                <item id="visible">Synligt</item>
                 <item id="obscured">Obscured</item>
-                <item id="partial" todo="true">Partial</item>
-                <item id="reveal" todo="true">Allow user to reveal</item>
+                <item id="partial">Delvis</item>
+                <item id="reveal">Tillåt användare att visa</item>
             </field-value-visibility>
         </xbl-control-settings>
         <messages>
@@ -17658,20 +17658,20 @@
             <delete-column>Bekräfta att du vill ta bort denna kolumn</delete-column>
             <delete-row>Bekräfta att du vill ta bort denna rad</delete-row>
             <delete-resources>Bekräfta att du vill ta bort alla resurser för detta språk</delete-resources>
-            <delete-service todo="true">Bekräfta att du vill ta bort denna tjänst "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
-            <delete-action todo="true">Bekräfta att du vill ta bort detta kommando "{0}"?</delete-action>
+            <delete-service>Bekräfta att du vill ta bort denna tjänst "{0}"?{1,choice,0# Inget kommando använder den.|1# 1 kommando använder den.|1&lt; {1,number,integer} kommandon använder den.}</delete-service>
+            <delete-action>Bekräfta att du vill ta bort detta kommando "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
             <metadata-edit-title>Metadata</metadata-edit-title>
-            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <select-template-output>Välj en formulärmall att använda som utgångspunkt.</select-template-output>
             <app-form-optional>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret.</app-form-optional>
-            <app-form-required todo="true">Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret.</app-form-required>
+            <app-form-required>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret.</app-form-required>
             <save-as-metadata-output>Var god definiera namn på område och formulär att användas för kopian av formuläret:</save-as-metadata-output>
             <xpath-errors>Det finns {0,choice,1#ett XPath-fel|1&lt;{0,number,integer} XPath-fel} i formuläret.</xpath-errors>
             <lhha-checkbox>Kryssa denna ruta om du vill skriva HTML-taggar</lhha-checkbox>
         </messages>
         <alerts>
-            <required todo="true">[Value is required]</required>
-            <xpath todo="true">[Incorrect XPath expression]</xpath>
+            <required>Värde krävs</required>
+            <xpath>Felaktigt XPath-uttryck</xpath>
         </alerts>
         <template>
             <untitled-form>Formulär utan titel</untitled-form>

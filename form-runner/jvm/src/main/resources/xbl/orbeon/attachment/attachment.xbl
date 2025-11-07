@@ -27,17 +27,19 @@
         xxbl:label-for="fr-attachment-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Single File Attachment</display-name>
-            <display-name lang="es">Archivos Adjuntos</display-name>
-            <display-name lang="fi">Tiedoston liittäminen</display-name>
-            <display-name lang="fr">Fichier joint unique</display-name>
-            <display-name lang="ru">Загрузка файла</display-name>
-            <display-name lang="it">File allegato</display-name>
-            <display-name lang="de">Einzelner Dateianhang</display-name>
-            <display-name lang="sv">Fil som bilaga</display-name>
-            <display-name lang="nl">Bestandsbijlage</display-name>
-            <display-name lang="pt">Anexar ficheiro</display-name>
-            <display-name lang="ar">مرفق ملف واحد</display-name>
+                            <display-name lang="en">Single File Attachment</display-name>
+        <display-name lang="fr">Fichier joint unique</display-name>
+        <display-name lang="no">Enkelt filvedlegg</display-name>
+        <display-name lang="ru">Загрузка файла</display-name>
+        <display-name lang="it">File allegato</display-name>
+        <display-name lang="de">Einzelner Dateianhang</display-name>
+        <display-name lang="fi">Tiedoston liittäminen</display-name>
+        <display-name lang="es">Archivos Adjuntos</display-name>
+        <display-name lang="nl">Bestandsbijlage</display-name>
+        <display-name lang="pt">Anexar ficheiro</display-name>
+        <display-name lang="sv">Fil som bilaga</display-name>
+        <display-name lang="ar">مرفق ملف واحد</display-name>
+        <display-name lang="pl">Załącznik pojedynczego pliku</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-o</icon-class>
             </icon>
@@ -86,7 +88,7 @@
                             </resource>
                             <resource xml:lang="fr">
                                 <allow-download>Permettre le téléchargement</allow-download>
-                                <ow-si>Montrer la taille</ow-si>
+                                <show-size>Montrer la taille</show-size>
                             </resource>
                             <resource xml:lang="ar">
                                 <allow-download>السماح بالتنزيل</allow-download>
@@ -265,18 +267,18 @@
                             <remove>Supprimer le fichier joint</remove>
                         </resource>
                         <resource xml:lang="ru">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
-                            <download>Download</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <drag-single>Перетащите файл сюда или {0}выберите файл{1}.</drag-single>
+                            <drag-multiple>Перетащите файлы сюда или {0}выберите файлы{1}.</drag-multiple>
+                            <download>Скачать</download>
+                            <empty>Нет вложения.</empty>
+                            <remove>Удалить вложение</remove>
                         </resource>
                         <resource xml:lang="it">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
+                            <drag-single>Trascina qui il file o {0}seleziona il file{1}.</drag-single>
+                            <drag-multiple>Trascina qui i file o {0}seleziona i file{1}.</drag-multiple>
                             <download>Scaricare</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <empty>Nessun allegato.</empty>
+                            <remove>Rimuovi allegato</remove>
                         </resource>
                         <resource xml:lang="de">
                             <drag-single>Ziehen Sie die Datei hierher oder {0}wählen Sie eine Datei aus{1}.</drag-single>
@@ -286,39 +288,39 @@
                             <remove>Anhang entfernen</remove>
                         </resource>
                         <resource xml:lang="sv">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
+                            <drag-single>Dra filen hit eller {0}välj fil{1}.</drag-single>
+                            <drag-multiple>Dra filerna hit eller {0}välj filer{1}.</drag-multiple>
                             <download>Ladda ner</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <empty>Ingen bilaga.</empty>
+                            <remove>Ta bort bilaga</remove>
                         </resource>
                         <resource xml:lang="nl">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
-                            <download>Download</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <drag-single>Sleep bestand hierheen of {0}selecteer bestand{1}.</drag-single>
+                            <drag-multiple>Sleep bestanden hierheen of {0}selecteer bestanden{1}.</drag-multiple>
+                            <download>Downloaden</download>
+                            <empty>Geen bijlage.</empty>
+                            <remove>Bijlage verwijderen</remove>
                         </resource>
                         <resource xml:lang="pt">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
+                            <drag-single>Arraste o arquivo aqui ou {0}selecione o arquivo{1}.</drag-single>
+                            <drag-multiple>Arraste os arquivos aqui ou {0}selecione os arquivos{1}.</drag-multiple>
                             <download>Baixar</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <empty>Sem anexo.</empty>
+                            <remove>Remover anexo</remove>
                         </resource>
                         <resource xml:lang="lt">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
+                            <drag-single>Nuvilkite failą čia arba {0}pasirinkite failą{1}.</drag-single>
+                            <drag-multiple>Nuvilkite failus čia arba {0}pasirinkite failus{1}.</drag-multiple>
                             <download>Parsisiųsti</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <empty>Nėra priedo.</empty>
+                            <remove>Pašalinti priedą</remove>
                         </resource>
                         <resource xml:lang="da">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
+                            <drag-single>Træk fil her eller {0}vælg fil{1}.</drag-single>
+                            <drag-multiple>Træk filer her eller {0}vælg filer{1}.</drag-multiple>
                             <download>Hent</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <empty>Ingen vedhæftning.</empty>
+                            <remove>Fjern vedhæftning</remove>
                         </resource>
                     </_>
                 </xf:instance>

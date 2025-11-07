@@ -56,18 +56,19 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Date</display-name>
-            <display-name lang="es">Fecha</display-name>
-            <display-name lang="fi">Päivämäärä</display-name>
-            <display-name lang="fr">Date</display-name>
-            <display-name lang="ru">Дата</display-name>
-            <display-name lang="de">Datum</display-name>
-            <display-name lang="it">Data</display-name>
-            <display-name lang="nl">Datum</display-name>
-            <display-name lang="sv">Datum</display-name>
-            <display-name lang="pt">Data</display-name>
-            <display-name lang="da">Dato</display-name>
-            <display-name lang="ar">تاريخ</display-name>
+                    <display-name lang="en">Date</display-name>
+        <display-name lang="fr">Date</display-name>
+        <display-name lang="no">Dato</display-name>
+        <display-name lang="ru">Дата</display-name>
+        <display-name lang="it">Data</display-name>
+        <display-name lang="de">Datum</display-name>
+        <display-name lang="fi">Päivämäärä</display-name>
+        <display-name lang="es">Fecha</display-name>
+        <display-name lang="nl">Datum</display-name>
+        <display-name lang="pt">Data</display-name>
+        <display-name lang="sv">Datum</display-name>
+        <display-name lang="ar">تاريخ</display-name>
+        <display-name lang="pl">Data</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

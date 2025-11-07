@@ -14,16 +14,19 @@
 <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Text Controls</display-name>
-        <display-name lang="es">Controles de Texto</display-name>
-        <display-name lang="fi">Tekstikontrollit</display-name>
+                <display-name lang="en">Text Controls</display-name>
         <display-name lang="fr">Contrôles texte</display-name>
+        <display-name lang="no">Tekstkontroller</display-name>
         <display-name lang="ru">Элементы ввода текста</display-name>
-        <display-name lang="de">Text-Steuerelemente</display-name>
         <display-name lang="it">Controlli di testo</display-name>
+        <display-name lang="de">Text-Steuerelemente</display-name>
+        <display-name lang="fi">Tekstikontrollit</display-name>
+        <display-name lang="es">Controles de Texto</display-name>
         <display-name lang="nl">Tekst-elementen</display-name>
-        <display-name lang="sv">Textfält</display-name>
         <display-name lang="pt">Controlos de Texto</display-name>
+        <display-name lang="sv">Textfält</display-name>
+        <display-name lang="ar">عناصر التحكم في النص</display-name>
+        <display-name lang="pl">Kontrolki tekstowe</display-name>
     </metadata>
 
 </xbl:xbl>

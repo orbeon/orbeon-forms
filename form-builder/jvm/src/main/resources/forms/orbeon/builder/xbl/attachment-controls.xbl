@@ -18,12 +18,15 @@
         <display-name lang="es">Archivos Adjuntos</display-name>
         <display-name lang="fi">Liitteet</display-name>
         <display-name lang="fr">Fichiers joints</display-name>
-        <display-name lang="ru" todo="true">Attachments</display-name>
+        <display-name lang="ru">Вложения</display-name>
         <display-name lang="it">Allegati</display-name>
         <display-name lang="de">Anhänge</display-name>
         <display-name lang="sv">Bilagor</display-name>
         <display-name lang="nl">Bijlagen</display-name>
         <display-name lang="pt">Anexos</display-name>
+        <display-name lang="no">Vedlegg</display-name>
+        <display-name lang="ar">مرفقات</display-name>
+        <display-name lang="pl">Załączniki</display-name>
     </metadata>
 
 </xbl:xbl>

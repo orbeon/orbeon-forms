@@ -38,17 +38,19 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Time</display-name>
-            <display-name lang="es">Hora</display-name>
-            <display-name lang="fi">Kellonaika</display-name>
-            <display-name lang="fr">Heure</display-name>
-            <display-name lang="ru">Время</display-name>
-            <display-name lang="de">Uhrzeit</display-name>
-            <display-name lang="it">Ora</display-name>
-            <display-name lang="nl">Tijd</display-name>
-            <display-name lang="sv">Tid</display-name>
-            <display-name lang="pt">Hora</display-name>
-            <display-name lang="ar">الوقت</display-name>
+                    <display-name lang="en">Time</display-name>
+        <display-name lang="fr">Heure</display-name>
+        <display-name lang="no">Tid</display-name>
+        <display-name lang="ru">Время</display-name>
+        <display-name lang="it">Ora</display-name>
+        <display-name lang="de">Uhrzeit</display-name>
+        <display-name lang="fi">Kellonaika</display-name>
+        <display-name lang="es">Hora</display-name>
+        <display-name lang="nl">Tijd</display-name>
+        <display-name lang="pt">Hora</display-name>
+        <display-name lang="sv">Tid</display-name>
+        <display-name lang="ar">الوقت</display-name>
+        <display-name lang="pl">Czas</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-clock-o</icon-class>
             </icon>

@@ -16,16 +16,19 @@
 
     <xbl:binding id="fb-trigger-minimal" element="xf|trigger[appearance='minimal']">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Link Button</display-name>
-            <display-name lang="es">Botón Hipervínculo</display-name>
-            <display-name lang="fi">Linkitä painike</display-name>
-            <display-name lang="fr">Bouton lien</display-name>
-            <display-name lang="ru">Кнопка-ссылка</display-name>
-            <display-name lang="de">Link-Schaltfläche</display-name>
-            <display-name lang="it">Pulsante link</display-name>
-            <display-name lang="nl">Knop met link</display-name>
-            <display-name lang="sv">Knapp med länk</display-name>
-            <display-name lang="pt">Botão para endereço</display-name>
+                    <display-name lang="en">Link Button</display-name>
+        <display-name lang="fr">Bouton lien</display-name>
+        <display-name lang="no">Lenkeknapp</display-name>
+        <display-name lang="ru">Кнопка-ссылка</display-name>
+        <display-name lang="it">Pulsante link</display-name>
+        <display-name lang="de">Link-Schaltfläche</display-name>
+        <display-name lang="fi">Linkitä painike</display-name>
+        <display-name lang="es">Botón Hipervínculo</display-name>
+        <display-name lang="nl">Knop met link</display-name>
+        <display-name lang="pt">Botão para endereço</display-name>
+        <display-name lang="sv">Knapp med länk</display-name>
+        <display-name lang="ar">زر الرابط</display-name>
+        <display-name lang="pl">Przycisk linku</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-link</icon-class>

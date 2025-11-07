@@ -72,17 +72,19 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Number</display-name>
-            <display-name lang="es">Número</display-name>
-            <display-name lang="fi">Numero</display-name>
-            <display-name lang="fr">Nombre</display-name>
-            <display-name lang="ru" todo="true">[Number]</display-name>
-            <display-name lang="de">Zahlenwert</display-name>
-            <display-name lang="it">Valore numerico</display-name>
-            <display-name lang="sv">Numeriskt värde</display-name>
-            <display-name lang="nl">Getal</display-name>
-            <display-name lang="pt">Número</display-name>
-            <display-name lang="ar">رقم</display-name>
+        <display-name lang="en">Number</display-name>
+        <display-name lang="fr">Nombre</display-name>
+        <display-name lang="no">Tall</display-name>
+        <display-name lang="ru">Число</display-name>
+        <display-name lang="it">Valore numerico</display-name>
+        <display-name lang="de">Zahlenwert</display-name>
+        <display-name lang="fi">Numero</display-name>
+        <display-name lang="es">Número</display-name>
+        <display-name lang="nl">Getal</display-name>
+        <display-name lang="pt">Número</display-name>
+        <display-name lang="sv">Numeriskt värde</display-name>
+        <display-name lang="ar">رقم</display-name>
+        <display-name lang="pl">Liczba</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-superscript</icon-class>
             </icon>

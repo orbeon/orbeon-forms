@@ -34,16 +34,19 @@
             xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">With Character Counter</display-name>
-            <display-name lang="es">Con Contador de Caracteres</display-name>
-            <display-name lang="fi" todo="true">[With Character Counter]</display-name>
-            <display-name lang="fr">Avec compteur de charactères</display-name>
-            <display-name lang="ru" todo="true">[With Character Counter]</display-name>
-            <display-name lang="de">Mit Zeichenzähler</display-name>
-            <display-name lang="it">Con contatore di caratteri</display-name>
-            <display-name lang="nl" todo="true">[With Character Counter]</display-name>
-            <display-name lang="sv">Med teckenräknare</display-name>
-            <display-name lang="pt" todo="true">[With Character Counter]</display-name>
+                    <display-name lang="en">With Character Counter</display-name>
+        <display-name lang="fr">Avec compteur de charactères</display-name>
+        <display-name lang="no">Med tegnantall</display-name>
+        <display-name lang="ru">Со счётчиком символов</display-name>
+        <display-name lang="it">Con contatore di caratteri</display-name>
+        <display-name lang="de">Mit Zeichenzähler</display-name>
+        <display-name lang="fi">Merkkimäärälaskurilla</display-name>
+        <display-name lang="es">Con Contador de Caracteres</display-name>
+        <display-name lang="nl">Met tekenteller</display-name>
+        <display-name lang="pt">Com contador de caracteres</display-name>
+        <display-name lang="sv">Med teckenräknare</display-name>
+        <display-name lang="ar">مع عداد الحروف</display-name>
+        <display-name lang="pl">Z licznikiem znaków</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-gauge</icon-class>

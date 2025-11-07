@@ -16,16 +16,19 @@
 
     <xbl:binding id="fb-input-select1-full" element="xf|select1[appearance ~= full]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Radio Buttons</display-name>
-            <display-name lang="es">Botones de Opción</display-name>
-            <display-name lang="fi">Radiopainikkeet</display-name>
-            <display-name lang="fr">Boutons radio</display-name>
-            <display-name lang="ru">Радио-кнопки</display-name>
-            <display-name lang="de">Exklusive Auswahl</display-name>
-            <display-name lang="it">Scelta unica</display-name>
-            <display-name lang="nl">Keuzerondje</display-name>
-            <display-name lang="sv">Enkelval</display-name>
-            <display-name lang="pt">Botões de Opção</display-name>
+                    <display-name lang="en">Radio Buttons</display-name>
+        <display-name lang="fr">Boutons radio</display-name>
+        <display-name lang="no">Alternativknapper</display-name>
+        <display-name lang="ru">Радио-кнопки</display-name>
+        <display-name lang="it">Scelta unica</display-name>
+        <display-name lang="de">Exklusive Auswahl</display-name>
+        <display-name lang="fi">Radiopainikkeet</display-name>
+        <display-name lang="es">Botones de Opción</display-name>
+        <display-name lang="nl">Keuzerondje</display-name>
+        <display-name lang="pt">Botões de Opção</display-name>
+        <display-name lang="sv">Enkelval</display-name>
+        <display-name lang="ar">أزرار الاختيار</display-name>
+        <display-name lang="pl">Przyciski opcji</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-dot-circle-o</icon-class>
             </icon>

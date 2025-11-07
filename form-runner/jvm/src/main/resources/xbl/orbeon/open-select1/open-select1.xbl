@@ -48,16 +48,19 @@
         xxbl:label-for="fr-open-select1-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Radio Buttons with "Other"</display-name>
-            <display-name lang="es">Botones de Radio con "Otros"</display-name>
-            <display-name lang="fi" todo="true">[Radio Buttons with "Other"]</display-name>
-            <display-name lang="fr">Boutons radio avec "Autre"</display-name>
-            <display-name lang="ru" todo="true">[Radio Buttons with "Other"]</display-name>
-            <display-name lang="de">Auswahl-Buttons mit "Andere"</display-name>
-            <display-name lang="it">Scelta unica con "Altro"</display-name>
-            <display-name lang="nl" todo="true">[Radio Buttons with "Other"]</display-name>
-            <display-name lang="pt" todo="true">[Radio Buttons with "Other"]</display-name>
-            <display-name lang="sv">Enkelval med "Annat"</display-name>
+                    <display-name lang="en">Radio Buttons with "Other"</display-name>
+        <display-name lang="fr">Boutons radio avec "Autre"</display-name>
+        <display-name lang="no">Radioknapper med "Annet"</display-name>
+        <display-name lang="ru">Переключатели с вариантом "Другое"</display-name>
+        <display-name lang="it">Scelta unica con "Altro"</display-name>
+        <display-name lang="de">Auswahl-Buttons mit "Andere"</display-name>
+        <display-name lang="fi">Valintapainikkeet "Muu"-vaihtoehdolla</display-name>
+        <display-name lang="es">Botones de Radio con "Otros"</display-name>
+        <display-name lang="nl">Keuzerondjes met "Anders"</display-name>
+        <display-name lang="pt">Botões de rádio com "Outro"</display-name>
+        <display-name lang="sv">Enkelval med "Annat"</display-name>
+        <display-name lang="ar">أزرار اختيار مع "آخر"</display-name>
+        <display-name lang="pl">Przyciski opcji z "Inne"</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-dot-circle-o</icon-class>
             </icon>

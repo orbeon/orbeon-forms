@@ -28,16 +28,19 @@
     <xbl:binding id="fr-link-select1-binding" element="fr|link-select1" xxbl:mode="lhha binding value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Link Selector</display-name>
-            <display-name lang="es">Selector de Enalce</display-name>
-            <display-name lang="fi">Linkinvalitsija</display-name>
-            <display-name lang="fr">Sélection avec liens</display-name>
-            <display-name lang="ru">Выбор в виде ссылок</display-name>
-            <display-name lang="de">Link Auswahl</display-name>
-            <display-name lang="it">Selezione link</display-name>
-            <display-name lang="sv">Länkväljare</display-name>
-            <display-name lang="nl">Linkselectie</display-name>
-            <display-name lang="pt">Selector de endereços</display-name>
+                    <display-name lang="en">Link Selector</display-name>
+        <display-name lang="fr">Sélection avec liens</display-name>
+        <display-name lang="no">Link Selector</display-name>
+        <display-name lang="ru">Выбор в виде ссылок</display-name>
+        <display-name lang="it">Selezione link</display-name>
+        <display-name lang="de">Link Auswahl</display-name>
+        <display-name lang="fi">Linkinvalitsija</display-name>
+        <display-name lang="es">Selector de Enalce</display-name>
+        <display-name lang="nl">Linkselectie</display-name>
+        <display-name lang="pt">Selector de endereços</display-name>
+        <display-name lang="sv">Länkväljare</display-name>
+        <display-name lang="ar">Link Selector</display-name>
+        <display-name lang="pl">Link Selector</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/link.png</small-icon>
             </icon>

@@ -64,17 +64,19 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">International Securities Identification Number (ISIN)</display-name>
-            <display-name lang="es">Número Internacional de Identificación de Valores (ISIN)</display-name>
-            <display-name lang="fi">Kansainvälinen arvopaperitunnus (ISIN)</display-name>
-            <display-name lang="fr">Numéro international d’identification des valeurs mobilières (ISIN)</display-name>
-            <display-name lang="ru">Международный идентификационный номер ценных бумаг (ISIN)</display-name>
-            <display-name lang="de">Internationale Wertpapierkennnummer (ISIN)</display-name>
-            <display-name lang="it">Numero Internazionale di Identificazione dei Titoli (ISIN)</display-name>
-            <display-name lang="nl">Internationaal effectenidentificatienummer (ISIN)</display-name>
-            <display-name lang="pt">Número Internacional de Identificação de Valores Mobiliários (ISIN)</display-name>
-            <display-name lang="sv">Internationellt värdepappersidentifieringsnummer (ISIN)</display-name>
-            <display-name lang="ar">رقم التعريف الدولي للأوراق المالية (ISIN)</display-name>
+                    <display-name lang="en">International Securities Identification Number (ISIN)</display-name>
+        <display-name lang="fr">Numéro international d’identification des valeurs mobilières (ISIN)</display-name>
+        <display-name lang="no">International Securities Identification Number (ISIN)</display-name>
+        <display-name lang="ru">Международный идентификационный номер ценных бумаг (ISIN)</display-name>
+        <display-name lang="it">Numero Internazionale di Identificazione dei Titoli (ISIN)</display-name>
+        <display-name lang="de">Internationale Wertpapierkennnummer (ISIN)</display-name>
+        <display-name lang="fi">Kansainvälinen arvopaperitunnus (ISIN)</display-name>
+        <display-name lang="es">Número Internacional de Identificación de Valores (ISIN)</display-name>
+        <display-name lang="nl">Internationaal effectenidentificatienummer (ISIN)</display-name>
+        <display-name lang="pt">Número Internacional de Identificação de Valores Mobiliários (ISIN)</display-name>
+        <display-name lang="sv">Internationellt värdepappersidentifieringsnummer (ISIN)</display-name>
+        <display-name lang="ar">رقم التعريف الدولي للأوراق المالية (ISIN)</display-name>
+        <display-name lang="pl">International Securities Identification Number (ISIN)</display-name>
 
             <icon>
                 <icon-class>fa fa-fw fa-coins</icon-class>

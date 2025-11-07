@@ -72,16 +72,19 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Currency</display-name>
-            <display-name lang="es">Moneda</display-name>
-            <display-name lang="fi">Valuutta</display-name>
-            <display-name lang="fr">Devise</display-name>
-            <display-name lang="de">Währung</display-name>
-            <display-name lang="it">Valuta</display-name>
-            <display-name lang="sv">Valuta</display-name>
-            <display-name lang="nl">Valuta</display-name>
-            <display-name lang="pt">Moeda</display-name>
-            <display-name lang="ar">عملة</display-name>
+                    <display-name lang="en">Currency</display-name>
+        <display-name lang="fr">Devise</display-name>
+        <display-name lang="no">Valuta</display-name>
+        <display-name lang="ru">Валюта</display-name>
+        <display-name lang="it">Valuta</display-name>
+        <display-name lang="de">Währung</display-name>
+        <display-name lang="fi">Valuutta</display-name>
+        <display-name lang="es">Moneda</display-name>
+        <display-name lang="nl">Valuta</display-name>
+        <display-name lang="pt">Moeda</display-name>
+        <display-name lang="sv">Valuta</display-name>
+        <display-name lang="ar">عملة</display-name>
+        <display-name lang="pl">Waluta</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-dollar-sign fa-usd</icon-class>
             </icon>

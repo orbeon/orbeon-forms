@@ -37,17 +37,19 @@
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Legal Entity Identifier (LEI)</display-name>
-            <display-name lang="es">Identificador de Entidad Jurídica (LEI)</display-name>
-            <display-name lang="fi">Oikeushenkilötunnus (LEI)</display-name>
-            <display-name lang="fr">Identifiant d’entité juridique (LEI)</display-name>
-            <display-name lang="ru">Идентификатор юридического лица (LEI)</display-name>
-            <display-name lang="de">Rechtsträgerkennung (LEI)</display-name>
-            <display-name lang="it">Identificatore di Entità Legale (LEI)</display-name>
-            <display-name lang="nl">Juridische entiteit-identificatie (LEI)</display-name>
-            <display-name lang="pt">Identificador de Entidade Jurídica (LEI)</display-name>
-            <display-name lang="sv">Juridisk enhetsidentifierare (LEI)</display-name>
-            <display-name lang="ar">معرّف الكيان القانوني (LEI)</display-name>
+                    <display-name lang="en">Legal Entity Identifier (LEI)</display-name>
+        <display-name lang="fr">Identifiant d’entité juridique (LEI)</display-name>
+        <display-name lang="no">Legal Entity Identifier (LEI)</display-name>
+        <display-name lang="ru">Идентификатор юридического лица (LEI)</display-name>
+        <display-name lang="it">Identificatore di Entità Legale (LEI)</display-name>
+        <display-name lang="de">Rechtsträgerkennung (LEI)</display-name>
+        <display-name lang="fi">Oikeushenkilötunnus (LEI)</display-name>
+        <display-name lang="es">Identificador de Entidad Jurídica (LEI)</display-name>
+        <display-name lang="nl">Juridische entiteit-identificatie (LEI)</display-name>
+        <display-name lang="pt">Identificador de Entidade Jurídica (LEI)</display-name>
+        <display-name lang="sv">Juridisk enhetsidentifierare (LEI)</display-name>
+        <display-name lang="ar">معرّف الكيان القانوني (LEI)</display-name>
+        <display-name lang="pl">Legal Entity Identifier (LEI)</display-name>
 
             <icon>
                 <icon-class>fa fa-fw fa-scale-balanced</icon-class>

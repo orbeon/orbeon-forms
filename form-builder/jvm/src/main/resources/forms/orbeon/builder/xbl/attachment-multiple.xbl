@@ -17,16 +17,19 @@
 
     <xbl:binding id="fr-attachment" element="fr|attachment[multiple ~= true]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Multiple File Attachments</display-name>
-            <display-name lang="es">[Multiple File Attachments]</display-name>
-            <display-name lang="fi">[Multiple File Attachments]</display-name>
-            <display-name lang="fr">Fichiers joints multiples</display-name>
-            <display-name lang="ru">[Multiple File Attachments]</display-name>
-            <display-name lang="it">Allegati multipli</display-name>
-            <display-name lang="de">Mehrfache Dateianhänge</display-name>
-            <display-name lang="sv">[Multiple File Attachments]</display-name>
-            <display-name lang="nl">[Multiple File Attachments]</display-name>
-            <display-name lang="pt">[Multiple File Attachments]</display-name>
+                    <display-name lang="en">Multiple File Attachments</display-name>
+        <display-name lang="fr">Fichiers joints multiples</display-name>
+        <display-name lang="no">Flere filvedlegg</display-name>
+        <display-name lang="ru">Несколько вложенных файлов</display-name>
+        <display-name lang="it">Allegati multipli</display-name>
+        <display-name lang="de">Mehrfache Dateianhänge</display-name>
+        <display-name lang="fi">Useita tiedostoliitteitä</display-name>
+        <display-name lang="es">Archivos adjuntos múltiples</display-name>
+        <display-name lang="nl">Meerdere bestandsbijlagen</display-name>
+        <display-name lang="pt">Anexos de vários arquivos</display-name>
+        <display-name lang="sv">Flera filbilagor</display-name>
+        <display-name lang="ar">مرفقات ملفات متعددة</display-name>
+        <display-name lang="pl">Wiele załączników plików</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-files-o</icon-class>
             </icon>

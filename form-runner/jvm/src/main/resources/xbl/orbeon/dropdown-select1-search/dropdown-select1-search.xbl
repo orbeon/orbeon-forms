@@ -31,28 +31,30 @@
         xxbl:mode="lhha binding value focus selection javascript-lifecycle allow-minimal-label-hint">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Dropdown with Search</display-name>
-            <display-name lang="es" todo="true">[Dropdown with Search]</display-name>
-            <display-name lang="fi" todo="true">[Dropdown with Search]</display-name>
-            <display-name lang="fr">Menu déroulant avec recherche</display-name>
-            <display-name lang="ru" todo="true">[Dropdown with Search]</display-name>
-            <display-name lang="de">Dropdown-Menü mit Suche</display-name>
-            <display-name lang="it">Menu a tendina con ricerca</display-name>
-            <display-name lang="nl" todo="true">[Dropdown with Search]</display-name>
-            <display-name lang="sv" todo="true">[Dropdown with Search]</display-name>
-            <display-name lang="pt" todo="true">[Dropdown with Search]</display-name>
-            <display-name lang="ar">قائمة منسدلة مع بحث</display-name>
+                            <display-name lang="en">Dropdown with Search</display-name>
+        <display-name lang="fr">Menu déroulant avec recherche</display-name>
+        <display-name lang="no">Rullegardinmeny med søk</display-name>
+        <display-name lang="ru">Раскрывающийся список с поиском</display-name>
+        <display-name lang="it">Menu a tendina con ricerca</display-name>
+        <display-name lang="de">Dropdown-Menü mit Suche</display-name>
+        <display-name lang="fi">Pudotusvalikko haulla</display-name>
+        <display-name lang="es">Menú desplegable con búsqueda</display-name>
+        <display-name lang="nl">Dropdown met zoeken</display-name>
+        <display-name lang="pt">Menu suspenso com pesquisa</display-name>
+        <display-name lang="sv">Rullgardinsmeny med sökning</display-name>
+        <display-name lang="ar">قائمة منسدلة مع بحث</display-name>
+        <display-name lang="pl">Lista rozwijana z wyszukiwaniem</display-name>
 
             <appearance-display-name lang="en">With Search</appearance-display-name>
-            <appearance-display-name lang="es" todo="true">[With Search]</appearance-display-name>
-            <appearance-display-name lang="fi" todo="true">[With Search]</appearance-display-name>
+            <appearance-display-name lang="es">Con búsqueda</appearance-display-name>
+            <appearance-display-name lang="fi">Haulla</appearance-display-name>
             <appearance-display-name lang="fr">Avec recherche</appearance-display-name>
-            <appearance-display-name lang="ru" todo="true">[With Search]</appearance-display-name>
+            <appearance-display-name lang="ru">С поиском</appearance-display-name>
             <appearance-display-name lang="de">Mit Suche</appearance-display-name>
             <appearance-display-name lang="it">Con ricerca</appearance-display-name>
-            <appearance-display-name lang="nl" todo="true">[With Search]</appearance-display-name>
-            <appearance-display-name lang="sv" todo="true">[With Search]</appearance-display-name>
-            <appearance-display-name lang="pt" todo="true">[With Search]</appearance-display-name>
+            <appearance-display-name lang="nl">Met zoeken</appearance-display-name>
+            <appearance-display-name lang="sv">Med sökning</appearance-display-name>
+            <appearance-display-name lang="pt">Com pesquisa</appearance-display-name>
             <appearance-display-name lang="ar">مع بحث</appearance-display-name>
             <toolbox show="false"/>
             <icon>

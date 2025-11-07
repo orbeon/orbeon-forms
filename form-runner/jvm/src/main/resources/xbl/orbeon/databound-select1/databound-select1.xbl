@@ -30,16 +30,19 @@
             xmlns="http://orbeon.org/oxf/xml/form-builder"
             xmlns:xf="http://www.w3.org/2002/xforms">
 
-            <display-name lang="en">Dynamic Dropdown</display-name>
-            <display-name lang="es">Lista Desplegable Dinámica</display-name>
-            <display-name lang="fi">Dynaamisen datan pudotusvalikko</display-name>
-            <display-name lang="fr">Menu déroulant dynamique</display-name>
-            <display-name lang="ru">Список из веб-сервиса</display-name>
-            <display-name lang="de">Daten Dropdown-Liste</display-name>
-            <display-name lang="it">Tendina dati</display-name>
-            <display-name lang="sv">Dynamisk rullgardinsmeny</display-name>
-            <display-name lang="nl">Selectie met dynamische gegevens</display-name>
-            <display-name lang="pt">Lista de Opções Dinâmica</display-name>
+                    <display-name lang="en">Dynamic Dropdown</display-name>
+        <display-name lang="fr">Menu déroulant dynamique</display-name>
+        <display-name lang="no">Dynamic Dropdown</display-name>
+        <display-name lang="ru">Список из веб-сервиса</display-name>
+        <display-name lang="it">Tendina dati</display-name>
+        <display-name lang="de">Daten Dropdown-Liste</display-name>
+        <display-name lang="fi">Dynaamisen datan pudotusvalikko</display-name>
+        <display-name lang="es">Lista Desplegable Dinámica</display-name>
+        <display-name lang="nl">Selectie met dynamische gegevens</display-name>
+        <display-name lang="pt">Lista de Opções Dinâmica</display-name>
+        <display-name lang="sv">Dynamisk rullgardinsmeny</display-name>
+        <display-name lang="ar">Dynamic Dropdown</display-name>
+        <display-name lang="pl">Dynamic Dropdown</display-name>
             <form-settings show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>

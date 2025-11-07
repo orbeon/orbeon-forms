@@ -21,16 +21,19 @@
             xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">With Clipboard Copy</display-name>
-            <display-name lang="es" todo="true">With Clipboard Copy</display-name>
-            <display-name lang="fi" todo="true">[With Clipboard Copy]</display-name>
-            <display-name lang="fr">Avec copie vers le presse-papiers</display-name>
-            <display-name lang="ru" todo="true">[With Clipboard Copy]</display-name>
-            <display-name lang="de">Mit Kopieren in die Zwischenablage</display-name>
-            <display-name lang="it">Con copia negli appunti</display-name>
-            <display-name lang="nl" todo="true">[With Clipboard Copy]</display-name>
-            <display-name lang="sv" todo="true">With Clipboard Copy</display-name>
-            <display-name lang="pt" todo="true">[With Clipboard Copy]</display-name>
+                    <display-name lang="en">With Clipboard Copy</display-name>
+        <display-name lang="fr">Avec copie vers le presse-papiers</display-name>
+        <display-name lang="no">Med kopiering til utklippstavle</display-name>
+        <display-name lang="ru">С копированием в буфер обмена</display-name>
+        <display-name lang="it">Con copia negli appunti</display-name>
+        <display-name lang="de">Mit Kopieren in die Zwischenablage</display-name>
+        <display-name lang="fi">Leikepöydän kopiolla</display-name>
+        <display-name lang="es">Con copia al portapapeles</display-name>
+        <display-name lang="nl">Met klembord kopiëren</display-name>
+        <display-name lang="pt">Com cópia para área de transferência</display-name>
+        <display-name lang="sv">Med kopiering till urklipp</display-name>
+        <display-name lang="ar">مع نسخ إلى الحافظة</display-name>
+        <display-name lang="pl">Z kopiowaniem do schowka</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-copy</icon-class>

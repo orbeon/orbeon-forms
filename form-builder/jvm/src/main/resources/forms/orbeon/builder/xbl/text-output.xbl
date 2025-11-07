@@ -19,21 +19,21 @@
             <display-name lang="en">Calculated Value</display-name>
             <display-name lang="es">Valor Calculado</display-name>
             <display-name lang="fr">Valeur calculée</display-name>
-            <display-name lang="ru" todo="true">Неизменяемый текст</display-name>
+            <display-name lang="ru">Вычисленное значение</display-name>
             <display-name lang="de">Berechneter Wert</display-name>
             <display-name lang="it">Valore calcolato</display-name>
-            <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
+            <display-name lang="nl">Berekende waarde</display-name>
             <display-name lang="sv">Beräknat värde</display-name>
-            <display-name lang="pt" todo="true">Saída de Texto</display-name>
+            <display-name lang="pt">Valor calculado</display-name>
             <appearance-display-name lang="en">Use default</appearance-display-name>
-            <appearance-display-name lang="es" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="es">Usar predeterminado</appearance-display-name>
             <appearance-display-name lang="fr">Défaut</appearance-display-name>
-            <appearance-display-name lang="ru" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="ru">Использовать по умолчанию</appearance-display-name>
             <appearance-display-name lang="de">Standard</appearance-display-name>
             <appearance-display-name lang="it">Predefinito</appearance-display-name>
-            <appearance-display-name lang="nl" todo="true">[Use default]</appearance-display-name>
-            <appearance-display-name lang="sv" todo="true">[Use default]</appearance-display-name>
-            <appearance-display-name lang="pt" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="nl">Standaard gebruiken</appearance-display-name>
+            <appearance-display-name lang="sv">Använd standard</appearance-display-name>
+            <appearance-display-name lang="pt">Usar padrão</appearance-display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
             </icon>
@@ -53,23 +53,23 @@
     <xbl:binding id="fb-output-full" element="xf|output[appearance ~= full]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Calculated Value With Border</display-name>
-            <display-name lang="es" todo="true">Valor Calculado</display-name>
+            <display-name lang="es">Valor calculado con borde</display-name>
             <display-name lang="fr">Valeur calculée avec bord</display-name>
-            <display-name lang="ru" todo="true">Неизменяемый текст</display-name>
+            <display-name lang="ru">Вычисленное значение с границей</display-name>
             <display-name lang="de">Berechneter Wert mit Rahmen</display-name>
             <display-name lang="it">Valore calcolato con bordo</display-name>
-            <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
-            <display-name lang="sv" todo="true">Beräknat värde</display-name>
-            <display-name lang="pt" todo="true">Saída de Texto</display-name>
+            <display-name lang="nl">Berekende waarde met rand</display-name>
+            <display-name lang="sv">Beräknat värde med ram</display-name>
+            <display-name lang="pt">Valor calculado com borda</display-name>
             <appearance-display-name lang="en">With border</appearance-display-name>
-            <appearance-display-name lang="es" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="es">Con borde</appearance-display-name>
             <appearance-display-name lang="fr">Avec bord</appearance-display-name>
-            <appearance-display-name lang="ru" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="ru">С границей</appearance-display-name>
             <appearance-display-name lang="de">Mit Rahmen</appearance-display-name>
             <appearance-display-name lang="it">Con bordo</appearance-display-name>
-            <appearance-display-name lang="nl" todo="true">[With border]</appearance-display-name>
-            <appearance-display-name lang="sv" todo="true">[With border]</appearance-display-name>
-            <appearance-display-name lang="pt" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="nl">Met rand</appearance-display-name>
+            <appearance-display-name lang="sv">Med ram</appearance-display-name>
+            <appearance-display-name lang="pt">Com borda</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
@@ -90,23 +90,23 @@
     <xbl:binding id="fb-output-minimal" element="xf|output[appearance ~= minimal]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Calculated Value Without Border</display-name>
-            <display-name lang="es" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="es">Valor calculado sin borde</display-name>
             <display-name lang="fr">Valeur calculée sans bord</display-name>
-            <display-name lang="ru" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="ru">Вычисленное значение без границы</display-name>
             <display-name lang="de">Berechneter Wert ohne Rahmen</display-name>
             <display-name lang="it">Valore calcolato senza bordo</display-name>
-            <display-name lang="nl" todo="true">Calculated Value Without Border</display-name>
-            <display-name lang="sv" todo="true">Calculated Value Without Border</display-name>
-            <display-name lang="pt" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="nl">Berekende waarde zonder rand</display-name>
+            <display-name lang="sv">Beräknat värde utan ram</display-name>
+            <display-name lang="pt">Valor calculado sem borda</display-name>
             <appearance-display-name lang="en">Without border</appearance-display-name>
-            <appearance-display-name lang="es" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="es">Sin borde</appearance-display-name>
             <appearance-display-name lang="fr">Sans bord</appearance-display-name>
-            <appearance-display-name lang="ru" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="ru">Без границы</appearance-display-name>
             <appearance-display-name lang="de">Ohne Rahmen</appearance-display-name>
             <appearance-display-name lang="it">Senza bordo</appearance-display-name>
-            <appearance-display-name lang="nl" todo="true">[Without border]</appearance-display-name>
-            <appearance-display-name lang="sv" todo="true">[Without border]</appearance-display-name>
-            <appearance-display-name lang="pt" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="nl">Zonder rand</appearance-display-name>
+            <appearance-display-name lang="sv">Utan ram</appearance-display-name>
+            <appearance-display-name lang="pt">Sem borda</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>

@@ -16,16 +16,19 @@
 
     <xbl:binding id="fb-input-select-full" element="xf|select[appearance ~= full]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Checkboxes</display-name>
-            <display-name lang="es">Casillas de Verificación</display-name>
-            <display-name lang="fi">Valintaruudut</display-name>
-            <display-name lang="fr">Cases à cocher</display-name>
-            <display-name lang="ru">Галочки</display-name>
-            <display-name lang="de">Mehrfachauswahl</display-name>
-            <display-name lang="it">Scelta multipla</display-name>
-            <display-name lang="nl">Selectievakjes</display-name>
-            <display-name lang="sv">Multival</display-name>
-            <display-name lang="pt">Caixas de Verificação</display-name>
+                    <display-name lang="en">Checkboxes</display-name>
+        <display-name lang="fr">Cases à cocher</display-name>
+        <display-name lang="no">Avkryssingsbokser</display-name>
+        <display-name lang="ru">Галочки</display-name>
+        <display-name lang="it">Scelta multipla</display-name>
+        <display-name lang="de">Mehrfachauswahl</display-name>
+        <display-name lang="fi">Valintaruudut</display-name>
+        <display-name lang="es">Casillas de Verificación</display-name>
+        <display-name lang="nl">Selectievakjes</display-name>
+        <display-name lang="pt">Caixas de Verificação</display-name>
+        <display-name lang="sv">Multival</display-name>
+        <display-name lang="ar">خانات الاختيار</display-name>
+        <display-name lang="pl">Pola wyboru</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>

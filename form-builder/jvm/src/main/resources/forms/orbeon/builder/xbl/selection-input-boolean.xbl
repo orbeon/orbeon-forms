@@ -18,16 +18,19 @@
 
     <xbl:binding id="fb-input-boolean" element="xf|input:xxf-type('xs:boolean')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Single Checkbox with Label on Top</display-name>
-            <display-name lang="es">Entrada Booleana</display-name>
-            <display-name lang="fi" todo="true">Boolean-syöttäminen</display-name>
-            <display-name lang="fr">Case à cocher unique avec libellé au dessus</display-name>
-            <display-name lang="ru" todo="true">[Boolean Input]</display-name>
-            <display-name lang="de">Boolsche Eingabe</display-name>
-            <display-name lang="it">Campo boolean</display-name>
-            <display-name lang="nl" todo="true">Booleaanse invoer</display-name>
-            <display-name lang="sv" todo="true">Booleskt värde</display-name>
-            <display-name lang="pt" todo="true">Entrada Booleana</display-name>
+                    <display-name lang="en">Single Checkbox with Label on Top</display-name>
+        <display-name lang="fr">Case à cocher unique avec libellé au dessus</display-name>
+        <display-name lang="no">Enkelt avkryssingsboks med etikett på toppen</display-name>
+        <display-name lang="ru">Один флажок с меткой сверху</display-name>
+        <display-name lang="it">Casella di controllo singola con etichetta in alto</display-name>
+        <display-name lang="de">Einzelnes Kontrollkästchen mit Bezeichnung oben</display-name>
+        <display-name lang="fi">Yksittäinen valintaruutu otsikolla ylhäällä</display-name>
+        <display-name lang="es">Casilla de verificación única con etiqueta arriba</display-name>
+        <display-name lang="nl">Enkel selectievakje met label bovenaan</display-name>
+        <display-name lang="pt">Caixa de seleção única com rótulo no topo</display-name>
+        <display-name lang="sv">Ensam kryssruta med etikett ovanför</display-name>
+        <display-name lang="ar">خانة اختيار واحدة مع تسمية في الأعلى</display-name>
+        <display-name lang="pl">Pojedyncze pole wyboru z etykietą u góry</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>

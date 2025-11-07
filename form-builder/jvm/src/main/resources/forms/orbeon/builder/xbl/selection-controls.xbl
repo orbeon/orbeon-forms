@@ -14,16 +14,19 @@
 <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Selection Controls</display-name>
-        <display-name lang="es">Controles de Selección</display-name>
-        <display-name lang="fi">Valintakontrollit</display-name>
+                <display-name lang="en">Selection Controls</display-name>
         <display-name lang="fr">Contrôles de sélection</display-name>
+        <display-name lang="no">Valgkontroller</display-name>
         <display-name lang="ru">Элементы выбора</display-name>
-        <display-name lang="de">Auswahl-Steuerelemente</display-name>
         <display-name lang="it">Controlli di selezione</display-name>
+        <display-name lang="de">Auswahl-Steuerelemente</display-name>
+        <display-name lang="fi">Valintakontrollit</display-name>
+        <display-name lang="es">Controles de Selección</display-name>
         <display-name lang="nl">Selectie-elementen</display-name>
-        <display-name lang="sv">Val</display-name>
         <display-name lang="pt">Controlos de Selecção</display-name>
+        <display-name lang="sv">Val</display-name>
+        <display-name lang="ar">عناصر التحكم في الاختيار</display-name>
+        <display-name lang="pl">Kontrolki wyboru</display-name>
     </metadata>
 
 </xbl:xbl>

@@ -31,17 +31,19 @@
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Dropdown Date</display-name>
-            <display-name lang="es">Calendario Desplegable</display-name>
-            <display-name lang="fi">Päivämäärän pudotusvalikko</display-name>
-            <display-name lang="fr">Date avec menus</display-name>
-            <display-name lang="ru">Дата выпадающим меню</display-name>
-            <display-name lang="it">Data a tendina</display-name>
-            <display-name lang="de">Dropdown-Datum</display-name>
-            <display-name lang="sv">Datumväljare med rullgardinsmeny</display-name>
-            <display-name lang="nl">Selectie datum</display-name>
-            <display-name lang="pt">Lista de Opções para Data</display-name>
-            <display-name lang="ar">تاريخ منسدل</display-name>
+                    <display-name lang="en">Dropdown Date</display-name>
+        <display-name lang="fr">Date avec menus</display-name>
+        <display-name lang="no">Rullegardinmeny for dato</display-name>
+        <display-name lang="ru">Дата выпадающим меню</display-name>
+        <display-name lang="it">Data a tendina</display-name>
+        <display-name lang="de">Dropdown-Datum</display-name>
+        <display-name lang="fi">Päivämäärän pudotusvalikko</display-name>
+        <display-name lang="es">Calendario Desplegable</display-name>
+        <display-name lang="nl">Selectie datum</display-name>
+        <display-name lang="pt">Lista de Opções para Data</display-name>
+        <display-name lang="sv">Datumväljare med rullgardinsmeny</display-name>
+        <display-name lang="ar">تاريخ منسدل</display-name>
+        <display-name lang="pl">Data w liście rozwijanej</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

@@ -28,16 +28,19 @@
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Dollars (Thousand)</display-name>
-            <display-name lang="es">Dólares (en miles)</display-name>
-            <display-name lang="fi">Dollaria (tuhatta)</display-name>
-            <display-name lang="fr">Milliers de dollars</display-name>
-            <display-name lang="ru">Доллары (в тысячах)</display-name>
-            <display-name lang="de">Dollar (in Tausend)</display-name>
-            <display-name lang="it">Dollari (mille)</display-name>
-            <display-name lang="sv">Dollar (tusental)</display-name>
-            <display-name lang="nl">Dollars (duizend)</display-name>
-            <display-name lang="pt">Dólares (milhares)</display-name>
+                    <display-name lang="en">Dollars (Thousand)</display-name>
+        <display-name lang="fr">Milliers de dollars</display-name>
+        <display-name lang="no">Dollars (Thousand)</display-name>
+        <display-name lang="ru">Доллары (в тысячах)</display-name>
+        <display-name lang="it">Dollari (mille)</display-name>
+        <display-name lang="de">Dollar (in Tausend)</display-name>
+        <display-name lang="fi">Dollaria (tuhatta)</display-name>
+        <display-name lang="es">Dólares (en miles)</display-name>
+        <display-name lang="nl">Dollars (duizend)</display-name>
+        <display-name lang="pt">Dólares (milhares)</display-name>
+        <display-name lang="sv">Dollar (tusental)</display-name>
+        <display-name lang="ar">Dollars (Thousand)</display-name>
+        <display-name lang="pl">Dollars (Thousand)</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
             </icon>

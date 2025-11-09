@@ -193,6 +193,7 @@ val fastOrFullOptJS                = taskKey[Attributed[File]]("Performs either 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-specific optimizations (for development).")
+val skipUglify                     = settingKey[Boolean]("Skip JavaScript minification with Uglify")
 
 // "ThisBuild is a Scope encompassing all projects"
 ThisBuild / scalaVersion                := mainScalaVersion
@@ -202,6 +203,7 @@ ThisBuild / orbeonVersionFromProperties := sys.props.get("orbeon.version") getOr
 ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
 ThisBuild / preferFastOptJS             := sys.props.get("orbeon.prefer-fast-opt-js").isDefined
+ThisBuild / skipUglify                  := sys.props.get("orbeon.skip-uglify"       ).isDefined
 
 // Restrict the number of concurrent linker processes so we don't run out of memory
 Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 1)
@@ -464,7 +466,7 @@ lazy val assetsSettings = Seq(
   Assets / LessKeys.compress               := false,
 
   // Uglify
-  Assets / pipelineStages                  := Seq(uglify),
+  Assets / pipelineStages                  := { if (skipUglify.value) Seq() else Seq(uglify) },
 
   // Minify all JavaScript files which are not minified/debug and which don't already have a minified version
   // NOTE: The default `excludeFilter in uglify` explicitly excludes files under `resourceDirectory in Assets`.

@@ -23,9 +23,7 @@ import org.orbeon.oxf.processor.{DOMSerializer, ProcessorImpl}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{LoggerFactory, PipelineUtils}
 
-import java.util as ju
 import java.util.concurrent.Semaphore
-import scala.jdk.CollectionConverters.*
 
 
 /**
@@ -155,15 +153,6 @@ class Properties private {
       case Some(propertyStore) =>
         update()
         propertyStore.getProcessorPropertySet(processorName)
-      case None =>
-        null
-    }
-
-  // Only for `SchemaRepository`
-  def keySetJava: ju.Set[?] =
-    propertyStore match {
-      case Some(propertyStore) =>
-        propertyStore.getGlobalPropertySet.keySet.asJava
       case None =>
         null
     }

@@ -21,7 +21,10 @@ import org.orbeon.oxf.processor.converter.QNameConverter;
 import org.orbeon.oxf.processor.converter.XMLConverter;
 import org.orbeon.oxf.processor.execute.ExecuteProcessor;
 import org.orbeon.oxf.processor.file.FileProcessor;
-import org.orbeon.oxf.processor.generator.*;
+import org.orbeon.oxf.processor.generator.DirectoryScannerProcessor;
+import org.orbeon.oxf.processor.generator.RequestGenerator;
+import org.orbeon.oxf.processor.generator.RequestSecurityGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
@@ -36,9 +39,7 @@ import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Global repository which maps schema URIs to file URIs.
@@ -149,16 +150,10 @@ public class SchemaRepository {
      * user-defined validation.
      */
     public String getSchemaLocation(String publicId) {
-        // First look in the properties
-        final Set keys = Properties.instance().keySetJava();
-        if (keys != null) {
-            for (Iterator i = keys.iterator(); i.hasNext();) {
-                final String currentKey = (String) i.next();
-                if (currentKey.equals(SCHEMA_PREFIX + publicId)) {
-                    return Properties.instance().getPropertySet().getString(currentKey);
-                }
-            }
-        }
+
+        final String fromProperties = Properties.instance().getPropertySet().getString(SCHEMA_PREFIX + publicId);
+        if (fromProperties != null)
+            return fromProperties;
 
         // Not defined in properties: try predefined Orbeon Forms schemas
         final String schemaFile = SCHEMAS.get(publicId);

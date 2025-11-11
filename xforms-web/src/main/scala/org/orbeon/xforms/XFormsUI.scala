@@ -207,8 +207,9 @@ object XFormsUI {
 
   private def isTooltipDisabled(elem: html.Element, lhha: String) =
     elem
-      .ancestorOrSelfElem(s".xforms-disable-$lhha-as-tooltip")
-      .nonEmpty
+      .ancestorOrSelfElem(s".xforms-disable-$lhha-as-tooltip, .xforms-enable-$lhha-as-tooltip")
+      .nextOption()
+      .exists(e => e.classList.contains(s"xforms-disable-$lhha-as-tooltip"))
 
   def mouseover(event: MouseEvent): Unit =
     event.targetOpt.foreach { target =>

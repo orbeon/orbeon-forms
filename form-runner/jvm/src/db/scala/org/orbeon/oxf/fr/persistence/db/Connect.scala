@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.db
 
 import org.orbeon.io.IOUtils.*
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.{Provider, SqlReader}
 import org.orbeon.oxf.fr.persistence.relational.Provider.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
@@ -39,7 +39,7 @@ object Connect {
       case PostgreSQL => "2025.1/postgresql-2025_1.sql"
       case SQLite     => "2025.1/sqlite-2025_1.sql"
     }
-    val createDDL = SQL.read(sql)
+    val createDDL = SqlReader.read(sql)
     Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
   }
 

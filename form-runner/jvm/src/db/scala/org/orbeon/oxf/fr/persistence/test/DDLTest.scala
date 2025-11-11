@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.test
 import org.junit.Test
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.persistence.db.*
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.{Provider, SqlReader}
 import org.orbeon.oxf.fr.persistence.relational.Provider.*
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.CollectionUtils.*
@@ -100,9 +100,9 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     withDebug("comparing upgrade to straight", List("provider" -> name, "from" -> from, "to" -> to)) {
       val fromDirectory = from.replace('_', '.')
       val toDirectory   = to.replace('_', '.')
-      val upgradeSQL    = SQL.read(s"$fromDirectory/$name-$from.sql") ++ SQL.read(s"$toDirectory/$name-$from-to-$to.sql")
+      val upgradeSQL    = SqlReader.read(s"$fromDirectory/$name-$from.sql") ++ SqlReader.read(s"$toDirectory/$name-$from-to-$to.sql")
       val upgrade       = sqlToTableInfo(provider, upgradeSQL)
-      val straight      = sqlToTableInfo(provider, SQL.read(s"$toDirectory/$name-$to.sql"))
+      val straight      = sqlToTableInfo(provider, SqlReader.read(s"$toDirectory/$name-$to.sql"))
       assert(upgrade === straight, s"$name from $from to $to")
     }
   }

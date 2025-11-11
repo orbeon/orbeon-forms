@@ -23,7 +23,11 @@ import scala.collection.mutable
 class TestWebAppContext(logger: Logger, val attributes: mutable.Map[String, AnyRef]) extends WebAppContext {
   def getResource(s: String)                    : URL                 = throw new UnsupportedOperationException
   def getResourceAsStream(s: String)            : InputStream         = throw new UnsupportedOperationException
-  def getRealPath(s: String)                    : String              = null
+  def getRealPath(s: String)                    : String              =
+    if (s == "WEB-INF/orbeon-demo.sqlite")
+      System.getProperty("orbeon.test.sqlite.path")
+    else
+      null
   val initParameters                            : Map[String, String] = Map.empty
   def log(message: String, throwable: Throwable): Unit                = logger.error(throwable)(message)
   def log(message: String)                      : Unit                = logger.info(message)

@@ -16,7 +16,9 @@ package org.orbeon.oxf.fr
 import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.io.CharsetNames
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.FormRunnerSupport.*
+import org.orbeon.oxf.fr.persistence.relational.SqlReader
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http.HttpResponse
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
@@ -28,6 +30,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache
+import java.sql.{Connection, DriverManager}
 
 
 object FormRunnerSupport {
@@ -43,6 +46,19 @@ trait FormRunnerSupport extends DocumentTestBase {
         thunk
       }
     }
+
+  def withTempSQLite[T](thunk: Connection => T): T = {
+    val sqliteFile = java.nio.file.Files.createTempFile("orbeon-bg-sqlite-", ".sqlite")
+    System.setProperty("orbeon.test.sqlite.path", sqliteFile.toAbsolutePath.toString)
+    Class.forName("org.sqlite.JDBC")
+    useAndClose(DriverManager.getConnection(s"jdbc:sqlite:${sqliteFile.toAbsolutePath}")) { connection =>
+      val stringStatements = SqlReader.read("2025.1/sqlite-2025_1.sql")
+      useAndClose(connection.createStatement()) { sqlStatement =>
+        stringStatements.foreach(sqlStatement.executeUpdate)
+      }
+      thunk(connection)
+    }
+  }
 
   def performSectionAction(sectionControl: XFormsControl, action: String): Unit = {
     // NOTE: We can't yet just dispatch `fr-insert-below` to the section, so find the nested repeater.

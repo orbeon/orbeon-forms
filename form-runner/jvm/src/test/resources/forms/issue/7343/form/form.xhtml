@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+  <xh:head>
+    <xh:title>Background API SQLite save with preexisting attachment #7343</xh:title>
+    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+      <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+        <form>
+          <file filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
+        </form>
+      </xf:instance>
+
+      <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xf:bind id="file-bind" ref="file" name="file" type="xf:anyURI"/>
+      </xf:bind>
+
+      <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <metadata>
+          <application-name>issue</application-name>
+          <form-name>7343</form-name>
+          <title xml:lang="en">Background API SQLite save with preexisting attachment #7343</title>
+          <description xml:lang="en"/>
+          <grid-tab-order>default</grid-tab-order>
+          <created-with-version>2025.1-SNAPSHOT PE</created-with-version>
+          <updated-with-version>2025.1-SNAPSHOT PE</updated-with-version>
+        </metadata>
+      </xf:instance>
+
+      <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+        <attachments/>
+      </xf:instance>
+
+      <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <resources>
+          <resource xml:lang="en">
+            <file>
+              <label>File</label>
+              <hint/>
+            </file>
+          </resource>
+        </resources>
+      </xf:instance>
+
+    </xf:model>
+  </xh:head>
+  <xh:body>
+    <fr:view>
+      <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+        <fr:section id="section" bind="fr-form-binds">
+          <fr:grid id="grid" bind="fr-form-binds">
+            <fr:c y="1" x="1" w="12">
+              <fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="file-control" bind="file-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/file/label"/>
+                <xf:hint ref="$form-resources/file/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:attachment>
+            </fr:c>
+          </fr:grid>
+        </fr:section>
+      </fr:body>
+    </fr:view>
+  </xh:body>
+</xh:html>
+

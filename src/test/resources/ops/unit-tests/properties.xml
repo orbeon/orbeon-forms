@@ -97,8 +97,9 @@
     </property>
 
     <!-- For background process tests -->
-
     <property as="xs:boolean" name="oxf.fr.detail.service.background.enable-return-data.issue.6669" value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.service.background.enable-return-data.issue.7343" value="true"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.issue.7343.data"                    value="sqlite"/>
 
     <!-- Implicit processes -->
     <property as="xs:string" name="oxf.fr.detail.process.before-data.background.new.issue.6669">
@@ -126,6 +127,12 @@
     <property as="xs:string" name="oxf.fr.detail.process.my-after-controls.issue.6669">
         xf:setvalue(ref = "//after-controls-no-initial-value", value = "'my-after-controls'")
         then xf:setvalue(ref = "//after-controls-with-initial-value", value = "'my-after-controls'")
+    </property>
+
+    <property as="xs:string" name="oxf.fr.detail.process.my-save.issue.7343">
+        save
+        then save(draft = "true")
+        then save
     </property>
 
     <!-- Async processes -->

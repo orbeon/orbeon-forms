@@ -437,8 +437,8 @@ object InitSupport {
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   Events.keydown)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     Events.input)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, Events.mouseover)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  Events.mouseout)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, XFormsUI.mouseover)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  XFormsUI.mouseout)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
 
         // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated

@@ -16,8 +16,7 @@ package org.orbeon.xforms.facade
 import org.orbeon.xforms.{$, Page, YUICustomEvent}
 import org.scalajs
 import org.scalajs.dom
-import org.scalajs.dom.Element
-import org.scalajs.dom.{FocusEvent, UIEvent, html}
+import org.scalajs.dom.{Element, FocusEvent, MouseEvent, UIEvent, html}
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.xforms
 
@@ -83,9 +82,12 @@ object Controls extends js.Object {
   def setFocus(controlId: String)                                                                        : Unit                                         = js.native
   def removeFocus(controlId: String)                                                                     : Unit                                         = js.native
   def getLabelMessage(elem: html.Element)                                                                : String                                       = js.native
+  def getHintMessage(elem: html.Element)                                                                 : String                                       = js.native
   def getHelpMessage(elem: html.Element)                                                                 : String                                       = js.native
+  def getAlertMessage(elem: html.Element)                                                                : String                                       = js.native
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit                                         = js.native
   def getControlLHHA(documentElement: html.Element, lhha: String)                                        : js.UndefOr[html.Element]                     = js.native
+  def getControlForLHHA(documentElement: html.Element, lhha: String)                                     : html.Element                                 = js.native
 
   def setLabelMessage(documentElement: html.Element, newLabel: String)                                   : Unit                                         = js.native
   def setHelpMessage(documentElement: html.Element, newHelp: String)                                     : Unit                                         = js.native
@@ -120,11 +122,11 @@ object Events extends js.Object {
   val keypress                    : js.Function1[UIEvent, Unit]    = js.native
   val keydown                     : js.Function1[UIEvent, Unit]    = js.native
   val input                       : js.Function1[UIEvent, Unit]    = js.native
-  val mouseover                   : js.Function1[UIEvent, Unit]    = js.native
   val mouseout                    : js.Function1[UIEvent, Unit]    = js.native
   val click                       : js.Function1[UIEvent, Unit]    = js.native
 
   def _findParentXFormsControl(t: dom.EventTarget): html.Element = js.native // can return `null`
+  def _showToolTip(hintTooltipForControl: js.Dictionary[js.Any], control: html.Element, target: html.Element, toolTipSuffix: String, message: String, event: MouseEvent): Unit = js.native
 }
 
 @JSGlobal("ORBEON.util.Property")

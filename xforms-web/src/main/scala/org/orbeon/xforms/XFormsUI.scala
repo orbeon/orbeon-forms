@@ -19,9 +19,9 @@ import org.orbeon.facades.HTMLDialogElement
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.Controls
+import org.orbeon.xforms.facade.{Controls, Events}
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.{MouseEvent, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import shapeless.syntax.typeable.*
 
@@ -202,6 +202,76 @@ object XFormsUI {
 
         if (mustHideModalPanel)
           hideModalProgressPanel(timerIdOpt, focusControlIdOpt)
+      }
+    }
+
+  private def isTooltipDisabled(elem: html.Element, lhha: String) =
+    elem
+      .ancestorOrSelfElem(s".xforms-disable-$lhha-as-tooltip")
+      .nonEmpty
+
+  def mouseover(event: MouseEvent): Unit =
+    event.targetOpt.foreach { target =>
+
+      val controlOpt = Option(Events._findParentXFormsControl(target))
+
+      if (target.classList.contains("xforms-alert") && target.classList.contains("xforms-active")) {
+        // Alert tooltip
+
+        // NOTE: control may be `null` if we have `<div for="">`. Using `control.getAttribute("for")` returns a proper
+        // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
+        // do anything if there is no control found.
+        Option(Controls.getControlForLHHA(target, "alert")).foreach { formField =>
+          if (! isTooltipDisabled(target, "alert")) {
+            // The 'for' typically points to a form field which is inside the element representing the control
+            Option(Events._findParentXFormsControl(formField)).foreach { control2 =>
+              val message = Controls.getAlertMessage(control2)
+              Events._showToolTip(Globals.alertTooltipForControl, control2, target, "-orbeon-alert-tooltip", message, event)
+            }
+          }
+        }
+      } else if (target.classList.contains("xforms-help")) {
+        // Help tooltip
+        controlOpt.foreach { control =>
+          if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
+            val message = Controls.getHelpMessage(control)
+            Events._showToolTip(Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event)
+          }
+        }
+      } else {
+        // Hint tooltip
+        controlOpt.foreach { control =>
+
+          // Only show hint if the mouse is over a child of the control, so we don't show both the hint and the alert or help
+          if (! isTooltipDisabled(control, "hint") && control != target) {
+
+            // Find closest ancestor-or-self control with a non-empty hint, for compound control like the datetime
+            var candidateMessageHolder: html.Element = control
+            var candidateMessage      : String       = ""
+            while (candidateMessageHolder != null && candidateMessage == "") {
+              candidateMessage       = Controls.getHintMessage(candidateMessageHolder)
+              candidateMessageHolder = Events._findParentXFormsControl(candidateMessageHolder.parentNode)
+            }
+
+            // Clear any `title`, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
+            if (control.classList.contains("xforms-trigger") || control.classList.contains("xforms-submit"))
+              control.querySelectorAllT("a, button").foreach(_.title = "")
+            Events._showToolTip(Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", candidateMessage, event)
+          }
+        }
+      }
+    }
+
+  def mouseout(event: MouseEvent): Unit =
+    event.targetOpt.foreach { target =>
+      Option(Events._findParentXFormsControl(target)).foreach { control =>
+        // Send the `mouseout` event to the YUI tooltip to handle the case where: (1) we get the `mouseover` event, (2) we
+        // create a YUI tooltip, (3) the `mouseout` happens before the YUI dialog got a chance to register its listener
+        // on `mouseout`, (4) the YUI dialog is only dismissed after `autodismissdelay` (5 seconds) leaving a trail.
+        Globals.hintTooltipForControl.get(control.id).foreach { yuiTooltip =>
+          if (! isTooltipDisabled(control, "hint"))
+            yuiTooltip.asInstanceOf[js.Dynamic].onContextMouseOut.call(control.id, event, yuiTooltip)
+        }
       }
     }
 

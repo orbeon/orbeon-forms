@@ -1125,12 +1125,13 @@
                                             ]/resources[
                                                 @lang = xxf:instance('fr-language-instance')
                                             ]/label"/>
-                                <xf:select1 ref="." class="fr-app-name-select">
+                                <xf:select1 ref="." class="fr-app-name-select xforms-enable-hint-as-tooltip">
                                     <xf:label class="xforms-hidden">
                                         <xf:output mediatype="text/html" value="$label"/>
                                     </xf:label>
+                                    <xf:hint ref="$label" appearance="minimal"/>
                                     <xf:itemset ref="xxf:instance('fb-permissions')/app">
-                                        <xf:label ref="concat($label, ': ', @name)"/>
+                                        <xf:label ref="@name"/>
                                         <xf:value ref="@name"/>
                                     </xf:itemset>
 

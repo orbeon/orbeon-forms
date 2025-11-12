@@ -577,73 +577,83 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
         }
       )
 
-    val attachmentsProviderCxrOpt = attachmentsProviderCxr(
-      isAttachment,
-      request,
-      appForm,
-      formOrData,
-      path,
-      bodyContentOpt,
-      outgoingVersionHeaderOpt
-    )
-
-    val cxr = cxrOpt.getOrElse {
-      // If an attachments provider is available, always use it to store the actual attachment
-      val outgoingRequestContent = if (attachmentsProviderCxrOpt.isDefined && request.getMethod == HttpMethod.PUT) {
-        // Body content processed by attachments provider, no need to pass it further
-        None
-      } else {
-        bodyContentOpt
-      }
-
-      val passSingletonHeader = isDataXmlRequest && request.getMethod == HttpMethod.PUT
-      val singletonHeaderOpt  = passSingletonHeader.flatOption(getSingletonHeader(appForm, effectiveFormDefinitionVersionOpt))
-      val allHeaders          =
-        outgoingPersistenceHeaders ++
-        outgoingVersionHeaderOpt   ++
-        singletonHeaderOpt         ++
-        existingFormOrDataHeaders
-
-      proxyEstablishConnection(
-        OutgoingRequest(request),
-        outgoingRequestContent,
-        serviceUri,
-        allHeaders
-      )
-    }
-
-    // A connection might have been opened above, and if so we use it
-    proxyRequestImpl(
-      cxr,
-      request,
-      response,
-      responseTransforms,
-      attachmentsProviderCxrOpt
-    )
-
-    // The following logic matches the logic for attachment deletion found in CreateUpdateDelete
     if (
-      Set[HttpMethod](HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PUT).contains(request.getMethod) &&
-      formOrData == FormOrData.Data                                                                   &&
-      ! isAttachment                                                                                  &&
-      (! isDraft || request.getMethod == HttpMethod.DELETE)                                           &&
-      StatusCode.isSuccessCode(response.getStatus)
+      request.getMethod == HttpMethod.PUT &&
+      isAttachment &&
+      responseHeadersOpt.isDefined
     ) {
-      // Delete filesystem/S3 draft attachments if needed
-      val deleteDraftsCxrOpt = deleteAttachmentsProviderDraftsCxr(
+      // Don't create a duplicate if the attachment already exists
+      response.setStatus(StatusCode.NoContent)
+    } else {
+
+      val attachmentsProviderCxrOpt = attachmentsProviderCxr(
+        isAttachment,
         request,
         appForm,
         formOrData,
-        documentIdOpt,
+        path,
+        bodyContentOpt,
         outgoingVersionHeaderOpt
       )
 
-      for {
-        deleteDraftsCxr <- deleteDraftsCxrOpt
-        if ! StatusCode.isSuccessCode(deleteDraftsCxr.statusCode)
-      } {
-        indentedLogger.logError("", s"${deleteDraftsCxr.statusCode}: Failed to delete draft attachments")
-        response.setStatus(deleteDraftsCxr.statusCode)
+      val cxr = cxrOpt.getOrElse {
+        // If an attachments provider is available, always use it to store the actual attachment
+        val outgoingRequestContent = if (attachmentsProviderCxrOpt.isDefined && request.getMethod == HttpMethod.PUT) {
+          // Body content processed by attachments provider, no need to pass it further
+          None
+        } else {
+          bodyContentOpt
+        }
+
+        val passSingletonHeader = isDataXmlRequest && request.getMethod == HttpMethod.PUT
+        val singletonHeaderOpt  = passSingletonHeader.flatOption(getSingletonHeader(appForm, effectiveFormDefinitionVersionOpt))
+        val allHeaders          =
+          outgoingPersistenceHeaders ++
+          outgoingVersionHeaderOpt   ++
+          singletonHeaderOpt         ++
+          existingFormOrDataHeaders
+
+        proxyEstablishConnection(
+          OutgoingRequest(request),
+          outgoingRequestContent,
+          serviceUri,
+          allHeaders
+        )
+      }
+
+      // A connection might have been opened above, and if so we use it
+      proxyRequestImpl(
+        cxr,
+        request,
+        response,
+        responseTransforms,
+        attachmentsProviderCxrOpt
+      )
+
+      // The following logic matches the logic for attachment deletion found in CreateUpdateDelete
+      if (
+        Set[HttpMethod](HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PUT).contains(request.getMethod) &&
+        formOrData == FormOrData.Data                                                                   &&
+        ! isAttachment                                                                                  &&
+        (! isDraft || request.getMethod == HttpMethod.DELETE)                                           &&
+        StatusCode.isSuccessCode(response.getStatus)
+      ) {
+        // Delete filesystem/S3 draft attachments if needed
+        val deleteDraftsCxrOpt = deleteAttachmentsProviderDraftsCxr(
+          request,
+          appForm,
+          formOrData,
+          documentIdOpt,
+          outgoingVersionHeaderOpt
+        )
+
+        for {
+          deleteDraftsCxr <- deleteDraftsCxrOpt
+          if ! StatusCode.isSuccessCode(deleteDraftsCxr.statusCode)
+        } {
+          indentedLogger.logError("", s"${deleteDraftsCxr.statusCode}: Failed to delete draft attachments")
+          response.setStatus(deleteDraftsCxr.statusCode)
+        }
       }
     }
   }

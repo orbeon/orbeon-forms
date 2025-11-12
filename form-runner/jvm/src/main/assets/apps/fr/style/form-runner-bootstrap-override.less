@@ -31,15 +31,67 @@ body.orbeon {
     h5 { font-size: var(--orbeon-h5-font-size); }
     h6 { font-size: var(--orbeon-h6-font-size); }
 
-    .popover-content { font-size: var(--orbeon-popover-content-font-size); }
-    .popover-title   { font-size: var(--orbeon-popover-title-font-size); }
+    // Disable null font size hack for now
+    // TODO: fix gap between buttons in button group properly
+    .btn-group, .btn-toolbar { font-size: inherit; }
+
+    .btn-group > .dropdown-menu {
+        // Reset null font size hack
+        font-size: var(--orbeon-base-font-size);
+
+        &>.dropdown-item { font-size: var(--orbeon-dropdown-font-size); }
+    }
+
+    .tooltip { font-size: var(--orbeon-tooltip-font-size); }
+
+    // .label is used for status pills in the Forms Admin table and for character counters
+    // .badge is used for document counters in dropdowns
+    // Keep them non-customizable for now, but make them relative instead of absolute
+    .label, .badge { font-size: 0.911em; } // 11.844px = 0.911 * 13px = 0.846 * 14px
+
+    // Reset to Orbeon base font size instead of Bootstrap base font size (see forms.less in Bootstrap)
+    select,
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"],
+    .uneditable-input {
+        font-size: var(--orbeon-base-font-size);
+    }
+
+    // Reset to Orbeon base font size instead of Bootstrap base font size (see forms.less in Bootstrap)
+    .input-append,
+    .input-prepend {
+        input,
+        select,
+        .uneditable-input,
+        .dropdown-menu,
+        .popover {
+            font-size: var(--orbeon-base-font-size);
+        }
+
+        .add-on {
+            font-size: var(--orbeon-base-font-size);
+        }
+    }
 
     --fr-min-gray-decoration: #ccc;
     @media (prefers-contrast: more) {
         --fr-min-gray-decoration: #949494;
     }
 
-    font-family: @frBaseFontFamily;
+    font-family: var(--orbeon-base-font-family);
     font-size: var(--orbeon-base-font-size);
     line-height: @baseLineHeight;
     color: @textColor;
@@ -53,7 +105,9 @@ body.orbeon {
     }
 
     button, .btn, .btn-group > .btn {
-        font-size: var(--orbeon-button-font-size);
+        font-size  : var(--orbeon-button-font-size);
+        font-family: var(--orbeon-button-font-family);
+        font-weight: var(--orbeon-button-font-weight);
     }
 
     .btn-link[disabled] {
@@ -61,7 +115,9 @@ body.orbeon {
     }
 
     label, .xforms-label {
-        font-size: var(--orbeon-label-font-size);
+        font-size  : var(--orbeon-label-font-size);
+        font-family: var(--orbeon-label-font-family);
+        font-weight: var(--orbeon-label-font-weight);
     }
 
     a {
@@ -228,7 +284,9 @@ body.orbeon {
     }
 
     input, button, select, textarea {
-        font-family: @frBaseFontFamily;
+        font-size  : var(--orbeon-control-font-size);
+        font-family: var(--orbeon-control-font-family);
+        font-weight: var(--orbeon-control-font-weight);
     }
 
     @media (prefers-contrast: no-preference) or (prefers-contrast: less) {

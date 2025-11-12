@@ -371,7 +371,9 @@
         .xforms-help-popover {
             // Reset to Form Runner default, as those properties as otherwise influenced by the place where the popover
             // is used, e.g. they won't be correct when the popover is for a section title
-            font-size:   var(--orbeon-base-font-size);
+            font-size  : var(--orbeon-base-font-size);
+            font-family: var(--orbeon-help-font-family);
+            font-weight: var(--orbeon-help-font-weight);
             line-height: @baseLineHeight;
             // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
             z-index: 1040;

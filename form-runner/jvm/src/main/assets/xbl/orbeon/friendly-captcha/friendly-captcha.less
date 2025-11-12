@@ -6,6 +6,8 @@
 // has the side effect of causing the captcha to reload automatically, which we don't want. This might be a bug in
 // Friendly Captcha.
 .xbl-fr-friendly-captcha-div {
+    font-size: var(--orbeon-friendly-captcha-font-size);
+
     * {
         margin: 0;
         padding: 0;
@@ -15,7 +17,6 @@
         filter: none !important;
         transition: none !important;
         font-weight: 400;
-        font-size: 14px;
         line-height: 1.2;
         text-decoration: none;
         background-color: initial;

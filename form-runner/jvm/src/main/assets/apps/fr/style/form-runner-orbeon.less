@@ -357,8 +357,9 @@ body.orbeon { background-color: @frBackground }
     }
 
     .xforms-alert.xforms-active {
-        font-family: sans-serif;
-        font-size: 13px;
+        font-family: var(--orbeon-active-alert-font-family);
+        font-size  : var(--orbeon-active-alert-font-size);
+        font-weight: var(--orbeon-active-alert-font-weight);
         color: white;
         position: relative;
         padding: 2px 8px;
@@ -414,9 +415,11 @@ body.orbeon { background-color: @frBackground }
     }
 
     .xforms-hint {
-        font-size: var(--orbeon-hint-font-size);
-        color: @minGrayText;
-        margin-top: .2em;
+        font-size  : var(--orbeon-hint-font-size);
+        font-family: var(--orbeon-hint-font-family);
+        font-weight: var(--orbeon-hint-font-weight);
+        color      : @minGrayText;
+        margin-top : .2em;
         margin-left: 0;// used to have margin here but with new colors no margin seems better
     }
 

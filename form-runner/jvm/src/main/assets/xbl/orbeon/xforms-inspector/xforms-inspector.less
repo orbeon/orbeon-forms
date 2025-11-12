@@ -15,6 +15,8 @@
 
 .xbl-fr-xforms-inspector {
 
+    font-size: var(--orbeon-inspector-font-size);
+
     .fr-xforms-inspector {
 
         position: fixed;
@@ -49,6 +51,7 @@
             top: 0;
             right: 0;
             button {
+                font-size: var(--orbeon-inspector-font-size);
                 border-top-left-radius: 0;
                 border-bottom-right-radius: 0;
                 &:focus { box-shadow: none }            // Remove focus outline, which is distracting
@@ -100,6 +103,7 @@
             .xforms-input:first-child {
                 flex-grow: 1;
                 input {
+                    font-size: var(--orbeon-inspector-font-size);
                     width: 100%;
                 }
             }

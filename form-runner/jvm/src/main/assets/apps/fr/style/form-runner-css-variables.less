@@ -14,23 +14,51 @@
 
 .orbeon {
 
-  // ***** Font sizes **************************************************************************************************
+  // ***** Fonts *******************************************************************************************************
 
   // Base font size
-  --orbeon-base-font-size: 13px;
+  --orbeon-base-font-size  : 13px;
+  --orbeon-base-font-family: @frBaseFontFamily;
+
+  // Labels
+  --orbeon-label-font-size  : 1.00em; // label and .xforms-label
+  --orbeon-label-font-family: @frBaseFontFamily;
+  --orbeon-label-font-weight: normal;
+
+  // Hints
+  --orbeon-hint-font-size  : smaller;
+  --orbeon-hint-font-family: @frBaseFontFamily;
+  --orbeon-hint-font-weight: inherit;
+
+  // Help
+  --orbeon-help-title-font-size  : 1.08em;
+  --orbeon-help-cpntent-font-size: 1.00em;;
+  --orbeon-help-font-family      : @frBaseFontFamily;
+  --orbeon-help-font-weight      : inherit;
+
+  // Controls
+  --orbeon-control-font-size  : inherit;
+  --orbeon-control-font-family: @frBaseFontFamily;
+  --orbeon-control-font-weight: inherit;
+
+  // Buttons
+  --orbeon-button-font-size  : 1.00em; // button and .btn
+  --orbeon-button-font-family: @frBaseFontFamily;
+  --orbeon-button-font-weight: normal;
 
   // Sections
-  --orbeon-section-title-font-size             : 1.38em; // ~18px
-  --orbeon-section-iteration-title-font-size   : 0.89em; // ~18px * 0.8 * 0.8
-  --orbeon-subsection-title-font-size          : 1.11em; // ~18px * 0.8
-  --orbeon-subsection-iteration-title-font-size: 0.89em; // ~18px * 0.8 * 0.8
+  --orbeon-section-title-font-size             : 1.38em; // 18px
+  --orbeon-section-iteration-title-font-size   : 0.89em; // 18px * 0.8 * 0.8
+  --orbeon-subsection-title-font-size          : 1.11em; // 18px * 0.8
+  --orbeon-subsection-iteration-title-font-size: 0.89em; // 18px * 0.8 * 0.8
   --orbeon-repeater-add-button-font-size       : 1.00em;
 
+  // Grids
+  --orbeon-repetition-number-font-size: smaller;
+
   // HTML elements
-  --orbeon-blockquote-font-size: 1.35em; // ~18px
-  --orbeon-button-font-size    : 1.00em; // button and .btn
-  --orbeon-code-font-size      : 0.92em; // ~12px; code and CodeMirror
-  --orbeon-label-font-size     : 1.00em; // label and .xforms-label
+  --orbeon-blockquote-font-size: 1.35em; // 18px
+  --orbeon-code-font-size      : 0.92em; // 12px; code and CodeMirror
   --orbeon-pre-font-size       : 1.00em;
   --orbeon-sub-sup-font-size   : 0.75em;
 
@@ -38,8 +66,13 @@
   --orbeon-search-caret-font-size : 0.80em;
   --orbeon-section-caret-font-size: 0.75em;
   --orbeon-dialog-icon-font-size  : 50px;
-  --orbeon-fa-icon-font-size      : 0.92em; // ~12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
+  --orbeon-fa-icon-font-size      : 0.92em; // 12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
   --orbeon-required-icon-font-size: 0.60em; // Font Awesome star is large
+
+  // Alerts
+  --orbeon-active-alert-font-size  : 1em; // TODO: overridden by "inherit" when visited => useless?
+  --orbeon-active-alert-font-family: sans-serif;
+  --orbeon-active-alert-font-weight: inherit;
 
   // Required icon (left)
   --orbeon-required-icon-display-before: inline;
@@ -51,21 +84,29 @@
   --orbeon-required-icon-display-after : inline;
   */
 
-  --orbeon-dialog-title-font-size  : 1.11em; // 2022-12-11: larger font size for dialog title looks better
-  --orbeon-header-footer-font-size : 1.10em;
-  --orbeon-hint-font-size          : smaller;
-  --orbeon-kbd-hint-font-size      : 0.82em; // 8pt
-  --orbeon-navbar-heading-font-size: 1.54em; // ~20px
+  --orbeon-dialog-title-font-size               : 1.11em; // 2022-12-11: larger font size for dialog title looks better
+  --orbeon-header-footer-font-size              : 1.10em;
+  --orbeon-kbd-hint-font-size                   : 0.82em; // 8pt
+  --orbeon-navbar-heading-font-size             : 1.54em; // 20px
+  --orbeon-revision-history-pane-title-font-size: 1.11em;
 
   // Headings
-  --orbeon-h1-font-size: 2.96em; // ~38px = 296% * 13px = 275% * 14px
-  --orbeon-h2-font-size: 2.42em; // ~32px = 242% * 13px = 225% * 14px
-  --orbeon-h3-font-size: 1.88em; // ~24px = 188% * 13px = 175% * 14px
-  --orbeon-h4-font-size: 1.35em; // ~18px = 135% * 13px = 125% * 14px
-  --orbeon-h5-font-size: 1.08em; // ~14px = 108% * 13px = 100% * 14px
-  --orbeon-h6-font-size: 0.92em; // ~12px =  92% * 13px =  85% * 14px
+  --orbeon-h1-font-size: 2.96em; // 38px = 296% * 13px = 275% * 14px
+  --orbeon-h2-font-size: 2.42em; // 32px = 242% * 13px = 225% * 14px
+  --orbeon-h3-font-size: 1.88em; // 24px = 188% * 13px = 175% * 14px
+  --orbeon-h4-font-size: 1.35em; // 18px = 135% * 13px = 125% * 14px
+  --orbeon-h5-font-size: 1.08em; // 14px = 108% * 13px = 100% * 14px
+  --orbeon-h6-font-size: 0.92em; // 12px =  92% * 13px =  85% * 14px
 
-  // Popovers
-  --orbeon-popover-title-font-size  : 1.08em;
-  --orbeon-popover-content-font-size: 1.00em;
+  // Dropdowns
+  --orbeon-dropdown-font-size: 1.08em;
+
+  // Tooltips
+  --orbeon-tooltip-font-size: 0.85em; // 11px; e.g. tabs tooltips
+
+  // Friendly Captcha
+  --orbeon-friendly-captcha-font-size: 1.08em; // 14px
+
+  // XForms inspector (by default, keep the font size absolute)
+  --orbeon-inspector-font-size: 13px;
 }

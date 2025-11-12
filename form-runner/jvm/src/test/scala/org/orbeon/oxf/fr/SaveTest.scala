@@ -1,10 +1,8 @@
 package org.orbeon.oxf.fr
 
-import org.orbeon.connection.StreamedContent
-import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.{ContentTypes, XPath}
+import org.orbeon.oxf.util.XPath
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -55,24 +53,30 @@ class SaveTest
              |  <file filename="preexisting.bin" mediatype="application/octet-stream" size="4">$attachmentUrl</file>
              |</form>
              |""".stripMargin
+        val formDataDoc =
+          XFormsCrossPlatformSupport.stringToTinyTree(
+            XPath.GlobalConfiguration,
+            formDataXml,
+            handleXInclude = false,
+            handleLexical  = true
+          )
 
-        val (_, _, httpResponse) =
-          runFormRunnerReturnContent(
+        val (processorService, docOpt, _) =
+          runFormRunner(
             app        = "issue",
             form       = "7343",
             mode       = "new",
             documentId = Some(DocumentId),
-            query      = List(
-              "fr-process-name"  -> "my-save",
-              "fr-process-phase" -> "after-controls"
-            ),
-            background = true,
-            content    = Some(StreamedContent.fromBytes(
-              bytes       = formDataXml.getBytes(CharsetNames.Utf8),
-              contentType = Some(ContentTypes.XmlContentType))
-            )
+            attributes = Map("fr-form-data" -> formDataDoc)
           )
-        assert(httpResponse.statusCode == 200)
+
+        val doc = docOpt.get
+
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+            SimpleProcess.runProcessByName("oxf.fr.detail.process", "my-save")
+          }
+        }
 
         val CountFilesSql =
           """|SELECT COUNT(*)

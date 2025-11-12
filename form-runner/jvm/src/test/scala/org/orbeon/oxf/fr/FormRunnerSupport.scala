@@ -43,7 +43,11 @@ trait FormRunnerSupport extends DocumentTestBase {
     ProcessorService.withProcessorService(processorService) {
       setupDocument(doc) // FIXME: to make it available to XFormsSupport
       withContainingDocument(doc) {
-        thunk
+        try {
+          thunk
+        } finally {
+          doc.afterExternalEvents(submissionIdOpt = None)
+        }
       }
     }
 

@@ -46,7 +46,7 @@ trait FormRunnerSupport extends DocumentTestBase {
         try {
           thunk
         } finally {
-          doc.afterExternalEvents(submissionIdOpt = None)
+          disposeDocument()
         }
       }
     }

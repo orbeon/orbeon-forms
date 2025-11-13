@@ -40,7 +40,7 @@ public class PipelineContext implements PropertyContext {
          *
          * @param success true if the pipeline execution was successful, false otherwise
          */
-        public void contextDestroyed(boolean success);
+        void contextDestroyed(boolean success);
     }
 
     /**
@@ -51,12 +51,12 @@ public class PipelineContext implements PropertyContext {
         }
     }
 
-    private Map<Object, Object> attributes = new HashMap<Object, Object>();
+    private final Map<Object, Object> attributes = new HashMap<>();
     private List<ContextListener> listeners;
     private boolean destroyed;
 
-    private static ThreadLocal<PipelineContext> threadLocal = new ThreadLocal<PipelineContext>();
-    private PipelineContext originalPipelineContext;
+    private static final ThreadLocal<PipelineContext> threadLocal = new ThreadLocal<>();
+    private final PipelineContext originalPipelineContext;
 
     /**
      * Create a new pipeline context.
@@ -98,7 +98,7 @@ public class PipelineContext implements PropertyContext {
      */
     public synchronized void addContextListener(ContextListener listener) {
         if (listeners == null)
-            listeners = new ArrayList<ContextListener>();
+            listeners = new ArrayList<>();
         listeners.add(listener);
     }
 

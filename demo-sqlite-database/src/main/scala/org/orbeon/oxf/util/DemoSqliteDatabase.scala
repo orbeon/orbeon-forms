@@ -39,6 +39,7 @@ object DemoSqliteDatabase {
       ResourceManagerSupportInitializer
 
       importFiles(Paths.get(args(0)), Paths.get(args(1)))
+      CacheSupport.close()
     } else {
       println("Usage: DemoSqliteDatabase <data-files> <sqlite-file>")
     }

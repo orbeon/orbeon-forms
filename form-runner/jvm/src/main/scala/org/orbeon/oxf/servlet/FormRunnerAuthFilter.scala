@@ -106,9 +106,9 @@ object FormRunnerAuthFilterImpl {
         }
 
         servletRequest
-      } else if (servletRequest.getRequestPathInfo.endsWith(".map")) {
-        // Don't amend headers for `.map` as this would cause the credentials code to clear the credentials
-        // unnecessarily. https://github.com/orbeon/orbeon-forms/issues/6080
+      } else if (! createSession) {
+        // Don't amend headers if we're not creating a session, as there may be no session to retrieve
+        // credentials from, which would cause a NullPointerException.
         servletRequest
       } else {
 

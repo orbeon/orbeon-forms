@@ -7,6 +7,7 @@ import org.orbeon.oxf.util.ServiceProviderSupport
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.properties.api
 import org.orbeon.properties.api.PropertyProvider
+import org.slf4j
 
 import java.net.URI
 import java.util as ju
@@ -21,9 +22,9 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
 
   private type CacheEntry = (api.ETag, PropertyStore)
 
-  private val BootPropertyProviderClassName      = "org.orbeon.oxf.properties.ResourcesPropertyProvider"
-  private val PropertyProvidersOrderPropertyName = "oxf.properties.providers.order"
-  private val ProviderEtagCacheName              = "orbeon.properties"
+  private val BootPropertyProviderClassName           = "org.orbeon.oxf.properties.ResourcesPropertyProvider"
+  private val PropertyProvidersClassnamesPropertyName = "oxf.properties.providers.classnames"
+  private val ProviderEtagCacheName                    = "orbeon.properties"
 
   @volatile
   private var initialized  = false
@@ -41,7 +42,7 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
       // 3. We compute the ordered list of property providers, using the boot property store we have read above, so no
       //    recursion should occur. This is computed once and for all. We could have used a `lazy val` except that
       //    we want to be more explicit in passing the boot property store.
-      propertyProvidersInOrderOpt = computePropertyProvidersInOrderOpt(bootPropertyStore)
+      propertyProvidersInIncreasingPriorityOpt = computePropertyProvidersInIncreasingPriorityOpt(bootPropertyStore)
       // 4. We store the boot property store ETag and `PropertyStore` in the cache used by `CacheSupport`, so that future
       //    calls to `getPropertyStoreImpl` can use it without having to reread the boot properties.
       Initialization.getAndClearBootPropertyStoreCacheEntryOpt.foreach { bootPropertyStoreCacheEntry =>
@@ -51,8 +52,8 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
       initialized = true
     } else {
       // Re-initialization is used for tests only: invalidate cached entries for all providers without custom cache keys
-      propertyProvidersInOrderOpt.foreach { propertyProvidersInOrderNel =>
-        propertyProvidersInOrderNel.map { provider =>
+      propertyProvidersInIncreasingPriorityOpt.foreach { providersNel =>
+        providersNel.map { provider =>
           findCache
             .foreach { cache =>
               cache.remove(providerClassName(provider))
@@ -167,8 +168,8 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
       Initialization.getInitializationPropertyStore
 
   private def getPropertyStoresFromProviders(requestOpt: Option[Request]): PropertyStore =
-    propertyProvidersInOrderOpt match {
-      case Some(propertyProvidersInOrderNel) =>
+    propertyProvidersInIncreasingPriorityOpt match {
+      case Some(propertyProvidersInIncreasingPriorityNel) =>
 
         val credentialsJavaOpt =
           requestOpt.flatMap(_.credentials).map(credentials =>
@@ -212,8 +213,8 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
             }
           ).toJava
 
-        val propertyStoreOptsNel: NonEmptyList[Option[PropertyStore]] =
-          propertyProvidersInOrderNel.map { provider =>
+        val propertyStoresInIncreasingPriorityNel: NonEmptyList[Option[PropertyStore]] =
+          propertyProvidersInIncreasingPriorityNel.map { provider =>
 
             val (providerCacheKeyX, cacheKey) =
               provider.getCacheKey(
@@ -259,16 +260,16 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
 
         // Combine all
         CombinedPropertyStore
-          .combine(propertyStoreOptsNel)
+          .combine(propertyStoresInIncreasingPriorityNel)
           .getOrElse(PropertyStore.empty)
       case None =>
         logger.warn("`getPropertySet`: no property providers found")
         PropertyStore.empty
   }
 
-  // This filters and orders the property providers according to the `oxf.properties.providers.order` property.
+  // This filters and orders the property providers according to the `oxf.properties.providers.classnames` property.
   // The boot property provider is always first and only occurs exactly once.
-  private def computePropertyProvidersInOrderOpt(bootPropertyStore: PropertyStore): Option[NonEmptyList[PropertyProvider]] =
+  private def computePropertyProvidersInIncreasingPriorityOpt(bootPropertyStore: PropertyStore): Option[NonEmptyList[PropertyProvider]] =
     propertyProvidersOpt.flatMap(propertyProviders =>
       NonEmptyList.fromList(
         propertyProviders.find(provider =>
@@ -276,8 +277,8 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
         ).toList :::
         bootPropertyStore
           .globalPropertySet
-          .getNonBlankString(PropertyProvidersOrderPropertyName)
-          .map(_.splitTo[List]())
+          .getNonBlankString(PropertyProvidersClassnamesPropertyName)
+          .map(_.splitTo[List]().reverse) // internally, we want to go in increasing priority order; property is in decreasing priority order
           .getOrElse(Nil)
           .flatMap { providerRe =>
             propertyProviders.find { provider =>
@@ -289,11 +290,11 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
     )
 
   @volatile
-  private var propertyProvidersInOrderOpt: Option[NonEmptyList[api.PropertyProvider]] = None
+  private var propertyProvidersInIncreasingPriorityOpt: Option[NonEmptyList[api.PropertyProvider]] = None
 
   // Unordered list of property providers
   private lazy val propertyProvidersOpt: Option[NonEmptyList[api.PropertyProvider]] = {
-    implicit val xxx = logger.logger
+    implicit val slf4jLogger: slf4j.Logger = logger.logger
     NonEmptyList.fromList(ServiceProviderSupport.loadProviders[api.PropertyProvider]("property"))
   }
 }

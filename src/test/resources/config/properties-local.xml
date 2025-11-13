@@ -73,7 +73,7 @@
     <!-- Custom property provider for `PropertiesTest` -->
     <property
         as="xs:string"
-        name="oxf.properties.providers.order"
+        name="oxf.properties.providers.classnames"
         value=".*TestPropertyProvider"/>
 
     <property as="xs:string"  name="a.b.c"  value="a.b.c.1"/>

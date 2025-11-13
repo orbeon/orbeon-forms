@@ -29,7 +29,8 @@
             &.fr-section-title, &.fr-section-iteration-title {
                 display: flex;
                 background-color: @grayLighter;
-                font-weight: normal;
+                font-family: var(--orbeon-section-font-family);
+                font-weight: var(--orbeon-section-font-weight);
                 color: @frHeaderColor;
                 line-height: @frSectionTitleLineHeightRatio;
                 min-height: @frSectionTitleLineHeightRatio;
@@ -110,8 +111,10 @@
                 .btn-link {
                     text-decoration: none;
                     color: @frHeaderColor; // Don't use the default styling for anchors
-                    font-size: inherit;    // Inherit from .fr-section-title instead of using the global button font size
-                    line-height: inherit;  // Inherit from .fr-section-title instead of using the global button line height
+                    font-size: inherit;    // Inherit from .fr-section-title instead of using the global button font properties
+                    font-family: inherit;
+                    font-weight: inherit;
+                    line-height: inherit;
                     padding-bottom: 0;
                     border-top: 0;
                     border-bottom: 0;

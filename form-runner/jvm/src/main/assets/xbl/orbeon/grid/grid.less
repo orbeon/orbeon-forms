@@ -582,7 +582,7 @@
                 }
 
                 .xforms-label {
-                    font-weight: 600; // Help label stand out
+                    font-weight: var(--orbeon-label-font-weight);
                     margin-top: 2px; // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
                     margin-bottom: @frGridCellPadding; // Insert some space between the label / help and the control (we add spacing below the label rather
                     // than above the control to make the CSS more generally applicable to XBL components)
@@ -773,6 +773,8 @@
                     .badge {
                         margin: @frGridCellPadding + 2 @frGridCellPadding;
                         font-size: var(--orbeon-repetition-number-font-size);
+                        font-family: var(--orbeon-repetition-number-font-family);
+                        font-weight: var(--orbeon-repetition-number-font-weight);
                     }
 
                     @media print {

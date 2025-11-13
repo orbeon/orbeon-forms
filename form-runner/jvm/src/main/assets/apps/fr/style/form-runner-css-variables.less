@@ -23,7 +23,7 @@
   // Labels
   --orbeon-label-font-size  : 1.00em; // label and .xforms-label
   --orbeon-label-font-family: @frBaseFontFamily;
-  --orbeon-label-font-weight: normal;
+  --orbeon-label-font-weight: 600; // Help label stand out
 
   // Hints
   --orbeon-hint-font-size  : smaller;
@@ -31,10 +31,11 @@
   --orbeon-hint-font-weight: inherit;
 
   // Help
-  --orbeon-help-title-font-size  : 1.08em;
-  --orbeon-help-cpntent-font-size: 1.00em;;
-  --orbeon-help-font-family      : @frBaseFontFamily;
-  --orbeon-help-font-weight      : inherit;
+  --orbeon-help-title-font-size    : 1.08em;
+  --orbeon-help-content-font-size  : 1.00em;
+  --orbeon-help-font-family        : @frBaseFontFamily;
+  --orbeon-help-title-font-weight  : inherit;
+  --orbeon-help-content-font-weight: inherit;
 
   // Controls
   --orbeon-control-font-size  : inherit;
@@ -51,16 +52,28 @@
   --orbeon-section-iteration-title-font-size   : 0.89em; // 18px * 0.8 * 0.8
   --orbeon-subsection-title-font-size          : 1.11em; // 18px * 0.8
   --orbeon-subsection-iteration-title-font-size: 0.89em; // 18px * 0.8 * 0.8
+  --orbeon-section-font-family                 : @frBaseFontFamily;
+  --orbeon-section-font-weight                 : normal;
   --orbeon-repeater-add-button-font-size       : 1.00em;
+  --orbeon-repeater-add-button-font-family     : inherit;
+  --orbeon-repeater-add-button-font-weight     : inherit;
 
   // Grids
-  --orbeon-repetition-number-font-size: smaller;
+  --orbeon-repetition-number-font-size  : smaller;
+  --orbeon-repetition-number-font-family: inherit;
+  --orbeon-repetition-number-font-weight: inherit;
 
   // HTML elements
-  --orbeon-blockquote-font-size: 1.35em; // 18px
-  --orbeon-code-font-size      : 0.92em; // 12px; code and CodeMirror
-  --orbeon-pre-font-size       : 1.00em;
-  --orbeon-sub-sup-font-size   : 0.75em;
+  --orbeon-blockquote-font-size  : 1.35em; // 18px
+  --orbeon-blockquote-font-family: inherit;
+  --orbeon-blockquote-font-weight: inherit;
+  --orbeon-code-font-size        : 0.92em; // 12px; code and CodeMirror
+  --orbeon-code-font-family      : inherit;
+  --orbeon-code-font-weight      : inherit;
+  --orbeon-pre-font-size         : 1.00em;
+  --orbeon-pre-font-family       : inherit;
+  --orbeon-pre-font-weight       : inherit;
+  --orbeon-sub-sup-font-size     : 0.75em;
 
   // Icons
   --orbeon-search-caret-font-size : 0.80em;
@@ -99,7 +112,8 @@
   --orbeon-h6-font-size: 0.92em; // 12px =  92% * 13px =  85% * 14px
 
   // Dropdowns
-  --orbeon-dropdown-font-size: 1.08em;
+  // TODO: which dropdowns?
+  --orbeon-dropdown-font-size: 1.08em; // 14px
 
   // Tooltips
   --orbeon-tooltip-font-size: 0.85em; // 11px; e.g. tabs tooltips

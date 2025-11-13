@@ -19,10 +19,24 @@ body.orbeon {
 
 .orbeon {
 
-    blockquote p { font-size: var(--orbeon-blockquote-font-size); }
-    code         { font-size: var(--orbeon-code-font-size); }
-    pre          { font-size: var(--orbeon-pre-font-size); }
-    sub, sup     { font-size: var(--orbeon-sub-sup-font-size); }
+    blockquote p {
+        font-size  : var(--orbeon-blockquote-font-size);
+        font-family: var(--orbeon-blockquote-font-family);
+        font-weight: var(--orbeon-blockquote-font-weight);
+    }
+    code {
+        font-size  : var(--orbeon-code-font-size);
+        font-family: var(--orbeon-code-font-family);
+        font-weight: var(--orbeon-code-font-weight);
+    }
+    pre {
+        font-size  : var(--orbeon-pre-font-size);
+        font-family: var(--orbeon-pre-font-family);
+        font-weight: var(--orbeon-pre-font-weight);
+    }
+    sub, sup {
+        font-size: var(--orbeon-sub-sup-font-size);
+    }
 
     h1 { font-size: var(--orbeon-h1-font-size); }
     h2 { font-size: var(--orbeon-h2-font-size); }
@@ -33,7 +47,10 @@ body.orbeon {
 
     // Disable null font size hack for now
     // TODO: fix gap between buttons in button group properly
-    .btn-group, .btn-toolbar { font-size: inherit; }
+    .btn-group, .btn-toolbar      { font-size: inherit; }
+
+    // Disable null font size hack (this doesn't seem to have any unwanted effect)
+    .input-append, .input-prepend { font-size: inherit; }
 
     .btn-group > .dropdown-menu {
         // Reset null font size hack
@@ -48,27 +65,6 @@ body.orbeon {
     // .badge is used for document counters in dropdowns
     // Keep them non-customizable for now, but make them relative instead of absolute
     .label, .badge { font-size: 0.911em; } // 11.844px = 0.911 * 13px = 0.846 * 14px
-
-    // Reset to Orbeon base font size instead of Bootstrap base font size (see forms.less in Bootstrap)
-    select,
-    textarea,
-    input[type="text"],
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="url"],
-    input[type="search"],
-    input[type="tel"],
-    input[type="color"],
-    .uneditable-input {
-        font-size: var(--orbeon-base-font-size);
-    }
 
     // Reset to Orbeon base font size instead of Bootstrap base font size (see forms.less in Bootstrap)
     .input-append,
@@ -271,13 +267,13 @@ body.orbeon {
     input[type="search"],
     input[type="tel"],
     input[type="color"],
-    .uneditable-input {                          // NOTE: .uneditable-input is removed from Bootstrap 3
-        font-size: var(--orbeon-base-font-size); // Use our own preferred font size
-        margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
-        color: black;                            // Make text inside the fields stand out, as this is the most important information
-        box-sizing: border-box;                  // So width: 100% works with the padding added by Bootstrap
+    .uneditable-input {                             // NOTE: .uneditable-input is removed from Bootstrap 3
+        font-size: var(--orbeon-control-font-size); // Use our own preferred font size
+        margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
+        color: black;                               // Make text inside the fields stand out, as this is the most important information
+        box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
         height: @controlsHeight;
-        background-image: none;                  // Liferay adds background images which don't mix well with Bootstrap
+        background-image: none;                     // Liferay adds background images which don't mix well with Bootstrap
 
         background-color: @inputBackground;
         .focusHighlight();

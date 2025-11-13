@@ -3,6 +3,7 @@ package org.orbeon.oxf.xml
 
 object XMLUtils {
 
+  //@XPathFunction
   def maybeAVT(attributeValue: String): Boolean =
     attributeValue.indexOf('{') != -1
 

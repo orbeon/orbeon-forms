@@ -23,6 +23,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xbl:binding id="fb-dialog-container-settings" element="fb|dialog-container-settings" xxbl:mode="binding">
@@ -84,7 +85,7 @@
                 <xf:var name="resources"                             value="frf:currentFormResources()"/>
 
                 <xf:var name="standard-classes"                      value="$resources/dialog-container-settings/options/item/value/string()"/>
-                <xf:var name="control-classes"                       value="xxf:split($control/@fb:class)"/>
+                <xf:var name="control-classes"                       value="xxf:split(($control/@fb:class, $control/@class)[1])"/>
 
                 <xf:setvalue ref="$i/standard-classes"               value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"                 value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
@@ -229,8 +230,10 @@
                     <xf:var name="control" value="fbf:findControlByNameOrEmpty($new-name)"/>
 
                     <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
-                    <xf:delete if="count($classes) = 0" ref="$control/@fb:class"/>
-                    <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('fb:class', string-join($classes, ' '))"/>
+                    <xf:var name="classes-string" value="string-join($classes, ' ')"/>
+                    <xf:var name="attribute-name" value="if (xmlutils:maybeAVT($classes-string)) then 'fb:class' else 'class'"/>
+                    <xf:delete ref="$control/@fb:class | $control/@class"/>
+                    <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute($attribute-name, $classes-string)"/>
 
                     <xf:action if="$i/container-type = 'section'">
                         <!-- Initially open -->

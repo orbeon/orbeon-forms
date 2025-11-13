@@ -23,6 +23,7 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
@@ -146,7 +147,7 @@
     </xsl:template>
 
     <!-- https://github.com/orbeon/orbeon-forms/issues/6648 -->
-    <xsl:template match="@class" mode="within-body">
+    <xsl:template match="@class[xmlutils:maybeAVT(.)]" mode="within-body">
         <xsl:attribute name="fb:{local-name()}" select="."/>
     </xsl:template>
 

@@ -21,6 +21,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+         xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -59,7 +60,7 @@
 
                 <!-- Split out classes -->
                 <xf:var name="standard-classes"               value="'fr-attachment', 'fr-static-attachment'"/>
-                <xf:var name="control-classes"                value="xxf:split($control/@fb:class)"/>
+                <xf:var name="control-classes"                value="xxf:split(($control/@fb:class, $control/@class)[1])"/>
                 <xf:setvalue ref="$i/standard-classes"        value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
@@ -485,8 +486,10 @@
                         </xf:action>
                         <!-- Write classes -->
                         <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
-                        <xf:delete if="count($classes) = 0" ref="$control/@fb:class"/>
-                        <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('fb:class', string-join($classes, ' '))"/>
+                        <xf:var name="classes-string" value="string-join($classes, ' ')"/>
+                        <xf:var name="attribute-name" value="if (xmlutils:maybeAVT($classes-string)) then 'fb:class' else 'class'"/>
+                        <xf:delete ref="$control/@fb:class | $control/@class"/>
+                        <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute($attribute-name, $classes-string)"/>
                         <!-- Write custom PDF field name -->
                         <xf:delete
                             if="$i/pdf-field-name/@type = 'automatic' or xxf:is-blank($i/pdf-field-name)"

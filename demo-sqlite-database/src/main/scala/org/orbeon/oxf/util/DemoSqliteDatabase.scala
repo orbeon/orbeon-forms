@@ -16,6 +16,7 @@ package org.orbeon.oxf.util
 import org.apache.commons.io.FilenameUtils
 import org.log4s.Logger
 import org.orbeon.connection.StreamedContent
+import org.orbeon.oxf.cache.CacheSupport
 import org.orbeon.oxf.fr.{FormRunnerPersistence, Version}
 import org.orbeon.oxf.fr.persistence.db.{Connect, DatasourceDescriptor}
 import org.orbeon.oxf.fr.persistence.relational.Provider

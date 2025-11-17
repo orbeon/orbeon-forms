@@ -450,6 +450,9 @@
             <attachment-max-files-per-control>
                 <label>Maximum Number of Files per Control</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Minimum Number of Files per Control</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Allowed File Types</label>
                 <hint>For example "image/* application/pdf"</hint>
@@ -726,6 +729,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Maximum Attachment Size per File</item>
                 <item id="upload-max-size-aggregate-per-control">Maximum Aggregate Attachment Size</item>
                 <item id="upload-max-files-per-control">Maximum Number of Files per Control</item>
+                <item id="upload-min-files-per-control">Minimum Number of Files per Control</item>
                 <item id="upload-mediatypes">Supported File Types</item>
                 <item id="excluded-dates">Dates to Exclude</item>
             </constraint>
@@ -2063,6 +2067,9 @@
             <attachment-max-files-per-control>
                 <label>Nombre maximal de fichiers par contrôle de pièces jointes</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Nombre minimal de fichiers par contrôle de pièces jointes</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Types de fichiers supportés</label>
                 <hint>Par exemple "image/* application/pdf"</hint>
@@ -2339,6 +2346,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Taille maximale par fichier joint</item>
                 <item id="upload-max-size-aggregate-per-control">Taille maximale de tous les fichiers joints du contrôle</item>
                 <item id="upload-max-files-per-control">Nombre maximum de fichiers par contrôle</item>
+                <item id="upload-min-files-per-control">Nombre minimum de fichiers par contrôle</item>
                 <item id="upload-mediatypes">Types de fichiers supportés</item>
                 <item id="excluded-dates">Dates à exclure</item>
             </constraint>
@@ -3661,6 +3669,9 @@
             <attachment-max-files-per-control>
                 <label>Maksimalt antall filer per vedleggskontroll</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Minimalt antall filer per vedleggskontroll</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Tillatte filtyper</label>
                 <hint>For eksempel "image/* application/pdf"</hint>
@@ -3938,6 +3949,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Maksimal vedleggsstørrelse per fil</item>
                 <item id="upload-max-size-aggregate-per-control">Maksimal samlet vedleggsstørrelse</item>
                 <item id="upload-max-files-per-control">Maksimalt antall filer per kontroll</item>
+                <item id="upload-min-files-per-control">Minimalt antall filer per kontroll</item>
                 <item id="upload-mediatypes">Støttede filtyper</item>
                 <item id="excluded-dates">Datoer som skal ekskluderes</item>
             </constraint>
@@ -5285,6 +5297,9 @@
             <attachment-max-files-per-control>
                 <label>Максимальное количество файлов на элемент управления вложениями</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Минимальное количество файлов на элемент управления вложениями</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Разрешенные типы файлов</label>
                 <hint>Например "image/* application/pdf"</hint>
@@ -5561,6 +5576,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Максимальный размер вложения на файл</item>
                 <item id="upload-max-size-aggregate-per-control">Максимальный суммарный размер вложений</item>
                 <item id="upload-max-files-per-control">Максимальное количество файлов на элемент управления</item>
+                <item id="upload-min-files-per-control">Минимальное количество файлов на элемент управления</item>
                 <item id="upload-mediatypes">Поддерживаемые типы файлов</item>
                 <item id="excluded-dates">Исключаемые даты</item>
             </constraint>
@@ -6916,6 +6932,9 @@
             <attachment-max-files-per-control>
                 <label>Numero massimo di file per controllo allegati</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Numero minimo di file per controllo allegati</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Tipi di file consentiti</label>
                 <hint>Ad esempio "image/* application/pdf"</hint>
@@ -7192,6 +7211,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Dimensione massima allegato per file</item>
                 <item id="upload-max-size-aggregate-per-control">Dimensione massima aggregata degli allegati</item>
                 <item id="upload-max-files-per-control">Numero massimo di file per controllo</item>
+                <item id="upload-min-files-per-control">Numero minimo di file per controllo</item>
                 <item id="upload-mediatypes">Tipi di file supportati</item>
                 <item id="excluded-dates">Date da escludere</item>
             </constraint>
@@ -8488,6 +8508,9 @@
             <attachment-max-files-per-control>
                 <label>Maximale Anzahl Dateien pro Anlage-Steuerelement</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Minimale Anzahl Dateien pro Anlage-Steuerelement</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Erlaubte Dateitypen</label>
                 <hint>Zum Beispiel "image/* application/pdf"</hint>
@@ -8764,6 +8787,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Maximale Größe pro Datei</item>
                 <item id="upload-max-size-aggregate-per-control">Maximale Gesamtgröße der Anhänge pro Steuerelement</item>
                 <item id="upload-max-files-per-control">Maximale Anzahl Dateien pro Steuerelement</item>
+                <item id="upload-min-files-per-control">Minimale Anzahl Dateien pro Steuerelement</item>
                 <item id="upload-mediatypes">Erlaubte Dateitypen</item>
                 <item id="excluded-dates">Auszuschließende Datumswerte</item>
             </constraint>
@@ -10063,6 +10087,9 @@
             <attachment-max-files-per-control>
                 <label>Liitetiedostojen enimmäismäärä ohjausyksikköä kohden</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Liitetiedostojen vähimmäismäärä ohjausyksikköä kohden</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Sallitut tiedostotyypit</label>
                 <hint>Esimerkiksi "image/* application/pdf"</hint>
@@ -10339,6 +10366,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Liitteen enimmäiskoko per tiedosto</item>
                 <item id="upload-max-size-aggregate-per-control">Liitteiden yhteenlaskettu enimmäiskoko</item>
                 <item id="upload-max-files-per-control">Enimmäismäärä tiedostoja per kontrolli</item>
+                <item id="upload-min-files-per-control">Vähimmäismäärä tiedostoja per kontrolli</item>
                 <item id="upload-mediatypes">Tuetut tiedostotyypit</item>
                 <item id="excluded-dates">Pois suljettavat päivämäärät</item>
             </constraint>
@@ -11651,6 +11679,9 @@
             <attachment-max-files-per-control>
                 <label>Número máximo de archivos por control de adjuntos</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Número mínimo de archivos por control de adjuntos</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Tipos de archivo permitidos</label>
                 <hint>Por ejemplo "image/* application/pdf"</hint>
@@ -11927,6 +11958,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Tamaño máximo de adjunto por archivo</item>
                 <item id="upload-max-size-aggregate-per-control">Tamaño máximo total de adjuntos</item>
                 <item id="upload-max-files-per-control">Número máximo de archivos por control</item>
+                <item id="upload-min-files-per-control">Número mínimo de archivos por control</item>
                 <item id="upload-mediatypes">Tipos de archivo admitidos</item>
                 <item id="excluded-dates">Fechas a excluir</item>
             </constraint>
@@ -13261,6 +13293,9 @@
             <attachment-max-files-per-control>
                 <label>Maximum aantal bestanden per bijlage-element</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Minimum aantal bestanden per bijlage-element</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Toegestane bestandstypen</label>
                 <hint>Bijvoorbeeld "image/* application/pdf"</hint>
@@ -13537,6 +13572,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Maximale bijlagegrootte per bestand</item>
                 <item id="upload-max-size-aggregate-per-control">Maximale totale bijlagegrootte</item>
                 <item id="upload-max-files-per-control">Maximaal aantal bestanden per besturingselement</item>
+                <item id="upload-min-files-per-control">Minimaal aantal bestanden per besturingselement</item>
                 <item id="upload-mediatypes">Ondersteunde bestandstypen</item>
                 <item id="excluded-dates">Uit te sluiten datums</item>
             </constraint>
@@ -14857,6 +14893,9 @@
             <attachment-max-files-per-control>
                 <label>Número máximo de ficheiros por controlo de anexos</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Número mínimo de ficheiros por controlo de anexos</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>Tipos de Ficheiro Permitidos</label>
                 <hint>Por exemplo "image/* application/pdf"</hint>
@@ -15133,6 +15172,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Tamanho Máximo de Anexo por Ficheiro</item>
                 <item id="upload-max-size-aggregate-per-control">Tamanho Máximo Agregado de Anexos</item>
                 <item id="upload-max-files-per-control">Número máximo de arquivos por controle</item>
+                <item id="upload-min-files-per-control">Número mínimo de arquivos por controle</item>
                 <item id="upload-mediatypes">Tipos de Ficheiro Suportados</item>
                 <item id="excluded-dates">Datas a Excluir</item>
             </constraint>
@@ -16480,6 +16520,9 @@
             <attachment-max-files-per-control>
                 <label>Maximalt antal filer per bilagekontroll</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>Minimalt antal filer per bilagekontroll</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -16756,6 +16799,7 @@
                 <item id="upload-max-size-per-file" multiple="true">Maximal bilagestorlek per fil</item>
                 <item id="upload-max-size-aggregate-per-control">Maximal total bilagestorlek</item>
                 <item id="upload-max-files-per-control">Maximalt antal filer per kontroll</item>
+                <item id="upload-min-files-per-control">Minimalt antal filer per kontroll</item>
                 <item id="upload-mediatypes">Tillåtna filtyper</item>
                 <item id="excluded-dates">Datum att utesluta</item>
             </constraint>
@@ -18399,6 +18443,7 @@
                 <item id="upload-max-size-per-file" multiple="true">الحد الأقصى لحجم المرفق لكل ملف</item>
                 <item id="upload-max-size-aggregate-per-control">الحد الأقصى الإجمالي لحجم المرفقات</item>
                 <item id="upload-max-files-per-control">الحد الأقصى لعدد الملفات لكل عنصر تحكم</item>
+                <item id="upload-min-files-per-control">الحد الأدنى لعدد الملفات لكل عنصر تحكم</item>
                 <item id="upload-mediatypes">أنواع الملفات المدعومة</item>
                 <item id="excluded-dates">تواريخ للاستبعاد</item>
             </constraint>

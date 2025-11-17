@@ -4,6 +4,7 @@ object ValidationFunctionNames {
   val UploadMaxSizePerFile             = "upload-max-size-per-file"
   val UploadMaxSizeAggregatePerControl = "upload-max-size-aggregate-per-control"
   val UploadMaxFilesPerControl         = "upload-max-files-per-control"
+  val UploadMinFilesPerControl         = "upload-min-files-per-control"
   val UploadMediatypes                 = "upload-mediatypes"
 
   // Backward compatibility

@@ -19,9 +19,11 @@ import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 import scala.jdk.CollectionConverters.*
 
@@ -76,6 +78,31 @@ trait LongValidationFunction extends ValidationFunction[Long] {
 
 trait StringValidationFunction extends ValidationFunction[String] {
   def argumentOpt(implicit xpathContext: XPathContext): Option[String] = stringArgumentOpt(0)
+}
+
+trait NodeValidationFunction[T] extends ValidationFunction[T] {
+
+  def evaluateNode(nodeInfo: om.NodeInfo, constraintOpt: Option[T]): Boolean
+
+  def evaluate(value: String, constraintOpt: Option[T]): Boolean = true
+
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
+    implicit val ctx: XPathContext = xpathContext
+
+    val constraintOpt = argumentOpt
+    setProperty(propertyName, toMipValue(constraintOpt))
+
+    Option(xpathContext.getContextItem) match {
+      case Some(nodeInfo: om.NodeInfo) =>
+        evaluateNode(nodeInfo, constraintOpt)
+      case _ =>
+        true
+    }
+  }
+}
+
+trait LongNodeValidationFunction extends NodeValidationFunction[Long] {
+  def argumentOpt(implicit xpathContext: XPathContext): Option[Long] = longArgumentOpt(0)
 }
 
 trait DateSeqValidationFunction extends ValidationFunction[Seq[DateValue]] {
@@ -246,6 +273,18 @@ class UploadMaxFilesPerControlValidation extends LongValidationFunction {
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
     case Some(constraint) => true // for now, don't actually validate
     case None             => true
+  }
+}
+
+class UploadMinFilesPerControlValidation extends LongNodeValidationFunction {
+  val propertyName: String = ValidationFunctionNames.UploadMinFilesPerControl
+
+  def evaluateNode(nodeInfo: om.NodeInfo, constraintOpt: Option[Long]): Boolean = constraintOpt match {
+    case Some(minFiles) =>
+      val fileCount = nodeInfo.child("_").size
+      fileCount >= minFiles
+    case None =>
+      true
   }
 }
 

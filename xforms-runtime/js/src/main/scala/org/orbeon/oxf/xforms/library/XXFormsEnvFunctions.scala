@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport}
 import org.orbeon.saxon.ma.map.MapItem
@@ -689,6 +690,21 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     // For now, don't actually validate, see #2956
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMediatypes, constraintOpt, _ => true)
   }
+
+  @XPathFunction
+  def uploadMinFilesPerControl(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean =
+    Option(xpc.getContextItem) match {
+      case Some(nodeInfo: om.NodeInfo) =>
+        constraintOpt match {
+          case Some(minFiles) =>
+            val fileCount = nodeInfo.child("_").size
+            fileCount >= minFiles
+          case None =>
+            true
+        }
+      case _ =>
+        true
+    }
 
 //    Fun(ExcludedDatesValidation.PropertyName, classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
 //      Arg(DATE, ALLOWS_ZERO_OR_MORE)

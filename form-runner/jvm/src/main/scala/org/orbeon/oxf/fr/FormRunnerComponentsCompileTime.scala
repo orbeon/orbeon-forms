@@ -200,6 +200,9 @@ trait FormRunnerComponentsCompileTime {
       case (constraintName @ ValidationFunctionNames.UploadMaxFilesPerControl, Some(max)) =>
         Some(hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$max'"))
 
+      case (constraintName @ ValidationFunctionNames.UploadMinFilesPerControl, Some(min)) =>
+        Some(hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$min'"))
+
       case (constraintName @ ValidationFunctionNames.UploadMediatypes, Some(mediatypesStr)) =>
         val mediatypes        = mediatypesStr.splitTo[List]()
         val displayMediatypes = mediatypes.flatMap { mediatype =>

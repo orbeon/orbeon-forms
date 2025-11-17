@@ -367,6 +367,7 @@
             <upload-max-size-per-file>Els fitxers han de mesurar menys de {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>La mida del total de fitxers no pot superar {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Podeu adjuntar fins a {0} fitxers.</upload-max-files-per-control>
+            <upload-min-files-per-control>Heu d'adjuntar almenys {0} fitxers.</upload-min-files-per-control>
             <upload-mediatypes>Només {0} fitxers.</upload-mediatypes>
             <upload-image>imatge</upload-image>
             <upload-video>vídeo</upload-video>

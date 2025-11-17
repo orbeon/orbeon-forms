@@ -349,6 +349,7 @@
             <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Você pode anexar até {0} arquivos.</upload-max-files-per-control>
+            <upload-min-files-per-control>Você deve anexar pelo menos {0} arquivos.</upload-min-files-per-control>
             <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
             <upload-image todo="true">[image]</upload-image>
             <upload-video todo="true">[video]</upload-video>

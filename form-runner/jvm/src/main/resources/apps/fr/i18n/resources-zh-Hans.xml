@@ -343,6 +343,7 @@
             <upload-max-size-per-file>文件必须小于{0}。</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>控件中的总文件大小必须小于{0}。</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>您最多可以附加 {0} 个文件。</upload-max-files-per-control>
+            <upload-min-files-per-control>您必须附加至少 {0} 个文件。</upload-min-files-per-control>
             <upload-mediatypes>仅接受{0}文件。</upload-mediatypes>
             <upload-image>图像</upload-image>
             <upload-video>视频</upload-video>

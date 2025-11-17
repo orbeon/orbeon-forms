@@ -349,6 +349,7 @@
             <upload-max-size-per-file>يجب أن تكون الملفات أقل من {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>يجب أن يكون إجمالي حجم الملف في عنصر التحكم أقل من {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>يمكنك إرفاق ما يصل إلى {0} ملفات.</upload-max-files-per-control>
+            <upload-min-files-per-control>يجب عليك إرفاق {0} ملف على الأقل.</upload-min-files-per-control>
             <upload-mediatypes>فقط ملفات {0} مقبولة.</upload-mediatypes>
             <upload-image>صورة</upload-image>
             <upload-video>فيديو</upload-video>

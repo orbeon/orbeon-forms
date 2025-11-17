@@ -349,6 +349,7 @@
             <upload-max-size-per-file>Die maximale Dateigröße ist {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Die Gesamtgröße der Dateien in diesem Steuerelement muss unter {0} liegen.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Sie können bis zu {0} Dateien anhängen.</upload-max-files-per-control>
+            <upload-min-files-per-control>Sie müssen mindestens {0} Dateien anhängen.</upload-min-files-per-control>
             <upload-mediatypes>Es sind nur {0}-Dateien zulässig.</upload-mediatypes>
             <upload-image>Bild</upload-image>
             <upload-video>Video</upload-video>

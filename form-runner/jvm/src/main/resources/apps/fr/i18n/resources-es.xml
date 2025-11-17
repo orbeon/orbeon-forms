@@ -378,6 +378,7 @@
             <upload-max-size-per-file>Ficheros por debajo de {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>El tamaño total de ficheros en el control tiene que estar por debajo de {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Puede adjuntar hasta {0} archivos.</upload-max-files-per-control>
+            <upload-min-files-per-control>Debe adjuntar al menos {0} archivos.</upload-min-files-per-control>
             <upload-mediatypes>Solo {0} ficheros son aceptados.</upload-mediatypes>
             <upload-image>imagen</upload-image>
             <upload-video>video</upload-video>

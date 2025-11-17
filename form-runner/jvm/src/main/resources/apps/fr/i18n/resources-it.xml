@@ -349,6 +349,7 @@
             <upload-max-size-per-file>I file devono essere inferiori a {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>La dimensione totale dei file in questo controllo deve essere inferiore a {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>È possibile allegare fino a {0} file.</upload-max-files-per-control>
+            <upload-min-files-per-control>È necessario allegare almeno {0} file.</upload-min-files-per-control>
             <upload-mediatypes>Sono accettati solo file {0}.</upload-mediatypes>
             <upload-image>immagine</upload-image>
             <upload-video>video</upload-video>

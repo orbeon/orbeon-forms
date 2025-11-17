@@ -352,6 +352,7 @@
             <upload-max-size-per-file>La taille des fichiers doit être inférieurs à {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>La taille totale des fichiers pour ce contrôle doit être inférieure à {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Vous pouvez joindre jusqu'à {0} fichiers.</upload-max-files-per-control>
+            <upload-min-files-per-control>Vous devez joindre au moins {0} fichiers.</upload-min-files-per-control>
             <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
             <upload-image>image</upload-image>
             <upload-video>vidéo</upload-video>

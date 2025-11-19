@@ -331,7 +331,7 @@
                            </xf:input>
                        </fr:c>
                        <fr:c y="1" x="7" w="6">
-                           <fr:attachment id="control-16-control" bind="control-16-bind" fb:class="fr-attachment">
+                           <fr:attachment id="control-16-control" bind="control-16-bind" class="fr-attachment">
                                <xf:label ref="$form-resources/control-16/label"/>
                                <xf:hint ref="$form-resources/control-16/hint"/>
                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -350,7 +350,7 @@
                            </xf:input>
                        </fr:c>
                        <fr:c y="1" x="7" w="6">
-                           <fr:image-attachment id="control-17-control" bind="control-17-bind" fb:class="fr-attachment">
+                           <fr:image-attachment id="control-17-control" bind="control-17-bind" class="fr-attachment">
                                <xf:label ref="$form-resources/control-17/label"/>
                                <xf:hint ref="$form-resources/control-17/hint"/>
                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -429,7 +429,7 @@
                     <xf:label ref="$form-resources/section-25/label"/>
                     <fr:grid edit-ref="" id="grid-26-grid" bind="grid-26-bind">
                         <fr:c y="1" x="1" w="6">
-                            <xf:input id="control-27-control" bind="control-27-bind" fb:class="custom1 custom2">
+                            <xf:input id="control-27-control" bind="control-27-bind" class="custom1 custom2">
                                 <xf:label ref="$form-resources/control-27/label"/>
                                 <xf:hint ref="$form-resources/control-27/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -438,7 +438,7 @@
                                 </fr:index>
                                 <fr:encrypt/>
                             </xf:input>
-                            <xf:input id="control-28-control" bind="control-28-bind" fb:class="custom1 custom2 fr-email-subject">
+                            <xf:input id="control-28-control" bind="control-28-bind" class="custom1 custom2 fr-email-subject">
                                 <xf:label ref="$form-resources/control-28/label"/>
                                 <xf:hint ref="$form-resources/control-28/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -456,7 +456,7 @@
                                     service-performs-search="true"
                                     service-supports-paging="false"
                                     is-last-page=""
-                                    fb:class="custom1 custom2 fr-email-subject">
+                                    class="custom1 custom2 fr-email-subject">
                                 <xf:label>Country code:</xf:label>
                                 <xf:itemset ref="/countries/country">
                                     <xf:label ref="name"/>
@@ -468,7 +468,7 @@
                                 </fr:index>
                                 <fr:encrypt/>
                             </fr:databound-select1>
-                            <fr:time id="control-30-control" bind="control-30-bind" fb:class="custom1 custom2">
+                            <fr:time id="control-30-control" bind="control-30-bind" class="custom1 custom2">
                                 <xf:label ref="$form-resources/control-30/label"/>
                                 <xf:hint ref="$form-resources/control-30/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -476,13 +476,13 @@
                                     <fr:summary-show search="false"/>
                                 </fr:index>
                             </fr:time>
-                            <fr:date id="control-31-control" bind="control-31-bind" fb:class="custom1 custom2">
+                            <fr:date id="control-31-control" bind="control-31-bind" class="custom1 custom2">
                                 <xf:label ref="$form-resources/control-31/label"/>
                                 <xf:hint ref="$form-resources/control-31/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index/>
                             </fr:date>
-                            <fr:dropdown-select1 id="control-32-control" bind="control-32-bind" fb:class="custom1 custom2">
+                            <fr:dropdown-select1 id="control-32-control" bind="control-32-bind" class="custom1 custom2">
                                 <xf:label ref="$form-resources/control-32/label"/>
                                 <xf:hint ref="$form-resources/control-32/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>

@@ -21,6 +21,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
@@ -497,7 +498,9 @@
         <xsl:variable name="output">
             <xsl:copy>
                 <xsl:if test="exists($filtered-classes)">
-                    <xsl:attribute name="fb:class" select="string-join($filtered-classes, ' ')"/>
+                    <xsl:attribute
+                        name="{if (xmlutils:maybeAVT(string-join($filtered-classes, ' '))) then 'fb:class' else 'class'}"
+                        select="string-join($filtered-classes, ' ')"/>
                 </xsl:if>
                 <xsl:copy-of select="@* except @class | node() except (fr:index | fr:encrypt)"/>
                 <xsl:if test="$has-index">

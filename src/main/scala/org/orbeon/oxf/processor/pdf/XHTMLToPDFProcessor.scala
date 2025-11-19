@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.pdf
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
+import org.orbeon.css.CSSParsing
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -32,6 +33,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 import java.io.{FileInputStream, OutputStream}
+import java.net.{URI, URL}
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
 import scala.util.Try
@@ -157,7 +159,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
       // `OrbeonPdfBoxUserAgent`.
       val baseUri = requestOpt.map(_.getRequestURI)
 
-      pdfRendererBuilder.withW3cDocument(
+      val w3cDocument =
         readInputAsDOM(
           pipelineContext,
           input,
@@ -194,13 +196,38 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
                 super.startElement(uri, localname, qName, newAttributes)
               }
           }
-        ),
+        )
+
+      val (outerPipelineContext, outerExternalContext, outerIndentedLogger) =
+        (pipelineContext, externalContext, indentedLogger)
+
+      val uriResolver = new URIResolver {
+        override val pipelineContext         : PipelineContext = outerPipelineContext
+        override implicit val externalContext: ExternalContext = outerExternalContext
+        override implicit val indentedLogger : IndentedLogger  = outerIndentedLogger
+      }
+
+      val variableDefinitions =
+        CSSParsing.variableDefinitions(
+          // Retrieve CSS resources from the document (link and style elements)
+          resources          = CSSParsing.cssResources(w3cDocument),
+          inputStreamFromURI = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString)).openStream()
+        )
+
+      pdfRendererBuilder.withW3cDocument(
+        w3cDocument,
         baseUri.orNull // no base URL if can't get request URL from context
       )
 
       IOUtils.useAndClose(
         pdfRendererBuilder.buildPdfRenderer(outputDevice =>
-          new OrbeonPdfBoxUserAgent(jpegCompressionLevel, outputDevice, pipelineContext, DefaultDotsPerPixel)
+          new OrbeonPdfBoxUserAgent(
+            jpegCompressionLevel,
+            outputDevice,
+            pipelineContext,
+            DefaultDotsPerPixel,
+            variableDefinitions
+          )
         )
       ) { pdfBoxRenderer =>
 

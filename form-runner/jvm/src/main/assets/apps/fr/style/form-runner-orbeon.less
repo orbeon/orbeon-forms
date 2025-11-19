@@ -367,7 +367,7 @@ body.orbeon { background-color: @frBackground }
         margin-top: 10px;
 
         // https://github.com/orbeon/orbeon-forms/issues/6349
-        @media (prefers-contrast: no-preference) or (prefers-contrast: less) {
+        @media (prefers-contrast: no-preference), (prefers-contrast: less) {
             &:before {
                 content: "";
                 position: absolute;

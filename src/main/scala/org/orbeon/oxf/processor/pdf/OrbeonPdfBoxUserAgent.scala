@@ -15,8 +15,10 @@ package org.orbeon.oxf.processor.pdf
 
 import com.openhtmltopdf.pdfboxout.{PdfBoxImage, PdfBoxOutputDevice, PdfBoxUserAgent}
 import com.openhtmltopdf.resource.ImageResource
+import com.openhtmltopdf.swing.NaiveUserAgent
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
 import org.orbeon.connection.ConnectionResult
+import org.orbeon.css.{CSSParsing, MediaQuery, MediaType, VariableDefinitions}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -35,19 +37,15 @@ import javax.imageio.ImageIO
 
 
 class OrbeonPdfBoxUserAgent(
-  jpegCompressionLevel: Float,
-  outputDevice        : PdfBoxOutputDevice,
-  pipelineContext     : PipelineContext,
-  dotsPerPixel        : Int
-)(implicit
-  externalContext     : ExternalContext,
-  indentedLogger      : IndentedLogger
-) extends PdfBoxUserAgent(outputDevice) {
-
-  import Private.*
-
-  // Unneeded for JVM platform
-  private implicit val resourceResolver: Option[ResourceResolver] = None
+  jpegCompressionLevel                 : Float,
+  outputDevice                         : PdfBoxOutputDevice,
+  override val pipelineContext         : PipelineContext,
+  dotsPerPixel                         : Int,
+  variableDefinitions                  : VariableDefinitions,
+)(override implicit val externalContext: ExternalContext,
+  override implicit val indentedLogger : IndentedLogger
+) extends PdfBoxUserAgent(outputDevice)
+  with URIResolver {
 
   override def getImageResource(uriStr: String): ImageResource = {
     @throws[IOException]
@@ -139,6 +137,39 @@ class OrbeonPdfBoxUserAgent(
     resource
   }
 
+  override protected def openReader(uri: String): Reader = {
+    debug(s"openReader($uri)")
+
+    val reader = new InputStreamReader(openStream(uri), StandardCharsets.UTF_8)
+
+    if (uri.contains(".css")) {
+
+      val modifiedCss = CSSParsing.injectVariablesIntoCss(
+        originalCss         = IOUtils.readStreamAsStringAndClose(reader),
+        variableDefinitions = variableDefinitions,
+        mediaQuery          = MediaQuery(MediaType.Print),
+        cssSource           = s"URI: $uri"
+      )
+
+      new StringReader(modifiedCss)
+    } else {
+      reader
+    }
+  }
+}
+
+trait URIResolver extends NaiveUserAgent {
+
+  val pipelineContext         : PipelineContext
+  implicit val externalContext: ExternalContext
+  implicit val indentedLogger : IndentedLogger
+
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
+
+  lazy val requestOpt: Option[ExternalContext.Request] =
+    Option(externalContext).flatMap(ctx => Option(ctx.getRequest))
+
   // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
   // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
   // the servlet context and version number if needed. In addition, CSS resources must either use
@@ -201,14 +232,5 @@ class OrbeonPdfBoxUserAgent(
     ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = false)(identity) doEitherWay {
       pipelineContext.addContextListener((_: Boolean) => cxr.close())
     } get
-  }
-
-  override protected def openReader(uri: String): Reader = {
-    debug(s"openReader($uri)")
-    new InputStreamReader(openStream(uri), StandardCharsets.UTF_8)
-  }
-
-  private object Private {
-    val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
   }
 }

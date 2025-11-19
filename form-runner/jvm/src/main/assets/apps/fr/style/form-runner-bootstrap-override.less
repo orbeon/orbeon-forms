@@ -285,7 +285,7 @@ body.orbeon {
         font-weight: var(--orbeon-control-font-weight);
     }
 
-    @media (prefers-contrast: no-preference) or (prefers-contrast: less) {
+    @media (prefers-contrast: no-preference), (prefers-contrast: less) {
         // Follow BS5 styling
         input[type="radio"],
         input[type="checkbox"] {
@@ -370,7 +370,7 @@ body.orbeon {
         input[type="checkbox"] {
             margin-top: 3px;    // override Bootstrap
             &[disabled] {
-                @media (prefers-contrast: no-preference) or (prefers-contrast: less) {
+                @media (prefers-contrast: no-preference), (prefers-contrast: less) {
                     // BS5 style for disabled
                     pointer-events: none;
                     filter: none;

@@ -172,7 +172,7 @@
                 }
 
                 // Wide layout: hide LHH
-                @media not (max-width: 640px) {
+                @media not all and (max-width: 640px) {
                     .hide-lhh(~".fr-grid-body .fr-grid-td");
                 }
 
@@ -286,7 +286,7 @@
                     &.fr-grid-css {
 
                         // Wide layout
-                        @media not (max-width: 640px) {
+                        @media not all and (max-width: 640px) {
                             // In general, we want all rows except the first to have a top border
                             // So: if we have a head, that's all the iteration; if we don't, it all the iterations after the first
                             // Exception: readonly + multiple rows, where we have a head, but hide it with CSS, so here exclude it
@@ -318,7 +318,7 @@
                         border-collapse: separate; // otherwise we cannot have rounded corners
 
                         // Web: wide layout
-                        @media not (max-width: 640px) {
+                        @media not all and (max-width: 640px) {
                             // See comment above for the CSS grid / wide layout
                             .fr-grid-head:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
                             .fr-grid-repeat-iteration                                      ~ .fr-grid-repeat-iteration {

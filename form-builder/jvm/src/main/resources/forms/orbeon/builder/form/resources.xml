@@ -18167,6 +18167,9 @@
             <attachment-max-files-per-control>
                 <label>الحد الأقصى لعدد الملفات لكل عنصر تحكم</label>
             </attachment-max-files-per-control>
+            <attachment-min-files-per-control>
+                <label>الحد الأدنى لعدد الملفات لكل عنصر تحكم</label>
+            </attachment-min-files-per-control>
             <attachment-mediatypes>
                 <label>أنواع الملفات المسموح بها</label>
                 <hint>على سبيل المثال "image/* application/pdf"</hint>

@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
-import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport}
 import org.orbeon.saxon.ma.map.MapItem
@@ -26,6 +25,7 @@ import org.orbeon.saxon.model.BuiltInAtomicType
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, SequenceTool, StandardNames}
 import org.orbeon.saxon.value.{AtomicValue, QNameValue, SequenceExtent, StringValue}
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable.*
 
@@ -346,12 +346,13 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def r(
-    resourceKey      : String,
-    instanceOpt      : Option[String]  = None,
-    templateParamsOpt: Option[om.Item] = None // TODO: must be a `MapItem` (`map(*)`)
+    resourceKey            : String,
+    instanceOpt            : Option[String]  = None,
+    fallbackLangInstanceOpt: Option[String]  = None,
+    templateParamsOpt      : Option[om.Item] = None // TODO: must be a `MapItem` (`map(*)`)
   )(implicit
-    xpc                : XPathContext,
-    xfc                : XFormsFunction.Context
+    xpc                    : XPathContext,
+    xfc                    : XFormsFunction.Context
   ): Option[String] = {
 
     def javaNamedParamsOpt: Option[List[(String, Any)]] =
@@ -368,9 +369,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       }
 
     XXFormsLangSupport.r(
-      resourceKey        = resourceKey,
-      instanceOpt        = instanceOpt,
-      javaNamedParamsOpt = javaNamedParamsOpt
+      resourceKey             = resourceKey,
+      instanceOpt             = instanceOpt,
+      javaNamedParamsOpt      = javaNamedParamsOpt,
+      fallbackLangInstanceOpt = fallbackLangInstanceOpt
     )
   }
 

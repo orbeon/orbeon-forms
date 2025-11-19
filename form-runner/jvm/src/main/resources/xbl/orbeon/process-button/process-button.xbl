@@ -17,7 +17,8 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xbl="http://www.w3.org/ns/xbl"
-    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
     <xbl:binding
         id="fr-process-button"
@@ -29,7 +30,7 @@
 
             <!-- Figure button label -->
             <xf:var name="button-name"  value="fr:component-param-value('name')"/>
-            <xf:var name="button-label" value="xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|')"/>
+            <xf:var name="button-label" value="xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|', '|fr-fr-language-instance|')"/>
 
             <!-- Figure what, if any, loading indicator to use -->
             <xf:var name="loading-indicator-property"

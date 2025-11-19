@@ -19,6 +19,7 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.NameTest
+import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{StringValue, Value}
 import org.orbeon.scaxon.Implicits.*
 
@@ -34,7 +35,15 @@ class XXFormsResource extends XFormsFunction {
 
     val resourceKey       = stringArgument(0)
     val instanceOpt       = stringArgumentOpt(1)
-    val templateParamsOpt = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
+    val fallbackItemsOpt  = itemsArgumentOpt(2)
+    val templateParamsOpt = itemsArgumentOpt(3) map (it => MapFunctions.collectMapValues(it).next())
+
+    val fallbackLangInstanceOpt =
+      for {
+        iterator <- fallbackItemsOpt
+        item     <- Option(iterator.next())
+        value    <- Option(item.getStringValue)
+      } yield value
 
     def javaNamedParamsOpt: Option[List[(String, Any)]] =
       templateParamsOpt.map { params =>
@@ -47,9 +56,10 @@ class XXFormsResource extends XFormsFunction {
       }
 
     XXFormsLangSupport.r(
-      resourceKey        = resourceKey,
-      instanceOpt        = instanceOpt,
-      javaNamedParamsOpt = javaNamedParamsOpt
+      resourceKey             = resourceKey,
+      instanceOpt             = instanceOpt,
+      javaNamedParamsOpt      = javaNamedParamsOpt,
+      fallbackLangInstanceOpt = fallbackLangInstanceOpt
     )
   }
 
@@ -78,8 +88,8 @@ object XXFormsResource {
     pathMapNodeSet : PathMap.PathMapNodeSet
   ): PathMap.PathMapNodeSet = {
 
-    // `xxf:r()` function doesn't reevaluate if 3rd parameter is a `map`
-    if (arguments.size > 2) {
+    // `xxf:r()` function doesn't reevaluate if 4th parameter is a `map`
+    if (arguments.size > 3) {
       pathMap.setInvalidated(true)
       return null
     }

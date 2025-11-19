@@ -28,11 +28,12 @@ object XXFormsLangSupport {
     }
 
   def r(
-    resourceKey       : String,
-    instanceOpt       : Option[String],
-    javaNamedParamsOpt: => Option[List[(String, Any)]]
+    resourceKey            : String,
+    instanceOpt            : Option[String],
+    javaNamedParamsOpt     : => Option[List[(String, Any)]],
+    fallbackLangInstanceOpt: Option[String] = None
   )(implicit
-    xfc               : XFormsFunction.Context
+    xfc                    : XFormsFunction.Context
   ): Option[String] = {
 
     def findInstance: Option[XFormsObject] = {
@@ -57,7 +58,7 @@ object XXFormsLangSupport {
         elementAnalysis <- elementAnalysisForSource
         resources       <- findResourcesElement
         requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis)
-        resourceRoot    <- findResourceElementForLang(resources, requestedLang)
+        resourceRoot    <- findResourceElementForLang(resources, requestedLang, fallbackLangInstanceOpt)
         leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKey)).headOption
       } yield
         processResourceString(leaf.getStringValue)

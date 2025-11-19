@@ -341,7 +341,7 @@
                     concat(
                         'xxf:r(''',
                             $xxf-r-path,
-                            ''',''fr-form-resources'',',
+                            ''',''fr-form-resources'', (),',
                             fr:build-template-param-map(
                                 fr:param,
                                 $library-name,

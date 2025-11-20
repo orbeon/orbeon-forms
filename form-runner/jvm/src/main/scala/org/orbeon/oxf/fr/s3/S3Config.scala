@@ -29,10 +29,9 @@ import scala.util.{Failure, Success, Try}
 case class S3Config(endpoint: String, region: Region, bucket: String, accessKey: String, secretAccessKey: String)
 
 object S3Config {
-  val PropertyPrefix = "oxf.fr.s3."
-
-  private val DefaultEndpoint = "s3.amazonaws.com"
-  private val DefaultRegion   = "aws-global"
+  val PropertyPrefix        = "oxf.fr.s3."
+  val DefaultEndpoint       = "s3.amazonaws.com"
+  private val DefaultRegion = "aws-global"
 
   def fromProperties(configName: String): Try[S3Config] = {
 

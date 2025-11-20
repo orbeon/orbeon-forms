@@ -18,6 +18,7 @@ import org.orbeon.connection.Content
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.oxf.http.HttpRange
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.NetUtils
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
@@ -25,6 +26,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 
 import java.io.InputStream
+import java.net.URI
 import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
 import scala.util.{Failure, Success, Try}
 
@@ -149,12 +151,14 @@ object S3 {
     Try(s3Client.deleteObjects(deleteRequest))
   }
 
-  def newS3Client()(implicit config: S3Config): S3Client = {
-    val credentials = AwsBasicCredentials.create(config.accessKey, config.secretAccessKey)
+  private def newS3Client()(implicit config: S3Config): S3Client = {
+    val credentials        = AwsBasicCredentials.create(config.accessKey, config.secretAccessKey)
+    val nonDefaultEndpoint = config.endpoint != S3Config.DefaultEndpoint
 
     S3Client.builder()
       .credentialsProvider(StaticCredentialsProvider.create(credentials))
       .region(config.region)
+      .pipeIf(nonDefaultEndpoint, _.endpointOverride(URI.create(config.endpoint)))
       .build()
   }
 }

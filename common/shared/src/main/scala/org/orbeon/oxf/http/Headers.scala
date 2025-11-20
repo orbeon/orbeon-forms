@@ -51,6 +51,7 @@ object Headers {
   val Cookie                       = "Cookie"
   val Accept                       = "Accept"
   val AcceptLanguage               = "Accept-Language"
+  val UserAgent                    = "User-Agent"
   val SOAPAction                   = "SOAPAction"
   val Timeout                      = "Timeout"
   val TimeoutValuePrefix           = "Second-"
@@ -78,7 +79,9 @@ object Headers {
   val AuthorizationLower           = Authorization.toLowerCase
   val LocationLower                = Location.toLowerCase
   val OrbeonClientLower            = OrbeonClient.toLowerCase
+  val AcceptLower                  = Accept.toLowerCase
   val AcceptLanguageLower          = AcceptLanguage.toLowerCase
+  val UserAgentLower               = UserAgent.toLowerCase
   val CreatedLower                 = Created.toLowerCase
   val TimeoutLower                 = Timeout.toLowerCase
   val ETagLower                    = ETag.toLowerCase

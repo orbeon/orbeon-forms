@@ -146,7 +146,11 @@ class XFormsOutputControl(
 
     // TODO: pass BindingContext directly
     getContextStack.setBinding(bindingContext)
-    val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
+    val headersToForward = SubmissionUtils.clientHeadersToForward(
+      allHeaders       = containingDocument.getRequestHeaders,
+      forwardUserAgent = true,
+      forwardAccept    = false
+    )
 
     implicit val contextStack: XFormsContextStack = getContextStack
 

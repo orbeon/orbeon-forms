@@ -244,30 +244,37 @@ object SubmissionUtils {
       SubmissionHeaders.evaluateHeaders(
         parentEffectiveId  = submission.effectiveId,
         enclosingElement   = submission.staticSubmission,
-        initialHeaders     = clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders),
+        initialHeaders     = clientHeadersToForward(
+          allHeaders       = submission.containingDocument.getRequestHeaders,
+          forwardUserAgent = forwardClientHeaders,
+          forwardAccept    = forwardClientHeaders
+        ),
         eventTarget        = submission,
         collector          = failFastCollector
       )
     }
 
   def clientHeadersToForward(
-    allHeaders           : Map[String, List[String]],
-    forwardClientHeaders : Boolean
-  ): Map[String, List[String]] =
-    if (forwardClientHeaders) {
-      // Forwarding the user agent
-      // https://github.com/orbeon/orbeon-forms/issues/6651
-      val toForward =
-        for {
-          name   <- List("user-agent")
-          values <- allHeaders.get(name)
-        } yield
-          name -> values
+    allHeaders       : Map[String, List[String]],
+    forwardUserAgent : Boolean,
+    forwardAccept    : Boolean
+  ): Map[String, List[String]] = {
+    val headersToForward =
+      List(
+        Option.when(forwardUserAgent)(http.Headers.UserAgentLower),
+        Option.when(forwardAccept   )(http.Headers.AcceptLower)
+      ).flatten
 
-      // Give priority to explicit headers
-      toForward.toMap
-    } else
-      Map.empty[String, List[String]]
+    val toForward =
+      for {
+        name   <- headersToForward
+        values <- allHeaders.get(name)
+      } yield
+        name -> values
+
+    // Give priority to explicit headers
+    toForward.toMap
+  }
 
   private def forwardResponseHeaders(cxr: ConnectionResultT[?], response: ExternalContext.Response): Unit =
     for {

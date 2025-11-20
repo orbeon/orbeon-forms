@@ -18,6 +18,7 @@ import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.swing.NaiveUserAgent
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
 import org.orbeon.connection.ConnectionResult
+import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.css.{CSSParsing, MediaQuery, MediaType, VariableDefinitions}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
@@ -29,7 +30,7 @@ import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{Connection, ImageMetadata, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
 import java.io.*
-import java.net.URI
+import java.net.{URI, URL}
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.logging.Level
@@ -42,6 +43,7 @@ class OrbeonPdfBoxUserAgent(
   override val pipelineContext         : PipelineContext,
   dotsPerPixel                         : Int,
   variableDefinitions                  : VariableDefinitions,
+  cssCache                             : CSSCache
 )(override implicit val externalContext: ExternalContext,
   override implicit val indentedLogger : IndentedLogger
 ) extends PdfBoxUserAgent(outputDevice)
@@ -140,16 +142,27 @@ class OrbeonPdfBoxUserAgent(
   override protected def openReader(uri: String): Reader = {
     debug(s"openReader($uri)")
 
-    val reader = new InputStreamReader(openStream(uri), StandardCharsets.UTF_8)
+    lazy val reader = new InputStreamReader(openStream(uri), StandardCharsets.UTF_8)
 
     if (uri.contains(".css")) {
 
-      val modifiedCss = CSSParsing.injectVariablesIntoCss(
-        originalCss         = IOUtils.readStreamAsStringAndClose(reader),
-        variableDefinitions = variableDefinitions,
-        mediaQuery          = MediaQuery(MediaType.Print),
-        cssSource           = s"URI: $uri"
-      )
+      lazy val originalCss = IOUtils.readStreamAsStringAndClose(reader)
+
+      // Retrieve parsed CSS from cache or parse from reader
+      val cascadingStyleSheetOpt = cssCache.get(new URL(resolveURI(uri)), CSSParsing.parsedCss(originalCss))
+
+      val modifiedCss = cascadingStyleSheetOpt match {
+        case None =>
+          error(s"Could not parse CSS for variable injection from $uri")
+          originalCss
+
+        case Some(cascadingStyleSheet) =>
+          CSSParsing.injectVariablesIntoCss(
+            cascadingStyleSheet = cascadingStyleSheet,
+            variableDefinitions = variableDefinitions,
+            mediaQuery          = MediaQuery(MediaType.Print)
+          )
+      }
 
       new StringReader(modifiedCss)
     } else {

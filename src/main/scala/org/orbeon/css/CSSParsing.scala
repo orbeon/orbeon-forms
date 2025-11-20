@@ -25,8 +25,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{IndentedLogger, StringUtils}
 import org.w3c.dom.{Document, Element, Node}
 
-import java.io.InputStream
-import java.net.URI
+import java.net.{URI, URL}
 import java.nio.charset.StandardCharsets
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.ListHasAsScala
@@ -34,60 +33,75 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 
 object CSSParsing {
 
-  private def parsedCss(css: String): Option[CascadingStyleSheet] = {
+  class CSSCache {
+    private val cascadingStyleSheets = mutable.Map[String, CascadingStyleSheet]()
+
+    def get(url: URL, cascadingStyleSheetOpt: => Option[CascadingStyleSheet]): Option[CascadingStyleSheet] =
+      cascadingStyleSheets
+        .get(url.toString)
+        .orElse {
+          cascadingStyleSheetOpt.map { cascadingStyleSheet =>
+            cascadingStyleSheets.update(url.toString, cascadingStyleSheet)
+            cascadingStyleSheet
+          }
+        }
+  }
+
+  def parsedCss(css: String): Option[CascadingStyleSheet] = {
     // bBrowserCompliantMode = true for lenient parsing
     val settings = (new CSSReaderSettings).setCSSVersion(ECSSVersion.CSS30).setBrowserCompliantMode(true)
+
+    // Enabling/disabling source location (setUseSourceLocation) or browser compliance mode (setBrowserCompliantMode)
+    // doesn't seem to affect performances in any way (better or worse)
 
     Option(CSSReader.readFromStringReader(css, settings))
   }
 
   def variableDefinitions(
-    resources         : List[CSSResource],
-    inputStreamFromURI: URI => InputStream
+    resources     : List[CSSResource],
+    resolvedURL   : URI => URL
   )(implicit
-    indentedLogger    : IndentedLogger
+    cssCache      : CSSCache,
+    indentedLogger: IndentedLogger,
   ): VariableDefinitions =
     resources.foldLeft(VariableDefinitions(Nil)) { case (previousVariableDefinitions, resource) =>
       // Merge variables definitions from all resources
-      previousVariableDefinitions.merged(variableDefinitions(resource, inputStreamFromURI))
+      previousVariableDefinitions.merged(variableDefinitions(resource, resolvedURL))
     }
 
   def variableDefinitions(
-    resource          : CSSResource,
-    inputStreamFromURI: URI => InputStream
+    resource      : CSSResource,
+    resolvedURL   : URI => URL
   )(implicit
-    indentedLogger    : IndentedLogger
-  ): VariableDefinitions = {
-    val (css, cssSource) = resource match {
-      case Style(css, _) =>
-        (css, s"Inline CSS: ${StringUtils.truncateWithEllipsis(css, 20, 1)}")
-
-      case Link (uri, _) =>
-        (IOUtils.readStreamAsStringAndClose(inputStreamFromURI(uri), charset = None), s"URI: ${uri.toString}")
-    }
-
-    val mediaQueries = resource.mediaQueries
-
-    variableDefinitions(css, mediaQueries, cssSource)
-  }
-
-  def variableDefinitions(
-    css           : String,
-    mediaQueries  : List[MediaQuery],
-    cssSource     : String
-  )(implicit
+    cssCache      : CSSCache,
     indentedLogger: IndentedLogger
-  ): VariableDefinitions =
-    parsedCss(css) match {
+  ): VariableDefinitions = {
+
+    val (cascadingStyleSheetOpt, cssSource) =
+      resource match {
+        case Style(css, _) =>
+          (parsedCss(css), s"inline CSS: ${StringUtils.truncateWithEllipsis(css, 20, 1)}")
+
+        case Link(uri, _) =>
+          val url = resolvedURL(uri)
+
+          val cascadingStyleSheetOpt =
+            cssCache.get(url, parsedCss(IOUtils.readStreamAsStringAndClose(url.openStream(), charset = None)))
+
+          (cascadingStyleSheetOpt, uri.toString)
+      }
+
+    cascadingStyleSheetOpt match {
       case None =>
-        error(s"Could not parse CSS for variable definition parsing, source: $cssSource")
+        error(s"Could not parse CSS for variable definition parsing from $cssSource")
         VariableDefinitions(Nil)
 
-      case Some(css) =>
-        val variableVisitor = new VariableVisitor(mediaQueries)
-        CSSVisitor.visitCSS(css, variableVisitor)
+      case Some(cascadingStyleSheet) =>
+        val variableVisitor = new VariableVisitor(resource.mediaQueries)
+        CSSVisitor.visitCSS(cascadingStyleSheet, variableVisitor)
         VariableDefinitions(variableVisitor.variableBuffer.toList)
     }
+  }
 
   private class VariableVisitor(mediaQueries: List[MediaQuery]) extends DefaultCSSVisitor {
     val variableBuffer: mutable.ArrayBuffer[VariableDefinition] = mutable.ArrayBuffer[VariableDefinition]()
@@ -201,17 +215,12 @@ object CSSParsing {
     }
 
   def injectVariablesIntoCss(
-    originalCss        : String,
+    cascadingStyleSheet: CascadingStyleSheet,
     variableDefinitions: VariableDefinitions,
     mediaQuery         : MediaQuery,
-    cssSource          : String
-  )(implicit
-    indentedLogger     : IndentedLogger
   ): String = {
 
-    val cssOpt = parsedCss(originalCss)
-
-    cssOpt.toList.flatMap(_.getAllRules.asScala).foreach {
+    cascadingStyleSheet.getAllRules.asScala.foreach {
       case styleRule: CSSStyleRule =>
         val selectors = styleRule.getAllSelectors.asScala.toList.map(s => Selector(s.getAsCSSString))
 
@@ -226,16 +235,9 @@ object CSSParsing {
       case _ =>
     }
 
-    cssOpt match {
-      case Some(css) =>
-        // Serialize CSS
-        val writer = new CSSWriter(new CSSWriterSettings(ECSSVersion.CSS30))
-        writer.setContentCharset(StandardCharsets.UTF_8.name)
-        writer.getCSSAsString(css)
-
-      case None =>
-        error(s"Could not parse CSS for variable injection, source: $cssSource")
-        originalCss
-    }
+    // Serialize CSS
+    val writer = new CSSWriter(new CSSWriterSettings(ECSSVersion.CSS30))
+    writer.setContentCharset(StandardCharsets.UTF_8.name)
+    writer.getCSSAsString(cascadingStyleSheet)
   }
 }

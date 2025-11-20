@@ -17,6 +17,7 @@ import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase,
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.css.CSSParsing
+import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -198,6 +199,9 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
           }
         )
 
+      // Cache will be written when variable definitions are parsed and read when variables values are injected
+      implicit val cssCache: CSSCache = new CSSCache()
+
       val (outerPipelineContext, outerExternalContext, outerIndentedLogger) =
         (pipelineContext, externalContext, indentedLogger)
 
@@ -210,8 +214,8 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
       val variableDefinitions =
         CSSParsing.variableDefinitions(
           // Retrieve CSS resources from the document (link and style elements)
-          resources          = CSSParsing.cssResources(w3cDocument),
-          inputStreamFromURI = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString)).openStream()
+          resources   = CSSParsing.cssResources(w3cDocument),
+          resolvedURL = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString))
         )
 
       pdfRendererBuilder.withW3cDocument(
@@ -226,7 +230,8 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             outputDevice,
             pipelineContext,
             DefaultDotsPerPixel,
-            variableDefinitions
+            variableDefinitions,
+            cssCache
           )
         )
       ) { pdfBoxRenderer =>

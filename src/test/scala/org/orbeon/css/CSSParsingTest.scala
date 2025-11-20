@@ -14,8 +14,11 @@
 package org.orbeon.css
 
 import org.log4s.Logger
+import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.oxf.util.IndentedLogger
 import org.scalatest.funspec.AnyFunSpec
+
+import java.net.URL
 
 
 class CSSParsingTest extends AnyFunSpec {
@@ -82,6 +85,8 @@ class CSSParsingTest extends AnyFunSpec {
   }
 
   describe("Variable definitions") {
+    implicit val cssCache: CSSCache = new CSSCache()
+
     val cssWithVariableDefinitions = """|:root {
                                         |  --orbeon-test1: test1;
                                         |  --orbeon-test2: test2
@@ -96,9 +101,8 @@ class CSSParsingTest extends AnyFunSpec {
 
     it("must parse variable definitions from a CSS string") {
       val variableDefinitions = CSSParsing.variableDefinitions(
-        css          = cssWithVariableDefinitions,
-        mediaQueries = List(MediaQuery("all")),
-        cssSource    = "CSSParsingTest"
+        resource    = Style(cssWithVariableDefinitions, List(MediaQuery("all"))),
+        resolvedURL = _ => new URL("") // Won't be called
       )
 
       // Only check variable names and values for now
@@ -146,16 +150,14 @@ class CSSParsingTest extends AnyFunSpec {
 
     it("must inject variables into a CSS stylesheet") {
       val variableDefinitions = CSSParsing.variableDefinitions(
-        css          = cssWithVariableDefinitions,
-        mediaQueries = List(MediaQuery("all")),
-        cssSource    = "tests"
+        resource    = Style(cssWithVariableDefinitions, List(MediaQuery("all"))),
+        resolvedURL = _ => new URL("") // Won't be called
       )
 
       val actualModifiedCss = CSSParsing.injectVariablesIntoCss(
-        originalCss         = cssWithVariableEvaluations,
+        cascadingStyleSheet = CSSParsing.parsedCss(cssWithVariableEvaluations).get,
         variableDefinitions = variableDefinitions,
-        mediaQuery          = MediaQuery("screen"),
-        cssSource           = "CSSParsingTest"
+        mediaQuery          = MediaQuery("screen")
       )
 
       val expectedModifiedCss =

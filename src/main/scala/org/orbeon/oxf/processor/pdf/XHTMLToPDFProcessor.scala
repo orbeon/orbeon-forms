@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.pdf
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
-import org.orbeon.css.CSSParsing
+import org.orbeon.css.{CSSParsing, VariableDefinitions}
 import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -33,7 +33,7 @@ import org.w3c.dom.Document
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-import java.io.{FileInputStream, OutputStream}
+import java.io.{FileInputStream, FileNotFoundException, OutputStream}
 import java.net.{URI, URL}
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
@@ -211,12 +211,20 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
         override implicit val indentedLogger : IndentedLogger  = outerIndentedLogger
       }
 
-      val variableDefinitions =
-        CSSParsing.variableDefinitions(
-          // Retrieve CSS resources from the document (link and style elements)
-          resources   = CSSParsing.cssResources(w3cDocument),
-          resolvedURL = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString))
-        )
+      val variableDefinitions = {
+        try {
+          CSSParsing.variableDefinitions(
+            // Retrieve CSS resources from the document (link and style elements)
+            resources   = CSSParsing.cssResources(w3cDocument),
+            resolvedURL = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString))
+          )
+        } catch {
+          case e: FileNotFoundException =>
+            // This is a workaround for the fact that CSS files from Webjars are not accessible while running tests (see #6642)
+            logger.error(e)("CSS file content could not be read while parsing variable definitions")
+            VariableDefinitions(Nil)
+        }
+      }
 
       pdfRendererBuilder.withW3cDocument(
         w3cDocument,

@@ -9,7 +9,7 @@ import scala.jdk.CollectionConverters.*
 // This is used to pass information that does not keep a handle on an incoming `Request` object. This is necessary for
 // asynchronous calls in particular. See https://github.com/orbeon/orbeon-forms/issues/6760.
 //
-// This is generally immuable, except:
+// This is generally immutable, except:
 //
 // 1. In order to be able to recreate an `ExternalContext` from this, we keep a handle on the `WebAppContext`. This
 //    typically keeps a handle on a native `ServletContext`, which has mutation, specifically for attributes.
@@ -64,15 +64,14 @@ object SafeRequestContext {
     externalContext: ExternalContext
   ): SafeRequestContext =
     apply(
-      request       = externalContext.getRequest,
-      webAppContext = externalContext.getWebAppContext
+      webAppContext = externalContext.getWebAppContext,
+      request       = externalContext.getRequest
     )
 
   def apply(
     webAppContext: WebAppContext,
     request      : ExternalContext.Request,
-  ): SafeRequestContext = {
-
+  ): SafeRequestContext =
     SafeRequestContext(
       scheme             = request.getScheme,
       method             = request.getMethod,
@@ -106,5 +105,4 @@ object SafeRequestContext {
       webAppContext      = webAppContext,
       session            = Option(request.getSession(create = false))
     )
-  }
 }

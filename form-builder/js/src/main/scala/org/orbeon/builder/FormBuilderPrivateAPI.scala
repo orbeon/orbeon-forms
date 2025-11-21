@@ -17,7 +17,6 @@ import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Support}
 import org.scalajs.dom
-import org.scalajs.dom.html
 
 import scala.scalajs.js
 

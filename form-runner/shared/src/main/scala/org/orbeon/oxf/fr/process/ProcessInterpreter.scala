@@ -16,14 +16,13 @@ package org.orbeon.oxf.fr.process
 import cats.effect.IO
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.FormRunnerCommon.spc
-import org.orbeon.oxf.fr.{FormRunnerRename, XMLNames}
 import org.orbeon.oxf.fr.process.ProcessParser.*
+import org.orbeon.oxf.fr.{FormRunnerRename, XMLNames}
 import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XML_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.functions.FunctionLibrary

@@ -148,7 +148,6 @@ trait FormRunnerActionsCommon {
   def trySaveAttachmentsAndData(params: ActionParams): ActionResult =
     ActionResult.tryAsync {
 
-      implicit val externalContext: ExternalContext          = CoreCrossPlatformSupport.externalContext
       implicit val connectionCtx  : ConnectionContexts       = ConnectionContextSupport.findContext(Map.empty)
       implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
 
@@ -205,7 +204,7 @@ trait FormRunnerActionsCommon {
         FormRunner.documentEtag
       }
 
-      implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
+      implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(CoreCrossPlatformSupport.externalContext)
 
       // Saving is an asynchronous operation
       val computation: IO[PutWithAttachmentsResult] =

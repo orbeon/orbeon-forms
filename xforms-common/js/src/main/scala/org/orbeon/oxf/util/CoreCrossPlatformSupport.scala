@@ -14,9 +14,7 @@
 package org.orbeon.oxf.util
 
 import cats.effect.unsafe.IORuntime
-import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
+import org.orbeon.oxf.properties.{PropertyLoader, PropertyStore}
 import org.scalajs.dom
 
 import scala.concurrent.ExecutionContext
@@ -48,19 +46,5 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   def getApplicationResourceVersion: Option[String] = None // TODO: CHECK
 
-  // Global and updated during deserialization
-  // Q: Multiple forms will update this. Are we ok with this?
-  var properties: PropertySet = PropertySet.empty
-
-  def getPropertySet(processorName: QName): PropertySet = PropertySet.empty
-
-  private val externalContextDyn  = new DynamicVariable[ExternalContext]
-
-  def externalContext: ExternalContext =
-    externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
-
-  def withExternalContext[T](ec: ExternalContext)(body: => T): T =
-    externalContextDyn.withValue(ec) {
-      body
-    }
+  def propertyStore: PropertyStore = PropertyLoader.getPropertyStore(None)
 }

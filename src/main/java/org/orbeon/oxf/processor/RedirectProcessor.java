@@ -68,7 +68,7 @@ public class RedirectProcessor extends ProcessorImpl {
             }
 
             // Send the redirect
-            final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final ExternalContext externalContext = NetUtils.getExternalContext();
             final ExternalContext.Response response = externalContext.getResponse();
 
             // Don't rewrite the path if doing a server-side redirect, because the forward expects a URL without the servlet context

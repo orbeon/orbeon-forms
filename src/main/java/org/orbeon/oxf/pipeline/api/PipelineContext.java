@@ -27,11 +27,6 @@ import java.util.Map;
 public class PipelineContext implements PropertyContext {
 
     /**
-     * Key name for the EXTERNAL_CONTEXT attribute of type ExternalContext.
-     */
-    public static final String EXTERNAL_CONTEXT = "external-context";
-
-    /**
      * ContextListener interface to listen on PipelineContext events.
      */
     public interface ContextListener {
@@ -61,7 +56,7 @@ public class PipelineContext implements PropertyContext {
     /**
      * Create a new pipeline context.
      */
-    public PipelineContext() {
+    public PipelineContext(String reason) {
         // Save and set ThreadLocal
         originalPipelineContext = threadLocal.get();
         threadLocal.set(this);

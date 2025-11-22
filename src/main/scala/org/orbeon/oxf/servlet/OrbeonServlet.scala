@@ -16,6 +16,7 @@ package org.orbeon.oxf.servlet
 import org.log4s
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.http.{PropertiesApacheHttpClient, StatusCode}
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.*
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.webapp.ServletPortlet.*
@@ -91,9 +92,11 @@ abstract class OrbeonServletImpl(servletContextProvider: ServletContextProvider)
           logger.info("HTTP method not accepted: " + httpMethod + ". You can configure methods in your web.xml using the parameter: " + HttpAcceptMethodsParam)
           response.setStatus(StatusCode.MethodNotAllowed)
         } else {
-          val pipelineContext = new PipelineContext
-          val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
-          processorService.service(pipelineContext, externalContext)
+          val pipelineContext = new PipelineContext("OrbeonServlet.service()")
+          processorService.service(
+            pipelineContext = pipelineContext,
+            externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
+          )
         }
       }
     }

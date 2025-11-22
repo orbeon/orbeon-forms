@@ -16,8 +16,11 @@ package org.orbeon.oxf.portlet.processor;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 import javax.portlet.PortletPreferences;
@@ -36,7 +39,7 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorOutputImpl(PortletPreferencesGenerator.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final ExternalContext externalContext = NetUtils.getExternalContext();
 
                 if (!(externalContext.getRequest().getNativeRequest() instanceof PortletRequest))
                     throw new OXFException("Portlet preferences are only available from within a portlet");

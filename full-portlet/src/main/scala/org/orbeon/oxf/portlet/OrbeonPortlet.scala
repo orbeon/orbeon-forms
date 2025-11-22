@@ -17,9 +17,10 @@ import org.log4s.Logger
 import org.orbeon.connection.StreamedContentT
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, PortletWebAppContext}
-import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.fr.embedding.*
+import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet.*
@@ -113,7 +114,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     }
 
   private def directContext(request: PortletRequest): AsyncContext = {
-    val pipelineContext = new PipelineContext
+    val pipelineContext = new PipelineContext("OrbeonPortlet.directContext()")
     val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
 
     AsyncContext(externalContext, Some(pipelineContext))
@@ -121,23 +122,30 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
   // Call the Orbeon Forms pipeline processor service
   private def callService(context: AsyncContext): StreamedContentOrRedirect = {
-    processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
+    // withNewPipelineContext { pipelineContext =>
+    processorService.service(context.pipelineContext.getOrElse(new PipelineContext("OrbeonPortlet.callService()")), context.externalContext)
     context.externalContext.getResponse.asInstanceOf[BufferedResponseImpl].responseContent
   }
 
   private def directServeResource(request: ResourceRequest, response: ResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
-    // Process request
-    val pipelineContext = new PipelineContext
-    val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
-    processorService.service(pipelineContext, externalContext)
+    InitUtils.withNewPipelineContext("OrbeonPortlet.directServeResource()") { pipelineContext =>
 
-    // Write out the response
-    externalContext.getResponse.responseContent match {
-      case Right(_: Redirect) =>
-        throw new NotImplementedError("redirect not supported when serving resource")
-      case Left(s @ StreamedContentT(_, contentType, _, _)) =>
-        contentType foreach response.setContentType
-        APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(s)
+      val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
+
+      // Process request
+      processorService.service(
+        pipelineContext,
+        externalContext
+      )
+
+      // Write out the response
+      externalContext.getResponse.responseContent match {
+        case Right(_: Redirect) =>
+          throw new NotImplementedError("redirect not supported when serving resource")
+        case Left(s @ StreamedContentT(_, contentType, _, _)) =>
+          contentType foreach response.setContentType
+          APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(s)
+      }
     }
   }
 }

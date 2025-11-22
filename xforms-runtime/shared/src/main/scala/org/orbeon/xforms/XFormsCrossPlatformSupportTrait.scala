@@ -43,7 +43,7 @@ import javax.xml.transform.{OutputKeys, Transformer}
 //
 trait XFormsCrossPlatformSupportTrait {
 
-  def externalContext: ExternalContext
+  def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
 
   def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[FileItemType]]
 

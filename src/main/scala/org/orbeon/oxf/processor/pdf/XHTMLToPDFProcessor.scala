@@ -120,10 +120,8 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
     outputStream    : OutputStream
   ): Unit = {
 
-    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
     implicit val indentedLogger : IndentedLogger  = new IndentedLogger(XHTMLToPDFProcessor.logger)
-
-    val requestOpt = Option(externalContext).flatMap(ec => Option(ec.getRequest))
 
     val pdfRendererBuilder = new CustomPdfRendererBuilder
     XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
@@ -158,7 +156,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
       // We are trying to avoid `getRequestURL`. Most likely, we do not rely on this to resolve resources in
       // `OrbeonPdfBoxUserAgent`.
-      val baseUri = requestOpt.map(_.getRequestURI)
+      val baseUri = CoreCrossPlatformSupport.requestOpt.map(_.getRequestURI)
 
       val w3cDocument =
         readInputAsDOM(

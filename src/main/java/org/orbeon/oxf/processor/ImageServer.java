@@ -45,8 +45,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * ImageServer directly serves or converts to its "data" output images from URLs while performing
@@ -324,7 +324,7 @@ public class ImageServer extends ProcessorImpl {
      * to an ExternalContext.Response.
      */
     public void start(PipelineContext pipelineContext) {
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Response response = externalContext.getResponse();
 
         processImage(pipelineContext, new ImageResponse() {

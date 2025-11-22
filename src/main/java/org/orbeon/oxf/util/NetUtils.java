@@ -386,8 +386,7 @@ public class NetUtils {
      * @return  external context if found, null otherwise
      */
     public static ExternalContext getExternalContext() {
-        final PipelineContext pipelineContext = PipelineContext.get();
-        return (pipelineContext != null) ? (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT) : null;
+        return CoreCrossPlatformSupport.externalContext();
     }
 
     public static void deleteFile(final File file, final Logger logger) {

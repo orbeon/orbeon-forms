@@ -18,8 +18,10 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{WebAppContext, WebAppExternalContext}
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.InitUtils.*
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 
 import scala.util.control.NonFatal
 
@@ -69,10 +71,11 @@ trait ServletPortlet {
     // Create and run processor if definition is found
     searchDefinition(processorPrefix, inputPrefix) foreach  { definition =>
       ProcessorService.Logger.info(logPrefix + " - About to run processor: " +  definition.toString)
-
-      val processor = createProcessor(definition)
-      val externalContext = new WebAppExternalContext(webAppContext)
-      runProcessor(processor, externalContext, new PipelineContext)(ProcessorService.Logger)
+      runProcessor(
+        processor       = createProcessor(definition),
+        externalContext = new WebAppExternalContext(webAppContext),
+        pipelineContext = new PipelineContext("ServletPortlet.runInitDestroyListenerProcessor()")
+      )(ProcessorService.Logger)
     }
   }
 

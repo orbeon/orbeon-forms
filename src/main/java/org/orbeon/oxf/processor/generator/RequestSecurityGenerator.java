@@ -17,8 +17,12 @@ import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.SAXUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
 import java.util.Iterator;
@@ -36,7 +40,7 @@ public class RequestSecurityGenerator extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorOutputImpl(RequestSecurityGenerator.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
-                ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                ExternalContext externalContext = NetUtils.getExternalContext();
                 if (externalContext == null)
                     throw new OXFException("Missing external context object in RequestSecurityGenerator");
                 Node config = readCacheInputAsOrbeonDom(context, INPUT_CONFIG);

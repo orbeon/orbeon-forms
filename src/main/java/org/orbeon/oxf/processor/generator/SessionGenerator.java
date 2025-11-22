@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.datatypes.LocationData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -56,7 +57,7 @@ public class SessionGenerator extends ProcessorImpl {
                                 }
                             }
                         });
-                    ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
+                    ExternalContext externalContext = NetUtils.getExternalContext();
 
                     // If there is a session, try to read the object
                     ExternalContext.Session session = externalContext.getSession(false);

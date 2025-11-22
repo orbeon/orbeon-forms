@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer.*
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream
 import org.orbeon.oxf.processor.{CacheableInputReader, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, URLRewriterUtils}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport, LoggerFactory, URLRewriterUtils}
 import org.orbeon.oxf.xml.XPathUtils.*
 
 import java.io.OutputStream
@@ -150,8 +150,7 @@ abstract class HttpSerializerBase protected
     val config    = readConfig(pipelineContext)
     val dataInput = getInputByName(INPUT_DATA)
 
-    val externalContext =
-      pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT).asInstanceOf[ExternalContext]
+    val externalContext = CoreCrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 

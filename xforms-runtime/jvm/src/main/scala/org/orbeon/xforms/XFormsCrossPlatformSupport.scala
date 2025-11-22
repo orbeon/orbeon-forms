@@ -34,13 +34,12 @@ import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.xforms.route.XFormsAssetServerRoute
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.route.XFormsAssetServerRoute
 
 import java.io.*
 import java.net.URI
-import java.nio.charset.Charset
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
 
@@ -72,8 +71,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       ).leftMap(_.getMessage)
     }
 
-  def externalContext: ExternalContext = NetUtils.getExternalContext
-
   def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[CoreCrossPlatformSupport.FileItemType]] =
     UploaderServer.getUploadProgress(request, uuid, fieldName)
 
@@ -85,12 +82,12 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String = {
     val resolvedURI = containingDocument.resolveXMLBase(element, url)
-    URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, resolvedURI.toString, rewriteMode)
+    URLRewriterUtils.rewriteServiceURL(CoreCrossPlatformSupport.externalContext.getRequest, resolvedURI.toString, rewriteMode)
   }
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String = {
     val resolvedURI = containingDocument.resolveXMLBase(element, url)
-    externalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
+    CoreCrossPlatformSupport.externalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
   }
 
   def resolveRenderURL(
@@ -104,13 +101,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     if (skipRewrite)
       resolvedURIStringNoPortletFragment
     else
-      externalContext.getResponse.rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null)
+      CoreCrossPlatformSupport.externalContext.getResponse.rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String = {
     val resolvedURI = containingDocument.resolveXMLBase(currentElement, url)
     val resolvedURIStringNoPortletFragment = uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument, resolvedURI)
-    externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
+    CoreCrossPlatformSupport.externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =

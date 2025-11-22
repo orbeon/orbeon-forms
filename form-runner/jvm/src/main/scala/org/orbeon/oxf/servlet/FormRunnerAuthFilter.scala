@@ -17,7 +17,7 @@ import org.apache.logging.log4j.ThreadContext
 import org.orbeon.oxf.externalcontext.CredentialsSupport
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
 import org.orbeon.oxf.util.StringUtils.*
 import org.slf4j.LoggerFactory
 
@@ -55,8 +55,10 @@ class FormRunnerAuthFilterImpl extends Filter {
       res.asInstanceOf[HttpServletResponse].setHeader("Content-Security-Policy", value)
     }
 
+    implicit val propertySet: PropertySet = PropertyLoader.getPropertyStore(None).globalPropertySet
+
     val addHttpHeadersToThreadContext =
-      Properties.instance.getPropertySet.getBoolean("oxf.log4j.thread-context.http-headers", default = false)
+      propertySet.getBoolean("oxf.log4j.thread-context.http-headers", default = false)
     if (addHttpHeadersToThreadContext)
       req.asInstanceOf[HttpServletRequest]
         .headerNamesWithValues
@@ -72,7 +74,7 @@ object FormRunnerAuthFilterImpl {
 
   private val logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
 
-  def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
+  def amendRequest(servletRequest: HttpServletRequest)(implicit propertySet: PropertySet): HttpServletRequest = {
 
     // Do not create a session for fonts, source maps, or OPTIONS requests
     val createSession  = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)

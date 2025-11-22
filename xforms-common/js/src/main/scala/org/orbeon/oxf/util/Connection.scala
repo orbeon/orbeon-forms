@@ -18,6 +18,7 @@ import org.orbeon.connection.*
 import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
 import org.orbeon.{fs2dom, sjsdom}
@@ -321,7 +322,7 @@ object Connection extends ConnectionTrait {
     )
   }
 
-  def isInternalPath(path: String): Boolean = false
+  def isInternalPath(path: String)(implicit propertySet: PropertySet): Boolean = false
 
   def findInternalUrl(
     normalizedUrl: URI,

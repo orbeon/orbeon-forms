@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.util.NetUtils;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -41,7 +42,7 @@ public class PortletPreferencesSerializer extends ProcessorImpl {
 
     public void start(PipelineContext pipelineContext) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
 
         final PortletRequest portletRequest = (PortletRequest) externalContext.getRequest().getNativeRequest();
         final PortletPreferences preferences = portletRequest.getPreferences();

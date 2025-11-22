@@ -60,11 +60,10 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
   }
 
   def withTestExternalContext[T](body: ExternalContext => T): T =
-    PipelineSupport.withTestExternalContext(
+    PipelineSupport.withPipelineContextAndTestExternalContext(
       XFormsStateManager.sessionCreated,
-      XFormsStateManager.sessionDestroyed)(
-      body
-    )
+      XFormsStateManager.sessionDestroyed
+    )((_, ec) => body(ec))
 
   describe("Test size constraints") {
 

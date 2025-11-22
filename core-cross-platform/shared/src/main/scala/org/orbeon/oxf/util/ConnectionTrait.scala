@@ -21,6 +21,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.debug
 
@@ -71,7 +72,7 @@ trait ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult]
 
-  def isInternalPath(path: String): Boolean
+  def isInternalPath(path: String)(implicit propertySet: PropertySet): Boolean
 
   def findInternalUrl(
     normalizedUrl: URI,

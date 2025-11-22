@@ -15,12 +15,9 @@ package org.orbeon.oxf.util
 
 import cats.effect.unsafe.{IORuntime, IORuntimeBuilder, IORuntimeConfig}
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.orbeon.dom.QName
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.properties.{Properties, PropertyLoader, PropertySet}
+import org.orbeon.oxf.properties.{PropertyLoader, PropertyStore}
 
 import java.util.concurrent.ExecutorService
 import javax.naming.InitialContext
@@ -87,13 +84,8 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def isJsEnv: Boolean = false
   def randomHexId: String = SecureUtils.randomHexId
   def getApplicationResourceVersion: Option[String] = URLRewriterUtils.getApplicationResourceVersion
-  def properties: PropertySet = Properties.getPropertySet
-  def getPropertySet(processorName: QName): PropertySet = Properties.getPropertySet(processorName)
-  def externalContext: ExternalContext = NetUtils.getExternalContext
+  def propertyStore: PropertyStore = PropertyLoader.getPropertyStore(requestOpt)
 
-  def withExternalContext[T](ec: ExternalContext)(body: => T): T =
-    InitUtils.withPipelineContext { pipelineContext =>
-      pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, ec)
-      body
-    }
+  def setExternalContext(ec: ExternalContext): Unit = externalContextDyn.value = ec
+  def clearExternalContext()                 : Unit = externalContextDyn.clear()
 }

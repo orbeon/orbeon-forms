@@ -8,7 +8,7 @@ import io.circe.{Decoder, DecodingFailure, HCursor, KeyDecoder}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.properties.{PropertyLoader, PropertySet, PropertyStore, SimplePropertyStore}
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
@@ -1029,7 +1029,15 @@ object XFormsStaticStateDeserializer {
         // Do this *after* the top-level template has been deserialized
         topLevelPart.marks = collectedSAXStoreMarks
 
-        CoreCrossPlatformSupport.properties = PropertySet(properties, eTag = "")
+        PropertyLoader.setServerPropertyStore(
+          SimplePropertyStore(
+            PropertySet(
+              properties,
+              eTag = System.currentTimeMillis().toString
+            ),
+            Map.empty
+          )
+        )
 
         // Set collected `Model` information on elements
         for {

@@ -14,7 +14,9 @@
 package org.orbeon.oxf.processor.transformer;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -43,8 +45,8 @@ public class TransformerURIResolver implements URIResolver {
     private ProcessorImpl processor;
     private PipelineContext pipelineContext;
     private String prohibitedInput;
-    private ParserConfiguration parserConfiguration;
-    private String mode;
+    private final ParserConfiguration parserConfiguration;
+    private final String mode;
     private boolean destroyPipelineContext;
 
     /**
@@ -82,7 +84,7 @@ public class TransformerURIResolver implements URIResolver {
      * @param parserConfiguration   parser configuration
      */
     public TransformerURIResolver(ParserConfiguration parserConfiguration) {
-        this(null, new PipelineContext(), null, parserConfiguration);
+        this(null, new PipelineContext("TransformerURIResolver"), null, parserConfiguration);
         destroyPipelineContext = true;
     }
 

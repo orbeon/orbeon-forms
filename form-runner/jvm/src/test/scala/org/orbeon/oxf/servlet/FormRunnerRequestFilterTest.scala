@@ -18,6 +18,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
@@ -57,7 +58,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
           override def getPathInfo: String = path
         }
 
-      FormRunnerAuthFilterImpl.amendRequest(mockRequest)
+      FormRunnerAuthFilterImpl.amendRequest(mockRequest)(PropertyLoader.getPropertyStore(None).globalPropertySet)
     }
 
     val testCredentials =

@@ -14,8 +14,9 @@
 package org.orbeon.oxf.processor.serializer.store;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class ResultStoreOutputStream extends ByteArrayOutputStream implements Re
     }
 
     public void replay(PipelineContext context) {
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        ExternalContext externalContext = NetUtils.getExternalContext();
         replay(externalContext.getResponse().getOutputStream());
     }
 

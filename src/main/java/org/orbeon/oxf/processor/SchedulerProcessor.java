@@ -25,6 +25,7 @@ import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.servlet.HttpSession;
 import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -116,7 +117,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                 }
             });
 
-            ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            ExternalContext externalContext = NetUtils.getExternalContext();
             TaskScheduler scheduler = TaskScheduler.getInstance(externalContext.getWebAppContext());
 
             //assert externalContext != null;
@@ -194,7 +195,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         logger.info("Task: " + getName() + " won't run since it is already running");
                 } else {
                     setStatus(true);
-                    InitUtils.runProcessor(processor, externalContext, new PipelineContext(), logger);
+                    InitUtils.runProcessor(processor, externalContext, new PipelineContext("SchedulerProcessor.run()"), logger);
                     setStatus(false);
                 }
             } catch (Exception e) {

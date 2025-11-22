@@ -28,7 +28,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession, ServletContext}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
+import org.orbeon.oxf.util.{AttributesToMap, CoreCrossPlatformSupport, PipelineUtils}
 import org.orbeon.saxon.om.NodeInfo
 
 import java.util
@@ -43,10 +43,8 @@ object InitUtils {
   private val DeprecatedProcessorsProperty = "oxf.prologue"
   private val DefaultProcessors            = "oxf:/processors.xml"
 
-  // Run with a pipeline context and destroy the pipeline when done
-  def withPipelineContext[T](body: PipelineContext => T): T = {
+  def withPipelineContext[T](location: String, pipelineContext: PipelineContext)(body: PipelineContext => T): T = {
     var success = false
-    val pipelineContext = new PipelineContext // side effect of creating a `ThreadLocal`
     try {
       val result = body(pipelineContext)
       success = true
@@ -55,64 +53,68 @@ object InitUtils {
       pipelineContext.destroy(success)
   }
 
+  // Run with a pipeline context and destroy the pipeline when done
+  def withNewPipelineContext[T](location: String)(body: PipelineContext => T): T =
+    withPipelineContext(location, new PipelineContext(location))(body)// side effect of creating a `ThreadLocal`
+
   // Run a processor with an ExternalContext
   def runProcessor(
-    processor       : Processor,
-    externalContext : ExternalContext,
-    pipelineContext : PipelineContext
+    processor      : Processor,
+    externalContext: ExternalContext,
+    pipelineContext: PipelineContext
   )(implicit
-    logger          : log4s.Logger
-  ): Unit = {
+    logger         : log4s.Logger
+  ): Unit =
+    InitUtils.withPipelineContext("ServletPortlet.runInitDestroyListenerProcessor()", pipelineContext) { pipelineContext =>
+      CoreCrossPlatformSupport.withExternalContext(externalContext) {
 
-    // Record start time for this request
-    val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
+        // Record start time for this request
+        val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
 
-    if (logger.isInfoEnabled)
-      externalContext.getStartLoggerString.trimAllToOpt foreach (logger.info(_))
+        if (logger.isInfoEnabled)
+          externalContext.getStartLoggerString.trimAllToOpt foreach (logger.info(_))
 
-    // Set ExternalContext into PipelineContext
-    pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
+        var success = false
+        try {
+          // Set cache size
+          Properties.instance.getPropertySet.getIntOpt(CacheSizeProperty) foreach
+            ObjectCache.instance.setMaxSize
 
-    var success = false
-    try {
-      // Set cache size
-      Properties.instance.getPropertySet.getIntOpt(CacheSizeProperty) foreach
-        ObjectCache.instance.setMaxSize
+          // Start execution
+          processor.reset(pipelineContext)
+          processor.start(pipelineContext)
+          success = true
+        } catch {
+          case NonFatal(t) =>
+            def locationData    = getRootLocationData(t)
+            def locationMessage = locationData map ("at " + _) getOrElse "with no location data"
 
-      // Start execution
-      processor.reset(pipelineContext)
-      processor.start(pipelineContext)
-      success = true
-    } catch {
-      case NonFatal(t) =>
-        def locationData    = getRootLocationData(t)
-        def locationMessage = locationData map ("at " + _) getOrElse "with no location data"
-
-        Exceptions.getRootThrowable(t) match {
-          case e: HttpStatusCodeException =>
-            externalContext.getResponse.sendError(e.code)
-            logger.info(e.toString + " " + locationMessage)
-            if (logger.isDebugEnabled)
-              logger.debug(e.throwable map OrbeonFormatter.format getOrElse "")
-          case e: ResourceNotFoundException =>
-            externalContext.getResponse.sendError(StatusCode.NotFound)
-            logger.info(s"Resource not found${Option(e.resource).map(": " + _).getOrElse("")} $locationMessage")
-          case _ =>
-            throw t
+            Exceptions.getRootThrowable(t) match {
+              case e: HttpStatusCodeException =>
+                externalContext.getResponse.sendError(e.code)
+                logger.info(e.toString + " " + locationMessage)
+                if (logger.isDebugEnabled)
+                  logger.debug(e.throwable map OrbeonFormatter.format getOrElse "")
+              case e: ResourceNotFoundException =>
+                externalContext.getResponse.sendError(StatusCode.NotFound)
+                logger.info(s"Resource not found${Option(e.resource).map(": " + _).getOrElse("")} $locationMessage")
+              case _ =>
+                throw t
+            }
+        } finally {
+          if (logger.isInfoEnabled) {
+            val timing = System.currentTimeMillis - tsBegin
+            logger.info(s"${externalContext.getEndLoggerString} - Timing: $timing")
+          }
+          try
+            pipelineContext.destroy(success)
+          catch {
+            case NonFatal(t) =>
+              logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(t))
+          }
         }
-    } finally {
-      if (logger.isInfoEnabled) {
-        val timing = System.currentTimeMillis - tsBegin
-        logger.info(s"${externalContext.getEndLoggerString} - Timing: $timing")
-      }
-      try
-        pipelineContext.destroy(success)
-      catch {
-        case NonFatal(t) =>
-          logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(t))
       }
     }
-  }
 
   // Create a processor and connect its inputs to static URLs
   def createProcessor(processorDefinition: ProcessorDefinition): Processor = {
@@ -175,12 +177,11 @@ object InitUtils {
 
     processorDefinitionOption foreach { processorDefinition =>
       logger.info(logMessagePrefix + " - About to run processor: " + processorDefinition)
-      val processor = createProcessor(processorDefinition)
-      val externalContext = new WebAppExternalContext(webAppContext, session)
-
-      withPipelineContext { pipelineContext =>
-        runProcessor(processor, externalContext, pipelineContext)
-      }
+      runProcessor(
+        processor       = createProcessor(processorDefinition),
+        externalContext = new WebAppExternalContext(webAppContext, session),
+        pipelineContext = new PipelineContext("InitUtils.runWithServletContext()")
+      )
     }
   }
 
@@ -193,7 +194,7 @@ object InitUtils {
       val registry = new XMLProcessorRegistry
       PipelineUtils.connect(processorDefinitions, "data", registry, "config")
 
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("InitUtils.processorDefinitions") { pipelineContext =>
         processorDefinitions.reset(pipelineContext)
         registry.reset(pipelineContext)
         registry.start(pipelineContext)
@@ -256,14 +257,6 @@ object InitUtils {
     def removed(key: String): Map[String, String] = Map() ++ this - key
     def updated[V1 >: String](key: String, value: V1): Map[String, V1] = Map() ++ this + (key -> value)
   }
-
-  // View of the HttpSession properties as a Map
-  class SessionMap(session: HttpSession) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
-    def getAttribute(s: String): AnyRef             = session.getAttribute(s)
-    def getAttributeNames: util.Enumeration[String] = session.getAttributeNames
-    def removeAttribute(s: String): Unit            = session.removeAttribute(s)
-    def setAttribute(s: String, o: AnyRef): Unit    = session.setAttribute(s, o)
-  })
 
   // View of the HttpServletRequest properties as a Map
   class RequestMap(request: HttpServletRequest) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {

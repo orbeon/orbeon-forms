@@ -73,18 +73,14 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
   }
 
   def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument => T): T =
-    InitUtils.withPipelineContext { pipelineContext =>
-      PipelineSupport.setExternalContext(
-        pipelineContext,
-        PipelineSupport.DefaultRequestUrl,
+      PipelineSupport.withPipelineContextAndTestExternalContext(
         XFormsStateManager.sessionCreated,
         XFormsStateManager.sessionDestroyed
-      )
+      ) { (_, _) =>
       val doc = setupDocument(xhtml)
-      try {
+      try
         thunk(doc)
-      } finally {
+      finally
         disposeDocument(doc)
-      }
     }
 }

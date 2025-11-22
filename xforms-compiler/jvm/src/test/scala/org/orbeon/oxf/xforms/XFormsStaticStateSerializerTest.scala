@@ -1,7 +1,5 @@
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.{PipelineSupport, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
@@ -19,7 +17,7 @@ class XFormsStaticStateSerializerTest
 
       val DocumentURL = "oxf:/apps/xforms-compiler/forms/multiple-fields.xhtml"
 
-      withTestExternalContext { _ =>
+      PipelineSupport.withPipelineContextAndTestExternalContext() { (_, _) =>
 
         implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("compiler")
 
@@ -32,14 +30,4 @@ class XFormsStaticStateSerializerTest
       }
     }
   }
-
-  def withTestExternalContext[T](body: ExternalContext => T): T =
-    InitUtils.withPipelineContext { pipelineContext =>
-      body(
-        PipelineSupport.setExternalContext(
-          pipelineContext,
-          PipelineSupport.DefaultRequestUrl
-        )
-      )
-    }
 }

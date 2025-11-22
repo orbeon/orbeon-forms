@@ -15,22 +15,21 @@ package org.orbeon.oxf.test
 
 import org.orbeon.connection.StreamedContent
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.pipeline.InitUtils.*
-import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
+import org.orbeon.oxf.pipeline.api.ProcessorDefinition
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, SecureUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, SecureUtils, URLRewriterUtils}
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 
-import java.util.Locale
-import java.{util, util as ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
@@ -101,7 +100,7 @@ object TestHttpClient {
     }
 
     val (response, sessionOpt) =
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("TestHttpClient.connect()") { pipelineContext =>
 
         val (externalContext, response) = {
 
@@ -131,7 +130,6 @@ object TestHttpClient {
           (externalContext, response)
         }
 
-        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
         pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
         pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", true) // the default
 
@@ -140,7 +138,6 @@ object TestHttpClient {
             processorService.service(pipelineContext, externalContext)
           }
         }
-
 
         (response, Option(externalContext.getRequest.getSession(false)))
       }

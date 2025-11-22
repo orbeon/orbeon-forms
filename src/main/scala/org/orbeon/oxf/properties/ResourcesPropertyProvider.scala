@@ -2,7 +2,7 @@ package org.orbeon.oxf.properties
 
 import cats.Eval
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+import org.orbeon.oxf.pipeline.InitUtils.withNewPipelineContext
 import org.orbeon.oxf.processor.{DOMSerializer, Processor, ProcessorImpl}
 import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.properties.api
@@ -24,7 +24,7 @@ class ResourcesPropertyProvider extends api.PropertyProvider {
 
   private def readUnconditionally(semaphore: java.util.concurrent.Semaphore): Option[(api.PropertyDefinitions, api.ETag)] =
     ResourcesPropertyProvider.withAcquiredResourceOrNone(semaphore) {
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("ResourcesPropertyProvider.readUnconditionally()") { pipelineContext =>
 
         val (urlGenerator, domSerializer) = processors.value
 
@@ -57,7 +57,7 @@ class ResourcesPropertyProvider extends api.PropertyProvider {
 
   private def findResourceLastModified(semaphore: java.util.concurrent.Semaphore): Option[Long] =
     ResourcesPropertyProvider.withAcquiredResourceOrNone(semaphore) {
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("ResourcesPropertyProvider.findResourceLastModified()") { pipelineContext =>
 
         val (urlGenerator, domSerializer) = processors.value
 

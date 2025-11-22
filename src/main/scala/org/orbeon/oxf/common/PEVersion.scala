@@ -20,7 +20,7 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.*
-import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+import org.orbeon.oxf.pipeline.InitUtils.withNewPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
@@ -199,7 +199,7 @@ private object PEVersion {
       }
 
       // Execute pipeline to obtain license document
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("LicenseInfo.tryGetSignedData()") { pipelineContext =>
         serializer.reset(pipelineContext)
         serializer.runGetDocument(pipelineContext)
       }

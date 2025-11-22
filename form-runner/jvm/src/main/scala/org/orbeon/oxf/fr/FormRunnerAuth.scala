@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.fr.auth.RolesProviderFactory
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -51,6 +51,8 @@ object FormRunnerAuth {
     getAttribute: String => AnyRef,
     session     : ExternalContext.Session,
     getHeader   : String => List[String]
+  )(implicit
+    propertySet : PropertySet
   ): List[(String, NonEmptyList[String])] =
     getCredentialsUseSession(userRoles, getAttribute, session, getHeader) match {
       case Some(credentials) =>
@@ -68,6 +70,8 @@ object FormRunnerAuth {
     usernameOpt   : => Option[String],
     rolesList     : => List[String],
     groupOpt      : => Option[String]
+  )(implicit
+    propertySet   : PropertySet
   ): Option[Credentials] =
     fromCredentialsHeader(credentialsOpt) orElse
       fromIndividualHeaders(
@@ -119,12 +123,14 @@ object FormRunnerAuth {
       getAttribute: String => AnyRef,
       session     : ExternalContext.Session,
       getHeader   : String => List[String]
+    )(implicit
+      propertySet : PropertySet
     ): Option[Credentials] = {
 
       val sessionCredentialsOpt = CredentialsSupport.findCredentialsInSession(session)
 
       lazy val stickyHeadersConfigured =
-        Properties.instance.getPropertySet.getBoolean(HeaderStickyPropertyName, default = false)
+        propertySet.getBoolean(HeaderStickyPropertyName, default = false)
 
       lazy val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getAttribute, getHeader)
 
@@ -169,9 +175,8 @@ object FormRunnerAuth {
       headerAsJSONStrings.mkString("{", ", ", "}")
     }
 
-    def authMethod: AuthMethod = {
+    def authMethod(implicit propertySet : PropertySet): AuthMethod = {
 
-      val propertySet               = Properties.instance.getPropertySet
       val requestedAuthMethodString = propertySet.getString(MethodPropertyName, "container")
       val requestedAuthMethodOpt    = AuthMethod.withNameOption(requestedAuthMethodString)
       def unsupportedAuthMethod     = s"`$MethodPropertyName` property: unsupported authentication method `$requestedAuthMethodString`"
@@ -183,9 +188,9 @@ object FormRunnerAuth {
       userRoles   : UserRolesFacade,
       getAttribute: String => AnyRef,
       getHeader   : String => List[String]
+    )(implicit
+      propertySet : PropertySet
     ): Option[Credentials] = {
-
-      val propertySet = Properties.instance.getPropertySet
 
       val requestedAuthMethod = propertySet.getString(MethodPropertyName, "container")
 
@@ -265,12 +270,12 @@ object FormRunnerAuth {
       usernameOpt: => Option[String],
       rolesList  : => List[String],
       groupOpt   : => Option[String]
+    )(implicit
+      propertySet : PropertySet
     ): Option[Credentials] =
       usernameOpt map { username =>
         // Roles: all headers with the given name are used, each header value is split, and result combined
         // See also: https://github.com/orbeon/orbeon-forms/issues/1690
-
-        val propertySet = Properties.instance.getPropertySet
 
         val headerPropertyName =
           propertySet.getNonBlankString(HeaderRolesPropertyNamePropertyName)

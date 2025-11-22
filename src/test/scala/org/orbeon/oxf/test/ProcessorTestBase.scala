@@ -84,15 +84,11 @@ abstract class ProcessorTestBase(
 
   private def runOneTest(d: TestDescriptor): TestResult =
     try {
-      // Create pipeline context
-      InitUtils.withPipelineContext { pipelineContext =>
-
-         PipelineSupport.setExternalContext(
-           pipelineContext,
-           d.requestUrlOpt getOrElse PipelineSupport.DefaultRequestUrl,
-           sessionCreated,
-           sessionDestroyed
-         )
+      PipelineSupport.withPipelineContextAndTestExternalContext(
+        sessionCreated,
+        sessionDestroyed,
+        d.requestUrlOpt.getOrElse(PipelineSupport.DefaultRequestUrl)
+      ) { (pipelineContext, _) =>
 
         d.processor.reset(pipelineContext)
 
@@ -130,7 +126,7 @@ abstract class ProcessorTestBase(
       PipelineUtils.connect(urlGenerator, "data", domSerializer, "data")
 
       new DocumentWrapper(
-        domSerializer.runGetDocument(new PipelineContext),
+        domSerializer.runGetDocument(new PipelineContext("ProcessorTestBase.findTestsToRun()")),
         null,
         XPath.GlobalConfiguration
       )

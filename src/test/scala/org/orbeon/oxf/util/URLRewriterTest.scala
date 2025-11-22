@@ -31,19 +31,19 @@ class URLRewriterTest
 
   private val directRequest: ExternalContext.Request =
     new TestExternalContext(
-      new PipelineContext,
+      new PipelineContext("URLRewriterTest.directRequest"),
       ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request.xml", null)
     ).getRequest
 
   private val forwardRequest: ExternalContext.Request =
     new TestExternalContext(
-      new PipelineContext,
+      new PipelineContext("URLRewriterTest.forwardRequest"),
       ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-forward.xml", null)
     ).getRequest
 
   private val filterRequest: ExternalContext.Request =
     new TestExternalContext(
-      new PipelineContext,
+      new PipelineContext("URLRewriterTest.filterRequest"),
       ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-filter.xml", null)
     ).getRequest
 

@@ -2,6 +2,7 @@ package org.orbeon.oxf.xml.xerces
 
 import cats.Eval
 import org.orbeon.oxf.properties.PropertyLoader
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.xml.ParserConfiguration
@@ -79,7 +80,7 @@ private object XercesSAXParserFactoryImpl {
   }
 
   private def getPropertiesEntityExpansionLimit: Int =
-    PropertyLoader.getPropertyStore(None).globalPropertySet.getInteger(OrbeonEntityExpansionLimitProperty, default = 0)
+    PropertyLoader.getPropertyStore(Option(CoreCrossPlatformSupport.externalContext).flatMap(ec => Option(ec.getRequest))).globalPropertySet.getInteger(OrbeonEntityExpansionLimitProperty, default = 0)
 
   @volatile private var _securityManager: Eval[org.orbeon.apache.xerces.util.SecurityManager] = Eval.later {
     newSecurityManager(getPropertiesEntityExpansionLimit)

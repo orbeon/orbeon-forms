@@ -14,7 +14,7 @@
 package org.orbeon.oxf.pipeline
 
 import org.orbeon.dom.{Document, Element, QName}
-import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+import org.orbeon.oxf.pipeline.InitUtils.withNewPipelineContext
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor, PipelineReader}
 import org.orbeon.oxf.processor.{DOMSerializer, ProcessorSupport, XPLConstants}
@@ -59,7 +59,7 @@ object Transform {
     val (pipeline, domSerializerData) = createTransformPipeline(transform, data, transformQName)
 
     // Run the transformation
-    withPipelineContext { newPipelineContext =>
+    withNewPipelineContext("Transform.transformDocument()") { newPipelineContext =>
       pipeline.reset(newPipelineContext)
       domSerializerData.runGetDocument(newPipelineContext)
     }
@@ -137,7 +137,7 @@ object Transform {
     PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
 
     // Run the transformation
-    withPipelineContext { newPipelineContext =>
+    withNewPipelineContext("Transform.transformFromPipelineConfig()") { newPipelineContext =>
       pipeline.reset(newPipelineContext)
       domSerializerData.runGetDocument(newPipelineContext)
     }

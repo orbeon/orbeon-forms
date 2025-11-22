@@ -2,6 +2,7 @@ package org.orbeon.oxf.util
 
 import cats.syntax.option.*
 import org.orbeon.datatypes.Mediatype
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.test.{PipelineSupport, ResourceManagerSupport}
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata
 import org.scalatest.funspec.AnyFunSpecLike
@@ -42,7 +43,9 @@ class ImageSupportTest
 
     for ((imgUri, maxWidthOpt, maxHeightOpt, mediatypeOpt, expectedOpt) <- Expected)
       it(s"must pass for $imgUri/$maxWidthOpt/$maxHeightOpt/$mediatypeOpt") {
-        PipelineSupport.withTestExternalContext() { implicit ec =>
+        PipelineSupport.withPipelineContextAndTestExternalContext() { (_, ec) =>
+
+          implicit val externalContext: ExternalContext = ec
 
           val actualOpt =
             ImageSupport.tryMaybeTransformImage(

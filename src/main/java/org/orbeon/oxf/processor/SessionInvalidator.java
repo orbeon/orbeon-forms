@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 
 public class SessionInvalidator extends ProcessorImpl {
 
@@ -23,7 +24,7 @@ public class SessionInvalidator extends ProcessorImpl {
 
     public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
         try {
-            ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
+            ExternalContext externalContext = NetUtils.getExternalContext();
             externalContext.getRequest().sessionInvalidate();
         } catch (Exception e) {
             throw new OXFException(e);

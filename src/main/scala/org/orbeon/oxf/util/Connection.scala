@@ -23,12 +23,12 @@ import org.orbeon.connection.ConnectionContextSupport.{ConnectionContexts, Empty
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{UriScheme, UriUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
+import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.*
-import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.properties.{Properties, PropertyLoader, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -199,8 +199,7 @@ object Connection extends ConnectionTrait {
     )
   }
 
-  def isInternalPath(path: String): Boolean = {
-    val propertySet = Properties.instance.getPropertySet
+  def isInternalPath(path: String)(implicit propertySet: PropertySet): Boolean = {
     val p = propertySet.getPropertyOrThrow(HttpInternalPathsProperty)
     val r = p.associatedValue(_.stringValue.r)
 
@@ -423,6 +422,8 @@ object Connection extends ConnectionTrait {
       safeRequestCtx: SafeRequestContext,
       connectionCtx : ConnectionContexts
     ): ConnectionResult = {
+
+      implicit val propertySet: PropertySet = PropertyLoader.fromSafeRequestContext(safeRequestCtx).globalPropertySet
 
       val normalizedUrlString = normalizedUrl.toString
 

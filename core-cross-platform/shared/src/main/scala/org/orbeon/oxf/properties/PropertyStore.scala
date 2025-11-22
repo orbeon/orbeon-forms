@@ -51,7 +51,7 @@ object PropertyStore {
   val empty: PropertyStore =
     SimplePropertyStore(PropertySet.empty, Map.empty)
 
-  def fromPropertyDefinitions(propertyDefinitions: PropertyDefinitions, eTag: api.ETag): PropertyStore = {
+  def fromPropertyDefinitions(propertyDefinitions: Iterable[PropertyDefinition], eTag: api.ETag): PropertyStore = {
 
     def makePropertyParams(pp: PropertyDefinition) =
       PropertyParams(
@@ -63,13 +63,12 @@ object PropertyStore {
 
     val globalPropertySet =
       PropertySet(
-        propertyDefinitions.asScala.view.filter(_.getCategory.isEmpty).map(makePropertyParams),
+        propertyDefinitions.view.filter(_.getCategory.isEmpty).map(makePropertyParams),
         eTag
       )
 
     val uniqueCategoriesAsList =
       propertyDefinitions
-        .asScala
         .iterator
         .map(_.getCategory)
         .distinct
@@ -81,7 +80,6 @@ object PropertyStore {
         QName.fromUriQualifiedName(category).getOrElse(throw new IllegalArgumentException(category)) ->
           PropertySet(
             propertyDefinitions
-              .asScala
               .view
               .filter(d => ! d.getCategory.isEmpty && d.getCategory.get() == category)
               .map(makePropertyParams),

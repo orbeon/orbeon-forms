@@ -37,21 +37,20 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
   // Run
   def service(pipelineContext: PipelineContext, externalContext: ExternalContext): Unit = {
 
-    pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-
     LifecycleLogger.withEventAssumingRequest("service", "handle", Nil) {
 
-      // NOTE: Should this just be available from the ExternalContext?
+      // Q: Should this just be available from the `ExternalContext`?
       pipelineContext.setAttribute(JNDIContext, jndiContext)
 
-      try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext)(Logger)
+      try
+        InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext)(Logger)
       catch {
         case NonFatal(t) =>
           // Log first
           Logger.error(OrbeonFormatter.format(t))
 
           // Try to start the error pipeline if the response has not been committed yet
-          Option(externalContext.getResponse) foreach  { response =>
+          Option(externalContext.getResponse).foreach  { response =>
             if (! response.isCommitted) {
               response.reset()
               serviceError(externalContext, t)
@@ -64,7 +63,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
 
   private def serviceError(externalContext: ExternalContext, throwable: Throwable): Unit = errorProcessor match {
     case Some(processor) =>
-      val pipelineContext = new PipelineContext
+      val pipelineContext = new PipelineContext("ProcessorService.serviceError()")
 
       // Put top-level throwable so that the exception page can show the Orbeon Forms call stack if available
       if (showExceptions)
@@ -73,7 +72,8 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
       // NOTE: Should this just be available from the ExternalContext?
       pipelineContext.setAttribute(JNDIContext, jndiContext)
 
-      try InitUtils.runProcessor(processor, externalContext, pipelineContext)(Logger)
+      try
+        InitUtils.runProcessor(processor, externalContext, pipelineContext)(Logger)
       catch {
         case NonFatal(t) =>
           Logger.error(OrbeonFormatter.format(t))

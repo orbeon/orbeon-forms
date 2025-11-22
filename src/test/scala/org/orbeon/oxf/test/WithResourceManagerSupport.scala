@@ -67,6 +67,6 @@ trait WithResourceManagerSupport {
     val config = PipelineUtils.createDOMGenerator(doc, processorsXML, DOMGenerator.ZeroValidity, processorsXML)
 
     PipelineUtils.connect(config, "data", registry, "config")
-    registry.start(new PipelineContext)
+    registry.start(new PipelineContext("WithResourceManagerSupport"))
   }
 }

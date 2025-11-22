@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.test;
 
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.io.CharsetNames;
@@ -25,12 +26,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.CoreCrossPlatformSupport;
+import org.orbeon.oxf.util.CoreCrossPlatformSupport$;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.Comparator;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.datatypes.LocationData;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -108,15 +110,16 @@ public class TestScriptProcessor extends ProcessorImpl {
 
         // Tell output processor to read and cache value
         // Candidate for Scala withPipelineContext
-        final PipelineContext pipelineContext = new PipelineContext();
+        final PipelineContext pipelineContext = new PipelineContext("TestScriptProcessor.handleCacheValueCommand");
         boolean success = false;
         try {
-            if (executionContext.externalContext != null)
-                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+            CoreCrossPlatformSupport.setExternalContext(executionContext.externalContext);
             executionContext.mainProcessor.reset(pipelineContext);
             executionContext.outputProcessor.readCacheInputWithValue(pipelineContext, outputName, value);
             success = true;
         } finally {
+
+            CoreCrossPlatformSupport.clearExternalContext();
             pipelineContext.destroy(success);
         }
     }
@@ -142,11 +145,10 @@ public class TestScriptProcessor extends ProcessorImpl {
             ensureOutputConnected(executionContext, outputName);
 
         // Candidate for Scala withPipelineContext
-        final PipelineContext pipelineContext = new PipelineContext();
+        final PipelineContext pipelineContext = new PipelineContext("TestScriptProcessor.handleAssertCommand");
         boolean success = false;
         try {
-            if (executionContext.externalContext != null)
-                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+            CoreCrossPlatformSupport.setExternalContext(executionContext.externalContext);
             executionContext.mainProcessor.reset(pipelineContext);
 
             if (condition.equals("output-cached")) {
@@ -184,6 +186,7 @@ public class TestScriptProcessor extends ProcessorImpl {
 
             success = true;
         } finally {
+            CoreCrossPlatformSupport.clearExternalContext();
             pipelineContext.destroy(success);
         }
     }
@@ -248,15 +251,15 @@ public class TestScriptProcessor extends ProcessorImpl {
 
     private void handleRunCommand(ExecutionContext executionContext, Element commandElement) {
         // Candidate for Scala withPipelineContext
-        final PipelineContext pipelineContext = new PipelineContext();
+        final PipelineContext pipelineContext = new PipelineContext("TestScriptProcessor.handleRunCommand");
         boolean success = false;
         try {
-            if (executionContext.externalContext != null)
-                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+            CoreCrossPlatformSupport.setExternalContext(executionContext.externalContext);
             executionContext.mainProcessor.reset(pipelineContext);
             executionContext.mainProcessor.start(pipelineContext);
             success = true;
         } finally {
+            CoreCrossPlatformSupport.clearExternalContext();
             pipelineContext.destroy(success);
         }
     }

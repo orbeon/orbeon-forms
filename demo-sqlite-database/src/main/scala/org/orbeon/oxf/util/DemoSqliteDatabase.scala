@@ -53,8 +53,7 @@ object DemoSqliteDatabase {
     Files.deleteIfExists(sqliteFile)
     Files.createDirectories(sqliteFile.getParent)
 
-    // TODO: rename this method?
-    PipelineSupport.withTestExternalContext(XFormsStateManager.sessionCreated, XFormsStateManager.sessionDestroyed) { _ =>
+    PipelineSupport.withPipelineContextAndTestExternalContext(XFormsStateManager.sessionCreated, XFormsStateManager.sessionDestroyed) { (_, _) =>
 
       val datasourceDescriptor = DatasourceDescriptor.sqliteDatasourceDescriptor(sqliteFile)
 

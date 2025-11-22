@@ -368,7 +368,7 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private ExternalContext.Request getRequest(PipelineContext context) {
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        ExternalContext externalContext = NetUtils.getExternalContext();
         if (externalContext == null)
             throw new OXFException("Missing external context");
         return externalContext.getRequest();

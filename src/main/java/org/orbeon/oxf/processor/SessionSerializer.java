@@ -17,7 +17,7 @@ import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 
@@ -29,7 +29,7 @@ public class SessionSerializer extends ProcessorImpl {
 
     public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
         try {
-            ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            ExternalContext externalContext = NetUtils.getExternalContext();
 
             SAXStore store = new SAXStore();
             Document document = readCacheInputAsOrbeonDom(context, INPUT_DATA);

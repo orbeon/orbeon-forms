@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -62,7 +63,7 @@ public class ScopeSerializer extends ScopeProcessorBase {
         // Read config
         final ContextConfig config = readConfig(context);
 
-        final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         // Find the map for the scope
         if (config.javaIsRequestScope()) {
             putOrRemove(externalContext.getRequest().getAttributesMap(), config, store);

@@ -18,23 +18,43 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
+
+import scala.util.chaining.scalaUtilChainingOps
+
 
 object PipelineSupport {
 
   val DefaultRequestUrl = "oxf:/org/orbeon/oxf/default-request.xml"
 
-  def createPipelineContextWithExternalContextJava(): PipelineContext =
-    createPipelineContextWithExternalContext()
+  def createPipelineContextAndExternalContextJava(): PipelineContext =
+    createPipelineContextAndExternalContext()
 
-  def createPipelineContextWithExternalContext(
+  def destroyPipelineContextAndExternalContextJava(pipelineContext: PipelineContext): Unit = {
+    if (pipelineContext ne null)
+      pipelineContext.destroy(true)
+    CoreCrossPlatformSupport.clearExternalContext()
+  }
+
+  def createPipelineContextAndExternalContext(
     requestURL       : String = DefaultRequestUrl,
     sessionCreated   : Session => Any = _ => (),
     sessionDestroyed : Session => Any = _ => ()
-  ): PipelineContext =
-    new PipelineContext |!> (setExternalContext(_, requestURL, sessionCreated, sessionDestroyed))
+  ): PipelineContext = {
+    val pipelineContext =
+      new PipelineContext("PipelineSupport.createPipelineContextWithExternalContext()")
+    val externalContext =
+      createTestExternalContext(
+        pipelineContext,
+        requestURL,
+        sessionCreated,
+        sessionDestroyed
+      )
+    CoreCrossPlatformSupport.setExternalContext(externalContext)
+    pipelineContext
+  }
 
-  def setExternalContext(
+  def createTestExternalContext(
     pipelineContext  : PipelineContext,
     requestURL       : String = DefaultRequestUrl,
     sessionCreated   : Session => Any = _ => (),
@@ -45,28 +65,28 @@ object PipelineSupport {
       ProcessorUtils.createDocumentFromURL(requestURL, null),
       sessionCreated,
       sessionDestroyed
-    ) |!> (
-      pipelineContext.setAttribute(
-        PipelineContext.EXTERNAL_CONTEXT,
-        _
-      )
-    ) |!> (
-      _.getSession(create = true) // make sure a session is available for downstream `SafeRequestContext`
+    )
+    .tap(
+      ec => ec.getSession(create = true) // make sure a session is available for downstream `SafeRequestContext`
     )
 
-  def withTestExternalContext[T](
-    sessionCreated   : Session => Any = _ => (),
-    sessionDestroyed : Session => Any = _ => ())(
-    body             : ExternalContext => T
+  def withPipelineContextAndTestExternalContext[T](
+    sessionCreated  : Session => Any = _ => (),
+    sessionDestroyed: Session => Any = _ => (),
+    requestURL      : String = DefaultRequestUrl,
+  )(
+    body            : (PipelineContext, ExternalContext) => T
   ): T =
-    InitUtils.withPipelineContext { pipelineContext =>
-      body(
-        setExternalContext(
+    InitUtils.withNewPipelineContext("withTestExternalContext()") { pipelineContext =>
+      val externalContext =
+        createTestExternalContext(
           pipelineContext,
-          PipelineSupport.DefaultRequestUrl,
+          requestURL,
           sessionCreated,
           sessionDestroyed
         )
-      )
+      CoreCrossPlatformSupport.withExternalContext(externalContext) {
+        body(pipelineContext, externalContext)
+      }
     }
 }

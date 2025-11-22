@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.sqlite.SQLiteDataSource;
 import scala.Option;
 
@@ -104,7 +105,7 @@ public class DatabaseContext {
                 }
                 if (ds == null) {
 
-                    ds = fallbackDataSource((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT), jndiName);
+                    ds = fallbackDataSource(NetUtils.getExternalContext(), jndiName);
                 }
 
                 Connection newConnection = ds.getConnection();

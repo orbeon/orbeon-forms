@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.util.ContentTypes;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 import org.xml.sax.SAXException;
@@ -65,7 +66,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                         ScopeProcessorBase.ContextConfig config = readConfig(pipelineContext);
 
                         // Get value from context
-                        ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                        ExternalContext externalContext = NetUtils.getExternalContext();
                         if (externalContext == null)
                             throw new OXFException("Missing external context");
                         Object value = config.javaIsRequestScope()

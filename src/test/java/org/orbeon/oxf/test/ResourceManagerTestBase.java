@@ -40,12 +40,11 @@ public abstract class ResourceManagerTestBase {
 
     @Before
     public void setupResourceManagerTestPipelineContext() {
-        this.pipelineContext = PipelineSupport.createPipelineContextWithExternalContextJava();
+        this.pipelineContext = PipelineSupport.createPipelineContextAndExternalContextJava();
     }
 
     @After
     public void tearDownResourceManagerTestPipelineContext() {
-        if (pipelineContext != null)
-            pipelineContext.destroy(true);
+        PipelineSupport.destroyPipelineContextAndExternalContextJava(this.pipelineContext);
     }
 }

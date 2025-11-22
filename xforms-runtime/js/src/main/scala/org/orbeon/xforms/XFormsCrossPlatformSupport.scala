@@ -40,8 +40,6 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
-  def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
-
   // We have no notion of upload progress in the JavaScript environment as we just pass a `File` object.
   def getUploadProgress(
     request   : ExternalContext.Request,

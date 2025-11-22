@@ -16,7 +16,8 @@ package org.orbeon.oxf.util
 import cats.effect.unsafe.IORuntime
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.properties.{PropertySet, PropertyStore}
 
 import scala.concurrent.ExecutionContext
 
@@ -33,8 +34,22 @@ trait CoreCrossPlatformSupportTrait {
   def isJsEnv: Boolean
   def randomHexId: String
   def getApplicationResourceVersion: Option[String]
-  def properties: PropertySet
-  def getPropertySet(processorName: QName): PropertySet
-  def externalContext: ExternalContext
-  def withExternalContext[T](ec: ExternalContext)(body: => T): T
+  def propertyStore: PropertyStore
+
+  // TODO: Update callers to use `propertyStore` directly.
+  def properties: PropertySet = propertyStore.globalPropertySet
+  def getPropertySet(processorName: QName): PropertySet = propertyStore.processorPropertySet(processorName)
+
+  def requestOpt: Option[Request] =
+    Option(externalContext).flatMap(ec => Option(ec.getRequest))
+
+  protected val externalContextDyn  = new DynamicVariable[ExternalContext](initial = None, isInheritable = false)
+
+  def externalContext: ExternalContext =
+    externalContextDyn.value.orNull //.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+
+  def withExternalContext[T](ec: ExternalContext)(body: => T): T =
+    externalContextDyn.withValue(ec) {
+      body
+    }
 }

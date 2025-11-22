@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet.liferay
 
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.PortletSessionImpl
+import org.orbeon.oxf.properties.PropertyLoader
 
 import javax.portlet.*
 import javax.portlet.filter.*
@@ -55,6 +56,8 @@ object FormRunnerAuthFilter {
       getAttribute = req.getAttribute,
       session      = new PortletSessionImpl(req.getPortletSession),
       getHeader    = req.getProperties(_).asScala.to(List)
+    )(
+      PropertyLoader.getPropertyStore(None).globalPropertySet
     ).toMap
 
     AddLiferayUserHeadersFilter.wrap(req, FormRunnerAuth.AllAuthHeaderNames, authHeaders)

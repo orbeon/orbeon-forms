@@ -16,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock
 import scala.collection.immutable.ArraySeq
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
+import scala.util.chaining.scalaUtilChainingOps
 
 
 trait PropertyLoaderPlatform extends PropertyLoaderTrait {
@@ -25,6 +26,56 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   private val BootPropertyProviderClassName           = "org.orbeon.oxf.properties.ResourcesPropertyProvider"
   private val PropertyProvidersClassnamesPropertyName = "oxf.properties.providers.classnames"
   private val ProviderEtagCacheName                    = "orbeon.properties"
+
+  import java.util.concurrent.atomic.AtomicInteger
+  import scala.collection.mutable
+
+  class ProviderStats {
+    val hits   = new AtomicInteger(0)
+    val misses = new AtomicInteger(0)
+  }
+
+  private class Statistics {
+    var providersCount  : Int         = 0
+    var orderedProviders: Seq[String] = Seq.empty
+    val callsCount                    = new AtomicInteger(0)
+    val callsWithoutRequestCount      = new AtomicInteger(0)
+    val cacheHits                     = new AtomicInteger(0)
+    val cacheMisses                   = new AtomicInteger(0)
+    val providerStats                 = mutable.Map[String, ProviderStats]()
+
+    def recordRequest(requestOpt: Option[Request]): Unit = {
+      callsCount.incrementAndGet()
+      if (requestOpt.isEmpty)
+        callsWithoutRequestCount.incrementAndGet()
+    }
+
+    def recordHit(provider: String): Unit = {
+      cacheHits.incrementAndGet()
+      providerStats.getOrElseUpdate(provider, new ProviderStats).hits.incrementAndGet()
+    }
+
+    def recordMiss(provider: String): Unit = {
+      cacheMisses.incrementAndGet()
+      providerStats.getOrElseUpdate(provider, new ProviderStats).misses.incrementAndGet()
+    }
+
+    def asReadableString: String = {
+      s"""
+         |Property Loader Statistics:
+         |  Total Providers: $providersCount
+         |  Ordered Providers: ${orderedProviders.mkString(", ")}
+         |  Calls: ${callsCount.get()}
+         |  Calls without Request: ${callsWithoutRequestCount.get()}
+         |  Cache Hits: ${cacheHits.get()}
+         |  Cache Misses: ${cacheMisses.get()}
+         |  Provider-specific stats:
+         |${providerStats.map { case (name, stats) => s"    $name: ${stats.hits} hits, ${stats.misses} misses" }.mkString("\n")}
+         |""".stripMargin
+    }
+  }
+
+  private val stats = new Statistics
 
   @volatile
   private var initialized  = false
@@ -125,7 +176,7 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
               .map { newPropertyDefinitionsWithEtag =>
                 val newPropertyStore =
                   PropertyStore.fromPropertyDefinitions(
-                    newPropertyDefinitionsWithEtag.getProperties,
+                    newPropertyDefinitionsWithEtag.getProperties.asScala,
                     newPropertyDefinitionsWithEtag.getETag
                   )
                 bootPropertyStoreCacheEntryOpt =
@@ -161,11 +212,13 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   private def findCache: Option[CacheApi] =
     CacheSupport.findCache(ProviderEtagCacheName, store = false)
 
-  def getPropertyStoreImpl(requestOpt: Option[Request]): PropertyStore =
+  def getPropertyStoreImpl(requestOpt: Option[Request]): PropertyStore = {
+    stats.recordRequest(requestOpt)
     if (initialized)
       getPropertyStoresFromProviders(requestOpt)
     else
       Initialization.getInitializationPropertyStore
+  }.tap(_ => logger.debug(stats.asReadableString))
 
   private def getPropertyStoresFromProviders(requestOpt: Option[Request]): PropertyStore =
     propertyProvidersInIncreasingPriorityOpt match {
@@ -213,8 +266,10 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
             }
           ).toJava
 
+
         val propertyStoresInIncreasingPriorityNel: NonEmptyList[Option[PropertyStore]] =
           propertyProvidersInIncreasingPriorityNel.map { provider =>
+            val pcn = providerClassName(provider)
 
             val (providerCacheKeyX, cacheKey) =
               provider.getCacheKey(
@@ -224,17 +279,20 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
                 extension   = Map.empty.asJava,
               )
               .toScala
-              .map(cacheKey => Some(cacheKey) -> s"${providerClassName(provider)}:$cacheKey")
-              .getOrElse(None -> providerClassName(provider))
+              .map(cacheKey => Some(cacheKey) -> s"$pcn:$cacheKey")
+              .getOrElse(None -> pcn)
 
             val cacheEntryOpt =
               findCache
                 .flatMap(_.get(cacheKey))
                 .map(_.asInstanceOf[CacheEntry])
 
+
+            val eTag = cacheEntryOpt.map(_._1).toJava
+
             provider.getPropertiesIfNeeded(
               cacheKey     = providerCacheKeyX.toJava,
-              eTag         = cacheEntryOpt.map(_._1).toJava,
+              eTag         = eTag,
               credentials  = credentialsJavaOpt,
               request      = requestJavaOpt,
               session      = sessionJavaOpt,
@@ -242,11 +300,12 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
             )
             .toScala
             .map { newPropertyDefinitionsWithEtag =>
+              stats.recordMiss(providerClassName(provider))
               val newETag = newPropertyDefinitionsWithEtag.getETag
 
               val newPropertyStore =
                 PropertyStore.fromPropertyDefinitions(
-                  newPropertyDefinitionsWithEtag.getProperties,
+                  newPropertyDefinitionsWithEtag.getProperties.asScala,
                   newETag
                 )
               findCache
@@ -254,6 +313,7 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
               newPropertyStore
             }
             .orElse {
+              stats.recordHit(providerClassName(provider))
               cacheEntryOpt.map(_._2)
             }
           }
@@ -270,24 +330,28 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   // This filters and orders the property providers according to the `oxf.properties.providers.classnames` property.
   // The boot property provider is always first and only occurs exactly once.
   private def computePropertyProvidersInIncreasingPriorityOpt(bootPropertyStore: PropertyStore): Option[NonEmptyList[PropertyProvider]] =
-    propertyProvidersOpt.flatMap(propertyProviders =>
-      NonEmptyList.fromList(
-        propertyProviders.find(provider =>
-          provider.getClass.getName.contains(BootPropertyProviderClassName)
-        ).toList :::
-        bootPropertyStore
-          .globalPropertySet
-          .getNonBlankString(PropertyProvidersClassnamesPropertyName)
-          .map(_.splitTo[List]().reverse) // internally, we want to go in increasing priority order; property is in decreasing priority order
-          .getOrElse(Nil)
-          .flatMap { providerRe =>
-            propertyProviders.find { provider =>
-              ! provider.getClass.getName.contains(BootPropertyProviderClassName) &&
-                provider.getClass.getName.matches(providerRe)
-            }
-          }
-      )
-    )
+    propertyProvidersOpt.flatMap { propertyProviders =>
+      stats.providersCount = propertyProviders.length
+      val orderedProviders =
+        NonEmptyList.fromList(
+          propertyProviders.find(provider =>
+            provider.getClass.getName.contains(BootPropertyProviderClassName)
+          ).toList :::
+            bootPropertyStore
+              .globalPropertySet
+              .getNonBlankString(PropertyProvidersClassnamesPropertyName)
+              .map(_.splitTo[List]().reverse) // internally, we want to go in increasing priority order; property is in decreasing priority order
+              .getOrElse(Nil)
+              .flatMap { providerRe =>
+                propertyProviders.find { provider =>
+                  !provider.getClass.getName.contains(BootPropertyProviderClassName) &&
+                    provider.getClass.getName.matches(providerRe)
+                }
+              }
+        )
+      stats.orderedProviders = orderedProviders.map(_.toList.map(providerClassName)).getOrElse(Seq.empty)
+      orderedProviders
+    }
 
   @volatile
   private var propertyProvidersInIncreasingPriorityOpt: Option[NonEmptyList[api.PropertyProvider]] = None
@@ -295,6 +359,7 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   // Unordered list of property providers
   private lazy val propertyProvidersOpt: Option[NonEmptyList[api.PropertyProvider]] = {
     implicit val slf4jLogger: slf4j.Logger = logger.logger
-    NonEmptyList.fromList(ServiceProviderSupport.loadProviders[api.PropertyProvider]("property"))
+    val res = NonEmptyList.fromList(ServiceProviderSupport.loadProviders[api.PropertyProvider]("property"))
+    res
   }
 }

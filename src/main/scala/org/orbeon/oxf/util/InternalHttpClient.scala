@@ -87,8 +87,8 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         val response = new LocalResponse(urlRewriter)
 
         currentProcessorService.service(
-          new PipelineContext,
-          new LocalExternalContext(
+          pipelineContext = new PipelineContext("InternalHttpClient.connect()"),
+          externalContext = new LocalExternalContext(
             safeRequestCtx.webAppContext,
             localRequest,
             response

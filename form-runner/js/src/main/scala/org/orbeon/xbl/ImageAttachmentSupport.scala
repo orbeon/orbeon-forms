@@ -5,7 +5,7 @@ import org.orbeon.connection.AsyncConnectionResult
 import org.orbeon.connection.ConnectionContextSupport.{ConnectionContexts, EmptyConnectionContexts}
 import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.{Connection, IndentedLogger, ResourceResolver}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger, ResourceResolver}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.scalajs.dom
@@ -30,7 +30,7 @@ object ImageAttachmentSupport extends ImageAttachmentSupportTrait {
     // TODO: Ideally, this would use HTTP caching, so we could do a conditional `GET`, for example.
     def fromConnection: IO[AsyncConnectionResult] = {
 
-      implicit val safeRequestCtx  : SafeRequestContext       = SafeRequestContext(XFormsCrossPlatformSupport.externalContext)
+      implicit val safeRequestCtx  : SafeRequestContext       = SafeRequestContext(CoreCrossPlatformSupport.externalContext)
       implicit val connectionCtx   : ConnectionContexts       = EmptyConnectionContexts
       implicit val resourceResolver: Option[ResourceResolver] = containingDocument.staticState.resourceResolverOpt
 

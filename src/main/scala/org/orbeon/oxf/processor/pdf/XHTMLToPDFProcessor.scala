@@ -16,8 +16,8 @@ package org.orbeon.oxf.processor.pdf
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
-import org.orbeon.css.{CSSParsing, VariableDefinitions}
 import org.orbeon.css.CSSParsing.CSSCache
+import org.orbeon.css.{CSSParsing, VariableDefinitions}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -33,7 +33,7 @@ import org.w3c.dom.Document
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-import java.io.{FileInputStream, FileNotFoundException, OutputStream}
+import java.io.{FileInputStream, IOException, OutputStream}
 import java.net.{URI, URL}
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
@@ -219,7 +219,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             resolvedURL = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString))
           )
         } catch {
-          case e: FileNotFoundException =>
+          case e: IOException =>
             // This is a workaround for the fact that CSS files from Webjars are not accessible while running tests (see #6642)
             logger.error(e)("CSS file content could not be read while parsing variable definitions")
             VariableDefinitions(Nil)

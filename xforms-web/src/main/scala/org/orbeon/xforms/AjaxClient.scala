@@ -186,6 +186,7 @@ object AjaxClient {
         )
 
       // Show the dialog
+      js.Dynamic.global.dialogPolyfill.registerDialog(dialogEl)
       dialogEl.asInstanceOf[js.Dynamic].showModal()
     }
   }

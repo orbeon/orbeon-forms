@@ -312,6 +312,7 @@ object XFormsUI {
   // Server telling us to show the dialog
   def showDialog(controlId: String, neighborIdOpt: Option[String], reason: String): Unit = {
     val dialogElem = dom.document.getElementById(controlId).asInstanceOf[HTMLDialogElement]
+    js.Dynamic.global.dialogPolyfill.registerDialog(dialogElem)
     dialogElem.showModal()
     dialogElem.addEventListener("cancel" , dialogCancelListener )
     dialogElem.addEventListener("keydown", dialogKeydownListener)

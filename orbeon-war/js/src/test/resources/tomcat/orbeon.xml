@@ -4,7 +4,15 @@
     path="/orbeon"
     allowLinking="true">
 
-    <Resources allowLinking="true"/>
+    <!-- Add test-resources to the Java classpath with precedence over JARs, so `Ehcache2Provider` can load
+         `/config/ehcache.xml` via `getClass.getResource()`. -->
+    <Resources allowLinking="true">
+        <PreResources
+            className="org.apache.catalina.webresources.DirResourceSet"
+            base="/usr/local/tomcat/webapps/orbeon/WEB-INF/test-resources"
+            webAppMount="/WEB-INF/classes"
+            internalPath="/"/>
+    </Resources>
 
     <Parameter
         override="false"

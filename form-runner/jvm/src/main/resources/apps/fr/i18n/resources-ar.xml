@@ -70,8 +70,8 @@
         <validation-dialog-continue>متابعة</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>حفظ مع الاستبدال</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>تجاهل وإعادة التحميل</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; اختبار</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; فحص الصيغ (تجريبي)</test-formulas>
@@ -307,16 +307,16 @@
             <upload-error-mediatype>الملف الذي تم تحميله من نوع غير صحيح: {0}</upload-error-mediatype>
             <upload-error-file-scan>تم رفض الملف الذي تم تحميله من قبل فاحص الملفات. يرجى التأكد من أن هذا الملف غير مصاب. إليك رسالة فاحص الملفات: "{0}".</upload-error-file-scan>
             <lost-attachments>تم فقدان بعض مرفقات الملفات بسبب مشكلة في الخادم. يرجى التحقق من جميع مرفقاتك وتحميلها مرة أخرى إذا لزم الأمر.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>تم اكتشاف تعارض</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>تم تغيير البيانات منذ تحميلها. يمكنك إما:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>الحفظ الآن، مع استبدال البيانات المحفوظة سابقًا.</li>
+                        <li>تجاهل التغييرات الحالية وإعادة تحميل البيانات المحفوظة سابقًا.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>تم العثور على مستند محفوظ تلقائيًا</found-draft>

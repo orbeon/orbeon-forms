@@ -6,14 +6,14 @@
             <short-date>[D01]/[M01]/[Y01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
+            <incomplete-configuration>Orbeon Forms -asetuksesi ovat puutteelliset. Lisätietoja saat tarkistamalla Orbeon Forms -lokitiedoston ja avaamalla &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;ohjeet&lt;/a&gt;.</incomplete-configuration>
         </messages>
     </common>
     <buttons>
-        <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
-        <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
-        <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
-        <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Luo</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Näytä</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Hyväksy</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Hylkää</reject>
 
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Koti</home>
         <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Koti</landing>
@@ -23,19 +23,19 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Poista</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Tuo</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Uusi</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Luo uudet tiedot</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Kopioi</duplicate>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Tallenna</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Tallenna</save-final>
-        <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna</save-draft>
-        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna</save-progress>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna luonnos</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna luonnos</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Muokkaa</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Lähetä</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Sähköposti</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Tarkista oikeellisuus</validate>
-        <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Testaa PDF</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Toimita</submit>
@@ -52,12 +52,12 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Lataa sivu uudelleen"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Pienennä kaikki</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Laajenna kaikki</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Päivitä</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</wizard-prev>
-        <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sisältö</wizard-toc>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
@@ -70,22 +70,22 @@
         <validation-dialog-continue>Jatka</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Tallenna ja korvaa</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Hylkää ja lataa uudelleen</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
-        <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
-        <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-        <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
-        <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
-        <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
-        <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Tarkastele kaavoja (beta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testaa offline-tilassa (beta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-vienti</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-vienti</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML-vienti</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML-vienti</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</save-publish>
 
-        <yes todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Yes</yes>
-        <no todo="true">&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
-        <ok todo="true">OK</ok>
+        <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Kyllä</yes>
+        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Ei</no>
+        <ok>OK</ok>
         <previous>Paluu</previous>
         <next>Seuraava</next>
     </buttons>
@@ -94,38 +94,38 @@
             <open-section>Näytä lohko</open-section>
             <close-section>Piilota lohko</close-section>
             <section-name>Lohkon nimi</section-name>
-            <yes todo="true">[Yes]</yes>
-            <no todo="true">[No]</no>
-            <other todo="true">[Other]</other>
-            <clear todo="true">[Clear Value]</clear>
+            <yes>Kyllä</yes>
+            <no>Ei</no>
+            <other>Muu</other>
+            <clear>Tyhjennä arvo</clear>
             <please-select>Valitse:</please-select>
         </labels>
         <grid>
-            <menu todo="true">Menu</menu>
+            <menu>Valikko</menu>
             <insert-above>Liitä ylle</insert-above>
             <insert-below>Liitä alle</insert-below>
             <move-up>Siirrä ylös</move-up>
             <move-down>Siirrä alas</move-down>
             <clear>
-                <label todo="true">[Clear Line]</label>
+                <label>Tyhjennä rivi</label>
             </clear>
             <remove>
                 <label>Poista</label>
-                <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                <hint>Poista rivi toistuvasta taulukosta</hint>
             </remove>
             <add-another>
-                <label todo="true">[Add Another]</label>
-                <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                <label>Lisää toinen</label>
+                <hint>Lisää toinen rivi toistuvaan taulukkoon</hint>
             </add-another>
         </grid>
         <section>
             <remove>
                 <label>Poista</label>
-                <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                <hint>Poista toisto toistuvasta osiosta</hint>
             </remove>
             <add-another>
-                <label todo="true">[Add Another]</label>
-                <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                <label>Lisää toinen</label>
+                <hint>Lisää toinen toisto toistuvaan osioon</hint>
             </add-another>
         </section>
         <date-time>
@@ -135,40 +135,40 @@
             <select-date>Valitse päivämäärä</select-date>
         </date-time>
         <wizard>
-            <errors todo="true">[Errors]</errors>
-            <incomplete todo="true">[Incomplete]</incomplete>
-            <complete todo="true">[Complete]</complete>
-            <not-started todo="true">[Not Started]</not-started>
-            <edit todo="true">[Edit]</edit>
+            <errors>Virheet</errors>
+            <incomplete>Keskeneräinen</incomplete>
+            <complete>Valmis</complete>
+            <not-started>Ei aloitettu</not-started>
+            <edit>Muokkaa</edit>
         </wizard>
         <error-summary>
-            <show-more todo="true">[Show More]</show-more>
-            <show-less todo="true">[Show Less]</show-less>
+            <show-more>Näytä lisää</show-more>
+            <show-less>Näytä vähemmän</show-less>
         </error-summary>
         <revision-history>
-            <label todo="true">Revision History</label>
-            <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <label>Versiohistoria</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Ensimmäinen versio)}'|1# (Nykyinen versio)}</date>
+            <date-format>[FNn,*-3] [D]. [MNn,*-3] [Y] [h]:[m] [P,*-2]</date-format>
 
-            <named-user todo="true">User {0}</named-user>
-            <anonymous-user todo="true">An anonymous user</anonymous-user>
+            <named-user>Käyttäjä {0}</named-user>
+            <anonymous-user>Nimetön käyttäjä</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
-            <initial-revision todo="true">saved the initial revision.</initial-revision>
-            <no-changes todo="true">saved with no changes detected.</no-changes>
-            <specific-changes todo="true">made the following changes:</specific-changes>
+            <unknown-changes>teki joitakin muutoksia.</unknown-changes>
+            <initial-revision>tallensi ensimmäisen version.</initial-revision>
+            <no-changes>tallensi ilman havaittuja muutoksia.</no-changes>
+            <specific-changes>teki seuraavat muutokset:</specific-changes>
 
-            <view-data todo="true">View this revision</view-data>
+            <view-data>Näytä tämä versio</view-data>
 
-            <value-entered todo="true">"{0}" entered</value-entered>
-            <value-cleared todo="true">"{0}" cleared</value-cleared>
-            <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
-            <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
-            <other-changed todo="true">internal information changed</other-changed>
-            <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+            <value-entered>"{0}" syötetty</value-entered>
+            <value-cleared>"{0}" poistettu</value-cleared>
+            <value-changed>muutettu arvosta "{0}" arvoon "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#toisto|1&lt;toistoa} lisätty</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#toisto|1&lt;toistoa} poistettu</iteration-removed>
+            <other-changed>sisäiset tiedot muuttuivat</other-changed>
+            <workflow-stage-changed>Työvaihe muutettu arvosta "{0}" arvoon "{1}"</workflow-stage-changed>
 
-             <load-more todo="true">Load More</load-more>
+             <load-more>Lataa lisää</load-more>
         </revision-history>
     </components>
     <untitled-form>Nimetön lomake</untitled-form>
@@ -183,14 +183,14 @@
             1&lt;{1,number,integer} '{0,choice,0#Virhettä|1#Varoitusta|2#Tiedottavaa viestiä|3#Viestiä}' - }{2}</form-title>
         <none>Ei virheitä lomakkeessa</none>
         <unsaved>Tallentamattomat muutokset</unsaved>
-        <canvas-not-supported>Voidakseni tehdä kuvakommentointia tulee selaimen tukea HTML5:n canvas-elementtiä</canvas-not-supported>
-        <search todo="true">[Error performing search]</search>
+        <canvas-not-supported>Voidaksesi tehdä kuvakommentointia selaimen tulee tukea HTML5:n canvas-elementtiä</canvas-not-supported>
+        <search>Virhe haun suorittamisessa</search>
     </errors>
     <email>
         <subject>Orbeon-lomakkeiden vahvistus</subject>
         <body>Ole hyvä ja katso PDF- ja XML-formaatissa olevaa lomaketta.</body>
-        <na todo="true">[N/A]</na>
-        <iteration todo="true">[Iteration {$iteration}]</iteration>
+        <na>Ei sovellettavissa</na>
+        <iteration>Iteraatio {$iteration}</iteration>
     </email>
     <!-- Formats used for PDF template -->
     <print>
@@ -204,9 +204,9 @@
         <titles>
             <summary-title>Yhteenveto</summary-title>
             <delete-confirmation>Vahvista poistaminen</delete-confirmation>
-            <document-id todo="true">Document Id</document-id>
-            <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-            <created-by todo="true">[Created By]</created-by>
+            <document-id>Asiakirjan tunnus</document-id>
+            <workflow-stage>Työvaihe</workflow-stage>
+            <created-by>Luonut</created-by>
             <selected>Valittu</selected>
             <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
             <toc>Sisällysluettelo</toc>
@@ -216,18 +216,18 @@
             <errors-count>Virheitä lomakkeessasi</errors-count>
         </titles>
         <buttons>
-            <select-all todo="true">Select all</select-all>
-            <deselect-all todo="true">Deselect all</deselect-all>
-            <select-saved todo="true">Select explicitly saved only</select-saved>
-            <select-drafts todo="true">Select drafts only</select-drafts>
+            <select-all>Valitse kaikki</select-all>
+            <deselect-all>Poista valinnat</deselect-all>
+            <select-saved>Valitse vain erikseen tallennetut</select-saved>
+            <select-drafts>Valitse vain luonnokset</select-drafts>
         </buttons>
         <bulk-edit>
-            <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
-            <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
-            <bulk-edit todo="true">[Bulk edit]</bulk-edit>
-            <apply todo="true">[Apply]</apply>
-            <value-required todo="true">[Value is required]</value-required>
-            <submission-error todo="true">[Error while editing form data.]</submission-error>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä massamuokkaus</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Piilota massamuokkaus</close-bulk-edit>
+            <bulk-edit>Massamuokkaus</bulk-edit>
+            <apply>Käytä</apply>
+            <value-required>Arvo on pakollinen</value-required>
+            <submission-error>Virhe muokattaessa lomaketietoja.</submission-error>
         </bulk-edit>
         <paging>
             <to>-</to>
@@ -237,7 +237,7 @@
         <messages>
             <no-form-data-found>Taulukkotietoja ei löytynyt.</no-form-data-found>
             <delete-confirmation>Haluatko varmasti poistaa yhden tai yhden tai useampia taulukoita?</delete-confirmation>
-            <version todo="true">[Form Version {0,number,integer}]</version>
+            <version>Lomakkeen versio {0,number,integer}</version>
         </messages>
         <labels>
             <draft>Luonnos</draft>
@@ -245,7 +245,7 @@
             <language-choice>Valitse kieli</language-choice>
             <form-choice>Valitse taulukko</form-choice>
             <free-search>Vapaa haku</free-search>
-            <clear-value todo="true">[[Clear value]]</clear-value>
+            <clear-value>Tyhjennä arvo</clear-value>
             <script>Täysi versio</script>
             <refresh>Lataa sivu uudelleen</refresh>
             <close-box>[sulje]</close-box>
@@ -259,30 +259,30 @@
             <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label todo="true">Excel Export Options</label>
-            <headings-labels todo="true">Use labels for headings</headings-labels>
-            <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
-            <include-document-id todo="true">Include document id column</include-document-id>
+            <label>Excel-viennin asetukset</label>
+            <headings-labels>Käytä otsikoissa nimiöitä</headings-labels>
+            <selection-controls-labels>Käytä valintakomponenttien nimiöitä</selection-controls-labels>
+            <include-document-id>Sisällytä asiakirjan tunnus -sarake</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
             <save-success>Asiakirja tallennettu onnistuneesti!</save-success>
-            <save-draft-success todo="true">Luonnos tallennettu onnistuneesti!</save-draft-success>
-            <save-progress-success todo="true">Luonnos tallennettu onnistuneesti!</save-progress-success>
+            <save-draft-success>Luonnos tallennettu onnistuneesti!</save-draft-success>
+            <save-progress-success>Luonnos tallennettu onnistuneesti!</save-progress-success>
             <email-success>Sähköposti lähetetty onnistuneesti!</email-success>
             <form-validation-error>Löytyi virheitä. Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti.</form-validation-error>
             <database-error>Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</database-error>
-            <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
-            <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
+            <service-error>Virhe viestiessä taustapalvelun kanssa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</service-error>
+            <action-error>Virhe viestiessä taustapalvelun kanssa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</action-error>
             <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
-            <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
-            <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
+            <wizard-prev-error>Korjaa virheet ennen siirtymistä taaksepäin</wizard-prev-error>
+            <wizard-next-error>Korjaa virheet ennen siirtymistä eteenpäin</wizard-next-error>
             <clear-confirm-message>Oletko varma, että haluat tyhjentää kaikki kentät tällä sivulla? Tiedot häviävät jos et ole tallentanut niitä</clear-confirm-message>
             <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
             <confirmation-dialog-title>Varmistus</confirmation-dialog-title>
             <confirmation-dialog-message>Haluatko varmasti jatkaa?</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message-overwrite>Tämä toiminto saattaa korvata osan lomaketiedoista. Haluatko varmasti jatkaa?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Lomake toimitettu</submit-dialog-title>
             <submit-dialog-message>Tietosi on toimitettu.</submit-dialog-message>
             <validation-dialog-title>Käy läpi lomakevalidoinnin viestejä</validation-dialog-title>
@@ -301,22 +301,22 @@
             <upload-cancel>Käyttäjä keskeytti tiedoston lähetyksen</upload-cancel>
             <upload-done>Tiedoston lähetys valmis</upload-done>
             <upload-error>Tiedoston lähetyksen aikana tapahtui virhe. Yritä uudelleen.</upload-error>
-            <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
+            <upload-error-empty-file>Ladattu tiedosto on tyhjä.</upload-error-empty-file>
             <upload-error-size>Lähetettävä tiedosto on liian suuri. Suurin sallittu tiedostokoko on {0} ja todellinen vastaanotettu koko on {1}.</upload-error-size>
             <upload-error-max-files-per-control>Tiedostojen enimmäismäärä ylitetty. Et voi liittää enempää kuin {0,number,integer} tiedostoa tähän kenttään.</upload-error-max-files-per-control>
-            <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
-            <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
-            <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
-                <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
-                    <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
-                    </ul>
-                </div>
-            ]</conflict-dialog-message>
+            <upload-error-mediatype>Ladattu tiedosto on väärää tyyppiä: {0}</upload-error-mediatype>
+            <upload-error-file-scan>Ladittu tiedosto hylättiin tiedostotarkistimessa. Varmista, ettei tiedosto ole saastunut. Tiedostotarkistimen viesti: "{0}".</upload-error-file-scan>
+            <lost-attachments>Osa tiedostoliitteistä katosi palvelinongelman vuoksi. Tarkista kaikki liitteet ja lataa ne uudelleen tarvittaessa.</lost-attachments>
+            <conflict-dialog-title>Ristiriita havaittu</conflict-dialog-title>
+            <conflict-dialog-message>
+                &lt;div&gt;
+                    &lt;p&gt;Tiedot ovat muuttuneet sen jälkeen kun latasit ne.&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Voit tallentaa nyt ja korvata aiemmin tallennetut tiedot.&lt;/li&gt;
+                        &lt;li&gt;Voit hylätä nykyiset muutoksesi ja ladata aiemmin tallennetut tiedot uudelleen.&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/div&gt;
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Löydetty luonnos</found-draft>
@@ -328,9 +328,9 @@
             <open-draft>Avaa automaattisesti tallennettu luonnos</open-draft>
             <view-drafts>Näytä automaattisesti tallennetut luonnokset</view-drafts>
             <start-new>Aloita tyhjästä</start-new>
-            <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
-            <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
-            <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
+            <multiple-docs-title>Olemassa olevia lomaketietoja löytyi</multiple-docs-title>
+            <multiple-docs-explanation>Et voi luoda uusia tietoja tälle lomakemääritykselle, mutta voit mahdollisesti muokata olemassa olevia tietoja.</multiple-docs-explanation>
+            <multiple-docs-view-data>Näytä olemassa olevat lomaketiedot</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Kieli</language-choice>
@@ -339,21 +339,21 @@
             <error-details>Näytä virhetiedot</error-details>
             <confirm>Vahvista</confirm>
             <alert>Puuttuva tai virheellinen arvo</alert>
-            <alert-out-of-range todo="true">[Out of range value, please select an available value]</alert-out-of-range>
-            <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
-            <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
+            <alert-out-of-range>Arvo ei ole sallitulla alueella, valitse jokin käytettävissä oleva arvo</alert-out-of-range>
+            <alert-out-of-range-multiple>Arvo(t) eivät ole sallitulla alueella</alert-out-of-range-multiple>
+            <clear-out-of-range>Tyhjennä sallitun alueen ulkopuoliset arvot</clear-out-of-range>
             <captcha-label>Kuvavarmenne</captcha-label>
-            <captcha-alert todo="true">Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
+            <captcha-alert>Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-size-per-file>Tiedostojen on oltava kooltaan alle {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>Kaikkien tähän kenttään liitettyjen tiedostojen yhteiskoon on oltava alle {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Voit liittää enintään {0} tiedostoa.</upload-max-files-per-control>
             <upload-min-files-per-control>Sinun on liitettävä vähintään {0} tiedostoa.</upload-min-files-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Vain {0}-tyyppiset tiedostot hyväksytään.</upload-mediatypes>
+            <upload-image>kuva</upload-image>
+            <upload-video>video</upload-video>
+            <upload-audio>ääni</upload-audio>
         </hints>
         <view>
             <explanation>
@@ -361,28 +361,28 @@
             </explanation>
         </view>
         <lease>
-            <no-lease-title todo="true">[Lease]</no-lease-title>
-            <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
-            <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
-            <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
-            <current-user-right todo="true">.]</current-user-right>
-            <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
-            <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
-            <relinquish todo="true">[Relinquish lease]</relinquish>
-            <renew todo="true">[Renew lease]</renew>
-            <try-acquire todo="true">[Try to acquire lease]</try-acquire>
-            <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
+            <no-lease-title>Varaus</no-lease-title>
+            <renew-lease-title>Uusitaanko varaus?</renew-lease-title>
+            <renew-lease-message>Varaus on vanhenemassa. Haluatko uusia varauksen nyt?</renew-lease-message>
+            <current-user-left>Sinulla on varaus tähän asiakirjaan vielä </current-user-left>
+            <current-user-right>.</current-user-right>
+            <relinquished>Sinulla ei ole enää varausta tähän asiakirjaan.</relinquished>
+            <other-user>Toinen käyttäjä, käyttäjänimellä "{0}", on varannut tämän asiakirjan.</other-user>
+            <relinquish>Luovu varauksesta</relinquish>
+            <renew>Uusi varaus</renew>
+            <try-acquire>Yritä varata asiakirja</try-acquire>
+            <show-in-view-mode>Näytä vain luku -tilassa</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>Istunto on vanhenemassa</expiring>
+                <expired>Istunto on vanhentunut</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                <expiring>Istuntosi on vanhenemassa. Jatkaaksesi tämän sivun käyttöä, napsauta alla olevaa painiketta.</expiring>
                 <expired>Tämä lomake on ladattava uudelleen. Tämä saattaa viedä sinut kirjautumissivulle. Jos arvelet, että sinun ei pitäisi nähdä tätä viestiä ja ongelma jatkuu, ota yhteyttä tukeen.</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
+            <renew-button>Uusi istunto</renew-button>
             <reload-button>Lataa uudelleen</reload-button>
         </session-expiration>
         <tab-duplication>
@@ -390,13 +390,13 @@
             <message>Näyttää siltä, että olet monistanut tämän selaimen välilehden. Sulje tämä välilehti ja jatka istuntoasi alkuperäisessä välilehdessä.</message>
         </tab-duplication>
         <available-from>
-            <message todo="true">[This form isn't available yet]</message>
+            <message>Tämä lomake ei ole vielä käytettävissä</message>
         </available-from>
         <available-to>
-            <message todo="true">[This form isn't available anymore]</message>
+            <message>Tämä lomake ei ole enää käytettävissä</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Vaihe</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -420,38 +420,38 @@
         </dialog-body>
     </save-locally>
     <share-dialog>
-        <label todo="true">Create link to share</label>
-        <body todo="true">Let anyone with the link view or edit this data.</body>
-        <link todo="true">Link</link>
-        <select-operations todo="true">Select operations</select-operations>
-        <readonly todo="true">Readonly</readonly>
-        <readwrite todo="true">Read-write</readwrite>
+        <label>Luo jaettava linkki</label>
+        <body>Salli linkin haltijan tarkastella tai muokata näitä tietoja.</body>
+        <link>Linkki</link>
+        <select-operations>Valitse toiminnot</select-operations>
+        <readonly>Vain luku</readonly>
+        <readwrite>Luku ja kirjoitus</readwrite>
     </share-dialog>
     <admin>
-        <title todo="true">[Forms Admin]</title>
+        <title>Lomakehallinta</title>
     </admin>
     <landing>
         <title>Landing</title>
         <titles>
-            <published-forms todo="true">Published Forms</published-forms>
-            <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-            <form-builder-new todo="true">New Form Builder Form</form-builder-new>
-            <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
-            <demo-forms todo="true">Demo Forms</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
-            <quick-links todo="true">Quick Links</quick-links>
-            <form-runner-admin todo="true">Forms Admin</form-runner-admin>
+            <published-forms>Julkaistut lomakkeet</published-forms>
+            <form-builder-forms>Form Builder -lomakkeet</form-builder-forms>
+            <form-builder-new>Uusi Form Builder -lomake</form-builder-new>
+            <form-builder-summary>Form Builder -lomakkeet</form-builder-summary>
+            <demo-forms>Esimerkkilomakkeet</demo-forms>
+            <demo-features>Esimerkkitoiminnot</demo-features>
+            <quick-links>Pikalinkit</quick-links>
+            <form-runner-admin>Lomakehallinta</form-runner-admin>
         </titles>
         <descriptions>
-            <published-forms todo="true">Access your published forms</published-forms>
-            <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <published-forms>Siirry julkaistuihin lomakkeisiisi</published-forms>
+            <form-builder-forms>Näytä ja muokkaa Form Builderilla luotuja keskeneräisiä lomakkeita</form-builder-forms>
+            <demo-forms>Tutustu Orbeon Forms -esimerkkilomakkeisiin</demo-forms>
+            <demo-features>Tutustu yksittäisten Orbeon Forms -ominaisuuksien esimerkkeihin</demo-features>
         </descriptions>
-        <show-more todo="true">Show more…</show-more>
+        <show-more>Näytä lisää…</show-more>
     </landing>
     <home>
-        <title todo="true">Form Runner Koti</title>
+        <title>Form Runner -koti</title>
         <buttons>
             <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Poista julkaisu</unpublish>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
@@ -459,8 +459,8 @@
             <connect>Yhdistä</connect>
             <select>Valitse</select>
             <operation>Toiminto</operation>
-            <reindex todo="true">[Reindex database(s)]</reindex>
-            <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
+            <reindex>Indeksoi tietokannat uudelleen</reindex>
+            <stop-reindex>Lopeta uudelleenindeksointi</stop-reindex>
             <all>Kaikki</all>
             <none>Ei mitään</none>
             <unpublished-local>Julkaisemattomat paikalliset lomakkeet</unpublished-local>
@@ -479,13 +479,13 @@
             <navigate-new>Luo uusi</navigate-new>
             <upgrade-local>Päivitä paikallisen lomakkeen määritykset</upgrade-local>
             <upgrade-remote>Päivitä etälomakkeen määritykset</upgrade-remote>
-            <delete-local todo="true">Delete local forms</delete-local>
-            <delete-remote todo="true">Delete remote forms</delete-remote>
-            <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
-            <reload-resources todo="true">[Reload resources]</reload-resources>
+            <delete-local>Poista paikalliset lomakkeet</delete-local>
+            <delete-remote>Poista etälomakkeet</delete-remote>
+            <reencrypt>Salaa lomakemääritykset uudelleen</reencrypt>
+            <reload-resources>Lataa resurssit uudelleen</reload-resources>
         </buttons>
         <titles>
-            <publish-confirmation>Vahvista lomakkeen julkaisu/julkaisun poisto</publish-confirmation>
+            <publish-confirmation>Vahvista lomakkeen tilamuutos</publish-confirmation>
             <credentials>Etäpalvelimen tunnistetiedot</credentials>
             <status>Tila</status>
             <view>Näytä</view>
@@ -493,197 +493,197 @@
             <local>Paikallinen</local>
             <remote>Etä</remote>
             <form-identification>Lomakkeen tunnistetiedot</form-identification>
-            <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
+            <reindexing-confirmation>Vahvista uudelleenindeksointi</reindexing-confirmation>
+            <reencrypt-confirmation>Vahvista uudelleensalaus</reencrypt-confirmation>
+            <purge-confirmation>Vahvista tietojen poisto</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[Käyttöönotettuja lomakkeita ei löytynyt.]</no-form-found>
-            <publish-confirmation todo="true">Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade|3#delete} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
-            <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
+            <no-form-found>Käyttöönotettuja lomakkeita ei löytynyt.</no-form-found>
+            <publish-confirmation>Haluatko varmasti {0,choice,0#ottaa käyttöön|1#poistaa käytöstä|2#päivittää|3#poistaa} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}? Tätä toimintoa ei voi perua.</publish-confirmation>
+            <reindexing-confirmation>Uudelleenindeksoinnin aikana jotkin toiminnot, kuten Form Runner -yhteenvetosivut, eivät välttämättä toimi odotetulla tavalla. Suosittelemme suorittamaan uudelleenindeksoinnin käyttökatkon aikana. Haluatko varmasti jatkaa?</reindexing-confirmation>
+            <reencrypt-confirmation>Suosittelemme suorittamaan uudelleensalauksen käyttökatkon aikana. Haluatko varmasti jatkaa?</reencrypt-confirmation>
+            <purge-confirmation>Haluatko varmasti poistaa valitut tiedot pysyvästi?</purge-confirmation>
         </messages>
         <labels>
             <available>Saatavilla</available>
             <unavailable>Ei saatavilla</unavailable>
             <library>Kirjasto</library>
             <newer>Uudempi</newer>
-            <remote-server todo="true">[Remote server]</remote-server>
+            <remote-server>Etäpalvelin</remote-server>
             <username>Käyttäjänimi</username>
             <password>Salasana</password>
-            <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
-            <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
-            <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
-            <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
-            <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
-            <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
-            <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+            <reindexing-generic>Indeksoidaan uudelleen &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>Indeksoidaan uudelleen {0} ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>Uudelleenindeksointi on pysähtymässä &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>Uudelleenindeksointi on valmis</reindexing-finished>
+            <reencrypt-state>Salaus uusitaan {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Uudelleensalaus aloitettu</reencrypt-started>
+            <reencrypt-finished>Uudelleensalaus valmis</reencrypt-finished>
         </labels>
         <export-purge>
-            <export todo="true">[Export]</export>
-            <purge todo="true">[Purge]</purge>
-            <or todo="true">[or]</or>
-            <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
-            <following-forms todo="true">[Following forms:]</following-forms>
-            <application todo="true">[Application:]</application>
-            <form todo="true">[Form:]</form>
-            <version todo="true">[Version:]</version>
-            <all-applications todo="true">[All applications]</all-applications>
-            <all-forms todo="true">[All forms]</all-forms>
-            <all-versions todo="true">[All versions]</all-versions>
-            <latest-version todo="true">[Latest version]</latest-version>
+            <export>Vie</export>
+            <purge>Poista pysyvästi</purge>
+            <or>tai</or>
+            <selected-forms>Valitut lomakkeet ({0,number,integer})</selected-forms>
+            <following-forms>Seuraavat lomakkeet:</following-forms>
+            <application>Sovellus:</application>
+            <form>Lomake:</form>
+            <version>Versio:</version>
+            <all-applications>Kaikki sovellukset</all-applications>
+            <all-forms>Kaikki lomakkeet</all-forms>
+            <all-versions>Kaikki versiot</all-versions>
+            <latest-version>Uusin versio</latest-version>
             <definitions-data>
-                <label todo="true">[Form definitions / data:]</label>
-                <definitions todo="true">[Definitions only]</definitions>
-                <data todo="true">[Data only]</data>
-                <both todo="true">[Definitions and data]</both>
+                <label>Lomakemääritykset / tiedot:</label>
+                <definitions>Vain määritykset</definitions>
+                <data>Vain tiedot</data>
+                <both>Määritykset ja tiedot</both>
             </definitions-data>
             <current-history>
-                <label todo="true">[Current data / revision history:]</label>
-                <current-data todo="true">[Current data only]</current-data>
-                <revision-history todo="true">[Revision history only]</revision-history>
-                <both todo="true">[Current data and revision history]</both>
+                <label>Nykyiset tiedot / versiohistoria:</label>
+                <current-data>Vain nykyiset tiedot</current-data>
+                <revision-history>Vain versiohistoria</revision-history>
+                <both>Nykyiset tiedot ja versiohistoria</both>
             </current-history>
-            <from-date todo="true">[From:]</from-date>
-            <until-date todo="true">[Until:]</until-date>
-            <redundant-values todo="true">[Redundant values]</redundant-values>
-            <invalid-date todo="true">[Invalid date]</invalid-date>
-            <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            <from-date>Alkaen:</from-date>
+            <until-date>Asti:</until-date>
+            <redundant-values>Redundantit arvot</redundant-values>
+            <invalid-date>Virheellinen päivämäärä</invalid-date>
+            <wrong-date-order>Virheellinen päivämääräjärjestys</wrong-date-order>
         </export-purge>
     </home>
     <import>
         <form-version>
-            <label todo="true">Form Version</label>
-            <alert todo="true">Missing form version</alert>
+            <label>Lomakkeen versio</label>
+            <alert>Lomakkeen versio puuttuu</alert>
         </form-version>
         <application-name>
-            <label todo="true">Application Name</label>
+            <label>Sovelluksen nimi</label>
         </application-name>
         <form-name>
-            <label todo="true">Form Name</label>
+            <label>Lomakkeen nimi</label>
         </form-name>
         <version-comment>
-            <label todo="true">Version comment</label>
+            <label>Version kommentti</label>
         </version-comment>
         <upload>
-            <label todo="true">Upload</label>
+            <label>Lähetys</label>
         </upload>
         <file>
-            <label todo="true">File to import</label>
-            <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-            <alert todo="true">Missing or unsupported file</alert>
-            <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
-            <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
+            <label>Tuotava tiedosto</label>
+            <hint>Tiedoston on oltava Excel 2007 -muodossa (.xlsx) tai XML-muodossa (.xml)</hint>
+            <alert>Tiedosto puuttuu tai on tuntematonta tyyppiä</alert>
+            <excel-headings-format>Excel 2007 otsikoilla varustetussa muodossa (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 nimetyillä alueilla varustetussa muodossa (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML -vientimuoto (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label todo="true">Validation</label>
-            <alert todo="true">Please start the validation before proceeding to the import</alert>
+            <label>Validointi</label>
+            <alert>Suorita validointi ennen tuonnin jatkamista</alert>
         </validation>
         <start-validation>
-            <label todo="true">Start Validation</label>
+            <label>Aloita validointi</label>
         </start-validation>
-        <total todo="true">Total</total>
-        <valid todo="true">Valid</valid>
-        <invalid todo="true">Invalid</invalid>
-        <imported todo="true">[Imported]</imported>
-        <skipped todo="true">[Skipped]</skipped>
-        <eta todo="true">ETA</eta>
+        <total>Yhteensä</total>
+        <valid>Kelvolliset</valid>
+        <invalid>Virheelliset</invalid>
+        <imported>Tuotu</imported>
+        <skipped>Ohitettu</skipped>
+        <eta>Arvioitu kesto</eta>
         <cancel-validation>
-            <label todo="true">Cancel Validation</label>
+            <label>Peruuta validointi</label>
         </cancel-validation>
-        <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+        <validation-canceled>Validointi peruttiin.</validation-canceled>
         <import>
-            <label todo="true">Import</label>
+            <label>Tuo</label>
         </import>
         <existing-records>
-            <label todo="true">Existing database records</label>
-            <item id="0" todo="true">Keep</item>
-            <item id="1" todo="true">Delete</item>
+            <label>Olemassa olevat tietokantatietueet</label>
+            <item id="0">Säilytä</item>
+            <item id="1">Poista</item>
         </existing-records>
         <invalid-data>
-            <label todo="true">Records with invalid data</label>
-            <item id="0" todo="true">Skip</item>
-            <item id="1" todo="true">Import</item>
+            <label>Tietueet, joissa on virheellisiä tietoja</label>
+            <item id="0">Ohita</item>
+            <item id="1">Tuo</item>
         </invalid-data>
         <start-import>
-            <label todo="true">Start Import</label>
+            <label>Aloita tuonti</label>
         </start-import>
         <cancel-import>
-            <label todo="true">Cancel Import</label>
+            <label>Peruuta tuonti</label>
         </cancel-import>
-        <import-canceled todo="true">Import was canceled.</import-canceled>
+        <import-canceled>Tuonti peruttiin.</import-canceled>
         <start-over>
-            <label todo="true">Start Over</label>
+            <label>Aloita alusta</label>
         </start-over>
         <review-data>
-            <label todo="true">Review Data</label>
+            <label>Tarkastele tietoja</label>
         </review-data>
-        <existing-records-message todo="true">
-            There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+        <existing-records-message>
+            Version {3} lomakkeelle {1}/{2} löytyi tietokannasta {0,number,integer} {0,choice,1#olemassa oleva asiakirja|1&lt;olemassa olevaa asiakirjaa}.
         </existing-records-message>
-        <eta-message todo="true">
-            {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} tuntia} {1,choice,0#|0&lt;{1, number, integer} minuuttia} {2,choice,0#|0&lt;{2, number, integer} sekuntia}
         </eta-message>
-        <invalid-records-message todo="true">
-            {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+        <invalid-records-message>
+            {0,number,integer} / {1,number,integer} {1,choice,1#asiakirja|1&lt;asiakirjaa} {0,choice,1#on|1&lt;ovat} virheellinen.
         </invalid-records-message>
-        <valid-records-message todo="true">
-            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+        <valid-records-message>
+            {0,number,integer} {0,choice,1#asiakirja|1&lt;asiakirjaa} {0,choice,1#on|1&lt;on} validoitu ja tuodaan.
         </valid-records-message>
-        <invalid-document-message todo="true">
-            The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+        <invalid-document-message>
+            Ladatussa asiakirjassa on validointivirheitä. Käytä "Tarkastele tietoja" -painiketta virheiden tarkastelemiseen ja korjaamiseen ennen tallentamista.
         </invalid-document-message>
-        <valid-document-message todo="true">
-            The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+        <valid-document-message>
+            Ladatussa asiakirjassa on kelvolliset tiedot. Käytä "Tarkastele tietoja" -painiketta lomaketietojen tarkasteluun ennen tallentamista.
         </valid-document-message>
-        <import-complete-message todo="true">
-            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+        <import-complete-message>
+            {0,number,integer} {0,choice,1#asiakirjan|1&lt;asiakirjan} tuonti on valmis. {1,number,integer} virheellistä {1,choice,1#asiakirjaa jätettiin|1&lt;asiakirjaa jätettiin} väliin.
         </import-complete-message>
-        <na todo="true">N/A</na>
-        <fields-found todo="true">Fields Found</fields-found>
-        <values-found todo="true">Values Found</values-found>
-        <errors todo="true">Errors</errors>
-        <warnings todo="true">Warnings</warnings>
+        <na>Ei sovellettavissa</na>
+        <fields-found>Löydetyt kentät</fields-found>
+        <values-found>Löydetyt arvot</values-found>
+        <errors>Virheet</errors>
+        <warnings>Varoitukset</warnings>
         <error-messages>
-            <validating todo="true">[An error occurred while validating the data.]</validating>
-            <importing todo="true">[An error occurred while importing the data.]</importing>
-            <deleting todo="true">[An error occurred while deleting the data.]</deleting>
-            <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
-            <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
-            <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
-            <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            <validating>Tapahtui virhe tietoja validoitaessa.</validating>
+            <importing>Tapahtui virhe tietoja tuotaessa.</importing>
+            <deleting>Tapahtui virhe tietoja poistettaessa.</deleting>
+            <unauthorized>Sinulla ei ole oikeuksia näiden tietojen tarkasteluun.</unauthorized>
+            <reading-form-data>Tapahtui virhe lomaketietoja haettaessa.</reading-form-data>
+            <reading-form-metadata>Tapahtui virhe lomakkeen metatietoja luettaessa.</reading-form-metadata>
+            <reading-form-definition>Tapahtui virhe lomakemääritystä luettaessa.</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
         <menu>
-            <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
-            <logout todo="true">[Logout]</logout>
-            <login todo="true">[Login]</login>
-            <register todo="true">[Register]</register>
+            <logged-in-as>Kirjautuneena käyttäjänä {0}</logged-in-as>
+            <logout>Kirjaudu ulos</logout>
+            <login>Kirjaudu sisään</login>
+            <register>Rekisteröidy</register>
         </menu>
         <login>
-            <title todo="true">[Form Runner Login]</title>
-            <username todo="true">[Username]</username>
-            <password todo="true">[Password]</password>
-            <login todo="true">[Login]</login>
+            <title>Form Runner -kirjautuminen</title>
+            <username>Käyttäjänimi</username>
+            <password>Salasana</password>
+            <login>Kirjaudu sisään</login>
         </login>
         <logout-done>
-            <title todo="true">[Form Runner Logout]</title>
-            <message todo="true">[You're logged out.]</message>
+            <title>Form Runner -uloskirjautuminen</title>
+            <message>Olet kirjautunut ulos.</message>
         </logout-done>
         <login-error>
-            <title todo="true">[Form Runner Login Error]</title>
-            <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
-            <try-again todo="true">[Please try again.]</try-again>
+            <title>Form Runner -kirjautumisvirhe</title>
+            <unrecognized>Antamaasi käyttäjänimeä tai salasanaa ei tunnistettu.</unrecognized>
+            <try-again>Yritä uudelleen.</try-again>
         </login-error>
     </authentication>
     <home-summary>
         <titles>
             <created>Luotu</created>
             <last-modified>Muokattu</last-modified>
-            <last-modified-by todo="true">[Modified By]</last-modified-by>
+            <last-modified-by>Muokannut</last-modified-by>
             <application-name>Sovellus</application-name>
             <form-name>Lomake</form-name>
             <version>Versio</version>
@@ -698,32 +698,32 @@
             <any>[mikä tahansa]</any>
             <dates>
                 <item>
-                    <label todo="true">[Today]</label>
+                    <label>Tänään</label>
                     <value>today</value>
                 </item>
                 <item>
-                    <label todo="true">[Yesterday]</label>
+                    <label>Eilen</label>
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 7 days]</label>
+                    <label>Viimeiset 7 päivää</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 30 days]</label>
+                    <label>Viimeiset 30 päivää</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 90 days]</label>
+                    <label>Viimeiset 90 päivää</label>
                     <value>last-90-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Custom...]</label>
+                    <label>Mukautettu…</label>
                     <value>custom</value>
                 </item>
             </dates>
-            <date-after todo="true">[After]</date-after>
-            <date-before todo="true">[Before]</date-before>
+            <date-after>Jälkeen</date-after>
+            <date-before>Ennen</date-before>
         </search>
     </home-summary>
 </resource>

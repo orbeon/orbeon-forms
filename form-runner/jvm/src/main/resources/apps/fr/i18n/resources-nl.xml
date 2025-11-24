@@ -6,7 +6,7 @@
             <short-date>[D01]-[M01]-[Y01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
+            <incomplete-configuration>Uw Orbeon Forms-configuratie is onvolledig. Raadpleeg voor meer informatie uw Orbeon Forms-logbestand en bezoek &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;de documentatie&lt;/a&gt;.</incomplete-configuration>
         </messages>
     </common>
     <buttons>
@@ -23,19 +23,19 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Verwijderen</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importeren</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nieuw</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nieuwe gegevens maken</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliceren</duplicate>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Opslaan</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Opslaan</save-final>
-        <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Opslaan</save-draft>
-        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Opslaan</save-progress>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Voortgang opslaan</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Voortgang opslaan</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Bewerken</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Sturen</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; E-mail</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valideren</validate>
-        <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Indienen</submit>
@@ -52,12 +52,12 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Verversen"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Alles inklappen</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Alles uitklappen</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Verversen"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</wizard-prev>
-        <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Inhoud</wizard-toc>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
@@ -70,16 +70,16 @@
         <validation-dialog-continue>Doorgaan</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Opslaan en overschrijven</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Verwerpen en herladen</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testen</test>
-        <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
-        <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-        <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
-        <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
-        <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
-        <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Formules inspecteren (bèta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Offline testen (bèta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-export</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-export</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML-export</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML-export</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</save-publish>
 
@@ -97,7 +97,7 @@
             <yes>Ja</yes>
             <no>Nee</no>
             <other>Anders</other>
-            <clear todo="true">[Clear Value]</clear>
+            <clear>Waarde wissen</clear>
             <please-select>Maak een keuze:</please-select>
         </labels>
         <grid>
@@ -107,7 +107,7 @@
             <move-up>Omhoog</move-up>
             <move-down>Omlaag</move-down>
             <clear>
-                <label todo="true">[Clear Line]</label>
+                <label>Regel wissen</label>
             </clear>
             <remove>
                 <label>Verwijderen</label>
@@ -146,29 +146,29 @@
             <show-less>Toon minder</show-less>
         </error-summary>
         <revision-history>
-            <label todo="true">Revision History</label>
-            <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <label>Revisiegeschiedenis</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initiële revisie)}'|1# (Huidige revisie)}</date>
+            <date-format>[FNn,*-3] [D] [MNn,*-3] [Y] om [h]:[m] [P,*-2]</date-format>
 
-            <named-user todo="true">User {0}</named-user>
-            <anonymous-user todo="true">An anonymous user</anonymous-user>
+            <named-user>Gebruiker {0}</named-user>
+            <anonymous-user>Een anonieme gebruiker</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
-            <initial-revision todo="true">saved the initial revision.</initial-revision>
-            <no-changes todo="true">saved with no changes detected.</no-changes>
-            <specific-changes todo="true">made the following changes:</specific-changes>
+            <unknown-changes>heeft enkele wijzigingen aangebracht.</unknown-changes>
+            <initial-revision>heeft de initiële revisie opgeslagen.</initial-revision>
+            <no-changes>heeft opgeslagen zonder wijzigingen.</no-changes>
+            <specific-changes>heeft de volgende wijzigingen aangebracht:</specific-changes>
 
-            <view-data todo="true">View this revision</view-data>
+            <view-data>Deze revisie bekijken</view-data>
 
-            <value-entered todo="true">"{0}" entered</value-entered>
-            <value-cleared todo="true">"{0}" cleared</value-cleared>
-            <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
-            <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
-            <other-changed todo="true">internal information changed</other-changed>
-            <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+            <value-entered>"{0}" ingevoerd</value-entered>
+            <value-cleared>"{0}" gewist</value-cleared>
+            <value-changed>gewijzigd van "{0}" naar "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#herhaling|1&lt;herhalingen} toegevoegd</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#herhaling|1&lt;herhalingen} verwijderd</iteration-removed>
+            <other-changed>interne informatie gewijzigd</other-changed>
+            <workflow-stage-changed>Workflowfase gewijzigd van "{0}" naar "{1}"</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>Meer laden</load-more>
         </revision-history>
     </components>
     <untitled-form>Naamloos form</untitled-form>
@@ -184,7 +184,7 @@
         <none>Geen fouten op form</none>
         <unsaved>Niet-bewaarde wijzigingen</unsaved>
         <canvas-not-supported>Voor annotaties op afbeeldingen, moet uw browser het HTML5 canvas ondersteunen</canvas-not-supported>
-        <search todo="true">[Error performing search]</search>
+        <search>Fout bij het uitvoeren van de zoekopdracht</search>
     </errors>
     <email>
         <subject>Orbeon Forms bevestiging</subject>
@@ -204,9 +204,9 @@
         <titles>
             <summary-title>Samenvatting</summary-title>
             <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
-            <document-id todo="true">Document Id</document-id>
-            <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-            <created-by todo="true">[Created By]</created-by>
+            <document-id>Document-id</document-id>
+            <workflow-stage>Workflowfase</workflow-stage>
+            <created-by>Gemaakt door</created-by>
             <selected>Geselecteerd</selected>
             <refresh>Deze bewerking zal de pagina doen verversen</refresh>
             <toc>Inhoudsopgave</toc>
@@ -216,18 +216,18 @@
             <errors-count>Fouten in uw form</errors-count>
         </titles>
         <buttons>
-            <select-all todo="true">Select all</select-all>
-            <deselect-all todo="true">Deselect all</deselect-all>
-            <select-saved todo="true">Select explicitly saved only</select-saved>
-            <select-drafts todo="true">Select drafts only</select-drafts>
+            <select-all>Alles selecteren</select-all>
+            <deselect-all>Alles deselecteren</deselect-all>
+            <select-saved>Alleen expliciet opgeslagen selecteren</select-saved>
+            <select-drafts>Alleen automatisch opgeslagen selecteren</select-drafts>
         </buttons>
         <bulk-edit>
-            <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
-            <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
-            <bulk-edit todo="true">[Bulk edit]</bulk-edit>
-            <apply todo="true">[Apply]</apply>
-            <value-required todo="true">[Value is required]</value-required>
-            <submission-error todo="true">[Error while editing form data.]</submission-error>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Bulkbewerking tonen</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Bulkbewerking verbergen</close-bulk-edit>
+            <bulk-edit>Bulkbewerking</bulk-edit>
+            <apply>Toepassen</apply>
+            <value-required>Waarde is vereist</value-required>
+            <submission-error>Fout bij het bewerken van formgegevens.</submission-error>
         </bulk-edit>
         <paging>
             <to>tot</to>
@@ -237,7 +237,7 @@
         <messages>
             <no-form-data-found>Er zijn geen formgegevens gevonden.</no-form-data-found>
             <delete-confirmation>Weet u zeker dat u één of meerdere form wilt verwijderen? Merk op dat u door het verwijderen van een opgeslagen document, ook de bijbehorende conceptversies verwijdert.</delete-confirmation>
-            <version todo="true">[Form Version {0,number,integer}]</version>
+            <version>Formversie {0,number,integer}</version>
         </messages>
         <labels>
             <draft>Concept</draft>
@@ -245,7 +245,7 @@
             <language-choice>Taal kiezen</language-choice>
             <form-choice>Een form kiezen</form-choice>
             <free-search>Vrij zoeken</free-search>
-            <clear-value todo="true">[[Clear value]]</clear-value>
+            <clear-value>Waarde wissen</clear-value>
             <script>Volledige versie</script>
             <refresh>Verversen</refresh>
             <close-box>sluiten</close-box>
@@ -259,30 +259,30 @@
             <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label todo="true">Excel Export Options</label>
-            <headings-labels todo="true">Use labels for headings</headings-labels>
-            <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
-            <include-document-id todo="true">Include document id column</include-document-id>
+            <label>Excel-exportopties</label>
+            <headings-labels>Labels gebruiken als kolomtitels</headings-labels>
+            <selection-controls-labels>Labels gebruiken voor keuzebesturingselementen</selection-controls-labels>
+            <include-document-id>Kolom met document-id opnemen</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
             <save-success>Document succesvol bewaard!</save-success>
-            <save-draft-success todo="true">Concept succesvol bewaard!</save-draft-success>
-            <save-progress-success todo="true">Concept succesvol bewaard!</save-progress-success>
+            <save-draft-success>Concept succesvol bewaard!</save-draft-success>
+            <save-progress-success>Concept succesvol bewaard!</save-progress-success>
             <email-success>E-mail succesvol verstuurd!</email-success>
             <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
             <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
-            <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
-            <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
+            <service-error>Er is een fout opgetreden bij de communicatie met een backendservice. Neem contact op met de applicatiebeheerder.</service-error>
+            <action-error>Er is een fout opgetreden bij het uitvoeren van een actie. Neem contact op met de applicatiebeheerder.</action-error>
             <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
-            <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
-            <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
+            <wizard-prev-error>Corrigeer de fouten voordat u teruggaat.</wizard-prev-error>
+            <wizard-next-error>Corrigeer de fouten voordat u verdergaat.</wizard-next-error>
             <clear-confirm-message>Weet u zeker dat alle velden op deze pagina wilt wissen? Uw gegevens zijn weg als u deze niet hebt opgeslagen.</clear-confirm-message>
             <error-dialog-title>Kon actie niet voltooien</error-dialog-title>
             <confirmation-dialog-title>Bevestiging</confirmation-dialog-title>
             <confirmation-dialog-message>Weet u zeker dat u door wilt gaan?</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message-overwrite>Deze actie kan ertoe leiden dat bepaalde formuliergegevens worden overschreven. Weet u zeker dat u wilt doorgaan?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Form ingediend</submit-dialog-title>
             <submit-dialog-message>Uw informatie is ingediend, bedankt.</submit-dialog-message>
             <validation-dialog-title>Review form-validatiemeldingen</validation-dialog-title>
@@ -301,22 +301,22 @@
             <upload-cancel>Upload geannuleerd door de gebruiker</upload-cancel>
             <upload-done>Upload voltooid</upload-done>
             <upload-error>Er was een probleem tijdens de upload. Probeer opnieuw.</upload-error>
-            <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
+            <upload-error-empty-file>Het geüploade bestand is leeg.</upload-error-empty-file>
             <upload-error-size>Het geüploade bestand is te groot. De maximale, toegestane grootte is {0} en de huidige, ontvangen grootte is {1}.</upload-error-size>
             <upload-error-max-files-per-control>Maximaal aantal bestanden overschreden. U kunt niet meer dan {0,number,integer} bestanden aan dit element toevoegen.</upload-error-max-files-per-control>
             <upload-error-mediatype>Het geüploade bestand heeft een onjuist type: {0}</upload-error-mediatype>
             <upload-error-file-scan>Het geüploade bestand is geweigerd door de bestandenscanner. Zorg dat dit geen geïnfecteerd bestand is. De melding uit de bestandenscanner was: "{0}".</upload-error-file-scan>
             <lost-attachments>Sommige bijlagen zijn verloren gegaan door een serverprobleem. Controleer uw bijlagen en upload deze opnieuw indien nodig.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>Conflict gedetecteerd</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>De gegevens zijn gewijzigd sinds u ze hebt geladen. U kunt het volgende doen:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Nu opslaan en de eerder opgeslagen gegevens overschrijven.</li>
+                        <li>Uw huidige wijzigingen verwerpen en de eerder opgeslagen gegevens opnieuw laden.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Concept gevonden</found-draft>
@@ -339,21 +339,21 @@
             <error-details>Toon foutdetails</error-details>
             <confirm>Bevestigen</confirm>
             <alert>Ontbrekende of incorrecte waarde</alert>
-            <alert-out-of-range todo="true">[Out of range value, please select an available value]</alert-out-of-range>
-            <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
-            <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
+            <alert-out-of-range>Waarde buiten bereik, selecteer een beschikbare waarde</alert-out-of-range>
+            <alert-out-of-range-multiple>Waarde(n) buiten bereik</alert-out-of-range-multiple>
+            <clear-out-of-range>Waarde(n) buiten bereik wissen</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-size-per-file>Bestanden moeten kleiner zijn dan {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>De totale bestandsgrootte in dit element moet kleiner zijn dan {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>U kunt maximaal {0} bestanden bijvoegen.</upload-max-files-per-control>
             <upload-min-files-per-control>U moet ten minste {0} bestanden bijvoegen.</upload-min-files-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Alleen bestanden van het type {0} zijn toegestaan.</upload-mediatypes>
+            <upload-image>afbeelding</upload-image>
+            <upload-video>video</upload-video>
+            <upload-audio>audio</upload-audio>
         </hints>
         <view>
             <explanation>
@@ -371,18 +371,18 @@
             <relinquish>Lease afstaan</relinquish>
             <renew>Lease vernieuwen</renew>
             <try-acquire>Lease proberen te krijgen</try-acquire>
-            <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
+            <show-in-view-mode>In alleen-lezen modus tonen</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>Sessie staat op het punt te verlopen</expiring>
+                <expired>Sessie verlopen</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                <expiring>Uw sessie staat op het punt te verlopen. Klik op de knop hieronder als u deze pagina wilt blijven gebruiken.</expiring>
                 <expired>Dit formulier moet opnieuw worden geladen. Dit kan je naar de inlogpagina leiden. Als je denkt dat je dit bericht niet zou moeten zien en het probleem aanhoudt, neem dan contact op met de ondersteuning.</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
+            <renew-button>Sessie verlengen</renew-button>
             <reload-button>Herladen</reload-button>
         </session-expiration>
         <tab-duplication>
@@ -390,13 +390,13 @@
             <message>Het lijkt erop dat u dit browsertabblad hebt gedupliceerd. Sluit dit tabblad en hervat uw sessie in het oorspronkelijke tabblad.</message>
         </tab-duplication>
         <available-from>
-            <message todo="true">[This form isn't available yet]</message>
+            <message>Dit formulier is nog niet beschikbaar</message>
         </available-from>
         <available-to>
-            <message todo="true">[This form isn't available anymore]</message>
+            <message>Dit formulier is niet meer beschikbaar</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Fase</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -420,38 +420,38 @@
         </dialog-body>
     </save-locally>
     <share-dialog>
-        <label todo="true">Create link to share</label>
-        <body todo="true">Let anyone with the link view or edit this data.</body>
-        <link todo="true">Link</link>
-        <select-operations todo="true">Select operations</select-operations>
-        <readonly todo="true">Readonly</readonly>
-        <readwrite todo="true">Read-write</readwrite>
+        <label>Koppeling om te delen maken</label>
+        <body>Laat iedereen met de koppeling deze gegevens bekijken of bewerken.</body>
+        <link>Koppeling</link>
+        <select-operations>Bewerkingen selecteren</select-operations>
+        <readonly>Alleen-lezen</readonly>
+        <readwrite>Lezen en schrijven</readwrite>
     </share-dialog>
     <admin>
-        <title todo="true">[Forms Admin]</title>
+        <title>Formulierenbeheer</title>
     </admin>
     <landing>
         <title>Landing</title>
         <titles>
-            <published-forms todo="true">Published Forms</published-forms>
-            <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-            <form-builder-new todo="true">New Form Builder Form</form-builder-new>
-            <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
-            <demo-forms todo="true">Demo Forms</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
-            <quick-links todo="true">Quick Links</quick-links>
-            <form-runner-admin todo="true">Forms Admin</form-runner-admin>
+            <published-forms>Gepubliceerde forms</published-forms>
+            <form-builder-forms>Form Builder-forms</form-builder-forms>
+            <form-builder-new>Nieuw Form Builder-form</form-builder-new>
+            <form-builder-summary>Form Builder-forms</form-builder-summary>
+            <demo-forms>Demoforms</demo-forms>
+            <demo-features>Demofuncties</demo-features>
+            <quick-links>Snelle koppelingen</quick-links>
+            <form-runner-admin>Form Runner-beheer</form-runner-admin>
         </titles>
         <descriptions>
-            <published-forms todo="true">Access your published forms</published-forms>
-            <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <published-forms>Toegang tot uw gepubliceerde forms</published-forms>
+            <form-builder-forms>Bekijk en bewerk uw lopende forms die met Form Builder zijn gemaakt</form-builder-forms>
+            <demo-forms>Probeer de verzameling Orbeon Forms-demoforms uit</demo-forms>
+            <demo-features>Probeer demo's van specifieke Orbeon Forms-functies uit</demo-features>
         </descriptions>
-        <show-more todo="true">Show more…</show-more>
+        <show-more>Meer weergeven…</show-more>
     </landing>
     <home>
-        <title todo="true">[Published Forms]</title>
+        <title>Gepubliceerde forms</title>
         <buttons>
             <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Publicatie verwijderen</unpublish>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
@@ -479,10 +479,10 @@
             <navigate-new>Naar nieuw</navigate-new>
             <upgrade-local>Upgrade lokale formdefinities</upgrade-local>
             <upgrade-remote>Upgrade externe formdefinities</upgrade-remote>
-            <delete-local todo="true">Delete local forms</delete-local>
-            <delete-remote todo="true">Delete remote forms</delete-remote>
-            <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
-            <reload-resources todo="true">[Reload resources]</reload-resources>
+            <delete-local>Lokale forms verwijderen</delete-local>
+            <delete-remote>Externe forms verwijderen</delete-remote>
+            <reencrypt>Formdefinities opnieuw versleutelen</reencrypt>
+            <reload-resources>Resources opnieuw laden</reload-resources>
         </buttons>
         <titles>
             <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
@@ -495,14 +495,14 @@
             <form-identification>Form-identificatie</form-identification>
             <reindexing-confirmation>Bevestigen herindexeren</reindexing-confirmation>
             <reencrypt-confirmation>Bevestigen her-encryptie</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
+            <purge-confirmation>Bevestigen opschonen</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[Er is geen geïmplementeerd formulier gevonden.]</no-form-found>
-            <publish-confirmation todo="true">Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden|3#delete}?</publish-confirmation>
-            <reindexing-confirmation>Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner samenvattingpagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat het herindexeren wilt starten?</reindexing-confirmation>
+            <no-form-found>Er is geen geïmplementeerd formulier gevonden.</no-form-found>
+            <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden|3#verwijderen}?</publish-confirmation>
+            <reindexing-confirmation>Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner-samenvattingspagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat u het herindexeren wilt starten?</reindexing-confirmation>
             <reencrypt-confirmation>We adviseren u het vernieuwen van de encryptie te doen als het systeem offline is. Weet u zeker dat u door wilt gaan met her-encryptie?</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
+            <purge-confirmation>Weet u zeker dat u de geselecteerde gegevens wilt opschonen?</purge-confirmation>
         </messages>
         <labels>
             <available>Beschikbaar</available>
@@ -516,174 +516,174 @@
             <reindexing-provider>Herindexeren {0} ({1,number}/{2,number})</reindexing-provider>
             <reindexing-stopping>Herindexeren wordt gestopt &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
             <reindexing-finished>Herindexeren is gestopt</reindexing-finished>
-            <reencrypt-state>Her-encryptie-encrypting {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-state>Her-encryptie {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Her-encryptie gestart</reencrypt-started>
             <reencrypt-finished>Her-encryptie voltooid</reencrypt-finished>
         </labels>
         <export-purge>
-            <export todo="true">[Export]</export>
-            <purge todo="true">[Purge]</purge>
-            <or todo="true">[or]</or>
-            <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
-            <following-forms todo="true">[Following forms:]</following-forms>
-            <application todo="true">[Application:]</application>
-            <form todo="true">[Form:]</form>
-            <version todo="true">[Version:]</version>
-            <all-applications todo="true">[All applications]</all-applications>
-            <all-forms todo="true">[All forms]</all-forms>
-            <all-versions todo="true">[All versions]</all-versions>
-            <latest-version todo="true">[Latest version]</latest-version>
+            <export>Exporteren</export>
+            <purge>Opschonen</purge>
+            <or>of</or>
+            <selected-forms>Geselecteerde forms ({0,number,integer})</selected-forms>
+            <following-forms>Volgende forms:</following-forms>
+            <application>Applicatie:</application>
+            <form>Form:</form>
+            <version>Versie:</version>
+            <all-applications>Alle applicaties</all-applications>
+            <all-forms>Alle forms</all-forms>
+            <all-versions>Alle versies</all-versions>
+            <latest-version>Nieuwste versie</latest-version>
             <definitions-data>
-                <label todo="true">[Form definitions / data:]</label>
-                <definitions todo="true">[Definitions only]</definitions>
-                <data todo="true">[Data only]</data>
-                <both todo="true">[Definitions and data]</both>
+                <label>Formdefinities / gegevens:</label>
+                <definitions>Alleen definities</definitions>
+                <data>Alleen gegevens</data>
+                <both>Definities en gegevens</both>
             </definitions-data>
             <current-history>
-                <label todo="true">[Current data / revision history:]</label>
-                <current-data todo="true">[Current data only]</current-data>
-                <revision-history todo="true">[Revision history only]</revision-history>
-                <both todo="true">[Current data and revision history]</both>
+                <label>Huidige gegevens / revisiegeschiedenis:</label>
+                <current-data>Alleen huidige gegevens</current-data>
+                <revision-history>Alleen revisiegeschiedenis</revision-history>
+                <both>Huidige gegevens en revisiegeschiedenis</both>
             </current-history>
-            <from-date todo="true">[From:]</from-date>
-            <until-date todo="true">[Until:]</until-date>
-            <redundant-values todo="true">[Redundant values]</redundant-values>
-            <invalid-date todo="true">[Invalid date]</invalid-date>
-            <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            <from-date>Vanaf:</from-date>
+            <until-date>Tot:</until-date>
+            <redundant-values>Redundante waarden</redundant-values>
+            <invalid-date>Ongeldige datum</invalid-date>
+            <wrong-date-order>Verkeerde datumvolgorde</wrong-date-order>
         </export-purge>
     </home>
     <import>
         <form-version>
-            <label todo="true">Form Version</label>
-            <alert todo="true">Missing form version</alert>
+            <label>Formversie</label>
+            <alert>Formversie ontbreekt</alert>
         </form-version>
         <application-name>
-            <label todo="true">Application Name</label>
+            <label>Applicatienaam</label>
         </application-name>
         <form-name>
-            <label todo="true">Form Name</label>
+            <label>Formnaam</label>
         </form-name>
         <version-comment>
-            <label todo="true">Version comment</label>
+            <label>Versieopmerking</label>
         </version-comment>
         <upload>
-            <label todo="true">Upload</label>
+            <label>Uploaden</label>
         </upload>
         <file>
-            <label todo="true">File to import</label>
-            <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-            <alert todo="true">Missing or unsupported file</alert>
-            <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
-            <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
+            <label>Te importeren bestand</label>
+            <hint>Bestand moet in Excel 2007-indeling (.xlsx) of XML-indeling (.xml) zijn</hint>
+            <alert>Bestand ontbreekt of wordt niet ondersteund</alert>
+            <excel-headings-format>Excel 2007 met benoemde kopteksten-indeling (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 met benoemde bereiken-indeling (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML-exportindeling (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label todo="true">Validation</label>
-            <alert todo="true">Please start the validation before proceeding to the import</alert>
+            <label>Validatie</label>
+            <alert>Start de validatie voordat u doorgaat met importeren</alert>
         </validation>
         <start-validation>
-            <label todo="true">Start Validation</label>
+            <label>Validatie starten</label>
         </start-validation>
-        <total todo="true">Total</total>
-        <valid todo="true">Valid</valid>
-        <invalid todo="true">Invalid</invalid>
-        <imported todo="true">[Imported]</imported>
-        <skipped todo="true">[Skipped]</skipped>
-        <eta todo="true">ETA</eta>
+        <total>Totaal</total>
+        <valid>Geldig</valid>
+        <invalid>Ongeldig</invalid>
+        <imported>Geïmporteerd</imported>
+        <skipped>Overgeslagen</skipped>
+        <eta>Resterende tijd</eta>
         <cancel-validation>
-            <label todo="true">Cancel Validation</label>
+            <label>Validatie annuleren</label>
         </cancel-validation>
-        <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+        <validation-canceled>Validatie is geannuleerd.</validation-canceled>
         <import>
-            <label todo="true">Import</label>
+            <label>Importeren</label>
         </import>
         <existing-records>
-            <label todo="true">Existing database records</label>
-            <item id="0" todo="true">Keep</item>
-            <item id="1" todo="true">Delete</item>
+            <label>Bestaande records in de database</label>
+            <item id="0">Behouden</item>
+            <item id="1">Verwijderen</item>
         </existing-records>
         <invalid-data>
-            <label todo="true">Records with invalid data</label>
-            <item id="0" todo="true">Skip</item>
-            <item id="1" todo="true">Import</item>
+            <label>Records met ongeldige gegevens</label>
+            <item id="0">Overslaan</item>
+            <item id="1">Importeren</item>
         </invalid-data>
         <start-import>
-            <label todo="true">Start Import</label>
+            <label>Import starten</label>
         </start-import>
         <cancel-import>
-            <label todo="true">Cancel Import</label>
+            <label>Import annuleren</label>
         </cancel-import>
-        <import-canceled todo="true">Import was canceled.</import-canceled>
+        <import-canceled>Import is geannuleerd.</import-canceled>
         <start-over>
-            <label todo="true">Start Over</label>
+            <label>Opnieuw beginnen</label>
         </start-over>
         <review-data>
-            <label todo="true">Review Data</label>
+            <label>Gegevens controleren</label>
         </review-data>
-        <existing-records-message todo="true">
-            There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+        <existing-records-message>
+            Er {0,choice,1#is|1&lt;zijn} {0,number,integer} {0,choice,1#bestaand document|1&lt;bestaande documenten} in de database voor versie {3} van form {1}/{2}.
         </existing-records-message>
-        <eta-message todo="true">
-            {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} uur} {1,choice,0#|0&lt;{1, number, integer} minuten} {2,choice,0#|0&lt;{2, number, integer} seconden}
         </eta-message>
-        <invalid-records-message todo="true">
-            {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+        <invalid-records-message>
+            {0,number,integer} van de {1,number,integer} {1,choice,1#document|1&lt;documenten} {0,choice,1#is|1&lt;zijn} ongeldig.
         </invalid-records-message>
-        <valid-records-message todo="true">
-            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+        <valid-records-message>
+            {0,number,integer} {0,choice,1#document|1&lt;documenten} {0,choice,1#is|1&lt;zijn} gevalideerd en worden geïmporteerd.
         </valid-records-message>
-        <invalid-document-message todo="true">
-            The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+        <invalid-document-message>
+            Het geüploade document bevat validatiefouten. Gebruik de knop "Gegevens controleren" om de fouten te bekijken en te corrigeren voordat u opslaat.
         </invalid-document-message>
-        <valid-document-message todo="true">
-            The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+        <valid-document-message>
+            Het geüploade document bevat geldige gegevens. Gebruik de knop "Gegevens controleren" om de formgegevens te bekijken voordat u opslaat.
         </valid-document-message>
-        <import-complete-message todo="true">
-            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+        <import-complete-message>
+            Import van {0,number,integer} {0,choice,1#document|1&lt;documenten} is voltooid. {1,number,integer} ongeldig{1,choice,1# document is|1&lt;e documenten zijn} overgeslagen.
         </import-complete-message>
-        <na todo="true">N/A</na>
-        <fields-found todo="true">Fields Found</fields-found>
-        <values-found todo="true">Values Found</values-found>
-        <errors todo="true">Errors</errors>
-        <warnings todo="true">Warnings</warnings>
+        <na>N.V.T.</na>
+        <fields-found>Velden gevonden</fields-found>
+        <values-found>Waarden gevonden</values-found>
+        <errors>Fouten</errors>
+        <warnings>Waarschuwingen</warnings>
         <error-messages>
-            <validating todo="true">[An error occurred while validating the data.]</validating>
-            <importing todo="true">[An error occurred while importing the data.]</importing>
-            <deleting todo="true">[An error occurred while deleting the data.]</deleting>
-            <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
-            <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
-            <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
-            <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            <validating>Er is een fout opgetreden bij het valideren van de gegevens.</validating>
+            <importing>Er is een fout opgetreden bij het importeren van de gegevens.</importing>
+            <deleting>Er is een fout opgetreden bij het verwijderen van de gegevens.</deleting>
+            <unauthorized>U bent niet gemachtigd om deze gegevens te openen.</unauthorized>
+            <reading-form-data>Er is een fout opgetreden bij het ophalen van formgegevens.</reading-form-data>
+            <reading-form-metadata>Er is een fout opgetreden bij het lezen van formmetadata.</reading-form-metadata>
+            <reading-form-definition>Er is een fout opgetreden bij het lezen van de formdefinitie.</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
         <menu>
-            <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
-            <logout todo="true">[Logout]</logout>
-            <login todo="true">[Login]</login>
-            <register todo="true">[Register]</register>
+            <logged-in-as>Aangemeld als {0}</logged-in-as>
+            <logout>Afmelden</logout>
+            <login>Aanmelden</login>
+            <register>Registreren</register>
         </menu>
         <login>
-            <title todo="true">[Form Runner Login]</title>
-            <username todo="true">[Username]</username>
-            <password todo="true">[Password]</password>
-            <login todo="true">[Login]</login>
+            <title>Form Runner-aanmelding</title>
+            <username>Gebruikersnaam</username>
+            <password>Wachtwoord</password>
+            <login>Aanmelden</login>
         </login>
         <logout-done>
-            <title todo="true">[Form Runner Logout]</title>
-            <message todo="true">[You're logged out.]</message>
+            <title>Form Runner-afmelding</title>
+            <message>U bent afgemeld.</message>
         </logout-done>
         <login-error>
-            <title todo="true">[Form Runner Login Error]</title>
-            <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
-            <try-again todo="true">[Please try again.]</try-again>
+            <title>Form Runner-aanmeldingsfout</title>
+            <unrecognized>De ingevulde gebruikersnaam of het ingevulde wachtwoord is niet herkend.</unrecognized>
+            <try-again>Probeer het opnieuw.</try-again>
         </login-error>
     </authentication>
     <home-summary>
         <titles>
             <created>Aangemaakt</created>
             <last-modified>Bewerkt</last-modified>
-            <last-modified-by todo="true">[Modified By]</last-modified-by>
+            <last-modified-by>Gewijzigd door</last-modified-by>
             <application-name>Applicatie</application-name>
             <form-name>Form</form-name>
             <version>Versie</version>
@@ -698,32 +698,32 @@
             <any>[Elke]</any>
             <dates>
                 <item>
-                    <label todo="true">[Today]</label>
+                    <label>Vandaag</label>
                     <value>today</value>
                 </item>
                 <item>
-                    <label todo="true">[Yesterday]</label>
+                    <label>Gisteren</label>
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 7 days]</label>
+                    <label>Afgelopen 7 dagen</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 30 days]</label>
+                    <label>Afgelopen 30 dagen</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 90 days]</label>
+                    <label>Afgelopen 90 dagen</label>
                     <value>last-90-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Custom...]</label>
+                    <label>Aangepast...</label>
                     <value>custom</value>
                 </item>
             </dates>
-            <date-after todo="true">[After]</date-after>
-            <date-before todo="true">[Before]</date-before>
+            <date-after>Na</date-after>
+            <date-before>Voor</date-before>
         </search>
     </home-summary>
 </resource>

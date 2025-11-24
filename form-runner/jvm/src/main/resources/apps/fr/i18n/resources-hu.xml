@@ -52,8 +52,8 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Frissítés"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Összes összecsukása</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Összes kibontása</expand-all-full>
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Frissítés"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</wizard-prev>
@@ -70,8 +70,8 @@
         <validation-dialog-continue>Folytatás</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Mentés és felülírás</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Módosítások elvetése és újratöltés</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Teszt</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Képletek vizsgálata (Béta)</test-formulas>
@@ -307,16 +307,16 @@
             <upload-error-mediatype>A feltöltött fájl típusa helytelen: {0}</upload-error-mediatype>
             <upload-error-file-scan>A feltöltött fájlt a fájlszkenner elutasította. Kérjük, győződjön meg arról, hogy ez nem fertőzött fájl. Itt van a fájlszkenner üzenete: „{0}".</upload-error-file-scan>
             <lost-attachments>Néhány fájlmelléklet elveszett egy szerverprobléma miatt. Kérjük, ellenőrizze az összes mellékletet, és szükség esetén töltse fel újra.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>Ütközés észlelve</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>Az adatok megváltoztak azóta, hogy betöltötte őket. A következőket teheti:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Most ment, felülírva a korábban elmentett adatokat.</li>
+                        <li>Elveti a jelenlegi módosításait, és újratölti a korábban elmentett adatokat.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Automatikusan mentett dokumentum található</found-draft>
@@ -396,7 +396,7 @@
             <message>Ez az űrlap már nem érhető el</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Állapot</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -438,7 +438,7 @@
             <form-builder-new>Új Form Builder űrlap</form-builder-new>
             <form-builder-summary>Form Builder űrlapok</form-builder-summary>
             <demo-forms>Demó űrlapok</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
+            <demo-features>Demó funkciók</demo-features>
             <quick-links>Gyors linkek</quick-links>
             <form-runner-admin>Űrlapok adminisztrációja</form-runner-admin>
         </titles>
@@ -446,7 +446,7 @@
             <published-forms>Hozzáférés a közzétett űrlapjaihoz</published-forms>
             <form-builder-forms>A Form Builder segítségével létrehozott, folyamatban lévő űrlapok megtekintése és szerkesztése</form-builder-forms>
             <demo-forms>Próbálja ki az Orbeon Forms-szal szállított demó űrlapokat</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <demo-features>Próbálja ki az Orbeon Forms egyes funkcióit bemutató demókat</demo-features>
         </descriptions>
         <show-more>Több megjelenítése…</show-more>
     </landing>

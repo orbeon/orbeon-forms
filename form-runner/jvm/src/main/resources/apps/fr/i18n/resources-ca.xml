@@ -73,8 +73,8 @@
         <validation-dialog-continue>Continuar</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Desar i sobreescriure</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Descartar i recarregar</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testejar</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspeccionar fórmules (Beta)</test-formulas>
@@ -151,7 +151,7 @@
         <revision-history>
             <label>Historic de revisions</label>
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Revisió inicial)}'|1# (Revisió actual)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <date-format>[FNn,*-3], [D] de [MNn,*-3] de [Y] a les [h]:[m] [P,*-2]</date-format>
 
             <named-user>Usuari {0}</named-user>
             <anonymous-user>Usuari anònim</anonymous-user>
@@ -166,10 +166,10 @@
             <value-entered>"{0}" entrat</value-entered>
             <value-cleared>"{0}" netejat</value-cleared>
             <value-changed>canvis de "{0}" a "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions}
-                afegida</iteration-added>
-            <iteration-removed todo="true">{0,number,integer}
-                {0,choice,1#repetition|1&lt;repetitions} eliminada</iteration-removed>
+            <iteration-added>{0,number,integer} {0,choice,1#repetició|1&lt;repeticions}
+                afegida/es</iteration-added>
+            <iteration-removed>{0,number,integer}
+                {0,choice,1#repetició|1&lt;repeticions} eliminada/es</iteration-removed>
             <other-changed>informació interna canviada</other-changed>
             <workflow-stage-changed>flux de treball canviat de "{0}" a "{1}"</workflow-stage-changed>
 
@@ -320,16 +320,16 @@
                 fitxers: "{0}".</upload-error-file-scan>
             <lost-attachments>Alguns fitxers s'han perdut per un incident amb el servidor. Verifiqui
                 tots els annexos i puja'ls de nou si és necessari.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>Conflicte detectat</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>Les dades han canviat des que les vau carregar. Podeu:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Desar ara, sobreescrivint les dades desades prèviament.</li>
+                        <li>Descartar els canvis actuals i tornar a carregar les dades desades prèviament.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Esborrany trobat</found-draft>
@@ -610,11 +610,11 @@
             <label>Començar la validació</label>
         </start-validation>
         <total>Total</total>
-        <valid>Valid</valid>
-        <invalid>Invalid</invalid>
+        <valid>Vàlid</valid>
+        <invalid>Invàlid</invalid>
         <imported>Importat</imported>
         <skipped>Omés</skipped>
-        <eta todo="true">ETA</eta>
+        <eta>Temps estimat</eta>
         <cancel-validation>
             <label>Cancelar validació</label>
         </cancel-validation>
@@ -645,9 +645,8 @@
         <review-data>
             <label>Revisar les dades</label>
         </review-data>
-        <existing-records-message todo="true">El
-             {0,choice,1#is|1&lt;are} {0,number,integer} te
-            {0,choice,1#document|1&lt;documents} en la BD per la versió {3} del formulari {1}/{2}.
+        <existing-records-message>Hi ha {0,number,integer} {0,choice,1#document|1&lt;documents}
+            existents a la base de dades per a la versió {3} del formulari {1}/{2}.
         </existing-records-message>
         <eta-message>
             {0,choice,0#|0&lt;{0, number, integer} hores} {1,choice,0#|0&lt;{1, number, integer}
@@ -670,7 +669,7 @@
             L'importació de {0,number,integer} {0,choice,1#document|1&lt;documents} s'ha completat.
             {1,number,integer} invalid {1,choice,1#document s'ha|1&lt;documents s'han} omes.
         </import-complete-message>
-        <na todo="true">N/A</na>
+        <na>N/D</na>
         <fields-found>Camps trobats</fields-found>
         <values-found>Valors trobats</values-found>
         <errors>Errors</errors>
@@ -739,7 +738,7 @@
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label>[Last 30 days]</label>
+                    <label>Last 30 days</label>
                     <value>last-30-days</value>
                 </item>
                 <item>

@@ -6,7 +6,7 @@
             <short-date>[Y01]-[M01]-[D01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
+            <incomplete-configuration>Twoja konfiguracja Orbeon Forms jest niekompletna. Aby uzyskać więcej informacji, sprawdź plik dziennika Orbeon Forms i odwiedź &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;dokumentację&lt;/a&gt;.</incomplete-configuration>
         </messages>
     </common>
     <buttons>
@@ -23,19 +23,19 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Usuń</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importuj</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nowy</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Utwórz nowe dane</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplikuj</duplicate>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Zapisz</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Złóż</save-final>
-        <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-draft>
-        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-progress>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Zapisz postęp</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Wyślij</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Zweryfikuj</validate>
-        <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Testuj PDF</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Złóż</submit>
@@ -52,9 +52,9 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"/></collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"/></expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Zwiń wszystko</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Rozwiń wszystko</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Odśwież</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>
@@ -70,16 +70,16 @@
         <validation-dialog-continue>Kontynuuj</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Zapisz i nadpisz</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Odrzuć i wczytaj ponownie</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testuj</test>
-        <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
-        <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-        <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
-        <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
-        <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
-        <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Sprawdź formuły (beta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testuj w trybie offline (beta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Eksport do Excela</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Eksport do Excela</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Eksport do XML</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; Eksport XHTML</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Zapisz i publikuj</save-publish>
 
@@ -97,7 +97,7 @@
             <yes>Tak</yes>
             <no>Nie</no>
             <other>inne</other>
-            <clear todo="true">[Clear Value]</clear>
+            <clear>Wyczyść wartość</clear>
             <please-select>Wybierz:</please-select>
         </labels>
         <grid>
@@ -107,7 +107,7 @@
             <move-up>Przesuń w górę</move-up>
             <move-down>Przesuń w dół</move-down>
             <clear>
-                <label todo="true">[Clear Line]</label>
+                <label>Wyczyść linię</label>
             </clear>
             <remove>
                 <label>Usuń linię</label>
@@ -146,29 +146,29 @@
             <show-less>Pokaż mniej</show-less>
         </error-summary>
         <revision-history>
-            <label todo="true">Revision History</label>
-            <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <label>Historia zmian</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (wersja początkowa)}'|1# (bieżąca wersja)}</date>
+            <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] o [h]:[m] [P,*-2]</date-format>
 
-            <named-user todo="true">User {0}</named-user>
-            <anonymous-user todo="true">An anonymous user</anonymous-user>
+            <named-user>Użytkownik {0}</named-user>
+            <anonymous-user>Anonimowy użytkownik</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
-            <initial-revision todo="true">saved the initial revision.</initial-revision>
-            <no-changes todo="true">saved with no changes detected.</no-changes>
-            <specific-changes todo="true">made the following changes:</specific-changes>
+            <unknown-changes>dokonał zmian.</unknown-changes>
+            <initial-revision>zapisał wersję początkową.</initial-revision>
+            <no-changes>zapisano bez wykrytych zmian.</no-changes>
+            <specific-changes>dokonał następujących zmian:</specific-changes>
 
-            <view-data todo="true">View this revision</view-data>
+            <view-data>Zobacz tę wersję</view-data>
 
-            <value-entered todo="true">"{0}" entered</value-entered>
-            <value-cleared todo="true">"{0}" cleared</value-cleared>
-            <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
-            <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
-            <other-changed todo="true">internal information changed</other-changed>
-            <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+            <value-entered>"{0}" wprowadzono</value-entered>
+            <value-cleared>"{0}" usunięto</value-cleared>
+            <value-changed>zmieniono z "{0}" na "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#powtórzenie|1&lt;powtórzenia} dodano</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#powtórzenie|1&lt;powtórzenia} usunięto</iteration-removed>
+            <other-changed>zmieniono informacje wewnętrzne</other-changed>
+            <workflow-stage-changed>Etap przepływu pracy zmieniony z "{0}" na "{1}"</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>Wczytaj więcej</load-more>
         </revision-history>
     </components>
     <untitled-form>Bez tytułu</untitled-form>
@@ -184,7 +184,7 @@
         <none>Brak błędów w formularzu</none>
         <unsaved>Niezachowane zmiany</unsaved>
         <canvas-not-supported>Aby móc dodać adnotacje do pliku graficznego twoja przeglądarka musi wspierać HTML5 canvas</canvas-not-supported>
-        <search todo="true">[Error performing search]</search>
+        <search>Błąd podczas wyszukiwania</search>
     </errors>
     <email>
         <subject>Potwierdzenie formularza Orbeon Forms</subject>
@@ -204,9 +204,9 @@
         <titles>
             <summary-title>Podsumowanie</summary-title>
             <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
-            <document-id todo="true">Document Id</document-id>
-            <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-            <created-by todo="true">[Created By]</created-by>
+            <document-id>Identyfikator dokumentu</document-id>
+            <workflow-stage>Etap przepływu pracy</workflow-stage>
+            <created-by>Utworzony przez</created-by>
             <selected>Wybrany</selected>
             <refresh>Ta operacja spowoduje odświeżenie strony</refresh>
             <toc>Spis treści</toc>
@@ -216,18 +216,18 @@
             <errors-count>Błędy/-ów w Twoim formularzu</errors-count>
         </titles>
         <buttons>
-            <select-all todo="true">Select all</select-all>
-            <deselect-all todo="true">Deselect all</deselect-all>
-            <select-saved todo="true">Select explicitly saved only</select-saved>
-            <select-drafts todo="true">Select drafts only</select-drafts>
+            <select-all>Zaznacz wszystko</select-all>
+            <deselect-all>Odznacz wszystko</deselect-all>
+            <select-saved>Zaznacz tylko zapisane formularze</select-saved>
+            <select-drafts>Zaznacz tylko szkice</select-drafts>
         </buttons>
         <bulk-edit>
-            <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
-            <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
-            <bulk-edit todo="true">[Bulk edit]</bulk-edit>
-            <apply todo="true">[Apply]</apply>
-            <value-required todo="true">[Value is required]</value-required>
-            <submission-error todo="true">[Error while editing form data.]</submission-error>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż edycję zbiorczą</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Ukryj edycję zbiorczą</close-bulk-edit>
+            <bulk-edit>Edycja zbiorcza</bulk-edit>
+            <apply>Zastosuj</apply>
+            <value-required>Wartość jest wymagana</value-required>
+            <submission-error>Wystąpił błąd podczas edycji danych formularza.</submission-error>
         </bulk-edit>
         <paging>
             <to>do</to>
@@ -245,10 +245,10 @@
             <language-choice>Wybierz język</language-choice>
             <form-choice>Wybierz formularz</form-choice>
             <free-search>Wyszukiwanie pełnotekstowe</free-search>
-            <clear-value todo="true">[[Clear value]]</clear-value>
+            <clear-value>Wyczyść wartość</clear-value>
             <script>Pełna wersja</script>
             <refresh>Odśwież</refresh>
-            <close-box>[zamknij]</close-box>
+            <close-box>zamknij</close-box>
             <help-back>Wstecz</help-back>
             <goto-content>Idź do treści</goto-content>
         </labels>
@@ -259,30 +259,30 @@
             <save-datetime>[Y]-[M]-[D] [H01]:[m01]:[s01]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label todo="true">Excel Export Options</label>
-            <headings-labels todo="true">Use labels for headings</headings-labels>
-            <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
-            <include-document-id todo="true">Include document id column</include-document-id>
+            <label>Opcje eksportu do Excela</label>
+            <headings-labels>Użyj etykiet jako nagłówków</headings-labels>
+            <selection-controls-labels>Użyj etykiet dla kontrolek wyboru</selection-controls-labels>
+            <include-document-id>Dołącz kolumnę z identyfikatorem dokumentu</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
             <save-success>Formularz został zapisany pomyślnie!</save-success>
-            <save-draft-success todo="true">Szkic został pomyślnie zapisany.</save-draft-success>
-            <save-progress-success todo="true">Szkic został pomyślnie zapisany.</save-progress-success>
+            <save-draft-success>Szkic został pomyślnie zapisany.</save-draft-success>
+            <save-progress-success>Postęp został pomyślnie zapisany.</save-progress-success>
             <email-success>Email został pomyślnie wysłany.</email-success>
             <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
             <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
             <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>
-            <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
+            <action-error>Wystąpił błąd podczas komunikacji z usługą zaplecza. Skontaktuj się z administratorem aplikacji.</action-error>
             <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
-            <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
-            <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
+            <wizard-prev-error>Popraw błędy przed przejściem do poprzedniego kroku</wizard-prev-error>
+            <wizard-next-error>Popraw błędy przed przejściem do następnego kroku</wizard-next-error>
             <clear-confirm-message>Czy jesteś pewien, że chcesz wyczyścić wszystkie pola na tej stronie? Twoje dane zostaną utraceone, jeśli nie zostały wcześniej zapisane.</clear-confirm-message>
             <error-dialog-title>Nie można ukończyć akcji.</error-dialog-title>
             <confirmation-dialog-title>Potwierdzenie</confirmation-dialog-title>
             <confirmation-dialog-message>Czy kontynuować? Wysłanego formularza nie można poprawić.</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message-overwrite>Ta operacja może spowodować nadpisanie danych formularza. Czy na pewno chcesz kontynuować?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Formularz złożony</submit-dialog-title>
             <submit-dialog-message>Twój formularz został złożony, dziękuję.</submit-dialog-message>
             <validation-dialog-title>Przegląd komunikatów walidacji</validation-dialog-title>
@@ -301,22 +301,22 @@
             <upload-cancel>Wgrywanie pliku/-ów zostało anulowane przez użytkownika</upload-cancel>
             <upload-done>Wgrywanie pliku/-ów zostało zakończone</upload-done>
             <upload-error>W trakcie wgrywania pliku/-ów wystąpił błąd. Spróbuj ponownie.</upload-error>
-            <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
+            <upload-error-empty-file>Przesłany plik jest pusty.</upload-error-empty-file>
             <upload-error-size>Wgrany plik jest zbyt duży. Maksymalny dozwolony rozmiar plikuto {0}, a rozmiar otrzymanego pliku to {1}.</upload-error-size>
             <upload-error-max-files-per-control>Przekroczono maksymalną liczbę plików. Nie można dołączyć więcej niż {0,number,integer} plików do tego kontrolki.</upload-error-max-files-per-control>
             <upload-error-mediatype>Wgrany plik jest niewłaściwego typu: {0}</upload-error-mediatype>
             <upload-error-file-scan>Przesłany plik został odrzucony przez skaner plików. Upewnij się, że nie jest to zainfekowany plik. Oto komunikat skanera plików: „{0}”.</upload-error-file-scan>
             <lost-attachments>Niektóre załączniki zostały utracone z powodu problemu z serwerem. Sprawdź wszystkie załączniki i prześlij je ponownie w razie potrzeby.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>Wykryto konflikt</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>Dane uległy zmianie od czasu ich wczytania. Możesz:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>zapisać teraz, nadpisując wcześniej zapisane dane,</li>
+                        <li>lub odrzucić bieżące zmiany i ponownie wczytać wcześniej zapisane dane.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Znaleziono szkic</found-draft>
@@ -339,21 +339,21 @@
             <error-details>Podgląd szczegółów błędu</error-details>
             <confirm>Potwierdź</confirm>
             <alert>Brakująca lub niepoprawna wartość</alert>
-            <alert-out-of-range todo="true">[Out of range value, please select an available value]</alert-out-of-range>
-            <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
-            <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
+            <alert-out-of-range>Wartość spoza dozwolonego zakresu, wybierz dostępną wartość</alert-out-of-range>
+            <alert-out-of-range-multiple>Wartość spoza dozwolonego zakresu</alert-out-of-range-multiple>
+            <clear-out-of-range>Wyczyść wartości spoza dozwolonego zakresu</clear-out-of-range>
             <captcha-label>Captcha</captcha-label>
             <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-size-per-file>Pliki muszą mieć rozmiar poniżej {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>Łączny rozmiar plików w tej kontrolce musi być mniejszy niż {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Możesz załączyć maksymalnie {0} plików.</upload-max-files-per-control>
             <upload-min-files-per-control>Musisz dołączyć co najmniej {0} pliki.</upload-min-files-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Akceptowane są tylko pliki typu {0}.</upload-mediatypes>
+            <upload-image>obraz</upload-image>
+            <upload-video>wideo</upload-video>
+            <upload-audio>dźwięk</upload-audio>
         </hints>
         <view>
             <explanation>
@@ -371,18 +371,18 @@
             <relinquish>Odblokuj dokument do edycji dla innych użytkowników.</relinquish>
             <renew>Przedłuż swoje prawo do edycji dokumentu.</renew>
             <try-acquire>Spróbuj uzyskać prawo do edycji dokumentu.</try-acquire>
-            <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
+            <show-in-view-mode>Pokaż w trybie tylko do odczytu</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>Sesja wkrótce wygaśnie</expiring>
+                <expired>Sesja wygasła</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                <expiring>Twoja sesja wkrótce wygaśnie. Kliknij przycisk poniżej, jeśli chcesz dalej korzystać z tej strony.</expiring>
                 <expired>Ten formularz musi zostać ponownie załadowany. Może to przenieść Cię na stronę logowania. Jeśli uważasz, że nie powinieneś widzieć tej wiadomości i problem nadal występuje, skontaktuj się z pomocą techniczną.</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
+            <renew-button>Przedłuż sesję</renew-button>
             <reload-button>Odśwież</reload-button>
         </session-expiration>
         <tab-duplication>
@@ -390,13 +390,13 @@
             <message>Wygląda na to, że zduplikowano tę kartę przeglądarki. Zamknij tę kartę i wznów sesję w oryginalnej karcie.</message>
         </tab-duplication>
         <available-from>
-            <message todo="true">[This form isn't available yet]</message>
+            <message>Ten formularz nie jest jeszcze dostępny</message>
         </available-from>
         <available-to>
-            <message todo="true">[This form isn't available anymore]</message>
+            <message>Ten formularz nie jest już dostępny</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Etap</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -420,38 +420,38 @@
         </dialog-body>
     </save-locally>
     <share-dialog>
-        <label todo="true">Create link to share</label>
-        <body todo="true">Let anyone with the link view or edit this data.</body>
-        <link todo="true">Link</link>
-        <select-operations todo="true">Select operations</select-operations>
-        <readonly todo="true">Readonly</readonly>
-        <readwrite todo="true">Read-write</readwrite>
+        <label>Utwórz link do udostępniania</label>
+        <body>Pozwól każdemu z linkiem wyświetlać lub edytować te dane.</body>
+        <link>Link</link>
+        <select-operations>Wybierz operacje</select-operations>
+        <readonly>Tylko do odczytu</readonly>
+        <readwrite>Odczyt i zapis</readwrite>
     </share-dialog>
     <admin>
-        <title todo="true">[Forms Admin]</title>
+        <title>Administracja formularzami</title>
     </admin>
     <landing>
         <title>Landing</title>
         <titles>
-            <published-forms todo="true">Published Forms</published-forms>
-            <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-            <form-builder-new todo="true">New Form Builder Form</form-builder-new>
-            <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
-            <demo-forms todo="true">Demo Forms</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
-            <quick-links todo="true">Quick Links</quick-links>
-            <form-runner-admin todo="true">Forms Admin</form-runner-admin>
+            <published-forms>Opublikowane formularze</published-forms>
+            <form-builder-forms>Formularze Form Buildera</form-builder-forms>
+            <form-builder-new>Nowy formularz Form Buildera</form-builder-new>
+            <form-builder-summary>Formularze Form Buildera</form-builder-summary>
+            <demo-forms>Formularze demonstracyjne</demo-forms>
+            <demo-features>Funkcje demonstracyjne</demo-features>
+            <quick-links>Szybkie łącza</quick-links>
+            <form-runner-admin>Administracja formularzami</form-runner-admin>
         </titles>
         <descriptions>
-            <published-forms todo="true">Access your published forms</published-forms>
-            <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <published-forms>Uzyskaj dostęp do opublikowanych formularzy</published-forms>
+            <form-builder-forms>Przeglądaj i edytuj tworzone formularze utworzone w Form Builderze</form-builder-forms>
+            <demo-forms>Wypróbuj kolekcję przykładowych formularzy Orbeon Forms</demo-forms>
+            <demo-features>Wypróbuj demonstracje wybranych funkcji Orbeon Forms</demo-features>
         </descriptions>
-        <show-more todo="true">Show more…</show-more>
+        <show-more>Pokaż więcej…</show-more>
     </landing>
     <home>
-        <title todo="true">[Published Forms]</title>
+        <title>Opublikowane formularze</title>
         <buttons>
             <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Cofnij publikację</unpublish>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>
@@ -479,10 +479,10 @@
             <navigate-new>Przejdź do nowych</navigate-new>
             <upgrade-local>Aktualizuj lokalne definicje formularzy</upgrade-local>
             <upgrade-remote>Aktualizuj zdalne definicje formularzy</upgrade-remote>
-            <delete-local todo="true">Delete local forms</delete-local>
-            <delete-remote todo="true">Delete remote forms</delete-remote>
+            <delete-local>Usuń lokalne formularze</delete-local>
+            <delete-remote>Usuń zdalne formularze</delete-remote>
             <reencrypt>Ponownie zaszyfruj definicje formularzy</reencrypt>
-            <reload-resources todo="true">[Reload resources]</reload-resources>
+            <reload-resources>Przeładuj zasoby</reload-resources>
         </buttons>
         <titles>
             <publish-confirmation>Potwierdź publikację/cofnięcie publikacji formularza</publish-confirmation>
@@ -495,14 +495,14 @@
             <form-identification>Identyfikacja formularza</form-identification>
             <reindexing-confirmation>Potwierdź reindeksację</reindexing-confirmation>
             <reencrypt-confirmation>Potwierdź ponowne szyfrowanie</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
+            <purge-confirmation>Potwierdź usunięcie danych</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[Nie znaleziono żadnego wdrożonego formularza.]</no-form-found>
-            <publish-confirmation todo="true">Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować|3#delete} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
+            <no-form-found>Nie znaleziono żadnego wdrożonego formularza.</no-form-found>
+            <publish-confirmation>Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować|3#usunąć} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
             <reindexing-confirmation>W trakcie reindeksacji niektóre funkcje, jak strony podsumowań Form Runner'a, mogą nie działać prawidłowo. Z tego powodu rekomendujemy, abyś wykonywał reindeksowanie, kiedy system jest offline. Czy jesteś pewien, że chcesz kontynuować reindeksację?</reindexing-confirmation>
             <reencrypt-confirmation>Zalecamy ponowne szyfrowanie, gdy system jest w trybie offline. Czy na pewno chcesz kontynuować ponowne szyfrowanie?</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
+            <purge-confirmation>Czy na pewno chcesz usunąć wybrane dane?</purge-confirmation>
         </messages>
         <labels>
             <available>Dostępny</available>
@@ -521,35 +521,35 @@
             <reencrypt-finished>Ponowne szyfrowanie zakończone</reencrypt-finished>
         </labels>
         <export-purge>
-            <export todo="true">[Export]</export>
-            <purge todo="true">[Purge]</purge>
-            <or todo="true">[or]</or>
-            <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
-            <following-forms todo="true">[Following forms:]</following-forms>
-            <application todo="true">[Application:]</application>
-            <form todo="true">[Form:]</form>
-            <version todo="true">[Version:]</version>
-            <all-applications todo="true">[All applications]</all-applications>
-            <all-forms todo="true">[All forms]</all-forms>
-            <all-versions todo="true">[All versions]</all-versions>
-            <latest-version todo="true">[Latest version]</latest-version>
+            <export>Eksportuj</export>
+            <purge>Usuń</purge>
+            <or>lub</or>
+            <selected-forms>Wybrane formularze ({0,number,integer})</selected-forms>
+            <following-forms>Następujące formularze:</following-forms>
+            <application>Aplikacja:</application>
+            <form>Formularz:</form>
+            <version>Wersja:</version>
+            <all-applications>Wszystkie aplikacje</all-applications>
+            <all-forms>Wszystkie formularze</all-forms>
+            <all-versions>Wszystkie wersje</all-versions>
+            <latest-version>Najnowsza wersja</latest-version>
             <definitions-data>
-                <label todo="true">[Form definitions / data:]</label>
-                <definitions todo="true">[Definitions only]</definitions>
-                <data todo="true">[Data only]</data>
-                <both todo="true">[Definitions and data]</both>
+                <label>Definicje formularzy / dane:</label>
+                <definitions>Tylko definicje</definitions>
+                <data>Tylko dane</data>
+                <both>Definicje i dane</both>
             </definitions-data>
             <current-history>
-                <label todo="true">[Current data / revision history:]</label>
-                <current-data todo="true">[Current data only]</current-data>
-                <revision-history todo="true">[Revision history only]</revision-history>
-                <both todo="true">[Current data and revision history]</both>
+                <label>Bieżące dane / historia zmian:</label>
+                <current-data>Tylko bieżące dane</current-data>
+                <revision-history>Tylko historia zmian</revision-history>
+                <both>Bieżące dane i historia zmian</both>
             </current-history>
-            <from-date todo="true">[From:]</from-date>
-            <until-date todo="true">[Until:]</until-date>
-            <redundant-values todo="true">[Redundant values]</redundant-values>
-            <invalid-date todo="true">[Invalid date]</invalid-date>
-            <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            <from-date>Od:</from-date>
+            <until-date>Do:</until-date>
+            <redundant-values>Nadmiarowe wartości</redundant-values>
+            <invalid-date>Nieprawidłowa data</invalid-date>
+            <wrong-date-order>Nieprawidłowa kolejność dat</wrong-date-order>
         </export-purge>
     </home>
     <import>
@@ -571,11 +571,11 @@
         </upload>
         <file>
             <label>Plik z danymi do importu</label>
-            <hint todo="true">Plik musi być w formacie Excel 2007 (.xlsx)</hint>
-            <alert todo="true">Brakujący plik</alert>
-            <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
-            <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>e
+            <hint>Plik musi być w formacie Excel 2007 (.xlsx) lub XML (.xml)</hint>
+            <alert>Brakujący lub nieobsługiwany plik</alert>
+            <excel-headings-format>Excel 2007 w formacie z nazwanymi nagłówkami (.xlsx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 w formacie z nazwanymi zakresami (.xlsx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Format eksportu Orbeon XML (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
             <label>Walidacja</label>
@@ -618,7 +618,7 @@
             <label>Zacznij od nowa</label>
         </start-over>
         <review-data>
-            <label todo="true">Review Data</label>
+            <label>Przejrzyj dane</label>
         </review-data>
         <existing-records-message>
             {0,choice,1#Istnieje|1&lt;Istnieją} {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} w bazie danych dla wersji {3} dla fołrmularza {1}/{2}.
@@ -632,28 +632,28 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} {0,choice,1#został zatwierdzony i zostanie zaimportowany|1&lt;zostały zatwierdzone i zostaną zaimportowane}.
         </valid-records-message>
-        <invalid-document-message todo="true">
-            The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+        <invalid-document-message>
+            Przesłany dokument zawiera błędy walidacji. Użyj przycisku „Przejrzyj dane”, aby przejrzeć i poprawić błędy przed zapisaniem.
         </invalid-document-message>
-        <valid-document-message todo="true">
-            The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+        <valid-document-message>
+            Przesłany dokument zawiera prawidłowe dane. Użyj przycisku „Przejrzyj dane”, aby przejrzeć dane formularza przed zapisaniem.
         </valid-document-message>
         <import-complete-message>
             Import {0,number,integer} {0,choice,1#dokumentu|1&lt;dokumentów} jest gotowy. {1,number,integer} {1,choice,1#nieprawidłowy dokument był pominięty|1&lt;nieprawidłowe dokumenty były pominiete}.
         </import-complete-message>
         <na>Nie dotyczy</na>
-        <fields-found todo="true">Fields Found</fields-found>
-        <values-found todo="true">Values Found</values-found>
-        <errors todo="true">Errors</errors>
-        <warnings todo="true">Warnings</warnings>
+        <fields-found>Znalezione pola</fields-found>
+        <values-found>Znalezione wartości</values-found>
+        <errors>Błędy</errors>
+        <warnings>Ostrzeżenia</warnings>
         <error-messages>
-            <validating todo="true">[An error occurred while validating the data.]</validating>
-            <importing todo="true">[An error occurred while importing the data.]</importing>
-            <deleting todo="true">[An error occurred while deleting the data.]</deleting>
-            <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
-            <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
-            <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
-            <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            <validating>Wystąpił błąd podczas walidacji danych.</validating>
+            <importing>Wystąpił błąd podczas importu danych.</importing>
+            <deleting>Wystąpił błąd podczas usuwania danych.</deleting>
+            <unauthorized>Nie masz uprawnień dostępu do tych danych.</unauthorized>
+            <reading-form-data>Wystąpił błąd podczas pobierania danych formularza.</reading-form-data>
+            <reading-form-metadata>Wystąpił błąd podczas odczytywania metadanych formularza.</reading-form-metadata>
+            <reading-form-definition>Wystąpił błąd podczas odczytywania definicji formularza.</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
@@ -683,7 +683,7 @@
         <titles>
             <created>Utworzony</created>
             <last-modified>Zmodyfikowany</last-modified>
-            <last-modified-by todo="true">[Modified By]</last-modified-by>
+            <last-modified-by>Zmodyfikowany przez</last-modified-by>
             <application-name>Aplikacja</application-name>
             <form-name>Formularz</form-name>
             <version>Wersja</version>
@@ -695,35 +695,35 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-search-options>
             <search-options>Opcje wyszukiwania</search-options>
-            <any>[Dowolny]</any>
+            <any>Dowolny</any>
             <dates>
                 <item>
-                    <label todo="true">[Today]</label>
+                    <label>Dzisiaj</label>
                     <value>today</value>
                 </item>
                 <item>
-                    <label todo="true">[Yesterday]</label>
+                    <label>Wczoraj</label>
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 7 days]</label>
+                    <label>Ostatnie 7 dni</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 30 days]</label>
+                    <label>Ostatnie 30 dni</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 90 days]</label>
+                    <label>Ostatnie 90 dni</label>
                     <value>last-90-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Custom...]</label>
+                    <label>Niestandardowy...</label>
                     <value>custom</value>
                 </item>
             </dates>
-            <date-after todo="true">[After]</date-after>
-            <date-before todo="true">[Before]</date-before>
+            <date-after>Po</date-after>
+            <date-before>Przed</date-before>
         </search>
     </home-summary>
 </resource>

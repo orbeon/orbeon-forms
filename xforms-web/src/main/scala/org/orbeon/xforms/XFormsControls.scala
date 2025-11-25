@@ -68,7 +68,7 @@ object XFormsControls {
       if (control.classList.contains("xforms-mediatype-text-html"))
         control.innerHTML = newControlValue
       else
-        control.innerText = newControlValue
+        control.textContent = newControlValue
     } else if (control.classList.contains("xforms-output") || isStaticReadonly) {
       // XForms output or other field in "static readonly" mode
       control.childrenT(".xforms-output-output, .xforms-field").headOption.foreach {

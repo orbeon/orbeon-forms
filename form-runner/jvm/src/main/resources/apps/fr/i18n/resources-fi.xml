@@ -309,13 +309,13 @@
             <lost-attachments>Osa tiedostoliitteistä katosi palvelinongelman vuoksi. Tarkista kaikki liitteet ja lataa ne uudelleen tarvittaessa.</lost-attachments>
             <conflict-dialog-title>Ristiriita havaittu</conflict-dialog-title>
             <conflict-dialog-message>
-                &lt;div&gt;
-                    &lt;p&gt;Tiedot ovat muuttuneet sen jälkeen kun latasit ne.&lt;/p&gt;
-                    &lt;ul&gt;
-                        &lt;li&gt;Voit tallentaa nyt ja korvata aiemmin tallennetut tiedot.&lt;/li&gt;
-                        &lt;li&gt;Voit hylätä nykyiset muutoksesi ja ladata aiemmin tallennetut tiedot uudelleen.&lt;/li&gt;
-                    &lt;/ul&gt;
-                &lt;/div&gt;
+                <div>
+                    <p>Tiedot ovat muuttuneet sen jälkeen kun latasit ne. Voit joko:</p>
+                    <ul>
+                        <li>tallentaa nyt ja korvata aiemmin tallennetut tiedot.</li>
+                        <li>hylätä nykyiset muutoksesi ja ladata aiemmin tallennetut tiedot uudelleen.</li>
+                    </ul>
+                </div>
             </conflict-dialog-message>
         </messages>
         <draft-singleton>

@@ -1,6 +1,7 @@
 package org.orbeon.oxf.properties
 
 import cats.data.NonEmptyList
+import org.orbeon.concurrent.ResourceLock
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.ServiceProviderSupport
@@ -11,8 +12,6 @@ import org.slf4j
 
 import java.net.URI
 import java.util as ju
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.locks.ReentrantLock
 import scala.collection.immutable.ArraySeq
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
@@ -115,46 +114,22 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
 
   private object Initialization {
 
-    private val firstCallerAtomic = new AtomicBoolean(false)
-    private val lock              = new ReentrantLock
-
-    @volatile
-    private var initializingBootPropertyStore = false
     @volatile
     private var bootPropertyStoreCacheEntryOpt: Option[CacheEntry] = None
+
+    private val initializationResourceLock = new ResourceLock
 
     // We want to control initialization to avoid infinite recursion.
     // So the first caller only is allowed to perform initialization. It takes a lock and then calls
     // `getBootPropertyStore()`. This can recursively call `getPropertyStoreImpl()`, but we detect that condition and
-    // return an empty property store to avoid infinite recursion. There are some assumptions about what the callers might
-    // need during initialization.
+    // return an empty property store to avoid infinite recursion. The assumption is that the callers are few and don't
+    // require important properties, or ones that have defaults, including: XML parser security manager; processors
+    // validation settings (only for reading `properties-*.xml`).
     def getInitializationPropertyStore: PropertyStore =
-      if (firstCallerAtomic.compareAndSet(false, true)) {
-        lock.lock()
-        initializingBootPropertyStore = true
-        try
-          getBootPropertyStore // this must not use `CacheSupport`
-        finally {
-          initializingBootPropertyStore = false
-          lock.unlock()
-        }
-      } else {
-        lock.lock() // a recursive call, or one done after `unlock()` above will go through; others will wait
-        try
-          if (initializingBootPropertyStore) {
-            // Recursive call during initialization
-            // We return an empty property store to avoid infinite recursion. The assumption is that the callers
-            // are few and don't require important properties, or ones that have defaults, including: XML parser
-            // security manager; processors validation settings (only for reading `properties-*.xml`).
-            PropertyStore.empty
-          } else {
-            // Subsequent call after initialization
-            // Still only return the boot property store, to avoid recursion through `CacheSupport`
-            getBootPropertyStore
-          }
-        finally
-          lock.unlock()
+      initializationResourceLock.withAcquiredResourceOrNone(allowBlocking = true) {
+        getBootPropertyStore
       }
+      .getOrElse(PropertyStore.empty)
 
     // This returns a `PropertyStore` without recursively without using `CacheSupport`. The property provider will
     // recursively call `PropertyLoader.getPropertyStore()`, but this will not use `CacheSupport` as we detect that

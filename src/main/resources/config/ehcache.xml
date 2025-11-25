@@ -100,7 +100,7 @@
            overflowToDisk="false"
            diskSpoolBufferSizeMB="1"
            eternal="false"
-           timeToLiveSeconds="30"
+           timeToLiveSeconds="0"
            timeToIdleSeconds="0"
            diskPersistent="false"
            maxElementsOnDisk="0"

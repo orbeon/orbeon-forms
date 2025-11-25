@@ -21,9 +21,10 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils}
 
 import java.time.Instant
 import scala.util.{Failure, Success}
@@ -39,9 +40,10 @@ object CRUDRoute
 
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
-    implicit val indentedLogger : IndentedLogger  = new IndentedLogger(logger)
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(logger)
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
 
-    implicit val httpRequest: ExternalContext.Request  = ec.getRequest
+    implicit val httpRequest: ExternalContext.Request = ec.getRequest
     val httpResponse  : ExternalContext.Response = ec.getResponse
 
     try {

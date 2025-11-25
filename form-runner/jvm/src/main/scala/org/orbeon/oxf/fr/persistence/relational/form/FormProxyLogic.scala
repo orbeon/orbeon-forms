@@ -29,6 +29,7 @@ import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
 import org.orbeon.oxf.fr.persistence.relational.form.adt.*
 import org.orbeon.oxf.http.{BasicCredentials, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.PathUtils.PathOps
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xml.dom.IOSupport.readOrbeonDom
@@ -53,6 +54,7 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
     request          : Request,
     appFormFromUrlOpt: Option[AppFormOpt]
   )(implicit
+    propertySet      : PropertySet,
     indentedLogger   : IndentedLogger
   ): NodeInfo = {
 
@@ -166,7 +168,8 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
     localMetadataProvider: LocalMetadataProvider,
     formRequest          : FormRequest
   )(implicit
-    indentedLogger         : IndentedLogger
+    propertySet          : PropertySet,
+    indentedLogger       : IndentedLogger
   ): FormResponse = {
 
     val (providerURI, providerHeaders) = getPersistenceURLHeadersFromProvider(localMetadataProvider.provider)

@@ -18,8 +18,9 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.http.{HttpMethod, HttpRanges, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 
 import scala.util.{Failure, Success}
 
@@ -30,9 +31,10 @@ object CRUDRoute extends NativeRoute {
 
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
-    implicit val httpRequest:  Request  = ec.getRequest
-    implicit val httpResponse: Response = ec.getResponse
+    implicit val httpRequest   : Request        = ec.getRequest
+    implicit val httpResponse  : Response       = ec.getResponse
     implicit val indentedLogger: IndentedLogger = new IndentedLogger(logger)
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
 
     try {
       info(s"Attachments provider service: ${httpRequest.getMethod} ${httpRequest.getRequestPath}")

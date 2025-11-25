@@ -17,16 +17,17 @@ import org.log4s.Logger
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.http.{HttpRange, HttpRanges, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 
 import java.io.InputStream
 import scala.util.{Failure, Success}
 
 
 trait CRUDMethods {
-  def head  (pathInformation: PathInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
-  def get   (pathInformation: PathInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
-  def put   (pathInformation: PathInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
-  def delete(pathInformation: PathInformation                        )(implicit httpRequest: Request, httpResponse: Response): Unit
+  def head  (pathInformation: PathInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response, propertySet: PropertySet): Unit
+  def get   (pathInformation: PathInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response, propertySet: PropertySet): Unit
+  def put   (pathInformation: PathInformation                        )(implicit httpRequest: Request, httpResponse: Response, propertySet: PropertySet): Unit
+  def delete(pathInformation: PathInformation                        )(implicit httpRequest: Request, httpResponse: Response, propertySet: PropertySet): Unit
 }
 
 object CRUDMethods {

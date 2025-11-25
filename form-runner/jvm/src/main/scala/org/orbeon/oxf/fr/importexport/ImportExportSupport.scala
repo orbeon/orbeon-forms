@@ -16,6 +16,7 @@ import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
 import org.orbeon.oxf.fr.process.FormRunnerExternalMode.PrivateModeMetadata
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt.*
@@ -415,7 +416,8 @@ object ImportExportSupport {
     modeType       : ModeType.ForExistingData
   )(implicit
     logger         : IndentedLogger,
-    externalContext: ExternalContext
+    externalContext: ExternalContext,
+    propertySet    : PropertySet
   ): FormDataWithDetails = {
 
     debug(s"document id provided: `$documentId`")

@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.EventCollector
@@ -54,6 +54,8 @@ class FormRunnerFunctionsTest
       FormOrData.Data ->
         """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/S%C3%A3o_Paulo</value></header><header><name>Orbeon-City-Name</name><value>São Paulo</value></header><header><name>Orbeon-Population</name><value>11244369</value></header></headers>"""
     )
+
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
 
     for ((formOrData, expected) <- Expected)
       it(s"must get headers for ${formOrData.entryName}") {
@@ -337,7 +339,7 @@ class FormRunnerFunctionsTest
 
   describe("`getProviders()` function") {
 
-    val properties: PropertySet =
+    implicit val propertySet: PropertySet =
       PropertySet.forTests(
         List(
           PropertyParams(Map.empty, "oxf.fr.persistence.*.active",                       XS_BOOLEAN_QNAME, "true"), // this is the default, not strictly needed here
@@ -391,32 +393,11 @@ class FormRunnerFunctionsTest
 
     for (((appOpt, formOpt, formOrData), expected) <- expected)
       it(s"must return `$expected` for `$appOpt`/`$formOpt`/`$formOrData`") {
-        assert(getProviders(appOpt, formOpt, formOrData, properties).toSet == expected)
+        assert(getProviders(appOpt, formOpt, formOrData).toSet == expected)
       }
   }
 
   describe("`databaseConfigurationPresent()` function") {
-
-    val properties: PropertySet =
-      PropertySet.forTests(
-        List(
-          PropertyParams(Map.empty, "oxf.fr.persistence.*.active",                       XS_BOOLEAN_QNAME, "true"), // this is the default, not strictly needed here
-          PropertyParams(Map.empty, "oxf.fr.persistence.my-inactive-provider.active",    XS_BOOLEAN_QNAME, "false"),
-
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
-
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*",                 XS_STRING_QNAME,  "mysql"),
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.orbeon.bookshelf.form", XS_STRING_QNAME,  "sqlite"),
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.form",     XS_STRING_QNAME,  "postgresql"),
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
-
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.*",               XS_STRING_QNAME,  "p1"),
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.bar.*",             XS_STRING_QNAME,  "p2"),
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.form",            XS_STRING_QNAME,  "p3"),
-
-          PropertyParams(Map.empty, "oxf.fr.persistence.provider.baz.*.*",               XS_STRING_QNAME,  "my-inactive-provider"),
-        )
-      )
 
     val expected: List[(String, Boolean, String => Boolean, List[PropertyParams])] =
       List(
@@ -564,9 +545,10 @@ class FormRunnerFunctionsTest
         ),
       )
 
-    for ((desc, expected, get, properties) <- expected)
+    for ((desc, expected, get, propertyParams) <- expected)
       it(s"must return `$expected` for `$desc`") {
-        assert(RelationalUtils.databaseConfigurationPresent(PropertySet.forTests(properties), get) == expected)
+        implicit val propertySet: PropertySet = PropertySet.forTests(propertyParams)
+        assert(RelationalUtils.databaseConfigurationPresent(get) == expected)
       }
   }
 

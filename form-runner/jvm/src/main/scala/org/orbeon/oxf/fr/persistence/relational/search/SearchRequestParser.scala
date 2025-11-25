@@ -18,12 +18,13 @@ import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.relational.search.adt.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts.*
-import org.orbeon.oxf.fr.persistence.relational.search.adt.*
 import org.orbeon.oxf.fr.persistence.relational.{FormStorageDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -43,7 +44,8 @@ object SearchRequestParser {
     searchDocument     : DocumentInfo,
     version            : FormDefinitionVersion
   )(implicit
-    indentedLogger: IndentedLogger
+    indentedLogger     : IndentedLogger,
+    propertySet        : PropertySet
   ): SearchRequest = {
 
     debug(s"search request: ${TransformerUtils.tinyTreeToString(searchDocument)}")
@@ -106,7 +108,8 @@ object SearchRequestParser {
     controlQueryEls: List[NodeInfo],
     allControls    : Boolean
   )(implicit
-    indentedLogger : IndentedLogger
+    indentedLogger : IndentedLogger,
+    propertySet    : PropertySet
   ): List[ControlQuery] = {
     val specificControls =
       controlQueryEls

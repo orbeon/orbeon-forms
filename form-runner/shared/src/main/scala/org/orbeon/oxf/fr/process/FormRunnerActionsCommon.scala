@@ -19,7 +19,7 @@ import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
-import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
+import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.{setCreateUpdateResponse, updateAttachments}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
@@ -27,6 +27,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils.*
@@ -150,7 +151,7 @@ trait FormRunnerActionsCommon {
 
       implicit val connectionCtx  : ConnectionContexts       = ConnectionContextSupport.findContext(Map.empty)
       implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
-
+      implicit val propertySet    : PropertySet              = CoreCrossPlatformSupport.properties
       implicit val formRunnerParams @ FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()

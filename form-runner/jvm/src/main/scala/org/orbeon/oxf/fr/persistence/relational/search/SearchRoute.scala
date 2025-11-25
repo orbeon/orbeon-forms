@@ -20,7 +20,8 @@ import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 
 
 object SearchRoute extends XmlNativeRoute {
@@ -31,7 +32,8 @@ object SearchRoute extends XmlNativeRoute {
 
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
-    implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
 
     try {
       val httpRequest = ec.getRequest

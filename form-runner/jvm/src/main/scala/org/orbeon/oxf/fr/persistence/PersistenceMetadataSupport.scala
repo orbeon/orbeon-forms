@@ -8,7 +8,7 @@ import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.FormStorageDetails
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.TryUtils.*
@@ -34,6 +34,7 @@ object PersistenceMetadataSupport {
     ! Properties.instance.getPropertySet.getBooleanOpt("oxf.fr.persistence.form-definition-cache.enable").contains(false)
 
   // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
+  // xxx which is not used? remove
   private lazy val formDefinitionCache = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-definition", store = false)
   private lazy val formMetadataCache   = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-metadata",   store = false)
 
@@ -59,7 +60,8 @@ object PersistenceMetadataSupport {
     appForm : AppForm,
     version : FormDefinitionVersion
   )(implicit
-    indentedLogger: IndentedLogger
+    indentedLogger: IndentedLogger,
+    propertySet   : PropertySet
   ): Try[FormStorageDetails] =
     readMaybeFromCache(appForm, version, formDefinitionCache) {
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport

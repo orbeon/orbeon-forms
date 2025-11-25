@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 
 
@@ -34,7 +35,8 @@ object ReindexRoute extends NativeRoute {
 
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
-    implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
 
     ec.getRequest.getRequestPath match {
       case ReindexPathRegex(providerToken, null, null) =>

@@ -17,11 +17,12 @@ import cats.implicits.catsSyntaxOptionId
 import io.circe.{Json, parser}
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.findProvider
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringReplacer.*
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
@@ -44,7 +45,7 @@ trait FormRunnerHome {
     ops     : Set[String]
   ) {
 
-    import org.orbeon.oxf.fr.persistence.relational.form.adt.Form._
+    import org.orbeon.oxf.fr.persistence.relational.form.adt.Form.*
 
     def isLocalAvailable    = local  exists (_.available)
     def isRemoteAvailable   = remote exists (_.available)
@@ -189,11 +190,13 @@ trait FormRunnerHome {
     formsForSelection(selection, forms) forall (_.isRemote)
 
   //@XPathFunction
-  def canReEncrypt(selection: String, forms: SequenceIterator): Boolean =
+  def canReEncrypt(selection: String, forms: SequenceIterator): Boolean = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     formsForSelection(selection, forms).forall { form =>
       val provider = findProvider(form.appForm, FormOrData.Data).get
       providerPropertyAsBoolean(provider, property = "reencrypt", default = false)
     }
+  }
 
   // Return remote servers information:
   //

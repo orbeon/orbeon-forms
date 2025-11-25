@@ -20,7 +20,7 @@ object FieldEncryption {
     appForm     : AppForm,
     isForXmlData: Boolean // vs. attachment data
   )(implicit
-    logger             : IndentedLogger
+    logger      : IndentedLogger
   ): Option[(InputStream, Option[Long])] = None
 
   def decryptDataXmlTransform(

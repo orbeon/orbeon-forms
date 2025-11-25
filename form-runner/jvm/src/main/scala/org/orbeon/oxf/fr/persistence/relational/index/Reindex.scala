@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.WhatToReindex.*
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
@@ -51,7 +52,8 @@ trait Reindex extends FormDefinition {
     connectionOpt  : Option[java.sql.Connection] = None
   )(implicit
     externalContext: ExternalContext,
-    indentedLogger : IndentedLogger
+    indentedLogger : IndentedLogger,
+    propertySet    : PropertySet
   ): Unit = {
 
     // If a document id was provided, produce WHERE clause, and set parameter

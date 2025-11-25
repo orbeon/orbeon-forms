@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, runtime}
 import org.orbeon.oxf.util.StringUtils.*
@@ -87,6 +88,7 @@ trait FormRunnerSummary {
   //@XPathFunction
   def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo = {
     implicit val indentedLogger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-runner")
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
     val appForm = AppForm(app, form)
     Index.searchableValues(
       formDoc,
@@ -107,13 +109,13 @@ trait FormRunnerSummary {
     workflowStage : String
   ): Unit = {
 
-    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
+    implicit val safeRequestCtx : SafeRequestContext       = SafeRequestContext(CoreCrossPlatformSupport.externalContext)
+    implicit val connectionCtx  : ConnectionContexts       = ConnectionContextSupport.findContext(Map.empty)
+    implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
+    implicit val indentedLogger : IndentedLogger           = xfcd.getIndentedLogger("form-runner")
+    implicit val propertySet    : PropertySet              = CoreCrossPlatformSupport.properties
 
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                     = CoreCrossPlatformSupport
-    implicit val safeRequestCtx         : SafeRequestContext                                 = SafeRequestContext(CoreCrossPlatformSupport.externalContext)
-    implicit val connectionCtx          : ConnectionContexts                                 = ConnectionContextSupport.findContext(Map.empty)
-    implicit val xfcd                   : XFormsContainingDocument                           = inScopeContainingDocument
-    implicit val indentedLogger         : IndentedLogger                                     = xfcd.getIndentedLogger("form-runner")
+    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
 
     Await.result(
       putWithAttachments(

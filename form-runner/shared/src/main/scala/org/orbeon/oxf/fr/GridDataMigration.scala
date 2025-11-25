@@ -15,6 +15,8 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.datamigration.*
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
@@ -32,6 +34,8 @@ object GridDataMigration {
     data        : DocumentNodeInfoType,
     metadataOpt : Option[DocumentNodeInfoType]
   ): DocumentNodeInfoType = {
+
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
 
     val appForm              = AppForm(app, form)
     val dstDataFormatVersion = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement))
@@ -61,7 +65,8 @@ object GridDataMigration {
     form        : String,
     data        : DocumentNodeInfoType,
     metadataOpt : Option[DocumentNodeInfoType]
-  ): DocumentNodeInfoType =
+  ): DocumentNodeInfoType = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     MigrationSupport.migrateDataWithFormMetadataMigrations(
       appForm              = AppForm(app, form),
       data                 = data,
@@ -72,6 +77,7 @@ object GridDataMigration {
       pruneTmpAttMetadata  = true
     ) getOrElse
       data
+  }
 
   // 2024-08-08: Can't find a trace of this being used internally or externally. But it seems that at some point we
   // might have exposed it?

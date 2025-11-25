@@ -33,6 +33,7 @@ import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
@@ -67,6 +68,7 @@ object PersistenceProxyRoute extends NativeRoute {
   import PersistenceProxy.*
 
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
     implicit val indentedLogger: IndentedLogger = new IndentedLogger(PersistenceProxy.Logger)
     proxyRequest(ec.getRequest, ec.getResponse)
   }
@@ -174,6 +176,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     request        : Request,
     response       : Response
   )(implicit
+    propertySet    : PropertySet,
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): Unit = {
@@ -204,6 +207,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     formOrData    : FormOrData, // for finding the provider
     path          : String
   )(implicit
+    propertySet   : PropertySet,
     indentedLogger: IndentedLogger
   ): Unit = {
 
@@ -257,6 +261,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     path           : String,
     documentIdOpt  : Option[String] = None
   )(implicit
+    propertySet    : PropertySet,
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): Unit = {
@@ -665,7 +670,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     appForm         : AppForm,
     encrypt         : Boolean
   )(implicit
-    indentedLogger: IndentedLogger
+    indentedLogger  : IndentedLogger,
+    propertySet     : PropertySet
   ): Option[StreamedContent] =
     HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
 
@@ -693,8 +699,9 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     appForm                 : AppForm,
     formDefinitionVersionOpt: Option[Int]
   )(implicit
-    indentedLogger          : IndentedLogger
-  ): Option[(String, String)] = {
+    indentedLogger          : IndentedLogger,
+    propertySet             : PropertySet
+  ): Option[(String, String)] =
     // Only attempt to check singleton status when we have a form version
     formDefinitionVersionOpt.flatMap { versionInt =>
       val version               = FormDefinitionVersion.Specific(versionInt)
@@ -703,7 +710,6 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
         formStorageDetails.isSingleton.option(Headers.OrbeonSingleton -> "true")
       }
     }
-  }
 
   private def attachmentsProviderCxr(
     isAttachment            : Boolean,
@@ -714,6 +720,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     streamedContent         : Option[StreamedContent],
     outgoingVersionHeaderOpt: Option[(String, String)]
   )(implicit
+    propertySet             : PropertySet,
     indentedLogger          : IndentedLogger
   ): Option[ConnectionResult] =
     if (isAttachment) {
@@ -734,6 +741,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     documentIdOpt           : Option[String],
     outgoingVersionHeaderOpt: Option[(String, String)]
   )(implicit
+    propertySet             : PropertySet,
     indentedLogger          : IndentedLogger
   ): Option[ConnectionResult] =
     findAttachmentsProvider(appForm, formOrData).map { provider =>
@@ -888,6 +896,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     request        : Request,
     appForm        : AppForm,
     formOrData     : FormOrData
+  )(implicit
+    propertySet    : PropertySet
   ): Unit =
     if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod))
       // https://github.com/orbeon/orbeon-forms/issues/4861
@@ -1068,6 +1078,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     response         : Response,
     appFormFromUrlOpt: Option[AppFormOpt]
   )(implicit
+    properties       : PropertySet,
     indentedLogger   : IndentedLogger
   ): Unit =
     if (request.getMethod == HttpMethod.GET || request.getMethod == HttpMethod.POST) {
@@ -1089,6 +1100,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     response      : Response,
     appFormOpt    : Option[AppForm],
   )(implicit
+    propertySet   : PropertySet,
     indentedLogger: IndentedLogger
   ): Unit = {
 
@@ -1124,6 +1136,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     request       : Request,
     response      : Response
   )(implicit
+    propertySet   : PropertySet,
     indentedLogger: IndentedLogger
   ): Unit = {
 

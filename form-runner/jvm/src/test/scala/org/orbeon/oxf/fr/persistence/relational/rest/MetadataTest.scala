@@ -15,8 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -24,6 +26,8 @@ import org.scalatestplus.junit.AssertionsForJUnit
 class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 
   @Test def extractMetadata(): Unit = {
+
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
 
     val is = ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/fr/form-with-metadata.xhtml")
 

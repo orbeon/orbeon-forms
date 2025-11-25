@@ -33,9 +33,10 @@ import org.orbeon.oxf.fr.s3.S3
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData, S3Tag, S3Test}
 import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, SecureUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, SecureUtils}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
@@ -87,6 +88,7 @@ class RestApiTest
   }
 
   // Read filesystem/S3 base paths from oxf.fr.persistence.[provider].base-path test properties
+  private implicit lazy val propertySet: PropertySet = CoreCrossPlatformSupport.properties
   private lazy val filesystemBasePath = Paths.get(providerProperty(provider = "filesystem", "base-path", defaultOpt = None))
   private lazy val s3BasePath         =           providerProperty(provider = "s3",         "base-path", defaultOpt = None)
 

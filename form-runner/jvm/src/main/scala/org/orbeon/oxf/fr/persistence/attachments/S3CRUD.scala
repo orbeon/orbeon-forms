@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{Headers, HttpRange, HttpRanges, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.function.Property.evaluateAsAvt
@@ -34,9 +35,12 @@ trait S3CRUD extends CRUDMethods {
 
   override def head(
     pathInformation: PathInformation,
-    httpRanges     : HttpRanges)(implicit
+    httpRanges     : HttpRanges
+  )(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
+
   ): Unit =
     withS3Context(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { s3Context =>
 
@@ -55,9 +59,12 @@ trait S3CRUD extends CRUDMethods {
 
   override def get(
     pathInformation: PathInformation,
-    httpRanges     : HttpRanges)(implicit
+    httpRanges     : HttpRanges
+  )(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
+
   ): Unit =
     withS3Context(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { s3Context =>
 
@@ -81,9 +88,11 @@ trait S3CRUD extends CRUDMethods {
     }
 
   override def put(
-    pathInformation: PathInformation)(implicit
+    pathInformation: PathInformation
+  )(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
   ): Unit =
     withS3Context(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { s3Context =>
 
@@ -105,9 +114,11 @@ trait S3CRUD extends CRUDMethods {
     }
 
   override def delete(
-    pathInformation: PathInformation)(implicit
+    pathInformation: PathInformation
+  )(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
   ): Unit =
     withS3Context(pathInformation, mandatoryFilename = false, httpRequest, httpResponse) { s3Context =>
 
@@ -128,8 +139,11 @@ trait S3CRUD extends CRUDMethods {
     pathInformation  : PathInformation,
     mandatoryFilename: Boolean,
     httpRequest      : Request,
-    httpResponse     : Response)(
+    httpResponse     : Response
+  )(
     body             : S3CRUD.S3Context => Unit
+  )(implicit
+    propertySet      : PropertySet
   ): Unit = {
 
     assert(pathInformation.filenameOpt.isDefined || ! mandatoryFilename)
@@ -175,7 +189,7 @@ object S3CRUD extends CRUDConfig {
         .mkString("/")
   }
 
-  override def config(appForm: AppForm, formOrData: FormOrData): Config = {
+  override def config(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Config = {
     val provider                          = this.provider(appForm, formOrData)
     val s3ConfigName                      = providerProperty(provider, "s3-config", defaultOpt = "default".some)
     val s3Config                          = S3Config.fromProperties(s3ConfigName).get

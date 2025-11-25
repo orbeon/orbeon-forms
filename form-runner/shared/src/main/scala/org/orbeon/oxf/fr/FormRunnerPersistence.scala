@@ -32,10 +32,9 @@ import org.orbeon.oxf.fr.datamigration.{MigrationSupport, PathElem}
 import org.orbeon.oxf.fr.process.SimpleProcess.xpathFunctionContext
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
-import org.orbeon.oxf.properties.{Property, PropertySet}
+import org.orbeon.oxf.properties.{Property, PropertyLoader, PropertySet}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils.*
@@ -74,12 +73,16 @@ object FormOrData extends Enum[FormOrData] {
 
 object FormRunnerPersistenceJava {
   //@XPathFunction
-  def providerDataFormatVersion(app: String, form: String): String =
+  def providerDataFormatVersion(app: String, form: String): String = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)).entryName
+  }
 
   //@XPathFunction
-  def findProvider(app: String, form: String, formOrData: String): Option[String] =
+  def findProvider(app: String, form: String, formOrData: String): Option[String] = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     FormRunnerPersistence.findProvider(AppForm(app, form), FormOrData.withName(formOrData))
+  }
 }
 
 sealed abstract class DataFormatVersion(override val entryName: String) extends EnumEntry
@@ -205,39 +208,40 @@ object FormRunnerPersistence {
   val AttachmentAttributeNames            = List("filename", "mediatype", "size")
   val JsEnvProviderName                   = "javascript"
 
-  def findProvider(appForm: AppForm, formOrData: FormOrData, properties: PropertySet = CoreCrossPlatformSupport.properties): Option[String] =
+  def findProvider(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Option[String] =
     if (CoreCrossPlatformSupport.isJsEnv)
       JsEnvProviderName.some
     else
-      properties.getNonBlankString(
+      propertySet.getNonBlankString(
         PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: Nil mkString "."
       )
 
-  def findAttachmentsProvider(appForm: AppForm, formOrData: FormOrData): Option[String] =
-    properties.getNonBlankString(
+  def findAttachmentsProvider(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Option[String] =
+    propertySet.getNonBlankString(
       PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: AttachmentsSuffix :: Nil mkString "."
     )
 
   // Get all providers that can be used either for form data or for form definitions
   // 2024-02-28: Called with `None`/`None`/`Data`, or appOpt/formOpt/`Form`
   def getProviders(
-    appOpt    : Option[String],
-    formOpt   : Option[String],
-    formOrData: FormOrData,
-    properties: PropertySet = CoreCrossPlatformSupport.properties
+    appOpt     : Option[String],
+    formOpt    : Option[String],
+    formOrData : FormOrData
+  )(implicit
+    propertySet: PropertySet
   ): List[String] =
     getProvidersWithProperties(
       appOpt,
       formOpt,
-      formOrData.some,
-      properties
+      formOrData.some
     ).keys.toList
 
   def getProvidersWithProperties(
-    appOpt    : Option[String],
-    formOpt   : Option[String],
-    formOrData: Option[FormOrData],
-    properties: PropertySet = CoreCrossPlatformSupport.properties
+    appOpt     : Option[String],
+    formOpt    : Option[String],
+    formOrData : Option[FormOrData]
+  )(implicit
+    propertySet: PropertySet
   ): Map[String, List[Property]] = {
 
     val propertyName =
@@ -247,48 +251,65 @@ object FormRunnerPersistence {
       formOrData.map(_.entryName).getOrElse(PropertySet.StarToken) ::
       Nil mkString "."
 
-    properties.propertiesMatching(propertyName)
+    propertySet.propertiesMatching(propertyName)
       .flatMap(p => p.nonBlankStringValue.map(_ -> p))
       .groupBy(_._1)
       .view
       .mapValues(_.map(_._2))
-      .filter(kv => FormRunner.isActiveProvider(kv._1, properties))
+      .filter(kv => FormRunner.isActiveProvider(kv._1))
       .toMap
   }
 
   def providerPropertyName(provider: String, property: String): String =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
 
-  def providerPropertyOpt(provider: String, property: String, properties: PropertySet): Option[Property] =
-    properties.getPropertyOpt(providerPropertyName(provider, property))
+  def providerPropertyOpt(provider: String, property: String)(implicit propertySet: PropertySet): Option[Property] =
+    propertySet.getPropertyOpt(providerPropertyName(provider, property))
 
-  def providerPropertyAsUrlOpt(provider: String, property: String): Option[String] =
-    properties.getStringOrURIAsStringOpt(providerPropertyName(provider, property))
+  private def providerPropertyAsUrlOpt(provider: String, property: String)(implicit propertySet: PropertySet): Option[String] =
+    propertySet.getStringOrURIAsStringOpt(providerPropertyName(provider, property))
 
   def providerPropertyWithNs(
-    provider  : String,
-    property  : String,
-    properties: PropertySet = CoreCrossPlatformSupport.properties
+    provider   : String,
+    property   : String
+  )(implicit
+    propertySet: PropertySet
   ): Option[(String, NamespaceMapping)] =
-    providerPropertyOpt(provider, property, properties).map { p =>
+    providerPropertyOpt(provider, property).map { p =>
       (p.stringValue, p.namespaceMapping)
     }
 
   // https://github.com/orbeon/orbeon-forms/issues/6300
-  def isInternalProvider(provider: String, properties: PropertySet): Boolean =
-    providerPropertyOpt(provider, "uri", properties)
+  def isInternalProvider(provider: String)(implicit propertySet: PropertySet): Boolean =
+    providerPropertyOpt(provider, "uri")
       .flatMap(_.nonBlankStringValue)
       .exists(_.startsWith("/"))
 
-  def getPersistenceURLHeaders(appForm: AppForm, formOrData: FormOrData): (String, Map[String, String]) = {
+  def getPersistenceURLHeaders(
+    appForm    : AppForm,
+    formOrData : FormOrData
+  )(implicit
+    propertySet: PropertySet
+  ): (String, Map[String, String]) = {
 
     require(augmentString(appForm.app).nonEmpty) // Q: why `augmentString`?
     require(augmentString(appForm.form).nonEmpty)
 
-    getPersistenceURLHeadersFromProvider(findProvider(appForm, formOrData).get)
+    getPersistenceURLHeadersFromProvider({
+      val r = findProvider(appForm, formOrData)
+      if (r.isEmpty) {
+        // xxx check again
+        val req = CoreCrossPlatformSupport.requestOpt
+        println(s"xxx no provider found for ${appForm.app}/${appForm.form} ${formOrData.entryName} (request: ${req.map(_.getRequestURI).getOrElse("no request")})")
+        val ps = PropertyLoader.getPropertyStore(req)
+        println(s"xxx getPropertyStore class: ${ps.getClass.getName}")
+        println(s"xxx properties: ${ps.globalPropertySet.allPropertiesAsJson}")
+      }
+      r
+    }.get)
   }
 
-  def getPersistenceURLHeadersFromProvider(provider: String): (String, Map[String, String]) = {
+  def getPersistenceURLHeadersFromProvider(provider: String)(implicit propertySet: PropertySet): (String, Map[String, String]) = {
 
     val propertyPrefix = PersistencePropertyPrefix :: provider :: Nil mkString "."
     val propertyPrefixTokenCount = propertyPrefix.splitTo[List](".").size
@@ -296,11 +317,11 @@ object FormRunnerPersistence {
     // Build headers map
     val headers = (
       for {
-        propertyName   <- properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
+        propertyName   <- propertySet.propertiesStartsWith(propertyPrefix, matchWildcards = false)
         lowerSuffix    <- propertyName.splitTo[List](".").drop(propertyPrefixTokenCount).headOption
         if ! StandardProviderProperties(lowerSuffix)
         headerName     = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
-        headerValue    <- properties.getObjectOpt(propertyName)
+        headerValue    <- propertySet.getObjectOpt(propertyName)
       } yield
         headerName -> headerValue.toString
     ).toMap
@@ -311,7 +332,12 @@ object FormRunnerPersistence {
     (uri, headers)
   }
 
-  def getPersistenceHeadersAsXML(appForm: AppForm, formOrData: FormOrData): DocumentNodeInfoType = {
+  def getPersistenceHeadersAsXML(
+    appForm    : AppForm,
+    formOrData : FormOrData
+  )(implicit
+    propertySet: PropertySet
+  ): DocumentNodeInfoType = {
 
     val (_, headers) = getPersistenceURLHeaders(appForm, formOrData)
 
@@ -333,7 +359,7 @@ object FormRunnerPersistence {
     )
   }
 
-  def providerDataFormatVersionOrThrow(appForm: AppForm): DataFormatVersion = {
+  def providerDataFormatVersionOrThrow(appForm: AppForm)(implicit propertySet: PropertySet): DataFormatVersion = {
 
     val provider =
       findProvider(appForm, FormOrData.Data) getOrElse
@@ -407,8 +433,8 @@ object FormRunnerPersistence {
   private def fullProviderPropertyName(provider: String, property: String) =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
 
-  private def providerPropertyAsString(provider: String, property: String, default: String) =
-    properties.getString(fullProviderPropertyName(provider, property), default)
+  private def providerPropertyAsString(provider: String, property: String, default: String)(implicit propertySet: PropertySet) =
+    propertySet.getString(fullProviderPropertyName(provider, property), default)
 }
 
 trait FormRunnerPersistence {
@@ -473,12 +499,13 @@ trait FormRunnerPersistence {
     )
 
   //@XPathFunction
-  def createNewFromServiceUrlOrEmpty(app: String, form: String): String =
-    properties.getStringOrURIAsStringOpt(NewFromServiceUriProperty :: app :: form :: Nil mkString ".") match {
+  def createNewFromServiceUrlOrEmpty(app: String, form: String): String = {
+    val propertySet = CoreCrossPlatformSupport.properties
+    propertySet.getStringOrURIAsStringOpt(NewFromServiceUriProperty :: app :: form :: Nil mkString ".") match {
       case Some(serviceUrl) =>
 
         val requestedParams =
-          properties.getString(NewFromServiceParamsProperty :: app :: form :: Nil mkString ".", "").splitTo[List]()
+          propertySet.getString(NewFromServiceParamsProperty :: app :: form :: Nil mkString ".", "").splitTo[List]()
 
         val docParams = inScopeContainingDocument.getRequestParameters
 
@@ -497,26 +524,30 @@ trait FormRunnerPersistence {
 
       case None => null
     }
+  }
 
   // For a given attachment path, return the filename
-  def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =
+  private def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =
     splitQuery(pathQuery)._1.split('/').last
 
   def providerPropertyAsBoolean(
     provider  : String,
     property  : String,
-    default   : Boolean,
-    properties: PropertySet = CoreCrossPlatformSupport.properties
+    default   : Boolean
+  )(implicit
+    propertySet: PropertySet
   ): Boolean =
-    properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
+    propertySet.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
-  def providerPropertyAsInteger(provider: String, property: String, default: Int, properties: PropertySet = CoreCrossPlatformSupport.properties): Int =
-    properties.getInteger(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
+  def providerPropertyAsInteger(provider: String, property: String, default: Int)(implicit propertySet: PropertySet): Int =
+    propertySet.getInteger(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
   // 2020-12-23: If the provider is not configured, return `false` (for offline FIXME).
   //@XPathFunction
-  def isAutosaveSupported(app: String, form: String): Boolean =
+  def isAutosaveSupported(app: String, form: String): Boolean = {
+    implicit val properties: PropertySet = CoreCrossPlatformSupport.properties
     findProvider(AppForm(app, form), FormOrData.Data) exists (providerPropertyAsBoolean(_, "autosave", default = false))
+  }
 
   // 2024-08-07: This is currently unused. Conceivably, Form Runner could have different behavior if the persistence
   // provider does not support permissions. But this would be significant work to do properly.
@@ -525,25 +556,31 @@ trait FormRunnerPersistence {
 //    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "permissions", default = false)
 
   //@XPathFunction
-  def isFormDefinitionVersioningSupported(app: String, form: String): Boolean =
+  def isFormDefinitionVersioningSupported(app: String, form: String): Boolean = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     findProvider(AppForm(app, form), FormOrData.Form) match {
       case Some(provider) => providerPropertyAsBoolean(provider, "versioning", default = false)
       case None           => false // Needed for case with Form Builder when lease is not acquired
     }
+  }
 
   //@XPathFunction
-  def isLeaseSupported(app: String, form: String): Boolean =
+  def isLeaseSupported(app: String, form: String): Boolean = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     findProvider(AppForm(app, form), FormOrData.Data) match {
       case Some(provider) => providerPropertyAsBoolean(provider, "lease", default = false)
       case None           => false // Needed for case with Form Builder when lease is not acquired
     }
+  }
 
   //@XPathFunction
-  def isSortSupported(app: String, form: String): Boolean =
+  def isSortSupported(app: String, form: String): Boolean = {
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "sort", default = false)
+  }
 
-  def isActiveProvider(provider: String, properties: PropertySet = CoreCrossPlatformSupport.properties): Boolean =
-    providerPropertyAsBoolean(provider, "active", default = true, properties)
+  def isActiveProvider(provider: String)(implicit propertySet: PropertySet): Boolean =
+    providerPropertyAsBoolean(provider, "active", default = true)
 
   // Whether the form data is valid as per the error summary
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
@@ -572,7 +609,8 @@ trait FormRunnerPersistence {
 
     // We have to
     // https://github.com/orbeon/orbeon-forms/issues/6530
-    implicit val ctx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+    implicit val ctx        : FormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+    implicit val propertySet: PropertySet          = CoreCrossPlatformSupport.properties
 
     val possiblePathsLeafToRoot =
       frc.searchControlsInFormByControlPredicate(

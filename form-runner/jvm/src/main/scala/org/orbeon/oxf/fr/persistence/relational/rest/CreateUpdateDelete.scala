@@ -28,6 +28,7 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, What
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger, Whitespace, XPath}
@@ -101,7 +102,7 @@ object RequestReader {
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, "", false, false)
     }
 
-  def dataAndMetadataAsString(bodyOpt: Option[Body], provider: Provider, metadata: Boolean): (Option[String], Option[String]) =
+  def dataAndMetadataAsString(bodyOpt: Option[Body], provider: Provider, metadata: Boolean)(implicit propertySet: PropertySet): (Option[String], Option[String]) =
     requestInputStream(bodyOpt).map { is =>
       val (data, metadataOpt) = dataAndMetadataAsString(provider, is, metadata)
       (Some(data), metadataOpt)
@@ -113,6 +114,8 @@ object RequestReader {
     provider   : Provider,
     inputStream: InputStream,
     metadata   : Boolean
+  )(implicit
+    propertySet: PropertySet
   ): (String, Option[String]) = {
 
     def newTransformer =
@@ -189,13 +192,13 @@ trait CreateUpdateDelete {
   case class StoreResult(idOpt: Option[Int], lastModifiedOpt: Option[Instant])
 
   private def store(
-    connection     : java.sql.Connection,
-    req            : CrudRequest,
-    reqBodyOpt     : Option[RequestReader.Body],
-    delete         : Boolean,
-    versionToSet   : Int
+    connection  : java.sql.Connection,
+    req         : CrudRequest,
+    reqBodyOpt  : Option[RequestReader.Body],
+    delete      : Boolean,
+    versionToSet: Int
   )(implicit
-    externalContext: ExternalContext
+    propertySet : PropertySet
   ): StoreResult = {
 
     val table = SqlSupport.tableName(req)
@@ -382,7 +385,9 @@ trait CreateUpdateDelete {
     delete         : Boolean
   )(implicit
     externalContext: ExternalContext,
-    indentedLogger : IndentedLogger
+    indentedLogger : IndentedLogger,
+    propertySet    : PropertySet
+
   ): Unit = {
 
     debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
@@ -415,7 +420,7 @@ trait CreateUpdateDelete {
       }
     }
 
-    def reindex(connectionOpt: Option[java.sql.Connection]): Unit =
+    def reindex(connectionOpt: Option[java.sql.Connection])(implicit propertySet: PropertySet): Unit =
       // Update index if needed
       if (
         ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
@@ -558,7 +563,8 @@ trait CreateUpdateDelete {
     versionToSet   : Int
   )(implicit
     externalContext: ExternalContext,
-    indentedLogger : IndentedLogger
+    indentedLogger : IndentedLogger,
+    propertySet    : PropertySet
   ): Unit =
     withDebug("CRUD: creating flat view") {
       RelationalUtils.withConnection { connection =>

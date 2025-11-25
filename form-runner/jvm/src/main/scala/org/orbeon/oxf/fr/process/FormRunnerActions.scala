@@ -31,6 +31,7 @@ import org.orbeon.oxf.fr.process.FormRunnerExternalMode.PrivateModeMetadata
 import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
@@ -265,7 +266,8 @@ trait FormRunnerActions
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
 
-    implicit val xfcd: XFormsContainingDocument = inScopeContainingDocument
+    implicit val xfcd       : XFormsContainingDocument = inScopeContainingDocument
+    implicit val propertySet: PropertySet              = CoreCrossPlatformSupport.properties
 
     val propertyPrefixOpt = paramByNameOrDefaultUseAvt(params, "property")
 

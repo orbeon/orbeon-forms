@@ -45,9 +45,9 @@ object RelationalUtils extends Logging {
     new IndentedLogger(Logger)
 
   def databaseConfigurationPresent(
-    properties            : PropertySet,
     isDataSourceConfigured: String => Boolean = getDataSourceNoFallback(_).isDefined
   )(implicit
+    propertySet           : PropertySet,
     indentedLogger        : IndentedLogger
   ): Boolean = {
 
@@ -55,15 +55,14 @@ object RelationalUtils extends Logging {
       getProvidersWithProperties(
         None,
         None,
-        None,
-        properties
+        None
       )
-      .filter { case (provider, _) => provider != ResourceProvider && isInternalProvider(provider, properties) }
+      .filter { case (provider, _) => provider != ResourceProvider && isInternalProvider(provider) }
       .view.mapValues(_.sortBy(_.name))
 
     val problematicDataSources = propertiesByProvider.filter { case (provider, propertiesWithProvider) =>
 
-      val dataSourceName = providerPropertyOpt(provider, "datasource", properties).flatMap(_.nonBlankStringValue)
+      val dataSourceName = providerPropertyOpt(provider, "datasource").flatMap(_.nonBlankStringValue)
 
       dataSourceName match {
         case Some(name) if ! isDataSourceConfigured(name) =>

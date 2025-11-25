@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 
 import java.sql.{PreparedStatement, Timestamp}
@@ -74,7 +74,8 @@ object SqlSupport {
     currentTimestamp       : Timestamp,
     currentUserOrganization: => Option[OrganizationId]
   )(implicit
-    externalContext: ExternalContext
+    propertySet            : PropertySet
+
   ): List[Col]  = {
 
     val xmlCol = Provider.xmlColUpdate(req.provider)

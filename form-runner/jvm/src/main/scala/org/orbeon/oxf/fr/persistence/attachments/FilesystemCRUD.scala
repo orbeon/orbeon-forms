@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{FileRangeInputStream, HttpRange, HttpRanges, StatusCode}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.saxon.function.Property.evaluateAsAvt
 
@@ -34,9 +35,11 @@ trait FilesystemCRUD extends CRUDMethods {
 
   override def head(
     pathInformation: PathInformation,
-    httpRanges     : HttpRanges)(implicit
+    httpRanges     : HttpRanges
+  )(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
   ): Unit =
     withFile(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { fileToAccess =>
 
@@ -50,9 +53,11 @@ trait FilesystemCRUD extends CRUDMethods {
 
   override def get(
     pathInformation: PathInformation,
-    httpRanges     : HttpRanges)(implicit
+    httpRanges     : HttpRanges
+  )(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
   ): Unit =
     withFile(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { fileToRead =>
 
@@ -67,7 +72,8 @@ trait FilesystemCRUD extends CRUDMethods {
   override def put(
     pathInformation: PathInformation)(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
   ): Unit =
     withFile(pathInformation, mandatoryFilename = true, httpRequest, httpResponse) { fileToWrite =>
 
@@ -84,7 +90,8 @@ trait FilesystemCRUD extends CRUDMethods {
   override def delete(
     pathInformation: PathInformation)(implicit
     httpRequest    : Request,
-    httpResponse   : Response
+    httpResponse   : Response,
+    propertySet    : PropertySet
   ): Unit =
     withFile(pathInformation, mandatoryFilename = false, httpRequest, httpResponse) { fileOrDirectoryToDelete =>
 
@@ -104,7 +111,7 @@ trait FilesystemCRUD extends CRUDMethods {
       httpResponse.setStatus(if (deleted) StatusCode.NoContent else StatusCode.InternalServerError)
     }
 
-  private def deleteFiles(pathInformation: PathInformation, filesToDelete: Iterable[File]): Boolean = {
+  private def deleteFiles(pathInformation: PathInformation, filesToDelete: Iterable[File])(implicit propertySet: PropertySet): Boolean = {
 
     val deleted = filesToDelete.map(_.delete()).forall(identity)
 
@@ -141,8 +148,11 @@ trait FilesystemCRUD extends CRUDMethods {
     pathInformation  : PathInformation,
     mandatoryFilename: Boolean,
     httpRequest      : Request,
-    httpResponse     : Response)(
+    httpResponse     : Response
+  )(
     body             : File => Unit
+  )(implicit
+    propertySet      : PropertySet
   ): Unit = {
 
     assert(pathInformation.filenameOpt.isDefined || ! mandatoryFilename)
@@ -167,8 +177,8 @@ trait FilesystemCRUD extends CRUDMethods {
   }
 
   private implicit class PathInformationOps(pathInformation: PathInformation) {
-    def basePath: Path = FilesystemCRUD.basePath(pathInformation.appForm, pathInformation.formOrData)
-    def file    : File = Paths.get(this.basePath.toString, pathInformation.pathSegments*).toFile
+    def basePath(implicit propertySet: PropertySet): Path = FilesystemCRUD.basePath(pathInformation.appForm, pathInformation.formOrData)
+    def file    (implicit propertySet: PropertySet): File = Paths.get(this.basePath.toString, pathInformation.pathSegments*).toFile
   }
 }
 
@@ -177,7 +187,7 @@ object FilesystemCRUD extends CRUDConfig {
 
   type C = Config
 
-  override def config(appForm: AppForm, formOrData: FormOrData): Config = {
+  override def config(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Config = {
     val provider = this.provider(appForm, formOrData)
 
     val (rawBasePath, basePathNamespaces) =
@@ -190,7 +200,7 @@ object FilesystemCRUD extends CRUDConfig {
     Config(provider, evaluateAsAvt(rawBasePath, basePathNamespaces))
   }
 
-  def basePath(appForm: AppForm, formOrData: FormOrData): Path = {
+  def basePath(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Path = {
     val config = this.config(appForm, formOrData)
     val path   = Paths.get(config.basePath)
 

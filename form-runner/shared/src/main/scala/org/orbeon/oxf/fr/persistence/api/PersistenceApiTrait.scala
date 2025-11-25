@@ -12,6 +12,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
@@ -205,12 +206,15 @@ trait PersistenceApiTrait {
   def distinctValues(
     appForm                 : AppForm,
     searchVersion           : SearchVersion,
-    controlPaths            : Seq[String])(implicit
+    controlPaths            : Seq[String]
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): DistinctValues = {
 
     debug(s"calling distinct values for `$appForm`/`$searchVersion`")
+
+    implicit val propertySet: PropertySet = coreCrossPlatformSupport.properties
 
     val provider = findProvider(appForm, FormOrData.Data).get
 

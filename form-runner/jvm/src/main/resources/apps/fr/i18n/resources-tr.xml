@@ -23,7 +23,7 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Sil</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; İçe Aktar</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Yeni</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Yeni Veri Oluştur</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Çoğalt</duplicate>
 
         <!-- Standard process buttons -->
@@ -52,9 +52,9 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Yenile"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Tümünü Daralt</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Tümünü Genişlet</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Yenile</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İleri</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Geri</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; İçerik</wizard-toc>
@@ -70,8 +70,8 @@
         <validation-dialog-continue>Devam Et</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Kaydet ve Üzerine Yaz</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Değişiklikleri At ve Yeniden Yükle</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Formülleri İncele (Beta)</test-formulas>
@@ -153,7 +153,7 @@
             <named-user>{0} kullanıcısı</named-user>
             <anonymous-user>Anonim bir kullanıcı</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
+            <unknown-changes>bazı değişiklikler yaptı.</unknown-changes>
             <initial-revision>ilk revizyonu kaydetti.</initial-revision>
             <no-changes>hiçbir değişiklik tespit edilmeden kaydedildi.</no-changes>
             <specific-changes>aşağıdaki değişiklikleri yaptı:</specific-changes>
@@ -168,7 +168,7 @@
             <other-changed>dahili bilgiler değiştirildi</other-changed>
             <workflow-stage-changed>İş akışı aşaması "{0}" değerinden "{1}" değerine değiştirildi</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>Daha Fazla Yükle</load-more>
         </revision-history>
     </components>
     <untitled-form>Başlıksız Form</untitled-form>
@@ -307,16 +307,14 @@
             <upload-error-mediatype>Yüklenen dosya yanlış türde: {0}</upload-error-mediatype>
             <upload-error-file-scan>Yüklenen dosya dosya tarayıcısı tarafından reddedildi. Lütfen bunun virüslü bir dosya olmadığından emin olun. İşte dosya tarayıcısı mesajı: "{0}".</upload-error-file-scan>
             <lost-attachments>Bazı dosya ekleri bir sunucu sorunu nedeniyle kayboldu. Lütfen tüm eklerinizi kontrol edin ve gerekirse tekrar yükleyin.</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
-                <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+            <conflict-dialog-title>Çakışma Tespit Edildi</conflict-dialog-title>
+            <conflict-dialog-message><div>
+                    <p>Veri, siz yükledikten sonra değiştirildi. Şunları yapabilirsiniz:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Şimdi kaydedip daha önce kaydedilen verilerin üzerine yazabilirsiniz.</li>
+                        <li>Geçerli değişikliklerinizi atıp daha önce kaydedilen verileri yeniden yükleyebilirsiniz.</li>
                     </ul>
-                </div>
-            ]</conflict-dialog-message>
+                </div></conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Otomatik kaydedilmiş belge bulundu</found-draft>
@@ -396,7 +394,7 @@
             <message>Bu form artık kullanılabilir değil</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Aşama</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -438,7 +436,7 @@
             <form-builder-new>Yeni Form Oluşturucu Formu</form-builder-new>
             <form-builder-summary>Form Oluşturucu Formları</form-builder-summary>
             <demo-forms>Demo Formları</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
+            <demo-features>Demo Özellikler</demo-features>
             <quick-links>Hızlı Bağlantılar</quick-links>
             <form-runner-admin>Form Yönetimi</form-runner-admin>
         </titles>
@@ -446,7 +444,7 @@
             <published-forms>Yayınlanan formlarınıza erişin</published-forms>
             <form-builder-forms>Form Oluşturucu ile oluşturulan devam eden formlarınızı görüntüleyin ve düzenleyin</form-builder-forms>
             <demo-forms>Orbeon Forms ile birlikte gelen demo formlarını deneyin</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <demo-features>Belirli Orbeon Forms özelliklerinin demolarını deneyin</demo-features>
         </descriptions>
         <show-more>Daha fazla göster…</show-more>
     </landing>
@@ -498,7 +496,7 @@
             <purge-confirmation>Temizlemeyi Onayla</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[Dağıtılmış form bulunamadı.]</no-form-found>
+            <no-form-found>Dağıtılmış form bulunamadı.</no-form-found>
             <publish-confirmation>{1,choice,1#Bir formu|1&lt;{1,number,integer} formu} {0,choice,0#kullanılabilir yapmak|1#kullanılamaz yapmak|2#yükseltmek|3#silmek} istediğinizden emin misiniz? Bu işlem geri alınamaz.</publish-confirmation>
             <reindexing-confirmation>Yeniden indeksleme sırasında, Form Runner özet sayfaları gibi bazı özellikler beklendiği gibi çalışmayacaktır. Bu nedenle, yeniden indeksleme işlemini sistem çevrimdışıyken gerçekleştirmenizi öneririz. Yeniden indekslemeye devam etmek istediğinizden emin misiniz?</reindexing-confirmation>
             <reencrypt-confirmation>Yeniden şifreleme işlemini sistem çevrimdışıyken gerçekleştirmenizi öneririz. Yeniden şifrelemeye devam etmek istediğinizden emin misiniz?</reencrypt-confirmation>

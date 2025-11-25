@@ -23,7 +23,7 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 刪除</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; 導入</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新建</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 創建新數據</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; 複製</duplicate>
 
         <!-- 標準流程按鈕 -->
@@ -52,9 +52,9 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="刷新"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; 全部折疊</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; 全部展開</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; 刷新</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一步</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一步</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 目錄</wizard-toc>
@@ -70,8 +70,8 @@
         <validation-dialog-continue>繼續</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>保存並覆蓋</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>丟棄並重新加載</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; 測試</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 檢查公式（測試版）</test-formulas>
@@ -153,7 +153,7 @@
             <named-user>用戶 {0}</named-user>
             <anonymous-user>匿名用戶</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
+            <unknown-changes>進行了某些更改。</unknown-changes>
             <initial-revision>保存了初始修訂。</initial-revision>
             <no-changes>保存時未檢測到更改。</no-changes>
             <specific-changes>進行了以下更改：</specific-changes>
@@ -168,7 +168,7 @@
             <other-changed>內部信息已更改</other-changed>
             <workflow-stage-changed>工作流階段從 "{0}" 更改為 "{1}"</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>加載更多</load-more>
         </revision-history>
     </components>
     <untitled-form>未命名表單</untitled-form>
@@ -307,16 +307,16 @@
             <upload-error-mediatype>上傳的文件類型不正確：{0}</upload-error-mediatype>
             <upload-error-file-scan>上傳的文件被文件掃描程序拒絕。請確保這不是一個受感染的文件。以下是文件掃描程序的消息："{0}"。</upload-error-file-scan>
             <lost-attachments>由於服務器問題，一些文件附件丟失。請檢查所有附件並在需要時重新上傳。</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <conflict-dialog-title>檢測到衝突</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>自您加載以來，數據已發生更改。您可以：</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>立即保存，並覆蓋之前保存的數據。</li>
+                        <li>放棄當前更改，並重新加載之前保存的數據。</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>找到自動保存的文檔</found-draft>
@@ -396,7 +396,7 @@
             <message>此表單不再可用</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>工作流階段</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -438,7 +438,7 @@
             <form-builder-new>新建 Form Builder 表單</form-builder-new>
             <form-builder-summary>Form Builder 表單</form-builder-summary>
             <demo-forms>演示表單</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
+            <demo-features>功能演示</demo-features>
             <quick-links>快速鏈接</quick-links>
             <form-runner-admin>表單管理</form-runner-admin>
         </titles>
@@ -446,7 +446,7 @@
             <published-forms>訪問您已發布的表單</published-forms>
             <form-builder-forms>查看和編輯您使用 Form Builder 創建的進行中表單</form-builder-forms>
             <demo-forms>試用隨 Orbeon Forms 一起提供的演示表單</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <demo-features>試用 Orbeon Forms 特定功能的演示</demo-features>
         </descriptions>
         <show-more>顯示更多…</show-more>
     </landing>
@@ -498,7 +498,7 @@
             <purge-confirmation>確認清除</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[未找到已部署的表单。]</no-form-found>
+            <no-form-found>未找到已部署的表單。</no-form-found>
             <publish-confirmation>您確定要{0,choice,0#設置為可用|1#設置為不可用|2#升級|3#刪除} {1,choice,1#一個表單|1&lt;{1,number,integer}個表單}嗎？此操作無法撤消。</publish-confirmation>
             <reindexing-confirmation>重新索引期間,某些功能(如Form Runner摘要頁面)將無法正常工作。因此,我們建議您在系統離線時執行重新索引。您確定要繼續重新索引嗎？</reindexing-confirmation>
             <reencrypt-confirmation>我們建議您在系統離線時執行重新加密。您確定要繼續重新加密嗎？</reencrypt-confirmation>

@@ -86,7 +86,7 @@ object XFormsControls {
         case elem if control.classList.contains("xforms-mediatype-text-html") =>
           elem.innerHTML = newControlValue
         case elem =>
-          // We want to use `textContent`, `innerText`, as we don't want the browser to add any `<br>`.
+          // We want to use `textContent`, not `innerText`, as we don't want the browser to add any `<br>`.
           elem.textContent = newControlValue
       }
     } else if (! force.contains(true) && AjaxFieldChangeTracker.hasChangedIdsRequest(control)) {

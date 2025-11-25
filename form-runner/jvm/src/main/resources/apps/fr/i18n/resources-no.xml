@@ -6,7 +6,7 @@
             <short-date>[D01]/[M01]/[Y01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
+            <incomplete-configuration>Orbeon Forms-konfigurasjonen din er ufullstendig. For mer informasjon, se i Orbeon Forms-loggfilen og gå til &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;dokumentasjonen&lt;/a&gt;.</incomplete-configuration>
         </messages>
     </common>
     <buttons>
@@ -23,19 +23,19 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slett</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nytt skjema</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Opprett nye data</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliser</duplicate>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre endelig</save-final>
         <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre utkast</save-draft>
-        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre</save-progress>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre fremdrift</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Epost</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valider</validate>
-        <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send inn</submit>
@@ -52,9 +52,9 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Oppdater"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Fold sammen alt</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Utvid alt</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Oppdater</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tilbake</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innhold</wizard-toc>
@@ -70,16 +70,16 @@
         <validation-dialog-continue>Fortsett</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Lagre og overskriv</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Forkast og last inn på nytt</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
-        <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
-        <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-        <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
-        <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
-        <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
-        <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspiser formler (beta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test frakoblet (beta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-eksport</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-eksport</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML-eksport</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML-eksport</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt;  Lagre og Publiser…</save-publish>
 
@@ -97,11 +97,11 @@
             <yes>Ja</yes>
             <no>Nei</no>
             <other>Annet</other>
-            <clear todo="true">[Clear Value]</clear>
+            <clear>Tøm verdi</clear>
             <please-select>Velg:</please-select>
         </labels>
         <grid>
-            <menu todo="true">Menu</menu>
+            <menu>Meny</menu>
             <insert-above>Sett inn over</insert-above>
             <insert-below>Sett inn under</insert-below>
             <move-up>Flytt opp</move-up>
@@ -146,45 +146,51 @@
             <show-less>Vis mindre</show-less>
         </error-summary>
         <revision-history>
-            <label todo="true">Revision History</label>
-            <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <label>Revisjonshistorikk</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (første revisjon)}'|1# (gjeldende revisjon)}</date>
+            <date-format>[FNn,*-3] [D]. [MNn,*-3] [Y] kl. [h]:[m] [P,*-2]</date-format>
 
-            <named-user todo="true">User {0}</named-user>
-            <anonymous-user todo="true">An anonymous user</anonymous-user>
+            <named-user>Bruker {0}</named-user>
+            <anonymous-user>En anonym bruker</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
-            <initial-revision todo="true">saved the initial revision.</initial-revision>
-            <no-changes todo="true">saved with no changes detected.</no-changes>
-            <specific-changes todo="true">made the following changes:</specific-changes>
+            <unknown-changes>gjorde noen endringer.</unknown-changes>
+            <initial-revision>lagret første revisjon.</initial-revision>
+            <no-changes>lagret uten oppdagede endringer.</no-changes>
+            <specific-changes>gjorde følgende endringer:</specific-changes>
 
-            <view-data todo="true">View this revision</view-data>
+            <view-data>Vis denne revisjonen</view-data>
 
-            <value-entered todo="true">"{0}" entered</value-entered>
-            <value-cleared todo="true">"{0}" cleared</value-cleared>
-            <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
-            <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
-            <other-changed todo="true">internal information changed</other-changed>
-            <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+            <value-entered>"{0}" lagt inn</value-entered>
+            <value-cleared>"{0}" fjernet</value-cleared>
+            <value-changed>endret fra "{0}" til "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#repetisjon|1&lt;repetisjoner} lagt til</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#repetisjon|1&lt;repetisjoner} fjernet</iteration-removed>
+            <other-changed>intern informasjon endret</other-changed>
+            <workflow-stage-changed>Arbeidsflytstadium endret fra "{0}" til "{1}"</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>Last mer</load-more>
         </revision-history>
     </components>
     <untitled-form>Skjema ikke navngitt</untitled-form>
     <errors>
-        <summary-title todo="true">[Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
-        <form-title todo="true">[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
+        <summary-title>Skjemaet ditt {1,choice,
+            0#inneholder ingen meldinger|
+            1#inneholder følgende '{0,choice,0#feil|1#advarsel|2#informasjonsmelding|3#melding}'|
+            1&lt;inneholder følgende '{0,choice,0#feil|1#advarsler|2#informasjonsmeldinger|3#meldinger}'}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer} '{0,choice,0#Feil|1#Advarsel|2#Informasjonsmelding|3#Melding}' - |
+            1&lt;{1,number,integer} '{0,choice,0#Feil|1#Advarsler|2#Informasjonsmeldinger|3#Meldinger}' - }{2}</form-title>
         <none>Ingen feil i skjema</none>
         <unsaved>Ulagrede endringer</unsaved>
-        <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
-        <search todo="true">[Error performing search]</search>
+        <canvas-not-supported>For å kunne annotere bilder må nettleseren din støtte HTML5 canvas</canvas-not-supported>
+        <search>Feil under søk</search>
     </errors>
     <email>
         <subject>Orbeon Forms Bekreftelse</subject>
         <body>Vedlagt er skjema i PDF- og XML-format.</body>
-        <na todo="true">[N/A]</na>
-        <iteration todo="true">[Iteration {$iteration}]</iteration>
+        <na>Ikke aktuelt</na>
+        <iteration>Iterasjon {$iteration}</iteration>
     </email>
     <!-- Formats used for PDF template -->
     <print>
@@ -197,10 +203,10 @@
     <summary>
         <titles>
             <summary-title>Oppsummering</summary-title>
-            <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
-            <document-id todo="true">Document Id</document-id>
-            <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-            <created-by todo="true">[Created By]</created-by>
+            <delete-confirmation>Bekreft sletting</delete-confirmation>
+            <document-id>Dokument-ID</document-id>
+            <workflow-stage>Arbeidsflytstadium</workflow-stage>
+            <created-by>Opprettet av</created-by>
             <selected>Valgt</selected>
             <refresh>Denne operasjonen vil laste siden på nytt</refresh>
             <toc>Innholdsfortegnelse</toc>
@@ -210,18 +216,18 @@
             <errors-count>ugyldige eller manglende svar i skjema</errors-count>
         </titles>
         <buttons>
-            <select-all todo="true">Select all</select-all>
-            <deselect-all todo="true">Deselect all</deselect-all>
-            <select-saved todo="true">Select explicitly saved only</select-saved>
-            <select-drafts todo="true">Select drafts only</select-drafts>
+            <select-all>Velg alle</select-all>
+            <deselect-all>Opphev valg av alle</deselect-all>
+            <select-saved>Velg bare eksplisitt lagrede</select-saved>
+            <select-drafts>Velg bare utkast</select-drafts>
         </buttons>
         <bulk-edit>
-            <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
-            <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
-            <bulk-edit todo="true">[Bulk edit]</bulk-edit>
-            <apply todo="true">[Apply]</apply>
-            <value-required todo="true">[Value is required]</value-required>
-            <submission-error todo="true">[Error while editing form data.]</submission-error>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis masseendring</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Skjul masseendring</close-bulk-edit>
+            <bulk-edit>Masseendring</bulk-edit>
+            <apply>Bruk</apply>
+            <value-required>Verdi er obligatorisk</value-required>
+            <submission-error>Feil ved redigering av skjemadata.</submission-error>
         </bulk-edit>
         <paging>
             <to>til</to>
@@ -231,7 +237,7 @@
         <messages>
             <no-form-data-found>Ingen skjema funnet.</no-form-data-found>
             <delete-confirmation>Vil du slette markerte skjema? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
-            <version todo="true">[Form Version {0,number,integer}]</version>
+            <version>Skjemaversjon {0,number,integer}</version>
         </messages>
         <labels>
             <draft>Utkast</draft>
@@ -239,7 +245,7 @@
             <language-choice>Velg språk</language-choice>
             <form-choice>Velg et skjema</form-choice>
             <free-search>Fritekstsøk</free-search>
-            <clear-value todo="true">[[Clear value]]</clear-value>
+            <clear-value>Tøm verdi</clear-value>
             <script>Full versjon</script>
             <refresh>Oppdater</refresh>
             <close-box>[lukk]</close-box>
@@ -253,22 +259,22 @@
             <save-datetime>[D] [MNn], [Y] [H01]:[m01]:[s01]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label todo="true">Excel Export Options</label>
-            <headings-labels todo="true">Use labels for headings</headings-labels>
-            <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
-            <include-document-id todo="true">Include document id column</include-document-id>
+            <label>Alternativer for Excel-eksport</label>
+            <headings-labels>Bruk etiketter som overskrifter</headings-labels>
+            <selection-controls-labels>Bruk etiketter for valgkontroller</selection-controls-labels>
+            <include-document-id>Inkluder kolonne med dokument-ID</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
             <save-success>Skjemaet er lagret!</save-success>
             <save-draft-success>Utkast er lagret!</save-draft-success>
-            <save-progress-success todo="true">[Progress saved successfully!]</save-progress-success>
+            <save-progress-success>Fremdrift er lagret!</save-progress-success>
             <email-success>E-post er sendt!</email-success>
             <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
             <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
             <service-error>Feil i kommunikasjon med backend. Vennligst kontakt din systemadministrator.</service-error>
-            <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
+            <action-error>Feil i kommunikasjon med en backend-tjeneste. Vennligst kontakt din systemadministrator.</action-error>
             <process-error>Feil ved kjøring av prosessen. Vennligst kontakt din systemadministrator.</process-error>
             <wizard-prev-error>Vennligst rett opp feilene før du går tilbake</wizard-prev-error>
             <wizard-next-error>Vennligst rett opp feilene før du går videre</wizard-next-error>
@@ -276,17 +282,17 @@
             <error-dialog-title>Kan ikke fullføre handlingen</error-dialog-title>
             <confirmation-dialog-title>Bekreftelse</confirmation-dialog-title>
             <confirmation-dialog-message>Er du sikker på at du vil fortsette?</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message-overwrite>Denne handlingen kan føre til at enkelte skjemadata blir overskrevet. Er du sikker på at du vil fortsette?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
             <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
             <validation-dialog-title>Gjennomgå valideringsmeldinger i skjemaet</validation-dialog-title>
-            <validation-dialog-message todo="true">[Your form {1,choice,
-                0#does not contain any messages|
-                1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
-                1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+            <validation-dialog-message>Skjemaet ditt {1,choice,
+                0#inneholder ingen meldinger|
+                1#inneholder én '{0,choice,0#feil|1#advarsel|2#informasjonsmelding|3#melding}'|
+                1&lt;inneholder {1,number,integer} '{0,choice,0#feil|1#advarsler|2#informasjonsmeldinger|3#meldinger}'}.
                 {0,choice,
-                    0#Please retry once all fields have been properly filled-out|
-                    0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.]
+                    0#Prøv igjen når alle felt er fylt ut korrekt|
+                    0&lt;Du kan velge å gjennomgå '{1,choice,1#den|1&lt;dem}' først, eller å ignorere '{1,choice,1#den|1&lt;dem}' og fortsette med operasjonen}.
             </validation-dialog-message>
             <buttons-message/>
             <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
@@ -295,27 +301,27 @@
             <upload-cancel>Opplasting kansellert av brukeren</upload-cancel>
             <upload-done>Opplasting fullført</upload-done>
             <upload-error>Det oppsto en feil under opplastingen. Vennligst prøv igjen.</upload-error>
-            <upload-error-empty-file todo="true">[The file uploaded is empty.]</upload-error-empty-file>
+            <upload-error-empty-file>Den opplastede filen er tom.</upload-error-empty-file>
             <upload-error-size>Filen er for stor. Maks filstørrelse er på {0} og størrelse på filen er {1}.</upload-error-size>
             <upload-error-max-files-per-control>Maksimalt antall filer overskredet. Du kan ikke legge ved mer enn {0,number,integer} filer til denne kontrollen.</upload-error-max-files-per-control>
-            <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
-            <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
-            <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <upload-error-mediatype>Den opplastede filen har feil type: {0}</upload-error-mediatype>
+            <upload-error-file-scan>Den opplastede filen ble avvist av filskanneren. Kontroller at dette ikke er en infisert fil. Meldingen fra filskanneren er: "{0}".</upload-error-file-scan>
+            <lost-attachments>Noen vedlegg gikk tapt på grunn av et serverproblem. Kontroller alle vedleggene og last dem opp på nytt ved behov.</lost-attachments>
+            <conflict-dialog-title>Konflikt oppdaget</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>Dataene har endret seg siden du lastet dem. Du kan enten:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Lagre nå og overskrive tidligere lagrede data.</li>
+                        <li>Forkaste de gjeldende endringene og laste inn tidligere lagrede data på nytt.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
          <draft-singleton>
-            <found-draft todo="true">Utkast funnet.</found-draft>
-            <found-drafts todo="true">[Found drafts]</found-drafts>
-            <found-draft-for-document todo="true">[After this document was saved, a draft was autosaved, and it might contain additional work. Do you want to open the saved document, or the autosaved draft?]</found-draft-for-document>
+            <found-draft>Utkast funnet.</found-draft>
+            <found-drafts>Fant utkast.</found-drafts>
+            <found-draft-for-document>Etter at dette dokumentet ble lagret, ble et utkast lagret automatisk, som kan inneholde ytterligere arbeid. Vil du åpne det lagrede dokumentet eller det automatisk lagrede utkastet?</found-draft-for-document>
             <found-draft-for-never-saved>Utkast for dette skjemaet ble lagret automatisk. Vil du starte på nytt eller åpne utkastet?</found-draft-for-never-saved>
             <found-drafts-for-never-saved>Flere utkast for dette skjemaet ble lagret automatisk. Vil du starte på nytt eller se på utkastene (og eventuelt gjøre endringer på et av de)?</found-drafts-for-never-saved>
             <open-saved>Åpne lagret dokument</open-saved>
@@ -333,21 +339,21 @@
             <error-details>Vis feilmeldingsdetaljer</error-details>
             <confirm>Bekreft</confirm>
             <alert>Manglende eller ugyldig svar</alert>
-            <alert-out-of-range todo="true">[Out of range value, please select an available value]</alert-out-of-range>
-            <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
-            <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
-            <captcha-label todo="true">[Captcha]</captcha-label>
-            <captcha-alert todo="true">[The value you entered didn't match the image, please try again]</captcha-alert>
+            <alert-out-of-range>Verdi utenfor gyldig område, velg en tilgjengelig verdi</alert-out-of-range>
+            <alert-out-of-range-multiple>Verdi(er) utenfor gyldig område</alert-out-of-range-multiple>
+            <clear-out-of-range>Tøm verdier utenfor gyldig område</clear-out-of-range>
+            <captcha-label>CAPTCHA</captcha-label>
+            <captcha-alert>Verdien du skrev inn samsvarte ikke med bildet, prøv igjen</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-size-per-file>Filer må være under {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>Total filstørrelse i kontrollen må være under {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Du kan legge ved opptil {0} filer.</upload-max-files-per-control>
             <upload-min-files-per-control>Du må legge ved minst {0} filer.</upload-min-files-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Bare filer av typen {0} godtas.</upload-mediatypes>
+            <upload-image>bilde</upload-image>
+            <upload-video>video</upload-video>
+            <upload-audio>lyd</upload-audio>
         </hints>
         <view>
             <explanation>
@@ -355,28 +361,28 @@
             </explanation>
         </view>
         <lease>
-            <no-lease-title todo="true">[Lease]</no-lease-title>
-            <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
-            <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
-            <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
-            <current-user-right todo="true">.]</current-user-right>
-            <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
-            <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
-            <relinquish todo="true">[Relinquish lease]</relinquish>
-            <renew todo="true">[Renew lease]</renew>
-            <try-acquire todo="true">[Try to acquire lease]</try-acquire>
-            <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
+            <no-lease-title>Leie</no-lease-title>
+            <renew-lease-title>Fornye leie?</renew-lease-title>
+            <renew-lease-message>Leieavtalen din er i ferd med å utløpe. Vil du fornye den nå?</renew-lease-message>
+            <current-user-left>Du har leie på dette dokumentet i ytterligere </current-user-left>
+            <current-user-right>.</current-user-right>
+            <relinquished>Du har ikke lenger leie på dette dokumentet.</relinquished>
+            <other-user>En annen bruker, med brukernavn "{0}", har for øyeblikket leie på dette dokumentet.</other-user>
+            <relinquish>Gi fra deg leie</relinquish>
+            <renew>Forny leie</renew>
+            <try-acquire>Prøv å få leie</try-acquire>
+            <show-in-view-mode>Vis i skrivebeskyttet modus</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>Økten er i ferd med å utløpe</expiring>
+                <expired>Økten er utløpt</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                <expiring>Økten din er i ferd med å utløpe. Klikk på knappen under hvis du vil fortsette å bruke denne siden.</expiring>
                 <expired>Dette skjemaet må lastes inn på nytt. Dette kan føre deg til innloggingssiden. Hvis du tror at du ikke burde se denne meldingen og at problemet vedvarer, vennligst kontakt support.</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
+            <renew-button>Forny økt</renew-button>
             <reload-button>Last på nytt</reload-button>
         </session-expiration>
         <tab-duplication>
@@ -384,13 +390,13 @@
             <message>Det ser ut til at du har duplisert denne nettleserfanen. Lukk denne fanen og gjenoppta økten i den opprinnelige fanen.</message>
         </tab-duplication>
         <available-from>
-            <message todo="true">[This form isn't available yet]</message>
+            <message>Dette skjemaet er ikke tilgjengelig ennå</message>
         </available-from>
         <available-to>
-            <message todo="true">[This form isn't available anymore]</message>
+            <message>Dette skjemaet er ikke lenger tilgjengelig</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Trinn</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -411,69 +417,69 @@
         </dialog-body>
     </save-locally>
     <share-dialog>
-        <label todo="true">Create link to share</label>
-        <body todo="true">Let anyone with the link view or edit this data.</body>
-        <link todo="true">Link</link>
-        <select-operations todo="true">Select operations</select-operations>
-        <readonly todo="true">Readonly</readonly>
-        <readwrite todo="true">Read-write</readwrite>
+        <label>Opprett lenke for deling</label>
+        <body>La alle med lenken se eller redigere disse dataene.</body>
+        <link>Lenke</link>
+        <select-operations>Velg operasjoner</select-operations>
+        <readonly>Skrivebeskyttet</readonly>
+        <readwrite>Lese/skrive</readwrite>
     </share-dialog>
     <admin>
-        <title todo="true">[Forms Admin]</title>
+        <title>Skjemabehandling</title>
     </admin>
     <landing>
         <title>Landing</title>
         <titles>
-            <published-forms todo="true">Published Forms</published-forms>
-            <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-            <form-builder-new todo="true">New Form Builder Form</form-builder-new>
-            <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
-            <demo-forms todo="true">Demo Forms</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
-            <quick-links todo="true">Quick Links</quick-links>
-            <form-runner-admin todo="true">Forms Admin</form-runner-admin>
+            <published-forms>Publiserte skjema</published-forms>
+            <form-builder-forms>Skjema bygget med Form Builder</form-builder-forms>
+            <form-builder-new>Nytt Form Builder-skjema</form-builder-new>
+            <form-builder-summary>Skjema bygget med Form Builder</form-builder-summary>
+            <demo-forms>Demoskjema</demo-forms>
+            <demo-features>Demofunksjoner</demo-features>
+            <quick-links>Hurtiglenker</quick-links>
+            <form-runner-admin>Skjemabehandling</form-runner-admin>
         </titles>
         <descriptions>
-            <published-forms todo="true">Access your published forms</published-forms>
-            <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <published-forms>Få tilgang til dine publiserte skjema</published-forms>
+            <form-builder-forms>Vis og rediger skjema under arbeid opprettet med Form Builder</form-builder-forms>
+            <demo-forms>Prøv samlingen av Orbeon Forms-demoskjema</demo-forms>
+            <demo-features>Prøv demonstrasjoner av enkelte Orbeon Forms-funksjoner</demo-features>
         </descriptions>
-        <show-more todo="true">Show more…</show-more>
+        <show-more>Vis mer…</show-more>
     </landing>
     <home>
-        <title todo="true">Skjemamotor hjem</title>
+        <title>Publiserte skjema</title>
         <buttons>
-            <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Unpublish]</unpublish>
-            <publish todo="true">[&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish]</publish>
-            <cancel todo="true">[Cancel]</cancel>
-            <connect todo="true">[Connect]</connect>
-            <select todo="true">[Select]</select>
-            <operation todo="true">[Operation]</operation>
-            <reindex todo="true">[Reindex database(s)]</reindex>
-            <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
-            <all todo="true">[All]</all>
-            <none todo="true">[None]</none>
-            <unpublished-local todo="true">[Unavailable local forms]</unpublished-local>
-            <published-local todo="true">[Published local forms]</published-local>
-            <unpublished-remote todo="true">[Unpublished remote forms]</unpublished-remote>
-            <published-remote todo="true">[Published remote forms]</published-remote>
-            <newer-local todo="true">[Forms that are newer locally]</newer-local>
-            <newer-remote todo="true">[Forms that are newer remotely]</newer-remote>
-            <publish-local todo="true">[Publish local forms]</publish-local>
-            <unpublish-local todo="true">[Unpublish local forms]</unpublish-local>
-            <publish-remote todo="true">[Publish remote forms]</publish-remote>
-            <unpublish-remote todo="true">[Unpublish remote forms]</unpublish-remote>
-            <push-to-remote todo="true">[Push to remote]</push-to-remote>
-            <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
-            <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
-            <navigate-new todo="true">[Navigate to New]</navigate-new>
-            <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-            <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
-            <delete-local todo="true">Delete local forms</delete-local>
-            <delete-remote todo="true">Delete remote forms</delete-remote>
-            <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
-            <reload-resources todo="true">[Reload resources]</reload-resources>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Gjør utilgjengelig</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Gjør tilgjengelig</publish>
+            <cancel>Avbryt</cancel>
+            <connect>Koble til</connect>
+            <select>Velg</select>
+            <operation>Operasjon</operation>
+            <reindex>Reindekser databaser</reindex>
+            <stop-reindex>Stopp reindeksering</stop-reindex>
+            <all>Alle</all>
+            <none>Ingen</none>
+            <unpublished-local>Utilgjengelige lokale skjema</unpublished-local>
+            <published-local>Tilgjengelige lokale skjema</published-local>
+            <unpublished-remote>Utilgjengelige eksterne skjema</unpublished-remote>
+            <published-remote>Tilgjengelige eksterne skjema</published-remote>
+            <newer-local>Skjema som er nyere lokalt</newer-local>
+            <newer-remote>Skjema som er nyere eksternt</newer-remote>
+            <publish-local>Gjør lokale skjema tilgjengelige</publish-local>
+            <unpublish-local>Gjør lokale skjema utilgjengelige</unpublish-local>
+            <publish-remote>Gjør eksterne skjema tilgjengelige</publish-remote>
+            <unpublish-remote>Gjør eksterne skjema utilgjengelige</unpublish-remote>
+            <push-to-remote>Push til ekstern server</push-to-remote>
+            <pull-from-remote>Hent fra ekstern server</pull-from-remote>
+            <navigate-summary>Gå til oppsummering</navigate-summary>
+            <navigate-new>Gå til nytt</navigate-new>
+            <upgrade-local>Oppgrader lokale skjemadefinisjoner</upgrade-local>
+            <upgrade-remote>Oppgrader eksterne skjemadefinisjoner</upgrade-remote>
+            <delete-local>Slett lokale skjema</delete-local>
+            <delete-remote>Slett eksterne skjema</delete-remote>
+            <reencrypt>Krypter skjemadefinisjoner på nytt</reencrypt>
+            <reload-resources>Last ressurser på nytt</reload-resources>
         </buttons>
         <titles>
             <publish-confirmation>Bekreft skjemapublisering/Opphev skjemapublisering</publish-confirmation>
@@ -484,63 +490,63 @@
             <local>Lokalt</local>
             <remote>På server</remote>
             <form-identification>Skjemaindentifikasjon</form-identification>
-            <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
+            <reindexing-confirmation>Bekreft reindeksering</reindexing-confirmation>
+            <reencrypt-confirmation>Bekreft rekryptering</reencrypt-confirmation>
+            <purge-confirmation>Bekreft sletting</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[Ingen distribuert skjema ble funnet.]</no-form-found>
-            <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
-            <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
+            <no-form-found>Ingen distribuert skjema ble funnet.</no-form-found>
+            <publish-confirmation>Er du sikker på at du vil {0,choice,0#gjøre tilgjengelig|1#gjøre utilgjengelig|2#oppgradere|3#slette} {1,choice,1#ett skjema|1&lt;{1,number,integer} skjema}? Denne operasjonen kan ikke angres.</publish-confirmation>
+            <reindexing-confirmation>Under reindeksering vil enkelte funksjoner, som Form Runner-oppsummeringssider, ikke fungere som forventet. Vi anbefaler derfor at du utfører reindeksering når systemet er offline. Er du sikker på at du vil fortsette med reindeksering?</reindexing-confirmation>
+            <reencrypt-confirmation>Vi anbefaler at du utfører rekryptering når systemet er offline. Er du sikker på at du vil fortsette med rekryptering?</reencrypt-confirmation>
+            <purge-confirmation>Er du sikker på at du vil slette de valgte dataene?</purge-confirmation>
         </messages>
         <labels>
-            <available todo="true">[Available]</available>
-            <unavailable todo="true">[Unavailable]</unavailable>
-            <library todo="true">[Library]</library>
-            <newer todo="true">[Newer]</newer>
-            <remote-server todo="true">[Remote server]</remote-server>
-            <username todo="true">[Username]</username>
-            <password todo="true">[Password]</password>
-            <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
-            <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
-            <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
-            <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
-            <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
-            <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
-            <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+            <available>Tilgjengelig</available>
+            <unavailable>Utilgjengelig</unavailable>
+            <library>Bibliotek</library>
+            <newer>Nyere</newer>
+            <remote-server>Ekstern server</remote-server>
+            <username>Brukernavn</username>
+            <password>Passord</password>
+            <reindexing-generic>Reindekserer &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>Reindekserer {0} ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>Reindekseringsoperasjonen stoppes &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>Reindekseringsoperasjonen er fullført</reindexing-finished>
+            <reencrypt-state>Rekrypterer {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Rekryptering startet</reencrypt-started>
+            <reencrypt-finished>Rekryptering fullført</reencrypt-finished>
         </labels>
         <export-purge>
-            <export todo="true">[Export]</export>
-            <purge todo="true">[Purge]</purge>
-            <or todo="true">[or]</or>
-            <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
-            <following-forms todo="true">[Following forms:]</following-forms>
-            <application todo="true">[Application:]</application>
-            <form todo="true">[Form:]</form>
-            <version todo="true">[Version:]</version>
-            <all-applications todo="true">[All applications]</all-applications>
-            <all-forms todo="true">[All forms]</all-forms>
-            <all-versions todo="true">[All versions]</all-versions>
-            <latest-version todo="true">[Latest version]</latest-version>
+            <export>Eksporter</export>
+            <purge>Slett</purge>
+            <or>eller</or>
+            <selected-forms>Valgte skjema ({0,number,integer})</selected-forms>
+            <following-forms>Følgende skjema:</following-forms>
+            <application>Applikasjon:</application>
+            <form>Skjema:</form>
+            <version>Versjon:</version>
+            <all-applications>Alle applikasjoner</all-applications>
+            <all-forms>Alle skjema</all-forms>
+            <all-versions>Alle versjoner</all-versions>
+            <latest-version>Siste versjon</latest-version>
             <definitions-data>
-                <label todo="true">[Form definitions / data:]</label>
-                <definitions todo="true">[Definitions only]</definitions>
-                <data todo="true">[Data only]</data>
-                <both todo="true">[Definitions and data]</both>
+                <label>Skjemadefinisjoner / data:</label>
+                <definitions>Bare definisjoner</definitions>
+                <data>Bare data</data>
+                <both>Definisjoner og data</both>
             </definitions-data>
             <current-history>
-                <label todo="true">[Current data / revision history:]</label>
-                <current-data todo="true">[Current data only]</current-data>
-                <revision-history todo="true">[Revision history only]</revision-history>
-                <both todo="true">[Current data and revision history]</both>
+                <label>Gjeldende data / revisjonshistorikk:</label>
+                <current-data>Bare gjeldende data</current-data>
+                <revision-history>Bare revisjonshistorikk</revision-history>
+                <both>Gjeldende data og revisjonshistorikk</both>
             </current-history>
-            <from-date todo="true">[From:]</from-date>
-            <until-date todo="true">[Until:]</until-date>
-            <redundant-values todo="true">[Redundant values]</redundant-values>
-            <invalid-date todo="true">[Invalid date]</invalid-date>
-            <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            <from-date>Fra:</from-date>
+            <until-date>Til:</until-date>
+            <redundant-values>Redundante verdier</redundant-values>
+            <invalid-date>Ugyldig dato</invalid-date>
+            <wrong-date-order>Feil datorekkefølge</wrong-date-order>
         </export-purge>
     </home>
     <import>
@@ -549,132 +555,132 @@
             <alert>Mangler skjemaversjon</alert>
         </form-version>
         <application-name>
-            <label todo="true">Application Name</label>
+            <label>Applikasjonsnavn</label>
         </application-name>
         <form-name>
             <label>Skjemanavn</label>
         </form-name>
         <version-comment>
-            <label todo="true">Version comment</label>
+            <label>Versjonskommentar</label>
         </version-comment>
         <upload>
             <label>Last opp</label>
         </upload>
         <file>
-            <label todo="true">File to import</label>
-            <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-            <alert todo="true">Missing or unsupported file</alert>
-            <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
-            <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
+            <label>Fil som skal importeres</label>
+            <hint>Filen må være i Excel 2007-format (.xlsx) eller XML-format (.xml)</hint>
+            <alert>Manglende eller ikke støttet fil</alert>
+            <excel-headings-format>Excel 2007 med navngitte overskrifter (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 med navngitte områder (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML-eksportformat (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label todo="true">Validation</label>
-            <alert todo="true">Please start the validation before proceeding to the import</alert>
+            <label>Validering</label>
+            <alert>Start valideringen før du fortsetter med importen</alert>
         </validation>
         <start-validation>
-            <label todo="true">Start Validation</label>
+            <label>Start validering</label>
         </start-validation>
-        <total todo="true">Total</total>
-        <valid todo="true">Valid</valid>
-        <invalid todo="true">Invalid</invalid>
-        <imported todo="true">[Imported]</imported>
-        <skipped todo="true">[Skipped]</skipped>
-        <eta todo="true">ETA</eta>
+        <total>Totalt</total>
+        <valid>Gyldig</valid>
+        <invalid>Ugyldig</invalid>
+        <imported>Importert</imported>
+        <skipped>Hoppet over</skipped>
+        <eta>ETA</eta>
         <cancel-validation>
-            <label todo="true">Cancel Validation</label>
+            <label>Avbryt validering</label>
         </cancel-validation>
-        <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+        <validation-canceled>Valideringen ble avbrutt.</validation-canceled>
         <import>
-            <label todo="true">Import</label>
+            <label>Importer</label>
         </import>
         <existing-records>
-            <label todo="true">Existing database records</label>
-            <item id="0" todo="true">Keep</item>
-            <item id="1" todo="true">Delete</item>
+            <label>Eksisterende databaseoppføringer</label>
+            <item id="0">Behold</item>
+            <item id="1">Slett</item>
         </existing-records>
         <invalid-data>
-            <label todo="true">Records with invalid data</label>
-            <item id="0" todo="true">Skip</item>
-            <item id="1" todo="true">Import</item>
+            <label>Oppføringer med ugyldige data</label>
+            <item id="0">Hopp over</item>
+            <item id="1">Importer</item>
         </invalid-data>
         <start-import>
-            <label todo="true">Start Import</label>
+            <label>Start import</label>
         </start-import>
         <cancel-import>
-            <label todo="true">Cancel Import</label>
+            <label>Avbryt import</label>
         </cancel-import>
-        <import-canceled todo="true">Import was canceled.</import-canceled>
+        <import-canceled>Importen ble avbrutt.</import-canceled>
         <start-over>
-            <label todo="true">Start Over</label>
+            <label>Start på nytt</label>
         </start-over>
         <review-data>
-            <label todo="true">Review Data</label>
+            <label>Gå gjennom data</label>
         </review-data>
-        <existing-records-message todo="true">
-            There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+        <existing-records-message>
+            Det {0,choice,1#er|1&lt;er} {0,number,integer} eksisterende {0,choice,1#dokument|1&lt;dokumenter} i databasen for versjon {3} av skjema {1}/{2}.
         </existing-records-message>
-        <eta-message todo="true">
-            {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} timer} {1,choice,0#|0&lt;{1, number, integer} minutter} {2,choice,0#|0&lt;{2, number, integer} sekunder}
         </eta-message>
-        <invalid-records-message todo="true">
-            {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+        <invalid-records-message>
+            {0,number,integer} av {1,number,integer} {1,choice,1#dokument|1&lt;dokumenter} {0,choice,1#er|1&lt;er} ugyldige.
         </invalid-records-message>
-        <valid-records-message todo="true">
-            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+        <valid-records-message>
+            {0,number,integer} {0,choice,1#dokument|1&lt;dokumenter} {0,choice,1#har|1&lt;har} blitt validert og vil bli importert.
         </valid-records-message>
-        <invalid-document-message todo="true">
-            The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+        <invalid-document-message>
+            Det opplastede dokumentet inneholder valideringsfeil. Bruk knappen "Gå gjennom data" for å se gjennom og rette feil før du lagrer.
         </invalid-document-message>
-        <valid-document-message todo="true">
-            The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+        <valid-document-message>
+            Det opplastede dokumentet inneholder gyldige data. Bruk knappen "Gå gjennom data" for å se gjennom skjemadata før du lagrer.
         </valid-document-message>
-        <import-complete-message todo="true">
-            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+        <import-complete-message>
+            Import av {0,number,integer} {0,choice,1#dokument|1&lt;dokumenter} er fullført. {1,number,integer} ugyldige {1,choice,1#dokument ble|1&lt;dokumenter ble} hoppet over.
         </import-complete-message>
-        <na todo="true">N/A</na>
-        <fields-found todo="true">Fields Found</fields-found>
-        <values-found todo="true">Values Found</values-found>
-        <errors todo="true">Errors</errors>
-        <warnings todo="true">Warnings</warnings>
+        <na>Ikke aktuelt</na>
+        <fields-found>Felter funnet</fields-found>
+        <values-found>Verdier funnet</values-found>
+        <errors>Feil</errors>
+        <warnings>Advarsler</warnings>
         <error-messages>
-            <validating todo="true">[An error occurred while validating the data.]</validating>
-            <importing todo="true">[An error occurred while importing the data.]</importing>
-            <deleting todo="true">[An error occurred while deleting the data.]</deleting>
-            <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
-            <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
-            <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
-            <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            <validating>Det oppsto en feil under validering av dataene.</validating>
+            <importing>Det oppsto en feil under import av dataene.</importing>
+            <deleting>Det oppsto en feil under sletting av dataene.</deleting>
+            <unauthorized>Du har ikke tilgang til disse dataene.</unauthorized>
+            <reading-form-data>Det oppsto en feil ved henting av skjemadata.</reading-form-data>
+            <reading-form-metadata>Det oppsto en feil ved lesing av skjemametadata.</reading-form-metadata>
+            <reading-form-definition>Det oppsto en feil ved lesing av skjemadefinisjonen.</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
         <menu>
-            <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
-            <logout todo="true">[Logout]</logout>
-            <login todo="true">[Login]</login>
-            <register todo="true">[Register]</register>
+            <logged-in-as>Innlogget som {0}</logged-in-as>
+            <logout>Logg ut</logout>
+            <login>Logg inn</login>
+            <register>Registrer deg</register>
         </menu>
         <login>
-            <title todo="true">[Form Runner Login]</title>
-            <username todo="true">[Username]</username>
-            <password todo="true">[Password]</password>
-            <login todo="true">[Login]</login>
+            <title>Form Runner-innlogging</title>
+            <username>Brukernavn</username>
+            <password>Passord</password>
+            <login>Logg inn</login>
         </login>
         <logout-done>
-            <title todo="true">[Form Runner Logout]</title>
-            <message todo="true">[You're logged out.]</message>
+            <title>Form Runner-utlogging</title>
+            <message>Du er logget ut.</message>
         </logout-done>
         <login-error>
-            <title todo="true">[Form Runner Login Error]</title>
-            <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
-            <try-again todo="true">[Please try again.]</try-again>
+            <title>Feil ved Form Runner-innlogging</title>
+            <unrecognized>Brukernavnet eller passordet du skrev inn ble ikke gjenkjent.</unrecognized>
+            <try-again>Prøv igjen.</try-again>
         </login-error>
     </authentication>
     <home-summary>
         <titles>
             <created>Opprettet</created>
             <last-modified>Endret</last-modified>
-            <last-modified-by todo="true">[Modified By]</last-modified-by>
+            <last-modified-by>Endret av</last-modified-by>
             <application-name>App</application-name>
             <form-name>Skjema</form-name>
             <version>Versjon</version>
@@ -689,32 +695,32 @@
             <any>[Vilkårlig]</any>
             <dates>
                 <item>
-                    <label todo="true">[Today]</label>
+                    <label>I dag</label>
                     <value>today</value>
                 </item>
                 <item>
-                    <label todo="true">[Yesterday]</label>
+                    <label>I går</label>
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 7 days]</label>
+                    <label>Siste 7 dager</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 30 days]</label>
+                    <label>Siste 30 dager</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 90 days]</label>
+                    <label>Siste 90 dager</label>
                     <value>last-90-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Custom...]</label>
+                    <label>Tilpasset…</label>
                     <value>custom</value>
                 </item>
             </dates>
-            <date-after todo="true">[After]</date-after>
-            <date-before todo="true">[Before]</date-before>
+            <date-after>Etter</date-after>
+            <date-before>Før</date-before>
         </search>
     </home-summary>
 </resource>

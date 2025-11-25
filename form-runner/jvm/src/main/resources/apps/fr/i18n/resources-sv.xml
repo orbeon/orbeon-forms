@@ -6,14 +6,14 @@
             <short-date>[Y0001]-[M01]-[D01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
+            <incomplete-configuration>Din Orbeon Forms-konfiguration är ofullständig. För mer information, kontrollera Orbeon Forms-loggfilen och besök &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;dokumentationen&lt;/a&gt;.</incomplete-configuration>
         </messages>
     </common>
     <buttons>
-        <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
-        <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
-        <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
-        <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
+        <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Skapa</create>
+        <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visa</view>
+        <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Godkänn</approve>
+        <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Avvisa</reject>
 
         <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Start</home>
         <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Start</landing>
@@ -23,19 +23,19 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Ta bort</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importera</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Skapa</new>
-        <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Skapa ny data</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicera</duplicate>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Spara</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Spara</save-final>
-        <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara</save-draft>
-        <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara</save-progress>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara utkast</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara utkast</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Redigera</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Mejla</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Godkänn</validate>
-        <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Test PDF</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Testa PDF</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</submit>
@@ -52,12 +52,12 @@
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Visa på nytt"&gt;&lt;/i&gt;</refresh>
-        <collapse-all-full todo="true">&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Collapse All</collapse-all-full>
-        <expand-all-full todo="true">&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Expand All</expand-all-full>
-        <refresh-full todo="true">&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
+        <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; Fäll ihop alla</collapse-all-full>
+        <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Fäll ut alla</expand-all-full>
+        <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Uppdatera</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nästa</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föreg</wizard-prev>
-        <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
+        <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innehåll</wizard-toc>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
@@ -70,16 +70,16 @@
         <validation-dialog-continue>Fortsätt</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite todo="true">[Save &amp; Overwrite]</conflict-dialog-save-overwrite>
-        <conflict-dialog-discard-reload todo="true">[Discard &amp; Reload]</conflict-dialog-discard-reload>
+        <conflict-dialog-save-overwrite>Spara och skriv över</conflict-dialog-save-overwrite>
+        <conflict-dialog-discard-reload>Kasta och läs in på nytt</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testa</test>
-        <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
-        <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-        <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
-        <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
-        <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
-        <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspektera formler (beta)</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testa offline (beta)</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportera till Excel</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportera till Excel</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportera XML</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; Exportera XHTML</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</save-publish>
 
@@ -97,7 +97,7 @@
             <yes>Ja</yes>
             <no>Nej</no>
             <other>Annat</other>
-            <clear todo="true">[Clear Value]</clear>
+            <clear>Rensa värde</clear>
             <please-select>Välj:</please-select>
         </labels>
         <grid>
@@ -107,25 +107,25 @@
             <move-up>Flytta upp</move-up>
             <move-down>Flytta ned</move-down>
             <clear>
-                <label todo="true">[Clear Line]</label>
+                <label>Rensa rad</label>
             </clear>
             <remove>
                 <label>Ta bort</label>
-                <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                <hint>Ta bort rad från den upprepade tabellen</hint>
             </remove>
             <add-another>
                 <label>Lägg till rad</label>
-                <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                <hint>Lägg till ytterligare rad i den upprepade tabellen</hint>
             </add-another>
         </grid>
         <section>
             <remove>
                 <label>Ta bort</label>
-                <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                <hint>Ta bort repetition från den upprepade sektionen</hint>
             </remove>
             <add-another>
                 <label>Lägg till rad</label>
-                <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                <hint>Lägg till ytterligare repetition i den upprepade sektionen</hint>
             </add-another>
         </section>
         <date-time>
@@ -135,40 +135,40 @@
             <select-date>Välj datum</select-date>
         </date-time>
         <wizard>
-            <errors todo="true">[Errors]</errors>
-            <incomplete todo="true">[Incomplete]</incomplete>
-            <complete todo="true">[Complete]</complete>
-            <not-started todo="true">[Not Started]</not-started>
-            <edit todo="true">[Edit]</edit>
+            <errors>Fel</errors>
+            <incomplete>Ofullständig</incomplete>
+            <complete>Slutförd</complete>
+            <not-started>Inte påbörjad</not-started>
+            <edit>Redigera</edit>
         </wizard>
         <error-summary>
-            <show-more todo="true">[Show More]</show-more>
-            <show-less todo="true">[Show Less]</show-less>
+            <show-more>Visa mer</show-more>
+            <show-less>Visa mindre</show-less>
         </error-summary>
         <revision-history>
-            <label todo="true">Revision History</label>
-            <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
-            <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+            <label>Ändringshistorik</label>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Första versionen)}'|1# (Aktuell version)}</date>
+            <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] kl. [h]:[m] [P,*-2]</date-format>
 
-            <named-user todo="true">User {0}</named-user>
-            <anonymous-user todo="true">An anonymous user</anonymous-user>
+            <named-user>Användare {0}</named-user>
+            <anonymous-user>En anonym användare</anonymous-user>
 
-            <unknown-changes todo="true">made some changes.</unknown-changes>
-            <initial-revision todo="true">saved the initial revision.</initial-revision>
-            <no-changes todo="true">saved with no changes detected.</no-changes>
-            <specific-changes todo="true">made the following changes:</specific-changes>
+            <unknown-changes>gjorde vissa ändringar.</unknown-changes>
+            <initial-revision>sparade den första versionen.</initial-revision>
+            <no-changes>sparade utan att några ändringar upptäcktes.</no-changes>
+            <specific-changes>gjorde följande ändringar:</specific-changes>
 
-            <view-data todo="true">View this revision</view-data>
+            <view-data>Visa denna version</view-data>
 
-            <value-entered todo="true">"{0}" entered</value-entered>
-            <value-cleared todo="true">"{0}" cleared</value-cleared>
-            <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
-            <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
-            <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
-            <other-changed todo="true">internal information changed</other-changed>
-            <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
+            <value-entered>"{0}" angavs</value-entered>
+            <value-cleared>"{0}" rensades</value-cleared>
+            <value-changed>ändrades från "{0}" till "{1}"</value-changed>
+            <iteration-added>{0,number,integer} {0,choice,1#upprepning|1&lt;upprepningar} lades till</iteration-added>
+            <iteration-removed>{0,number,integer} {0,choice,1#upprepning|1&lt;upprepningar} togs bort</iteration-removed>
+            <other-changed>intern information ändrad</other-changed>
+            <workflow-stage-changed>Arbetsflödessteg ändrades från "{0}" till "{1}"</workflow-stage-changed>
 
-            <load-more todo="true">Load More</load-more>
+            <load-more>Läs in fler</load-more>
         </revision-history>
     </components>
     <untitled-form>Formulär utan titel</untitled-form>
@@ -184,13 +184,13 @@
         <none>Inga fel i formuläret</none>
         <unsaved>Ej sparade ändringar</unsaved>
         <canvas-not-supported>För att kunna göra noteringar måste webbläsaren stödja HTML5 canvas</canvas-not-supported>
-        <search todo="true">[Error performing search]</search>
+        <search>Fel vid sökning</search>
     </errors>
     <email>
         <subject>Orbeon Forms bekräftelse</subject>
         <body>Formuläret bifogas på PDF- och XML-format.</body>
-        <na todo="true">[N/A]</na>
-        <iteration todo="true">[Iteration {$iteration}]</iteration>
+        <na>Ej tillämpligt</na>
+        <iteration>Iteration {$iteration}</iteration>
     </email>
     <!-- Formats used for PDF template -->
     <print>
@@ -204,9 +204,9 @@
         <titles>
             <summary-title>Sammanställning</summary-title>
             <delete-confirmation>Bekräfta borttag</delete-confirmation>
-            <document-id todo="true">Document Id</document-id>
-            <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-            <created-by todo="true">[Created By]</created-by>
+            <document-id>Dokument-ID</document-id>
+            <workflow-stage>Arbetsflödessteg</workflow-stage>
+            <created-by>Skapad av</created-by>
             <selected>Vald</selected>
             <refresh>Uppdatera sidan</refresh>
             <toc>Innehållsförteckning</toc>
@@ -216,18 +216,18 @@
             <errors-count>Fel i formuläret</errors-count>
         </titles>
         <buttons>
-            <select-all todo="true">Select all</select-all>
-            <deselect-all todo="true">Deselect all</deselect-all>
-            <select-saved todo="true">Select explicitly saved only</select-saved>
-            <select-drafts todo="true">Select drafts only</select-drafts>
+            <select-all>Markera alla</select-all>
+            <deselect-all>Avmarkera alla</deselect-all>
+            <select-saved>Markera endast sparade</select-saved>
+            <select-drafts>Markera endast utkast</select-drafts>
         </buttons>
         <bulk-edit>
-            <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
-            <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
-            <bulk-edit todo="true">[Bulk edit]</bulk-edit>
-            <apply todo="true">[Apply]</apply>
-            <value-required todo="true">[Value is required]</value-required>
-            <submission-error todo="true">[Error while editing form data.]</submission-error>
+            <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa massändring</show-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj massändring</close-bulk-edit>
+            <bulk-edit>Massändring</bulk-edit>
+            <apply>Verkställ</apply>
+            <value-required>Värde är obligatoriskt</value-required>
+            <submission-error>Fel vid redigering av formulärdata.</submission-error>
         </bulk-edit>
         <paging>
             <to>till</to>
@@ -237,7 +237,7 @@
         <messages>
             <no-form-data-found>Inget formulär hittades.</no-form-data-found>
             <delete-confirmation>Bekräfta att du vill ta bort formulären. Om du tar bort ett sparat formulär så tas motsvarande utkast också bort.</delete-confirmation>
-            <version todo="true">[Form Version {0,number,integer}]</version>
+            <version>Formulärversion {0,number,integer}</version>
         </messages>
         <labels>
             <draft>Utkast</draft>
@@ -245,7 +245,7 @@
             <language-choice>Välj språk</language-choice>
             <form-choice>Välj ett formulär</form-choice>
             <free-search>Fri sökning</free-search>
-            <clear-value todo="true">[[Clear value]]</clear-value>
+            <clear-value>[rensa värde]</clear-value>
             <script>Fullständig version</script>
             <refresh>Visa på nytt</refresh>
             <close-box>[stäng]</close-box>
@@ -259,30 +259,30 @@
             <save-datetime>[Y0001]-[M01]-[D01] [H]:[m]:[s]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label todo="true">Excel Export Options</label>
-            <headings-labels todo="true">Use labels for headings</headings-labels>
-            <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
-            <include-document-id todo="true">Include document id column</include-document-id>
+            <label>Alternativ för Excel-export</label>
+            <headings-labels>Använd etiketter som kolumnrubriker</headings-labels>
+            <selection-controls-labels>Använd etiketter för valkontroller</selection-controls-labels>
+            <include-document-id>Ta med kolumn för dokument-ID</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
             <save-success>Formuläret sparat</save-success>
-            <save-draft-success todo="true">Utkast sparat</save-draft-success>
-            <save-progress-success todo="true">Utkast sparat</save-progress-success>
+            <save-draft-success>Utkast sparat</save-draft-success>
+            <save-progress-success>Utkast sparat</save-progress-success>
             <email-success>Mejl skickat</email-success>
             <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
             <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
-            <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
-            <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
+            <service-error>Det uppstod ett fel vid kommunikation med en backend-tjänst. Kontakta applikationsadministratören.</service-error>
+            <action-error>Det uppstod ett fel vid kommunikation med en backend-tjänst. Kontakta applikationsadministratören.</action-error>
             <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
-            <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
-            <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
+            <wizard-prev-error>Åtgärda felen innan du går tillbaka.</wizard-prev-error>
+            <wizard-next-error>Åtgärda felen innan du går vidare.</wizard-next-error>
             <clear-confirm-message>Bekräfta att du vill rensa alla fält på denna sida. Värdena går förlorade om du inte har sparat dem.</clear-confirm-message>
             <error-dialog-title>Operationen kunde inte fullföljas</error-dialog-title>
             <confirmation-dialog-title>Var god bekräfta</confirmation-dialog-title>
             <confirmation-dialog-message>Vill du genomföra detta?</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message-overwrite>Den här åtgärden kan skriva över formulärdata. Är du säker på att du vill fortsätta?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Formuläret skickat</submit-dialog-title>
             <submit-dialog-message>Det ifyllda formuläret är skickat.</submit-dialog-message>
             <validation-dialog-title>Granskning av giltighet</validation-dialog-title>
@@ -301,22 +301,22 @@
             <upload-cancel>Överföring stoppad av användaren</upload-cancel>
             <upload-done>Överföring klar</upload-done>
             <upload-error>Fel under överföring. Vänligen försök igen.</upload-error>
-            <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
+            <upload-error-empty-file>Den uppladdade filen är tom.</upload-error-empty-file>
             <upload-error-size>Filen är för stor för att överföras. Största storlek är {0}.</upload-error-size>
             <upload-error-max-files-per-control>Maximalt antal filer överskridet. Du kan inte bifoga mer än {0,number,integer} filer till denna kontroll.</upload-error-max-files-per-control>
-            <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type: {0}]</upload-error-mediatype>
-            <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
-            <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
-            <conflict-dialog-title todo="true">[Conflict Detected]</conflict-dialog-title>
-            <conflict-dialog-message todo="true">[
+            <upload-error-mediatype>Den uppladdade filen har en felaktig typ: {0}</upload-error-mediatype>
+            <upload-error-file-scan>Den uppladdade filen avvisades av filskannern. Kontrollera att filen inte är infekterad. Meddelande från filskannern: "{0}".</upload-error-file-scan>
+            <lost-attachments>Vissa filbilagor förlorades på grund av ett serverfel. Kontrollera alla bilagor och ladda upp dem igen vid behov.</lost-attachments>
+            <conflict-dialog-title>Konflikt upptäckt</conflict-dialog-title>
+            <conflict-dialog-message>
                 <div>
-                    <p>The data has changed since you loaded it. You can either:</p>
+                    <p>Data har ändrats sedan du laddade den. Du kan antingen:</p>
                     <ul>
-                        <li>Save now, overwriting the data saved previously.</li>
-                        <li>Discard your current changes, and reload the data saved previously.</li>
+                        <li>Spara nu och skriva över den tidigare sparade datan.</li>
+                        <li>Kasta dina aktuella ändringar och läsa in den tidigare sparade datan.</li>
                     </ul>
                 </div>
-            ]</conflict-dialog-message>
+            </conflict-dialog-message>
         </messages>
         <draft-singleton>
             <found-draft>Utkast hittat</found-draft>
@@ -339,21 +339,21 @@
             <error-details>Visa fel</error-details>
             <confirm>Bekräfta</confirm>
             <alert>Utelämnat eller felaktigt värde</alert>
-            <alert-out-of-range todo="true">[Out of range value, please select an available value]</alert-out-of-range>
-            <alert-out-of-range-multiple todo="true">[Out of range value]</alert-out-of-range-multiple>
-            <clear-out-of-range todo="true">[Clear out of range value(s)]</clear-out-of-range>
+            <alert-out-of-range>Värdet ligger utanför tillåtet intervall, välj ett tillgängligt värde</alert-out-of-range>
+            <alert-out-of-range-multiple>Värdet ligger utanför tillåtet intervall</alert-out-of-range-multiple>
+            <clear-out-of-range>Rensa värde(n) utanför tillåtet intervall</clear-out-of-range>
             <captcha-label>Robotfilter</captcha-label>
-            <captcha-alert todo="true">Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
+            <captcha-alert>Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
+            <upload-max-size-per-file>Filer måste vara mindre än {0}.</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>Den totala filstorleken i kontrollen får inte överstiga {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Du kan bifoga upp till {0} filer.</upload-max-files-per-control>
             <upload-min-files-per-control>Du måste bifoga minst {0} filer.</upload-min-files-per-control>
-            <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
-            <upload-image todo="true">[image]</upload-image>
-            <upload-video todo="true">[video]</upload-video>
-            <upload-audio todo="true">[audio]</upload-audio>
+            <upload-mediatypes>Endast filer av typen {0} accepteras.</upload-mediatypes>
+            <upload-image>bild</upload-image>
+            <upload-video>video</upload-video>
+            <upload-audio>ljud</upload-audio>
         </hints>
         <view>
             <explanation>
@@ -361,28 +361,28 @@
             </explanation>
         </view>
         <lease>
-            <no-lease-title todo="true">[Lease]</no-lease-title>
-            <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
-            <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
-            <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
-            <current-user-right todo="true">.]</current-user-right>
-            <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
-            <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
-            <relinquish todo="true">[Relinquish lease]</relinquish>
-            <renew todo="true">[Renew lease]</renew>
-            <try-acquire todo="true">[Try to acquire lease]</try-acquire>
-            <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
+            <no-lease-title>Upplåtelserätt</no-lease-title>
+            <renew-lease-title>Fördjänga upplåtelserätt?</renew-lease-title>
+            <renew-lease-message>Din upplåtelserätt håller på att gå ut. Vill du förlänga den nu?</renew-lease-message>
+            <current-user-left>Du har upplåtelserätt till detta dokument i ytterligare </current-user-left>
+            <current-user-right>.</current-user-right>
+            <relinquished>Du har inte längre upplåtelserätt till detta dokument.</relinquished>
+            <other-user>En annan användare med användarnamnet "{0}" har för närvarande upplåtelserätt till detta dokument.</other-user>
+            <relinquish>Avstå upplåtelserätt</relinquish>
+            <renew>Förläng upplåtelserätt</renew>
+            <try-acquire>Försök få upplåtelserätt</try-acquire>
+            <show-in-view-mode>Visa i skrivskyddat läge</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring todo="true">[Session About To Expire]</expiring>
-                <expired todo="true">[Session Expired]</expired>
+                <expiring>Sessionen håller på att löpa ut</expiring>
+                <expired>Sessionen har löpt ut</expired>
             </title>
             <message>
-                <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                <expiring>Din session håller på att löpa ut. Klicka på knappen nedan om du vill fortsätta använda den här sidan.</expiring>
                 <expired>Detta formulär måste laddas om. Detta kan ta dig till inloggningssidan. Om du tror att du inte borde se detta meddelande och att problemet kvarstår, kontakta support.</expired>
             </message>
-            <renew-button todo="true">[Renew Session]</renew-button>
+            <renew-button>Förnya session</renew-button>
             <reload-button>Ladda om</reload-button>
         </session-expiration>
         <tab-duplication>
@@ -390,13 +390,13 @@
             <message>Du verkar ha duplicerat den här webbläsarfliken. Stäng den här fliken och återuppta din session i originalfliken.</message>
         </tab-duplication>
         <available-from>
-            <message todo="true">[This form isn't available yet]</message>
+            <message>Detta formulär är ännu inte tillgängligt</message>
         </available-from>
         <available-to>
-            <message todo="true">[This form isn't available anymore]</message>
+            <message>Detta formulär är inte längre tillgängligt</message>
         </available-to>
         <workflow-stage>
-            <label todo="true">Stage</label>
+            <label>Steg</label>
         </workflow-stage>
     </detail>
     <save-locally>
@@ -420,47 +420,47 @@
         </dialog-body>
     </save-locally>
     <share-dialog>
-        <label todo="true">Create link to share</label>
-        <body todo="true">Let anyone with the link view or edit this data.</body>
-        <link todo="true">Link</link>
-        <select-operations todo="true">Select operations</select-operations>
-        <readonly todo="true">Readonly</readonly>
-        <readwrite todo="true">Read-write</readwrite>
+        <label>Skapa länk för delning</label>
+        <body>Låt alla med länken visa eller redigera dessa data.</body>
+        <link>Länk</link>
+        <select-operations>Välj åtgärder</select-operations>
+        <readonly>Skrivskyddad</readonly>
+        <readwrite>Skrivbar</readwrite>
     </share-dialog>
     <admin>
-        <title todo="true">[Forms Admin]</title>
+        <title>Formuläradministration</title>
     </admin>
     <landing>
         <title>Landing</title>
         <titles>
-            <published-forms todo="true">Published Forms</published-forms>
-            <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-            <form-builder-new todo="true">New Form Builder Form</form-builder-new>
-            <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
-            <demo-forms todo="true">Demo Forms</demo-forms>
-            <demo-features todo="true">Demo Features</demo-features>
-            <quick-links todo="true">Quick Links</quick-links>
-            <form-runner-admin todo="true">Forms Admin</form-runner-admin>
+            <published-forms>Publicerade formulär</published-forms>
+            <form-builder-forms>Form Builder-formulär</form-builder-forms>
+            <form-builder-new>Nytt Form Builder-formulär</form-builder-new>
+            <form-builder-summary>Form Builder-formulär</form-builder-summary>
+            <demo-forms>Demonstrationsformulär</demo-forms>
+            <demo-features>Demonstrationsfunktioner</demo-features>
+            <quick-links>Snabblänkar</quick-links>
+            <form-runner-admin>Formuläradministration</form-runner-admin>
         </titles>
         <descriptions>
-            <published-forms todo="true">Access your published forms</published-forms>
-            <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
-            <demo-forms todo="true">Try out the collection of Orbeon Forms demo forms</demo-forms>
-            <demo-features todo="true">Try out demos of specific Orbeon Forms features</demo-features>
+            <published-forms>Öppna dina publicerade formulär</published-forms>
+            <form-builder-forms>Visa och redigera pågående formulär skapade med Form Builder</form-builder-forms>
+            <demo-forms>Prova samlingen av Orbeon Forms-demonstrationsformulär</demo-forms>
+            <demo-features>Prova demonstrationer av specifika Orbeon Forms-funktioner</demo-features>
         </descriptions>
-        <show-more todo="true">Show more…</show-more>
+        <show-more>Visa fler…</show-more>
     </landing>
     <home>
-        <title todo="true">Start av formulärmotorn</title>
+        <title>Publicerade formulär</title>
         <buttons>
             <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Upphäv publicering</unpublish>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
             <cancel>Avbryt</cancel>
             <connect>Anslut</connect>
             <select>Välj</select>
-            <operation>Operation</operation>
-            <reindex todo="true">[Reindex database(s)]</reindex>
-            <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
+            <operation>Åtgärd</operation>
+            <reindex>Indexera om databas(er)</reindex>
+            <stop-reindex>Stoppa omindexering</stop-reindex>
             <all>Alla</all>
             <none>Inga</none>
             <unpublished-local>Opublicerade lokala formulär</unpublished-local>
@@ -479,30 +479,30 @@
             <navigate-new>Gå till Skapa</navigate-new>
             <upgrade-local>Uppgradera lokala formulärdefinitioner</upgrade-local>
             <upgrade-remote>Uppgradera formulärdefinitioner på servern</upgrade-remote>
-            <delete-local todo="true">Delete local forms</delete-local>
-            <delete-remote todo="true">Delete remote forms</delete-remote>
-            <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
-            <reload-resources todo="true">[Reload resources]</reload-resources>
+            <delete-local>Ta bort lokala formulär</delete-local>
+            <delete-remote>Ta bort formulär på servern</delete-remote>
+            <reencrypt>Kryptera om formulärdefinitioner</reencrypt>
+            <reload-resources>Läs in resurser igen</reload-resources>
         </buttons>
         <titles>
-            <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
-            <credentials>Serverns identitet</credentials>
+            <publish-confirmation>Bekräfta ändring av formulärtillgänglighet</publish-confirmation>
+            <credentials>Inloggningsuppgifter för server</credentials>
             <status>Status</status>
             <view>Visa</view>
-            <new>Skapa</new>
+            <new>Nytt</new>
             <local>Lokalt</local>
             <remote>På servern</remote>
             <form-identification>Identifiering av formulär</form-identification>
-            <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
+            <reindexing-confirmation>Bekräfta omindexering</reindexing-confirmation>
+            <reencrypt-confirmation>Bekräfta omkryptering</reencrypt-confirmation>
+            <purge-confirmation>Bekräfta rensning</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found todo="true">[Inga publicerade formulär hittades.]</no-form-found>
-            <publish-confirmation todo="true">Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering|3#delete} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
-            <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
-            <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
-            <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
+            <no-form-found>Inga publicerade formulär hittades.</no-form-found>
+            <publish-confirmation>Är du säker på att du vill {0,choice,0#göra tillgängligt|1#göra otillgängligt|2#uppgradera|3#ta bort} {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}? Denna åtgärd kan inte ångras.</publish-confirmation>
+            <reindexing-confirmation>När du indexerar om fungerar vissa funktioner, som sammanställningssidor, inte som förväntat. Vi rekommenderar därför att du indexerar om när systemet är offline. Är du säker på att du vill fortsätta?</reindexing-confirmation>
+            <reencrypt-confirmation>Vi rekommenderar att du krypterar om när systemet är offline. Är du säker på att du vill fortsätta med omkrypteringen?</reencrypt-confirmation>
+            <purge-confirmation>Är du säker på att du vill rensa den valda datan?</purge-confirmation>
         </messages>
         <labels>
             <available>Tillgänglig</available>
@@ -512,178 +512,178 @@
             <remote-server>Server</remote-server>
             <username>Användarnamn</username>
             <password>Lösenord</password>
-            <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
-            <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
-            <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
-            <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
-            <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
-            <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
-            <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+            <reindexing-generic>Indexerar om &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+            <reindexing-provider>Indexerar om {0} ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>Omindexering stoppas &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>Omindexeringen är klar</reindexing-finished>
+            <reencrypt-state>Krypterar om {0,number}/{1,number}</reencrypt-state>
+            <reencrypt-started>Omkryptering startad</reencrypt-started>
+            <reencrypt-finished>Omkryptering klar</reencrypt-finished>
         </labels>
         <export-purge>
-            <export todo="true">[Export]</export>
-            <purge todo="true">[Purge]</purge>
-            <or todo="true">[or]</or>
-            <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
-            <following-forms todo="true">[Following forms:]</following-forms>
-            <application todo="true">[Application:]</application>
-            <form todo="true">[Form:]</form>
-            <version todo="true">[Version:]</version>
-            <all-applications todo="true">[All applications]</all-applications>
-            <all-forms todo="true">[All forms]</all-forms>
-            <all-versions todo="true">[All versions]</all-versions>
-            <latest-version todo="true">[Latest version]</latest-version>
+            <export>Exportera</export>
+            <purge>Rensa</purge>
+            <or>eller</or>
+            <selected-forms>Valda formulär ({0,number,integer})</selected-forms>
+            <following-forms>Följande formulär:</following-forms>
+            <application>Applikation:</application>
+            <form>Formulär:</form>
+            <version>Version:</version>
+            <all-applications>Alla applikationer</all-applications>
+            <all-forms>Alla formulär</all-forms>
+            <all-versions>Alla versioner</all-versions>
+            <latest-version>Senaste version</latest-version>
             <definitions-data>
-                <label todo="true">[Form definitions / data:]</label>
-                <definitions todo="true">[Definitions only]</definitions>
-                <data todo="true">[Data only]</data>
-                <both todo="true">[Definitions and data]</both>
+                <label>Formulärdefinitioner / data:</label>
+                <definitions>Endast definitioner</definitions>
+                <data>Endast data</data>
+                <both>Definitioner och data</both>
             </definitions-data>
             <current-history>
-                <label todo="true">[Current data / revision history:]</label>
-                <current-data todo="true">[Current data only]</current-data>
-                <revision-history todo="true">[Revision history only]</revision-history>
-                <both todo="true">[Current data and revision history]</both>
+                <label>Aktuella data / ändringshistorik:</label>
+                <current-data>Endast aktuella data</current-data>
+                <revision-history>Endast ändringshistorik</revision-history>
+                <both>Aktuella data och ändringshistorik</both>
             </current-history>
-            <from-date todo="true">[From:]</from-date>
-            <until-date todo="true">[Until:]</until-date>
-            <redundant-values todo="true">[Redundant values]</redundant-values>
-            <invalid-date todo="true">[Invalid date]</invalid-date>
-            <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            <from-date>Från:</from-date>
+            <until-date>Till:</until-date>
+            <redundant-values>Redundanta värden</redundant-values>
+            <invalid-date>Ogiltigt datum</invalid-date>
+            <wrong-date-order>Fel datumordning</wrong-date-order>
         </export-purge>
     </home>
     <import>
         <form-version>
-            <label todo="true">Form Version</label>
-            <alert todo="true">Missing form version</alert>
+            <label>Formulärversion</label>
+            <alert>Formulärversion saknas</alert>
         </form-version>
         <application-name>
-            <label todo="true">Application Name</label>
+            <label>Applikationsnamn</label>
         </application-name>
         <form-name>
-            <label todo="true">Form Name</label>
+            <label>Formulärnamn</label>
         </form-name>
         <version-comment>
-            <label todo="true">Version comment</label>
+            <label>Versionskommentar</label>
         </version-comment>
         <upload>
-            <label todo="true">Upload</label>
+            <label>Uppladdning</label>
         </upload>
         <file>
-            <label todo="true">File to import</label>
-            <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-            <alert todo="true">Missing or unsupported file</alert>
-            <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
-            <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
+            <label>Fil att importera</label>
+            <hint>Filen måste vara i Excel 2007-format (.xlsx) eller XML-format (.xml)</hint>
+            <alert>Fil saknas eller stöds inte</alert>
+            <excel-headings-format>Excel 2007 med namngivna kolumnrubriker (.xslx)</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 med namngivna områden (.xslx)</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XML-exportformat (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label todo="true">Validation</label>
-            <alert todo="true">Please start the validation before proceeding to the import</alert>
+            <label>Validering</label>
+            <alert>Starta valideringen innan du fortsätter med importen</alert>
         </validation>
         <start-validation>
-            <label todo="true">Start Validation</label>
+            <label>Starta validering</label>
         </start-validation>
-        <total todo="true">Total</total>
-        <valid todo="true">Valid</valid>
-        <invalid todo="true">Invalid</invalid>
-        <imported todo="true">[Imported]</imported>
-        <skipped todo="true">[Skipped]</skipped>
-        <eta todo="true">ETA</eta>
+        <total>Totalt</total>
+        <valid>Giltiga</valid>
+        <invalid>Ogiltiga</invalid>
+        <imported>Importerade</imported>
+        <skipped>Hoppade över</skipped>
+        <eta>Beräknad tid</eta>
         <cancel-validation>
-            <label todo="true">Cancel Validation</label>
+            <label>Avbryt validering</label>
         </cancel-validation>
-        <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+        <validation-canceled>Valideringen avbröts.</validation-canceled>
         <import>
-            <label todo="true">Import</label>
+            <label>Importera</label>
         </import>
         <existing-records>
-            <label todo="true">Existing database records</label>
-            <item id="0" todo="true">Keep</item>
-            <item id="1" todo="true">Delete</item>
+            <label>Befintliga poster i databasen</label>
+            <item id="0">Behåll</item>
+            <item id="1">Ta bort</item>
         </existing-records>
         <invalid-data>
-            <label todo="true">Records with invalid data</label>
-            <item id="0" todo="true">Skip</item>
-            <item id="1" todo="true">Import</item>
+            <label>Poster med ogiltiga data</label>
+            <item id="0">Hoppa över</item>
+            <item id="1">Importera</item>
         </invalid-data>
         <start-import>
-            <label todo="true">Start Import</label>
+            <label>Starta import</label>
         </start-import>
         <cancel-import>
-            <label todo="true">Cancel Import</label>
+            <label>Avbryt import</label>
         </cancel-import>
-        <import-canceled todo="true">Import was canceled.</import-canceled>
+        <import-canceled>Importen avbröts.</import-canceled>
         <start-over>
-            <label todo="true">Start Over</label>
+            <label>Börja om</label>
         </start-over>
         <review-data>
-            <label todo="true">Review Data</label>
+            <label>Granska data</label>
         </review-data>
-        <existing-records-message todo="true">
-            There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+        <existing-records-message>
+            Det finns {0,number,integer} befintliga {0,choice,1#dokument|1&lt;dokument} i databasen för version {3} av formuläret {1}/{2}.
         </existing-records-message>
-        <eta-message todo="true">
-            {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+        <eta-message>
+            {0,choice,0#|0&lt;{0, number, integer} timmar} {1,choice,0#|0&lt;{1, number, integer} minuter} {2,choice,0#|0&lt;{2, number, integer} sekunder}
         </eta-message>
-        <invalid-records-message todo="true">
-            {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+        <invalid-records-message>
+            {0,number,integer} av {1,number,integer} {1,choice,1#dokument|1&lt;dokument} {0,choice,1#är|1&lt;är} ogiltiga.
         </invalid-records-message>
-        <valid-records-message todo="true">
-            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+        <valid-records-message>
+            {0,number,integer} {0,choice,1#dokument|1&lt;dokument} {0,choice,1#har|1&lt;har} validerats och kommer att importeras.
         </valid-records-message>
-        <invalid-document-message todo="true">
-            The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+        <invalid-document-message>
+            Den uppladdade filen innehåller valideringsfel. Använd knappen "Granska data" för att granska och rätta felen innan du sparar.
         </invalid-document-message>
-        <valid-document-message todo="true">
-            The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+        <valid-document-message>
+            Den uppladdade filen innehåller giltiga data. Använd knappen "Granska data" för att granska formulärets data innan du sparar.
         </valid-document-message>
-        <import-complete-message todo="true">
-            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+        <import-complete-message>
+            Import av {0,number,integer} {0,choice,1#dokument|1&lt;dokument} är klar. {1,number,integer} ogiltiga {1,choice,1#dokument|1&lt;dokument} hoppades över.
         </import-complete-message>
-        <na todo="true">N/A</na>
-        <fields-found todo="true">Fields Found</fields-found>
-        <values-found todo="true">Values Found</values-found>
-        <errors todo="true">Errors</errors>
-        <warnings todo="true">Warnings</warnings>
+        <na>Ej tillämpligt</na>
+        <fields-found>Fält hittade</fields-found>
+        <values-found>Värden hittade</values-found>
+        <errors>Fel</errors>
+        <warnings>Varningar</warnings>
         <error-messages>
-            <validating todo="true">[An error occurred while validating the data.]</validating>
-            <importing todo="true">[An error occurred while importing the data.]</importing>
-            <deleting todo="true">[An error occurred while deleting the data.]</deleting>
-            <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
-            <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
-            <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
-            <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            <validating>Ett fel uppstod vid validering av data.</validating>
+            <importing>Ett fel uppstod vid import av data.</importing>
+            <deleting>Ett fel uppstod vid borttagning av data.</deleting>
+            <unauthorized>Du har inte behörighet att komma åt dessa data.</unauthorized>
+            <reading-form-data>Ett fel uppstod vid hämtning av formulärdata.</reading-form-data>
+            <reading-form-metadata>Ett fel uppstod vid läsning av formulärmetadata.</reading-form-metadata>
+            <reading-form-definition>Ett fel uppstod vid läsning av formulärdefinitionen.</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
         <menu>
-            <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
-            <logout todo="true">[Logout]</logout>
-            <login todo="true">[Login]</login>
-            <register todo="true">[Register]</register>
+            <logged-in-as>Inloggad som {0}</logged-in-as>
+            <logout>Logga ut</logout>
+            <login>Logga in</login>
+            <register>Registrera</register>
         </menu>
         <login>
-            <title todo="true">[Form Runner Login]</title>
-            <username todo="true">[Username]</username>
-            <password todo="true">[Password]</password>
-            <login todo="true">[Login]</login>
+            <title>Form Runner-inloggning</title>
+            <username>Användarnamn</username>
+            <password>Lösenord</password>
+            <login>Logga in</login>
         </login>
         <logout-done>
-            <title todo="true">[Form Runner Logout]</title>
-            <message todo="true">[You're logged out.]</message>
+            <title>Form Runner-utloggning</title>
+            <message>Du är utloggad.</message>
         </logout-done>
         <login-error>
-            <title todo="true">[Form Runner Login Error]</title>
-            <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
-            <try-again todo="true">[Please try again.]</try-again>
+            <title>Form Runner-inloggningsfel</title>
+            <unrecognized>Användarnamnet eller lösenordet du angav kunde inte kännas igen.</unrecognized>
+            <try-again>Försök igen.</try-again>
         </login-error>
     </authentication>
     <home-summary>
         <titles>
             <created>Skapad</created>
             <last-modified>Senast ändrad</last-modified>
-            <last-modified-by todo="true">[Modified By]</last-modified-by>
+            <last-modified-by>Ändrad av</last-modified-by>
             <application-name>Område</application-name>
             <form-name>Formulär</form-name>
             <version>Version</version>
@@ -698,32 +698,32 @@
             <any>[Alla]</any>
             <dates>
                 <item>
-                    <label todo="true">[Today]</label>
+                    <label>Idag</label>
                     <value>today</value>
                 </item>
                 <item>
-                    <label todo="true">[Yesterday]</label>
+                    <label>Igår</label>
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 7 days]</label>
+                    <label>Senaste 7 dagarna</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 30 days]</label>
+                    <label>Senaste 30 dagarna</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Last 90 days]</label>
+                    <label>Senaste 90 dagarna</label>
                     <value>last-90-days</value>
                 </item>
                 <item>
-                    <label todo="true">[Custom...]</label>
+                    <label>Anpassat…</label>
                     <value>custom</value>
                 </item>
             </dates>
-            <date-after todo="true">[After]</date-after>
-            <date-before todo="true">[Before]</date-before>
+            <date-after>Efter</date-after>
+            <date-before>Före</date-before>
         </search>
     </home-summary>
 </resource>

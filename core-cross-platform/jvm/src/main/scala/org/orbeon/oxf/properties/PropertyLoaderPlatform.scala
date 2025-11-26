@@ -241,7 +241,6 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
             }
           ).toJava
 
-
         val propertyStoresInIncreasingPriorityNel: NonEmptyList[Option[PropertyStore]] =
           propertyProvidersInIncreasingPriorityNel.map { provider =>
             val pcn = providerClassName(provider)
@@ -334,7 +333,6 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   // Unordered list of property providers
   private lazy val propertyProvidersOpt: Option[NonEmptyList[api.PropertyProvider]] = {
     implicit val slf4jLogger: slf4j.Logger = logger.logger
-    val res = NonEmptyList.fromList(ServiceProviderSupport.loadProviders[api.PropertyProvider]("property"))
-    res
+    NonEmptyList.fromList(ServiceProviderSupport.loadProviders[api.PropertyProvider]("property"))
   }
 }

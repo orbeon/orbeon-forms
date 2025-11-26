@@ -1,0 +1,1627 @@
+<resource xml:lang="pt">
+    <!-- Form metadata -->
+    <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+    <application-name>
+        <label>Nome da Aplicação</label>
+        <hint>Identifica um grupo de formulários, agrupado por exemplo por funcionalidade ou departamento (exemplo: vendas). Tendo um grupo de formulários, pode-se usar o nome da organização (ex. "acme"). Este nome é visível no URL do formulário publicado pelo que recomendamos o uso de minúsculas.</hint>
+        <help />
+        <alert>Use no máximo 255 letras ASCII, algarismos, "-" ou "_"</alert>
+    </application-name>
+    <form-name>
+        <label>Nome do Formulário</label>
+        <hint>Identifica este formulário específico (ex.: boletim de saúde). Este nome é visível no URL pelo que recomendamos o uso de minúsculas.</hint>
+        <help />
+        <alert>Use no máximo 255 letras ASCII, algarismos, "-" ou "_"</alert>
+        <no-form-alert>
+            Não foi encontrado nenhum formulário com este nome de aplicação e nome de formulário específicos neste sistema.
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#Um formulário|1&lt;{0,number,integer} formulários}
+            com este nome de aplicação e nome de formulário {0,choice,1#está|1&lt;estão} publicado.
+            &lt;a href="{1}" target="_blank"&gt;Ver na página de Administração.&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#Um formulário|1&lt;{0,number,integer} formulários}
+            com este nome de aplicação e nome de formulário {0,choice,1#está|1&lt;estão} em progresso.
+            &lt;a href="{1}" target="_blank"&gt;Ver na página de Sumário do Form Builder.&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>Título do Formulário</label>
+        <hint>Título do formulário na língua actual</hint>
+    </title>
+    <description>
+        <label>Descrição do Formulário</label>
+        <hint>Descrição do formulário na língua actual</hint>
+    </description>
+    <logo>
+        <label>Logotipo</label>
+        <hint>O logotipo que aparece to topo do formulário</hint>
+    </logo>
+    <general-settings>
+        <label>Configurações Gerais</label>
+    </general-settings>
+    <custom-settings>
+        <label>Configurações Personalizadas</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>Cortar</label>
+    </cut>
+    <copy>
+        <label>Copiar</label>
+    </copy>
+    <paste>
+        <label>Colar</label>
+    </paste>
+    <undo-redo>
+        <undo>Desfazer {0}</undo>
+        <redo>Refazer {0}</redo>
+        <insert>inserir</insert>
+        <rename>renomear</rename>
+        <delete-control>apagar controlo</delete-control>
+        <delete-container>apagar contentor</delete-container>
+        <merge-section-template>fundir modelo de secção</merge-section-template>
+        <move-control>mover controlo</move-control>
+        <move-container>mover contentor</move-container>
+        <update-settings>actualizar configurações</update-settings>
+        <insert-control>inserir controlo</insert-control>
+        <insert-section>inserir secção</insert-section>
+        <insert-grid>inserir grelha</insert-grid>
+        <delete-row>apagar linha</delete-row>
+        <insert-row>inserir linha</insert-row>
+        <control-settings>configurações do controlo</control-settings>
+        <move-wall>mover parede</move-wall>
+        <split-cell>dividir célula</split-cell>
+        <merge-cell>fundir célula</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>Fundir Modelo de Secção</label>
+    </merge-section>
+    <form-structure>
+        <label>Estrutura do Formulário</label>
+    </form-structure>
+    <controls>
+        <label>Controlos</label>
+    </controls>
+    <i18n>
+        <label>Internacionalização</label>
+    </i18n>
+    <language>
+        <label>Língua Actual</label>
+    </language>
+    <advanced>
+        <label>Avançado</label>
+    </advanced>
+    <attachments>
+        <label>Anexos</label>
+    </attachments>
+    <services-actions>
+        <label>Serviços &amp; Acções</label>
+    </services-actions>
+    <http-services>
+        <label>Serviços HTTP</label>
+    </http-services>
+    <database-services>
+        <label>Serviços de Base de Dados</label>
+    </database-services>
+    <actions>
+        <label>Acções</label>
+    </actions>
+    <new-section>
+        <label>Nova secção</label>
+    </new-section>
+    <new-grid>
+        <label>Nova Grelha</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>Nova Grelha Repetida</label>
+    </new-repeated-grid>
+    <change-schema>
+        <label>Alterar o Schema</label>
+    </change-schema>
+    <upload-schema>
+        <label>XML Schema</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>Anexar o PDF</label>
+    </pdf-templates>
+    <change-css>
+        <label>Alterar o CSS</label>
+    </change-css>
+    <upload-css>
+        <label>Anexar o CSS</label>
+    </upload-css>
+    <show-source>
+        <label>Mostrar a fonte</label>
+    </show-source>
+    <edit-source>
+        <label>Alterar a fonte</label>
+    </edit-source>
+    <permissions>
+        <label>Dar permissões</label>
+    </permissions>
+    <reload-components>
+        <label>Recarregar as Ferramentas</label>
+    </reload-components>
+    <library-version>
+        <label>Versão da Biblioteca</label>
+        <item>
+            <label>Versão {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>Clique aqui para adicionar um título à secção</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>Escreva aqui o título para a secção</label>
+    </type-section-title>
+    <enter-label>
+        <label>Clique aqui para introduzir uma label</label>
+    </enter-label>
+    <type-label>
+        <label>Escreva aqui o conteúdo da sua label</label>
+    </type-label>
+    <enter-hint>
+        <label>Clique para introduzir uma pista</label>
+    </enter-hint>
+    <type-hint>
+        <label>Escreva aqui a sua pista</label>
+    </type-hint>
+    <enter-text>
+        <label>Clique para introduzir texto</label>
+    </enter-text>
+    <type-text>
+        <label>Escreva aqui o seu texto</label>
+    </type-text>
+    <click-cell>
+        <label>Clique para seleccionar esta célula</label>
+    </click-cell>
+    <insert-control>
+        <label>Use as ferramentas para introduzir um controlo novo</label>
+    </insert-control>
+    <edit-items>
+        <label>Alterar escolhas</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>Expandir horizontalmente</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>Dividir horizontalmente</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>Expandir verticalmente</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>Dividir verticalmente</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>Apagar Controlo</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>Arrastar e largar para mover ou copiar</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>Apagar Secção</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>Apagar Linha</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>Apagar Coluna</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>Adicionar coluna à esquerda</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>Adicionar coluna à direita</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>Adicionar Linha Acima</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>Adicionar Linha Abaixo</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>Configurações da secção</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>Configurações da grelha</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>Mover para Cima</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>Mover para Baixo</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>Mover para a Direita</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>Mover para a Esquerda</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>Configurações do Controlo</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>Mudar a aparência</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>Alterar a Ajuda</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>Adicionar</label>
+    </add>
+    <remove>
+        <label>Remover</label>
+    </remove>
+    <edit>
+        <label>Alterar</label>
+    </edit>
+    <classes>
+        <label>Classes CSS Personalizadas</label>
+    </classes>
+    <autocomplete>
+        <label>Atributo de preenchimento automático</label>
+        <groups>
+            <general>Geral</general>
+            <name>Nome e Título</name>
+            <credentials>Credenciais</credentials>
+            <address>Morada</address>
+            <contact>Contacto</contact>
+            <payment>Pagamento</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">Usar propriedade</item>
+        <item id="1">Sim</item>
+        <item id="2">Não</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>Continuar</label>
+    </continue>
+    <apply>
+        <label>Aplicar</label>
+    </apply>
+    <cancel>
+        <label>Cancelar</label>
+    </cancel>
+    <close>
+        <label>Fechar</label>
+    </close>
+    <delete>
+        <label>Apagar</label>
+    </delete>
+    <or>
+        <label>ou</label>
+    </or>
+    <errors>
+        <label>Erros</label>
+    </errors>
+    <error-summary>
+        <label>{1,choice,
+            0#Nenhuma mensagem|
+            1#'{0,choice,0#Erro|1#Aviso|2#Mensagem informativa|3#Mensagem}'|
+            1&lt;'{0,choice,0#Erros|1#Avisos|2#Mensagens informativas|3#Mensagens}'}</label>
+    </error-summary>
+    <back-to-summary>
+        <label>Voltar à Lista de Formulários</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">[Fixed View]</item>
+        <item id="1">[Fluid View]</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Usar sugestão: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>Nome</label>
+                <alert>Valor em falta ou incorrecto</alert>
+            </name>
+            <xpath>
+                <label>Fórmula</label>
+                <alert>Fórmula em falta ou incorrecta</alert>
+            </xpath>
+            <control>
+                <label>Controlo</label>
+                <alert>Valor em falta</alert>
+            </control>
+            <token>
+                <label>Gerar parâmetro de URL de token</label>
+            </token>
+            <type>
+                <item id="0">Valor de Controlo</item>
+                <item id="1">Fórmula</item>
+                <item id="2">Todos os Valores de Controlo</item>
+                <choice label="Ligação">
+                    <item id="3">Página de edição</item>
+                    <item id="4">Página de visualização</item>
+                    <item id="5">Nova página</item>
+                    <item id="6">Página de sumário</item>
+                    <item id="7">Página inicial</item>
+                    <item id="9">Página de formulários publicados</item>
+                    <item id="10">Administração de formulários</item>
+                    <item id="8">Ficheiro PDF</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>Configurações do Formulário</label>
+        <save-as>Guardar como…</save-as>
+        <open><label>Configurações do Formulário</label></open>
+        <options>Opções do Formulário</options>
+        <view-options>Aparência</view-options>
+        <wizard-options>Assistente</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Configurações de Controlo</control-settings>
+        <about>Sobre este Formulário</about>
+        <stats>Estatística do Formulário</stats>
+        <sections>Secções</sections>
+        <repeats>Repetições</repeats>
+        <grids>Grelhas</grids>
+        <section-templates>Templates da Secção</section-templates>
+        <controls>Controlos</controls>
+        <all>Todos</all>
+        <use-property>Usar propriedade</use-property>
+        <singleton>
+            <label>Formulário único</label>
+            <hint>Impedir utilizadores de criar dados de formulário adicionais se tiverem acesso a dados de formulário existentes para esta definição de formulário</hint>
+        </singleton>
+        <allow-template-use>
+            <label>Permitir uso como modelo de formulário</label>
+            <hint>Se seleccionado, este formulário aparecerá na lista de modelos de formulário</hint>
+        </allow-template-use>
+        <wizard>
+            <label>Vista de Assistente</label>
+            <hint>Mostrar secções de nível superior como páginas de assistente separadas</hint>
+        </wizard>
+        <wizard-mode>
+            <label>Modo de Validação de Navegação do Assistente</label>
+            <hint>Como a navegação do assistente se comporta quando os dados não são válidos</hint>
+            <item id="0">Usar propriedade</item>
+            <item id="1">Livre</item>
+            <item id="2">Relaxado</item>
+            <item id="3">Estrito</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>Navegação de Subsecções do Assistente</label>
+            <hint>Se o assistente permite navegação para secções e grelhas dentro de secções de nível superior</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>Wizard Subsections Table of Contents</label>
+            <hint>How the wizard table of contents shows subsections</hint>
+            <item id="0">Use property</item>
+            <item id="1">Show Subsections for the Active Section Only</item>
+            <item id="2">Show Subsections for All Sections</item>
+            <item id="3">Don't Show Subsections</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>Índice Separado do Assistente</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>Mostrar Sempre Estado da Secção do Assistente</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>Tamanho Máximo de Anexo por Ficheiro</label>
+            <hint>Também pode ser definido por controlo nas Configurações de Controlo</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>Tamanho Máximo Agregado de Anexos</label>
+            <hint>Aplica-se a todos os controlos de anexo neste formulário</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>Número máximo de ficheiros por controlo de anexos</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>Número mínimo de ficheiros por controlo de anexos</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>Tipos de Ficheiro Permitidos</label>
+            <hint>Por exemplo "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>Aparência das Etiquetas de Controlo</label>
+        </labels>
+        <hints>
+            <label>Aparência das Dicas de Controlo</label>
+        </hints>
+        <automatic-hints>
+            <label>Usar Dicas Automáticas</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">Usar propriedade</item>
+            <item id="1">Em linha</item>
+            <item id="2">Tooltip</item>
+        </appearances>
+        <placeholders>
+            <label>Usar Marcador de Posição para Campos e Áreas de Texto</label>
+        </placeholders>
+        <data-migration>
+            <label>Migração Simples de Dados</label>
+            <hint>Adicionar/remover automaticamente elementos em falta nos dados</hint>
+            <item id="0">Usar propriedade</item>
+            <item id="1">Activado</item>
+            <item id="2">Desactivado</item>
+            <item id="3">Gerar um erro</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>Ordem de Tabulação da Grelha</label>
+            <item id="0">Usar propriedade</item>
+            <item id="1">Linhas</item>
+            <item id="2">Colunas</item>
+        </grid-tab-order>
+        <time-window>
+            <label>Janela Temporal</label>
+            <available>
+                <available-from>
+                    <label>Criação apenas disponível a partir de data específica</label>
+                    <date>Data e hora de início</date>
+                    <message>Mensagem pendente</message>
+                </available-from>
+                <available-to>
+                    <label>Criação apenas disponível até data específica</label>
+                    <date>Data e hora de fim</date>
+                    <message>Mensagem expirada</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>Orientação da página PDF</label>
+            <hint />
+            <item id="default">Usar propriedade</item>
+            <item id="portrait">Retrato</item>
+            <item id="landscape">Paisagem</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>Tamanho da página PDF</label>
+            <hint />
+            <item id="default">Usar propriedade</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">Carta</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>Cálculos em Modos de Apenas Leitura (Revisão, PDF)</label>
+            <hint />
+            <item id="default">Usar propriedade</item>
+            <item id="false">Activar</item>
+            <item id="true">Desactivar</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>Disposição da Página do Navegador</label>
+            <hint>Se o formulário tem largura fixa ou fluida</hint>
+            <item id="0">Usar propriedade</item>
+            <item id="1">Largura fixa</item>
+            <item id="2">Largura fluida</item>
+        </html-page-layout>
+        <density>
+            <label>Densidade</label>
+            <hint>Espaçamento entre elementos na interface</hint>
+            <item id="0">Usar propriedade</item>
+            <item id="1">Compacto</item>
+            <item id="2">Confortável</item>
+            <item id="3">Espaçoso</item>
+        </density>
+        <analysis-calculate>
+            <label>Dependências de Cálculos Automáticos</label>
+            <hint>Determinar automaticamente a ordem de avaliação para fórmulas de "Valor Calculado" e "Valor Inicial"</hint>
+        </analysis-calculate>
+        <versions>Versões</versions>
+        <current-version>Versão Actual</current-version>
+        <created-with-version>Criado com Versão</created-with-version>
+        <updated-with-versions>Actualizado com Versões</updated-with-versions>
+        <thumbnail>
+            <label>Miniatura do Formulário</label>
+            <hint>Usada para modelos de formulário e a página de destino</hint>
+        </thumbnail>
+        <default-template>Modelo Predefinido</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>Configurações do Controlo: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>Configurações Básicas</label></tab-base>
+        <tab-validations><label>Validações e Alertas</label></tab-validations>
+        <tab-formulas><label>Fórmulas</label></tab-formulas>
+        <control-name>
+            <label>Nome do Controlo</label>
+            <alert>O nome está incorrecto ou já existe um outro controlo com o mesmo nome</alert>
+            <hint>Ex.: "primeiro-nome"</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>Nome do campo PDF</label>
+            <alert>Nome de campo PDF desconhecido</alert>
+            <item id="0">Automático</item>
+            <item id="1">Personalizado</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Nome do intervalo do Excel</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>Controlo de índice</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>Mostrar no Resumo</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>Permitir edição em massa</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>Por defeito, ordenar por esta coluna</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>Encriptar dados em repouso</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>Não mostrar na página de Sumário</do-not-show>
+            <show>Mostrar na página de Sumário</show>
+            <column-only>Mostrar apenas coluna</column-only>
+            <search-only>Mostrar apenas pesquisa</search-only>
+        </summary-show>
+        <role>
+            <restrict>Restringir a papel</restrict>
+            <all>Todos</all>
+            <any>Qualquer</any>
+            <of-the-following>dos seguintes:</of-the-following>
+            <empty>Papel vazio</empty>
+            <duplicate>Papel duplicado</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>Guardar dados</save-data>
+            <run-process>Executar Processo</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>Ascendente</ascending>
+            <descending>Descendente</descending>
+            <conflict>Activar ordenação neste controlo irá desactivá-la no seguinte controlo: {0}</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>Aparência do Controlo</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>Remover espaços iniciais e finais</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+        <types>
+            <label>Tipo de Dados</label>
+        </types>
+        <builtin-type>
+            <label>Tipos Embutidos</label>
+            <hint>Tipos de dados embutidos</hint>
+
+            <use-schema-type>Use schema type</use-schema-type>
+            <use-component-type>Usar tipo predefinido</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>Comuns</label>
+                    <type label="String">string</type>
+                    <type label="Boolean">boolean</type>
+                    <type label="Email address">email</type>
+                </choices>
+                <choices>
+                    <label>Numéricos</label>
+                    <type label="Decimal">decimal</type>
+
+                    <type label="Integer">integer</type>
+                    <type label="Positive integer">positiveInteger</type>
+                    <type label="Non-positive integer">nonPositiveInteger</type>
+                    <type label="Negative integer">negativeInteger</type>
+                    <type label="Non-negative integer">nonNegativeInteger</type>
+
+                    <type label="Simple-precision floating-point">float</type>
+                    <type label="Double-precision floating-point">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Datas</label>
+                    <type label="Date">date</type>
+                    <type label="Time">time</type>
+                    <type label="Date and time">dateTime</type>
+                    <type label="Duration">duration</type>
+                    <type label="Year and month">gYearMonth</type>
+                    <type label="Month and day">gMonthDay</type>
+                    <type label="Year">gYear</type>
+                    <type label="Month">gMonth</type>
+                    <type label="Day">gDay</type>
+                </choices>
+                <choices>
+                    <label>XML</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="XML qualified name">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>Outros</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Base64-encoded binary">base64Binary</type>
+                    <type label="Hexadecimal-encoded binary">hexBinary</type>
+                    <type label="URI">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>Schema</label>
+            <hint>Tipo de dados de um schema importado</hint>
+        </schema-type>
+        <required>
+            <label>Obrigatório</label>
+            <hint>Indica se é ou não obrigatório</hint>
+            <item id="0">Sim</item>
+            <item id="1">Não</item>
+            <item id="2">XPath</item>
+        </required>
+        <constraint>
+            <item id="formula">Fórmula</item>
+            <item id="max-length">Comprimento Máximo</item>
+            <item id="min-length">Comprimento Mínimo</item>
+            <item id="positive">Positivo</item>
+            <item id="non-negative">Positivo ou Zero</item>
+            <item id="non-positive">Negativo ou Zero</item>
+            <item id="negative">Negativo</item>
+            <item id="fraction-digits">Dígitos Fraccionários Máximos</item>
+            <item id="upload-max-size-per-file" multiple="false">Tamanho Máximo de Anexo</item>
+            <item id="upload-max-size-per-file" multiple="true">Tamanho Máximo de Anexo por Ficheiro</item>
+            <item id="upload-max-size-aggregate-per-control">Tamanho Máximo Agregado de Anexos</item>
+            <item id="upload-max-files-per-control">Número máximo de arquivos por controle</item>
+            <item id="upload-min-files-per-control">Número mínimo de arquivos por controle</item>
+            <item id="upload-mediatypes">Tipos de Ficheiro Suportados</item>
+            <item id="excluded-dates">Datas a Excluir</item>
+        </constraint>
+        <formula>
+            <label>Fórmula</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath do tipo Boolean</hint>
+        </formula>
+        <integer-argument>
+            <label>Valor Inteiro</label>
+            <alert>Valor Incorrecto</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>Editar parâmetros do modelo de alerta</edit-label>
+            <dialog-label>Parâmetros do modelo de alerta</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>Visibilidade</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath do tipo Boolean</hint>
+            <help>
+                &lt;p&gt;
+                    Permite especificar se o controlo do formulário está visível ou não.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Sim:&lt;/b&gt; O controlo do formulário está visível.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Não:&lt;/b&gt; O controlo do formulário está oculto.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Fórmula:&lt;/b&gt; O controlo do formulário está visível ou oculto dinamicamente dependendo de uma fórmula.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    A fórmula permite especificar dinamicamente se o controlo do formulário está visível ou não. Deve retornar um valor booleano.
+                    O controlo do formulário está visível se a fórmula avaliar para &lt;code&gt;true()&lt;/code&gt;, e oculto se avaliar para &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pode referir-se a outros controlos do formulário na fórmula usando os seus nomes precedidos por um sinal &lt;code&gt;$&lt;/code&gt;.
+                    Ao introduzir o sinal &lt;code&gt;$&lt;/code&gt;, é apresentada uma lista de controlos de formulário disponíveis.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações sobre fórmulas, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>Apenas Leitura</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath do tipo Boolean</hint>
+            <help>
+                &lt;p&gt;
+                    Permite especificar se o controlo do formulário é apenas de leitura ou de leitura-escrita.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Sim:&lt;/b&gt; O controlo do formulário é apenas de leitura.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Não:&lt;/b&gt; O controlo do formulário é de leitura-escrita.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Fórmula:&lt;/b&gt; O controlo do formulário é apenas de leitura ou de leitura-escrita dinamicamente dependendo de uma fórmula.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    A fórmula permite especificar dinamicamente se o controlo do formulário é apenas de leitura ou de leitura-escrita. Deve retornar um valor booleano.
+                    O controlo do formulário é apenas de leitura se a fórmula avaliar para &lt;code&gt;true()&lt;/code&gt;, e de leitura-escrita se avaliar para &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pode referir-se a outros controlos do formulário na fórmula usando os seus nomes precedidos por um sinal &lt;code&gt;$&lt;/code&gt;.
+                    Ao introduzir o sinal &lt;code&gt;$&lt;/code&gt;, é apresentada uma lista de controlos de formulário disponíveis.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações sobre fórmulas, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>Valor Inicial</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath</hint>
+            <help>
+                &lt;p&gt;
+                    Esta fórmula permite especificar um valor inicial para o controlo do formulário apenas no modo "novo".
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pode referir-se a outros controlos do formulário na fórmula usando os seus nomes precedidos por um sinal &lt;code&gt;$&lt;/code&gt;.
+                    Ao introduzir o sinal &lt;code&gt;$&lt;/code&gt;, é apresentada uma lista de controlos de formulário disponíveis.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações sobre fórmulas, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>Valor Calculado</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath</hint>
+            <help>
+                &lt;p&gt;
+                    Esta fórmula permite especificar um valor calculado para o controlo do formulário.
+                    Este valor é reavaliado para permanecer actualizado conforme necessário.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pode referir-se a outros controlos do formulário na fórmula usando os seus nomes precedidos por um sinal &lt;code&gt;$&lt;/code&gt;.
+                    Ao introduzir o sinal &lt;code&gt;$&lt;/code&gt;, é apresentada uma lista de controlos de formulário disponíveis.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações sobre fórmulas, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>Etiqueta</label>
+        </control-label>
+        <control-hint>
+            <label>Dica</label>
+        </control-hint>
+        <control-help>
+            <label>Mensagem de Ajuda</label>
+            <hint>É mostrada quando a ajuda é activada</hint>
+        </control-help>
+        <control-text>
+            <label>Texto Explicativo</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>Etiqueta Curta</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>Etiqueta de Iteração</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>Etiqueta de Adicionar Repetição</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>Texto de Remover Repetição</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>Mensagem de Alerta</label>
+            <hint>DÉ mostrada quando o alerta está activo</hint>
+        </alert>
+        <default-alert>
+            <label>Mensagem de alerta por defeito</label>
+            <hint>É activada quando não existe uma mensagem de alerta mais específica</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>Usar mensagens de alerta por defeito globais</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>Usar mensagens de alerta por defeito</label>
+        </use-default-alert>
+        <validation-type><label>Tipo de Validação</label></validation-type>
+        <validation-details><label>Detalhes de Validação</label></validation-details>
+        <level><label>Nível</label></level>
+        <use-html>Usar HTML</use-html>
+        <parameters>Parâmetros de Modelo</parameters>
+        <automatic-hint>
+            <label>Usar dica automática</label>
+            <hint>Adiciona uma dica baseada no Tamanho Máximo de Ficheiro e Tipos de Ficheiro Suportados que possa ter especificado no separador Validações e Alertas</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>Selecção aberta</label>
+            <hint>Se activado, os utilizadores podem introduzir o seu próprio valor, e o valor (texto armazenado nos dados) é também usado como etiqueta (texto apresentado na lista pendente)</hint>
+        </open-selection>
+        <store-label>
+            <label>Armazenar etiqueta</label>
+            <hint>Se activado, a etiqueta seleccionada é armazenada juntamente com os dados</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">Usar predefinição</item>
+            <item id="1">Sim</item>
+            <item id="2">Não</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>{0,choice,0#Configurações da Secção: "{2}" / "{1}"|1#Configurações da Grelha: "{1}"}</label>
+        <control-name>
+            <label>Nome</label>
+            <alert>O Nome é incorrecto ou já existe</alert>
+            <hint>Ex.: "morada"</hint>
+        </control-name>
+        <grid-columns>
+            <label>Número de colunas da grelha</label>
+        </grid-columns>
+        <grid-rows>
+            <label>Número de linhas da grelha</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>Ordem de Tabulação da Grelha</label>
+            <item id="0">Predefinição</item>
+            <item id="1">Linhas</item>
+            <item id="2">Colunas</item>
+        </grid-tab-order>
+        <options>
+            <label>Opções</label>
+            <item>
+                <label>Inicialmente Aberto</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>Quebra de Página Antes</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>Recolhível</label>
+        </collapsible>
+        <visibility>
+            <label>Visibilidade</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath do tipo Boolean</hint>
+        </visibility>
+        <readonly>
+            <label>Apenas Leitura</label>
+            <alert>Expressão de XPath incorrecta</alert>
+            <hint>Expressão XPath do tipo Boolean</hint>
+        </readonly>
+        <repeat>
+            <label>Repetir conteúdo</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>Permitir ao utilizador adicionar, remover ou mover repetições</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>Mostrar número de repetição</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>Mostrar uma repetição de cada vez no assistente</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label> Nome da Iteração Personalizado</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>Nome da Iteração Personalizado</label>
+            <alert>O nome é incorrecto ou já está a ser utilizado</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>Valor mínimo de repetições</label>
+            <alert>Valor Incorrecto</alert>
+            <hint>Número não negativo</hint>
+        </min>
+        <max>
+            <label>Número máximo de repetições</label>
+            <alert>Valor incorrecto</alert>
+            <hint>Número positivo</hint>
+        </max>
+        <freeze>
+            <label>Congelar Repetições</label>
+            <alert>Valor incorrecto</alert>
+            <hint>Número não negativo até ao número mínimo de repetições (ver acima), ou uma expressão XPath</hint>
+        </freeze>
+        <no-freeze>Sem congelamento</no-freeze>
+        <appearance-minimal>
+            <label>Aparência simplificada</label>
+            <hint>Mostrar botões básicos de adicionar/remover sem menu ou reordenação</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>Aplicar fórmulas de valor inicial ao adicionar iterações</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>Número inicial de iterações usa modelo</label>
+        </initial-iterations>
+        <other>Outros</other>
+        <one>Uma repetição</one>
+        <unlimited>Ilimitado</unlimited>
+        <no-minimum>Sem mínimo</no-minimum>
+        <tab-base><label>Configurações Básicas e Fórmulas</label></tab-base>
+        <tab-repeat><label>Conteúdo Repetido</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>Confirmar</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>Nomes de Controlo</label>
+        <prefix>
+            <label>Prefixo</label>
+        </prefix>
+        <suffix>
+            <label>Sufixo</label>
+        </suffix>
+        <original-name>
+            <label>Nome Original</label>
+        </original-name>
+        <new-name>
+            <label>Novo Nome</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>Publicar Formulário</label>
+        <publish>Publicar</publish>
+        <publish-success>A definição de formulário foi publicada com sucesso com número de versão {1,number,integer}, {0,choice,0#sem anexos|1#com 1 anexo|1&lt;com {0,number,integer} anexos}.</publish-success>
+        <publish-error>Ocorreu um erro na publicação.</publish-error>
+        <latest-published-version>Última versão publicada</latest-published-version>
+        <create-new-version-item>criar uma nova definição de formulário com número de versão {0,number,integer}</create-new-version-item>
+        <overwrite-version-item>substituir a definição de formulário actual pela versão com número {0,number,integer} ({1,choice,0#indisponível|1#disponível})</overwrite-version-item>
+        <create-new-version-help>
+            ATENÇÃO: A publicação desta definição do formulário irá criar uma nova versão da definição do formulário na
+            base de dados. Os dados já existentes na base de dados continuarão a ser visualizados e editados com as versões anteriores
+            desta definição de formulário a que os dados estão associados. A nova versão de definição de formulário
+            será utilizada para criar novos dados.
+        </create-new-version-help>
+        <overwrite-version-help>
+            ATENÇÃO: Irá substituir a definição do formulário existente. Se as alterações feitas à definição do formulário forem pequenas,
+            como alterar rótulos de controlos, a nova definição do formulário será compatível com dados do formulário existentes.
+            Mas se você tiver efectuado alterações estruturais, como adicionar, remover, renomear ou mover controlos, a definição do formulário
+            poderá ser incompatível com os dados existentes. Recomendamos que tenha cuidado ao substituir uma versão de definição de formulário existente.
+        </overwrite-version-help>
+        <open-summary>Abrir a página de resumo do formulário submetido</open-summary>
+        <open-new>Abrir uma nova página de um formulário publicado</open-new>
+        <version>Versão</version>
+        <available>Tornar formulário publicado disponível</available>
+        <comment>Comentário</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>Adicionar língua</label>
+        <new-language>
+            <label>Adicionar a língua seguinte</label>
+        </new-language>
+        <common>Línguas mais comuns</common>
+        <all>Outras línguas</all>
+        <add-language>
+            <label>Adicionar língua</label>
+        </add-language>
+        <remove-language>
+            <label>Remover língua</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>Pesquisar Controlos</label>
+        <open-settings>
+            <label>Abrir Diálogo de Configurações</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>Carregar o XML Schema</label>
+        <schema-type>
+            <label>Tipos de Schema Disponíveis</label>
+            <hint>Os tipos simples disponíveis no schema carregado</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>Schema Namespace URI</label>
+            <hint>Este é o namespace URI do schema carregado</hint>
+        </namespace-uri>
+        <operations>
+            <label>Operações</label>
+        </operations>
+        <delete-schema>
+            <label>Apagar o XML Schema existente</label>
+        </delete-schema>
+        <change-schema>
+            <label>Alterar o XML Schema</label>
+        </change-schema>
+        <replace-schema>
+            <label>Substituir o XML Schema</label>
+        </replace-schema>
+        <upload-schema>
+            <label>Anexar o XML Schema</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>O seu schema não tem tipos simples. Não conseguirá seleccionar tipos deste schema para validação.</no-simple-types>
+            <has-includes>O seu schema contém imports ou includes. Estes vão-se tornar inválidos.</has-includes>
+            <not-a-schema>O ficheiro carregado não é um schema válido.</not-a-schema>
+            <new-schema-information>Nova Informação de Schema</new-schema-information>
+            <existing-schema-information>Informação de Schema Existente</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>Fonte</label>
+        <source>
+            <alert>Por favor verifique que o conteúdo é um XML bem formado.</alert>
+        </source>
+    </dialog-edit-source>
+    <dialog-view-source>
+        <label>Ver Fonte</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>Anexar um template PDF</label>
+        <pdf-upload>
+            <label>Ficheiro PDF</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>Nome</label>
+        </attachment-name>
+        <attachment-language>
+            <label>Língua</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>Alterar Escolhas</label>
+        <resources-language>
+            <label>Línguas dos Recursos</label>
+        </resources-language>
+        <label-header>
+            <label>Label</label>
+        </label-header>
+        <value-header>
+            <label>Valor</label>
+        </value-header>
+        <hint-header>
+            <label>Pista</label>
+        </hint-header>
+        <clear-value>
+            <label>Limpar Valor</label>
+        </clear-value>
+        <remove-all>
+            <label>Remover Tudo</label>
+        </remove-all>
+        <filter>
+            <label>Fórmula de Filtro</label>
+        </filter>
+        <itemsetid-mode>
+            <label>Usar opções dos metadados</label>
+            <item id="0">Quando o controle é o alvo de uma ação (padrão)</item>
+            <item id="1">Sempre</item>
+            <item id="2">Nunca</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>Editor do serviço HTTP</label>
+        <tab-definition><label>Definição</label></tab-definition>
+        <tab-advanced><label>Avançado</label></tab-advanced>
+        <tab-test><label>Resultados do Teste</label></tab-test>
+        <url-parameters><label>Parâmetros de URL</label></url-parameters>
+        <parameter-name><label>Nome</label></parameter-name>
+        <parameter-default-value><label>Valor Predefinido</label></parameter-default-value>
+        <no-headers>Nenhum cabeçalho recebido.</no-headers>
+        <service-name>
+            <label>Nome do Serviço</label>
+            <hint>Escolha um nome único para este serviço</hint>
+        </service-name>
+        <service-performs-search>
+            <label>Serviço efectua pesquisa</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>Serviço suporta paginação</label>
+        </service-supports-paging>
+        <resource>
+            <label>Recurso URL</label>
+            <hint>HTTP URL no qual o serviço reside</hint>
+        </resource>
+        <method>
+            <label>Método</label>
+        </method>
+        <serialization>
+            <label>Serialização</label>
+        </serialization>
+        <soap-submission>
+            <label>Serviço SOAP</label>
+            <hint>Indica se é um serviço SOAP</hint>
+        </soap-submission>
+        <soap-action>
+            <label>Acção SOAP</label>
+            <hint>Cabeçalho de acção SOAP opcional</hint>
+        </soap-action>
+        <http-authentication>
+            <label>Autenticação HTTP</label>
+            <hint>Autenticação HTTP</hint>
+        </http-authentication>
+        <username>
+            <label>Utilizador</label>
+        </username>
+        <password>
+            <label>Palavra-Passe</label>
+        </password>
+        <request-body>
+            <label>Corpo do Pedido</label>
+            <hint>dados XML (pode ser um envelope SOAP)</hint>
+        </request-body>
+        <is-binary-response>
+            <label>Resposta do Serviço tem Conteúdo Binário</label>
+            <hint>Seleccione esta opção se a resposta for usada para definir um valor de controlo de anexo</hint>
+        </is-binary-response>
+        <response>
+            <label>Resposta</label>
+        </response>
+        <error-type>
+            <label>Tipo de Erro</label>
+            <item>
+                <label>Submissão a decorrer</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>Sem dados</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>Erro de validação</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>Erro de recursos</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>Erro de Alvo</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>Erro interno</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>Recurso URL</label>
+        </resource-uri>
+        <status-code>
+            <label>Código do Estado</label>
+        </status-code>
+        <headers>
+            <label>Cabeçalhos</label>
+        </headers>
+        <header-name>
+            <label>Nome</label>
+        </header-name>
+        <header-value>
+            <label>Valor(es)</label>
+        </header-value>
+        <response-body>
+            <label>Corpo da Resposta</label>
+        </response-body>
+        <xml-response-body>
+            <label>Corpo da Resposta XML</label>
+        </xml-response-body>
+        <save>
+            <label>Guardar</label>
+        </save>
+        <test>
+            <label>Testar</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>Editor de Serviço de Base de Dados</label>
+        <service-name>
+            <label>Nome do Serviço</label>
+            <hint>Escolha um nome único para este serviço</hint>
+        </service-name>
+        <datasource>
+            <label>Fonte de Dados</label>
+            <hint> Fonte de dados JNDI para este serviço</hint>
+        </datasource>
+        <query>
+            <label>Query SQL </label>
+            <hint>Query SQL que pode conter espaços reservados a parâmetros</hint>
+        </query>
+        <save>
+            <label>Guardar</label>
+        </save>
+        <test>
+            <label>Testar</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>Editor de Acções</label>
+        <service-name>
+            <label>Nome da Acção</label>
+            <hint>Escolha um nome único para esta acção</hint>
+        </service-name>
+        <observer-type>
+            <label>Executar acção quando</label>
+            <item id="0">
+                <label>controlo</label>
+            </item>
+            <item id="1">
+                <label>o formulário é carregado</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>altera o seu valor</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>aparece</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>desaparece</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>é activado</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>antes do cálculo dos valores iniciais dos dados</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>depois dos dados estarem prontos</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>depois dos controlos estarem prontos</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <!--<event-type>-->
+            <!--<label>Reagir a</label>-->
+            <!--<hint>Evento (num controlo ou global) ao qual reagir</hint>-->
+            <!--<item id="0">-->
+                <!--<label>Mudança de valor</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="1">-->
+                <!--<label todo="true">Mudança de valor ou carregamento de formulário</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="2">-->
+                <!--<label>Activação</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="3">-->
+                <!--<label todo="true">Carregamento de Formulário (after controls ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="4">-->
+                <!--<label todo="true">Carregamento de Formulário (before data ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="5">-->
+                <!--<label todo="true">Carregamento de Formulário (after data ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+        <!--</event-type>-->
+        <event-condition>
+            <label>Condição</label>
+            <item id="always">Correr sempre</item>
+            <item id="new-only">Correr apenas em criação</item>
+            <item id="formula">Quando a fórmula é avaliada como "true"</item>
+            <formula>Fórmula</formula>
+        </event-condition>
+        <event-control>
+            <label>Controlo</label>
+        </event-control>
+        <service-to-call>
+            <label>Serviço a chamar</label>
+            <hint>Serviço a chamar quando o evento ocorre</hint>
+        </service-to-call>
+        <source>
+            <label>Origem</label>
+        </source>
+        <destination>
+            <label>Destino</label>
+        </destination>
+        <source-control>
+            <label>Controlo de fontes </label>
+        </source-control>
+        <destination-xpath>
+            <label>Expressão XPath de destino</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>Número do parâmetro</label>
+        </parameter-number>
+        <response-values>
+            <label>Atribuir valores de controlo à resposta</label>
+        </response-values>
+        <destination-control>
+            <label>Controlo de Destino</label>
+        </destination-control>
+        <source-xpath>
+            <label>Expressão fonte de XPath</label>
+        </source-xpath>
+        <response-itemset>
+            <label>Atribuir items aos controlos seleccionados da resposta</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>Controlo de selecção de resposta</label>
+        </destination-selection-control>
+        <items>
+            <label>Items</label>
+            <hint>Expressão XPath que retorna um nodo para cada item</hint>
+        </items>
+        <item-label>
+            <label>Label</label>
+            <hint>Expressão XPath relativa a um item de um nodo</hint>
+        </item-label>
+        <item-value>
+            <label>Valor</label>
+            <hint>Expressão XPath relativa a um item de um nodo</hint>
+        </item-value>
+        <item-hint>
+            <label>Fórmula de sugestão</label>
+            <hint>Relativa ao nodo de escolha</hint>
+        </item-hint>
+        <is-last-page>
+            <label>Fórmula de última página</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>Seleccionar automaticamente escolha única</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>Guardar</label>
+        </save>
+        <test>
+            <label>Testar</label>
+        </test>
+
+        <general-settings>Definições Gerais</general-settings>
+        <service-request-actions>Acções de Pedido de Serviço</service-request-actions>
+        <service-response-actions>Acções de Resposta de Serviço</service-response-actions>
+
+        <set-control-value>Definir valor de controle</set-control-value>
+        <set-control-itemset>Definir Lista de Items do Controlo</set-control-itemset>
+        <save-to-dataset>Guardar no Conjunto de Dados</save-to-dataset>
+        <dataset-name>Nome do Conjunto de Dados</dataset-name>
+        <set-control-value-unavailable>Definir valor de controle está disponível apenas quando "após os controles estarem prontos" estiver selecionado</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>Previsualização do formulário</label>
+        <console>Consola</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>Testar Produção de PDF</label>
+        <use-form-data>Usar dados introduzidos no formulário</use-form-data>
+        <disable-default>Desactivar a avaliação das fórmulas de "Valores Iniciais"</disable-default>
+        <disable-calculate>Desactivar a avaliação das fórmulas de "Valores Calculados"</disable-calculate>
+        <disable-relevant>Mostrar controlos, grelhas e secções com visibilidade dinâmica</disable-relevant>
+        <show-hints>Mostrar sugestões dos controlos</show-hints>
+        <show-alerts>Mostrar alertas de controlos inválidos</show-alerts>
+        <show-required>Estilizar controlos obrigatórios</show-required>
+        <use-pdf-template>Usar modelo PDF</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Característica do Orbeon Forms PE </label>
+        <message>
+            <div>
+                <p>Esta característica está apenas disponível no Orbeon Forms PE.</p>
+                <p>Para mais informações, por favor visite <a href="http://www.orbeon.com/download" target="_blank">Site do Orbeon</a>.</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>Definições de Email</label>
+        <templates>Modelos de email</templates>
+        <template-name>
+            <label>Nome do modelo de email</label>
+            <hint>Este nome não é visível para os utilizadores finais; é usado em processos, por exemplo: email(template = "notify-user")</hint>
+        </template-name>
+        <language>
+            <label>Idioma</label>
+            <any-language>Qualquer idioma</any-language>
+        </language>
+        <headers>
+            <from>Remetente</from>
+            <to>Destinatário</to>
+            <cc>CC</cc>
+            <bcc>BCC</bcc>
+            <reply-to>Responder Para</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>Valor do Controlo</control-value>
+            <expression>Fórmula</expression>
+            <text>Texto</text>
+        </header-value-types>
+        <enable-if-true>Activar este modelo apenas se a seguinte fórmula for avaliada como verdadeira</enable-if-true>
+        <subject>Assunto do Email</subject>
+        <body>Corpo do Email</body>
+        <use-html>Usar HTML</use-html>
+        <attach-form-as>Anexar formulário como</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>Anexar ficheiros enviados pelos utilizadores ao formulário</label>
+            <choices>
+                <all>Todos</all>
+                <none>Nenhum</none>
+                <selected>Anexos seleccionados</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>Excluir de Todos os Valores dos Controlos</exclude-from-all-control-values>
+        <use-default>Usar predefinição</use-default>
+        <delete-template>Apagar modelo</delete-template>
+        <template-parameters>Parâmetros do modelo</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>Permissões</label>
+        <enable-permissions>Activar as permissões para este formulário</enable-permissions>
+        <role>Perfil</role>
+        <permissions>Permissões</permissions>
+        <operations>Operações</operations>
+        <anyone>Qualquer um</anyone>
+        <anyone-with-token>Requer token</anyone-with-token>
+        <any-authenticated-user>Qualquer utilizador autenticado</any-authenticated-user>
+        <owner>Administrador</owner>
+        <group-member>Membros do Grupo</group-member>
+        <create>Criar</create>
+        <read>Ler</read>
+        <update>Actualizar</update>
+        <delete>Apagar</delete>
+        <list>Listar</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>Fluxo de Trabalho e Permissões</label>
+
+        <custom-operations>Definir operações personalizadas para este formulário</custom-operations>
+        <operation-label>Etiqueta</operation-label>
+        <predefined-label>Predefinida</predefined-label>
+        <custom-label>Personalizada</custom-label>
+        <available-to>Disponível Para</available-to>
+        <availability-to-anyone>Qualquer pessoa</availability-to-anyone>
+        <availability-to-no-one>Ninguém</availability-to-no-one>
+        <availability-to-users>Utilizadores que correspondem à seguinte regra</availability-to-users>
+        <availability-to-users-before>Utilizadores que correspondem</availability-to-users-before>
+        <availability-to-users-after>às seguintes regras</availability-to-users-after>
+        <workflow-stage>Etapa do Fluxo de Trabalho</workflow-stage>
+        <workflow-role>Papel do Fluxo de Trabalho</workflow-role>
+        <authentication-role>Papel de Autenticação</authentication-role>
+        <show-button>Mostrar botão na página de detalhes</show-button>
+        <any>Qualquer</any>
+        <all>Todas</all>
+        <actions>Acções</actions>
+        <no-action>Nenhuma Acção</no-action>
+        <change-stage-action>Mudar Etapa</change-stage-action>
+        <run-process-action>Executar Processo</run-process-action>
+        <remove-operation>Remover Operação</remove-operation>
+        <is>é</is>
+        <is-not>não é</is-not>
+
+        <stages>Etapas</stages>
+
+        <stage-name>Nome da Etapa</stage-name>
+        <default-stage>Predefinida</default-stage>
+
+        <operations>
+            <label>Operações</label>
+            <item>
+                <label>Preencher novo formulário</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Listar e pesquisar dados</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Aceder aos dados para edição</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>Aceder aos dados para visualização</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>Aceder a PDF/TIFF</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>Atalhos de teclado</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>Mensagens</label>
+        <language-header>Idioma</language-header>
+        <name-header>Nome</name-header>
+        <value-header>Valor</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>Modos editáveis</editable>
+        <review>Modo de revisão</review>
+        <pdf-automatic>PDF automático</pdf-automatic>
+        <pdf-template>Modelo PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Largura do campo</field-width>
+        <default>Usar predefinição</default>
+        <full>Completa</full>
+        <natural>Natural</natural>
+        <field-align>Alinhamento do campo</field-align>
+        <left>Esquerda</left>
+        <right>Direita</right>
+        <learn-settings-below>Saber mais sobre as definições abaixo</learn-settings-below>
+        <field-value-visibility>
+            <label>Visibilidade do Valor do Campo</label>
+            <hint>Controla como o valor do campo é apresentado</hint>
+            <item id="visible">Visível</item>
+            <item id="obscured">Obscured</item>
+            <item id="partial">Parcial</item>
+            <item id="reveal">Permitir ao utilizador revelar</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>Tem a certeza que deseja remover a secção actual?</delete-section>
+        <delete-grid>Tem a certeza que deseja remover a grelha actual?</delete-grid>
+        <delete-column>Tem a certeza que deseja remover a coluna actual?</delete-column>
+        <delete-row>Tem a certeza que deseja remover a linha actual?</delete-row>
+        <delete-resources>Tem a certeza que deseja remover a todos os recursos para esta língua</delete-resources>
+        <delete-service>Tem a certeza que deseja remover o serviço "{0}"?{1,choice,0# Nenhuma acção o está a usar.|1# 1 acção o está a usar.|1&lt; {1,number,integer} acções o estão a usar.}</delete-service>
+        <delete-action>Tem a certeza que deseja remover a acção "{0}"?</delete-action>
+        <controls-will-be-deleted>{0,choice,0#Nenhum controlo será apagado|1#1 controlo será apagado|1&lt;{0,number,integer} controlos serão apagados} .</controls-will-be-deleted>
+        <metadata-edit-title>Meta-dados do formulário</metadata-edit-title>
+        <select-template-output>Por favor seleccione um modelo de formulário para usar como ponto de partida.</select-template-output>
+        <app-form-optional>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário.</app-form-optional>
+        <app-form-required>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário.</app-form-required>
+        <save-as-metadata-output>Introduza um novo nome de aplicação e um nome de formulário para ser usado para cópia deste formulário:</save-as-metadata-output>
+        <xpath-errors> {0,choice,1#Existe um erro de XPath |1&lt;Existem {0,number,integer} erros de XPath} no seu formulário.</xpath-errors>
+        <lhha-checkbox>Seleccione esta checkbox se gostaria introduzir tags de HTML</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>Valor é obrigatório</required>
+        <xpath>Expressão XPath incorrecta</xpath>
+    </alerts>
+    <template>
+        <untitled-form>Formulário sem título</untitled-form>
+        <items>
+            <item>
+                <label>Primeira opção</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Segunda Opção</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Terceira Opção</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

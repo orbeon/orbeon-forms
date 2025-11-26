@@ -1,0 +1,1570 @@
+<resource xml:lang="de">
+    <!-- Form metadata -->
+    <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+    <application-name>
+        <label>Name der Anwendung</label>
+        <hint>Kennzeichnet eine Gruppe von Formularen (z. B. „acme“ oder „sales“)</hint>
+        <help>
+            &lt;p&gt;Der Anwendungsname ist ein Name, mit dem Formulare gruppiert werden können. Beispiele:&lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li&gt;ein Firmenname wie „orbeon“ oder „acme“&lt;/li&gt;
+                &lt;li&gt;eine Unternehmenseinheit wie „hr“, „sales“ oder „engineering“&lt;/li&gt;
+                &lt;li&gt;ein Projektname wie „mercury“ oder „phoenix“&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;Dieser Name erscheint in der URL des bereitgestellten Formulars; verwenden Sie daher nur Kleinbuchstaben.&lt;/p&gt;
+        </help>
+        <alert>Verwenden Sie maximal 255 ASCII-Buchstaben, Ziffern, „-" oder "_"</alert>
+    </application-name>
+    <form-name>
+        <label>Name des Formulars</label>
+        <hint>Identifiziert dieses Formular (z. B. „antrag“).</hint>
+        <help>
+            &lt;p&gt;Der Formularname ist ein Name, der innerhalb einer Anwendung eindeutig ist, z. B. „adresse“ oder „antrag“.&lt;/p&gt;
+            &lt;p&gt;Dieser Name erscheint in der URL; verwenden Sie daher nur Kleinbuchstaben.&lt;/p&gt;
+        </help>
+        <alert>Verwenden Sie maximal 255 ASCII-Buchstaben, Ziffern, "-" oder "_"</alert>
+        <no-form-alert>
+            In diesem System wurde kein Formular mit diesem Anwendungs- und Formularnamen gefunden.
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#Ein Formular|1&lt;{0,number,integer} Formulare}
+            mit diesem Anwendungs- und Formularnamen {0,choice,1#ist|1&lt;sind} veröffentlicht.
+            &lt;a href="{1}" target="_blank"&gt;In der Administrationsseite anzeigen.&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#Ein Formular|1&lt;{0,number,integer} Formulare}
+            mit diesem Anwendungs- und Formularnamen {0,choice,1#ist|1&lt;sind} in Bearbeitung.
+            &lt;a href="{1}" target="_blank"&gt;In der Form-Builder-Übersicht anzeigen.&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>Formulartitel</label>
+        <hint>Formulartitel in der zur Zeit verwendeten Sprache</hint>
+    </title>
+    <description>
+        <label>Formularbeschreibung</label>
+        <hint>Formularbeschreibung in der zur Zeit verwendeten Sprache</hint>
+    </description>
+    <logo>
+        <label>Logo</label>
+        <hint>Das Logo erscheint oberhalb des Formulars</hint>
+    </logo>
+    <general-settings>
+        <label>Allgemein</label>
+    </general-settings>
+    <custom-settings>
+        <label>Erweiterte Einstellungen</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>Ausschneiden</label>
+    </cut>
+    <copy>
+        <label>Kopieren</label>
+    </copy>
+    <paste>
+        <label>Einfügen</label>
+    </paste>
+    <undo-redo>
+        <undo>Rückgängig {0}</undo>
+        <redo>Wiederherstellen {0}</redo>
+        <insert>Einfügen</insert>
+        <rename>Umbenennen</rename>
+        <delete-control>Steuerelement entfernen</delete-control>
+        <delete-container>Container entfernen</delete-container>
+        <merge-section-template>Abschnittsvorlagen zusammenführen</merge-section-template>
+        <move-control>Steuerelement verschieben</move-control>
+        <move-container>Container verschieben</move-container>
+        <update-settings>Einstellungen aktualisieren</update-settings>
+        <insert-control>Steuerelement einfügen</insert-control>
+        <insert-section>Abschnitt einfügen</insert-section>
+        <insert-grid>Tabelle einfügen</insert-grid>
+        <delete-row>Zeile entfernen</delete-row>
+        <insert-row>Zeile einfügen</insert-row>
+        <control-settings>Steuerelement-Einstellungen</control-settings>
+        <move-wall>Zelle ändern</move-wall>
+        <split-cell>Zelle teilen</split-cell>
+        <merge-cell>Zellen zusammenführen</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>Abschnittsvorlage zusammenführen</label>
+    </merge-section>
+    <form-structure>
+        <label>Struktur des Formulars</label>
+    </form-structure>
+    <controls>
+        <label>Standard</label>
+    </controls>
+    <i18n>
+        <label>Internationalisierung</label>
+    </i18n>
+    <language>
+        <label>Aktuelle Sprache</label>
+    </language>
+    <advanced>
+        <label>Erweitert</label>
+    </advanced>
+    <attachments>
+        <label>Anhänge</label>
+    </attachments>
+    <services-actions>
+        <label>Dienste &amp; Aktionen</label>
+    </services-actions>
+    <http-services>
+        <label>HTTP-Dienste</label>
+    </http-services>
+    <database-services>
+        <label>Datenbankdienste</label>
+    </database-services>
+    <actions>
+        <label>Aktionen</label>
+    </actions>
+    <new-section>
+        <label>Neuer Abschnitt</label>
+    </new-section>
+    <new-grid>
+        <label>Neues Raster</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>Neues wiederholtes Raster</label>
+    </new-repeated-grid>
+    <change-schema>
+        <label>Schema ändern</label>
+    </change-schema>
+    <upload-schema>
+        <label>Schema XML</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>PDF anhängen</label>
+    </pdf-templates>
+    <change-css>
+        <label>CSS ändern</label>
+    </change-css>
+    <upload-css>
+        <label>CSS anhängen</label>
+    </upload-css>
+    <show-source>
+        <label>Quelltext anzeigen</label>
+    </show-source>
+    <edit-source>
+        <label>Quelltext ändern</label>
+    </edit-source>
+    <permissions>
+        <label>Berechtigungen setzen</label>
+    </permissions>
+    <reload-components>
+        <label>Toolbox neu laden</label>
+    </reload-components>
+    <library-version>
+        <label>Bibliotheksversion</label>
+        <item>
+            <label>Version {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>Klicken, um einen Abschnittstitel einzugeben</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>Geben Sie den Abschnittstitel hier ein</label>
+    </type-section-title>
+    <enter-label>
+        <label>Klicken, um die Beschriftung einzugeben</label>
+    </enter-label>
+    <type-label>
+        <label>Beschriftung hier eingeben</label>
+    </type-label>
+    <enter-hint>
+        <label>Klicken, um einen Hinweis hinzuzufügen</label>
+    </enter-hint>
+    <type-hint>
+        <label>Geben Sie den Text des Hinweises hier ein</label>
+    </type-hint>
+    <enter-text>
+        <label>Klicken, um einen Text einzugeben</label>
+    </enter-text>
+    <type-text>
+        <label>Text hier eingeben</label>
+    </type-text>
+    <click-cell>
+        <label>Klicken, um diese Zelle auszuwählen</label>
+    </click-cell>
+    <insert-control>
+        <label>Verwenden Sie die Toolbox um ein Element hinzuzufügen</label>
+    </insert-control>
+    <edit-items>
+        <label>Auswahlmöglichkeiten bearbeiten</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>Horizontal erweitern</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>Horizontal schrumpfen</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>Vertikal erweitern</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>Vertikal schrumpfen</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>Steuerelement löschen</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>Per Drag &amp; drop verschieben oder kopieren</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>Abschnitt oder Raster löschen</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>Zeile löschen</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>Spalte löschen</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>Spalte links einfügen</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>Spalte rechts einfügen</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>Zeile darüber einfügen</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>Zeile darunter einfügen</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>Abschnittseigenschaften</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>Rastereigenschaften</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>Nach oben verschieben</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>Nach unten verschieben</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>Nach rechts verschieben</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>Nach links verschieben</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>Einstellungen Steuerelemente</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>Ansicht wechseln</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>Hilfstext bearbeiten</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>Hinzufügen</label>
+    </add>
+    <remove>
+        <label>Entfernen</label>
+    </remove>
+    <edit>
+        <label>Ändern</label>
+    </edit>
+    <classes>
+        <label>Benutzerdefinierte CSS-Klassen</label>
+    </classes>
+    <autocomplete>
+        <label>Autocomplete-Attribut</label>
+        <groups>
+            <general>Allgemein</general>
+            <name>Name und Titel</name>
+            <credentials>Anmeldedaten</credentials>
+            <address>Adresse</address>
+            <contact>Kontakt</contact>
+            <payment>Zahlung</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">Eigenschaft verwenden</item>
+        <item id="1">Ja</item>
+        <item id="2">Nein</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>Weiter</label>
+    </continue>
+    <apply>
+        <label>Anwenden</label>
+    </apply>
+    <cancel>
+        <label>Abbrechen</label>
+    </cancel>
+    <close>
+        <label>Schließen</label>
+    </close>
+    <delete>
+        <label>Löschen</label>
+    </delete>
+    <or>
+        <label>oder</label>
+    </or>
+    <errors>
+        <label>Fehler</label>
+    </errors>
+    <error-summary>
+        <label>{1,choice,
+            0#Keine Meldung|
+            1#'{0,choice,0#Fehler|1#Warnung|2#Informationsmeldung|3#Hinweis}'|
+            1&lt;'{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}'}</label>
+    </error-summary>
+    <back-to-summary>
+        <label>Zurück zur Formularliste</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">[Fixed View]</item>
+        <item id="1">[Fluid View]</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Vorschlag verwenden: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>Name</label>
+                <alert>Fehlender oder falscher Wert</alert>
+            </name>
+            <xpath>
+                <label>Formel Ausdruck</label>
+                <alert>Ungültiger formel Ausdruck</alert>
+            </xpath>
+            <control>
+                <label>Steuerelement</label>
+                <alert>Fehlender Wert</alert>
+            </control>
+            <token>
+                <label>Token-URL-Parameter erzeugen</label>
+            </token>
+            <type>
+                <item id="0">Steuerelement-Wert</item>
+                <item id="1">Formel Ausdruck</item>
+                <item id="2">Werte aller Steuerelemente</item>
+                <choice label="Link">
+                    <item id="3">Bearbeitungsseite</item>
+                    <item id="4">Ansichtsseite</item>
+                    <item id="5">Neue Seite</item>
+                    <item id="6">Übersichtsseite</item>
+                    <item id="7">Startseite</item>
+                    <item id="9">Seite „Veröffentlichte Formulare“</item>
+                    <item id="10">Formularverwaltung</item>
+                    <item id="8">PDF-Datei</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>Formulareinstellungen</label>
+        <save-as>Speichern unter...</save-as>
+        <open><label>Formulareinstellungen</label></open>
+        <options>Formular</options>
+        <view-options>Darstellung</view-options>
+        <wizard-options>Assistent</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Steuerelement</control-settings>
+        <about>Über dieses Formular</about>
+        <stats>Statistiken</stats>
+        <sections>Abschnitte</sections>
+        <repeats>Wiederholungen</repeats>
+        <grids>Raster</grids>
+        <section-templates>Abschnittsvorlagen</section-templates>
+        <controls>Steuerelemente</controls>
+        <all>Alle</all>
+        <use-property>Eigenschaft verwenden</use-property>
+        <singleton>
+            <label>Nur eine einzige Formularinstanz erlauben</label>
+            <hint>Verhindert, dass Benutzer weitere Formulare dieses Typs erstellen, wenn sie bereits Zugriff auf ein Formular dieses Typs haben</hint>
+        </singleton>
+        <allow-template-use>
+            <label>Als Formularvorlage verwenden erlauben</label>
+            <hint>Wenn ausgewählt, erscheint dieses Formular in der Liste der Formularvorlagen</hint>
+        </allow-template-use>
+        <wizard>
+            <label>Wizard-Ansicht</label>
+            <hint>Zeigt die Haupt-Abschnitte als einzelne Seiten zum durchblättern</hint>
+        </wizard>
+        <wizard-mode>
+            <label>Wizard-Navigation: Validierungsmodus</label>
+            <hint>Wie soll sich die Wizard-Navigation verhalten, wenn die Daten ungültig sind?</hint>
+            <item id="0">Standard-Einstellung</item>
+            <item id="1">Frei</item>
+            <item id="2">Lax</item>
+            <item id="3">Streng</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>Wizard Unterabschnitts-Navigation</label>
+            <hint>Aktiviert die Navigation für Unterabschnitte in Hauptsektionen</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>Wizard Unterabschnitts-Inhaltsverzeichnis</label>
+            <hint>Definiert, wie das Inhaltsverzeichnis die Unterabschnitte darstellt</hint>
+            <item id="0">Standard</item>
+            <item id="1">Unterabschnitte nur für den aktiven Abschnitt zeigen</item>
+            <item id="2">Alle Unterabschnitte zeigen</item>
+            <item id="3">Keine Unterabschnitte</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>Assistent: Separates Inhaltsverzeichnis</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>Assistent: Abschnittsstatus immer anzeigen</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
+            <hint>Kann auch pro Steuerelement konfiguriert werden (in den Steuerelement-Einstellungen)</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>Maximale Dateigröße aller Anhänge</label>
+            <hint>Beinhaltet alle Steuerelemente dieses Formulars</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>Maximale Anzahl Dateien pro Anlage-Steuerelement</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>Minimale Anzahl Dateien pro Anlage-Steuerelement</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>Erlaubte Dateitypen</label>
+            <hint>Zum Beispiel "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>Anzeige der Steuerelement-Titel</label>
+        </labels>
+        <hints>
+            <label>Anzeige der Steuerelement-Hinweise</label>
+        </hints>
+        <automatic-hints>
+            <label>Automatische Hinweise verwenden</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">Standard-Einstellung</item>
+            <item id="1">Inline</item>
+            <item id="2">Tooltip</item>
+        </appearances>
+        <placeholders>
+            <label>Platzhalter für Felder und mehrzeilige Textfelder benutzen</label>
+        </placeholders>
+        <data-migration>
+            <label>Einfache Datenmigration</label>
+            <hint>Fehlende Elemente in den Daten automatisch hinzufügen/entfernen</hint>
+            <item id="0">Eigenschaft verwenden</item>
+            <item id="1">Aktiviert</item>
+            <item id="2">Deaktiviert</item>
+            <item id="3">Fehler auslösen</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>Tabulatorreihenfolge im Raster</label>
+            <item id="0">Eigenschaft verwenden</item>
+            <item id="1">Zeilen</item>
+            <item id="2">Spalten</item>
+        </grid-tab-order>
+        <time-window>
+            <label>Zeitfenster</label>
+            <available>
+                <available-from>
+                    <label>Erstellung erst ab bestimmtem Datum verfügbar</label>
+                    <date>Startdatum und -uhrzeit</date>
+                    <message>Meldung vor Verfügbarkeit</message>
+                </available-from>
+                <available-to>
+                    <label>Erstellung nur bis zu bestimmtem Datum verfügbar</label>
+                    <date>Enddatum und -uhrzeit</date>
+                    <message>Meldung nach Ablauf</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>PDF-Seitenorientierung</label>
+            <hint />
+            <item id="default">Eigenschaft verwenden</item>
+            <item id="portrait">Hochformat</item>
+            <item id="landscape">Querformat</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>PDF-Seitengröße</label>
+            <hint />
+            <item id="default">Eigenschaft verwenden</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">Letter</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>Berechnungen in schreibgeschützten Modi (Überprüfung, PDF)</label>
+            <hint />
+            <item id="default">Eigenschaft verwenden</item>
+            <item id="false">Aktivieren</item>
+            <item id="true">Deaktivieren</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>Layout der Browserseite</label>
+            <hint>Ob das Formular eine feste oder variable Breite hat</hint>
+            <item id="0">Eigenschaft verwenden</item>
+            <item id="1">Feste Breite</item>
+            <item id="2">Variable Breite</item>
+        </html-page-layout>
+        <density>
+            <label>Dichte</label>
+            <hint>Abstände zwischen Elementen der Benutzeroberfläche</hint>
+            <item id="0">Eigenschaft verwenden</item>
+            <item id="1">Kompakt</item>
+            <item id="2">Komfortabel</item>
+            <item id="3">Geräumig</item>
+        </density>
+        <analysis-calculate>
+            <label>Abhängigkeiten automatisch ermitteln</label>
+            <hint>Bestimmt die Auswertungsreihenfolge von „Berechneter Wert“ und „Initialer Wert“ automatisch</hint>
+        </analysis-calculate>
+        <versions>Versionen</versions>
+        <current-version>Aktuelle Version</current-version>
+        <created-with-version>Erstellt mit Version</created-with-version>
+        <updated-with-versions>Aktualisiert mit Versionen</updated-with-versions>
+        <thumbnail>
+            <label>Formular-Miniaturansicht</label>
+            <hint>Wird für Formularvorlagen und die Startseite verwendet</hint>
+        </thumbnail>
+        <default-template>Standardvorlage</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>Einstellungen Steuerelemente: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>Grundeinstellungen</label></tab-base>
+        <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
+        <tab-formulas><label>Formeln</label></tab-formulas>
+        <control-name>
+            <label>Steuerelementname</label>
+            <alert>Name ist bereits vergeben oder ungültig</alert>
+            <hint>z.B.: "Vorname"</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>Name des PDF-Felds</label>
+            <alert>Unbekannter PDF-Feldname</alert>
+            <item id="0">Automatisch</item>
+            <item id="1">Benutzerdefiniert</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Name des Excel-Bereichs</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>Index-Steuerelement</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>In Übersicht anzeigen</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>Bulk-Bearbeitung erlauben</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>Standardmäßig nach dieser Spalte sortieren</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>Daten in der Datenbank verschlüsseln</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>Nicht in der Übersicht anzeigen</do-not-show>
+            <show>In der Übersicht anzeigen</show>
+            <column-only>Nur Spalte anzeigen</column-only>
+            <search-only>Nur in der Suche anzeigen</search-only>
+        </summary-show>
+        <role>
+            <restrict>Auf Rolle beschränken</restrict>
+            <all>Alle</all>
+            <any>Beliebig</any>
+            <of-the-following>der folgenden:</of-the-following>
+            <empty>Leere Rolle</empty>
+            <duplicate>Rolle duplizieren</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>Daten speichern</save-data>
+            <run-process>Prozess ausführen</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>Aufsteigend</ascending>
+            <descending>Absteigend</descending>
+            <conflict>Das Aktivieren der Sortierung für dieses Steuerelement deaktiviert sie für das folgende Steuerelement: {0}</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>Erscheinungsbild der Steuerelemente</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>Leerzeich davor und danach entfernen</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+       <types>
+            <label>Datentyp</label>
+        </types>
+        <builtin-type>
+            <label>Eingebauter Typ</label>
+            <hint>Eingebauter Datentyp</hint>
+
+            <use-schema-type>Schematyp verwenden</use-schema-type>
+            <use-component-type>Vordefinierten Typ verwenden</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>Häufig verwendete Typen</label>
+                    <type label="Text">string</type>
+                    <type label="Boolean">boolean</type>
+                    <type label="E-Mail Adresse">email</type>
+                </choices>
+                <choices>
+                    <label>Numerische Typen</label>
+                    <type label="Dezimalzahl">decimal</type>
+
+                    <type label="Ganze Zahl">integer</type>
+                    <type label="Positive ganze Zahl">positiveInteger</type>
+                    <type label="Nicht positive ganze Zahl">nonPositiveInteger</type>
+                    <type label="Negative ganze Zahl">negativeInteger</type>
+                    <type label="Nicht negative ganze Zahl">nonNegativeInteger</type>
+
+                    <type label="Gleitkommazahl(Einfache Genauigkeit)">float</type>
+                    <type label="Gleitkommazahl(Doppelte Genauigkeit)">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Datum und Zeittypen</label>
+                    <type label="Datum">date</type>
+                    <type label="Uhrzeit">time</type>
+                    <type label="Datum und Uhrzeit">dateTime</type>
+                    <type label="Dauer">duration</type>
+                    <type label="Jahr und Monat">gYearMonth</type>
+                    <type label="Monat und Tag">gMonthDay</type>
+                    <type label="Jahr">gYear</type>
+                    <type label="Monat">gMonth</type>
+                    <type label="Tag">gDay</type>
+                </choices>
+                <choices>
+                    <label>XML Typen</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="Qualifizierter XML-Name">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>Andere Typen</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Base64-codierte Binärdaten">base64Binary</type>
+                    <type label="Hexadecimal-codierte Binärdaten">hexBinary</type>
+                    <type label="URI">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>Schematyp</label>
+            <hint>Typ des importierten Schemas</hint>
+        </schema-type>
+        <required>
+            <label>Erforderlich</label>
+            <hint>Ob die Eingabe erforderlich ist</hint>
+            <item id="0">Ja</item>
+            <item id="1">Nein</item>
+            <item id="2">XPath</item>
+        </required>
+        <constraint>
+            <item id="formula">Formel</item>
+            <item id="max-length">Maximale Länge</item>
+            <item id="min-length">Minimale Länge</item>
+            <item id="positive">Positiv</item>
+            <item id="non-negative">Positiv oder Null</item>
+            <item id="non-positive">Negativ oder Null</item>
+            <item id="negative">Negativ</item>
+            <item id="fraction-digits">Maximale Nachkommastellen</item>
+            <item id="upload-max-size-per-file" multiple="false">Maximale Größe des Dateianhangs</item>
+            <item id="upload-max-size-per-file" multiple="true">Maximale Größe pro Datei</item>
+            <item id="upload-max-size-aggregate-per-control">Maximale Gesamtgröße der Anhänge pro Steuerelement</item>
+            <item id="upload-max-files-per-control">Maximale Anzahl Dateien pro Steuerelement</item>
+            <item id="upload-min-files-per-control">Minimale Anzahl Dateien pro Steuerelement</item>
+            <item id="upload-mediatypes">Erlaubte Dateitypen</item>
+            <item id="excluded-dates">Auszuschließende Datumswerte</item>
+        </constraint>
+        <formula>
+            <label>Formel</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>Boolescher XPath-Ausdruck</hint>
+        </formula>
+        <integer-argument>
+            <label>Ganzzahl</label>
+            <alert>Ungültige Ganzzahl</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>Warnungsvorlagen-Parameter bearbeiten</edit-label>
+            <dialog-label>Warnungsvorlagen-Parameter</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>Sichtbarkeit</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>Boolescher XPath-Ausdruck</hint>
+            <help>
+                &lt;p&gt;Hier legen Sie fest, ob das Steuerelement sichtbar ist oder nicht.&lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Ja:&lt;/b&gt; Das Steuerelement ist sichtbar.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Nein:&lt;/b&gt; Das Steuerelement ist verborgen.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formel:&lt;/b&gt; Sichtbarkeit wird dynamisch per Formel gesteuert.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;Die Formel muss einen booleschen Wert liefern. Das Steuerelement ist sichtbar, wenn die Formel &lt;code&gt;true()&lt;/code&gt; ergibt, und verborgen, wenn sie &lt;code&gt;false()&lt;/code&gt; ergibt.&lt;/p&gt;
+                &lt;p&gt;Sie können in der Formel auf andere Steuerelemente mit ihrem Namen, vorangestellt von &lt;code&gt;$&lt;/code&gt;, verweisen. Beim Eingeben von &lt;code&gt;$&lt;/code&gt; wird eine Liste der verfügbaren Steuerelemente angezeigt.&lt;/p&gt;
+                &lt;p&gt;Weitere Informationen zu Formeln finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form-Builder-Dokumentation&lt;/a&gt;.&lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>Schreibgeschützt</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>Boolescher XPath-Ausdruck</hint>
+            <help>
+                &lt;p&gt;Hier legen Sie fest, ob das Steuerelement schreibgeschützt oder schreibbar ist.&lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Ja:&lt;/b&gt; Das Steuerelement ist schreibgeschützt.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Nein:&lt;/b&gt; Das Steuerelement ist schreibbar.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formel:&lt;/b&gt; Schreibschutz wird dynamisch per Formel gesteuert.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;Die Formel muss einen booleschen Wert liefern. Das Steuerelement ist schreibgeschützt, wenn die Formel &lt;code&gt;true()&lt;/code&gt; ergibt, und schreibbar, wenn sie &lt;code&gt;false()&lt;/code&gt; ergibt.&lt;/p&gt;
+                &lt;p&gt;Sie können in der Formel auf andere Steuerelemente mit ihrem Namen, vorangestellt von &lt;code&gt;$&lt;/code&gt;, verweisen. Beim Eingeben von &lt;code&gt;$&lt;/code&gt; wird eine Liste der verfügbaren Steuerelemente angezeigt.&lt;/p&gt;
+                &lt;p&gt;Weitere Informationen zu Formeln finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form-Builder-Dokumentation&lt;/a&gt;.&lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>Initialwert</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>XPath-Ausdruck</hint>
+            <help>
+                &lt;p&gt;Diese Formel legt einen Initialwert für das Steuerelement fest (nur im Modus „Neu“).&lt;/p&gt;
+                &lt;p&gt;Sie können in der Formel auf andere Steuerelemente mit ihrem Namen, vorangestellt von &lt;code&gt;$&lt;/code&gt;, verweisen. Beim Eingeben von &lt;code&gt;$&lt;/code&gt; wird eine Liste der verfügbaren Steuerelemente angezeigt.&lt;/p&gt;
+                &lt;p&gt;Weitere Informationen zu Formeln finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form-Builder-Dokumentation&lt;/a&gt;.&lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>Berechneter Wert</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>XPath-Ausdruck</hint>
+            <help>
+                &lt;p&gt;Diese Formel legt einen berechneten Wert für das Steuerelement fest. Der Wert wird bei Bedarf neu ausgewertet.&lt;/p&gt;
+                &lt;p&gt;Sie können in der Formel auf andere Steuerelemente mit ihrem Namen, vorangestellt von &lt;code&gt;$&lt;/code&gt;, verweisen. Beim Eingeben von &lt;code&gt;$&lt;/code&gt; wird eine Liste der verfügbaren Steuerelemente angezeigt.&lt;/p&gt;
+                &lt;p&gt;Weitere Informationen zu Formeln finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form-Builder-Dokumentation&lt;/a&gt;.&lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>Beschriftung</label>
+        </control-label>
+        <control-hint>
+            <label>Hinweis</label>
+        </control-hint>
+        <control-help>
+            <label>Hilfsnachricht</label>
+            <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
+        </control-help>
+        <control-text>
+            <label>Erklärungstext</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>Kurzbezeichnung</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>Beschriftung der Wiederholung</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>Beschriftung „Wiederholung hinzufügen“</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>Text „Wiederholung entfernen“</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>Warnmeldung</label>
+            <hint>Wird angezeigt, falls die Warnungen aktiviert wurden</hint>
+        </alert>
+        <default-alert>
+            <label>Standardwarnung</label>
+            <hint>Aktiv, falls es keine speziellere Warnung gibt</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>Verwende globale Standardwarnung</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>Verwende Standardwarnung</label>
+        </use-default-alert>
+        <validation-type><label>Validierungstypen</label></validation-type>
+        <validation-details><label>Validierungsdetails</label></validation-details>
+        <level><label>Level</label></level>
+        <use-html>HTML verwenden</use-html>
+        <parameters>Vorlagen-Parameter</parameters>
+        <automatic-hint>
+            <label>Automatischen Hinweis verwenden</label>
+            <hint>Fügt basierend auf „Maximale Dateigröße“ und „Erlaubte Dateitypen“ automatisch einen Hinweis hinzu (siehe Registerkarte „Validierungen und Benachrichtigungen“)</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>Offene Auswahl</label>
+            <hint>Wenn aktiviert, können Benutzer eigene Werte eingeben; der eingegebene Wert wird als Datenwert und als Beschriftung in der Auswahlliste verwendet</hint>
+        </open-selection>
+        <store-label>
+            <label>Beschriftung speichern</label>
+            <hint>Wenn aktiviert, wird die ausgewählte Beschriftung zusätzlich zu den Daten gespeichert</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">Standard verwenden</item>
+            <item id="1">Ja</item>
+            <item id="2">Nein</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>{0,choice,0#Abschnitteigenschaften: "{2}" / "{1}"|1#Tabelleneigenschaften: "{1}"}</label>
+        <control-name>
+            <label>Name</label>
+            <alert>Name ist bereits vergeben oder ungültig</alert>
+            <hint>z.B.: "Kontaktdaten"</hint>
+        </control-name>
+        <grid-columns>
+            <label>Anzahl der Rasterspalten</label>
+        </grid-columns>
+        <grid-rows>
+            <label>Anzahl der Rasterzeilen</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>Tabulatorreihenfolge im Raster</label>
+            <item id="0">Standard</item>
+            <item id="1">Zeilen</item>
+            <item id="2">Spalten</item>
+        </grid-tab-order>
+        <options>
+            <label>Optionen</label>
+            <item>
+                <label>Initial geöffnet</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>Seitenumbruch vor diesem Abschnitt</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>Kann versteckt werden</label>
+        </collapsible>
+        <visibility>
+            <label>Sichtbarkeit</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>Boolescher XPath-Ausdruck</hint>
+        </visibility>
+        <readonly>
+            <label>Schreibgeschützt</label>
+            <alert>Ungültiger XPath-Ausdruck</alert>
+            <hint>Boolescher XPath-Ausdruck</hint>
+        </readonly>
+        <repeat>
+            <label>Inhalt wiederholen</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>Benutzern erlauben, Wiederholungen hinzuzufügen, zu entfernen oder zu verschieben</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>Wiederholungsnummer anzeigen</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>Im Assistenten jeweils nur eine Wiederholung anzeigen</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label>Benutzerdefinierte Namen der Wiederholung aktivieren</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>Name der Wiederholung</label>
+            <alert>Name ist bereits vergeben oder ungültig</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>Mindestanzahl an Wiederholungen</label>
+            <alert>Ungültiger Wert</alert>
+            <hint>Nicht negative Zahl oder XPath-Ausdruck</hint>
+        </min>
+        <max>
+            <label>Maximale Anzahl an Wiederholungen</label>
+            <alert>Ungültiger Wert</alert>
+            <hint>Positive Zahl oder XPath-Ausdruck</hint>
+        </max>
+        <freeze>
+            <label>Wiederholungen sperren</label>
+            <alert>Ungültiger Wert</alert>
+            <hint>Nicht negative Zahl bis zur Mindestanzahl an Wiederholungen (siehe oben), oder XPath-Ausdruck</hint>
+        </freeze>
+        <no-freeze>Keine Sperre</no-freeze>
+        <appearance-minimal>
+            <label>Vereinfachte Darstellung</label>
+            <hint>Einfache Schaltflächen zum Hinzufügen/Entfernen ohne Menü oder Neuordnung anzeigen</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>Formeln für Initialwerte berechnen, wenn Iterationen hinzugefügt werden</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>Initial-Anzahl der Iterationen</label>
+        </initial-iterations>
+        <other>Anderes</other>
+        <one>Eine Wiederholung</one>
+        <unlimited>Unbeschränkt</unlimited>
+        <no-minimum>Kein Minimum</no-minimum>
+        <tab-base><label>Grundeinstellungen und Formeln</label></tab-base>
+        <tab-repeat><label>Wiederholter Inhalt</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>Bestätigen</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>Steuerelementnamen</label>
+        <prefix>
+            <label>Prefix</label>
+        </prefix>
+        <suffix>
+            <label>Suffix</label>
+        </suffix>
+        <original-name>
+            <label>Originalname</label>
+        </original-name>
+        <new-name>
+            <label>Neuer Name</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>Formular veröffentlichen</label>
+        <publish>Veröffentlichen</publish>
+        <publish-success>Das Formular wurde erfolgreich als Version {1,number,integer} mit {0,choice,0#keinem Anhang|1#1 Anhang|1&lt;{0,number,integer} Anhängen} veröffentlicht.</publish-success>
+        <publish-error>Beim Veröffentlichen des Formulars ist ein Fehler aufgetreten.</publish-error>
+        <latest-published-version>Letzte veröffentlichte Version</latest-published-version>
+        <create-new-version-item>Erstelle eine neue Formulardefinition mit der Versionsnummer {0,number,integer}</create-new-version-item>
+        <overwrite-version-item>Überschreibe die aktuelle Formulardefinition mit Versionsnummer {0,number,integer} ({1,choice,0#nicht verfügbar|1#verfügbar})</overwrite-version-item>
+        <create-new-version-help>
+            BITTE BEACHTEN SIE: Die Veröffentlichung dieser Formulardefinition erstellt eine neue Version der Formulardefiniton in der Datenbank. Daten, die sich bereits in der Datenbank befinden 		können noch in den vorherigen Versionen der Formulardefintion angezeigt und bearbeitet werden, welche mit ihnen verknüpft ist. Die neue Version der Formulardefinition wird verwendet, um 			neue Daten zu erstellen.
+        </create-new-version-help>
+        <overwrite-version-help>
+            BITTE BEACHTEN SIE: Das wird die bestehende Formulardefinition überschreiben. Wenn die Änderungen, die Sie vorgenommen haben klein sind, wie z.B. Änderung der Beschriftungen der 			Steuerelemente, wird die Formulardefinition mit den existierenden Formulardaten kompatible sein. Aber wenn Sie strukturelle Änderungen, wie Hinzufügen, Entfernen, Umbenennen oder 			Verschieben von Steuerelementen, vorgenommen haben, kann die Formulardefinition mit den vorhandenen Daten nicht vereinbar sein. Wir empfehlen beim Überschreiben von einer bestehenden 			Version der Formulardefinition vorsichtig zu sein.
+        </overwrite-version-help>
+        <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
+        <open-new>Öffne neue Seite des veröffentlichten Formulars </open-new>
+        <version>Version</version>
+        <available>Veröffentlichtes Formular verfügbar machen</available>
+        <comment>Kommentar</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>Sprache hinzufügen</label>
+        <new-language>
+            <label>Folgende Sprache hinzufügen</label>
+        </new-language>
+        <common>Häufig verwendete Sprachen</common>
+        <all>Andere Sprachen</all>
+        <add-language>
+            <label>Sprache hinzufügen</label>
+        </add-language>
+        <remove-language>
+            <label>Sprache löschen</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>Steuerelemente suchen</label>
+        <open-settings>
+            <label>Einstellungsdialog öffnen</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>XML-Schema hochladen</label>
+        <schema-type>
+            <label>Verfügbare Schema-Typen</label>
+            <hint>Die einfachen Typen, die im hochgeladenen Schema vorhanden sind</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>URI des Namesraumes des Schemas</label>
+            <hint>Das ist die URI des Namensraumes des hochgeladenen Schemas</hint>
+        </namespace-uri>
+        <operations>
+            <label>Operationen</label>
+        </operations>
+        <delete-schema>
+            <label>Lösche existierendes XML-Schema</label>
+        </delete-schema>
+        <change-schema>
+            <label>Ändere XML-Schema</label>
+        </change-schema>
+        <replace-schema>
+            <label>Ersetze XML-Schema</label>
+        </replace-schema>
+        <upload-schema>
+            <label>XML-Schema anhängen</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>Ihr Schema scheint keine einfachen Typen zu beinhalten. Sie werden nicht in der Lage sein, Typen aus diesem Schema für die Validierung auszuwählen.</no-simple-types>
+            <has-includes>Ihr Schema enthält Imports und Anhänge. Diese werden deaktiviert.</has-includes>
+            <not-a-schema>Die hochgeladene Datei ist kein zulässiges Schema.</not-a-schema>
+            <new-schema-information>Neue Schema-Informationen</new-schema-information>
+            <existing-schema-information>Bereits existierende Schema-Informationen</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>Quelltext</label>
+        <source>
+            <alert>Bitte stellen Sie sicher, dass der Inhalt richtig formatiertes XML ist</alert>
+        </source>
+    </dialog-edit-source>
+        <dialog-view-source>
+        <label>Quelltext anzeigen</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>Eine PDF-Vorlage anhängen</label>
+        <pdf-upload>
+            <label>PDF-Datei</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>Name</label>
+        </attachment-name>
+        <attachment-language>
+            <label>Sprache</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>Auswahlmöglichkeiten bearbeiten</label>
+        <resources-language>
+            <label>Sprache der Ressourcen</label>
+        </resources-language>
+        <label-header>
+            <label>Beschriftung</label>
+        </label-header>
+        <value-header>
+            <label>Wert</label>
+        </value-header>
+        <hint-header>
+            <label>Hinweis</label>
+        </hint-header>
+        <clear-value>
+            <label>Wert löschen</label>
+        </clear-value>
+        <remove-all>
+            <label>Alle entfernen</label>
+        </remove-all>
+        <filter>
+            <label>Filterformel</label>
+        </filter>
+        <itemsetid-mode>
+            <label>Auswahlen aus Metadaten verwenden</label>
+            <item id="0">Wenn das Steuerelement Ziel einer Aktion ist (Standard)</item>
+            <item id="1">Immer</item>
+            <item id="2">Nie</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>HTTP-Dienst Editor</label>
+        <tab-definition><label>Definition</label></tab-definition>
+        <tab-advanced><label>Erweitert</label></tab-advanced>
+        <tab-test><label>Testergebnisse</label></tab-test>
+        <url-parameters><label>URL Parameter</label></url-parameters>
+        <parameter-name><label>Name</label></parameter-name>
+        <parameter-default-value><label>Standardwert</label></parameter-default-value>
+        <no-headers>Keine Kopfzeilen empfangen.</no-headers>
+        <service-name>
+            <label>Name des Dienstes</label>
+            <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
+        </service-name>
+        <service-performs-search>
+            <label>Service führt Suche aus</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>Service unterstützt Paging</label>
+        </service-supports-paging>
+        <resource>
+            <label>URL der Ressourcen</label>
+            <hint>HTTP URL an dem der Dienst bereitgestellt wird</hint>
+        </resource>
+        <method>
+            <label>Methode</label>
+        </method>
+        <serialization>
+            <label>Serialisierung</label>
+        </serialization>
+        <soap-submission>
+            <label>SOAP-Dienst</label>
+            <hint>Ob dies ein SOAP-Dienst ist</hint>
+        </soap-submission>
+        <soap-action>
+            <label>SOAP-Aktion</label>
+            <hint>Optionaler SOAP-Aktionskopf</hint>
+        </soap-action>
+        <http-authentication>
+            <label>HTTP Authentifizierung</label>
+            <hint>HTTP Authentifizierung</hint>
+        </http-authentication>
+        <username>
+            <label>Benutzername</label>
+        </username>
+        <password>
+            <label>Passwort</label>
+        </password>
+        <request-body>
+            <label>Hauptteil der Anfrage</label>
+            <hint>XML-Daten (kann ein SOAP-Umschlag sein)</hint>
+        </request-body>
+        <is-binary-response>
+            <label>Service-Antwort enthält Binärdaten</label>
+            <hint>Aktivieren, wenn die Antwort verwendet wird, um den Wert eines Anlagen-Steuerelements zu setzen</hint>
+        </is-binary-response>
+        <response>
+            <label>Antwort</label>
+        </response>
+        <error-type>
+            <label>Fehlertyp</label>
+            <item>
+                <label>Wird gesendet</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>Keine Daten</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>Validationsfehler</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>Fehler in den Ressourcen</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>Zielfehler</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>Interner Fehler</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>URL der Ressourcen</label>
+        </resource-uri>
+        <status-code>
+            <label>Statuscode</label>
+        </status-code>
+        <headers>
+            <label>Köpfe</label>
+        </headers>
+        <header-name>
+            <label>Name</label>
+        </header-name>
+        <header-value>
+            <label>Wert/e</label>
+        </header-value>
+        <response-body>
+            <label>Haupteil der Antwort</label>
+        </response-body>
+        <xml-response-body>
+            <label>XML-Antworttext</label>
+        </xml-response-body>
+        <save>
+            <label>Speichern</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>Datenbank-Dienst Editor</label>
+        <service-name>
+            <label>Name des Dienstes</label>
+            <hint>Wähle einen einzigartigen Namen für diesen Dienst</hint>
+        </service-name>
+        <datasource>
+            <label>Datenquelle</label>
+            <hint>JNDI-Datenquelle für diesen Dienst</hint>
+        </datasource>
+        <query>
+            <label>SQL-Abfrage</label>
+            <hint>SQL-Abfrage, die Platzhalter für Parameter beinhalten kann</hint>
+        </query>
+        <save>
+            <label>Speichern</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>Aktionen-Editor</label>
+        <service-name>
+            <label>Name der Aktion</label>
+            <hint>Wähle einen einzigartigen Namen für diese Aktion</hint>
+        </service-name>
+        <observer-type>
+            <label>Aktion ausführen wenn</label>
+            <item id="0">
+                <label>Steuerelement</label>
+            </item>
+            <item id="1">
+                <label>das Formular lädt</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>hat den Wert geändert</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>erscheint</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>verschwindet</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>aktiviert wird</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>bevor die Initialwerte berechnet werden</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>alle Daten bereit sind</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>alle Steuerelemente bereit sind</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <event-condition>
+            <label>Bedingung</label>
+            <item id="always">Läuft immer</item>
+            <item id="new-only">Läuft nur beim Erstellen</item>
+            <item id="formula">Läuft nach formeln</item>
+            <formula>Formeln</formula>
+        </event-condition>
+        <event-control>
+            <label>Steuerelement</label>
+        </event-control>
+        <service-to-call>
+            <label>Aufzurufender Dienst</label>
+            <hint>Dienst welcher beim Auslösen der Aktion aufgerufen werden soll</hint>
+        </service-to-call>
+        <source>
+            <label>Quelle</label>
+        </source>
+        <destination>
+            <label>Ziel</label>
+        </destination>
+        <source-control>
+            <label>Steuerelement (Quelle)</label>
+        </source-control>
+        <destination-xpath>
+            <label>XPath-Ausdruck (Ziel)</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>Parameternummer</label>
+        </parameter-number>
+        <response-values>
+            <label>Werte der Steuerelemente aus Serviceantwort setzen</label>
+        </response-values>
+        <destination-control>
+            <label>Steuerelement (Ziel)</label>
+        </destination-control>
+        <source-xpath>
+            <label>XPath Ausdruck (Quelle)</label>
+        </source-xpath>
+        <response-itemset>
+            <label>Einträge aus der Antwort des Dienstes in Auswahllisten laden</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>Auswahlsteuerelement (Ziel)</label>
+        </destination-selection-control>
+        <items>
+            <label>Elemente</label>
+            <hint>XPath-Ausdruck, der eine Knoten für des Element zurückgibt</hint>
+        </items>
+        <item-label>
+            <label>Beschriftung</label>
+            <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
+        </item-label>
+        <item-value>
+            <label>Wert</label>
+            <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
+        </item-value>
+        <item-hint>
+            <label>Hinweisformel</label>
+            <hint>Relativ zum Eintragsknoten</hint>
+        </item-hint>
+        <is-last-page>
+            <label>Letzte Seite erreicht XPath-Ausdruck</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>Eindeutige Auswahl automatisch wählen</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>Speichern</label>
+        </save>
+        <test>
+            <label>Testen</label>
+        </test>
+
+        <general-settings>Allgemeine Einstellungen</general-settings>
+        <service-request-actions>Aktionen bei Serviceanfrage</service-request-actions>
+        <service-response-actions>Aktionen bei Serviceantwort</service-response-actions>
+
+        <set-control-value>Kontrollwert festlegen</set-control-value>
+        <set-control-itemset>Elementemenge des Steuerelements festlegen</set-control-itemset>
+        <save-to-dataset>In Dataset speichern</save-to-dataset>
+        <dataset-name>Dataset-Name</dataset-name>
+        <set-control-value-unavailable>Kontrollwert festlegen ist nur verfügbar, wenn "nachdem die Steuerelemente bereit sind" ausgewählt ist</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>Formularvorschau</label>
+        <console>Konsole</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>Test der PDF-Erzeugung</label>
+        <use-form-data>Eingegebene Daten verwenden</use-form-data>
+        <disable-default>Auswertung der Formeln “Initialwert” deaktivieren</disable-default>
+        <disable-calculate>Auswertung der Formeln “Berechneter Wert” deaktivieren</disable-calculate>
+        <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>
+        <show-hints>Hinweise zu Steuerelementen anzeigen</show-hints>
+        <show-alerts>Warnungen für ungültige Steuerelemente anzeigen</show-alerts>
+        <show-required>Pflichtsteuerelemente kennzeichnen</show-required>
+        <use-pdf-template>PDF-Vorlage verwenden</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Eigenschaften der Orbeon Forms PE</label>
+        <message>
+            <div>
+                <p>Diese Eigenschaft ist nur in Orbeon Forms PE vorhanden.</p>
+                <p>Für weitere Informationen besuchen Sie die <a href="http://www.orbeon.com/download" target="_blank">Orbeon web site</a>.</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>E-Mail-Einstellungen</label>
+        <templates>E-Mail-Vorlagen</templates>
+        <template-name>
+            <label>Name der E-Mail-Vorlage</label>
+            <hint>Dieser Name ist für Endbenutzer nicht sichtbar; er wird in Prozessen verwendet, z. B.: email(template = "notify-user")</hint>
+        </template-name>
+        <language>
+            <label>Sprache</label>
+            <any-language>Beliebige Sprache</any-language>
+        </language>
+        <headers>
+            <from>Absender</from>
+            <to>Empfänger</to>
+            <cc>CC</cc>
+            <bcc>BCC</bcc>
+            <reply-to>Antwort an</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>Steuerelementwert</control-value>
+            <expression>Formel</expression>
+            <text>Text</text>
+        </header-value-types>
+        <enable-if-true>Diese Vorlage nur aktivieren, wenn die folgende Formel zu true ausgewertet wird</enable-if-true>
+        <subject>E-Mail-Betreff</subject>
+        <body>E-Mail-Text</body>
+        <use-html>HTML verwenden</use-html>
+        <attach-form-as>Formular anhängen als</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>Dateien anhängen, die Benutzer zum Formular hochgeladen haben</label>
+            <choices>
+                <all>Alle</all>
+                <none>Keine</none>
+                <selected>Ausgewählte Anhänge</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>Von „Alle Steuerelementwerte“ ausschließen</exclude-from-all-control-values>
+        <use-default>Standard verwenden</use-default>
+        <delete-template>Vorlage löschen</delete-template>
+        <template-parameters>Vorlagenparameter</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>Berechtigungen</label>
+        <enable-permissions>Aktiviere Berechtigungen für dieses Formular</enable-permissions>
+        <role>Rolle</role>
+        <permissions>Berechtigungen</permissions>
+        <operations>Operationen</operations>
+        <anyone>Alle</anyone>
+        <anyone-with-token>Token erforderlich</anyone-with-token>
+        <any-authenticated-user>Jeder authentifizierte Benutzer</any-authenticated-user>
+        <owner>Inhaber</owner>
+        <group-member>Gruppenmitglieder</group-member>
+        <create>Erstellen</create>
+        <read>Lesen</read>
+        <update>Update</update>
+        <delete>Löschen</delete>
+        <list>Auflisten</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>Workflow und Berechtigungen</label>
+
+        <custom-operations>Benutzerdefinierte Operationen für dieses Formular definieren</custom-operations>
+        <operation-label>Beschriftung</operation-label>
+        <predefined-label>Vordefiniert</predefined-label>
+        <custom-label>Benutzerdefiniert</custom-label>
+        <available-to>Verfügbar für</available-to>
+        <availability-to-anyone>Jeder</availability-to-anyone>
+        <availability-to-no-one>Niemand</availability-to-no-one>
+        <availability-to-users>Benutzer, die der folgenden Regel entsprechen</availability-to-users>
+        <availability-to-users-before>Benutzer entsprechend</availability-to-users-before>
+        <availability-to-users-after>der folgenden Regeln</availability-to-users-after>
+        <workflow-stage>Workflow-Stufe</workflow-stage>
+        <workflow-role>Workflow-Rolle</workflow-role>
+        <authentication-role>Authentifizierungsrolle</authentication-role>
+        <show-button>Schaltfläche auf Detailseite anzeigen</show-button>
+        <any>Beliebig</any>
+        <all>Alle</all>
+        <actions>Aktionen</actions>
+        <no-action>Keine Aktion</no-action>
+        <change-stage-action>Stufe ändern</change-stage-action>
+        <run-process-action>Prozess ausführen</run-process-action>
+        <remove-operation>Operation entfernen</remove-operation>
+        <is>ist</is>
+        <is-not>ist nicht</is-not>
+
+        <stages>Stufen</stages>
+
+        <stage-name>Name der Stufe</stage-name>
+        <default-stage>Standard</default-stage>
+
+        <operations>
+            <label>Operationen</label>
+            <item>
+                <label>Neues Formular ausfüllen</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Daten auflisten und suchen</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Auf Daten zum Bearbeiten zugreifen</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>Auf Daten zum Anzeigen zugreifen</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>Auf PDF/TIFF zugreifen</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>Tastaturkürzel</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>Nachrichten</label>
+        <language-header>Sprache</language-header>
+        <name-header>Name</name-header>
+        <value-header>Wert</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>Bearbeitungsmodi</editable>
+        <review>Überprüfungsmodus</review>
+        <pdf-automatic>Automatisches PDF</pdf-automatic>
+        <pdf-template>PDF-Vorlage</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Feldbreite</field-width>
+        <default>Standard verwenden</default>
+        <full>Voll</full>
+        <natural>Natürlich</natural>
+        <field-align>Feldausrichtung</field-align>
+        <left>Links</left>
+        <right>Rechts</right>
+        <learn-settings-below>Dokumentation der untenstehenden Einstellungen</learn-settings-below>
+        <field-value-visibility>
+            <label>Sichtbarkeit des Feldwerts</label>
+            <hint>Steuert, wie der Feldwert angezeigt wird</hint>
+            <item id="visible">Sichtbar</item>
+            <item id="obscured">Verdeckt</item>
+            <item id="partial">Teilweise</item>
+            <item id="reveal">Benutzer darf anzeigen</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
+        <delete-grid>Sind Sie sicher, dass Sie das aktuelle Raster löschen wollen?</delete-grid>
+        <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
+        <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
+        <delete-resources>Sind Sie sicher, dass Sie alle Ressourcen löschen wollen für die Sprache</delete-resources>
+        <delete-service>Sind Sie sicher, dass Sie den Dienst "{0}" löschen wollen?{1,choice,0# Keine Aktion verwendet ihn.|1# 1 Aktion verwendet ihn.|1&lt; {1,number,integer} Aktionen verwenden ihn.}</delete-service>
+        <delete-action>Sind Sie sicher, dass Sie Aktion "{0}" löschen wollen?</delete-action>
+        <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>
+        <metadata-edit-title>Formularmetadaten</metadata-edit-title>
+        <select-template-output>Bitte wählen Sie eine Formularvorlage als Ausgangspunkt aus.</select-template-output>
+        <app-form-optional>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden.</app-form-optional>
+        <app-form-required>Geben Sie einen Anwendungs- und einen Formularnamen an, um Ihr Formular zu identifizieren. Diese Information ist erforderlich, bevor Sie Ihr Formular speichern oder veröffentlichen können.</app-form-required>
+        <save-as-metadata-output>Geben Sie einen neuen Anwendungstitel und Formulartitel ein, welche für die Kopie dieses Formulars verwendet werden:
+        </save-as-metadata-output>
+        <xpath-errors>{0,choice,1#Ein XPath Fehler|1&lt;{0,number,integer} XPath Fehler} im Formular.</xpath-errors>
+        <lhha-checkbox>Hier ein Häkchen setzen, falls Sie HTML-Tags verwenden wollen</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>Wert ist erforderlich</required>
+        <xpath>Ungültiger XPath-Ausdruck</xpath>
+    </alerts>
+    <template>
+        <untitled-form>Unbenanntes Formular</untitled-form>
+        <items>
+            <item>
+                <label>Erster Auswahlpunkt</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Zweiter Auswahlpunkt</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Dritter Auswahlpunkt</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

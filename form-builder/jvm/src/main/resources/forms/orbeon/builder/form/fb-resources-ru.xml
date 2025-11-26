@@ -1,0 +1,1627 @@
+<resource xml:lang="ru">
+    <!-- Form metadata -->
+    <application-name>
+        <label>Название приложения</label>
+        <hint>Определяет логическую группу форм. Например, по функциональности или по принадлежности к департаменту (например, "hr"). Если группа форм всего одна, можно использовать название организации. Название приложения входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
+        <help />
+        <alert>Используйте максимум 255 символов ASCII, цифр, "-" или "_"</alert>
+    </application-name>
+    <form-name>
+        <label>Название формы</label>
+        <hint>Определяет данную конкретную форму (например, "health-record"). Название формы входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
+        <help />
+        <alert>Используйте максимум 255 символов ASCII, цифр, "-" или "_"</alert>
+        <no-form-alert>
+            В системе не найдено ни одной формы с данным названием приложения и формы.
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#Одна форма|1&lt;{0,number,integer} форм(ы)}
+            с этим названием приложения и формы {0,choice,1#опубликована|1&lt;опубликованы}.
+            &lt;a href="{1}" target="_blank"&gt;Просмотреть на странице администратора.&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#Одна форма|1&lt;{0,number,integer} форм(ы)}
+            с этим названием приложения и формы {0,choice,1#находится|1&lt;находятся} в разработке.
+            &lt;a href="{1}" target="_blank"&gt;Просмотреть на странице сводки Form Builder.&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>Заголовок формы</label>
+        <hint>Нажмите чтобы ввести заголовок</hint>
+    </title>
+    <description>
+        <label>Описание формы</label>
+        <hint>Нажмите чтобы ввести описание (не обязательно)</hint>
+    </description>
+    <logo>
+        <label>Логотип</label>
+        <hint>Логотип отображается в верхней части формы</hint>
+    </logo>
+    <general-settings>
+        <label>Общие настройки</label>
+    </general-settings>
+    <custom-settings>
+        <label>Пользовательские настройки</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>Вырезать</label>
+    </cut>
+    <copy>
+        <label>Копировать</label>
+    </copy>
+    <paste>
+        <label>Вставить</label>
+    </paste>
+    <undo-redo>
+        <undo>Отменить {0}</undo>
+        <redo>Повторить {0}</redo>
+        <insert>вставка</insert>
+        <rename>переименование</rename>
+        <delete-control>удаление элемента</delete-control>
+        <delete-container>удаление контейнера</delete-container>
+        <merge-section-template>объединение шаблона раздела</merge-section-template>
+        <move-control>перемещение элемента</move-control>
+        <move-container>перемещение контейнера</move-container>
+        <update-settings>обновление настроек</update-settings>
+        <insert-control>вставка элемента</insert-control>
+        <insert-section>вставка раздела</insert-section>
+        <insert-grid>вставка сетки</insert-grid>
+        <delete-row>удаление строки</delete-row>
+        <insert-row>вставка строки</insert-row>
+        <control-settings>настройки элемента</control-settings>
+        <move-wall>перемещение разделителя</move-wall>
+        <split-cell>разделение ячейки</split-cell>
+        <merge-cell>объединение ячеек</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>Объединить шаблон раздела</label>
+    </merge-section>
+    <form-structure>
+        <label>Структура формы</label>
+    </form-structure>
+    <controls>
+        <label>Элементы</label>
+    </controls>
+    <i18n>
+        <label>Перевод</label>
+    </i18n>
+    <language>
+        <label>Текущий язык</label>
+    </language>
+    <advanced>
+        <label>Дополнительно</label>
+    </advanced>
+    <attachments>
+        <label>Вложения</label>
+    </attachments>
+    <services-actions>
+        <label>Сервисы и действия</label>
+    </services-actions>
+    <http-services>
+        <label>HTTP-сервисы</label>
+    </http-services>
+    <database-services>
+        <label>Сервисы СУБД</label>
+    </database-services>
+    <actions>
+        <label>Действия</label>
+    </actions>
+    <new-section>
+        <label>Новый раздел</label>
+    </new-section>
+    <new-grid>
+        <label>Новая сетка</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>Новая повторяющаяся сетка</label>
+    </new-repeated-grid>
+    <change-schema>
+        <label>Изменить схему</label>
+    </change-schema>
+    <upload-schema>
+        <label>Загрузить схему</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>Загрузить PDF</label>
+    </pdf-templates>
+    <change-css>
+        <label>Изменить CSS</label>
+    </change-css>
+    <upload-css>
+        <label>Загрузить CSS</label>
+    </upload-css>
+    <show-source>
+        <label>Просмотреть код</label>
+    </show-source>
+    <edit-source>
+        <label>Редактировать код</label>
+    </edit-source>
+    <permissions>
+        <label>Настроить права</label>
+    </permissions>
+    <reload-components>
+        <label>Перезагрузить элементы</label>
+    </reload-components>
+    <library-version>
+        <label>Версия библиотеки</label>
+        <item>
+            <label>Версия {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>Нажмите чтобы ввести название раздела</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>Введите название раздела</label>
+    </type-section-title>
+    <enter-label>
+        <label>Нажмите чтобы ввести название</label>
+    </enter-label>
+    <type-label>
+        <label>Введите название</label>
+    </type-label>
+    <enter-hint>
+        <label>Нажмите чтобы ввести подсказку</label>
+    </enter-hint>
+    <type-hint>
+        <label>Введите подсказку</label>
+    </type-hint>
+    <enter-text>
+        <label>Нажмите чтобы ввести текст</label>
+    </enter-text>
+    <type-text>
+        <label>Введите текст</label>
+    </type-text>
+    <click-cell>
+        <label>Нажмите чтобы выбрать ячейку</label>
+    </click-cell>
+    <insert-control>
+        <label>Выберите элемент с панели справа</label>
+    </insert-control>
+    <edit-items>
+        <label>Редактировать элементы</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>Объединить с ячейкой справа</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>Разделить по горизонтали</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>Расширить по вертикали</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>Разделить по вертикали</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>Удалить элемент</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>Перетащите для перемещения или копирования</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>Удалить раздел</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>Удалить строку</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>Удалить столбец</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>Вставить столбец слева</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>Вставить столбец справа</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>Вставить строку сверху</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>Вставить строку снизу</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>Настройки раздела</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>Настройки сетки</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>Переместить выше</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>Переместить ниже</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>Переместить вправо</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>Переместить влево</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>Настройки элемента</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>Переключить внешний вид</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>Редактировать справку</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>Добавить</label>
+    </add>
+    <remove>
+        <label>Удалить</label>
+    </remove>
+    <edit>
+        <label>Редактировать</label>
+    </edit>
+    <classes>
+        <label>Пользовательские CSS-классы</label>
+    </classes>
+    <autocomplete>
+        <label>Атрибут автозаполнения</label>
+        <groups>
+            <general>Общее</general>
+            <name>Имя и должность</name>
+            <credentials>Учетные данные</credentials>
+            <address>Адрес</address>
+            <contact>Контактные данные</contact>
+            <payment>Платеж</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">Использовать свойство</item>
+        <item id="1">Да</item>
+        <item id="2">Нет</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>Далее</label>
+    </continue>
+    <apply>
+        <label>Применить</label>
+    </apply>
+    <cancel>
+        <label>Отменить</label>
+    </cancel>
+    <close>
+        <label>Закрыть</label>
+    </close>
+    <delete>
+        <label>Удалить</label>
+    </delete>
+    <or>
+        <label>или</label>
+    </or>
+    <errors>
+        <label>Ошибки</label>
+    </errors>
+    <error-summary>
+        <label>{1,choice,
+            0#Нет сообщений|
+            1#'{0,choice,0#Ошибка|1#Предупреждение|2#Информационное сообщение|3#Сообщение}'|
+            1&lt;'{0,choice,0#Ошибки|1#Предупреждения|2#Информационные сообщения|3#Сообщения}'}</label>
+    </error-summary>
+    <back-to-summary>
+        <label>Назад к списку форм</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">[Fixed View]</item>
+        <item id="1">[Fluid View]</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Использовать предложение: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>Название</label>
+                <alert>Отсутствует или некорректное значение</alert>
+            </name>
+            <xpath>
+                <label>Формула</label>
+                <alert>Отсутствует или некорректная формула</alert>
+            </xpath>
+            <control>
+                <label>Элемент</label>
+                <alert>Отсутствует значение</alert>
+            </control>
+            <token>
+                <label>Генерировать токен URL-параметра</label>
+            </token>
+            <type>
+                <item id="0">Значение элемента</item>
+                <item id="1">Формула</item>
+                <item id="2">Все значения элементов</item>
+                <choice label="Ссылка">
+                    <item id="3">Страница редактирования</item>
+                    <item id="4">Страница просмотра</item>
+                    <item id="5">Страница создания</item>
+                    <item id="6">Сводная страница</item>
+                    <item id="7">Домашняя страница</item>
+                    <item id="9">Страница опубликованных форм</item>
+                    <item id="10">Администрирование форм</item>
+                    <item id="8">PDF файл</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>Настройки формы</label>
+        <save-as>Сохранить как…</save-as>
+        <open><label>Настройки формы</label></open>
+        <options>Параметры формы</options>
+        <view-options>Внешний вид</view-options>
+        <wizard-options>Мастер</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Настройки элементов</control-settings>
+        <about>О этой форме</about>
+        <stats>Статистика формы</stats>
+        <sections>Разделы</sections>
+        <repeats>Повторяющиеся элементы</repeats>
+        <grids>Сетки</grids>
+        <section-templates>Шаблоны разделов</section-templates>
+        <controls>Элементы</controls>
+        <all>Все</all>
+        <use-property>Использовать свойство</use-property>
+        <singleton>
+            <label>Форма-одиночка</label>
+            <hint>Запретить пользователям создавать дополнительные данные формы, если у них есть доступ к существующим данным для этого определения формы</hint>
+        </singleton>
+        <allow-template-use>
+            <label>Разрешить использование в качестве шаблона формы</label>
+            <hint>Если выбрано, эта форма появится в списке шаблонов форм</hint>
+        </allow-template-use>
+        <wizard>
+            <label>Режим мастера</label>
+            <hint>Показывать разделы верхнего уровня как отдельные страницы мастера</hint>
+        </wizard>
+        <wizard-mode>
+            <label>Режим валидации навигации мастера</label>
+            <hint>Как ведет себя навигация мастера, когда данные не валидны</hint>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Свободный</item>
+            <item id="2">Мягкий</item>
+            <item id="3">Строгий</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>Навигация по подразделам мастера</label>
+            <hint>Разрешает ли мастер навигацию по разделам и сеткам внутри разделов верхнего уровня</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>Оглавление подразделов мастера</label>
+            <hint>Как оглавление мастера показывает подразделы</hint>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Показывать подразделы только для активного раздела</item>
+            <item id="2">Показывать подразделы для всех разделов</item>
+            <item id="3">Не показывать подразделы</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>Отдельное оглавление мастера</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>Всегда показывать статус раздела мастера</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>Максимальный размер вложения на файл</label>
+            <hint>Также может быть установлен для отдельного элемента в настройках элемента</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>Максимальный суммарный размер вложений</label>
+            <hint>Применяется ко всем элементам вложений в этой форме</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>Максимальное количество файлов на элемент управления вложениями</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>Минимальное количество файлов на элемент управления вложениями</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>Разрешенные типы файлов</label>
+            <hint>Например "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>Внешний вид названий элементов</label>
+        </labels>
+        <hints>
+            <label>Внешний вид подсказок элементов</label>
+        </hints>
+        <automatic-hints>
+            <label>Использовать автоматические подсказки</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Встроенно</item>
+            <item id="2">Всплывающая подсказка</item>
+        </appearances>
+        <placeholders>
+            <label>Использовать заполнители для полей и текстовых областей</label>
+        </placeholders>
+        <data-migration>
+            <label>Простая миграция данных</label>
+            <hint>Автоматически добавлять/удалять отсутствующие элементы в данных</hint>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Включено</item>
+            <item id="2">Отключено</item>
+            <item id="3">Вызвать ошибку</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>Порядок табуляции в сетке</label>
+            <item id="0">Использовать свойство</item>
+            <item id="1">По строкам</item>
+            <item id="2">По столбцам</item>
+        </grid-tab-order>
+        <time-window>
+            <label>Временное окно</label>
+            <available>
+                <available-from>
+                    <label>Создание доступно только с определенной даты</label>
+                    <date>Дата и время начала</date>
+                    <message>Сообщение о недоступности</message>
+                </available-from>
+                <available-to>
+                    <label>Создание доступно только до определенной даты</label>
+                    <date>Дата и время окончания</date>
+                    <message>Сообщение об истечении срока</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>Ориентация PDF-страницы</label>
+            <hint />
+            <item id="default">Использовать свойство</item>
+            <item id="portrait">Портретная</item>
+            <item id="landscape">Альбомная</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>Размер PDF-страницы</label>
+            <hint />
+            <item id="default">Использовать свойство</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">Letter</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>Вычисления в режимах только для чтения (просмотр, PDF)</label>
+            <hint />
+            <item id="default">Использовать свойство</item>
+            <item id="false">Включить</item>
+            <item id="true">Отключить</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>Макет страницы в браузере</label>
+            <hint>Занимает ли форма фиксированную или резиновую ширину</hint>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Фиксированная ширина</item>
+            <item id="2">Резиновая ширина</item>
+        </html-page-layout>
+        <density>
+            <label>Плотность</label>
+            <hint>Расстояние между элементами интерфейса</hint>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Компактная</item>
+            <item id="2">Комфортная</item>
+            <item id="3">Просторная</item>
+        </density>
+        <analysis-calculate>
+            <label>Автоматические зависимости вычислений</label>
+            <hint>Автоматически определять порядок вычисления для формул "Вычисляемое значение" и "Начальное значение"</hint>
+        </analysis-calculate>
+        <versions>Версии</versions>
+        <current-version>Текущая версия</current-version>
+        <created-with-version>Создано с версией</created-with-version>
+        <updated-with-versions>Обновлено с версиями</updated-with-versions>
+        <thumbnail>
+            <label>Миниатюра формы</label>
+            <hint>Используется для шаблонов форм и главной страницы</hint>
+        </thumbnail>
+        <default-template>Шаблон по умолчанию</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>Настройки элемента: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>Основные настройки</label></tab-base>
+        <tab-validations><label>Валидация и предупреждения</label></tab-validations>
+        <tab-formulas><label>Формулы</label></tab-formulas>
+        <control-name>
+            <label>Название элемента</label>
+            <alert>Название уже используется или некорректно</alert>
+            <hint>Например: "first-name"</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>Название поля PDF</label>
+            <alert>Неизвестное название поля PDF</alert>
+            <item id="0">Автоматически</item>
+            <item id="1">Пользовательское</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Название диапазона Excel</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>Индексный элемент</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>Показывать в сводной странице</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>Разрешить массовое редактирование</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>По умолчанию сортировать по этому столбцу</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>Шифровать данные при хранении</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>Не показывать на сводной странице</do-not-show>
+            <show>Показывать на сводной странице</show>
+            <column-only>Показывать только столбец</column-only>
+            <search-only>Показывать только поиск</search-only>
+        </summary-show>
+        <role>
+            <restrict>Ограничить по роли</restrict>
+            <all>Все</all>
+            <any>Любая</any>
+            <of-the-following>из следующих:</of-the-following>
+            <empty>Пустая роль</empty>
+            <duplicate>Дублирующаяся роль</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>Сохранить данные</save-data>
+            <run-process>Выполнить процесс</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>По возрастанию</ascending>
+            <descending>По убыванию</descending>
+            <conflict>Включение сортировки для этого элемента отключит её для следующего элемента: {0}</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>Внешний вид элемента</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>Обрезать начальные и конечные пробелы</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+        <types>
+            <label>Тип данных</label>
+        </types>
+        <builtin-type>
+            <label>Встроенный тип</label>
+            <hint>Встроенный тип данных</hint>
+
+            <use-schema-type>Использовать тип схемы</use-schema-type>
+            <use-component-type>Использовать предопределенный тип</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>Стандартные типы</label>
+                    <type label="Любая строка">string</type>
+                    <type label="Булева переменная">boolean</type>
+                    <type label="Адрес e-mail">email</type>
+                </choices>
+                <choices>
+                    <label>Числовые типы</label>
+                    <type label="Десятичное число">decimal</type>
+
+                    <type label="Целое число">integer</type>
+                    <type label="Положительное целое">positiveInteger</type>
+                    <type label="Не-положительное целое">nonPositiveInteger</type>
+                    <type label="Отрицательное целое">negativeInteger</type>
+                    <type label="Не-отрицательное целое">nonNegativeInteger</type>
+
+                    <type label="Дробное число простой точности">float</type>
+                    <type label="Дробное число двойной точности">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Время</label>
+                    <type label="Дата">date</type>
+                    <type label="Время">time</type>
+                    <type label="Дата и время">dateTime</type>
+                    <type label="Длительность">duration</type>
+                    <type label="Год и месяц">gYearMonth</type>
+                    <type label="Месяц и день">gMonthDay</type>
+                    <type label="Год">gYear</type>
+                    <type label="Месяц">gMonth</type>
+                    <type label="День">gDay</type>
+                </choices>
+                <choices>
+                    <label>Строковые типы</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="XML qualified name">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>Другие типы</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Данные в Base64">base64Binary</type>
+                    <type label="Данные в Hex">hexBinary</type>
+                    <type label="Ссылка">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>Тип из схемы</label>
+            <hint>Тип из импортированной схемы</hint>
+        </schema-type>
+        <required>
+            <label>Обязательное</label>
+            <hint>Является ли поле обязательным</hint>
+            <item id="0">Да</item>
+            <item id="1">Нет</item>
+            <item id="2">XPath</item>
+        </required>
+        <constraint>
+            <item id="formula">Формула</item>
+            <item id="max-length">Максимальная длина</item>
+            <item id="min-length">Минимальная длина</item>
+            <item id="positive">Положительное</item>
+            <item id="non-negative">Положительное или ноль</item>
+            <item id="non-positive">Отрицательное или ноль</item>
+            <item id="negative">Отрицательное</item>
+            <item id="fraction-digits">Максимальное количество знаков после запятой</item>
+            <item id="upload-max-size-per-file" multiple="false">Максимальный размер вложения</item>
+            <item id="upload-max-size-per-file" multiple="true">Максимальный размер вложения на файл</item>
+            <item id="upload-max-size-aggregate-per-control">Максимальный суммарный размер вложений</item>
+            <item id="upload-max-files-per-control">Максимальное количество файлов на элемент управления</item>
+            <item id="upload-min-files-per-control">Минимальное количество файлов на элемент управления</item>
+            <item id="upload-mediatypes">Поддерживаемые типы файлов</item>
+            <item id="excluded-dates">Исключаемые даты</item>
+        </constraint>
+        <formula>
+            <label>Формула</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+        </formula>
+        <integer-argument>
+            <label>Целочисленное значение</label>
+            <alert>Некорректное значение</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>Редактировать параметры шаблона предупреждения</edit-label>
+            <dialog-label>Параметры шаблона предупреждения</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>Настройки видимости</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+            <help>
+                &lt;p&gt;
+                    Это позволяет вам указать, виден ли элемент формы или нет.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Да:&lt;/b&gt; Элемент формы виден.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Нет:&lt;/b&gt; Элемент формы скрыт.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Формула:&lt;/b&gt; Элемент формы виден или скрыт динамически в зависимости от формулы.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Формула позволяет динамически указывать, виден ли элемент формы или нет. Она должна возвращать булево значение.
+                    Элемент формы виден, если формула возвращает &lt;code&gt;true()&lt;/code&gt;, и скрыт, если она возвращает &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Вы можете ссылаться на другие элементы формы в формуле, используя их названия с префиксом &lt;code&gt;$&lt;/code&gt;.
+                    При вводе знака &lt;code&gt;$&lt;/code&gt; отображается список доступных элементов формы.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Подробнее о формулах см. в &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;документации Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>Только для чтения</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+            <help>
+                &lt;p&gt;
+                    Это позволяет вам указать, доступен ли элемент формы только для чтения или для чтения и записи.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Да:&lt;/b&gt; Элемент формы только для чтения.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Нет:&lt;/b&gt; Элемент формы для чтения и записи.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Формула:&lt;/b&gt; Элемент формы только для чтения или для чтения и записи динамически в зависимости от формулы.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Формула позволяет динамически указывать, доступен ли элемент формы только для чтения или для чтения и записи. Она должна возвращать булево значение.
+                    Элемент формы только для чтения, если формула возвращает &lt;code&gt;true()&lt;/code&gt;, и для чтения и записи, если она возвращает &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Вы можете ссылаться на другие элементы формы в формуле, используя их названия с префиксом &lt;code&gt;$&lt;/code&gt;.
+                    При вводе знака &lt;code&gt;$&lt;/code&gt; отображается список доступных элементов формы.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Подробнее о формулах см. в &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;документации Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>Начальное значение</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+            <help>
+                &lt;p&gt;
+                    Эта формула позволяет вам указать начальное значение для элемента формы только в режиме "создания".
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Вы можете ссылаться на другие элементы формы в формуле, используя их названия с префиксом &lt;code&gt;$&lt;/code&gt;.
+                    При вводе знака &lt;code&gt;$&lt;/code&gt; отображается список доступных элементов формы.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Подробнее о формулах см. в &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;документации Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>Вычисляемое значение</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+            <help>
+                &lt;p&gt;
+                    Эта формула позволяет вам указать вычисляемое значение для элемента формы.
+                    Это значение пересчитывается по мере необходимости, чтобы оставаться актуальным.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Вы можете ссылаться на другие элементы формы в формуле, используя их названия с префиксом &lt;code&gt;$&lt;/code&gt;.
+                    При вводе знака &lt;code&gt;$&lt;/code&gt; отображается список доступных элементов формы.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Подробнее о формулах см. в &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;документации Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>Название</label>
+        </control-label>
+        <control-hint>
+            <label>Подсказка</label>
+        </control-hint>
+        <control-help>
+            <label>Справочное сообщение</label>
+            <hint>Сообщение, отображаемое когда пользователи нажимают на значок справки рядом с названием</hint>
+        </control-help>
+        <control-text>
+            <label>Пояснительный текст</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>Краткое название</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>Название повторения</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>Название для добавления повторения</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>Текст для удаления повторения</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>Сообщение об ошибке</label>
+            <hint>Сообщение, которое будет показано, если введенное значение некорректно</hint>
+        </alert>
+        <default-alert>
+            <label>Предупреждение по умолчанию</label>
+            <hint>Активно когда нет более специфичного предупреждения</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>Использовать глобальное предупреждение по умолчанию</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>Использовать предупреждение по умолчанию</label>
+        </use-default-alert>
+        <validation-type><label>Тип валидации</label></validation-type>
+        <validation-details><label>Детали валидации</label></validation-details>
+        <level><label>Уровень</label></level>
+        <use-html>Использовать HTML</use-html>
+        <parameters>Параметры шаблона</parameters>
+        <automatic-hint>
+            <label>Использовать автоматическую подсказку</label>
+            <hint>Добавляет подсказку на основе максимального размера файла и поддерживаемых типов файлов, которые вы могли указать на вкладке валидации и предупреждений</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>Открытый выбор</label>
+            <hint>Если включено, пользователи могут ввести свое значение, и значение (текст, хранящийся в данных) также используется как название (текст, отображаемый в выпадающем списке)</hint>
+        </open-selection>
+        <store-label>
+            <label>Сохранять название</label>
+            <hint>Если включено, выбранное название сохраняется вместе с данными</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">Использовать по умолчанию</item>
+            <item id="1">Да</item>
+            <item id="2">Нет</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>Настройки раздела: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
+        <control-name>
+            <label>Название раздела</label>
+            <alert>Название уже используется или некорректно</alert>
+            <hint>Например: "address"</hint>
+        </control-name>
+        <grid-columns>
+            <label>Количество столбцов сетки</label>
+        </grid-columns>
+        <grid-rows>
+            <label>Количество строк сетки</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>Порядок табуляции в сетке</label>
+            <item id="0">По умолчанию</item>
+            <item id="1">По строкам</item>
+            <item id="2">По столбцам</item>
+        </grid-tab-order>
+        <options>
+            <label>Параметры</label>
+            <item>
+                <label>Изначально открыт</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>Разрыв страницы перед</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>Сворачиваемый</label>
+        </collapsible>
+        <visibility>
+            <label>Настройки видимости</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+        </visibility>
+        <readonly>
+            <label>Только для чтения</label>
+            <alert>Некорректное выражение XPath</alert>
+            <hint>Булево выражение XPath</hint>
+        </readonly>
+        <repeat>
+            <label>Повторяющееся содержимое</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>Разрешить пользователю добавлять, удалять или перемещать повторения</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>Показывать номер повторения</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>Показывать по одному повторению за раз в мастере</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label>Включить пользовательское имя элемента повторения</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>Пользовательское имя элемента повторения</label>
+            <alert>Название уже используется или некорректно</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>Минимальное количество повторений</label>
+            <alert>Некорректное значение</alert>
+            <hint>Неотрицательное число или выражение XPath</hint>
+        </min>
+        <max>
+            <label>Максимальное количество повторений</label>
+            <alert>Некорректное значение</alert>
+            <hint>Положительное число или выражение XPath</hint>
+        </max>
+        <freeze>
+            <label>Заморозить повторения</label>
+            <alert>Некорректное значение</alert>
+            <hint>Неотрицательное число до минимального количества повторений (см. выше), или выражение XPath</hint>
+        </freeze>
+        <no-freeze>Без замораживания</no-freeze>
+        <appearance-minimal>
+            <label>Упрощенный вид</label>
+            <hint>Показывать базовые кнопки добавления/удаления без меню или переупорядочивания</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>Применять формулы начальных значений при добавлении повторений</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>Начальное количество повторений использует шаблон</label>
+        </initial-iterations>
+        <other>Другое</other>
+        <one>Одно повторение</one>
+        <unlimited>Неограниченно</unlimited>
+        <no-minimum>Без минимума</no-minimum>
+        <tab-base><label>Основные настройки и формулы</label></tab-base>
+        <tab-repeat><label>Повторяющееся содержимое</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>Подтвердить</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>Названия элементов</label>
+        <prefix>
+            <label>Префикс</label>
+        </prefix>
+        <suffix>
+            <label>Суффикс</label>
+        </suffix>
+        <original-name>
+            <label>Исходное название</label>
+        </original-name>
+        <new-name>
+            <label>Новое название</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>Публикация формы</label>
+        <publish>Опубликовать</publish>
+        <publish-success>Форма была успешно опубликована как версия {1,number,integer}. {0,choice,0#Вложения не были опубликованы|1#1 вложение было опубликовано|1&lt;{0,number,integer} вложений были опубликованы}.</publish-success>
+        <publish-error>При публикации формы произошла ошибка.</publish-error>
+        <latest-published-version>Последняя опубликованная версия</latest-published-version>
+        <create-new-version-item>создать новое определение формы с номером версии {0,number,integer}</create-new-version-item>
+        <overwrite-version-item>перезаписать текущее определение формы с номером версии {0,number,integer} ({1,choice,0#недоступно|1#доступно})</overwrite-version-item>
+        <create-new-version-help>
+            ОБРАТИТЕ ВНИМАНИЕ: Публикация этого определения формы создаст новую версию определения формы в
+            базе данных. Данные, которые уже существуют в базе данных, по-прежнему будут просматриваться и редактироваться с помощью предыдущих
+            версий этого определения формы, которые связаны с этими данными. Новая версия определения формы
+            будет использоваться для создания новых данных.
+        </create-new-version-help>
+        <overwrite-version-help>
+            ОБРАТИТЕ ВНИМАНИЕ: Это перезапишет существующее определение формы. Если изменения, которые вы внесли в определение формы,
+            незначительны, например, изменение названий элементов, определение формы будет совместимо с
+            существующими данными формы. Но если вы внесли структурные изменения, такие как добавление, удаление, переименование или
+            перемещение элементов, определение формы может быть несовместимо с существующими данными. Мы рекомендуем быть
+            осторожными при перезаписи существующей версии определения формы.
+        </overwrite-version-help>
+        <open-summary>Открыть информацию об опубликованной форме</open-summary>
+        <open-new>Открыть страницу заполнения опубликованной формы</open-new>
+        <version>Версия</version>
+        <available>Сделать опубликованную форму доступной</available>
+        <comment>Комментарий</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>Добавить язык</label>
+        <new-language>
+            <label>Добавить следующий язык</label>
+        </new-language>
+        <common>Наиболее распространенные языки</common>
+        <all>Другие языки</all>
+        <add-language>
+            <label>Добавить язык</label>
+        </add-language>
+        <remove-language>
+            <label>Удалить язык</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>Поиск элементов</label>
+        <open-settings>
+            <label>Открыть диалог настроек</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>Загрузка схемы XML</label>
+        <schema-type>
+            <label>Доступные типы схемы</label>
+            <hint>Список простых типов, доступных в загруженной схеме</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>Пространства имен схемы</label>
+            <hint>Ссылки на пространства имен загруженной схемы</hint>
+        </namespace-uri>
+        <operations>
+            <label>Действия</label>
+        </operations>
+        <delete-schema>
+            <label>Удалить существующую схему XML</label>
+        </delete-schema>
+        <change-schema>
+            <label>Изменить схему XML</label>
+        </change-schema>
+        <replace-schema>
+            <label>Заменить схему XML</label>
+        </replace-schema>
+        <upload-schema>
+            <label>Загрузить схему XML</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>Похоже, загруженная схема не содержит простых типов. Вы не сможете выбрать типы этой схемы для автоматической проверки.</no-simple-types>
+            <has-includes>Схема содержит импортирование (import) или включение (include). Они не будут работать.</has-includes>
+            <not-a-schema>Загруженный файл не является корректной схемой.</not-a-schema>
+            <new-schema-information>Информация о новой схеме</new-schema-information>
+            <existing-schema-information>Информация о текущей схеме</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>Редактировать код</label>
+        <source>
+            <alert>Пожалуйста, убедитесь в корректности XML</alert>
+        </source>
+    </dialog-edit-source>
+    <dialog-view-source>
+        <label>Просмотреть код</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>Загрузка PDF</label>
+        <pdf-upload>
+            <label>Файл PDF</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>Название</label>
+        </attachment-name>
+        <attachment-language>
+            <label>Язык</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>Редактор элементов</label>
+        <resources-language>
+            <label>Язык</label>
+        </resources-language>
+        <label-header>
+            <label>Видно пользователю</label>
+        </label-header>
+        <value-header>
+            <label>Системное значение</label>
+        </value-header>
+        <hint-header>
+            <label>Подсказка</label>
+        </hint-header>
+        <clear-value>
+            <label>Очистить значение</label>
+        </clear-value>
+        <remove-all>
+            <label>Удалить все</label>
+        </remove-all>
+        <filter>
+            <label>Формула фильтра</label>
+        </filter>
+        <itemsetid-mode>
+            <label>Использовать варианты из метаданных</label>
+            <item id="0">Когда элемент управления является целью действия (по умолчанию)</item>
+            <item id="1">Всегда</item>
+            <item id="2">Никогда</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>Редактор HTTP-сервисов</label>
+        <tab-definition><label>Определение</label></tab-definition>
+        <tab-advanced><label>Расширенные</label></tab-advanced>
+        <tab-test><label>Результаты тестирования</label></tab-test>
+        <url-parameters><label>URL-параметры</label></url-parameters>
+        <parameter-name><label>Название</label></parameter-name>
+        <parameter-default-value><label>Значение по умолчанию</label></parameter-default-value>
+        <no-headers>Заголовки не получены.</no-headers>
+        <service-name>
+            <label>Название сервиса</label>
+            <hint>Выберите уникальное название для этого сервиса</hint>
+        </service-name>
+        <service-performs-search>
+            <label>Сервис выполняет поиск</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>Сервис поддерживает постраничную навигацию</label>
+        </service-supports-paging>
+        <resource>
+            <label>URL сервиса</label>
+            <hint>Адрес HTTP расположения сервиса</hint>
+        </resource>
+        <method>
+            <label>Метод</label>
+        </method>
+        <serialization>
+            <label>Сериализация</label>
+        </serialization>
+        <soap-submission>
+            <label>SOAP-сервис</label>
+            <hint>Является ли SOAP-сервисом</hint>
+        </soap-submission>
+        <soap-action>
+            <label>SOAP Action</label>
+            <hint>Заголовок SOAPAction (не обязательно)</hint>
+        </soap-action>
+        <http-authentication>
+            <label>Аутентификация HTTP</label>
+            <hint>Аутентификация HTTP</hint>
+        </http-authentication>
+        <username>
+            <label>Логин</label>
+        </username>
+        <password>
+            <label>Пароль</label>
+        </password>
+        <request-body>
+            <label>Тело запроса</label>
+            <hint>Данные XML (может быть SOAP-обертка)</hint>
+        </request-body>
+        <is-binary-response>
+            <label>Ответ сервиса содержит двоичные данные</label>
+            <hint>Отметьте это, если ответ используется для установки значения элемента вложения</hint>
+        </is-binary-response>
+        <response>
+            <label>Ответ</label>
+        </response>
+        <error-type>
+            <label>Типы ошибок</label>
+            <item>
+                <label>Запрос в процессе выполнения</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>Нет данных</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>Ошибка проверки</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>Ошибка ресурса</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>Ошибка целевого элемента</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>Внутренняя ошибка</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>Адрес ресурса</label>
+        </resource-uri>
+        <status-code>
+            <label>Статус</label>
+        </status-code>
+        <headers>
+            <label>Заголовки</label>
+        </headers>
+        <header-name>
+            <label>Название</label>
+        </header-name>
+        <header-value>
+            <label>Значение</label>
+        </header-value>
+        <response-body>
+            <label>Тело ответа</label>
+        </response-body>
+        <xml-response-body>
+            <label>Тело ответа XML</label>
+        </xml-response-body>
+        <save>
+            <label>Сохранить</label>
+        </save>
+        <test>
+            <label>Проверить</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>Редактор сервисов СУБД</label>
+        <service-name>
+            <label>Название сервиса</label>
+            <hint>Выберите уникальное название для этого сервиса</hint>
+        </service-name>
+        <datasource>
+            <label>Источник данных</label>
+            <hint>Источник данных для этого сервиса (JNDI)</hint>
+        </datasource>
+        <query>
+            <label>SQL-запрос</label>
+            <hint>SQL-запрос, может содержать метки для подстановки параметров</hint>
+        </query>
+        <save>
+            <label>Сохранить</label>
+        </save>
+        <test>
+            <label>Проверить</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>Редактор действий</label>
+        <service-name>
+            <label>Название действия</label>
+            <hint>Выберите уникальное название для этого действия</hint>
+        </service-name>
+        <observer-type>
+            <label>Выполнить действие когда</label>
+            <item id="0">
+                <label>элемент</label>
+            </item>
+            <item id="1">
+                <label>форма загружается</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>изменяет свое значение</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>появляется</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>исчезает</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>активируется</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>до вычисления начальных значений данных</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>после того как данные готовы</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>после того как элементы готовы</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <!--<event-type>-->
+            <!--<label>Реагировать на</label>-->
+            <!--<hint>Событие (отдельного элемента или всей формы), которое вызывает действие.</hint>-->
+            <!--<item id="0">-->
+                <!--<label>Изменение значения</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="1">-->
+                <!--<label todo="true">Изменение значения ИЛИ загрузка формы</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="2">-->
+                <!--<label>Активация элемента</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="3">-->
+                <!--<label todo="true">Загрузка формы (after controls ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="4">-->
+                <!--<label todo="true">Загрузка формы (before data ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="5">-->
+                <!--<label todo="true">Загрузка формы (after data ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+        <!--</event-type>-->
+        <event-condition>
+            <label>Выполнять действие в следующем случае</label>
+            <item id="always">Всегда</item>
+            <item id="new-only">Только в режиме "создания"</item>
+            <item id="formula">Когда формула возвращает "true"</item>
+            <formula>Формула</formula>
+        </event-condition>
+        <event-control>
+            <label>Элемент</label>
+        </event-control>
+        <service-to-call>
+            <label>Используемый сервис</label>
+            <hint>К какому сервису обращаться при наступлении события</hint>
+        </service-to-call>
+        <source>
+            <label>Источник</label>
+        </source>
+        <destination>
+            <label>Назначение</label>
+        </destination>
+        <source-control>
+            <label>Элемент-источник</label>
+        </source-control>
+        <destination-xpath>
+            <label>Выражение XPath для приемника</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>Номер параметра</label>
+        </parameter-number>
+        <response-values>
+            <label>Задать из ответа значения элементов</label>
+        </response-values>
+        <destination-control>
+            <label>Целевой элемент</label>
+        </destination-control>
+        <source-xpath>
+            <label>Выражение XPath для источника</label>
+        </source-xpath>
+        <response-itemset>
+            <label>Заполнить из ответа элементы выбора</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>Целевой элемент выбора</label>
+        </destination-selection-control>
+        <items>
+            <label>Элементы</label>
+            <hint>Выражение XPath, возвращает один узел для каждого элемента.</hint>
+        </items>
+        <item-label>
+            <label>Название</label>
+            <hint>Выражение XPath, возвращает значение.</hint>
+        </item-label>
+        <item-value>
+            <label>Значение</label>
+            <hint>Выражение XPath, возвращает значение.</hint>
+        </item-value>
+        <item-hint>
+            <label>Формула подсказки</label>
+            <hint>Относительно узла выбора</hint>
+        </item-hint>
+        <is-last-page>
+            <label>Формула последней страницы</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>Автоматически выбирать единственный вариант</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>Сохранить</label>
+        </save>
+        <test>
+            <label>Тестировать</label>
+        </test>
+
+        <general-settings>Общие настройки</general-settings>
+        <service-request-actions>Действия запроса к сервису</service-request-actions>
+        <service-response-actions>Действия ответа сервиса</service-response-actions>
+
+        <set-control-value>Установить значение элемента управления</set-control-value>
+        <set-control-itemset>Установить список вариантов элемента</set-control-itemset>
+        <save-to-dataset>Сохранить в набор данных</save-to-dataset>
+        <dataset-name>Название набора данных</dataset-name>
+        <set-control-value-unavailable>Установить значение элемента управления доступно только при выборе «после подготовки элементов управления»</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>Предварительный просмотр формы</label>
+        <console>Консоль</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>Тестирование PDF</label>
+        <use-form-data>Использовать введенные данные формы</use-form-data>
+        <disable-default>Отключить вычисление формул "Начальные значения"</disable-default>
+        <disable-calculate>Отключить вычисление формул "Вычисляемые значения"</disable-calculate>
+        <disable-relevant>Показывать элементы, сетки и разделы с динамической видимостью</disable-relevant>
+        <show-hints>Показывать подсказки элементов</show-hints>
+        <show-alerts>Показывать предупреждения некорректных элементов</show-alerts>
+        <show-required>Стилизовать обязательные элементы</show-required>
+        <use-pdf-template todd="true">Использовать шаблон PDF</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Возможность Orbeon Forms PE</label>
+        <message>
+            <div>
+                <p>Эта возможность доступна только в Orbeon Forms PE.</p>
+                <p>Для дополнительной информации обратитесь к <a href="http://www.orbeon.com/download" target="_blank">веб-сайту Orbeon</a>.</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>Настройки электронной почты</label>
+        <templates>Шаблоны электронной почты</templates>
+        <template-name>
+            <label>Название шаблона электронной почты</label>
+            <hint>Это название не видно конечным пользователям; оно используется в процессах, например: email(template = "notify-user")</hint>
+        </template-name>
+        <language>
+            <label>Язык</label>
+            <any-language>Любой язык</any-language>
+        </language>
+        <headers>
+            <from>Отправитель</from>
+            <to>Получатель</to>
+            <cc>Копия</cc>
+            <bcc>Скрытая копия</bcc>
+            <reply-to>Ответить на</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>Значение элемента</control-value>
+            <expression>Формула</expression>
+            <text>Текст</text>
+        </header-value-types>
+        <enable-if-true>Включить этот шаблон только если следующая формула возвращает true</enable-if-true>
+        <subject>Тема письма</subject>
+        <body>Тело письма</body>
+        <use-html>Использовать HTML</use-html>
+        <attach-form-as>Прикрепить форму как</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>Прикрепить файлы, загруженные пользователями в форму</label>
+            <choices>
+                <all>Все</all>
+                <none>Нет</none>
+                <selected>Выбранные вложения</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>Исключить из всех значений элементов</exclude-from-all-control-values>
+        <use-default>Использовать по умолчанию</use-default>
+        <delete-template>Удалить шаблон</delete-template>
+        <template-parameters>Параметры шаблона</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>Настройка прав</label>
+        <enable-permissions>Включить для этой формы управление доступом</enable-permissions>
+        <role>Роль</role>
+        <permissions>Права</permissions>
+        <operations>Действия</operations>
+        <anyone>Любой пользователь</anyone>
+        <anyone-with-token>Требуется токен</anyone-with-token>
+        <any-authenticated-user>Любой аутентифицированный пользователь</any-authenticated-user>
+        <owner>Владелец</owner>
+        <group-member>Члены группы</group-member>
+        <create>Заполнять форму</create>
+        <read>Просматривать</read>
+        <update>редактировать</update>
+        <delete>Удалять</delete>
+        <list>Список</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>Рабочий процесс и права</label>
+
+        <custom-operations>Определить пользовательские операции для этой формы</custom-operations>
+        <operation-label>Название</operation-label>
+        <predefined-label>Предопределенные</predefined-label>
+        <custom-label>Пользовательские</custom-label>
+        <available-to>Доступно для</available-to>
+        <availability-to-anyone>Любой</availability-to-anyone>
+        <availability-to-no-one>Никто</availability-to-no-one>
+        <availability-to-users>Пользователи, соответствующие следующему правилу</availability-to-users>
+        <availability-to-users-before>Пользователи, соответствующие</availability-to-users-before>
+        <availability-to-users-after>из следующих правил</availability-to-users-after>
+        <workflow-stage>Этап рабочего процесса</workflow-stage>
+        <workflow-role>Роль рабочего процесса</workflow-role>
+        <authentication-role>Роль аутентификации</authentication-role>
+        <show-button>Показывать кнопку на странице деталей</show-button>
+        <any>Любой</any>
+        <all>Все</all>
+        <actions>Действия</actions>
+        <no-action>Нет действия</no-action>
+        <change-stage-action>Изменить этап</change-stage-action>
+        <run-process-action>Выполнить процесс</run-process-action>
+        <remove-operation>Удалить операцию</remove-operation>
+        <is>является</is>
+        <is-not>не является</is-not>
+
+        <stages>Этапы</stages>
+
+        <stage-name>Название этапа</stage-name>
+        <default-stage>По умолчанию</default-stage>
+
+        <operations>
+            <label>Операции</label>
+            <item>
+                <label>Заполнить новую форму</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Просмотреть список и искать данные</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Доступ к данным для редактирования</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>Доступ к данным для просмотра</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>Доступ к PDF/TIFF</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>Горячие клавиши</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>Сообщения</label>
+        <language-header>Язык</language-header>
+        <name-header>Название</name-header>
+        <value-header>Значение</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>Редактируемые режимы</editable>
+        <review>Режим просмотра</review>
+        <pdf-automatic>Автоматический PDF</pdf-automatic>
+        <pdf-template>Шаблон PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Ширина поля</field-width>
+        <default>Использовать по умолчанию</default>
+        <full>Полная</full>
+        <natural>Естественная</natural>
+        <field-align>Выравнивание поля</field-align>
+        <left>Слева</left>
+        <right>Справа</right>
+        <learn-settings-below>Узнать больше о настройках ниже</learn-settings-below>
+        <field-value-visibility>
+            <label>Видимость значения поля</label>
+            <hint>Управляет тем, как отображается значение поля</hint>
+            <item id="visible">Видимое</item>
+            <item id="obscured">Скрытое</item>
+            <item id="partial">Частичное</item>
+            <item id="reveal">Разрешить пользователю показать</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>Вы уверены, что хотите удалить текущий раздел?</delete-section>
+        <delete-grid>Вы уверены, что хотите удалить текущую сетку?</delete-grid>
+        <delete-column>Вы уверены, что хотите удалить текущий столбец?</delete-column>
+        <delete-row>Вы уверены, что хотите удалить текущую строку?</delete-row>
+        <delete-resources>Вы уверены, что хотите удалить все ресуры для языка</delete-resources>
+        <delete-service>Вы уверены, что хотите удалить сервис "{0}"?{1,choice,0# Нет действий, использующих его.|1# 1 действие использует его.|1&lt; {1,number,integer} действий используют его.}</delete-service>
+        <delete-action>Вы уверены, что хотите удалить действие "{0}"?</delete-action>
+        <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
+        <metadata-edit-title>Описание формы</metadata-edit-title>
+        <select-template-output>Пожалуйста, выберите шаблон формы для использования в качестве отправной точки.</select-template-output>
+        <app-form-optional>Задайте название приложения и название формы.</app-form-optional>
+        <app-form-required>Задайте название приложения и название формы.</app-form-required>
+        <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
+        <xpath-errors>В вашей форме {0,choice,1#одна ошибка XPath|1&lt;{0,number,integer} ошибок XPath}.</xpath-errors>
+        <lhha-checkbox>Отметьте этот флажок, если хотите использовать HTML-теги</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>Значение обязательно</required>
+        <xpath>Некорректное выражение XPath</xpath>
+    </alerts>
+    <template>
+        <untitled-form>Новая форма</untitled-form>
+        <items>
+            <item>
+                <label>Первый вариант</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Второй вариант</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Третий вариант</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

@@ -1,0 +1,1600 @@
+<resource xml:lang="nl">
+    <!-- Form metadata -->
+    <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+    <application-name>
+        <label>Applicatienaam</label>
+        <hint>Identificeert een groep forms, bijvoorbeeld op basis van functionaliteit of afdeling (bijv. "verkoop"). Als u een groep forms hebt, kunt u uw organisatienaam (bijv. "acme") gebruiken. Deze naam komt terug in de URL van het gepubliceerde form, dus we raden u aan om alleen kleine letters gebruiken.</hint>
+        <help />
+        <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
+    </application-name>
+    <form-name>
+        <label>Form naam</label>
+        <hint>Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
+        <help />
+        <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
+        <no-form-alert>
+            Er is geen form met deze specifieke applicatie- en formnaam in dit systeem gevonden.
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#Eén form|1&lt;{0,number,integer} formulieren}
+            met deze applicatienaam en formnaam {0,choice,1#is|1&lt;zijn} gepubliceerd.
+            &lt;a href="{1}" target="_blank"&gt;Bekijk in de Admin-pagina.&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#Eén form|1&lt;{0,number,integer} formulieren}
+            met deze applicatienaam en formnaam {0,choice,1#is|1&lt;zijn} in behandeling.
+            &lt;a href="{1}" target="_blank"&gt;Bekijk in de Form Builder overzichtspagina.&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>Form titel</label>
+        <hint>Formtitel in de huidige taal</hint>
+    </title>
+    <description>
+        <label>Form omschrijving</label>
+        <hint>Form omschrijving in de huidige taal</hint>
+    </description>
+    <logo>
+        <label>Logo</label>
+        <hint>Het logo verschijnt bovenin uw form</hint>
+    </logo>
+    <general-settings>
+        <label>Algemene instellingen</label>
+    </general-settings>
+    <custom-settings>
+        <label>Aangepaste instellingen</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>Knippen</label>
+    </cut>
+    <copy>
+        <label>Kopiëren</label>
+    </copy>
+    <paste>
+        <label>Plakken</label>
+    </paste>
+    <undo-redo>
+        <undo>Herstel {0}</undo>
+        <redo>Opnieuw {0}</redo>
+        <insert>invoegen</insert>
+        <rename>naam wijzigen</rename>
+        <delete-control>verwijder control</delete-control>
+        <delete-container>verwijder container</delete-container>
+        <merge-section-template>voeg sectietemplate samen</merge-section-template>
+        <move-control>verplaats control</move-control>
+        <move-container>verplaats container</move-container>
+        <update-settings>update instellingen</update-settings>
+        <insert-control>voeg control toe</insert-control>
+        <insert-section>voeg sectie in</insert-section>
+        <insert-grid>voeg grid toe</insert-grid>
+        <delete-row>verwijder rij</delete-row>
+        <insert-row>voeg rij toe</insert-row>
+        <control-settings>control instellingen</control-settings>
+        <move-wall>verwijder muur</move-wall>
+        <split-cell>splits cel</split-cell>
+        <merge-cell>voeg cellen samen</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>Voeg sectietemplate samen</label>
+    </merge-section>
+    <form-structure>
+        <label>Form structuur</label>
+    </form-structure>
+    <controls>
+        <label>Controls</label>
+    </controls>
+    <i18n>
+        <label>Internationalisatie</label>
+    </i18n>
+    <language>
+        <label>Huidige taal</label>
+    </language>
+    <advanced>
+        <label>Geavanceerd</label>
+    </advanced>
+    <attachments>
+        <label>Bijlagen</label>
+    </attachments>
+    <services-actions>
+        <label>Services &amp; acties</label>
+    </services-actions>
+    <http-services>
+        <label>HTTP services</label>
+    </http-services>
+    <database-services>
+        <label>Database services</label>
+    </database-services>
+    <actions>
+        <label>Acties</label>
+    </actions>
+    <new-section>
+        <label>Nieuwe sectie</label>
+    </new-section>
+    <new-grid>
+        <label>Nieuw grid</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>Nieuw herhalend grid</label>
+    </new-repeated-grid>
+    <change-schema>
+        <label>Wijzig schema</label>
+    </change-schema>
+    <upload-schema>
+        <label>XML Schema</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>PDF templates</label>
+    </pdf-templates>
+    <change-css>
+        <label>Wijzig CSS</label>
+    </change-css>
+    <upload-css>
+        <label>Koppel CSS</label>
+    </upload-css>
+    <show-source>
+        <label>Toon bron</label>
+    </show-source>
+    <edit-source>
+        <label>Wijzig bron</label>
+    </edit-source>
+    <permissions>
+        <label>Bevoegdheden</label>
+    </permissions>
+    <reload-components>
+        <label>Laad toolbox opnieuw</label>
+    </reload-components>
+    <library-version>
+        <label>Bibliotheekversie</label>
+        <item>
+            <label>Versie {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>Klik om een sectietitel toe te voegen</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>Typ uw sectietitel</label>
+    </type-section-title>
+    <enter-label>
+        <label>Klik om een label toe te voegen</label>
+    </enter-label>
+    <type-label>
+        <label>Typ uw label hier</label>
+    </type-label>
+    <enter-hint>
+        <label>Klik om een hint toe te voegen</label>
+    </enter-hint>
+    <type-hint>
+        <label>Typ uw hint hier</label>
+    </type-hint>
+    <enter-text>
+        <label>Klik om tekst toe te voegen</label>
+    </enter-text>
+    <type-text>
+        <label>Typ uw tekst hier</label>
+    </type-text>
+    <click-cell>
+        <label>Klik om deze cel te selecteren</label>
+    </click-cell>
+    <insert-control>
+        <label>Gebruik de toolbar om een control toe te voegen</label>
+    </insert-control>
+    <edit-items>
+        <label>Wijzig keuzes</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>Cel samenvoegen met cel aan de rechterkant</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>Splits horizontaal</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>Cel samenvoegen met cel eronder</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>Splits verticaal</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>Verwijder control</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>Versleep om te verplaatsen of kopiëren</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>Verwijder sectie</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>Verwijder rij</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>Verwijder kolom</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>Kolom links toevoegen</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>Kolom rechts toevoegen</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>Rij boven toevoegen</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>Rij onder toevoegen</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>Sectie-instellingen</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>Grid-instellingen</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>Naar boven</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>Naar beneden</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>Naar rechts</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>Naar links</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>Control-instellingen</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>Wissel weergave</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>Wijzig help</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>Toevoegen</label>
+    </add>
+    <remove>
+        <label>Verwijderen</label>
+    </remove>
+    <edit>
+        <label>Bewerken</label>
+    </edit>
+    <classes>
+        <label>Aangepaste CSS classes</label>
+    </classes>
+    <autocomplete>
+        <label>Autocomplete attribuut</label>
+        <groups>
+            <general>Algemeen</general>
+            <name>Naam en titel</name>
+            <credentials>Inloggegevens</credentials>
+            <address>Adres</address>
+            <contact>Contact</contact>
+            <payment>Betaling</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">Gebruik property</item>
+        <item id="1">Ja</item>
+        <item id="2">Nee</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>Doorgaan</label>
+    </continue>
+    <apply>
+        <label>Toepassen</label>
+    </apply>
+    <cancel>
+        <label>Annuleren</label>
+    </cancel>
+    <close>
+        <label>Sluiten</label>
+    </close>
+    <delete>
+        <label>Verwijderen</label>
+    </delete>
+    <or>
+        <label>of</label>
+    </or>
+    <errors>
+        <label>Fouten</label>
+    </errors>
+    <error-summary>
+        <label>[{1,choice,
+            0#Geen bericht|
+            1#'{0,choice,0#Fout|1#Waarschuwing|2#Informatiebericht|3#Bericht}'|
+            1&lt;'{0,choice,0#Fouten|1#Waarschuwingen|2#Informatieberichten|3#Berichten}'}]</label>
+    </error-summary>
+    <back-to-summary>
+        <label>Terug naar lijst met formulieren</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">Vaste weergave</item>
+        <item id="1">Vloeiende weergave</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Gebruik suggestie: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>Naam</label>
+                <alert>Ontbrekende of ongeldige waarde</alert>
+            </name>
+            <xpath>
+                <label>Formule expressie</label>
+                <alert>Oneldige formule</alert>
+            </xpath>
+            <control>
+                <label>Control</label>
+                <alert>Ontbrekende waarde</alert>
+            </control>
+            <token>
+                <label>Genereer token URL-parameter</label>
+            </token>
+            <type>
+                <item id="0">Control-waarde</item>
+                <item id="1">Formule</item>
+                <item id="2">Alle control-waarden</item>
+                <choice label="Link">
+                    <item id="3">Bewerkpagina</item>
+                    <item id="4">Weergavepagina</item>
+                    <item id="5">Nieuwe pagina</item>
+                    <item id="6">Overzichtspagina</item>
+                    <item id="7">Startpagina</item>
+                    <item id="9">Pagina met gepubliceerde formulieren</item>
+                    <item id="10">Formulieren admin</item>
+                    <item id="8">PDF-bestand</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>Form-instellingen</label>
+        <save-as>Bewaar als…</save-as>
+        <open><label>Form-instellingen</label></open>
+        <options>Form opties</options>
+        <view-options>Weergave</view-options>
+        <wizard-options>Wizard</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Control-instellingen</control-settings>
+        <about>Over dit formulier</about>
+        <stats>Form-statistieken</stats>
+        <sections>Secties</sections>
+        <repeats>Herhalingen</repeats>
+        <grids>Grids</grids>
+        <section-templates>Sectie-templates</section-templates>
+        <controls>Controls</controls>
+        <all>Alle</all>
+        <use-property>Gebruik property</use-property>
+        <singleton>
+            <label>Singleton form</label>
+            <hint>Sta slechts één toegankelijke instantie van de formgegevens toe voor deze formdefinitie</hint>
+        </singleton>
+        <allow-template-use>
+            <label>Sta gebruik als formuliersjabloon toe</label>
+            <hint>Indien geselecteerd, wordt dit formulier getoond in de lijst met formuliersjablonen</hint>
+        </allow-template-use>
+        <wizard>
+            <label>Wizard weergave</label>
+            <hint>Of de bovenste secties als separate wizardpagina's moeten worden weergegeven</hint>
+        </wizard>
+        <wizard-mode>
+            <label>Wizard-navigatie validatiemodus</label>
+            <hint>Hoe wizard-navigatie zich gedraagt bij ongeldige gegevens</hint>
+            <item id="0">Gebruik standaard</item>
+            <item id="1">Vrij</item>
+            <item id="2">Laks</item>
+            <item id="3">Strikt</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>Wizard subsectie-navigatie</label>
+            <hint>Of de wizard navigatie toestaat voor secties en grids binnen secties op het bovenste niveau</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>Wizard subsecties inhoudsopgave</label>
+            <hint>Hoe de wizard subsecties toont in de inhoudsopgave</hint>
+            <item id="0">Gebruik standaard</item>
+            <item id="1">Toon subsecties alleen voor de actieve sectie</item>
+            <item id="2">Toon subsecties voor alle secties</item>
+            <item id="3">Toon geen subsecties</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>Wizard aparte inhoudsopgave</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>Toon altijd wizard sectie-status</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>Maximum bijlagegrootte per control</label>
+            <hint>Kan ook per control worden ingesteld in de control-instellingen</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>Maximum totale bijlagegrootte</label>
+            <hint>Van toepassing op alle bijlage-controles in dit form</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>Maximum aantal bestanden per bijlage-element</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>Minimum aantal bestanden per bijlage-element</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>Toegestane bestandstypen</label>
+            <hint>Bijvoorbeeld "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>Weergave van control-labels</label>
+        </labels>
+        <hints>
+            <label>Weergave van control-hints</label>
+        </hints>
+        <automatic-hints>
+            <label>Gebruik automatische hints</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">Gebruik standaard</item>
+            <item id="1">Inline</item>
+            <item id="2">Tooltip</item>
+        </appearances>
+        <placeholders>
+            <label>Gebruik placeholder voor tekstvelden en tekstgebieden</label>
+        </placeholders>
+        <data-migration>
+            <label>Eenvoudige gegevensmigratie</label>
+            <hint>Ontbrekende elementen in gegevens automatisch toevoegen/verwijderen</hint>
+            <item id="0">Gebruik property</item>
+            <item id="1">Ingeschakeld</item>
+            <item id="2">Uitgeschakeld</item>
+            <item id="3">Geef een foutmelding</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>Grid Tab-volgorde</label>
+            <item id="0">Gebruik property</item>
+            <item id="1">Rijen</item>
+            <item id="2">Kolommen</item>
+        </grid-tab-order>
+        <time-window>
+            <label>Tijdvenster</label>
+            <available>
+                <available-from>
+                    <label>Aanmaken alleen beschikbaar vanaf specifieke datum</label>
+                    <date>Startdatum en -tijd</date>
+                    <message>In behandeling bericht</message>
+                </available-from>
+                <available-to>
+                    <label>Aanmaken alleen beschikbaar tot specifieke datum</label>
+                    <date>Einddatum en -tijd</date>
+                    <message>Verlopen bericht</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>PDF-pagina oriëntatie</label>
+            <hint />
+            <item id="default">Gebruik property</item>
+            <item id="portrait">Staand</item>
+            <item id="landscape">Liggend</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>PDF-paginagrootte</label>
+            <hint />
+            <item id="default">Gebruik property</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">Letter</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>Berekeningen in alleen-lezen modus (Review, PDF)</label>
+            <hint />
+            <item id="default">Gebruik property</item>
+            <item id="false">Inschakelen</item>
+            <item id="true">Uitschakelen</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>Browserpagina-indeling</label>
+            <hint>Of het formulier een vaste of vloeiende breedte heeft</hint>
+            <item id="0">Gebruik property</item>
+            <item id="1">Vaste breedte</item>
+            <item id="2">Vloeiende breedte</item>
+        </html-page-layout>
+        <density>
+            <label>Dichtheid</label>
+            <hint>Afstand tussen elementen in de interface</hint>
+            <item id="0">Gebruik property</item>
+            <item id="1">Compact</item>
+            <item id="2">Comfortabel</item>
+            <item id="3">Ruim</item>
+        </density>
+        <analysis-calculate>
+            <label>Automatische afhankelijkheid calculatie</label>
+            <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>
+        </analysis-calculate>
+        <versions>Versies</versions>
+        <current-version>Huidige versie</current-version>
+        <created-with-version>Gemaakt met versie</created-with-version>
+        <updated-with-versions>Bijgewerkt met versies</updated-with-versions>
+        <thumbnail>
+            <label>Formulier thumbnail</label>
+            <hint>Gebruikt voor formuliersjablonen en de landingspagina</hint>
+        </thumbnail>
+        <default-template>Standaardsjabloon</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>Control-instellingen: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>Basis-instellingen</label></tab-base>
+        <tab-validations><label>Validatie en waarschuwingen</label></tab-validations>
+        <tab-formulas><label>Formules</label></tab-formulas>
+        <control-name>
+            <label>Control-naam</label>
+            <alert>Naam wordt al gebruikt of is ongeldig</alert>
+            <hint>Bijv.: "voornaam"</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>Naam van het PDF-veld</label>
+            <alert>Onbekende PDF-veldnaam</alert>
+            <item id="0">Automatisch</item>
+            <item id="1">Aangepast</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Naam van het Excel-bereik</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>Index control</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>Toon in samenvatting</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>Sta bulkbewerking toe</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>Standaard sorteren op deze kolom</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>Encrypt gegevens in rust</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>Niet tonen op overzichtspagina</do-not-show>
+            <show>Tonen op overzichtspagina</show>
+            <column-only>Alleen kolom tonen</column-only>
+            <search-only>Alleen zoeken tonen</search-only>
+        </summary-show>
+        <role>
+            <restrict>Beperk tot rol</restrict>
+            <all>Alle</all>
+            <any>Elke</any>
+            <of-the-following>van de volgende:</of-the-following>
+            <empty>Lege rol</empty>
+            <duplicate>Dubbele rol</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>Gegevens opslaan</save-data>
+            <run-process>Proces uitvoeren</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>Oplopend</ascending>
+            <descending>Aflopend</descending>
+            <conflict>Het inschakelen van sorteren op deze control zal het uitschakelen op de volgende control: {0}</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>Control weergave</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>Verwijder start- en eindspaties</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+        <types>
+            <label>Datatype</label>
+        </types>
+        <builtin-type>
+            <label>Ingebouwd type</label>
+            <hint>Built-in data type</hint>
+
+            <use-schema-type>Gebruik schema type</use-schema-type>
+            <use-component-type>Gebruik voorgedefinieerd type</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>Algemene typen</label>
+                    <type label="String">string</type>
+                    <type label="Boolean">boolean</type>
+                    <type label="E-mailadres">email</type>
+                </choices>
+                <choices>
+                    <label>Numerieke typen</label>
+                    <type label="Decimaal">decimal</type>
+
+                    <type label="Integer">integer</type>
+                    <type label="Positieve integer">positiveInteger</type>
+                    <type label="Niet-positieve integer">nonPositiveInteger</type>
+                    <type label="Negatieve integer">negativeInteger</type>
+                    <type label="Niet-negatieve integer">nonNegativeInteger</type>
+
+                    <type label="Eenvoudige precisie decimaal">float</type>
+                    <type label="Dubbele precisie decimaal">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Datum en tijd typen</label>
+                    <type label="Datum">date</type>
+                    <type label="Tijd">time</type>
+                    <type label="Datum en tijd">dateTime</type>
+                    <type label="Duur">duration</type>
+                    <type label="Jaar en maand">gYearMonth</type>
+                    <type label="Maand en dag">gMonthDay</type>
+                    <type label="Jaar">gYear</type>
+                    <type label="Maand">gMonth</type>
+                    <type label="Dag">gDay</type>
+                </choices>
+                <choices>
+                    <label>XML typen</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="XML qualified name">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>Andere typen</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Base64-gecodeerde binary">base64Binary</type>
+                    <type label="Hexadecimaal-gecodeerde binary">hexBinary</type>
+                    <type label="URI">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>Schema type</label>
+            <hint>Type van een geïmporteerd schema</hint>
+        </schema-type>
+        <required>
+            <label>Verplicht</label>
+            <hint>Of gegevens verplicht zijn</hint>
+            <item id="0">Ja</item>
+            <item id="1">Nee</item>
+            <item id="2">Formule</item>
+        </required>
+        <constraint>
+            <item id="formula">Formule</item>
+            <item id="max-length">Maximumlengte</item>
+            <item id="min-length">Minimumlengte</item>
+            <item id="positive">Positief</item>
+            <item id="non-negative">Positief of nul</item>
+            <item id="non-positive">Negatief of nul</item>
+            <item id="negative">Negatief</item>
+            <item id="fraction-digits">Maximum aantal decimalen</item>
+            <item id="upload-max-size-per-file" multiple="false">Maximum bijlagegrootte</item>
+            <item id="upload-max-size-per-file" multiple="true">Maximale bijlagegrootte per bestand</item>
+            <item id="upload-max-size-aggregate-per-control">Maximale totale bijlagegrootte</item>
+            <item id="upload-max-files-per-control">Maximaal aantal bestanden per besturingselement</item>
+            <item id="upload-min-files-per-control">Minimaal aantal bestanden per besturingselement</item>
+            <item id="upload-mediatypes">Ondersteunde bestandstypen</item>
+            <item id="excluded-dates">Uit te sluiten datums</item>
+        </constraint>
+        <formula>
+            <label>Formule</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>Boolean XPath expressie</hint>
+        </formula>
+        <integer-argument>
+            <label>Integer waarde</label>
+            <alert>Oneldige waarde</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>Waarschuwingssjabloon parameters bewerken</edit-label>
+            <dialog-label>Waarschuwingssjabloon parameters</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>Zichtbaarheid</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>Boolean XPath expressie</hint>
+             <help>
+                &lt;p&gt;
+                    Hiermee kunt u opgeven of de control zichtbaar is of niet.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Ja:&lt;/b&gt; De control is zichtbaar.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Nee:&lt;/b&gt; De control is verborgen.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formule:&lt;/b&gt; De control is dynamisch zichtbaar of verborgen, afhankelijk van een formule.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    De formule stelt u in staat om dynamisch op te geven of de control zichtbaar is of niet. Deze moet een boolean waarde retourneren.
+                    De control is zichtbaar als de formule evalueert naar &lt;code&gt;true()&lt;/code&gt;, en verborgen als deze evalueert naar &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code&gt;$&lt;/code&gt;-teken.
+                    Bij het invoeren van het &lt;code&gt;$&lt;/code&gt;-teken wordt een lijst met beschikbare form controls weergegeven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>Alleen-lezen</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>Boolean XPath expressie</hint>
+            <help>
+                &lt;p&gt;
+                    Hiermee kunt u opgeven of de control alleen-lezen of lezen-schrijven is.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Ja:&lt;/b&gt; De control is alleen-lezen.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Nee:&lt;/b&gt; De control is lezen-schrijven.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formule:&lt;/b&gt; De control is dynamisch alleen-lezen of lezen-schrijven, afhankelijk van een formule.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    De formule stelt u in staat om dynamisch op te geven of de control alleen-lezen of lezen-schrijven is. Deze moet een boolean waarde retourneren.
+                    De control is alleen-lezen als de formule evalueert naar &lt;code&gt;true()&lt;/code&gt;, en lezen-schrijven als deze evalueert naar &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code&gt;$&lt;/code&gt;-teken.
+                    Bij het invoeren van het &lt;code&gt;$&lt;/code&gt;-teken wordt een lijst met beschikbare form controls weergegeven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>Initiële waarde</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>XPath expressie</hint>
+            <help>
+                &lt;p&gt;
+                    Deze formule stelt u in staat om een initiële waarde op te geven voor de control in alleen "nieuwe" modus.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code&gt;$&lt;/code&gt;-teken.
+                    Bij het invoeren van het &lt;code&gt;$&lt;/code&gt;-teken wordt een lijst met beschikbare form controls weergegeven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>Berekende waarde</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>XPath expressie</hint>
+            <help>
+                &lt;p&gt;
+                    Deze formule stelt u in staat om een berekende waarde op te geven voor de control.
+                    Deze waarde wordt opnieuw geëvalueerd om indien nodig up-to-date te blijven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    U kunt naar andere form controls verwijzen in de formule door hun namen vooraf te laten gaan door een &lt;code&gt;$&lt;/code&gt;-teken.
+                    Bij het invoeren van het &lt;code&gt;$&lt;/code&gt;-teken wordt een lijst met beschikbare form controls weergegeven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voor meer informatie over formules, zie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>Label</label>
+        </control-label>
+        <control-hint>
+            <label>Hint</label>
+        </control-hint>
+        <control-help>
+            <label>Help melding</label>
+            <hint>Wordt getoond wanneer hulp wordt geactiveerd</hint>
+        </control-help>
+        <control-text>
+            <label>Verklarende tekst</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>Kort label</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>Iteratielabel</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>Label voor herhaling toevoegen</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>Tekst voor herhaling verwijderen</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>Waarschuwingsmelding</label>
+            <hint>Wordt getoond zolang de waarschuwing actief is</hint>
+        </alert>
+        <default-alert>
+            <label>Standaard waarschuwingsmelding</label>
+            <hint>Wordt getoond als er geen specifiekere waarschuwingsmelding beschikbaar is</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>Gebruik algemene standaard waarschuwingstekst</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>Gebruik standaard waarschuwingstekst</label>
+        </use-default-alert>
+        <validation-type><label>Validatie type</label></validation-type>
+        <validation-details><label>Validatiedetails</label></validation-details>
+        <level><label>Niveau</label></level>
+        <use-html>Gebruik HTML</use-html>
+        <parameters>Templateparameters</parameters>
+        <automatic-hint>
+            <label>Gebruik automatische hint</label>
+            <hint>Voegt een hint toe op basis van de maximale bestandsgrootte en ondersteunde bestandstypen die u mogelijk hebt opgegeven in het tabblad Validaties en waarschuwingen</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>Open selectie</label>
+            <hint>Indien ingeschakeld, kunnen gebruikers hun eigen waarde invoeren, en de waarde (tekst opgeslagen in de gegevens) wordt ook gebruikt als het label (tekst weergegeven in de vervolgkeuzelijst)</hint>
+        </open-selection>
+        <store-label>
+            <label>Label opslaan</label>
+            <hint>Indien ingeschakeld, wordt het geselecteerde label naast de gegevens opgeslagen</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">Gebruik standaard</item>
+            <item id="1">Ja</item>
+            <item id="2">Nee</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>{0,choice,0#Sectie instellingen: "{2}" / "{1}"|1#Grid instellingen: "{1}"}</label>
+        <control-name>
+            <label>Naam</label>
+            <alert>Naam is al in gebruik of ongeldig</alert>
+            <hint>Bijv.: "adres"</hint>
+        </control-name>
+        <grid-columns>
+            <label>Aantal gridkolommen</label>
+        </grid-columns>
+        <grid-rows>
+            <label>Aantal gridrijen</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>Grid Tab-volgorde</label>
+            <item id="0">Standaard</item>
+            <item id="1">Rijen</item>
+            <item id="2">Kolommen</item>
+        </grid-tab-order>
+        <options>
+            <label>Opties</label>
+            <item>
+                <label>Initieel open</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>Pagina-einde ervoor</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>Inklapbaar</label>
+        </collapsible>
+        <visibility>
+            <label>Zichtbaarheid</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>Boolean XPath expressie</hint>
+        </visibility>
+        <readonly>
+            <label>Alleen-lezen</label>
+            <alert>Oneldige XPath expressie</alert>
+            <hint>Boolean XPath expressie</hint>
+        </readonly>
+        <repeat>
+            <label>Herhaal inhoud</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>Sta de gebruiker toe herhalingen toe te voegen, te verwijderen of te verplaatsen</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>Toon herhalingsnummer</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>Toon één herhaling tegelijk in de wizard</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label>Activeer aangepaste iteratienaam</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>Aangepaste iteratienaam</label>
+            <alert>Naam is al in gebruik of ongeldig</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>Minimum aantal herhalingen</label>
+            <alert>Onjuiste waarde</alert>
+            <hint>Niet-negatief aantal of XPath expressie</hint>
+        </min>
+        <max>
+            <label>Maximum aantal herhalingen</label>
+            <alert>Onjuiste waarde</alert>
+            <hint>Positief aantal of XPath expressie</hint>
+        </max>
+        <freeze>
+            <label>Bevries herhalingen</label>
+            <alert>Onjuiste waarde</alert>
+            <hint>Niet-negatief getal tot het minimum aantal herhalingen (zie hierboven), of een XPath-expressie</hint>
+        </freeze>
+        <no-freeze>Niet bevriezen</no-freeze>
+        <appearance-minimal>
+            <label>Vereenvoudigde weergave</label>
+            <hint>Toon basis toevoegen/verwijderen knoppen zonder menu of herordenen</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>Pas initiële waarde formules toe bij toevoegen van iteraties</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>Initieel aantal iteraties gebruikt template</label>
+        </initial-iterations>
+        <other>Anders</other>
+        <one>Eén herhaling</one>
+        <unlimited>Onbeperkt</unlimited>
+        <no-minimum>Geen minimum</no-minimum>
+        <tab-base><label>Basis-instellingen en formules Settings and Formulas</label></tab-base>
+        <tab-repeat><label>Herhalende inhoud</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>Bevestig</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>Control namen</label>
+        <prefix>
+            <label>Prefix</label>
+        </prefix>
+        <suffix>
+            <label>Suffix</label>
+        </suffix>
+        <original-name>
+            <label>Oorspronkelijke naam</label>
+        </original-name>
+        <new-name>
+            <label>Nieuwe naam</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>Publiceer form</label>
+        <publish>Publiceer</publish>
+        <publish-success>De formdefinitie is succesvol gepubliceerd als versie {1,number,integer}, {0,choice,0#zonder bijlagen|1#met 1 bijlage|1&lt;met {0,number,integer} bijlagen}.</publish-success>
+        <publish-error>Er is een fout opgetreden tijdens het publiceren.</publish-error>
+        <latest-published-version>Laatst gepubliceerde versie</latest-published-version>
+        <create-new-version-item>maak een nieuwe formdefinitie met versienummer {0,number,integer}</create-new-version-item>
+        <overwrite-version-item>overschrijf de huidige formdefinitie met versienummer {0,number,integer} ({1,choice,0#niet beschikbaar|1#beschikbaar})</overwrite-version-item>
+        <create-new-version-help>
+            MERK OP: Publiceren van deze formdefinitie maakt een nieuwe versie van de formdefinitie in de database.
+            Bestaande gegevens in de database kunnen nog wel met de vorige versies van deze formdefinitie waaraan
+            deze zijn gkeoppeld, worden bekeken en bewerkt. De nieuwe versie van de formdefinitie wordt gebruikt om
+            nieuwe gegevens te maken.
+        </create-new-version-help>
+        <overwrite-version-help>
+            MERK OP: Hiermee overschrijft u de bestaande formdefnitie. Als de wijzigingen die u in de formdefinitie
+            hebt gedaan klein zijn, zoals wijzigingen in control-labels, dan zal de formdefinitie compatibel zijn met
+            bestaande formgegevens. Als u echter structuurwijzigingen hebt gedaan, zoals het toevoegen, verwijderen,
+            hernoemen, of verplaatsen van controls, dan is de formdefinitie mogelijk incompatibel met bestaande gegevens.
+            We raden u aan om voorzichtig te zijn bij het overschrijven van bestaande versies van formdefinities.
+        </overwrite-version-help>
+        <open-summary>Open Samenvattingpagina van gepubliceerd form</open-summary>
+        <open-new>Open Nieuw pagina van gepubliceerd form</open-new>
+        <version>Versie</version>
+        <available>Maak gepubliceerd form beschikbaar</available>
+        <comment>Opmerking</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>Taal toevoegen</label>
+        <new-language>
+            <label>Voeg de volgende taal toe</label>
+        </new-language>
+        <common>Meest gangbare talen</common>
+        <all>Andere talen</all>
+        <add-language>
+            <label>Taal toevoegen</label>
+        </add-language>
+        <remove-language>
+            <label>Taal verwijderen</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>Zoek controls</label>
+        <open-settings>
+            <label>Open instellingendialoog</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>XML Schema uploaden</label>
+        <schema-type>
+            <label>Beschikbare schema typen</label>
+            <hint>De beschikbare simple types in het geüploade schema</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>Schema namespace URI</label>
+            <hint>Dit is denamespace URI van het geüploade schema</hint>
+        </namespace-uri>
+        <operations>
+            <label>Bewerkingen</label>
+        </operations>
+        <delete-schema>
+            <label>Verwijder bestaand XML Schema</label>
+        </delete-schema>
+        <change-schema>
+            <label>XML Schema bewerken</label>
+        </change-schema>
+        <replace-schema>
+            <label>XML Schema vervangen</label>
+        </replace-schema>
+        <upload-schema>
+            <label>XML Schema koppelen</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>Uw schema lijkt geen simple types te bevatten. U zult geen typen kunnen selecteren uit dit schema voor validatie</no-simple-types>
+            <has-includes>Uw schema bevat imports of includes. Deze worden gedeactiveerd.</has-includes>
+            <not-a-schema>Het geüploade bestand is geen geldig schema.</not-a-schema>
+            <new-schema-information>Nieuw schema-informatie</new-schema-information>
+            <existing-schema-information>Bestaande schema-informatie</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>Bron</label>
+        <source>
+            <alert>Zorg dat de inhoud well-formed XML is</alert>
+        </source>
+    </dialog-edit-source>
+    <dialog-view-source>
+        <label>Bron tonen</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>PDF templates koppelen</label>
+        <pdf-upload>
+            <label>PDF-bestand</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>Naam</label>
+        </attachment-name>
+        <attachment-language>
+            <label>Taal</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>Keuze bewerken</label>
+        <resources-language>
+            <label>Resources taal</label>
+        </resources-language>
+        <label-header>
+            <label>Label</label>
+        </label-header>
+        <value-header>
+            <label>Waarde</label>
+        </value-header>
+        <hint-header>
+            <label>Hint</label>
+        </hint-header>
+        <clear-value>
+            <label>Waarde wissen</label>
+        </clear-value>
+        <remove-all>
+            <label>Alles verwijderen</label>
+        </remove-all>
+        <filter>
+            <label>Filterformule</label>
+        </filter>
+        <itemsetid-mode>
+            <label>Keuzes uit metadata gebruiken</label>
+            <item id="0">Wanneer de besturing het doel is van een actie (standaard)</item>
+            <item id="1">Altijd</item>
+            <item id="2">Nooit</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>HTTP service-editor</label>
+        <tab-definition><label>Definitie</label></tab-definition>
+        <tab-advanced><label>Geavanceerd</label></tab-advanced>
+        <tab-test><label>Testresultaten</label></tab-test>
+        <url-parameters><label>URL parameters</label></url-parameters>
+        <parameter-name><label>Naam</label></parameter-name>
+        <parameter-default-value><label>Standaardwaarde</label></parameter-default-value>
+        <no-headers>Geen headers ontvangen.</no-headers>
+        <service-name>
+            <label>Servicenaam</label>
+            <hint>Kies een unieke naam voor deze service</hint>
+        </service-name>
+        <service-performs-search>
+            <label>Service voert zoekactie uit</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>Service ondersteunt paginering</label>
+        </service-supports-paging>
+        <resource>
+            <label>Resource URL</label>
+            <hint>HTTP URL waarop de service beschikbaar is</hint>
+        </resource>
+        <method>
+            <label>Methode</label>
+        </method>
+        <serialization>
+            <label>Serialisatie</label>
+        </serialization>
+        <soap-submission>
+            <label>SOAP service</label>
+            <hint>Of dit een SOAP service is</hint>
+        </soap-submission>
+        <soap-action>
+            <label>SOAP Action</label>
+            <hint>Optionele SOAPAction header</hint>
+        </soap-action>
+        <http-authentication>
+            <label>HTTP authenticatie</label>
+            <hint>HTTP authenticatie</hint>
+        </http-authentication>
+        <username>
+            <label>Gebruikersnaam</label>
+        </username>
+        <password>
+            <label>Wachtwoord</label>
+        </password>
+        <request-body>
+            <label>Request body</label>
+            <hint>XML data (kan een SOAP envelope zijn)</hint>
+        </request-body>
+        <is-binary-response>
+            <label>Service respons heeft binaire inhoud</label>
+            <hint>Vink dit aan als de respons wordt gebruikt om een bijlage control-waarde in te stellen</hint>
+        </is-binary-response>
+        <response>
+            <label>Response</label>
+        </response>
+        <error-type>
+            <label>Fout type</label>
+            <item>
+                <label>Submission bezig</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>Geen gegevens</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>Validatiefout</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>Resource fout</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>Target fout</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>Interne fout</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>Resource URL</label>
+        </resource-uri>
+        <status-code>
+            <label>Statuscode</label>
+        </status-code>
+        <headers>
+            <label>Headers</label>
+        </headers>
+        <header-name>
+            <label>Headernaam</label>
+        </header-name>
+        <header-value>
+            <label>Headerwaarde(n)</label>
+        </header-value>
+        <response-body>
+            <label>Response body</label>
+        </response-body>
+        <xml-response-body>
+            <label>XML response body</label>
+        </xml-response-body>
+        <save>
+            <label>Bewaar</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>Database service-editor</label>
+        <service-name>
+            <label>Servicenaam</label>
+            <hint>Kies een unieke naam voor deze service</hint>
+        </service-name>
+        <datasource>
+            <label>Data-source</label>
+            <hint>JNDI data-source voor deze service</hint>
+        </datasource>
+        <query>
+            <label>SQL Query</label>
+            <hint>SQL query die placeholders kan bevatten voor parameters</hint>
+        </query>
+        <save>
+            <label>Bewaren</label>
+        </save>
+        <test>
+            <label>Testen</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>Acties-editor</label>
+        <service-name>
+            <label>Actie naam</label>
+            <hint>Kies een unieke naam voor deze actie</hint>
+        </service-name>
+        <observer-type>
+            <label>Start actie als</label>
+            <item id="0">
+                <label>het control</label>
+            </item>
+            <item id="1">
+                <label>het form laadt</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>zijn waarde wijzigt</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>toont</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>verdwijnt</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>wordt geactiveerd</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>voordat de initiële control-waardes worden berekend</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>Nadat de gegevens gereed zijn</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>Nadat de controls gereed zijn</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <event-condition>
+            <label>Conditie</label>
+            <item id="always">Start altijd</item>
+            <item id="new-only">Start alleen bij aanmaken</item>
+            <item id="formula">Wanneer formule evalueert naar "true"</item>
+            <formula>Formule</formula>
+        </event-condition>
+        <event-control>
+            <label>Control</label>
+        </event-control>
+        <service-to-call>
+            <label>Service om aan te roepen</label>
+            <hint>Service om aan te roepen bij optreden van event</hint>
+        </service-to-call>
+        <source>
+            <label>Bron</label>
+        </source>
+        <destination>
+            <label>Bestemming</label>
+        </destination>
+        <source-control>
+            <label>Bron control</label>
+        </source-control>
+        <destination-xpath>
+            <label>Doel XPath expressie</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>Parameter aantal</label>
+        </parameter-number>
+        <response-values>
+            <label>Stel response control-waarden in</label>
+        </response-values>
+        <destination-control>
+            <label>Doel control</label>
+        </destination-control>
+        <source-xpath>
+            <label>Bron XPath expressie</label>
+        </source-xpath>
+        <response-itemset>
+            <label>Stel response selectie control-keuzes in</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>Doel selectie control</label>
+        </destination-selection-control>
+        <items>
+            <label>Keuzes XPath expressie</label>
+            <hint>Eén node per keuze</hint>
+        </items>
+        <item-label>
+            <label>Label XPath expressie</label>
+            <hint>Relatief aan gekozen node</hint>
+        </item-label>
+        <item-value>
+            <label>Waarde XPath expressie</label>
+            <hint>Relatief aan gekozen node</hint>
+        </item-value>
+        <item-hint>
+            <label>Hint formule</label>
+            <hint>Relatief aan keuze node</hint>
+        </item-hint>
+        <is-last-page>
+            <label>Is laatste pagina formule</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>Selecteer automatisch unieke keuze</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>Bewaar</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+
+        <general-settings>Algemene instellingen</general-settings>
+        <service-request-actions>Service request acties</service-request-actions>
+        <service-response-actions>Service response acties</service-response-actions>
+
+        <set-control-value>Bedieningswaarde instellen</set-control-value>
+        <set-control-itemset>Stel control-keuzes in</set-control-itemset>
+        <save-to-dataset>Bewaar in dataset</save-to-dataset>
+        <dataset-name>Dataset naam</dataset-name>
+        <set-control-value-unavailable>Bedieningswaarde instellen is alleen beschikbaar wanneer "nadat de besturingselementen klaar zijn" is geselecteerd</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>Form voorvertoning</label>
+        <console>Console</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>Test PDF-productie</label>
+        <use-form-data>Gebruik ingevoerde formgegevens</use-form-data>
+        <disable-default>Schakel de evaluatie van "Initiële waarden" formules uit</disable-default>
+        <disable-calculate>Schakel de evaluatie van "Berekende waarden" formules uit</disable-calculate>
+        <disable-relevant>Toon controls, grids en secties met dynamische zichtbaarheid</disable-relevant>
+        <show-hints>Toon control hints</show-hints>
+        <show-alerts>Toon waarschuwingen van ongeldige controls</show-alerts>
+        <show-required>Stijl verplichte controls</show-required>
+        <use-pdf-template>Gebruik PDF template</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Orbeon Forms PE functie</label>
+        <message>
+            <div>
+                <p>Deze functie is alleen beschikbaar in Orbeon Forms PE.</p>
+                <p>Voor meer informatie bezoekt u de <a href="http://www.orbeon.com/download" target="_blank">Orbeon website</a>.</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>E-mailinstellingen</label>
+        <templates>E-mailsjablonen</templates>
+        <template-name>
+            <label>E-mailsjabloonnaam</label>
+            <hint>Deze naam is niet zichtbaar voor eindgebruikers; hij wordt gebruikt in processen, bijvoorbeeld: email(template = "notify-user")</hint>
+        </template-name>
+        <language>
+            <label>Taal</label>
+            <any-language>Elke taal</any-language>
+        </language>
+        <headers>
+            <from>Afzender</from>
+            <to>Ontvanger</to>
+            <cc>CC</cc>
+            <bcc>BCC</bcc>
+            <reply-to>Antwoord aan</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>Control-waarde</control-value>
+            <expression>Formule</expression>
+            <text>Tekst</text>
+        </header-value-types>
+        <enable-if-true>Activeer dit sjabloon alleen als de volgende formule evalueert naar waar</enable-if-true>
+        <subject>E-mailonderwerp</subject>
+        <body>E-mailbody</body>
+        <use-html>Gebruik HTML</use-html>
+        <attach-form-as>Voeg form toe als</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>Voeg bestanden toe die gebruikers naar het form hebben geüpload</label>
+            <choices>
+                <all>Alle</all>
+                <none>Geen</none>
+                <selected>Geselecteerde bijlagen</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>Sluit uit van alle control-waarden</exclude-from-all-control-values>
+        <use-default>Gebruik standaard</use-default>
+        <delete-template>Verwijder sjabloon</delete-template>
+        <template-parameters>Sjabloonparameters</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>Bevoegdheden</label>
+        <enable-permissions>Activeer bevoegdheden voor dit form</enable-permissions>
+        <role>Rol</role>
+        <permissions>Bevoegdheden</permissions>
+        <operations>Bewerkingen</operations>
+        <anyone>Iedereen</anyone>
+        <anyone-with-token>Vereist token</anyone-with-token>
+        <any-authenticated-user>Elke geauthenticeerde gebruiker</any-authenticated-user>
+        <owner>Eigenaar</owner>
+        <group-member>Groepleden</group-member>
+        <create>Maken</create>
+        <read>Lezen</read>
+        <update>Updaten</update>
+        <delete>Verwijderen</delete>
+        <list>Lijst</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>Workflow en bevoegdheden</label>
+
+        <custom-operations>Definieer aangepaste bewerkingen voor dit form</custom-operations>
+        <operation-label>Label</operation-label>
+        <predefined-label>Voorgedefinieerd</predefined-label>
+        <custom-label>Aangepast</custom-label>
+        <available-to>Beschikbaar voor</available-to>
+        <availability-to-anyone>Iedereen</availability-to-anyone>
+        <availability-to-no-one>Niemand</availability-to-no-one>
+        <availability-to-users>Gebruikers die aan de volgende regel voldoen</availability-to-users>
+        <availability-to-users-before>Gebruikers die</availability-to-users-before>
+        <availability-to-users-after>van de volgende regels</availability-to-users-after>
+        <workflow-stage>Workflow stadium</workflow-stage>
+        <workflow-role>Workflow rol</workflow-role>
+        <authentication-role>Authenticatierol</authentication-role>
+        <show-button>Toon knop op detailpagina</show-button>
+        <any>Iedereen</any>
+        <all>Alles</all>
+        <actions>Acties</actions>
+        <no-action>Geen actie</no-action>
+        <change-stage-action>Stadium bewerken</change-stage-action>
+        <run-process-action>Proces starten</run-process-action>
+        <remove-operation>Bewerking verwijderen</remove-operation>
+        <is>is</is>
+        <is-not>is niet</is-not>
+
+        <stages>Stadia</stages>
+
+        <stage-name>Stadium naam</stage-name>
+        <default-stage>Standaard</default-stage>
+
+        <operations>
+            <label>Bewerkingen</label>
+            <item>
+                <label>Vul nieuw form in</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Toon en zoek gegevens</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Toegang tot gegevens voor bewerking</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>Toegang tot gegevens voor weergave</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>Toegang tot PDF/TIFF</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>Sneltoetsen</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>Berichten</label>
+        <language-header>Taal</language-header>
+        <name-header>Naam</name-header>
+        <value-header>Waarde</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>Bewerkbare modi</editable>
+        <review>Beoordelingsmodus</review>
+        <pdf-automatic>Automatische PDF</pdf-automatic>
+        <pdf-template>PDF template</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Veldbreedte</field-width>
+        <default>Gebruik standaard</default>
+        <full>Volledig</full>
+        <natural>Natuurlijk</natural>
+        <field-align>Velduitlijning</field-align>
+        <left>Links</left>
+        <right>Rechts</right>
+        <learn-settings-below>Meer informatie over de onderstaande instellingen</learn-settings-below>
+        <field-value-visibility>
+            <label>Zichtbaarheid veldwaarde</label>
+            <hint>Bepaalt hoe de waarde van het veld wordt weergegeven</hint>
+            <item id="visible">Zichtbaar</item>
+            <item id="obscured">Obscured</item>
+            <item id="partial">Gedeeltelijk</item>
+            <item id="reveal">Sta gebruiker toe om te onthullen</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>Weet u zeker dat u de huidige sectie wilt verwijderen?</delete-section>
+        <delete-grid>Weet u zeker dat u het huidige grid wilt verwijderen?</delete-grid>
+        <delete-column>Weet u zeker dat u de huidige kolom wilt verwijderen?</delete-column>
+        <delete-row>Weet u zeker dat u de huidige rij wilt verwijderen?</delete-row>
+        <delete-resources>Weet u zeker dat u alle resources voor de taal wilt verwijderen</delete-resources>
+        <delete-service>Weet u zeker dat u de service wilt verwijderen "{0}"?{1,choice,0# Geen actie gebruikt deze.|1# 1 actie gebruikt deze.|1&lt; {1,number,integer} acties gebruiken deze.}</delete-service>
+        <delete-action>Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
+        <controls-will-be-deleted>Er {0,choice,0#worden geen controls|1#wordt 1 control|1&lt;worden {0,number,integer} controls} verwijderd.</controls-will-be-deleted>
+        <metadata-edit-title>Form metagegevens</metadata-edit-title>
+        <select-template-output>Selecteer een formsjabloon om als uitgangspunt te gebruiken.</select-template-output>
+        <app-form-optional>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-optional>
+        <app-form-required>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-required>
+        <save-as-metadata-output>Voer een nieuwe applicatienaam en formnaam in die worden gebruikt voor de kopie van dit form:</save-as-metadata-output>
+        <xpath-errors>Er {0,choice,1#is een XPath fout|1&lt;zijn {0,number,integer} XPath fouten} in uw form.</xpath-errors>
+        <lhha-checkbox>Activeer deze optie als u HTML tags wilt gebruiken</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>Waarde is verplicht</required>
+        <xpath>Onjuiste XPath expressie</xpath>
+    </alerts>
+    <template>
+        <untitled-form>Naamloos form</untitled-form>
+        <items>
+            <item>
+                <label>Eerste keuze</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Tweede keuze</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Derde keuze</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

@@ -1,0 +1,1613 @@
+<resource xml:lang="fi">
+    <!-- Form metadata -->
+    <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+    <application-name>
+        <label>Sovelluksen nimi</label>
+        <hint>Tunnistaa lomakkeiden ryhmän (esimerkiksi "acme" tai "myynti")</hint>
+        <help>
+            &lt;p&gt;
+            Sovelluksen nimi on nimi, joka mahdollistaa lomakkeiden ryhmittelyn. Sovelluksen nimi voi olla esimerkiksi:
+            &lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li&gt;yrityksen nimi kuten "orbeon" tai "acme"&lt;/li&gt;
+                &lt;li&gt;yrityksen osasto kuten "hr" tai "myynti" tai "suunnittelu"&lt;/li&gt;
+                &lt;li&gt;projektin nimi kuten "mercury" tai "phoenix"&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;
+            Tämä nimi näkyy käyttöönotetun lomakkeen URL-osoitteessa, joten suosittelemme käyttämään vain pieniä kirjaimia.
+            &lt;/p&gt;
+        </help>
+        <alert>Käytä enintään 255 ASCII-kirjainta, numeroa, "-" tai "_"</alert>
+    </application-name>
+    <form-name>
+        <label>Lomakkeen nimi</label>
+        <hint>Tunnistaa tämän tietyn lomakkeen (esimerkiksi "vaatimus")</hint>
+        <help>
+            &lt;p&gt;
+            Lomakkeen nimi on nimi, joka on paikallinen sovelluksen nimeen nähden, esimerkiksi "osoite" tai "vaatimus".
+            &lt;/p&gt;
+            &lt;p&gt;
+            Tämä nimi näkyy URL-osoitteessa, joten suosittelemme käyttämään vain pieniä kirjaimia.
+            &lt;/p&gt;
+        </help>
+        <alert>Käytä enintään 255 ASCII-kirjainta, numeroa, "-" tai "_"</alert>
+        <no-form-alert>
+            Yhtään lomaketta tällä tietyllä sovelluksen nimellä ja lomakkeen nimellä ei löytynyt tästä järjestelmästä.
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#Yksi lomake|1&lt;{0,number,integer} lomaketta}
+            tällä sovelluksen nimellä ja lomakkeen nimellä {0,choice,1#on julkaistu|1&lt;on julkaistu}.
+            &lt;a href="{1}" target="_blank"&gt;Näytä Admin-sivulla.&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#Yksi lomake|1&lt;{0,number,integer} lomaketta}
+            tällä sovelluksen nimellä ja lomakkeen nimellä {0,choice,1#on keskeneräinen|1&lt;on keskeneräisiä}.
+            &lt;a href="{1}" target="_blank"&gt;Näytä Form Builder yhteenvetosivulla.&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>Lomakkeen otsikko</label>
+        <hint>Lomakkeen otsikko nykyisellä kielellä</hint>
+    </title>
+    <description>
+        <label>Lomakkeen kuvaus</label>
+        <hint>Lomakkeen kuvaus nykyisellä kielellä</hint>
+    </description>
+    <logo>
+        <label>Logo</label>
+        <hint>Logo näkyy lomakkeesi yläosassa</hint>
+    </logo>
+    <general-settings>
+        <label>Yleiset asetukset</label>
+    </general-settings>
+    <custom-settings>
+        <label>Mukautetut asetukset</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>Leikkaa</label>
+    </cut>
+    <copy>
+        <label>Kopioi</label>
+    </copy>
+    <paste>
+        <label>Liitä</label>
+    </paste>
+    <undo-redo>
+        <undo>Kumoa {0}</undo>
+        <redo>Tee uudelleen {0}</redo>
+        <insert>lisäys</insert>
+        <rename>nimeäminen uudelleen</rename>
+        <delete-control>kontrollin poisto</delete-control>
+        <delete-container>säilön poisto</delete-container>
+        <merge-section-template>lohkomallin yhdistäminen</merge-section-template>
+        <move-control>kontrollin siirto</move-control>
+        <move-container>säilön siirto</move-container>
+        <update-settings>asetusten päivitys</update-settings>
+        <insert-control>kontrollin lisäys</insert-control>
+        <insert-section>lohkon lisäys</insert-section>
+        <insert-grid>ruudukon lisäys</insert-grid>
+        <delete-row>rivin poisto</delete-row>
+        <insert-row>rivin lisäys</insert-row>
+        <control-settings>kontrollin asetukset</control-settings>
+        <move-wall>seinän siirto</move-wall>
+        <split-cell>solun jakaminen</split-cell>
+        <merge-cell>solun yhdistäminen</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>Yhdistä lohkomalli</label>
+    </merge-section>
+    <form-structure>
+        <label>Lomakerakenne</label>
+    </form-structure>
+    <controls>
+        <label>Kontrolli</label>
+    </controls>
+    <i18n>
+        <label>Kansainvälistyminen</label>
+    </i18n>
+    <language>
+        <label>Nykyinen kieli</label>
+    </language>
+    <advanced>
+        <label>Kehittynyt</label>
+    </advanced>
+    <attachments>
+        <label>Liitteet</label>
+    </attachments>
+    <services-actions>
+        <label>Palvelut &amp; Toiminnot</label>
+    </services-actions>
+    <http-services>
+        <label>HTTP-palvelut</label>
+    </http-services>
+    <database-services>
+        <label>Tietokantapalvelut</label>
+    </database-services>
+    <actions>
+        <label>Toiminnot</label>
+    </actions>
+    <new-section>
+        <label>Uusi lohko</label>
+    </new-section>
+    <new-grid>
+        <label>Uusi ruudukko</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>Uusi toistettu ruudukko</label>
+        <!--<label>Uusi toisto</label>-->
+    </new-repeated-grid>
+    <change-schema>
+        <label>Uusi skeema</label>
+    </change-schema>
+    <upload-schema>
+        <label>Lähetä skeema</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>Liitä PDF</label>
+    </pdf-templates>
+    <change-css>
+        <label>Muuta CSS</label>
+    </change-css>
+    <upload-css>
+        <label>Liitä CSS</label>
+    </upload-css>
+    <show-source>
+        <label>Näytä lähde</label>
+    </show-source>
+    <edit-source>
+        <label>Muokkaa koodi</label>
+    </edit-source>
+    <permissions>
+        <label>Määritä käyttöoikeudet</label>
+    </permissions>
+    <reload-components>
+        <label>Lataa työkalupakki uudelleen</label>
+    </reload-components>
+    <library-version>
+        <label>Kirjaston versio</label>
+        <item>
+            <label>Versio {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>Klikkaa syöttääksesi lohkon otsikko</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>Kirjoita lohkon otsikko</label>
+    </type-section-title>
+    <enter-label>
+        <label>Klikkaa syöttääksesi nimike</label>
+    </enter-label>
+    <type-label>
+        <label>Kirjoita nimikkeesi tähän</label>
+    </type-label>
+    <enter-hint>
+        <label>Klikkaa lisätäksesi vihje</label>
+    </enter-hint>
+    <type-hint>
+        <label>Kirjoita vihjeesi tähän</label>
+    </type-hint>
+    <enter-text>
+        <label>Klikkaa syötääksesi tekstiä</label>
+    </enter-text>
+    <type-text>
+        <label>Kirjoita tekstisi tähän</label>
+    </type-text>
+    <click-cell>
+        <label>Klikkaa valitaksesi tämän solun</label>
+    </click-cell>
+    <insert-control>
+        <label>Käytä työkalupalkkia lisätäksesi kontrollin</label>
+    </insert-control>
+    <edit-items>
+        <label>Muokkaa kohdetta</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>Yhdistä oikeanpuoleiseen soluun</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>Jaa vaakasuunnassa</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>Yhdistä alapuolella olevaan soluun</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>Jaa pystysuunnassa</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>Poista kontrolli</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>Vedä ja pudota siirtääksesi tai kopioidaksesi</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>Poista lohko tai ruudukko</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>Poista rivi</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>Poista sarake</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>Lisää sarake vasemmalle</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>Lisää sarake oikealle</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>Lisää rivi yläpuolelle</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>Lisää rivi alapuolelle</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>Lohkon yksityiskohdat</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>Ruudukon yksityiskohdat</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>Siirry ylös</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>Siirry alas</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>Siirry oikealle</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>Siirry vasemmalle</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>Kontrollin yksityiskohdat</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>Kytkimen ulkonäkö</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>Muokkaa Ohje</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>Lisää</label>
+    </add>
+    <remove>
+        <label>Poista</label>
+    </remove>
+    <edit>
+        <label>Muokkaa</label>
+    </edit>
+    <classes>
+        <label>Mukautetut CSS luokat</label>
+    </classes>
+    <autocomplete>
+        <label>Automaattinen täydennys -attribuutti</label>
+        <groups>
+            <general>Yleiset</general>
+            <name>Nimi ja titteli</name>
+            <credentials>Tunnistetiedot</credentials>
+            <address>Osoite</address>
+            <contact>Yhteystiedot</contact>
+            <payment>Maksu</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">Käytä ominaisuutta</item>
+        <item id="1">Kyllä</item>
+        <item id="2">Ei</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>Jatka</label>
+    </continue>
+    <apply>
+        <label>Käytä</label>
+    </apply>
+    <cancel>
+        <label>Peruuta</label>
+    </cancel>
+    <close>
+        <label>Sulje</label>
+    </close>
+    <delete>
+        <label>Poista</label>
+    </delete>
+    <or>
+        <label>tai</label>
+    </or>
+    <errors>
+        <label>Virheet</label>
+    </errors>
+    <error-summary>
+        <label>{1,choice,
+            0#Ei viestiä|
+            1#'{0,choice,0#Virhe|1#Varoitus|2#Tiedotusviesti|3#Viesti}'|
+            1&lt;'{0,choice,0#Virheet|1#Varoitukset|2#Tiedotusviestit|3#Viestit}'}</label>
+    </error-summary>
+    <back-to-summary>
+        <label>Takaisin lomakkeiden luetteloon</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">Kiinteä näkymä</item>
+        <item id="1">Joustava näkymä</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Käytä ehdotusta: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>Nimi</label>
+                <alert>Puuttuva tai virheellinen arvo</alert>
+            </name>
+            <xpath>
+                <label>Kaava</label>
+                <alert>Puuttuva tai virheellinen kaava</alert>
+            </xpath>
+            <control>
+                <label>Kontrolli</label>
+                <alert>Puuttuva arvo</alert>
+            </control>
+            <token>
+                <label>Luo token URL-parametri</label>
+            </token>
+            <type>
+                <item id="0">Kontrollin arvo</item>
+                <item id="1">Kaava</item>
+                <item id="2">Kaikki kontrollin arvot</item>
+                <choice label="Linkki">
+                    <item id="3">Muokkaussivu</item>
+                    <item id="4">Katselusivu</item>
+                    <item id="5">Uusi sivu</item>
+                    <item id="6">Yhteenvetosivu</item>
+                    <item id="7">Kotisivu</item>
+                    <item id="9">Julkaistut lomakkeet -sivu</item>
+                    <item id="10">Lomakkeiden ylläpito</item>
+                    <item id="8">PDF-tiedosto</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>Lomakeasetukset</label>
+        <save-as>Tallenna nimellä</save-as>
+        <open><label>Lomakeasetukset</label></open>
+        <options>Lomakkeen valinnat</options>
+        <view-options>Ulkoasu</view-options>
+        <wizard-options>Ohjattu toiminto</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Kontrollin asetukset</control-settings>
+        <about>Tietoja tästä lomakkeesta</about>
+        <stats>Lomatilastot</stats>
+        <sections>Lohkot</sections>
+        <repeats>Toistot</repeats>
+        <grids>Ruudukot</grids>
+        <section-templates>Lohkomallinteet</section-templates>
+        <controls>Kontrollit</controls>
+        <all>Kaikki</all>
+        <use-property>Käytä ominaisuutta</use-property>
+        <singleton>
+            <label>Singleton-lomake</label>
+            <hint>Estää käyttäjiä luomasta lisälomakkeen tietoja, jos heillä on pääsy olemassa oleviin lomakkeen tietoihin tälle lomakemäärittelylle</hint>
+        </singleton>
+        <allow-template-use>
+            <label>Salli käyttö lomakemalliena</label>
+            <hint>Jos valittu, tämä lomake näytetään lomakemallien luettelossa</hint>
+        </allow-template-use>
+        <wizard>
+            <label>Ohjattu toiminto -näkymä</label>
+            <hint>Näytä ylätason lohkot erillisinä ohjatun toiminnon sivuina</hint>
+        </wizard>
+        <wizard-mode>
+            <label>Ohjatun toiminnon navigoinnin validointitila</label>
+            <hint>Miten ohjatun toiminnon navigointi toimii, kun tiedot eivät ole kelvollisia</hint>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Vapaa</item>
+            <item id="2">Lempeä</item>
+            <item id="3">Tiukka</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>Ohjatun toiminnon alalohkojen navigointi</label>
+            <hint>Mahdollistaako ohjattu toiminto navigoinnin lohkoille ja ruudukoille ylätason lohkojen sisällä</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>Wizard Subsections Table of Contents</label>
+            <hint>How the wizard table of contents shows subsections</hint>
+            <item id="0">Use property</item>
+            <item id="1">Show Subsections for the Active Section Only</item>
+            <item id="2">Show Subsections for All Sections</item>
+            <item id="3">Don't Show Subsections</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>Ohjatun toiminnon erillinen sisällysluettelo</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>Näytä aina ohjatun toiminnon lohkon tila</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>Liitteen enimmäiskoko per tiedosto</label>
+            <hint>Voidaan asettaa myös kontrollikohtaisesti kontrollin asetuksissa</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>Liitteiden yhteenlaskettu enimmäiskoko</label>
+            <hint>Koskee kaikkia liitekontrolleja tässä lomakkeessa</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>Liitetiedostojen enimmäismäärä ohjausyksikköä kohden</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>Liitetiedostojen vähimmäismäärä ohjausyksikköä kohden</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>Sallitut tiedostotyypit</label>
+            <hint>Esimerkiksi "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>Kontrollinimikkeiden ulkoasu</label>
+        </labels>
+        <hints>
+            <label>Kontrollivihjeiden ulkoasu</label>
+        </hints>
+        <automatic-hints>
+            <label>Käytä automaattisia vihjeitä</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Rivissä</item>
+            <item id="2">Työkaluvihje</item>
+        </appearances>
+        <placeholders>
+            <label>Käytä paikkamerkkiä kentissä ja tekstialueissa</label>
+        </placeholders>
+        <data-migration>
+            <label>Yksinkertainen tietojen migraatio</label>
+            <hint>Lisää tai poista puuttuvat elementit tiedoissa automaattisesti</hint>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Käytössä</item>
+            <item id="2">Pois käytöstä</item>
+            <item id="3">Aiheuta virhe</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>Ruudukon sarkainjärjestys</label>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Rivit</item>
+            <item id="2">Sarakkeet</item>
+        </grid-tab-order>
+        <time-window>
+            <label>Aikaikkuna</label>
+            <available>
+                <available-from>
+                    <label>Luominen mahdollista vain tietystä päivämäärästä alkaen</label>
+                    <date>Aloituspäivämäärä ja -aika</date>
+                    <message>Odottava viesti</message>
+                </available-from>
+                <available-to>
+                    <label>Luominen mahdollista vain tiettyyn päivämäärään asti</label>
+                    <date>Lopetuspäivämäärä ja -aika</date>
+                    <message>Vanhentunut viesti</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>PDF-sivun suunta</label>
+            <hint />
+            <item id="default">Käytä ominaisuutta</item>
+            <item id="portrait">Pysty</item>
+            <item id="landscape">Vaaka</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>PDF-sivun koko</label>
+            <hint />
+            <item id="default">Käytä ominaisuutta</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">Letter</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>Laskutoimitukset vain luku -tiloissa (Katselu, PDF)</label>
+            <hint />
+            <item id="default">Käytä ominaisuutta</item>
+            <item id="false">Käytä</item>
+            <item id="true">Poista käytöstä</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>Selaimen sivun asettelu</label>
+            <hint>Käyttääkö lomake kiinteää vai joustavaa leveyttä</hint>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Kiinteä leveys</item>
+            <item id="2">Joustava leveys</item>
+        </html-page-layout>
+        <density>
+            <label>Tiheys</label>
+            <hint>Elementtien välistys käyttöliittymässä</hint>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Tiivis</item>
+            <item id="2">Mukava</item>
+            <item id="3">Väljä</item>
+        </density>
+        <analysis-calculate>
+            <label>Automaattiset laskentariippuvuudet</label>
+            <hint>Määritä automaattisesti arviointijärjestys "Laskettu arvo" ja "Alkuarvo" -kaavoille</hint>
+        </analysis-calculate>
+        <versions>Versiot</versions>
+        <current-version>Nykyinen versio</current-version>
+        <created-with-version>Luotu versiolla</created-with-version>
+        <updated-with-versions>Päivitetty versioilla</updated-with-versions>
+        <thumbnail>
+            <label>Lomakkeen pikkukuva</label>
+            <hint>Käytetään lomakemalleissa ja aloitussivulla</hint>
+        </thumbnail>
+        <default-template>Oletusmalli</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>Kontrolliyksityiskohdat: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>Perusasetukset</label></tab-base>
+        <tab-validations><label>Vahvistukset ja hälytykset</label></tab-validations>
+        <tab-formulas><label>Kaavat</label></tab-formulas>
+        <control-name>
+            <label>Kontrollin nimi</label>
+            <alert>Nimi on virheellinen tai se on jo käytössä</alert>
+            <hint>Esim.: "etunimi"</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>PDF-kentän nimi</label>
+            <alert>Tuntematon PDF-kentän nimi</alert>
+            <item id="0">Automaattinen</item>
+            <item id="1">Mukautettu</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Excel-alueen nimi</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>Indeksoi kontrolli</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>Näytä tiivistelmänä</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>Salli joukkomuokkaus</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>Lajittele oletuksena tämän sarakkeen mukaan</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>Salaa tallennetut tiedot</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>Älä näytä yhteenvetosivulla</do-not-show>
+            <show>Näytä yhteenvetosivulla</show>
+            <column-only>Näytä vain sarake</column-only>
+            <search-only>Näytä vain haku</search-only>
+        </summary-show>
+        <role>
+            <restrict>Rajoita rooliin</restrict>
+            <all>Kaikki</all>
+            <any>Mikä tahansa</any>
+            <of-the-following>seuraavista:]</of-the-following>
+            <empty>Tyhjä rooli</empty>
+            <duplicate>Kaksoisrooli</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>Tallenna tiedot</save-data>
+            <run-process>Suorita prosessi</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>Nouseva</ascending>
+            <descending>Laskeva</descending>
+            <conflict>Lajittelun ottaminen käyttöön tässä kontrollissa poistaa sen käytöstä seuraavassa kontrollissa: {0}]</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>Kontrollin ulkoasu</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>Poista alussa ja lopussa olevat välilyönnit</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+        <types>
+            <label>Datatyyppi</label>
+        </types>
+        <builtin-type>
+            <label>Sisäänrakennettu datatyyppi</label>
+            <hint>Sisäänrakennettu datatyyppi</hint>
+
+            <use-schema-type>Käytä skeeman tyyppiä</use-schema-type>
+            <use-component-type>Käytä esimääritettyä tyyppiä</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>Yleiset tyypit</label>
+                    <type label="Mikä tahansa merkkijono">string</type>
+                    <type label="Boolean">boolean</type>
+                    <type label="Sähköpostiosoite">email</type>
+                </choices>
+                <choices>
+                    <label>Numerotyypit</label>
+                    <type label="Desimaalinen">decimal</type>
+
+                    <type label="Kokonaisluku">integer</type>
+                    <type label="Positiivinen kokonaisluku">positiveInteger</type>
+                    <type label="Ei-positiivinen kokonaisluku">nonPositiveInteger</type>
+                    <type label="Negatiivinen kokonaisluku">negativeInteger</type>
+                    <type label="Ei-negatiivinen kokonaisluku">nonNegativeInteger</type>
+
+                    <type label="Yksinkertainen tarkkuus liukulukuja">float</type>
+                    <type label="Tuplatarkkuus liukulukuja">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Aikatyypit</label>
+                    <type label="Päivämäärä">date</type>
+                    <type label="Kellonaika">time</type>
+                    <type label="Päivämäärä ja kellonaika">dateTime</type>
+                    <type label="Kesto">duration</type>
+                    <type label="Vuosi ja kuukausi">gYearMonth</type>
+                    <type label="Kuukausi ja päivä">gMonthDay</type>
+                    <type label="Vuosi">gYear</type>
+                    <type label="Kuukausi">gMonth</type>
+                    <type label="Päivä">gDay</type>
+                </choices>
+                <choices>
+                    <label>XML-tyypit</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="XML-kvalifioitu nimi">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>Muut tyypit</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Base64-encoded binary">base64Binary</type>
+                    <type label="Hexadecimal-encoded binary">hexBinary</type>
+                    <type label="URI">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>Skeeman tyyppi</label>
+            <hint>Tuodun skeeman tyyppi</hint>
+        </schema-type>
+        <required>
+            <label>Pakollinen</label>
+            <hint>Pakollinen data?</hint>
+            <item id="0">Kyllä</item>
+            <item id="1">Ei</item>
+            <item id="2">XPath</item>
+        </required>
+        <constraint>
+            <item id="formula">Kaava</item>
+            <item id="max-length">Maksimipituus</item>
+            <item id="min-length">Vähimmäispituus</item>
+            <item id="positive">Positiivinen</item>
+            <item id="non-negative">Positiivinen tai nolla</item>
+            <item id="non-positive">Negatiivinen tai nolla</item>
+            <item id="negative">Negatiivinen</item>
+            <item id="fraction-digits">Desimaalimerkkien enimmäismäärä</item>
+            <item id="upload-max-size-per-file" multiple="false">Liitteen enimmäiskoko</item>
+            <item id="upload-max-size-per-file" multiple="true">Liitteen enimmäiskoko per tiedosto</item>
+            <item id="upload-max-size-aggregate-per-control">Liitteiden yhteenlaskettu enimmäiskoko</item>
+            <item id="upload-max-files-per-control">Enimmäismäärä tiedostoja per kontrolli</item>
+            <item id="upload-min-files-per-control">Vähimmäismäärä tiedostoja per kontrolli</item>
+            <item id="upload-mediatypes">Tuetut tiedostotyypit</item>
+            <item id="excluded-dates">Pois suljettavat päivämäärät</item>
+        </constraint>
+        <formula>
+            <label>Kaava</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>Boolean XPath-lauseke</hint>
+        </formula>
+        <integer-argument>
+            <label>Kokonaislukuarvo</label>
+            <alert>Virheellinen arvo</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>Muokkaa hälytyspohjan parametreja</edit-label>
+            <dialog-label>Hälytyspohjan parametrit</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>Näkyvyys</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>Boolean XPath-lauseke</hint>
+            <help>
+                &lt;p&gt;
+                    This allows you to specify whether the form control is visible or not.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Yes:&lt;/b&gt; The form control is visible.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;No:&lt;/b&gt; The form control is hidden.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formula:&lt;/b&gt; The form control is visible or hidden dynamically depending on a formula.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                    The form control is visible if the formula evaluates to &lt;code&gt;true()&lt;/code&gt;, and hidden if it evaluates to &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>Vain luku</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>Boolean XPath-lauseke</hint>
+            <help>
+                &lt;p&gt;
+                    This allows you to specify whether the form control is readonly or read-write.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Yes:&lt;/b&gt; The form control is readonly.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;No:&lt;/b&gt; The form control is read-write.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formula:&lt;/b&gt; The form control is readonly or read-write dynamically depending on a formula.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                    The form control is readonly if the formula evaluates to &lt;code&gt;true()&lt;/code&gt;, and read-write if it evaluates to &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>Alkuperäinen arvo</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>XPath-lauseke</hint>
+            <help>
+                &lt;p&gt;
+                    This formula allows you to specify an initial value for the form control in "new" mode only.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>Laskettu arvo</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>XPath-lauseke</hint>
+            <help>
+                &lt;p&gt;
+                    This formula allows you to specify a calculated value for the form control.
+                    This value is re-evaluated to remain up to date as needed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>Nimike</label>
+        </control-label>
+        <control-hint>
+            <label>Vihje</label>
+        </control-hint>
+        <control-help>
+            <label>Ohjeviesti</label>
+            <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
+        </control-help>
+        <control-text>
+            <label>Selittävä teksti</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>Lyhyt nimike</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>Iteraation nimike</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>Lisää toiston nimike</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>Poista toiston teksti</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>Virheviesti</label>
+            <hint>Viesti näytetään, kun kontrollidata on väärää tai puuttuu</hint>
+        </alert>
+        <default-alert>
+            <label>Oletushälytysviesti</label>
+            <hint>Näytetään tilanteissa joissa ei ole tarkempaa hälytysviestiä</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>Käytä yleistä oletushälytysviestiä</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>Käytä oletushälytysviestiä</label>
+        </use-default-alert>
+        <validation-type><label>Vahvistamisen tyyppi</label></validation-type>
+        <validation-details><label>Vahvistamisen tiedot</label></validation-details>
+        <level><label>Taso</label></level>
+        <use-html>Käytä HTML</use-html>
+        <parameters>Mallin parametrit</parameters>
+        <automatic-hint>
+            <label>Käytä automaattista vihjettä</label>
+            <hint>Lisää vihjetekstin, joka perustuu enimmäistiedostokokoon ja tuettuihin tiedostotyyppeihin, jotka olet saattanut määrittää Validoinnit ja hälytykset -välilehdellä</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>Avoin valinta</label>
+            <hint>Jos käytössä, käyttäjät voivat syöttää oman arvonsa, ja arvo (data on tallennettu teksti) käytetään myös nimikkeenä (teksti näytetään pudotusvalikossa)</hint>
+        </open-selection>
+        <store-label>
+            <label>Tallenna nimike</label>
+            <hint>Jos käytössä, valittu nimike tallennetaan tietojen rinnalle</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">Käytä oletusta</item>
+            <item id="1">Kyllä</item>
+            <item id="2">Ei</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>Lohkon yksityiskohdat: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
+        <control-name>
+            <label>Lohkon nimi</label>
+            <alert>Nimi on virheellinen tai se on jo käytössä</alert>
+            <hint>Esim.: "osoite"</hint>
+        </control-name>
+        <grid-columns>
+            <label>Ruudukon sarakkeiden määrä</label>
+        </grid-columns>
+        <grid-rows>
+            <label>Ruudukon rivien määrä</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>Ruudukon sarkainjärjestys</label>
+            <item id="0">Oletus</item>
+            <item id="1">Rivit</item>
+            <item id="2">Sarakkeet</item>
+        </grid-tab-order>
+        <options>
+            <label>Asetukset</label>
+            <item>
+                <label>Aluksi avattu</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>Sivunvaihto ennen lohkoa</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>Kutistettava</label>
+        </collapsible>
+        <visibility>
+            <label>Näkyvyys</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>Boolean XPath-lauseke</hint>
+        </visibility>
+        <readonly>
+            <label>Vain luku</label>
+            <alert>Virheellinen XPath-lauseke</alert>
+            <hint>Boolean XPath-lauseke</hint>
+        </readonly>
+        <repeat>
+            <label>Toista osion sisältö</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>Salli käyttäjän lisätä, poistaa tai siirtää toistoja</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>Näytä toiston numero</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>Näytä yksi toisto kerrallaan ohjatussa toiminnossa</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label>Aktivoi mukautetun silmukan nimi</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>Mukautetun silmukan nimi</label>
+            <alert>Nimi on jo käytössä tai se on virheellinen</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>Toistojen vähimmäismäärä</label>
+            <alert>Virheellinen arvo</alert>
+            <hint>Positiivinen numero tai XPath-lauseke</hint>
+        </min>
+        <max>
+            <label>Toistojen maksimimäärä</label>
+            <alert>Virheellinen arvo</alert>
+            <hint>Positiivinen numero tai XPath-lauseke</hint>
+        </max>
+        <freeze>
+            <label>Jäädytä toistot</label>
+            <alert>Virheellinen arvo</alert>
+            <hint>Ei-negatiivinen luku enintään toistojen vähimmäismäärään (katso yllä), tai XPath-lauseke</hint>
+        </freeze>
+        <no-freeze>Ei jäädytystä</no-freeze>
+        <appearance-minimal>
+            <label>Yksinkertaistettu ulkoasu</label>
+            <hint>Näytä yksinkertaiset lisää/poista-painikkeet ilman valikkoa tai uudelleenjärjestelyä</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>Käytä alkuarvon kaavoja lisättäessä iteraatioita</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>Iteraatioiden alkumäärä käyttää mallia</label>
+        </initial-iterations>
+        <other>Muu</other>
+        <one>Yksi toisto</one>
+        <unlimited>Rajaton</unlimited>
+        <no-minimum>Ei vähimmäismäärää</no-minimum>
+        <tab-base><label>Perusasetukset ja lausekkeet</label></tab-base>
+        <tab-repeat><label>Toistettu sisältö</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>Vahvista</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>Kontrollien nimet</label>
+        <prefix>
+            <label>Etuliite</label>
+        </prefix>
+        <suffix>
+            <label>Jälkiliite</label>
+        </suffix>
+        <original-name>
+            <label>Alkuperäinen nimi</label>
+        </original-name>
+        <new-name>
+            <label>Uusi nimi</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>Julkaise lomake</label>
+        <publish>Julkaise</publish>
+        <publish-success>Lomake julkaistiin onnistuneesti [as version {1,number,integer}]. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
+        <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
+        <latest-published-version>Viimeisin julkaistu versio</latest-published-version>
+        <create-new-version-item>luo uusi lomakemäärittely versionumerolla {0,number,integer}</create-new-version-item>
+        <overwrite-version-item>korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer} ({1,choice,0#ei saatavilla|1#saatavilla})</overwrite-version-item>
+        <create-new-version-help>
+            HUOMAA: Tämän lomakemäärittelyn julkaiseminen luo uuden lomakemäärittelyversion tietokantaan. Tietoja, jotka jo ovat tietokannassa voidaan yhä tarkastella ja editoida niillä edellisillä lomakemäärittelyversioilla, jotka liittyvät tietoihin. Uutta lomakemäärittelyversiota käytetään uusien tietojen luomiseen.
+        </create-new-version-help>
+        <overwrite-version-help>
+            HUOMAA: Tämä korvaa nykyisen lomakemäärittelyn. Jos lomakemäärittelyyn tekemäsi muutokset ovat pieniä tekstimuutoksia, lomakemäärittely on yhteensopiva nykyisten lomakkeiden tietojen kanssa. Jos kuitenkin olet tehnyt muutoksia lomakkeen rakenteeseen, kuten lisännyt, poistanut, uudelleennimennyt tai siirtänyt elementtejä, lomakemäärittely voi olla yhteensopimaton nykyisen tiedon kanssa. Suosittelemme huolellisuutta korvattaessa olemassa olevaa lomakemäärittelyversiota.
+        </overwrite-version-help>
+        <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
+        <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
+        <version>Versio</version>
+        <available>Tee julkaistusta lomakkeesta saatavilla</available>
+        <comment>Kommentti</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>Lisää kieli</label>
+        <new-language>
+            <label>Lisää seuraava kieli</label>
+        </new-language>
+        <common>Yleisimmät kielet</common>
+        <all>Muut kielet</all>
+        <add-language>
+            <label>Lisää kieli</label>
+        </add-language>
+        <remove-language>
+            <label>Poista kieli</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>Hae kontrolleja</label>
+        <open-settings>
+            <label>Avaa asetusikkuna</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>XML-skeeman lähettäminen</label>
+        <schema-type>
+            <label>Saatavilla olevat skeematyypit</label>
+            <hint>Yksinkertaiset, lähetetyn skeeman saatavilla olevat tyypit</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>Skeeman nimiavaruus URI</label>
+            <hint>Tämä on lähetetyn skeeman nimiavaruus URI</hint>
+        </namespace-uri>
+        <operations>
+            <label>Operaatiot</label>
+        </operations>
+        <delete-schema>
+            <label>Poista olemassaoleva XML-skeema</label>
+        </delete-schema>
+        <change-schema>
+            <label>Muuta XML-skeeman</label>
+        </change-schema>
+        <replace-schema>
+            <label>Korvaa XML-skeema</label>
+        </replace-schema>
+        <upload-schema>
+            <label>Lähetä XML-skeema</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>Skeemasi ei sisällä yksinkertaisia tyyppejä. Sinun ei ole mahdollista valita tyyppejä tästä skeemasta oikeellisuutta varten.</no-simple-types>
+            <has-includes>Skeemasi sisältää tuotuja osia. Nämä kytketään pois päältä.</has-includes>
+            <not-a-schema>Lähetetty tiedosto ei ole kelpaava skeema.</not-a-schema>
+            <new-schema-information>Uuden skeeman tietoja</new-schema-information>
+            <existing-schema-information>Olemassaolevan skeeman tietoja</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>Lähde</label>
+        <source>
+            <alert>Ole hyvä ja varmista, että XML-sisältö on muotoutunut oikein</alert>
+        </source>
+    </dialog-edit-source>
+    <dialog-view-source>
+        <label>Näytä lähde</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>Liitä PDF-mallinne</label>
+        <pdf-upload>
+            <label>PDF-tiedosto</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>Nimi</label>
+        </attachment-name>
+        <attachment-language>
+            <label>Kieli</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>Itemset-editori</label>
+        <resources-language>
+            <label>Resurssi-kieli</label>
+        </resources-language>
+        <label-header>
+            <label>Nimike</label>
+        </label-header>
+        <value-header>
+            <label>Arvo</label>
+        </value-header>
+        <hint-header>
+            <label>Vihje</label>
+        </hint-header>
+        <clear-value>
+            <label>Tyhjennä arvo</label>
+        </clear-value>
+        <remove-all>
+            <label>Poista kaikki</label>
+        </remove-all>
+        <filter>
+            <label>Suodatuskaava</label>
+        </filter>
+        <itemsetid-mode>
+            <label>Käytä valintoja metatiedoista</label>
+            <item id="0">Kun ohjauselementti on toiminnon kohde (oletus)</item>
+            <item id="1">Aina</item>
+            <item id="2">Ei koskaan</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>HTTP-palvelineditori</label>
+        <tab-definition><label>Määritelmä</label></tab-definition>
+        <tab-advanced><label>Kehittynyt</label></tab-advanced>
+        <tab-test><label>Testitulokset</label></tab-test>
+        <url-parameters><label>URL-parametrit</label></url-parameters>
+        <parameter-name><label>Nimi</label></parameter-name>
+        <parameter-default-value><label>Oletusarvo</label></parameter-default-value>
+        <no-headers>Ei otsakkeita vastaanotettu.</no-headers>
+        <service-name>
+            <label>Palvelun nimi</label>
+            <hint>Valitse nimi tälle palvelulle</hint>
+        </service-name>
+        <service-performs-search>
+            <label>Palvelu suorittaa haun</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>Palvelu tukee sivutusta</label>
+        </service-supports-paging>
+        <resource>
+            <label>Resurssi URL</label>
+            <hint>HTTP URL jolla palvelu sijaitsee</hint>
+        </resource>
+        <method>
+            <label>Metodi</label>
+        </method>
+        <serialization>
+            <label>Serialisaatio</label>
+        </serialization>
+        <soap-submission>
+            <label>SOAP-palvelu</label>
+            <hint>Onko tämä SOAP-palvelu</hint>
+        </soap-submission>
+        <soap-action>
+            <label>SOAP-toiminto</label>
+            <hint>Valinnainen SOAP-toiminnon otsikko</hint>
+        </soap-action>
+        <http-authentication>
+            <label>HTTP-todentaminen</label>
+            <hint>HTTP-todentaminen</hint>
+        </http-authentication>
+        <username>
+            <label>Käyttäjänimi</label>
+        </username>
+        <password>
+            <label>Salasana</label>
+        </password>
+        <request-body>
+            <label>Ohjelmakoodin pyyntö</label>
+            <hint>XML-data (voi olla SOAP-kuori)</hint>
+        </request-body>
+        <is-binary-response>
+            <label>Palvelun vastaus sisältää binäärisistä</label>
+            <hint>Valitse tämä, jos vastaus käytetään liitekontrollin arvon asettamiseen</hint>
+        </is-binary-response>
+        <response>
+            <label>Vastaus</label>
+        </response>
+        <error-type>
+            <label>Virhetyyppi</label>
+            <item>
+                <label>Hakemus käynnissä</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>Ei dataa</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>Oikeellisuusvirhe</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>Resurssivirhe</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>Kohdevirhe</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>Sisäinen virhe</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>Resurssi URL</label>
+        </resource-uri>
+        <status-code>
+            <label>Statuskoodi</label>
+        </status-code>
+        <headers>
+            <label>Otsikot</label>
+        </headers>
+        <header-name>
+            <label>Nimi</label>
+        </header-name>
+        <header-value>
+            <label>Arvo(t)</label>
+        </header-value>
+        <response-body>
+            <label>Ohjelmakoodin vastaus</label>
+        </response-body>
+        <xml-response-body>
+            <label>XML-vastauksen runko</label>
+        </xml-response-body>
+        <save>
+            <label>Tallenna</label>
+        </save>
+        <test>
+            <label>Testaa</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>Tietokantapalvelun muokkaaja</label>
+        <service-name>
+            <label>Palvelun nimi</label>
+            <hint>Valitse nimi tälle palvelulle</hint>
+        </service-name>
+        <datasource>
+            <label>Datalähde</label>
+            <hint>JNDI-datalähde tälle palvelulle</hint>
+        </datasource>
+        <query>
+            <label>SQL-kysely</label>
+            <hint>SQL-kysely, joka voi sisältää paikkamerkkejä parametrejä varten</hint>
+        </query>
+        <save>
+            <label>Tallenna</label>
+        </save>
+        <test>
+            <label>Testaa</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>Toimintoeditori</label>
+        <service-name>
+            <label>Toiminnon nimi</label>
+            <hint>Valitse nimi tälle palvelulle</hint>
+        </service-name>
+        <observer-type>
+            <label>Suorita toiminto kun</label>
+            <item id="0">
+                <label>kontrolli</label>
+            </item>
+            <item id="1">
+                <label>lomake ladataan</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>muuttaa arvonsa</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>ilmestyy</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>katoaa</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>aktivoidaan</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>ennen kuin tietojen alkuarvot lasketaan</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>kun tiedot ovat valmiit</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>kun kontrollit ovat valmiit</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <event-condition>
+            <label>Tila</label>
+            <item id="always">Aja aina</item>
+            <item id="new-only">Aja vain luonnin yhteydessä</item>
+            <item id="formula">Kun kaava arvioidaan arvoon "tosi"</item>
+            <formula>Kaava</formula>
+        </event-condition>
+        <event-control>
+            <label>Kontrolli</label>
+        </event-control>
+        <service-to-call>
+            <label>Palvelu johon soitetaan</label>
+            <hint>Palvelu johon soitetaan tapahtuman tapahtuessa</hint>
+        </service-to-call>
+        <source>
+            <label>Lähde</label>
+        </source>
+        <destination>
+            <label>Kohde</label>
+        </destination>
+        <source-control>
+            <label>Lähdekontrolli</label>
+        </source-control>
+        <destination-xpath>
+            <label>Kohde XPath-lauseke</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>Parametrin numero</label>
+        </parameter-number>
+        <response-values>
+            <label>Aseta vastauskontrollin arvot</label>
+        </response-values>
+        <destination-control>
+            <label>Kohdekontrolli</label>
+        </destination-control>
+        <source-xpath>
+            <label>XPath-lausekkeen lähde</label>
+        </source-xpath>
+        <response-itemset>
+            <label>Aseta vastausvalinnan kontrollointivälineet</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>Kohdevalinnan kontrolli</label>
+        </destination-selection-control>
+        <items>
+            <label>Osaset</label>
+            <hint>XPath-lauseke palauttaa yhden solmun jokaiselle osaselle</hint>
+        </items>
+        <item-label>
+            <label>Nimike</label>
+            <hint>XPath-lauseke, joka liittyy osasen solmuun</hint>
+        </item-label>
+        <item-value>
+            <label>Arvo</label>
+            <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
+        </item-value>
+        <item-hint>
+            <label>Vihjekaava</label>
+            <hint>Suhteessa valintasolmuun</hint>
+        </item-hint>
+        <is-last-page>
+            <label>Viimeisen sivun kaava</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>Valitse ainutlaatuinen valinta automaattisesti</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>Tallenna</label>
+        </save>
+        <test>
+            <label>Testaa</label>
+        </test>
+
+        <general-settings>Yleiset asetukset</general-settings>
+        <service-request-actions>Palvelupyynnön toiminnot</service-request-actions>
+        <service-response-actions>Palveluvastauksen toiminnot</service-response-actions>
+
+        <set-control-value>Aseta kontrollin arvo</set-control-value>
+        <set-control-itemset>Aseta kontrollin kohdejoukko</set-control-itemset>
+        <save-to-dataset>Tallenna tietojoukkoon</save-to-dataset>
+        <dataset-name>Tietojoukon nimi</dataset-name>
+        <set-control-value-unavailable>Aseta kontrollin arvo on käytettävissä vain, kun "kontrollien valmistumisen jälkeen" on valittu</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>Lomakkeen esikatselu</label>
+        <console>Konsoli</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>Testaa PDF-tuotanto</label>
+        <use-form-data>Käytä syötettyjä lomakkeen tietoja</use-form-data>
+        <disable-default>Poista "Alkuarvot"-kaavojen arviointi käytöstä</disable-default>
+        <disable-calculate>Poista "Lasketut arvot"-kaavojen arviointi käytöstä</disable-calculate>
+        <disable-relevant>Näytä kontrollit, ruudukot ja lohkot, joilla on dynaaminen näkyvyys</disable-relevant>
+        <show-hints>Näytä kontrollien vihjeet</show-hints>
+        <show-alerts>Näytä virheellisten kontrollien hälytykset</show-alerts>
+        <show-required>Tyylitä pakolliset kontrollit</show-required>
+        <use-pdf-template todd="true">Use PDF template</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Orbeon-lomakkeiden PE-toiminnot</label>
+        <message>
+            <div>
+                <p>Tämä toiminto on saatavilla vain Orbeon-lomakkeiden PE-versiossa.</p>
+                <p>Lisätietoa löydät <a href="http://www.orbeon.com/download" target="_blank">Orbeon www-sivuilta</a>.</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>Sähköpostiasetukset</label>
+        <templates>Sähköpostimallit</templates>
+        <template-name>
+            <label>Sähköpostimallin nimi</label>
+            <hint>Tämä nimi ei näy loppukäyttäjille; sitä käytetään prosesseissa, esimerkiksi: email(template = "notify-user")]</hint>
+        </template-name>
+        <language>
+            <label>Kieli</label>
+            <any-language>Mikä tahansa kieli</any-language>
+        </language>
+        <headers>
+            <from>Lähettäjä</from>
+            <to>Vastaanottaja</to>
+            <cc>Kopio</cc>
+            <bcc>Piilokopio</bcc>
+            <reply-to>Vastausosoite</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>Kontrollin arvo</control-value>
+            <expression>Kaava</expression>
+            <text>Teksti</text>
+        </header-value-types>
+        <enable-if-true>Ota tämä malli käyttöön vain, jos seuraava kaava arvioidaan todeksi</enable-if-true>
+        <subject>Sähköpostin aihe</subject>
+        <body>Sähköpostin runko</body>
+        <use-html>Käytä HTML:ää</use-html>
+        <attach-form-as>Liitä lomake muodossa</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>Liitä tiedostot, jotka käyttäjät latasivat lomakkeeseen</label>
+            <choices>
+                <all>Kaikki</all>
+                <none>Ei mitään</none>
+                <selected>Valitut liitteet</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>Sulje pois kaikista kontrollin arvoista</exclude-from-all-control-values>
+        <use-default>Käytä oletusta</use-default>
+        <delete-template>Poista malli</delete-template>
+        <template-parameters>Mallin parametrit</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>Käyttöoikeudet</label>
+        <enable-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</enable-permissions>
+        <role>Rooli</role>
+        <permissions>Käyttöoikeudet</permissions>
+        <operations>Operaatiot</operations>
+        <anyone>Kuka tahansa</anyone>
+        <anyone-with-token>Vaadi tunniste</anyone-with-token>
+        <any-authenticated-user>Kuka tahansa todennettu käyttäjä</any-authenticated-user>
+        <owner>Omistaja</owner>
+        <group-member>Ryhmän jäsenet</group-member>
+        <create>Luo</create>
+        <read>Lue</read>
+        <update>Päivitä</update>
+        <delete>Poista</delete>
+        <list>Lista</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>Työnkulku ja käyttöoikeudet</label>
+
+        <custom-operations>Määritä mukautettuja toimintoja tälle lomakkeelle</custom-operations>
+        <operation-label>Nimike</operation-label>
+        <predefined-label>Esimääritetty</predefined-label>
+        <custom-label>Mukautettu</custom-label>
+        <available-to>Saatavilla käyttäjille</available-to>
+        <availability-to-anyone>Kuka tahansa</availability-to-anyone>
+        <availability-to-no-one>Ei kukaan</availability-to-no-one>
+        <availability-to-users>Seuraavaa sääntöä vastaavat käyttäjät</availability-to-users>
+        <availability-to-users-before>Käyttäjät, jotka vastaavat</availability-to-users-before>
+        <availability-to-users-after>seuraavista säännöistä</availability-to-users-after>
+        <workflow-stage>Työnkulun vaihe</workflow-stage>
+        <workflow-role>Työnkulun rooli</workflow-role>
+        <authentication-role>Todennusrooli</authentication-role>
+        <show-button>Näytä painike tietosivulla</show-button>
+        <any>Mikä tahansa</any>
+        <all>Kaikki</all>
+        <actions>Toiminnot</actions>
+        <no-action>Ei toimintoa</no-action>
+        <change-stage-action>Vaihda vaihetta</change-stage-action>
+        <run-process-action>Suorita prosessi</run-process-action>
+        <remove-operation>Poista toiminto</remove-operation>
+        <is>on</is>
+        <is-not>ei ole</is-not>
+
+        <stages>Vaiheet</stages>
+
+        <stage-name>Vaiheen nimi</stage-name>
+        <default-stage>Oletus</default-stage>
+
+        <operations>
+            <label>Toiminnot</label>
+            <item>
+                <label>Täytä uusi lomake</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Listaa ja hae tietoja</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Käytä tietoja muokkaamiseen</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>Käytä tietoja katseluun</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>Käytä PDF/TIFF</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>Pikanäppäimet</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>Viestit</label>
+        <language-header>Kieli</language-header>
+        <name-header>Nimi</name-header>
+        <value-header>Arvo</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>Muokattavat tilat</editable>
+        <review>Katselutila</review>
+        <pdf-automatic>Automaattinen PDF</pdf-automatic>
+        <pdf-template>PDF-malli</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Kentän leveys</field-width>
+        <default>Käytä oletusta</default>
+        <full>Täysi</full>
+        <natural>Luonnollinen</natural>
+        <field-align>Kentän tasaus</field-align>
+        <left>Vasen</left>
+        <right>Oikea</right>
+        <learn-settings-below>Lue lisää alla olevista asetuksista</learn-settings-below>
+        <field-value-visibility>
+            <label>Kentän arvon näkyvyys</label>
+            <hint>Hallitsee, miten kentän arvo näytetään</hint>
+            <item id="visible">Näkyvä</item>
+            <item id="obscured">Obscured</item>
+            <item id="partial">Osittainen</item>
+            <item id="reveal">Salli käyttäjän paljastaa</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>Haluatko varmasti poistaa nykyisen lohkon?</delete-section>
+        <delete-grid>Haluatko varmasti poistaa nykyisen ruudukon?</delete-grid>
+        <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
+        <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
+        <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
+        <delete-service>Haluatko varmasti poistaa palvelun "{0}"?{1,choice,0# Yksikään toiminto ei käytä sitä.|1# 1 toiminto käyttää sitä.|1&lt; {1,number,integer} toimintoa käyttävät sitä.}</delete-service>
+        <delete-action>Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
+        <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
+        <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
+        <select-template-output>Valitse lomakemalli käytettäväksi lähtökohtana.</select-template-output>
+        <app-form-optional>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-optional>
+        <app-form-required>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-required>
+        <save-as-metadata-output>Syötä uusi nimi sekä sovellukselle että lomakkeelle. Näitä käytetään tämän lomakkeen kopiota varten:</save-as-metadata-output>
+        <xpath-errors>Lomakkeestasi löytyi {0,choice,1#yksi XPath virhe|1&lt; {0,number,integer} XPath virhettä}.</xpath-errors>
+        <lhha-checkbox>Merkkaa tämä valintaruutu jos haluat kirjoittaa HTML-tageja</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>Arvo vaaditaan</required>
+        <xpath>Virheellinen XPath-lauseke</xpath>
+    </alerts>
+    <template>
+        <untitled-form>Nimetön lomake</untitled-form>
+        <items>
+            <item>
+                <label>Ensimmäinen valinta</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Toinen valinta</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Kolmas valinta</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

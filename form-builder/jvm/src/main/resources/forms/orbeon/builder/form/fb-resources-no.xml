@@ -1,0 +1,1628 @@
+<resource xml:lang="no">
+    <!-- Form metadata -->
+    <application-name>
+        <label>Applikasjonsnavn</label>
+        <hint>Identifiserer en gruppe skjemaer, for eksempel ved funksjonalitet eller avdeling (f.eks. «salg»). Hvis du har én gruppe skjemaer, kan du bruke organisasjonsnavnet (f.eks. «acme»). Dette navnet vises i URL-en til det publiserte skjemaet, så vi anbefaler at det bare brukes små bokstaver.</hint>
+        <help />
+        <alert>Bruk maksimalt 255 ASCII-bokstaver, sifre, "-" eller "_"</alert>
+    </application-name>
+    <form-name>
+        <label>Skjemanavn</label>
+        <hint>Identifiserer et spesifikt skjema. Dette navnet vises i URL-en til det publiserte skjemaet, så vi anbefaler at det bare brukes små bokstaver.</hint>
+        <help />
+        <alert>Bruk maksimalt 255 ASCII-bokstaver, sifre, "-" eller "_"</alert>
+        <no-form-alert>
+            Ingen skjema med dette spesifikke applikasjonsnavnet og skjemanavnet er funnet i systemet.
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#Ett skjema|1&lt;{0,number,integer} skjemaer}
+            med dette applikasjonsnavnet og skjemanavnet {0,choice,1#er|1&lt;er} publisert.
+            &lt;a href="{1}" target="_blank"&gt;Vis på administrasjonssiden.&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#Ett skjema|1&lt;{0,number,integer} skjemaer}
+            med dette applikasjonsnavnet og skjemanavnet {0,choice,1#er|1&lt;er} under arbeid.
+            &lt;a href="{1}" target="_blank"&gt;Vis på oppsummeringssiden for skjemabyggeren.&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>Skjematittel</label>
+        <hint>Klikk for å skrive inn en skjematittel</hint>
+    </title>
+    <description>
+        <label>Skjemainnstillinger</label>
+        <hint>Klikk for å skrive inn skjemainnstillinger</hint>
+    </description>
+    <logo>
+        <label>Logo</label>
+        <hint>Logoen synes på toppen av skjemaene</hint>
+    </logo>
+    <general-settings>
+        <label>Generelle innstillinger</label>
+    </general-settings>
+    <custom-settings>
+        <label>Tilpassede innstillinger</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>Klipp ut</label>
+    </cut>
+    <copy>
+        <label>Kopier</label>
+    </copy>
+    <paste>
+        <label>Lim inn</label>
+    </paste>
+    <undo-redo>
+        <undo>Angre {0}</undo>
+        <redo>Gjør om {0}</redo>
+        <insert>sett inn</insert>
+        <rename>gi nytt navn</rename>
+        <delete-control>slett kontroll</delete-control>
+        <delete-container>slett beholder</delete-container>
+        <merge-section-template>slå sammen seksjonsmal</merge-section-template>
+        <move-control>flytt kontroll</move-control>
+        <move-container>flytt beholder</move-container>
+        <update-settings>oppdater innstillinger</update-settings>
+        <insert-control>sett inn kontroll</insert-control>
+        <insert-section>sett inn seksjon</insert-section>
+        <insert-grid>sett inn rutenett</insert-grid>
+        <delete-row>slett rad</delete-row>
+        <insert-row>sett inn rad</insert-row>
+        <control-settings>kontrollinnstillinger</control-settings>
+        <move-wall>flytt vegg</move-wall>
+        <split-cell>del celle</split-cell>
+        <merge-cell>slå sammen celle</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>Slå sammen seksjonsmal</label>
+    </merge-section>
+    <form-structure>
+        <label>Skjemastruktur</label>
+    </form-structure>
+    <controls>
+        <label>Skjemaelementer</label>
+    </controls>
+    <i18n>
+        <label>Internasjonalisering</label>
+    </i18n>
+    <language>
+        <label>Valgt språk</label>
+    </language>
+    <advanced>
+        <label>Avansert</label>
+    </advanced>
+    <attachments>
+        <label>Vedlegg</label>
+    </attachments>
+    <services-actions>
+        <label>Tjenester &amp; Actions</label>
+    </services-actions>
+    <http-services>
+        <label>HTTP-tjenester</label>
+    </http-services>
+    <database-services>
+        <label>Databasetjenester</label>
+    </database-services>
+    <actions>
+        <label>Actions</label>
+    </actions>
+    <new-section>
+        <label>Ny seksjon</label>
+    </new-section>
+    <new-grid>
+        <label>Nytt rutenett</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>Nytt gjentakende rutenett</label>
+    </new-repeated-grid>
+    <change-schema>
+        <label>Endre skjema</label>
+    </change-schema>
+    <upload-schema>
+        <label>Last opp skjema</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>Last opp PDF</label>
+    </pdf-templates>
+    <change-css>
+        <label>Endre CSS</label>
+    </change-css>
+    <upload-css>
+        <label>Last opp CSS</label>
+    </upload-css>
+    <show-source>
+        <label>Vis kildekode</label>
+    </show-source>
+    <edit-source>
+        <label>Rediger kildekode</label>
+    </edit-source>
+    <permissions>
+        <label>[Permissions]</label>
+    </permissions>
+    <reload-components>
+        <label>Last skjemakomponenter på nytt</label>
+    </reload-components>
+    <library-version>
+        <label>Bibliotekversjon</label>
+        <item>
+            <label>Versjon {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>Klikk for å skrive inn seksjonstittel</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>Skriv seksjonstittelen din her</label>
+    </type-section-title>
+    <enter-label>
+        <label>klikk for å legge inn en ledetekst</label>
+    </enter-label>
+    <type-label>
+        <label>Skriv ledeteksten din her</label>
+    </type-label>
+    <enter-hint>
+        <label>klikk for å skrive inn et valgfritt hint</label>
+    </enter-hint>
+    <type-hint>
+        <label>Skriv hintet ditt her</label>
+    </type-hint>
+    <enter-text>
+        <label>klikk for å skrive inn tekst</label>
+    </enter-text>
+    <type-text>
+        <label>Skriv teksten din her</label>
+    </type-text>
+    <click-cell>
+        <label>klikk for å velge celle</label>
+    </click-cell>
+    <insert-control>
+        <label>bruk verktøylinja for å legge til en kontroll</label>
+    </insert-control>
+    <edit-items>
+        <label>Rediger svaralternativer</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>Slå sammen med cellen til høyre</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>Del horisontalt</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>Slå sammen med cellen nedenfor</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>Del vertikalt</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>Slett element</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>Dra og slipp for å flytte eller kopiere</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>Slett seksjon</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>Slett rad</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>Slett kolonne</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>Legg til kolonne til venstre</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>Legg til kolonne til høyre</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>Legg til rad over</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>Legg til rad under</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>Seksjonsdetaljer</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>Rutenettinnstillinger</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>Flytt opp</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>Flytt ned</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>Flytt til høyre</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>Flytt til venstre</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>Elementdetaljer</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>Endre utseende</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>Rediger hjelpetekst</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>Legg til</label>
+    </add>
+    <remove>
+        <label>Slett</label>
+    </remove>
+    <edit>
+        <label>Rediger</label>
+    </edit>
+    <classes>
+        <label>Egendefinerte CSS-klasser</label>
+    </classes>
+    <autocomplete>
+        <label>Autofullføringsattributt</label>
+        <groups>
+            <general>Generelt</general>
+            <name>Navn og tittel</name>
+            <credentials>Legitimasjon</credentials>
+            <address>Adresse</address>
+            <contact>Kontakt</contact>
+            <payment>Betaling</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">Bruk egenskap</item>
+        <item id="1">Ja</item>
+        <item id="2">Nei</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>Fortsett</label>
+    </continue>
+    <apply>
+        <label>Bruk</label>
+    </apply>
+    <cancel>
+        <label>Avbryt</label>
+    </cancel>
+    <close>
+        <label>Lukk</label>
+    </close>
+    <delete>
+        <label>Slett</label>
+    </delete>
+    <or>
+        <label>eller</label>
+    </or>
+    <errors>
+        <label>Feil</label>
+    </errors>
+    <error-summary>
+        <label>{1,choice,
+            0#Ingen melding|
+            1#'{0,choice,0#Feil|1#Advarsel|2#Informasjonsmelding|3#Melding}'|
+            1&lt;'{0,choice,0#Feil|1#Advarsler|2#Informasjonsmeldinger|3#Meldinger}'}</label>
+    </error-summary>
+    <back-to-summary>
+        <label>Tilbake til skjemaliste</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">Fast visning</item>
+        <item id="1">Flytende visning</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Bruk forslag: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>Navn</label>
+                <alert>Manglende eller ugyldig verdi</alert>
+            </name>
+            <xpath>
+                <label>Formel</label>
+                <alert>Manglende eller ugyldig formel</alert>
+            </xpath>
+            <control>
+                <label>Kontroll</label>
+                <alert>Manglende verdi</alert>
+            </control>
+            <token>
+                <label>Generer token URL-parameter</label>
+            </token>
+            <type>
+                <item id="0">Kontrollverdi</item>
+                <item id="1">Formel</item>
+                <item id="2">Alle kontrollverdier</item>
+                <choice label="Lenke">
+                    <item id="3">Redigeringsside</item>
+                    <item id="4">Visningsside</item>
+                    <item id="5">Ny side</item>
+                    <item id="6">Oppsummeringsside</item>
+                    <item id="7">Hjemmeside</item>
+                    <item id="9">Publiserte skjemaer-side</item>
+                    <item id="10">Skjemaadministrasjon</item>
+                    <item id="8">PDF-fil</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>Skjemainnstillinger</label>
+        <save-as>Lagre som…</save-as>
+        <open><label>Skjemainnstillinger</label></open>
+        <options>Skjemaalternativer</options>
+        <view-options>Utseende</view-options>
+        <wizard-options>Veiviser</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Kontrollinnstillinger</control-settings>
+        <about>Om dette skjemaet</about>
+        <stats>Skjemastatistikk</stats>
+        <sections>Seksjoner</sections>
+        <repeats>Gjentakelser</repeats>
+        <grids>Rutenett</grids>
+        <section-templates>Seksjonsmaler</section-templates>
+        <controls>Kontroller</controls>
+        <all>Alle</all>
+        <use-property>Bruk egenskap</use-property>
+        <singleton>
+            <label>Enkeltskjema</label>
+            <hint>Hindre brukere i å opprette ytterligere skjemadata hvis de har tilgang til eksisterende skjemadata for denne skjemadefinisjonen</hint>
+        </singleton>
+        <allow-template-use>
+            <label>Tillat bruk som skjemamal</label>
+            <hint>Hvis valgt, vil dette skjemaet vises i listen over skjemamaler</hint>
+        </allow-template-use>
+        <wizard>
+            <label>Veiviservisning</label>
+            <hint>Vis toppnivåseksjoner som separate veivisersider</hint>
+        </wizard>
+        <wizard-mode>
+            <label>Veiviser navigasjonsvalideringsmodus</label>
+            <hint>Hvordan veivisernavigasjon oppfører seg når data ikke er gyldige</hint>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">Fri</item>
+            <item id="2">Lempelig</item>
+            <item id="3">Streng</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>Veiviser underseksjonsnavigasjon</label>
+            <hint>Om veiviseren aktiverer navigasjon for seksjoner og rutenett innenfor toppnivåseksjoner</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>Wizard Subsections Table of Contents</label>
+            <hint>How the wizard table of contents shows subsections</hint>
+            <item id="0">Use property</item>
+            <item id="1">Show Subsections for the Active Section Only</item>
+            <item id="2">Show Subsections for All Sections</item>
+            <item id="3">Don't Show Subsections</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>Veiviser separat innholdsfortegnelse</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>Vis alltid veiviser seksjonsstatus</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>Maksimal vedleggsstørrelse per fil</label>
+            <hint>Kan også angis per kontroll i kontrollinnstillinger</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>Maksimal samlet vedleggsstørrelse</label>
+            <hint>Gjelder alle vedleggskontroller i dette skjemaet</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>Maksimalt antall filer per vedleggskontroll</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>Minimalt antall filer per vedleggskontroll</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>Tillatte filtyper</label>
+            <hint>For eksempel "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>Utseende for kontrolletiketter</label>
+        </labels>
+        <hints>
+            <label>Utseende for kontrollhint</label>
+        </hints>
+        <automatic-hints>
+            <label>Bruk automatiske hint</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">I linje</item>
+            <item id="2">Verktøytips</item>
+        </appearances>
+        <placeholders>
+            <label>Bruk plassholder for felt og tekstområder</label>
+        </placeholders>
+        <data-migration>
+            <label>Enkel datamigrering</label>
+            <hint>Legg til/fjern manglende elementer i data automatisk</hint>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">Aktivert</item>
+            <item id="2">Deaktivert</item>
+            <item id="3">Gi en feil</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>Rutenett tabulatorrekkefølge</label>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">Rader</item>
+            <item id="2">Kolonner</item>
+        </grid-tab-order>
+        <time-window>
+            <label>Tidsvindu</label>
+            <available>
+                <available-from>
+                    <label>Oppretting kun tilgjengelig fra spesifikk dato</label>
+                    <date>Startdato og -tid</date>
+                    <message>Ventende melding</message>
+                </available-from>
+                <available-to>
+                    <label>Oppretting kun tilgjengelig til spesifikk dato</label>
+                    <date>Sluttdato og -tid</date>
+                    <message>Utløpt melding</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>PDF-sideorientering</label>
+            <hint />
+            <item id="default">Bruk egenskap</item>
+            <item id="portrait">Stående</item>
+            <item id="landscape">Liggende</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>PDF-sidestørrelse</label>
+            <hint />
+            <item id="default">Bruk egenskap</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">Letter</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>Beregninger i skrivebeskyttede moduser (gjennomgang, PDF)</label>
+            <hint />
+            <item id="default">Bruk egenskap</item>
+            <item id="false">Aktiver</item>
+            <item id="true">Deaktiver</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>Nettleser sideoppsett</label>
+            <hint>Om skjemaet har en fast eller flytende bredde</hint>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">Fast bredde</item>
+            <item id="2">Flytende bredde</item>
+        </html-page-layout>
+        <density>
+            <label>Tetthet</label>
+            <hint>Avstand mellom elementer i grensesnittet</hint>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">Kompakt</item>
+            <item id="2">Behagelig</item>
+            <item id="3">Romslig</item>
+        </density>
+        <analysis-calculate>
+            <label>Automatiske beregningsavhengigheter</label>
+            <hint>Bestem automatisk evalueringsrekkefølge for "Utregnet verdi" og "Forhåndsutfylt verdi" formler</hint>
+        </analysis-calculate>
+        <versions>Versjoner</versions>
+        <current-version>Nåværende versjon</current-version>
+        <created-with-version>Opprettet med versjon</created-with-version>
+        <updated-with-versions>Oppdatert med versjoner</updated-with-versions>
+        <thumbnail>
+            <label>Skjemaminiatyrbilde</label>
+            <hint>Brukes for skjemamaler og landingssiden</hint>
+        </thumbnail>
+        <default-template>Standard mal</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>Rediger elementdetaljer: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>Grunnleggende innstillinger</label></tab-base>
+        <tab-validations><label>Valideringer og varsler</label></tab-validations>
+        <tab-formulas><label>Formler</label></tab-formulas>
+        <control-name>
+            <label>Elementnavn</label>
+            <alert>Navnet er galt eller allerede i bruk.</alert>
+            <hint>F.eks.: «fornavn»</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>Navn på PDF-feltet</label>
+            <alert>Ukjent PDF-feltnavn</alert>
+            <item id="0">Automatisk</item>
+            <item id="1">Tilpasset</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Navn på Excel-området</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>Indekskontroll</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>Vis i oppsummering</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>Tillat masseredigering</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>Som standard, sorter etter denne kolonnen</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>Krypter data i hvile</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>Ikke vis på oppsummeringssiden</do-not-show>
+            <show>Vis på oppsummeringssiden</show>
+            <column-only>Vis kun kolonne</column-only>
+            <search-only>Vis kun søk</search-only>
+        </summary-show>
+        <role>
+            <restrict>Begrens til rolle</restrict>
+            <all>Alle</all>
+            <any>Hvilken som helst</any>
+            <of-the-following>av følgende:</of-the-following>
+            <empty>Tom rolle</empty>
+            <duplicate>Duplikat rolle</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>Lagre data</save-data>
+            <run-process>Kjør prosess</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>Stigende</ascending>
+            <descending>Synkende</descending>
+            <conflict>Aktivering av sortering på denne kontrollen vil deaktivere den på følgende kontroll: {0}</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>Kontrollutseende</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>Fjern innledende og etterfølgende mellomrom</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+        <types>
+            <label>Datatype</label>
+        </types>
+        <builtin-type>
+            <label>Innebygd type</label>
+            <hint>Inngebygd datatype</hint>
+
+            <use-schema-type>Bruk skjematype</use-schema-type>
+            <use-component-type>Bruk forhåndsdefinert type</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>Vanlige typer</label>
+                    <type label="Enhver streng">string</type>
+                    <type label="Boolsk verdi">boolean</type>
+                    <type label="Email address">e-postadresse</type>
+                </choices>
+                <choices>
+                    <label>Talltyper</label>
+
+                    <type label="Desimaltall">decimal</type>
+
+                    <type label="Heltall">integer</type>
+                    <type label="Positivt heltall">positiveInteger</type>
+                    <type label="Ikke-positivt heltall">nonPositiveInteger</type>
+                    <type label="Negativt heltall">negativeInteger</type>
+                    <type label="Ikke-negativt heltall">nonNegativeInteger</type>
+
+                    <type label="Flyttall, enkel presisjon">float</type>
+                    <type label="Flyttall, dobbel presisjon">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Tidstyper</label>
+                    <type label="Dato">date</type>
+                    <type label="Klokkeslett">time</type>
+                    <type label="Dato og klokkeslett">dateTime</type>
+                    <type label="Varighet">duration</type>
+                    <type label="År og måned">gYearMonth</type>
+                    <type label="Måned og dag">gMonthDay</type>
+                    <type label="År">gYear</type>
+                    <type label="Måned">gMonth</type>
+                    <type label="Dag">gDay</type>
+                </choices>
+                <choices>
+                    <label>Strengtyper</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="XML qualified name">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>Andre typer</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Binærfil i base64-format">base64Binary</type>
+                    <type label="Binærfil i heksadesimalformat">hexBinary</type>
+                    <type label="URI">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>Skjematype</label>
+            <hint>Type from an imported schema</hint>
+        </schema-type>
+        <required>
+            <label>Påkrevd</label>
+            <hint>Hvorvidt feltet er påkrevd eller ikke</hint>
+            <item id="0">Ja</item>
+            <item id="1">Nei</item>
+            <item id="2">XPath</item>
+        </required>
+        <constraint>
+            <item id="formula">Formel</item>
+            <item id="max-length">Maksimal lengde</item>
+            <item id="min-length">Minimum lengde</item>
+            <item id="positive">Positiv</item>
+            <item id="non-negative">Positiv eller null</item>
+            <item id="non-positive">Negativ eller null</item>
+            <item id="negative">Negativ</item>
+            <item id="fraction-digits">Maksimalt antall desimaler</item>
+            <item id="upload-max-size-per-file" multiple="false">Maksimal vedleggsstørrelse</item>
+            <item id="upload-max-size-per-file" multiple="true">Maksimal vedleggsstørrelse per fil</item>
+            <item id="upload-max-size-aggregate-per-control">Maksimal samlet vedleggsstørrelse</item>
+            <item id="upload-max-files-per-control">Maksimalt antall filer per kontroll</item>
+            <item id="upload-min-files-per-control">Minimalt antall filer per kontroll</item>
+            <item id="upload-mediatypes">Støttede filtyper</item>
+            <item id="excluded-dates">Datoer som skal ekskluderes</item>
+        </constraint>
+        <formula>
+            <label>Formel</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>Boolsk XPath-uttrykk</hint>
+        </formula>
+        <integer-argument>
+            <label>[Integer Value]</label>
+            <alert>[Incorrect Value]</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>Rediger varselmal-parametre</edit-label>
+            <dialog-label>Varselmal-parametre</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>Synlighet</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>Boolsk XPath-uttrykk</hint>
+            <help>
+                &lt;p&gt;
+                    This allows you to specify whether the form control is visible or not.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Yes:&lt;/b&gt; The form control is visible.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;No:&lt;/b&gt; The form control is hidden.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formula:&lt;/b&gt; The form control is visible or hidden dynamically depending on a formula.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    The formula allows you to dynamically specify whether the form control is visible or not. It must return a boolean value.
+                    The form control is visible if the formula evaluates to &lt;code&gt;true()&lt;/code&gt;, and hidden if it evaluates to &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>Skrivebeskyttelse</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>Boolsk XPath-uttrykk</hint>
+            <help>
+                &lt;p&gt;
+                    This allows you to specify whether the form control is readonly or read-write.
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Yes:&lt;/b&gt; The form control is readonly.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;No:&lt;/b&gt; The form control is read-write.&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Formula:&lt;/b&gt; The form control is readonly or read-write dynamically depending on a formula.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    The formula allows you to dynamically specify whether the form control is readonly or read-write. It must return a boolean value.
+                    The form control is readonly if the formula evaluates to &lt;code&gt;true()&lt;/code&gt;, and read-write if it evaluates to &lt;code&gt;false()&lt;/code&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>Forhåndsutfylt verdi</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>XPath-uttrykk</hint>
+            <help>
+                &lt;p&gt;
+                    This formula allows you to specify an initial value for the form control in "new" mode only.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>Utregnet verdi</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>XPath-uttrykk</hint>
+            <help>
+                &lt;p&gt;
+                    This formula allows you to specify a calculated value for the form control.
+                    This value is re-evaluated to remain up to date as needed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their names preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more about formulas, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>Etikett</label>
+        </control-label>
+        <control-hint>
+            <label>Hint</label>
+        </control-hint>
+        <control-help>
+            <label>Hjelpemelding</label>
+            <hint>Melding som vises når brukere klikker på hjelpeikonet ved siden av etiketten</hint>
+        </control-help>
+        <control-text>
+            <label>Forklarende tekst</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>Kort etikett</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>Gjentagelsesetikett</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>Legg til gjentagelsesetikett</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>Fjern gjentagelsestekst</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>Varselmelding</label>
+            <hint>Melding som vises når varselet er aktivt</hint>
+        </alert>
+        <default-alert>
+            <label>Standard varselmelding</label>
+            <hint>Aktiv når det ikke finnes en mer spesifikk varselmelding</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>Bruk global standard varselmelding</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>Bruk standard varselmelding</label>
+        </use-default-alert>
+        <validation-type><label>Valideringstype</label></validation-type>
+        <validation-details><label>Valideringsdetaljer</label></validation-details>
+        <level><label>Nivå</label></level>
+        <use-html>Bruk HTML</use-html>
+        <parameters>Malparametre</parameters>
+        <automatic-hint>
+            <label>Bruk automatisk hint</label>
+            <hint>Legger til et hint basert på maksimal filstørrelse og støttede filtyper du kan ha spesifisert i fanen Valideringer og varsler</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>Åpen valg</label>
+            <hint>Hvis aktivert, kan brukere skrive inn sin egen verdi, og verdien (tekst lagret i dataene) brukes også som etikett (tekst vist i rullegardinlisten)</hint>
+        </open-selection>
+        <store-label>
+            <label>Lagre etikett</label>
+            <hint>Hvis aktivert, lagres den valgte etiketten sammen med dataene</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">Bruk standard</item>
+            <item id="1">Ja</item>
+            <item id="2">Nei</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>Rediger {0,choice,0#seksjonsdetaljer: "{2}" / "{1}"|1#rutenettinnstillinger: "{1}"}</label>
+        <control-name>
+            <label>Navn</label>
+            <alert>Navnet er galt eller allerede i bruk.</alert>
+            <hint>F.eks.: «adresse»</hint>
+        </control-name>
+        <grid-columns>
+            <label>Antall rutenettskolonner</label>
+        </grid-columns>
+        <grid-rows>
+            <label>Antall rutenettsr ader</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>Rutenett tabulatorrekkefølge</label>
+            <item id="0">Standard</item>
+            <item id="1">Rader</item>
+            <item id="2">Kolonner</item>
+        </grid-tab-order>
+        <options>
+            <label>Alternativer</label>
+            <item>
+                <label>Åpnet i utgangspunktet</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>Sideskift før</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>Sammenleggbar</label>
+        </collapsible>
+        <visibility>
+            <label>Synlighet</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>Boolsk XPath-uttrykk</hint>
+        </visibility>
+        <readonly>
+            <label>Skrivebeskyttet</label>
+            <alert>Galt XPath-uttrykk</alert>
+            <hint>Boolsk XPath-uttrykk</hint>
+        </readonly>
+        <repeat>
+            <label>Gjenta innhold</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>Tillat brukeren å legge til, fjerne eller flytte gjentagelser</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>Vis gjentagelsesnummer</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>Vis én gjentagelse om gangen i veiviseren</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label>Aktiver tilpasset gjentagelseselementnavn</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>Tilpasset gjentagelseselementnavn</label>
+            <alert>Navnet er allerede i bruk eller ugyldig</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>Minimalt antall gjentagelser</label>
+            <alert>Ugyldig verdi</alert>
+            <hint>Ikke-negativt tall eller XPath-uttrykk</hint>
+        </min>
+        <max>
+            <label>Maksimalt antall gjentagelser</label>
+            <alert>Ugyldig verdi</alert>
+            <hint>Positivt tall eller XPath-uttrykk</hint>
+        </max>
+        <freeze>
+            <label>Frys gjentagelser</label>
+            <alert>Ugyldig verdi</alert>
+            <hint>Ikke-negativt tall opp til minimalt antall gjentagelser (se over), eller et XPath-uttrykk</hint>
+        </freeze>
+        <no-freeze>Ikke frys</no-freeze>
+        <appearance-minimal>
+            <label>Forenklet utseende</label>
+            <hint>Vis grunnleggende legg til/fjern knapper uten meny eller omorganisering</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>Bruk forhåndsutfylte verdiformler når gjentagelser legges til</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>Innledende antall gjentagelser bruker mal</label>
+        </initial-iterations>
+        <other>Annet</other>
+        <one>Én gjentagelse</one>
+        <unlimited>Ubegrenset</unlimited>
+        <no-minimum>Intet minimum</no-minimum>
+        <tab-base><label>Grunnleggende innstillinger og formler</label></tab-base>
+        <tab-repeat><label>Gjentatt innhold</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>Bekreft</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>Kontrollnavn</label>
+        <prefix>
+            <label>Prefiks</label>
+        </prefix>
+        <suffix>
+            <label>Suffiks</label>
+        </suffix>
+        <original-name>
+            <label>Opprinnelig navn</label>
+        </original-name>
+        <new-name>
+            <label>Nytt navn</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>Publiser skjema</label>
+        <publish>Publiser</publish>
+        <publish-success>Skjemaet ble publisert som versjon {1,number,integer}. {0,choice,0#Ingen vedlegg har|1#Ett vedlegg har|1&lt;{0,number,integer} vedlegg har} blitt publisert.</publish-success>
+        <publish-error>Det oppsto en feil ved publisering.</publish-error>
+        <latest-published-version>Siste publiserte versjon</latest-published-version>
+        <create-new-version-item>opprett en ny skjemadefinisjon med versjonsnummer {0,number,integer}</create-new-version-item>
+        <overwrite-version-item>skriv over gjeldende skjemadefinisjon med versjonsnummer {0,number,integer} ({1,choice,0#utilgjengelig|1#tilgjengelig})</overwrite-version-item>
+        <create-new-version-help>
+            PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+            database. Data which already exists in the database will still be viewed and edited with the previous
+            versions of this form definition which are associated with that data. The new form definition version
+            will be used to create new data.
+        </create-new-version-help>
+        <overwrite-version-help>
+            PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+            definition are small, such as changing control labels, the form definition will be compatible with
+            existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+            moving controls, the form definition might be incompatible with existing data. We recommend being
+            careful when overwriting an existing form definition version.
+        </overwrite-version-help>
+        <open-summary>Åpne oppsummeringsside for det publiserte skjema</open-summary>
+        <open-new>Åpne publisert skjema i sluttbrukermodus</open-new>
+        <version>Versjon</version>
+        <available>Gjør publisert skjema tilgjengelig</available>
+        <comment>Kommentar</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>Legg til språk</label>
+        <new-language>
+            <label>Legg til det følgende språket</label>
+        </new-language>
+        <common>Mest vanlige språk</common>
+        <all>Andre språk</all>
+        <add-language>
+            <label>Legg til språk</label>
+        </add-language>
+        <remove-language>
+            <label>Fjern språk</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>Søk kontroller</label>
+        <open-settings>
+            <label>Åpne innstillingsdialog</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>XML-skjemaopplasting</label>
+        <schema-type>
+            <label>Tilgjengelige skjematyper</label>
+            <hint>Denne lister de simple typene som er tilgjengelige i det opplastede skjemaet</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>Schema Namespace URI</label>
+            <hint>Dette er URI-en til navnetrommet til det opplastede skjemaet</hint>
+        </namespace-uri>
+        <operations>
+            <label>Operasjoner</label>
+        </operations>
+        <delete-schema>
+            <label>Slett eksisterende XML-skjema</label>
+        </delete-schema>
+        <change-schema>
+            <label>Endre XML-skjema</label>
+        </change-schema>
+        <replace-schema>
+            <label>Bytt ut XML-skjema</label>
+        </replace-schema>
+        <upload-schema>
+            <label>Last opp XML-skjema</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>Skjemaet ditt ser ikke ut til å inneholde enkle typer. Du vil ikke kunne velge typer fra dette skjemaet for validering.</no-simple-types>
+            <has-includes>Skjemaet ditt inneholder importer eller inklusjoner. Disse vil ikke benyttes.</has-includes>
+            <not-a-schema>Den opplastede filen er ikke et gyldig skjema.</not-a-schema>
+            <new-schema-information>Ny skjemainformasjon</new-schema-information>
+            <existing-schema-information>Eksisterende skjemainformasjon</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>Rediger kildekode</label>
+        <source>
+            <alert>Vennligst sørg for at innholdet er velformet XML</alert>
+        </source>
+    </dialog-edit-source>
+    <dialog-view-source>
+        <label>Vis kildekode</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>Last opp PDF</label>
+        <pdf-upload>
+            <label>PDF-fil</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>Navn</label>
+        </attachment-name>
+        <attachment-language>
+            <label>Språk</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>Rediger valg</label>
+        <resources-language>
+            <label>Ressursspråk</label>
+        </resources-language>
+        <label-header>
+            <label>Label</label>
+        </label-header>
+        <value-header>
+            <label>Verdi</label>
+        </value-header>
+        <hint-header>
+            <label>Hint</label>
+        </hint-header>
+        <clear-value>
+            <label>Tøm verdi</label>
+        </clear-value>
+        <remove-all>
+            <label>Fjern alle</label>
+        </remove-all>
+        <filter>
+            <label>Filterformel</label>
+        </filter>
+        <itemsetid-mode>
+            <label>Bruk valg fra metadata</label>
+            <item id="0">Når kontrollen er målet for en handling (standard)</item>
+            <item id="1">Alltid</item>
+            <item id="2">Aldri</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>HTTP-tjenesteredigering</label>
+        <tab-definition><label>Definisjon</label></tab-definition>
+        <tab-advanced><label>Avansert</label></tab-advanced>
+        <tab-test><label>Testresultater</label></tab-test>
+        <url-parameters><label>URL-parametre</label></url-parameters>
+        <parameter-name><label>Navn</label></parameter-name>
+        <parameter-default-value><label>Standardverdi</label></parameter-default-value>
+        <no-headers>Ingen headere mottatt.</no-headers>
+        <service-name>
+            <label>Tjenestenavn</label>
+            <hint>Velg et entydig navn for denne tjenesten</hint>
+        </service-name>
+        <service-performs-search>
+            <label>Tjenesten utfører søk</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>Tjenesten støtter paginering</label>
+        </service-supports-paging>
+        <resource>
+            <label>Ressurs-URL</label>
+            <hint>HTTP-URL-en til denne tjenesten</hint>
+        </resource>
+        <method>
+            <label>Metode</label>
+        </method>
+        <serialization>
+            <label>Serialisering</label>
+        </serialization>
+        <soap-submission>
+            <label>SOAP-tjeneste</label>
+            <hint>Hvorvidt dette er en SOAP-tjeneste</hint>
+        </soap-submission>
+        <soap-action>
+            <label>SOAP-action</label>
+            <hint>Valgfri SOAPAction-header</hint>
+        </soap-action>
+        <http-authentication>
+            <label>HTTP-autentisering</label>
+            <hint>HTTP-autentisering</hint>
+        </http-authentication>
+        <username>
+            <label>Brukernavn</label>
+        </username>
+        <password>
+            <label>Passord</label>
+        </password>
+        <request-body>
+            <label>Forespørselens body</label>
+            <hint>XML-data (kan være en SOAP-konvolutt)</hint>
+        </request-body>
+        <is-binary-response>
+            <label>Tjenestersvar har binært innhold</label>
+            <hint>Kryss av dette hvis svaret brukes til å sette en vedleggskontrollverdi</hint>
+        </is-binary-response>
+        <response>
+            <label>Respons</label>
+        </response>
+        <error-type>
+            <label>Feiltype</label>
+            <item>
+                <label>Innsending pågår</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>Ingen data</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>Valideringsfeil</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>Ressursfeil</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>Target error</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>Intern feil</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>Ressurs-URL</label>
+        </resource-uri>
+        <status-code>
+            <label>Statuskode</label>
+        </status-code>
+        <headers>
+            <label>Headere</label>
+        </headers>
+        <header-name>
+            <label>Navn</label>
+        </header-name>
+        <header-value>
+            <label>Verdi(er)</label>
+        </header-value>
+        <response-body>
+            <label>Responsbody</label>
+        </response-body>
+        <xml-response-body>
+            <label>XML-responsbody</label>
+        </xml-response-body>
+        <save>
+            <label>Lagre</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>Databasetjenesteredigering</label>
+        <service-name>
+            <label>Tjenestenavn</label>
+            <hint>Velg et entydig navn for denne tjenesten</hint>
+        </service-name>
+        <datasource>
+            <label>Datakilde</label>
+            <hint>JNDI-datakilde for denne tjenesten</hint>
+        </datasource>
+        <query>
+            <label>SQL-spørring</label>
+            <hint>SQL-spørring som kan inneholde plassholdere for parametre</hint>
+        </query>
+        <save>
+            <label>Lagre</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>Actionredigering</label>
+        <service-name>
+            <label>Action-navn</label>
+            <hint>Velg et entydig navn for denne actionen</hint>
+        </service-name>
+        <observer-type>
+            <label>Kjør handling når</label>
+            <item id="0">
+                <label>kontrollen</label>
+            </item>
+            <item id="1">
+                <label>skjemaet lastes</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>endrer sin verdi</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>vises</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>forsvinner</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>aktiveres</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>før dataens innledende verdier beregnes</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>etter at dataene er klare</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>etter at kontrollene er klare</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <!--<event-type>-->
+            <!--<label>Reager på</label>-->
+            <!--<hint>Hendelse (på en kontroll eller globalt) som det skal reageres på</hint>-->
+            <!--<item id="0">-->
+                <!--<label>Verdiendring</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="1">-->
+                <!--<label todo="true">Verdiendring eller skjemainnlasting</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="2">-->
+                <!--<label>Aktivering</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="3">-->
+                <!--<label todo="true">Skjemainnlasting (after controls ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="4">-->
+                <!--<label todo="true">Skjemainnlasting (before data ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+            <!--<item id="5">-->
+                <!--<label todo="true">Skjemainnlasting (after data ready)</label>-->
+                <!--<hint/>-->
+            <!--</item>-->
+        <!--</event-type>-->
+        <event-condition>
+            <label>Kjør handlingen i følgende tilfelle</label>
+            <item id="always">Alltid</item>
+            <item id="new-only">Kun i "ny"-modus</item>
+            <item id="formula">Når formelen evalueres til "true"</item>
+            <formula>Formel</formula>
+        </event-condition>
+        <event-control>
+            <label>Kontroll</label>
+        </event-control>
+        <service-to-call>
+            <label>Tjeneste som kalles</label>
+            <hint>Tjeneste som skal kalles når en hendelse inntrer</hint>
+        </service-to-call>
+        <source>
+            <label>Kilde</label>
+        </source>
+        <destination>
+            <label>Destinasjon</label>
+        </destination>
+        <source-control>
+            <label>Kildekontroll</label>
+        </source-control>
+        <destination-xpath>
+            <label>Xpath-uttrykk for destinasjonen</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>Parameter number</label>
+        </parameter-number>
+        <response-values>
+            <label>Sett kontrollverdier for responsen</label>
+        </response-values>
+        <destination-control>
+            <label>Destinasjonskontroll</label>
+        </destination-control>
+        <source-xpath>
+            <label>XPath-uttrykk for kilden</label>
+        </source-xpath>
+        <response-itemset>
+            <label>Angi responsvalgkontrollvalg</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>Destinasjonsvalgkontroll</label>
+        </destination-selection-control>
+        <items>
+            <label>Items</label>
+            <hint>XPath-uttrykk som returnerer én node for hvert valg</hint>
+        </items>
+        <item-label>
+            <label>Label</label>
+            <hint>XPath-uttrykk relativt til en valgnode</hint>
+        </item-label>
+        <item-value>
+            <label>Verdi</label>
+            <hint>XPath-uttrykk relativt til en valgnode</hint>
+        </item-value>
+        <item-hint>
+            <label>Hintformel</label>
+            <hint>Relativt til valgnode</hint>
+        </item-hint>
+        <is-last-page>
+            <label>Er siste side-formel</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>Velg unikt valg automatisk</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>Lagre</label>
+        </save>
+        <test>
+            <label>Test</label>
+        </test>
+
+        <general-settings>Generelle innstillinger</general-settings>
+        <service-request-actions>Tjenesteforespørselshandlinger</service-request-actions>
+        <service-response-actions>Tjenesteresponshandlinger</service-response-actions>
+
+        <set-control-value>Angi kontrollverdi</set-control-value>
+        <set-control-itemset>Angi kontrollvalg</set-control-itemset>
+        <save-to-dataset>Lagre til datasett</save-to-dataset>
+        <dataset-name>Datasettnavn</dataset-name>
+        <set-control-value-unavailable>Angi kontrollverdi er bare tilgjengelig når "etter at kontrollene er klare" er valgt</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>Skjemaforhåndsvisning</label>
+        <console>Konsoll</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>Test PDF-produksjon</label>
+        <use-form-data>Bruk inntastede skjemadata</use-form-data>
+        <disable-default>Deaktiver evalueringen av "Forhåndsutfylte verdier" formler</disable-default>
+        <disable-calculate>Deaktiver evalueringen av "Utregnede verdier" formler</disable-calculate>
+        <disable-relevant>Vis kontroller, rutenett og seksjoner med dynamisk synlighet</disable-relevant>
+        <show-hints>Vis kontrollhint</show-hints>
+        <show-alerts>Vis ugyldige kontrollvarsler</show-alerts>
+        <show-required>Stil påkrevde kontroller</show-required>
+        <use-pdf-template>Bruk PDF-mal</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Orbeon Forms PE-funksjonalitet</label>
+        <message>
+            <div>
+                <p>Denne funksjonaliteten er bare tilgjengelig i Orbeon Forms PE.</p>
+                <p>For mer informasjon, besøke <a href="http://www.orbeon.com/download" target="_blank">Orbeons nettside</a>.</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>E-postinnstillinger</label>
+        <templates>E-postmaler</templates>
+        <template-name>
+            <label>E-postmalnavn</label>
+            <hint>Dette navnet er ikke synlig for sluttbrukere; det brukes i prosesser, for eksempel: email(template = "notify-user")</hint>
+        </template-name>
+        <language>
+            <label>Språk</label>
+            <any-language>Hvilket som helst språk</any-language>
+        </language>
+        <headers>
+            <from>Avsender</from>
+            <to>Mottaker</to>
+            <cc>CC</cc>
+            <bcc>BCC</bcc>
+            <reply-to>Svar til</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>Kontrollverdi</control-value>
+            <expression>Formel</expression>
+            <text>Tekst</text>
+        </header-value-types>
+        <enable-if-true>Aktiver denne malen bare hvis følgende formel evalueres til sann</enable-if-true>
+        <subject>E-postemne</subject>
+        <body>E-postinnhold</body>
+        <use-html>Bruk HTML</use-html>
+        <attach-form-as>Legg ved skjema som</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>Legg ved filer brukere har lastet opp til skjemaet</label>
+            <choices>
+                <all>Alle</all>
+                <none>Ingen</none>
+                <selected>Valgte vedlegg</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>Ekskluder fra alle kontrollverdier</exclude-from-all-control-values>
+        <use-default>Bruk standard</use-default>
+        <delete-template>Slett mal</delete-template>
+        <template-parameters>Malparametre</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>Permissions</label>
+        <enable-permissions>Aktiver tillatelser for dette skjemaet</enable-permissions>
+        <role>Role</role>
+        <permissions>Permissions</permissions>
+        <operations>Operations</operations>
+        <anyone>Anyone</anyone>
+        <anyone-with-token>Krev token</anyone-with-token>
+        <any-authenticated-user>Enhver autentisert bruker</any-authenticated-user>
+        <owner>Eier</owner>
+        <group-member>Gruppemedlemmer</group-member>
+        <create>Create</create>
+        <read>Read</read>
+        <update>Update</update>
+        <delete>Delete</delete>
+        <list>List</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>Arbeidsflyt og tillatelser</label>
+
+        <custom-operations>Definer tilpassede operasjoner for dette skjemaet</custom-operations>
+        <operation-label>Etikett</operation-label>
+        <predefined-label>Forhåndsdefinert</predefined-label>
+        <custom-label>Tilpasset</custom-label>
+        <available-to>Tilgjengelig for</available-to>
+        <availability-to-anyone>Hvem som helst</availability-to-anyone>
+        <availability-to-no-one>Ingen</availability-to-no-one>
+        <availability-to-users>Brukere som oppfyller følgende regel</availability-to-users>
+        <availability-to-users-before>Brukere som oppfyller</availability-to-users-before>
+        <availability-to-users-after>av følgende regler</availability-to-users-after>
+        <workflow-stage>Arbeidsflyttrinn</workflow-stage>
+        <workflow-role>Arbeidsflytrolle</workflow-role>
+        <authentication-role>Autentiseringsrolle</authentication-role>
+        <show-button>Vis knapp på detaljside</show-button>
+        <any>Hvilken som helst</any>
+        <all>Alle</all>
+        <actions>Handlinger</actions>
+        <no-action>Ingen handling</no-action>
+        <change-stage-action>Endre trinn</change-stage-action>
+        <run-process-action>Kjør prosess</run-process-action>
+        <remove-operation>Fjern operasjon</remove-operation>
+        <is>er</is>
+        <is-not>er ikke</is-not>
+
+        <stages>Trinn</stages>
+
+        <stage-name>Trinnnavn</stage-name>
+        <default-stage>Standard</default-stage>
+
+        <operations>
+            <label>Operasjoner</label>
+            <item>
+                <label>Fyll ut nytt skjema</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>List og søk i data</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Få tilgang til data for redigering</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>Få tilgang til data for visning</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>Få tilgang til PDF/TIFF</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>Tastatursnarveier</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>Meldinger</label>
+        <language-header>Språk</language-header>
+        <name-header>Navn</name-header>
+        <value-header>Verdi</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>Redigerbare moduser</editable>
+        <review>Gjennomgangsmodus</review>
+        <pdf-automatic>Automatisk PDF</pdf-automatic>
+        <pdf-template>PDF-mal</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Feltbredde</field-width>
+        <default>Bruk standard</default>
+        <full>Full</full>
+        <natural>Naturlig</natural>
+        <field-align>Feltjustering</field-align>
+        <left>Venstre</left>
+        <right>Høyre</right>
+        <learn-settings-below>Lær mer om innstillingene nedenfor</learn-settings-below>
+        <field-value-visibility>
+            <label>Feltverdisynlighet</label>
+            <hint>Styrer hvordan feltverdien vises</hint>
+            <item id="visible">Synlig</item>
+            <item id="obscured">Obscured</item>
+            <item id="partial">Delvis</item>
+            <item id="reveal">Tillat bruker å avsløre</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>Er du sikker på at du ønsker å slette denne seksjonen?</delete-section>
+        <delete-grid>Er du sikker på at du ønsker å slette dette rutenettet?</delete-grid>
+        <delete-column>Er du sikker på at du ønsker å slette denne kolonnen?</delete-column>
+        <delete-row>Er du sikker på at du ønsker å slette denne raden?</delete-row>
+        <delete-resources>Er du sikker på at du ønsker å slette alle ressursene for språket</delete-resources>
+        <delete-service>Er du sikker på at du ønsker å slette tjenesten "{0}"?{1,choice,0# Ingen handlinger bruker den.|1# 1 handling bruker den.|1&lt; {1,number,integer} handlinger bruker den.}</delete-service>
+        <delete-action>Er du sikker på at du ønsker å slette handlingen "{0}"?</delete-action>
+        <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
+        <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
+        <select-template-output>Velg en skjemamal som skal brukes som utgangspunkt.</select-template-output>
+        <app-form-optional>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet.</app-form-optional>
+        <app-form-required>Angi et applikasjons- og et skjemanavn for å identifisere skjemaet ditt. Denne informasjonen er nødvendig før du kan lagre eller publisere skjemaet ditt.</app-form-required>
+        <save-as-metadata-output>Angi et nytt applikasjonsnavn og skjemanavn som skal brukes for kopien av dette skjemaet:</save-as-metadata-output>
+        <xpath-errors>Det {0,choice,1#er én XPath-feil|1&lt;er {0,number,integer} formelfeil} i skjemaet ditt.</xpath-errors>
+        <lhha-checkbox>Merk av i denne boksen hvis du vil skrive HTML-tagger</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>Verdi er påkrevd</required>
+        <xpath>Ugyldig XPath-uttrykk</xpath>
+    </alerts>
+    <template>
+        <untitled-form>Uten tittel</untitled-form>
+        <items>
+            <item>
+                <label>Første valg</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>Andre valg</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>Tredje valg</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

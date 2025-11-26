@@ -592,7 +592,8 @@
         id="fr-form-resources"
         src="oxf:/forms/orbeon/builder/form/resources.xml"
         xxf:readonly="true"
-        xxf:cache="true"/>
+        xxf:cache="true"
+        xxf:xinclude="true"/>
 
     <!-- Instance containing the current language of the form being edited -->
     <xf:instance id="fb-language-instance">

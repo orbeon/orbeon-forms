@@ -6,6 +6,11 @@ import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration
 
 
 trait XFormsURIResolver {
-  def readAsOrbeonDom(urlString: String, credentials: BasicCredentials): dom.Document
-  def readAsTinyTree(configuration: SaxonConfiguration, urlString: String, credentials: BasicCredentials): DocumentNodeInfoType
+  def readAsOrbeonDom(urlString: String, credentials: BasicCredentials, handleXInclude: Boolean = false): dom.Document
+  def readAsTinyTree(
+    configuration : SaxonConfiguration,
+    urlString     : String,
+    credentials   : BasicCredentials,
+    handleXInclude: Boolean = false
+  ): DocumentNodeInfoType
 }

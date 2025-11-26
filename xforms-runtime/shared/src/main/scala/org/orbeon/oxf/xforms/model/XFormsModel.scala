@@ -416,7 +416,6 @@ trait XFormsModelInstances {
   }
 
   // Set instance and associated information if everything went well
-  // NOTE: No XInclude supported to read instances with `@src` for now
   private def setInlineInstance(instance: Instance): Unit = {
 
     assert(instance.useInlineContent)
@@ -573,23 +572,21 @@ trait XFormsModelInstances {
             )
 
           ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
-            // TODO: Handle validating and XInclude!
             // Read result as XML
             // TODO: use submission code?
             if (! instance.readonly)
-              Left(XFormsCrossPlatformSupport.readOrbeonDom(is, connectionResult.url, handleXInclude = false, handleLexical = true))
+              Left(XFormsCrossPlatformSupport.readOrbeonDom(is, connectionResult.url, handleXInclude = instance.handleXInclude, handleLexical = true))
             else
-              Right(XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, handleXInclude = false, handleLexical = true))
+              Right(XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, handleXInclude = instance.handleXInclude, handleLexical = true))
           }
         case Some(uriResolver) =>
           // Optimized case that uses the provided resolver
           debug("getting document from resolver", List("URI" -> absoluteURLString))
 
-          // TODO: Handle validating and handleXInclude!
           if (! instance.readonly)
-            Left(uriResolver.readAsOrbeonDom(absoluteURLString, instance.credentials.orNull))
+            Left(uriResolver.readAsOrbeonDom(absoluteURLString, instance.credentials.orNull, instance.handleXInclude))
           else
-            Right(uriResolver.readAsTinyTree(XPath.GlobalConfiguration, absoluteURLString, instance.credentials.orNull))
+            Right(uriResolver.readAsTinyTree(XPath.GlobalConfiguration, absoluteURLString, instance.credentials.orNull, instance.handleXInclude))
       }
 
     indexInstance(

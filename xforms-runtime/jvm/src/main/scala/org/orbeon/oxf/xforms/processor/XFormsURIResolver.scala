@@ -71,19 +71,22 @@ class XFormsURIResolver(
       }
     }
 
-  def readAsOrbeonDom(urlString: String, credentials: BasicCredentials): Document =
+  def readAsOrbeonDom(urlString: String, credentials: BasicCredentials, handleXInclude: Boolean = false): Document =
     try {
-      // XInclude handled by source if needed
-      TransformerUtils.readOrbeonDom(resolve(urlString, null, credentials), false)
+      TransformerUtils.readOrbeonDom(resolve(urlString, null, credentials), handleXInclude)
     } catch {
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(t, BasicLocationData(urlString, -1, -1))
     }
 
-  def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): DocumentInfo =
+  def readAsTinyTree(
+    configuration : Configuration,
+    urlString     : String,
+    credentials   : BasicCredentials,
+    handleXInclude: Boolean = false
+  ): DocumentInfo =
     try {
-      // XInclude handled by source if needed
-      TransformerUtils.readTinyTree(configuration, resolve(urlString, null, credentials), false)
+      TransformerUtils.readTinyTree(configuration, resolve(urlString, null, credentials), handleXInclude)
     } catch {
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(t, BasicLocationData(urlString, -1, -1))

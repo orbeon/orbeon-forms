@@ -903,12 +903,13 @@ object InstanceMetadataBuilder {
 
     val localExposeXPathTypes = element.attributeValueOpt(XXFORMS_EXPOSE_XPATH_TYPES_QNAME) contains "true"
     val readonly              = element.attributeValueOpt(XXFORMS_READONLY_ATTRIBUTE_QNAME) contains "true"
+    val handleXInclude        = element.attributeValueOpt(XXFORMS_XINCLUDE) exists (_.trimAllToEmpty == "true")
 
     InstanceMetadata(
       readonly              = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true",
       cache                 = element.attributeValue(XXFORMS_CACHE_QNAME) == "true",
       timeToLive            = Instance.timeToLiveOrDefault(element),
-      handleXInclude        = false,
+      handleXInclude        = handleXInclude,
       exposeXPathTypes      = localExposeXPathTypes || ! readonly && partExposeXPathTypes,
       indexIds              = indexIds,
       indexClasses          = indexClasses,

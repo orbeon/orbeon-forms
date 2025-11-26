@@ -37,9 +37,9 @@ version: 2.8.1
     padding: 0 10px;
     font-size: 93%;  /* 12px */
     line-height: 2;  /* ~24px */
-    *line-height: 1.7; /* For IE */
+    /**line-height: 1.7;*/ /* For IE */
     min-height: 2em; /* For Gecko */
-    *min-height: auto; /* For IE */
+    /**min-height: auto;*/ /* For IE */
     color: #000; 
 
 }
@@ -50,8 +50,8 @@ version: 2.8.1
         Necessary to get Buttons of type "link" to be the correct 
         height in IE.
     */
-    *line-height: 1.875;
-	*padding-bottom: 1px;
+    /**line-height: 1.875;*/
+	/**padding-bottom: 1px;*/
 
 }
 

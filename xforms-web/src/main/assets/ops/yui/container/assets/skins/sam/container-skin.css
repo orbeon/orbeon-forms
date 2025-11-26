@@ -15,7 +15,7 @@ version: 2.8.1
 .yui-skin-sam .yui-panel-container {
     padding:0 1px;
     /* Padding added for IE to allow 0,0 alignment with shadow */
-    *padding:2px;
+    /**padding:2px;*/
 }
 
 .yui-skin-sam .yui-panel {
@@ -28,9 +28,9 @@ version: 2.8.1
     z-index: 1;
 
     /* Rollback rounded corner support for IE6/7 */
-    *border-width:1px;
-    *zoom:1;
-    _zoom:normal;
+    /**border-width:1px;*/
+    /**zoom:1;*/
+    /*_zoom:normal;*/
 }
 
 .yui-skin-sam .yui-panel .hd,
@@ -42,8 +42,8 @@ version: 2.8.1
     margin: 0 -1px;
 
     /* Rollback rounded corner support for IE6/7 */
-    *margin:0;
-    *border:0;
+    /**margin:0;*/
+    /**border:0;*/
 }
 
 .yui-skin-sam .yui-panel .hd {
@@ -59,7 +59,7 @@ version: 2.8.1
     padding: 0 10px;
     font-size: 93%;  /* 12px */
     line-height: 2;  /* ~24px */
-    *line-height: 1.9; /* For IE */
+    /**line-height: 1.9;*/ /* For IE */
     font-weight: bold;
     color: #000;
     background: url(../../../../assets/skins/sam/sprite.png) repeat-x 0 -200px;
@@ -113,10 +113,10 @@ version: 2.8.1
     bottom: -3px;
 
     /* IE7 Strict (provides 3px shadow (when combined with 2px padding applied to container) */
-    *top: 4px;
-    *left: -1px;
-    *right: -1px;
-    *bottom: -1px;
+    /**top: 4px;*/
+    /**left: -1px;*/
+    /**right: -1px;*/
+    /**bottom: -1px;*/
 
     /* IE 7 Quirks Mode and IE 6 Standards Mode and Quirks mode */
     _top: 0;

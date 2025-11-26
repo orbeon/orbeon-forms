@@ -19,8 +19,8 @@
 .fr-spell-checker-dialog { width: 460px }
 .fr-spell-checker-dialog .xforms-label { width: 90px; display: inline-block }
 .fr-spell-checker-dialog .xforms-output-output { font-weight: bold }
-.fr-spell-checker-dialog .not-in-dictionary    { width: 180px; *width: 178px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-spell-checker-dialog input                 { width: 180px; *width: 174px }
+.fr-spell-checker-dialog .not-in-dictionary    { width: 180px; /**width: 178px;*/ -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
+.fr-spell-checker-dialog input                 { width: 180px; /**width: 174px*/ }
 .fr-spell-checker-dialog select                { width: 180px }
 .fr-spell-checker-dialog td { padding-right: 10px; padding-bottom: 5px; vertical-align: top }
 .fr-spell-checker-dialog .not-in-dictionary { height: 60px; overflow-y: scroll; display: block; border: 1px solid #999 }

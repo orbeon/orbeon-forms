@@ -24,4 +24,5 @@
     <xi:include href="fb-resources-pt.xml"/>
     <xi:include href="fb-resources-sv.xml"/>
     <xi:include href="fb-resources-ar.xml"/>
+    <xi:include href="fb-resources-pl.xml"/>
 </resources>

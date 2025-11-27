@@ -434,7 +434,8 @@
                                                                 xf:attribute('type', 'object'),
                                                                 xf:element  ('id'  , string($item/xxf:evaluate(instance('local')/value-ref))),
                                                                 xf:element  ('text', string($item/xxf:evaluate(instance('local')/label-ref))),
-                                                                let $hint-value := $item/xxf:evaluate(instance('local')/hint-ref)
+                                                                let $hint-ref   := instance('local')/hint-ref
+                                                                let $hint-value := if (xxf:non-blank($hint-ref)) then $item/xxf:evaluate($hint-ref) else ()
                                                                 return
                                                                     if (xxf:non-blank($hint-value)) then
                                                                         xf:element('title', $hint-value)

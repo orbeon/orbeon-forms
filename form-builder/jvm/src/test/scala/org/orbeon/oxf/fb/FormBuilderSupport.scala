@@ -67,7 +67,7 @@ trait FormBuilderSupport extends XFormsSupport {
             <xf:instance id="fb-form-instance"  xxf:index="id"><_/></xf:instance>
             <xf:instance id="fr-form-instance"  src={url}/>
             <xf:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
-                   xxf:readonly="true" xxf:cache="true"/>
+                   xxf:readonly="true" xxf:cache="true" xxf:xinclude="true"/>
 
             <xf:var name="model"             value="xh:head/xf:model[@id = 'fr-form-model']"/>
             <xf:var name="metadata-instance" value="frf:metadataInstanceRootOpt(instance('fb-form-instance'))"/>

@@ -443,7 +443,8 @@ public class TransformerUtils {
         try {
             final InputStream inputStream = URLFactory.createURL(url).openStream();
             try {
-                return readTinyTree(XPath.GlobalConfiguration(), inputStream, null, true, true);
+                // Pass the original URL as systemId so XInclude can resolve relative hrefs correctly.
+                return readTinyTree(XPath.GlobalConfiguration(), inputStream, url, true, true);
             } finally {
                 inputStream.close();
             }

@@ -29,7 +29,7 @@ body.orbeon {
         font-family: var(--orbeon-code-font-family);
         font-weight: var(--orbeon-code-font-weight);
     }
-    pre {
+    pre:not([role="textbox"]) {
         font-size  : var(--orbeon-pre-font-size);
         font-family: var(--orbeon-pre-font-family);
         font-weight: var(--orbeon-pre-font-weight);
@@ -51,13 +51,6 @@ body.orbeon {
 
     // Disable null font size hack (this doesn't seem to have any unwanted effect)
     .input-append, .input-prepend { font-size: inherit; }
-
-    .btn-group > .dropdown-menu {
-        // Reset null font size hack
-        font-size: var(--orbeon-base-font-size);
-
-        &>.dropdown-item { font-size: var(--orbeon-dropdown-font-size); }
-    }
 
     .tooltip { font-size: var(--orbeon-tooltip-font-size); }
 
@@ -106,11 +99,15 @@ body.orbeon {
         font-weight: var(--orbeon-button-font-weight);
     }
 
+    .btn .fa {
+        line-height: inherit;
+    }
+
     .btn-link[disabled] {
         cursor: default;
     }
 
-    label, .xforms-label {
+    label:not(.checkbox):not(.radio), .xforms-label {
         font-size  : var(--orbeon-label-font-size);
         font-family: var(--orbeon-label-font-family);
         font-weight: var(--orbeon-label-font-weight);
@@ -235,9 +232,6 @@ body.orbeon {
         padding: 4px 6px;
         margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
 
-        line-height: @baseLineHeight;
-        font-size: var(--orbeon-base-font-size); // Use our own preferred font size
-
         color: @textColor;                       // Darker than Bootstrap default of #555
         background-image: none;                  // Liferay adds background images which don't mix well with Bootstrap
 
@@ -269,6 +263,9 @@ body.orbeon {
     input[type="color"],
     .uneditable-input {                             // NOTE: .uneditable-input is removed from Bootstrap 3
         font-size: var(--orbeon-control-font-size); // Use our own preferred font size
+        font-family: var(--orbeon-control-font-family);
+        font-weight: var(--orbeon-control-font-weight);
+
         margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
         color: black;                               // Make text inside the fields stand out, as this is the most important information
         box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
@@ -279,7 +276,21 @@ body.orbeon {
         .focusHighlight();
     }
 
-    input, button, select, textarea {
+    // Cover controls not covered by the section just above
+    .xforms-field,
+    .xforms-output.xforms-output-appearance-minimal output,
+    .xforms-output.xforms-static output,
+    input[type="checkbox"],
+    input[type="radio"],
+    label.checkbox,
+    label.radio,
+    span[role="checkbox"],
+    span[role="radio"],
+    .select2-container,
+    .xbl-fr-attachment .fr-attachment-drop,
+    .xbl-fr-attachment .xbl-fr-dnd-repeat,
+    .xbl-fr-explanation,
+    .xbl-fr-tinymce-div {
         font-size  : var(--orbeon-control-font-size);
         font-family: var(--orbeon-control-font-family);
         font-weight: var(--orbeon-control-font-weight);
@@ -365,10 +376,11 @@ body.orbeon {
     }
 
     label.radio, label.checkbox {
+        align-items: center; // Do not vertically align using margin
         margin-bottom: @controlsBottomMargin;
         input[type="radio"],
         input[type="checkbox"] {
-            margin-top: 3px;    // override Bootstrap
+            margin-top: 0;    // override Bootstrap
             &[disabled] {
                 @media (prefers-contrast: no-preference), (prefers-contrast: less) {
                     // BS5 style for disabled
@@ -487,8 +499,6 @@ body.orbeon {
             display: block;
             padding: ((@baseLineHeight - 1) / 2); // We override these in form-runner-base.less, do we need this here?
             margin: 0 0 (@baseLineHeight / 2);    // We override these in form-runner-base.less, do we need this here?
-            font-size: var(--orbeon-pre-font-size);
-            line-height: @baseLineHeight;
             background-color: darken(@inputBackground, 5%);
             .fieldBorder();
             border-radius: @inputBorderRadius;
@@ -580,6 +590,14 @@ body.orbeon {
     // Dropdowns
     // ---------
 
+    .btn-group > .dropdown-menu {
+        font-size: inherit;
+    }
+
+    .dropup > .dropdown-menu > li > a {
+        font-size: var(--orbeon-button-font-size);
+    }
+
     .dropdown-menu {
 
         z-index: 2000; // because YUI dialogs are > 1000
@@ -590,6 +608,7 @@ body.orbeon {
             display: block;
             padding: 3px 20px;
             clear: both;
+            font-size: var(--orbeon-button-font-size);
             font-weight: normal;
             line-height: @baseLineHeight;
             color: @dropdownLinkColor;

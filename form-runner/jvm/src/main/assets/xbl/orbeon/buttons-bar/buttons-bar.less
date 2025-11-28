@@ -3,15 +3,6 @@
 .orbeon {
 
     .fr-buttons {
-        .xbl-fr-trigger {
-            font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
-
-            .xforms-trigger {
-                // Reset font size hack above
-                font-size: var(--orbeon-base-font-size);
-            }
-        }
-
         // Make buttons stick to the viewport
         // https://github.com/orbeon/orbeon-forms/issues/4809
         // https://github.com/orbeon/orbeon-forms/issues/6417
@@ -42,9 +33,16 @@
         }
     }
 
-    .fr-buttons, .fr-dialog-buttons {
+    .fr-buttons {
+        display: flex;
+        justify-content: center;
+    }
 
+    .fr-dialog-buttons {
         display: block;
+    }
+
+    .fr-buttons, .fr-dialog-buttons {
         width: 100%;
         box-sizing: border-box;
 
@@ -57,16 +55,9 @@
         .xforms-trigger, .xforms-submit, .xbl-fr-drop-trigger {
             button[class ~= btn]:first-of-type, input {
                 min-width     : 9.5em;
-                margin-left   : 4px;
+                margin-left   : 1px;
                 margin-bottom : 4px;
             }
-        }
-
-        // Special sizing for expand/collapse/refresh buttons
-        .fr-collapse-all-button.xforms-trigger button, .fr-expand-all-button.xforms-trigger button, .fr-refresh-button.xforms-trigger button {
-            min-width: 2em;
-            width: 2em;
-            padding: 0;
         }
 
         // Special sizing for new expand/collapse/refresh buttons

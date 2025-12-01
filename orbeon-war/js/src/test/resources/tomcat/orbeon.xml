@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context
     docBase="/usr/local/tomcat/webapps/orbeon"
-    path="/orbeon"
     allowLinking="true">
 
     <!-- Add test-resources to the Java classpath with precedence over JARs, so `Ehcache2Provider` can load

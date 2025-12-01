@@ -145,6 +145,24 @@ object PermissionsAuthorization {
         )
     }
 
+  def authorizedOperationsForNoDataOrThrow(
+    permissions   : Permissions,
+    credentialsOpt: Option[Credentials]
+  )(implicit
+    logger        : IndentedLogger
+  ): Operations =
+    authorizedOperationsForNoData(
+      permissions,
+      credentialsOpt
+    ) match {
+      case Operations.None =>
+        debug(s"UNAUTHORIZED USER")
+        throw HttpStatusCodeException(StatusCode.Forbidden)
+      case ops =>
+        debug(s"AUTHORIZED OPERATIONS ON FORM (NO DATA): `${Operations.serialize(ops, normalized = true)}`" )
+        ops
+    }
+
   def authorizedOperationsForNoData(
     permissions   : Permissions,
     credentialsOpt: Option[Credentials]

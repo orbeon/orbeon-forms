@@ -133,7 +133,7 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
           // This means that we found operations associated with data neither from persistence nor from mode change.
           // The scenario is an external `POST` to `edit`/`view`. In that case, we fall back to permissions without
           // checking the data.
-          PermissionsAuthorization.authorizedOperationsForNoData(
+          PermissionsAuthorization.authorizedOperationsForNoDataOrThrow(
             permissions    = permissionsFromElemOrProperties(Option(permissionsElemOrNull), formRunnerParams.appForm),
             credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession,
           )

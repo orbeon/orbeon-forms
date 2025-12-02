@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.FormRunnerSupport.*
 import org.orbeon.oxf.fr.persistence.relational.SqlReader
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
@@ -30,6 +31,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache
+
 import java.sql.{Connection, DriverManager}
 
 
@@ -84,27 +86,26 @@ trait FormRunnerSupport extends DocumentTestBase {
     app        : String,
     form       : String,
     mode       : String,
-    formVersion: String  = "", // not used yet
-    documentId : Option[String] = None,
+    formVersion: String                         = "", // not used yet
+    documentId : Option[String]                 = None,
     query      : IterableOnce[(String, String)] = Nil,
-    initialize : Boolean = true,
-    content    : Option[StreamedContent] = None,
-    attributes : Map[String, AnyRef]     = Map.empty
+    initialize : Boolean                        = true,
+    content    : Option[StreamedContent]        = None,
+    attributes : Map[String, AnyRef]            = Map.empty
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
-    val (processorService, response, _, events) =
-      TestHttpClient.connect(
-        url        = PathUtils.recombineQuery(s"/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}", query),
-        method     = if (content.isDefined) POST else GET,
-        headers    = Map.empty,
-        content    = content,
-        attributes = attributes
+    val (processorService, docOpt, events, _) =
+      runFormRunnerReturnAll(
+        app,
+        form,
+        mode,
+        formVersion,
+        documentId,
+        query,
+        initialize,
+        content,
+        attributes
       )
-
-    val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)
-
-    val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
-    val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests
 
     (processorService, docOpt, events)
   }
@@ -113,22 +114,64 @@ trait FormRunnerSupport extends DocumentTestBase {
     app        : String,
     form       : String,
     mode       : String,
-    formVersion: String  = "", // not used yet
-    documentId : Option[String] = None,
+    formVersion: String                         = "", // not used yet
+    documentId : Option[String]                 = None,
     query      : IterableOnce[(String, String)] = Nil,
-    initialize : Boolean = true,
-    content    : Option[StreamedContent] = None,
-    background : Boolean = false
+    initialize : Boolean                        = true,
+    content    : Option[StreamedContent]        = None,
+    attributes : Map[String, AnyRef]            = Map.empty,
+    headers    : Map[String, List[String]]      = Map.empty,
+    background : Boolean                        = false
   ): (ProcessorService, BufferedContent, HttpResponse) = {
 
-    val (processorService, response, _, _) =
-      TestHttpClient.connect(
-        url     = PathUtils.recombineQuery(s"/fr/${if (background) "service/" else ""}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query),
-        method  = if (content.isDefined) POST else GET,
-        headers = Map.empty,
-        content = content
+    val (processorService, _, _, response) =
+      runFormRunnerReturnAll(
+        app,
+        form,
+        mode,
+        formVersion,
+        documentId,
+        query,
+        initialize,
+        content,
+        attributes,
+        headers,
+        background = background
       )
 
     (processorService, BufferedContent(response.content)(IOUtils.toByteArray), response)
+  }
+
+  def runFormRunnerReturnAll(
+    app        : String,
+    form       : String,
+    mode       : String,
+    formVersion: String                         = "", // not used yet
+    documentId : Option[String]                 = None,
+    query      : IterableOnce[(String, String)] = Nil,
+    initialize : Boolean                        = true,
+    content    : Option[StreamedContent]        = None,
+    attributes : Map[String, AnyRef]            = Map.empty,
+    headers    : Map[String, List[String]]      = Map.empty,
+    credentials: Option[Credentials]            = None,
+    background : Boolean                        = false
+  ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent], HttpResponse) = {
+
+    val (processorService, response, _, events) =
+      TestHttpClient.connect(
+        url         = PathUtils.recombineQuery(s"/fr/${if (background) "service/" else ""}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query),
+        method      = if (content.isDefined) POST else GET,
+        headers     = headers,
+        content     = content,
+        credentials = credentials,
+        attributes  = attributes
+      )
+
+    val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)
+
+    val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
+    val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests
+
+    (processorService, docOpt, events, response)
   }
 }

@@ -1,0 +1,103 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1/>
+
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"/>
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7373</form-name>
+                    <title xml:lang="en">#7373: New page still shows for form with no `create` permission</title>
+                    <description xml:lang="en"/>
+                    <grid-tab-order>default</grid-tab-order>
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>2</orbeon>
+                        <app>2</app>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <permissions>
+                        <permission operations="create read update delete">
+                            <user-role any-of="my-role"/>
+                        </permission>
+                    </permissions>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1>
+                            <label/>
+                        </section-1>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

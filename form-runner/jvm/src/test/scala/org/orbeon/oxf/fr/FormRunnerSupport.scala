@@ -172,6 +172,18 @@ trait FormRunnerSupport extends DocumentTestBase {
     val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
     val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests
 
-    (processorService, docOpt, events, response)
+    (
+      processorService,
+      docOpt,
+      events,
+      // Recreate a response with the buffered content for further processing
+      new HttpResponse {
+        def statusCode  : Int                       = response.statusCode
+        def headers     : Map[String, List[String]] = response.headers
+        def lastModified: Option[Long]              = response.lastModified
+        def content     : StreamedContent           = StreamedContent(responseContent)
+        def disconnect(): Unit                      = response.disconnect()
+      }
+    )
   }
 }

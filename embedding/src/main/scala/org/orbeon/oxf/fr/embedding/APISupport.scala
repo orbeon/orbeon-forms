@@ -361,6 +361,8 @@ object APISupport {
             xbl
             |
             forms/orbeon/builder/images
+            |
+            webjars
           )
           /
           .+

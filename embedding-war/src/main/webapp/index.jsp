@@ -32,7 +32,9 @@
                             (isEmbeddingApiAngular ? "Angular Component"
                                                    : "React Component"));
 
+    String  appParameter  = request.getParameter("app");
     String  formParameter = request.getParameter("form");
+    String  selectedApp   = appParameter != null ? appParameter : "orbeon";
     String  selectedForm  = formParameter != null &&
             !((isEmbeddingApiAngular || isEmbeddingApiReact) && formParameter.equals("builder")) ?
             formParameter : "bookshelf";
@@ -103,7 +105,7 @@
             ORBEON.fr.API.embedForm(
                 document.getElementById("my-form"),
                 "<%= orbeonFormsContext %>",
-                "orbeon",
+                "<%= selectedApp %>",
                 "<%= selectedForm %>",
                 "new"
             )
@@ -117,7 +119,7 @@
 
         <% if (isEmbeddingApiAngular) { %>
             window.orbeonAngularConfig = {
-            app          : "orbeon",
+            app          : "<%= selectedApp %>",
             form         : "<%= selectedForm %>",
             mode         : "new",
             orbeonContext: "<%= orbeonFormsContext %>"
@@ -130,7 +132,7 @@
 
         <% if (isEmbeddingApiReact) { %>
         window.orbeonReactConfig = {
-            app          : "orbeon",
+            app          : "<%= selectedApp %>",
             form         : "<%= selectedForm %>",
             mode         : "new",
             orbeonContext: "<%= orbeonFormsContext %>"
@@ -197,7 +199,7 @@
             API.embedFormJava(
                     request,
                     out,
-                    "orbeon",
+                    selectedApp,
                     selectedForm,
                     "new",
                     null,

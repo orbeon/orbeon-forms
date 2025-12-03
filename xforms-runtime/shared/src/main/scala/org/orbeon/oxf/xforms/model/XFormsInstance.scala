@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_INSTANCE_INVALIDATE
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.state.InstanceState
@@ -222,7 +223,7 @@ class XFormsInstance(
             )
           case None =>
             warn(
-              "xxforms-instance-invalidate event dispatched to non-cached instance",
+              s"`$XXFORMS_INSTANCE_INVALIDATE` event dispatched to non-cached instance",
               Seq("instance id" -> effectiveId)
             )
         }

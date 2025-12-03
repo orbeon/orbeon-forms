@@ -83,6 +83,7 @@ val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
+val AwsSdkVersion                    = "2.39.5"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
@@ -779,8 +780,8 @@ lazy val formRunnerJVM = formRunner.jvm
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 
-    libraryDependencies += "software.amazon.awssdk" % "s3" % "2.39.5",
-    
+    libraryDependencies += "software.amazon.awssdk" % "s3" % AwsSdkVersion,
+
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",

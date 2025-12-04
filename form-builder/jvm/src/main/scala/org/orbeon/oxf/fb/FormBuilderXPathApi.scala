@@ -518,18 +518,26 @@ object FormBuilderXPathApi {
     val holdersWithRoots =
       for {
         sectionElem   <- FormRunner.findSectionsWithTemplates
-        controlName   <- FormRunner.getControlNameOpt(sectionElem).toList
-        holder        <- FormRunner.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
+        isRepeated    = FormRunner.isContentRepeat(sectionElem)
+        sectionName   <- FormRunner.getControlNameOpt(sectionElem).toList
+        holder        <- FormRunner.findDataHolders(sectionName) // TODO: What about within repeated sections? Templates ok?
         componentElem <- FormRunner.findComponentElemForSection(sectionElem)
         bindingElem   <- FormRunner.findXblBinding(ctx.bodyElem, componentElem.uriQualifiedName)
         instance      <- FormRunner.findXblInstance(bindingElem, fr.Names.FormTemplate)
         instanceRoot  <- instance / * headOption
       } yield
-        holder -> instanceRoot
+        (holder, instanceRoot, isRepeated)
 
-    holdersWithRoots foreach { case (holder, instanceRoot) =>
-      delete(holder / *)
-      insert(into = holder, origin = instanceRoot / *)
+    holdersWithRoots foreach {
+      case (holder, instanceRoot, false) =>
+        delete(holder / *)
+        insert(into = holder, origin = instanceRoot / *)
+      case (holder, instanceRoot, true) =>
+        // https://github.com/orbeon/orbeon-forms/issues/7352
+        holder / * foreach { iterationHolder =>
+          delete(iterationHolder / *)
+          insert(into = iterationHolder, origin = instanceRoot / *)
+        }
     }
   }
 

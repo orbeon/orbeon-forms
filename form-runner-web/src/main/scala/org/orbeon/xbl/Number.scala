@@ -61,7 +61,7 @@ object Number {
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
       // Switch the input type after cleaning up the value for edition
-      EventSupport.addListeners(visibleInputElem, List(DomEventNames.FocusIn, DomEventNames.TouchStart), (e: dom.Event) => {
+      EventSupport.addListeners(visibleInputElem, List(DomEventNames.FocusIn), (e: dom.Event) => {
         if (! isMarkedReadonly) {
 
           logger.debug(s"reacting to event ${e.`type`}")

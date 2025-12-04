@@ -53,7 +53,7 @@
             _.each(outputEls, function(outputEl) {
                 var sec = parseDuration($(outputEl).text());
                 if (! _.isNaN(sec)) {
-                    var countdown = YAHOO.xbl.fr.Countdown.instance(outputEl);
+                    var countdown = ORBEON.xforms.XBL.instanceForControl(outputEl);
                     var containerId = countdown.container.id;
                     var newSec = sec - increment;
                     if (newSec <= countdown.alertThreshold && ! $(outputEl).is(".fr-countdown-alert")) {

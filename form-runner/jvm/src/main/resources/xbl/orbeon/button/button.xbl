@@ -74,11 +74,11 @@
                             </xsl:if>
                             <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
                             <xf:action type="javascript" ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer"
-                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).enabled();</xf:action>
+                                if="$script" xxbl:scope="inner">ORBEON.xforms.XBL.instanceForControl(this).enabled();</xf:action>
                             <xf:action type="javascript" ev:event="xforms-readonly" ev:target="#observer"
-                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readonly();</xf:action>
+                                if="$script" xxbl:scope="inner">ORBEON.xforms.XBL.instanceForControl(this).readonly();</xf:action>
                             <xf:action type="javascript" ev:event="xforms-readwrite" ev:target="#observer"
-                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readwrite();</xf:action>
+                                if="$script" xxbl:scope="inner">ORBEON.xforms.XBL.instanceForControl(this).readwrite();</xf:action>
                         </xf:trigger>
                     </xh:span>
                 </xh:span>

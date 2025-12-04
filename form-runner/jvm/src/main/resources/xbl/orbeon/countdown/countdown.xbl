@@ -69,7 +69,7 @@
                 <xf:action event="xforms-enabled" type="javascript">
                     <xf:param name="alertThreshold" value="$alert-threshold"/>
                     <xf:body>
-                        YAHOO.xbl.fr.Countdown.instance(this).setAlertThreshold(alertThreshold);
+                        ORBEON.xforms.XBL.instanceForControl(this).setAlertThreshold(alertThreshold);
                     </xf:body>
                 </xf:action>
             </xf:output>
@@ -77,7 +77,7 @@
                 <xf:action event="xforms-value-changed" type="javascript">
                     <xf:param name="newValue" value="$time-left-min-sec"/>
                     <xf:body>
-                        YAHOO.xbl.fr.Countdown.instance(this).durationChanged(newValue);
+                        ORBEON.xforms.XBL.instanceForControl(this).durationChanged(newValue);
                     </xf:body>
                 </xf:action>
             </xf:output>

@@ -217,7 +217,7 @@
                                 <!-- If no value is found, clear the search field -->
                                 <xf:setvalue if="$value = ''"             ref="$local/textfield-value"/>
                                 <xf:setvalue if="exists($external-label)" ref="$external-label" value="$local/textfield-value"/>
-                                <xf:action type="javascript" id="out-arp" if="event('ajax-response-processed') and $script">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xf:action>
+                                <xf:action type="javascript" id="out-arp" if="event('ajax-response-processed') and $script">ORBEON.xforms.XBL.instanceForControl(this).ajaxResponseProcessed();</xf:action>
                             </xf:action>
                         </xf:action>
                         <xf:action ev:event="get-label-from-itemset">
@@ -256,7 +256,7 @@
                             target="#observer"
                             type="javascript"
                             if="$script">
-                            YAHOO.xbl.fr.Autocomplete.instance(this).init();
+                            ORBEON.xforms.XBL.instanceForControl(this).init();
                         </xf:action>
 
                         <!-- For resource mode: when the component is initialized or when resources changes, update our internal itemset -->
@@ -302,7 +302,7 @@
                                 <xf:action if="$mode = 'dynamic'">
                                     <xf:dispatch targetid="component-inner-group" name="update-external-world"/>
                                 </xf:action>
-                                <xf:action type="javascript" id="sr" if="$script">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xf:action>
+                                <xf:action type="javascript" id="sr" if="$script">ORBEON.xforms.XBL.instanceForControl(this).suggestionRequested = true;</xf:action>
                             </xf:action>
                         </xsl:if>
                         <!-- In static mode, when the external value changes, search for an item with that value, and set search value to the item's label -->

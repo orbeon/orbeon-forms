@@ -688,7 +688,7 @@ body.orbeon {
             // Try to make icons appear vertically centered
             img {
                 vertical-align: middle;
-                margin-bottom: (@baseLineHeight - @fbIconsHeight) / 2;
+                margin-bottom: ~"calc((@{fluidLineHeight} - @{fbIconsHeight}) / 2)";
             }
         }
 
@@ -1060,7 +1060,7 @@ body.orbeon {
         max-width: none;
 
         .xbl-fr-grid .fr-grid .xforms-textarea textarea {
-            height: @baseLineHeight * 10 + 8px;
+            height: ~"calc(@{fluidLineHeight} * 10 + 8px)";
         }
 
         .fb-service-dialog-error, .fb-service-dialog-success {
@@ -1094,7 +1094,7 @@ body.orbeon {
         }
 
         .fb-service-request-body textarea {
-            height: @baseLineHeight * 8 + 8px;
+            height: ~"calc(@{fluidLineHeight} * 8 + 8px)";
         }
     }
 
@@ -1369,7 +1369,7 @@ body.orbeon {
         }
 
         .fr-grid-help .xforms-textarea textarea {
-            height: @baseLineHeight * 5 + 8px;
+            height: ~"calc(@{fluidLineHeight} * 5 + 8px)";
         }
 
         .fb-base-tab-div {
@@ -1704,7 +1704,7 @@ body.orbeon {
     // Label and hint editors
 
     .fr-grid .xforms-label input, .fr-grid .xforms-hint input, .fb-label-editor input[type='text'] {
-        height: @baseLineHeight;
+        height: @fluidLineHeight;
         padding: 0;
         box-sizing: border-box;
         border-radius: 0;

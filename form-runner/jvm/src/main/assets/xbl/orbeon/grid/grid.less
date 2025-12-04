@@ -575,7 +575,13 @@
 
                 .xforms-help {
                     float: left;
-                    margin-top: ((@baseLineHeight - 14) / 2 + 1); // Vertically center help image on first line
+
+                    // Vertically center help image on first line
+                    margin-top: ((@fixedLineHeight - 14px) / 2 + 1px);
+                    @media screen {
+                        margin-top: ~"calc((@{fluidLineHeight} - 14px) / 2 + 1px)";
+                    }
+
                     margin-right: 3px;
 
                     .help-icon();
@@ -909,8 +915,8 @@
                     display: block;
 
                     box-sizing: border-box;
-                    min-height: @controlsHeight - 2 * 2px !important; // not sure why it doesn't kick in otherwise
-                    line-height: @controlsHeight - 2 * 2px;
+                    min-height: @fixedControlsHeight - 2 * 2px !important; // not sure why it doesn't kick in otherwise
+                    line-height: @fixedControlsHeight - 2 * 2px;
                 }
             }
 

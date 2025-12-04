@@ -49,10 +49,19 @@
 @fbGridDensityMarginRoomyTopBottom:       0.5em;
 @fbGridDensityMarginRoomyLeftRight:       1.0em;
 
-@controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
-@textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
 @controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
-@multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
+
+// Fluid line heights
+@fluidLineHeight: max(@baseLineHeight, 1em);                 // For larger font sizes, make the line height greater
+@fluidControlsHeight: ~"calc(@{fluidLineHeight} + 8px)";     // Because of the border-box on the controls
+@fluidTextareaHeight: ~"calc(@{fluidLineHeight} * 3 + 8px)"; // 3 lines // 5px is the Bootstrap default
+@fluidMultipleSelectHeight: ~"calc((@{fluidLineHeight} + @{controlsBottomMargin}) * 3 - @{controlsBottomMargin} + 8px)"; // 3 lines including margins
+
+// Static line heights (for PDF generator)
+@fixedLineHeight: @baseLineHeight;                 // For larger font sizes, the line height will stay fixed (TODO: use a specific CSS variable if needed)
+@fixedControlsHeight: (@baseLineHeight + 8px);     // Because of the border-box on the controls
+@fixedTextareaHeight: (@baseLineHeight * 3 + 8px); // 3 lines
+@fixedMultipleSelectHeight: ((@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px); // 3 lines including margins
 
 @minGrayDecorationFallback: #ccc;
 @minGrayDecorationVariable: var(--fr-min-gray-decoration);

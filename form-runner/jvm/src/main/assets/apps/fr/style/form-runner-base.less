@@ -375,13 +375,14 @@
             // is used, e.g. they won't be correct when the popover is for a section title
             font-size  : var(--orbeon-base-font-size);
             font-family: var(--orbeon-help-font-family);
-            line-height: @baseLineHeight;
+            line-height: @fluidLineHeight;
             // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
             z-index: 1040;
 
             .popover-title {
                 font-size: var(--orbeon-help-title-font-size);
                 font-weight: var(--orbeon-help-title-font-weight);
+                line-height: 1.3 // Override Bootstrap's value (18px for a font size of 14px)
             }
 
             .popover-content {
@@ -440,7 +441,10 @@
             word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
             word-break: normal;             // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
 
-            min-height: @controlsHeight;
+            min-height: @fixedControlsHeight;
+            @media screen {
+                min-height: @fluidControlsHeight;
+            }
             box-sizing: border-box;
             padding: 4px 6px;
             margin: 0;

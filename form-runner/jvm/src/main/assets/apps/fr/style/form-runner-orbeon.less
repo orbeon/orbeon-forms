@@ -117,7 +117,7 @@ body.orbeon { background-color: @frBackground }
 
     color: @textColor;
     font-size: var(--orbeon-base-font-size);
-    line-height: @baseLineHeight;
+    line-height: @fluidLineHeight;
 
     // Remove icons as content
     [class |= icon]:before {
@@ -276,7 +276,10 @@ body.orbeon { background-color: @frBackground }
         .focusHighlightGroup();
         border-radius: @inputBorderRadius;
         margin-left: 3px;
-        line-height: @baseLineHeight + 2px*2;
+        line-height: (@fixedLineHeight + 2px * 2);
+        @media screen {
+            line-height: ~"calc(@{fluidLineHeight} + 4px)";
+        }
     }
 
     // Focusable groups get a highlight
@@ -536,7 +539,10 @@ body.orbeon { background-color: @frBackground }
         .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
             &.xforms-static {
                 .xforms-selected, .xforms-deselected {
-                    min-height: @baseLineHeight;
+                    min-height: @fixedLineHeight;
+                    @media screen {
+                        min-height: @fluidLineHeight;
+                    }
                     background-size: 1.5em;
                     background-repeat: no-repeat;
                     background-position: 0 0;

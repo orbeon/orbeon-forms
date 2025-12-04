@@ -196,7 +196,7 @@
             <!-- Free `fr-form-instance`. Leave data as unsafe. -->
             <xf:insert
                 ref="xxf:instance('fr-form-instance')"
-                origin="xf:element('dummy')"/>
+                origin="xf:element('_')"/>
         </xf:action>
 
     </xf:submission>

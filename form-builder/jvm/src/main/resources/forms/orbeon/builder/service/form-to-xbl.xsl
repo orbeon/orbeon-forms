@@ -521,7 +521,7 @@
 
                     <!-- Section data model -->
                     <xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id">
-                        <empty/>
+                        <_/>
                     </xf:instance>
 
                     <!-- Template -->

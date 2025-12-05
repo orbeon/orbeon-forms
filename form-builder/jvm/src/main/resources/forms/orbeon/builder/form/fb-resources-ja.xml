@@ -1,0 +1,1611 @@
+<resource xml:lang="ja">
+    <!-- Form metadata -->
+    <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+    <application-name>
+        <label>アプリ名</label>
+        <hint>フォームをまとめる短い名前（例: acme / sales）</hint>
+        <help>
+            &lt;p&gt;
+            アプリ名はフォームをグループ化するための名前です。例えば:
+            &lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li&gt;"orbeon" や "acme" のような会社名&lt;/li&gt;
+                &lt;li&gt;"hr"、"sales"、"engineering" のような部門名&lt;/li&gt;
+                &lt;li&gt;"mercury"、"phoenix" のようなプロジェクト名&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;
+            公開時のURLに使われるので、英小文字のみを推奨します。
+            &lt;/p&gt;
+        </help>
+        <alert>ASCIIの英数字と「-」「_」で255文字以内にしてください</alert>
+    </application-name>
+    <form-name>
+        <label>フォーム名</label>
+        <hint>このフォームを識別する名前（例: claim）</hint>
+        <help>
+            &lt;p&gt;
+            フォーム名はアプリ内で固有の名前です。例: "address" や "claim"。
+            &lt;/p&gt;
+            &lt;p&gt;
+            URLに使われるので、英小文字のみを推奨します。
+            &lt;/p&gt;
+        </help>
+        <alert>ASCIIの英数字と「-」「_」で255文字以内にしてください</alert>
+        <no-form-alert>
+            このアプリ名とフォーム名のフォームは見つかりません。
+        </no-form-alert>
+        <form-published-alert>
+            {0,choice,1#1件のフォーム|1&lt;{0,number,integer}件のフォーム}
+            がこのアプリ名とフォーム名で公開されています。
+            &lt;a href="{1}" target="_blank"&gt;管理ページで確認&lt;/a&gt;
+        </form-published-alert>
+        <form-in-progress-alert>
+            {0,choice,1#1件のフォーム|1&lt;{0,number,integer}件のフォーム}
+            がこのアプリ名とフォーム名で作成中です。
+            &lt;a href="{1}" target="_blank"&gt;フォームビルダーの概要を開く&lt;/a&gt;
+        </form-in-progress-alert>
+    </form-name>
+    <title>
+        <label>フォームタイトル</label>
+        <hint>現在の言語でのタイトル</hint>
+    </title>
+    <description>
+        <label>フォーム説明</label>
+        <hint>現在の言語での説明</hint>
+    </description>
+    <logo>
+        <label>ロゴ</label>
+        <hint>フォーム上部に表示されます</hint>
+    </logo>
+    <general-settings>
+        <label>全般設定</label>
+    </general-settings>
+    <custom-settings>
+        <label>カスタム設定</label>
+    </custom-settings>
+    <!-- Toolbox -->
+    <cut>
+        <label>切り取り</label>
+    </cut>
+    <copy>
+        <label>コピー</label>
+    </copy>
+    <paste>
+        <label>貼り付け</label>
+    </paste>
+    <undo-redo>
+        <undo>元に戻す {0}</undo>
+        <redo>やり直す {0}</redo>
+        <insert>挿入</insert>
+        <rename>名前変更</rename>
+        <delete-control>コントロールを削除</delete-control>
+        <delete-container>コンテナを削除</delete-container>
+        <merge-section-template>セクションテンプレートを統合</merge-section-template>
+        <move-control>コントロールを移動</move-control>
+        <move-container>コンテナを移動</move-container>
+        <update-settings>設定を更新</update-settings>
+        <insert-control>コントロールを追加</insert-control>
+        <insert-section>セクションを追加</insert-section>
+        <insert-grid>グリッドを追加</insert-grid>
+        <delete-row>行を削除</delete-row>
+        <insert-row>行を追加</insert-row>
+        <control-settings>コントロール設定</control-settings>
+        <move-wall>壁を移動</move-wall>
+        <split-cell>セルを分割</split-cell>
+        <merge-cell>セルを結合</merge-cell>
+    </undo-redo>
+    <merge-section>
+        <label>セクションテンプレートを統合</label>
+    </merge-section>
+    <form-structure>
+        <label>フォーム構成</label>
+    </form-structure>
+    <controls>
+        <label>コントロール</label>
+    </controls>
+    <i18n>
+        <label>多言語</label>
+    </i18n>
+    <language>
+        <label>現在の言語</label>
+    </language>
+    <advanced>
+        <label>詳細設定</label>
+    </advanced>
+    <attachments>
+        <label>添付ファイル</label>
+    </attachments>
+    <services-actions>
+        <label>サービスとアクション</label>
+    </services-actions>
+    <http-services>
+        <label>HTTPサービス</label>
+    </http-services>
+    <database-services>
+        <label>データベースサービス</label>
+    </database-services>
+    <actions>
+        <label>アクション</label>
+    </actions>
+    <new-section>
+        <label>新しいセクション</label>
+    </new-section>
+    <new-grid>
+        <label>新しいグリッド</label>
+    </new-grid>
+    <new-repeated-grid>
+        <label>繰り返しグリッドを追加</label>
+    </new-repeated-grid>
+    <change-schema>
+        <label>スキーマを変更</label>
+    </change-schema>
+    <upload-schema>
+        <label>XML スキーマ</label>
+    </upload-schema>
+    <pdf-templates>
+        <label>PDF テンプレート</label>
+    </pdf-templates>
+    <change-css>
+        <label>CSS を変更</label>
+    </change-css>
+    <upload-css>
+        <label>CSS を添付</label>
+    </upload-css>
+    <show-source>
+        <label>ソースを表示</label>
+    </show-source>
+    <edit-source>
+        <label>ソースを編集</label>
+    </edit-source>
+    <permissions>
+        <label>権限</label>
+    </permissions>
+    <reload-components>
+        <label>ツールボックスを再読み込み</label>
+    </reload-components>
+    <library-version>
+        <label>ライブラリバージョン</label>
+        <item>
+            <label>バージョン {0,number,integer}</label>
+        </item>
+    </library-version>
+    <enter-section-title>
+        <label>クリックしてセクションタイトルを入力</label>
+    </enter-section-title>
+    <type-section-title>
+        <label>セクションタイトルを入力</label>
+    </type-section-title>
+    <enter-label>
+        <label>クリックしてラベルを入力</label>
+    </enter-label>
+    <type-label>
+        <label>ここにラベルを入力</label>
+    </type-label>
+    <enter-hint>
+        <label>クリックしてヒントを追加</label>
+    </enter-hint>
+    <type-hint>
+        <label>ここにヒントを入力</label>
+    </type-hint>
+    <enter-text>
+        <label>クリックしてテキストを入力</label>
+    </enter-text>
+    <type-text>
+        <label>ここにテキストを入力</label>
+    </type-text>
+    <click-cell>
+        <label>クリックしてセルを選択</label>
+    </click-cell>
+    <insert-control>
+        <label>ツールバーからコントロールを追加</label>
+    </insert-control>
+    <edit-items>
+        <label>選択肢を編集</label>
+    </edit-items>
+    <merge-right-icon>
+        <label>右のセルと結合</label>
+    </merge-right-icon>
+    <split-horizontally-icon>
+        <label>上下に分割</label>
+    </split-horizontally-icon>
+    <merge-below-icon>
+        <label>下のセルと結合</label>
+    </merge-below-icon>
+    <split-vertically-icon>
+        <label>左右に分割</label>
+    </split-vertically-icon>
+    <delete-control-icon>
+        <label>コントロールを削除</label>
+    </delete-control-icon>
+    <move-icon>
+        <label>ドラッグして移動／コピー</label>
+    </move-icon>
+    <delete-container-icon>
+        <label>セクション／グリッドを削除</label>
+    </delete-container-icon>
+    <delete-row-icon>
+        <label>行を削除</label>
+    </delete-row-icon>
+    <delete-column-icon>
+        <label>列を削除</label>
+    </delete-column-icon>
+    <insert-column-left-icon>
+        <label>左に列を追加</label>
+    </insert-column-left-icon>
+    <insert-column-right-icon>
+        <label>右に列を追加</label>
+    </insert-column-right-icon>
+    <insert-row-above-icon>
+        <label>上に行を追加</label>
+    </insert-row-above-icon>
+    <insert-row-below-icon>
+        <label>下に行を追加</label>
+    </insert-row-below-icon>
+    <section-details-icon>
+        <label>セクション設定</label>
+    </section-details-icon>
+    <grid-details-icon>
+        <label>グリッド設定</label>
+    </grid-details-icon>
+    <move-up-icon>
+        <label>上に移動</label>
+    </move-up-icon>
+    <move-down-icon>
+        <label>下に移動</label>
+    </move-down-icon>
+    <move-right-icon>
+        <label>右に移動</label>
+    </move-right-icon>
+    <move-left-icon>
+        <label>左に移動</label>
+    </move-left-icon>
+    <control-settings-icon>
+        <label>コントロール設定</label>
+    </control-settings-icon>
+    <switch-appearance-icon>
+        <label>表示を切替</label>
+    </switch-appearance-icon>
+    <help-icon>
+        <label>ヘルプを編集</label>
+    </help-icon>
+    <!-- Common -->
+    <add>
+        <label>追加</label>
+    </add>
+    <remove>
+        <label>削除</label>
+    </remove>
+    <edit>
+        <label>編集</label>
+    </edit>
+    <classes>
+        <label>カスタムCSSクラス</label>
+    </classes>
+    <autocomplete>
+        <label>autocomplete 属性</label>
+        <groups>
+            <general>一般</general>
+            <name>氏名・敬称</name>
+            <credentials>認証情報</credentials>
+            <address>住所</address>
+            <contact>連絡先</contact>
+            <payment>決済</payment>
+        </groups>
+    </autocomplete>
+    <property-yes-no>
+        <item id="0">プロパティを使う</item>
+        <item id="1">はい</item>
+        <item id="2">いいえ</item>
+    </property-yes-no>
+    <!-- Dialogs -->
+    <continue>
+        <label>続行</label>
+    </continue>
+    <apply>
+        <label>適用</label>
+    </apply>
+    <cancel>
+        <label>キャンセル</label>
+    </cancel>
+    <close>
+        <label>閉じる</label>
+    </close>
+    <delete>
+        <label>削除</label>
+    </delete>
+    <or>
+        <label>または</label>
+    </or>
+    <errors>
+        <label>エラー</label>
+    </errors>
+    <error-summary>
+        <label>{1,choice,
+            0#メッセージなし|
+            1#'{0,choice,0#エラー|1#警告|2#通知|3#メッセージ}'|
+            1&lt;'{0,choice,0#エラー|1#警告|2#通知|3#メッセージ}'}</label>
+    </error-summary>
+    <back-to-summary>
+        <label>フォーム一覧へ戻る</label>
+    </back-to-summary>
+    <form-builder-page-layout>
+        <item id="0">固定幅表示</item>
+        <item id="1">可変幅表示</item>
+    </form-builder-page-layout>
+    <suggestion>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; サジェストを使用: "{0}"</label>
+    </suggestion>
+    <components>
+        <parameters-editor>
+            <name>
+                <label>名前</label>
+                <alert>値が未入力または不正です</alert>
+            </name>
+            <xpath>
+                <label>計算式</label>
+                <alert>式が未入力または不正です</alert>
+            </xpath>
+            <control>
+                <label>コントロール</label>
+                <alert>値がありません</alert>
+            </control>
+            <token>
+                <label>トークンURLパラメーターを生成</label>
+            </token>
+            <type>
+                <item id="0">コントロールの値</item>
+                <item id="1">計算式</item>
+                <item id="2">全コントロールの値</item>
+                <choice label="リンク">
+                    <item id="3">編集ページ</item>
+                    <item id="4">閲覧ページ</item>
+                    <item id="5">新規ページ</item>
+                    <item id="6">サマリーページ</item>
+                    <item id="7">ホームページ</item>
+                    <item id="9">公開フォーム一覧</item>
+                    <item id="10">フォーム管理</item>
+                    <item id="8">PDFファイル</item>
+                </choice>
+            </type>
+        </parameters-editor>
+    </components>
+    <dialog-form-settings>
+        <label>フォーム設定</label>
+        <save-as>名前を付けて保存…</save-as>
+        <open><label>フォーム設定</label></open>
+        <options>フォームオプション</options>
+        <view-options>見た目</view-options>
+        <wizard-options>ウィザード</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>コントロール設定</control-settings>
+        <about>フォームについて</about>
+        <stats>フォーム統計</stats>
+        <sections>セクション</sections>
+        <repeats>繰り返し</repeats>
+        <grids>グリッド</grids>
+        <section-templates>セクションテンプレート</section-templates>
+        <controls>コントロール</controls>
+        <all>すべて</all>
+        <use-property>プロパティを使う</use-property>
+        <singleton>
+            <label>シングルトンフォーム</label>
+            <hint>この定義でアクセスできるデータを1件に制限します</hint>
+        </singleton>
+        <allow-template-use>
+            <label>フォームテンプレートとして表示</label>
+            <hint>チェックするとテンプレート一覧に表示されます</hint>
+        </allow-template-use>
+        <wizard>
+            <label>ウィザード表示</label>
+            <hint>トップレベルセクションをページごとに分けて表示</hint>
+        </wizard>
+        <wizard-mode>
+            <label>ウィザード遷移の検証</label>
+            <hint>データが不正なときの遷移動作</hint>
+            <item id="0">プロパティを使う</item>
+            <item id="1">自由</item>
+            <item id="2">ゆるめ</item>
+            <item id="3">厳密</item>
+        </wizard-mode>
+        <wizard-subsections-nav>
+            <label>ウィザード内サブセクション移動</label>
+            <hint>トップレベル内のセクションやグリッドでもウィザード移動を有効にする</hint>
+        </wizard-subsections-nav>
+        <wizard-subsections-toc>
+            <label>ウィザードのサブセクション目次</label>
+            <hint>目次でサブセクションをどう見せるか</hint>
+            <item id="0">プロパティを使う</item>
+            <item id="1">開いているセクションのみ表示</item>
+            <item id="2">すべてのセクションを表示</item>
+            <item id="3">表示しない</item>
+        </wizard-subsections-toc>
+        <wizard-separate-toc>
+            <label>ウィザード専用の目次を表示</label>
+        </wizard-separate-toc>
+        <wizard-section-status>
+            <label>ウィザード進捗を常に表示</label>
+        </wizard-section-status>
+        <attachment-max-size-per-file>
+            <label>添付ファイルの最大サイズ（1件）</label>
+            <hint>コントロール設定でも個別設定できます</hint>
+        </attachment-max-size-per-file>
+        <attachment-max-size-aggregate-per-form>
+            <label>添付ファイル合計の最大サイズ</label>
+            <hint>このフォーム内のすべての添付コントロールに適用</hint>
+        </attachment-max-size-aggregate-per-form>
+        <attachment-max-files-per-control>
+            <label>1コントロールあたりの最大ファイル数</label>
+        </attachment-max-files-per-control>
+        <attachment-min-files-per-control>
+            <label>1コントロールあたりの最小ファイル数</label>
+        </attachment-min-files-per-control>
+        <attachment-mediatypes>
+            <label>許可するファイルタイプ</label>
+            <hint>例: "image/* application/pdf"</hint>
+        </attachment-mediatypes>
+        <labels>
+            <label>ラベルの表示方法</label>
+        </labels>
+        <hints>
+            <label>ヒントの表示方法</label>
+        </hints>
+        <automatic-hints>
+            <label>自動ヒントを使う</label>
+        </automatic-hints>
+        <appearances>
+            <item id="0">プロパティを使う</item>
+            <item id="1">インライン</item>
+            <item id="2">ツールチップ</item>
+        </appearances>
+        <placeholders>
+            <label>入力欄にプレースホルダーを使う</label>
+        </placeholders>
+        <data-migration>
+            <label>簡易データ移行</label>
+            <hint>データの欠落要素を自動で追加／削除</hint>
+            <item id="0">プロパティを使う</item>
+            <item id="1">有効</item>
+            <item id="2">無効</item>
+            <item id="3">エラーにする</item>
+        </data-migration>
+        <grid-tab-order>
+            <label>グリッドのTab順</label>
+            <item id="0">プロパティを使う</item>
+            <item id="1">行</item>
+            <item id="2">列</item>
+        </grid-tab-order>
+        <time-window>
+            <label>受付期間</label>
+            <available>
+                <available-from>
+                    <label>指定日以降のみ作成可</label>
+                    <date>開始日時</date>
+                    <message>開始前メッセージ</message>
+                </available-from>
+                <available-to>
+                    <label>指定日まで作成可</label>
+                    <date>終了日時</date>
+                    <message>期限切れメッセージ</message>
+                </available-to>
+            </available>
+        </time-window>
+        <rendered-page-orientation>
+            <label>PDFの向き</label>
+            <hint />
+            <item id="default">プロパティを使う</item>
+            <item id="portrait">縦</item>
+            <item id="landscape">横</item>
+        </rendered-page-orientation>
+        <rendered-page-size>
+            <label>PDFの用紙サイズ</label>
+            <hint />
+            <item id="default">プロパティを使う</item>
+            <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+            <item id="letter">レター</item>
+            <item id="a4">A4</item>
+            <item id="legal">リーガル</item>
+        </rendered-page-size>
+        <readonly-disable-calculate>
+            <label>閲覧/PDF時の計算</label>
+            <hint />
+            <item id="default">プロパティを使う</item>
+            <item id="false">有効</item>
+            <item id="true">無効</item>
+        </readonly-disable-calculate>
+        <html-page-layout>
+            <label>ブラウザ表示幅</label>
+            <hint>フォームの幅を固定か可変か</hint>
+            <item id="0">プロパティを使う</item>
+            <item id="1">固定幅</item>
+            <item id="2">可変幅</item>
+        </html-page-layout>
+        <density>
+            <label>余白</label>
+            <hint>UI要素の間隔</hint>
+            <item id="0">プロパティを使う</item>
+            <item id="1">コンパクト</item>
+            <item id="2">標準</item>
+            <item id="3">広め</item>
+        </density>
+        <analysis-calculate>
+            <label>自動計算の依存関係</label>
+            <hint>計算値/初期値の式の評価順を自動で決定</hint>
+        </analysis-calculate>
+        <versions>バージョン</versions>
+        <current-version>現在のバージョン</current-version>
+        <created-with-version>作成時のバージョン</created-with-version>
+        <updated-with-versions>更新に使ったバージョン</updated-with-versions>
+        <thumbnail>
+            <label>フォームのサムネイル</label>
+            <hint>フォームテンプレートやランディングページで使用</hint>
+        </thumbnail>
+        <default-template>デフォルトテンプレート</default-template>
+    </dialog-form-settings>
+    <dialog-control-settings>
+        <label>コントロール設定: "{1}" / "{0}" ({2})</label>
+        <tab-base><label>基本設定</label></tab-base>
+        <tab-validations><label>検証とアラート</label></tab-validations>
+        <tab-formulas><label>計算式</label></tab-formulas>
+        <control-name>
+            <label>コントロール名</label>
+            <alert>既に使われているか不正です</alert>
+            <hint>例: "first-name"</hint>
+        </control-name>
+        <pdf-field-name>
+            <label>PDFフィールド名</label>
+            <alert>PDFフィールド名が不明です</alert>
+            <item id="0">自動</item>
+            <item id="1">カスタム</item>
+        </pdf-field-name>
+        <excel-field-name>
+            <label>Excel範囲名</label>
+        </excel-field-name>
+        <options>
+            <item>
+                <label>インデックスコントロール</label>
+                <value>fr-index</value>
+            </item>
+            <item>
+                <label>サマリーページに表示</label>
+                <value>fr-summary-show</value>
+            </item>
+            <item>
+                <label>一括編集を許可</label>
+                <value>fr-allow-bulk-edit</value>
+            </item>
+            <item>
+                <label>デフォルトでこの列をソート</label>
+                <value>fr-default-sort-column</value>
+            </item>
+            <item>
+                <label>保存データを暗号化</label>
+                <value>fr-encrypt</value>
+            </item>
+        </options>
+        <summary-show>
+            <do-not-show>サマリーに表示しない</do-not-show>
+            <show>サマリーに表示</show>
+            <column-only>列のみ表示</column-only>
+            <search-only>検索のみ表示</search-only>
+        </summary-show>
+        <role>
+            <restrict>ロールで制限</restrict>
+            <all>すべて</all>
+            <any>いずれか</any>
+            <of-the-following>次のいずれか:</of-the-following>
+            <empty>ロール未指定</empty>
+            <duplicate>ロールが重複しています</duplicate>
+        </role>
+        <bulk-edit-actions>
+            <save-data>データを保存</save-data>
+            <run-process>プロセスを実行</run-process>
+        </bulk-edit-actions>
+        <default-sort-column>
+            <ascending>昇順</ascending>
+            <descending>降順</descending>
+            <conflict>このコントロールでソートを有効にすると次のコントロールでは無効になります: {0}</conflict>
+        </default-sort-column>
+        <control-appearance>
+            <label>表示形式</label>
+        </control-appearance>
+        <whitespace>
+            <item>
+                <label>前後の空白を削除</label>
+                <value>trim</value>
+            </item>
+        </whitespace>
+        <types>
+            <label>データ型</label>
+        </types>
+        <builtin-type>
+            <label>組み込み型</label>
+            <hint>組み込みのデータ型</hint>
+
+            <use-schema-type>スキーマの型を使う</use-schema-type>
+            <use-component-type>定義済みの型を使う</use-component-type>
+
+            <choices>
+                <choices>
+                    <label>一般的な型</label>
+                    <type label="文字列">string</type>
+                    <type label="ブール値">boolean</type>
+                    <type label="メールアドレス">email</type>
+                </choices>
+                <choices>
+                    <label>数値型</label>
+                    <type label="少数">decimal</type>
+
+                    <type label="整数">integer</type>
+                    <type label="正の整数">positiveInteger</type>
+                    <type label="非正の整数">nonPositiveInteger</type>
+                    <type label="負の整数">negativeInteger</type>
+                    <type label="非負の整数">nonNegativeInteger</type>
+
+                    <type label="単精度浮動小数">float</type>
+                    <type label="倍精度浮動小数">double</type>
+
+                    <type label="">long</type>
+                    <type label="">int</type>
+                    <type label="">short</type>
+                    <type label="">byte</type>
+                    <type label="">unsignedLong</type>
+                    <type label="">unsignedInt</type>
+                    <type label="">unsignedShort</type>
+                    <type label="">unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>日付と時間</label>
+                    <type label="日付">date</type>
+                    <type label="時刻">time</type>
+                    <type label="日時">dateTime</type>
+                    <type label="期間">duration</type>
+                    <type label="年と月">gYearMonth</type>
+                    <type label="月と日">gMonthDay</type>
+                    <type label="年">gYear</type>
+                    <type label="月">gMonth</type>
+                    <type label="日">gDay</type>
+                </choices>
+                <choices>
+                    <label>XML 型</label>
+                    <type label="">normalizedString</type>
+                    <type label="">token</type>
+                    <type label="">language</type>
+                    <type label="">Name</type>
+                    <type label="">NCName</type>
+                    <type label="">ID</type>
+                    <type label="">IDREF</type>
+                    <type label="">IDREFS</type>
+                    <type label="">ENTITY</type>
+                    <type label="">ENTITIES</type>
+                    <type label="">NMTOKEN</type>
+                    <type label="">NMTOKENS</type>
+                    <type label="XML qualified name">QName</type>
+                    <type label="">NOTATION</type>
+                </choices>
+                <choices>
+                    <label>その他</label>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type label="Base64エンコードのバイナリ">base64Binary</type>
+                    <type label="16進エンコードのバイナリ">hexBinary</type>
+                    <type label="URI">anyURI</type>
+                </choices>
+            </choices>
+        </builtin-type>
+        <schema-type>
+            <label>スキーマ型</label>
+            <hint>読み込んだスキーマの型</hint>
+        </schema-type>
+        <required>
+            <label>必須</label>
+            <hint>必須かどうか</hint>
+            <item id="0">はい</item>
+            <item id="1">いいえ</item>
+            <item id="2">計算式</item>
+        </required>
+        <constraint>
+            <item id="formula">計算式</item>
+            <item id="max-length">最大長</item>
+            <item id="min-length">最小長</item>
+            <item id="positive">正のみ</item>
+            <item id="non-negative">正または0</item>
+            <item id="non-positive">負または0</item>
+            <item id="negative">負のみ</item>
+            <item id="fraction-digits">小数部桁数の最大</item>
+            <item id="upload-max-size-per-file" multiple="false">添付の最大サイズ</item>
+            <item id="upload-max-size-per-file" multiple="true">ファイルごとの最大サイズ</item>
+            <item id="upload-max-size-aggregate-per-control">添付合計の最大サイズ</item>
+            <item id="upload-max-files-per-control">1コントロールの最大ファイル数</item>
+            <item id="upload-min-files-per-control">1コントロールの最小ファイル数</item>
+            <item id="upload-mediatypes">対応ファイルタイプ</item>
+            <item id="excluded-dates">除外日</item>
+        </constraint>
+        <formula>
+            <label>計算式</label>
+            <alert>XPath式が不正です</alert>
+            <hint>真偽値を返すXPath式</hint>
+        </formula>
+        <integer-argument>
+            <label>整数値</label>
+            <alert>値が不正です</alert>
+        </integer-argument>
+        <alert-template-parameters>
+            <edit-label>アラートテンプレートのパラメーターを編集</edit-label>
+            <dialog-label>アラートテンプレートのパラメーター</dialog-label>
+        </alert-template-parameters>
+        <visibility>
+            <label>表示/非表示</label>
+            <alert>XPath式が不正です</alert>
+            <hint>真偽値を返すXPath式</hint>
+            <help>
+                &lt;p&gt;
+                    コントロールを表示するかどうかを指定します。
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;はい:&lt;/b&gt; コントロールを表示します。&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;いいえ:&lt;/b&gt; コントロールを非表示にします。&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;計算式:&lt;/b&gt; 式の結果で動的に表示/非表示を切り替えます。&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    式は真偽値を返す必要があります。&lt;code&gt;true()&lt;/code&gt; なら表示、&lt;code&gt;false()&lt;/code&gt; なら非表示になります。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    式では &lt;code&gt;$&lt;/code&gt; の後にコントロール名を付けて他のコントロールを参照できます。
+                    &lt;code&gt;$&lt;/code&gt; を入力すると利用可能なコントロールの候補が表示されます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細は &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder ドキュメント&lt;/a&gt; を参照してください。
+                &lt;/p&gt;
+            </help>
+        </visibility>
+        <readonly>
+            <label>読取専用</label>
+            <alert>XPath式が不正です</alert>
+            <hint>真偽値を返すXPath式</hint>
+            <help>
+                &lt;p&gt;
+                    コントロールを読取専用にするか、編集可にするかを指定します。
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;はい:&lt;/b&gt; コントロールは読取専用になります。&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;いいえ:&lt;/b&gt; コントロールは編集可能です。&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;計算式:&lt;/b&gt; 式の結果で動的に切り替えます。&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    式は真偽値を返す必要があります。&lt;code&gt;true()&lt;/code&gt; なら読取専用、&lt;code&gt;false()&lt;/code&gt; なら編集可です。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    式では &lt;code&gt;$&lt;/code&gt; の後にコントロール名を付けて他のコントロールを参照できます。
+                    &lt;code&gt;$&lt;/code&gt; を入力すると利用可能なコントロールの候補が表示されます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細は &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder ドキュメント&lt;/a&gt; を参照してください。
+                &lt;/p&gt;
+            </help>
+        </readonly>
+        <default>
+            <label>初期値</label>
+            <alert>XPath式が不正です</alert>
+            <hint>XPath式</hint>
+            <help>
+                &lt;p&gt;
+                    「新規」モードのときに使う初期値を式で指定します。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    式では &lt;code&gt;$&lt;/code&gt; の後にコントロール名を付けて他のコントロールを参照できます。
+                    &lt;code&gt;$&lt;/code&gt; を入力すると利用可能なコントロールの候補が表示されます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細は &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder ドキュメント&lt;/a&gt; を参照してください。
+                &lt;/p&gt;
+            </help>
+        </default>
+        <calculate>
+            <label>計算値</label>
+            <alert>XPath式が不正です</alert>
+            <hint>XPath式</hint>
+            <help>
+                &lt;p&gt;
+                    コントロールの値を式で計算します。必要に応じて再評価され最新の値を保ちます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    式では &lt;code&gt;$&lt;/code&gt; の後にコントロール名を付けて他のコントロールを参照できます。
+                    &lt;code&gt;$&lt;/code&gt; を入力すると利用可能なコントロールの候補が表示されます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細は &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/formulas"&gt;Form Builder ドキュメント&lt;/a&gt; を参照してください。
+                &lt;/p&gt;
+            </help>
+        </calculate>
+        <control-label>
+            <label>ラベル</label>
+        </control-label>
+        <control-hint>
+            <label>ヒント</label>
+        </control-hint>
+        <control-help>
+            <label>ヘルプメッセージ</label>
+            <hint>ヘルプ表示時に表示</hint>
+        </control-help>
+        <control-text>
+            <label>説明テキスト</label>
+            <hint />
+        </control-text>
+        <control-short-label>
+            <label>短いラベル</label>
+        </control-short-label>
+        <control-iteration-label>
+            <label>繰り返しラベル</label>
+        </control-iteration-label>
+        <control-add-iteration-label>
+            <label>繰り返し追加ボタンラベル</label>
+        </control-add-iteration-label>
+        <control-remove-iteration-label>
+            <label>繰り返し削除ラベル</label>
+        </control-remove-iteration-label>
+        <alert>
+            <label>アラートメッセージ</label>
+            <hint>アラート発生時に表示</hint>
+        </alert>
+        <default-alert>
+            <label>デフォルトのアラート</label>
+            <hint>他により具体的なアラートがない場合に使用</hint>
+        </default-alert>
+        <use-global-alert>
+            <label>グローバルデフォルトのアラートを使う</label>
+        </use-global-alert>
+        <use-default-alert>
+            <label>デフォルトアラートを使う</label>
+        </use-default-alert>
+        <validation-type><label>検証タイプ</label></validation-type>
+        <validation-details><label>検証の詳細</label></validation-details>
+        <level><label>レベル</label></level>
+        <use-html>HTMLを使用</use-html>
+        <parameters>テンプレートパラメーター</parameters>
+        <automatic-hint>
+            <label>自動ヒントを使う</label>
+            <hint>「検証とアラート」で指定した最大ファイルサイズと対応タイプからヒントを自動追加</hint>
+        </automatic-hint>
+        <open-selection>
+            <label>自由入力を許可</label>
+            <hint>有効にするとユーザー独自の値を入力でき、その値がデータと表示ラベルの両方に使われます</hint>
+        </open-selection>
+        <store-label>
+            <label>ラベルを保存</label>
+            <hint>有効にすると選択したラベルをデータと一緒に保存します</hint>
+        </store-label>
+        <default-yes-no>
+            <item id="0">デフォルトを使う</item>
+            <item id="1">はい</item>
+            <item id="2">いいえ</item>
+        </default-yes-no>
+    </dialog-control-settings>
+    <dialog-container-settings>
+        <label>{0,choice,0#セクション設定: "{2}" / "{1}"|1#グリッド設定: "{1}"}</label>
+        <control-name>
+            <label>名前</label>
+            <alert>既に使われているか不正です</alert>
+            <hint>例: "address"</hint>
+        </control-name>
+        <grid-columns>
+            <label>列数</label>
+        </grid-columns>
+        <grid-rows>
+            <label>行数</label>
+        </grid-rows>
+        <grid-tab-order>
+            <label>グリッドのTab順</label>
+            <item id="0">デフォルト</item>
+            <item id="1">行</item>
+            <item id="2">列</item>
+        </grid-tab-order>
+        <options>
+            <label>オプション</label>
+            <item>
+                <label>初期状態で開く</label>
+                <value>fr-initially-open</value>
+            </item>
+            <item>
+                <label>直前で改ページ</label>
+                <value>fr-page-break-before</value>
+            </item>
+        </options>
+        <collapsible>
+            <label>折りたたみ可</label>
+        </collapsible>
+        <visibility>
+            <label>表示/非表示</label>
+            <alert>XPath式が不正です</alert>
+            <hint>真偽値を返すXPath式</hint>
+        </visibility>
+        <readonly>
+            <label>読取専用</label>
+            <alert>XPath式が不正です</alert>
+            <hint>真偽値を返すXPath式</hint>
+        </readonly>
+        <repeat>
+            <label>繰り返しコンテンツ</label>
+        </repeat>
+        <user-can-add-remove>
+            <label>ユーザーによる追加・削除・並べ替えを許可</label>
+            <hint />
+        </user-can-add-remove>
+        <number-rows>
+            <label>繰り返し番号を表示</label>
+            <hint />
+        </number-rows>
+        <use-paging>
+            <label>ウィザードでは1件ずつ表示</label>
+            <hint />
+        </use-paging>
+        <custom-iteration-name>
+            <label>繰り返し要素名をカスタムする</label>
+            <hint />
+        </custom-iteration-name>
+        <iteration-name>
+            <label>カスタム繰り返し要素名</label>
+            <alert>既に使われているか不正です</alert>
+            <hint />
+        </iteration-name>
+        <min>
+            <label>繰り返しの最小数</label>
+            <alert>値が不正です</alert>
+            <hint>0以上の数またはXPath式</hint>
+        </min>
+        <max>
+            <label>繰り返しの最大数</label>
+            <alert>値が不正です</alert>
+            <hint>正の数またはXPath式</hint>
+        </max>
+        <freeze>
+            <label>繰り返しを固定</label>
+            <alert>値が不正です</alert>
+            <hint>上の最小数までの0以上の数、またはXPath式</hint>
+        </freeze>
+        <no-freeze>固定しない</no-freeze>
+        <appearance-minimal>
+            <label>シンプル表示</label>
+            <hint>メニューや並べ替えなしで追加/削除の基本ボタンのみ表示</hint>
+        </appearance-minimal>
+        <apply-defaults>
+            <label>繰り返し追加時に初期値の式を適用</label>
+        </apply-defaults>
+        <initial-iterations>
+            <label>初期回数はテンプレートを使用</label>
+        </initial-iterations>
+        <other>その他</other>
+        <one>1回</one>
+        <unlimited>無制限</unlimited>
+        <no-minimum>下限なし</no-minimum>
+        <tab-base><label>基本設定と計算式</label></tab-base>
+        <tab-repeat><label>繰り返し設定</label></tab-repeat>
+    </dialog-container-settings>
+    <dialog-confirmation>
+        <label>確認</label>
+    </dialog-confirmation>
+    <dialog-ids>
+        <label>コントロール名</label>
+        <prefix>
+            <label>接頭辞</label>
+        </prefix>
+        <suffix>
+            <label>接尾辞</label>
+        </suffix>
+        <original-name>
+            <label>元の名前</label>
+        </original-name>
+        <new-name>
+            <label>新しい名前</label>
+        </new-name>
+    </dialog-ids>
+    <dialog-publish>
+        <label>フォームを公開</label>
+        <publish>公開</publish>
+        <publish-success>フォーム定義をバージョン {1,number,integer} として公開しました（添付 {0,choice,0#なし|1#1 件|1&lt;{0,number,integer} 件}）。</publish-success>
+        <publish-error>公開中にエラーが発生しました。</publish-error>
+        <latest-published-version>最新公開バージョン</latest-published-version>
+        <create-new-version-item>バージョン {0,number,integer} の新しい定義を作成</create-new-version-item>
+        <overwrite-version-item>現在の定義をバージョン {0,number,integer} ({1,choice,0#利用不可|1#利用可}) で上書き</overwrite-version-item>
+        <create-new-version-help>
+            注意: 公開するとデータベースに新しいフォーム定義のバージョンが作成されます。
+            既存データは関連付けられた旧バージョンで表示・編集され、新しいバージョンは新規データに使われます。
+        </create-new-version-help>
+        <overwrite-version-help>
+            注意: 既存のフォーム定義を上書きします。ラベル変更など軽微な変更なら既存データと互換ですが、
+            追加・削除・名称変更・移動など構造変更を行った場合は互換性がないことがあります。上書きは慎重に行ってください。
+        </overwrite-version-help>
+        <open-summary>公開フォームのサマリーを開く</open-summary>
+        <open-new>公開フォームの新規ページを開く</open-new>
+        <version>バージョン</version>
+        <available>公開フォームを利用可能にする</available>
+        <comment>コメント</comment>
+    </dialog-publish>
+    <dialog-add-language>
+        <label>言語を追加</label>
+        <new-language>
+            <label>追加する言語</label>
+        </new-language>
+        <common>よく使う言語</common>
+        <all>その他の言語</all>
+        <add-language>
+            <label>言語を追加</label>
+        </add-language>
+        <remove-language>
+            <label>言語を削除</label>
+        </remove-language>
+    </dialog-add-language>
+    <dialog-search>
+        <label>コントロールを検索</label>
+        <open-settings>
+            <label>設定ダイアログを開く</label>
+        </open-settings>
+    </dialog-search>
+    <dialog-upload-schema>
+        <label>XMLスキーマをアップロード</label>
+        <schema-type>
+            <label>利用可能なスキーマ型</label>
+            <hint>アップロードしたスキーマ内の単純型</hint>
+        </schema-type>
+        <namespace-uri>
+            <label>スキーマの名前空間URI</label>
+            <hint>アップロードしたスキーマの名前空間URIです</hint>
+        </namespace-uri>
+        <operations>
+            <label>操作</label>
+        </operations>
+        <delete-schema>
+            <label>既存のXMLスキーマを削除</label>
+        </delete-schema>
+        <change-schema>
+            <label>XMLスキーマを変更</label>
+        </change-schema>
+        <replace-schema>
+            <label>XMLスキーマを置き換え</label>
+        </replace-schema>
+        <upload-schema>
+            <label>XMLスキーマを添付</label>
+        </upload-schema>
+        <messages>
+            <no-simple-types>スキーマに単純型がないようです。このスキーマから型を選択できません。</no-simple-types>
+            <has-includes>スキーマにimport / includeが含まれています。これらは無効化されます。</has-includes>
+            <not-a-schema>アップロードされたファイルは有効なスキーマではありません。</not-a-schema>
+            <new-schema-information>新しいスキーマ情報</new-schema-information>
+            <existing-schema-information>既存のスキーマ情報</existing-schema-information>
+        </messages>
+    </dialog-upload-schema>
+    <dialog-edit-source>
+        <label>ソース</label>
+        <source>
+            <alert>内容が整形式のXMLであることを確認してください</alert>
+        </source>
+    </dialog-edit-source>
+    <dialog-view-source>
+        <label>ソースを表示</label>
+    </dialog-view-source>
+    <dialog-pdf>
+        <label>PDFテンプレート</label>
+        <pdf-upload>
+            <label>PDFファイル</label>
+        </pdf-upload>
+        <attachment-name>
+            <label>名前</label>
+        </attachment-name>
+        <attachment-language>
+            <label>言語</label>
+        </attachment-language>
+    </dialog-pdf>
+    <dialog-itemsets>
+        <label>選択肢を編集</label>
+        <resources-language>
+            <label>リソース言語</label>
+        </resources-language>
+        <label-header>
+            <label>ラベル</label>
+        </label-header>
+        <value-header>
+            <label>値</label>
+        </value-header>
+        <hint-header>
+            <label>ヒント</label>
+        </hint-header>
+        <clear-value>
+            <label>値をクリア</label>
+        </clear-value>
+        <remove-all>
+            <label>すべて削除</label>
+        </remove-all>
+        <filter>
+            <label>フィルター式</label>
+        </filter>
+        <itemsetid-mode>
+            <label>メタデータの選択肢を使用</label>
+            <item id="0">コントロールがアクション対象のとき（既定）</item>
+            <item id="1">常に</item>
+            <item id="2">使用しない</item>
+        </itemsetid-mode>
+    </dialog-itemsets>
+    <dialog-http-services>
+        <label>HTTPサービスエディター</label>
+        <tab-definition><label>定義</label></tab-definition>
+        <tab-advanced><label>詳細</label></tab-advanced>
+        <tab-test><label>テスト結果</label></tab-test>
+        <url-parameters><label>URLパラメーター</label></url-parameters>
+        <parameter-name><label>名前</label></parameter-name>
+        <parameter-default-value><label>デフォルト値</label></parameter-default-value>
+        <no-headers>ヘッダーは受信していません。</no-headers>
+        <service-name>
+            <label>サービス名</label>
+            <hint>このサービスの一意な名前</hint>
+        </service-name>
+        <service-performs-search>
+            <label>検索を行うサービス</label>
+        </service-performs-search>
+        <service-supports-paging>
+            <label>ページングに対応</label>
+        </service-supports-paging>
+        <resource>
+            <label>リソースURL</label>
+            <hint>サービスがあるHTTP URL</hint>
+        </resource>
+        <method>
+            <label>メソッド</label>
+        </method>
+        <serialization>
+            <label>シリアライズ形式</label>
+        </serialization>
+        <soap-submission>
+            <label>SOAPサービス</label>
+            <hint>SOAPサービスかどうか</hint>
+        </soap-submission>
+        <soap-action>
+            <label>SOAPアクション</label>
+            <hint>任意のSOAPActionヘッダー</hint>
+        </soap-action>
+        <http-authentication>
+            <label>HTTP認証</label>
+            <hint>HTTP認証</hint>
+        </http-authentication>
+        <username>
+            <label>ユーザー名</label>
+        </username>
+        <password>
+            <label>パスワード</label>
+        </password>
+        <request-body>
+            <label>リクエストボディ</label>
+            <hint>XMLデータ（SOAPエンベロープも可）</hint>
+        </request-body>
+        <is-binary-response>
+            <label>レスポンスにバイナリが含まれる</label>
+            <hint>レスポンスを添付コントロールに設定する場合はチェック</hint>
+        </is-binary-response>
+        <response>
+            <label>レスポンス</label>
+        </response>
+        <error-type>
+            <label>エラー種別</label>
+            <item>
+                <label>送信中</label>
+                <value>submission-in-progress</value>
+            </item>
+            <item>
+                <label>データなし</label>
+                <value>no-data</value>
+            </item>
+            <item>
+                <label>検証エラー</label>
+                <value>validation-error</value>
+            </item>
+            <item>
+                <label>リソースエラー</label>
+                <value>resource-error</value>
+            </item>
+            <item>
+                <label>ターゲットエラー</label>
+                <value>target-error</value>
+            </item>
+            <item>
+                <label>内部エラー</label>
+                <value>xxforms-internal-error</value>
+            </item>
+        </error-type>
+        <resource-uri>
+            <label>リソースURL</label>
+        </resource-uri>
+        <status-code>
+            <label>ステータスコード</label>
+        </status-code>
+        <headers>
+            <label>HTTPヘッダー</label>
+        </headers>
+        <header-name>
+            <label>ヘッダー名</label>
+        </header-name>
+        <header-value>
+            <label>ヘッダー値</label>
+        </header-value>
+        <response-body>
+            <label>元のレスポンス本文</label>
+        </response-body>
+        <xml-response-body>
+            <label>XMLレスポンス本文</label>
+        </xml-response-body>
+        <save>
+            <label>保存</label>
+        </save>
+        <test>
+            <label>テスト</label>
+        </test>
+    </dialog-http-services>
+    <dialog-database-services>
+        <label>データベースサービスエディター</label>
+        <service-name>
+            <label>サービス名</label>
+            <hint>このサービスの一意な名前</hint>
+        </service-name>
+        <datasource>
+            <label>データソース</label>
+            <hint>このサービスのJNDIデータソース</hint>
+        </datasource>
+        <query>
+            <label>SQLクエリ</label>
+            <hint>パラメーター用のプレースホルダーを含められます</hint>
+        </query>
+        <save>
+            <label>保存</label>
+        </save>
+        <test>
+            <label>テスト</label>
+        </test>
+    </dialog-database-services>
+    <dialog-actions>
+        <label>アクションエディター</label>
+        <service-name>
+            <label>アクション名</label>
+            <hint>このアクションの一意な名前</hint>
+        </service-name>
+        <observer-type>
+            <label>実行のタイミング</label>
+            <item id="0">
+                <label>コントロールが</label>
+            </item>
+            <item id="1">
+                <label>フォーム読み込み時</label>
+            </item>
+        </observer-type>
+        <control-event-type>
+            <item>
+                <label>値が変わる</label>
+                <value>xforms-value-changed</value>
+            </item>
+            <item>
+                <label>表示される</label>
+                <value>xforms-enabled</value>
+            </item>
+            <item>
+                <label>非表示になる</label>
+                <value>xforms-disabled</value>
+            </item>
+            <item>
+                <label>アクティブになる</label>
+                <value>DOMActivate</value>
+            </item>
+        </control-event-type>
+        <form-event-type>
+            <item>
+                <label>データ初期値の計算前</label>
+                <value>fr-run-form-load-action-before-data</value>
+            </item>
+            <item>
+                <label>データ準備後</label>
+                <value>fr-run-form-load-action-after-data</value>
+            </item>
+            <item>
+                <label>コントロール準備後</label>
+                <value>fr-run-form-load-action-after-controls</value>
+            </item>
+        </form-event-type>
+        <event-condition>
+            <label>次の場合に実行</label>
+            <item id="always">常に</item>
+            <item id="new-only">新規モードのみ</item>
+            <item id="formula">式が true のとき</item>
+            <formula>計算式</formula>
+        </event-condition>
+        <event-control>
+            <label>コントロール</label>
+        </event-control>
+        <service-to-call>
+            <label>呼び出すサービス</label>
+            <hint>イベント発生時に呼び出すサービス</hint>
+        </service-to-call>
+        <source>
+            <label>ソース</label>
+        </source>
+        <destination>
+            <label>宛先</label>
+        </destination>
+        <source-control>
+            <label>ソースコントロール</label>
+        </source-control>
+        <destination-xpath>
+            <label>宛先の式</label>
+        </destination-xpath>
+        <parameter-number>
+            <label>パラメーター番号</label>
+        </parameter-number>
+        <response-values>
+            <label>レスポンスでコントロール値を設定</label>
+        </response-values>
+        <destination-control>
+            <label>宛先コントロール</label>
+        </destination-control>
+        <source-xpath>
+            <label>ソースの式</label>
+        </source-xpath>
+        <response-itemset>
+            <label>レスポンスで選択肢を設定</label>
+        </response-itemset>
+        <destination-selection-control>
+            <label>宛先の選択コントロール</label>
+        </destination-selection-control>
+        <items>
+            <label>選択肢の式</label>
+            <hint>選択肢1つにつき1ノード返します</hint>
+        </items>
+        <item-label>
+            <label>ラベルの式</label>
+            <hint>選択肢ノードからの相対式</hint>
+        </item-label>
+        <item-value>
+            <label>値の式</label>
+            <hint>選択肢ノードからの相対式</hint>
+        </item-value>
+        <item-hint>
+            <label>ヒントの式</label>
+            <hint>選択肢ノードからの相対式</hint>
+        </item-hint>
+        <is-last-page>
+            <label>最終ページ判定式</label>
+        </is-last-page>
+        <auto-select-unique-choice>
+            <label>選択肢が1つなら自動選択</label>
+        </auto-select-unique-choice>
+        <save>
+            <label>保存</label>
+        </save>
+        <test>
+            <label>テスト</label>
+        </test>
+
+        <general-settings>全般設定</general-settings>
+        <service-request-actions>サービス呼び出し前</service-request-actions>
+        <service-response-actions>サービス応答後</service-response-actions>
+
+        <set-control-value>コントロール値を設定</set-control-value>
+        <set-control-itemset>コントロールの選択肢を設定</set-control-itemset>
+        <save-to-dataset>データセットに保存</save-to-dataset>
+        <dataset-name>データセット名</dataset-name>
+        <set-control-value-unavailable>「コントロール準備後」の場合のみコントロール値の設定が可能です</set-control-value-unavailable>
+
+    </dialog-actions>
+    <dialog-test>
+        <label>フォームプレビュー</label>
+        <console>コンソール</console>
+    </dialog-test>
+    <dialog-test-pdf>
+        <label>PDF生成テスト</label>
+        <use-form-data>入力済みデータを使用</use-form-data>
+        <disable-default>「初期値」計算式を評価しない</disable-default>
+        <disable-calculate>「計算値」計算式を評価しない</disable-calculate>
+        <disable-relevant>動的表示のコントロール・グリッド・セクションも表示</disable-relevant>
+        <show-hints>ヒントを表示</show-hints>
+        <show-alerts>無効なコントロールのアラートを表示</show-alerts>
+        <show-required>必須コントロールを強調</show-required>
+        <use-pdf-template>PDFテンプレートを使用</use-pdf-template>
+    </dialog-test-pdf>
+    <dialog-pe>
+        <label>Orbeon Forms PEの機能</label>
+        <message>
+            <div>
+                <p>この機能は Orbeon Forms PE でのみ利用できます。</p>
+                <p>詳しくは <a href="http://www.orbeon.com/download" target="_blank">Orbeon のサイト</a>をご覧ください。</p>
+            </div>
+        </message>
+    </dialog-pe>
+    <dialog-email-settings>
+        <label>メール設定</label>
+        <templates>メールテンプレート</templates>
+        <template-name>
+            <label>メールテンプレート名</label>
+            <hint>エンドユーザーには表示されません。プロセス内で使用します (例: email(template = "notify-user"))</hint>
+        </template-name>
+        <language>
+            <label>言語</label>
+            <any-language>任意の言語</any-language>
+        </language>
+        <headers>
+            <from>送信者</from>
+            <to>宛先</to>
+            <cc>CC</cc>
+            <bcc>BCC</bcc>
+            <reply-to>返信先</reply-to>
+        </headers>
+        <header-value-types>
+            <control-value>コントロールの値</control-value>
+            <expression>計算式</expression>
+            <text>テキスト</text>
+        </header-value-types>
+        <enable-if-true>次の式が true の場合のみテンプレートを有効にする</enable-if-true>
+        <subject>件名</subject>
+        <body>本文</body>
+        <use-html>HTMLを使用</use-html>
+        <attach-form-as>フォームの添付形式</attach-form-as>
+        <pdf>PDF</pdf>
+        <xml>XML</xml>
+        <attach-files>
+            <label>フォームにアップロードされたファイルを添付</label>
+            <choices>
+                <all>すべて</all>
+                <none>なし</none>
+                <selected>選択した添付のみ</selected>
+            </choices>
+        </attach-files>
+        <exclude-from-all-control-values>全コントロール値から除外</exclude-from-all-control-values>
+        <use-default>既定を使う</use-default>
+        <delete-template>テンプレートを削除</delete-template>
+        <template-parameters>テンプレートパラメーター</template-parameters>
+    </dialog-email-settings>
+    <dialog-permissions>
+        <label>権限</label>
+        <enable-permissions>このフォームで権限を有効にする</enable-permissions>
+        <role>ロール</role>
+        <permissions>権限</permissions>
+        <operations>操作</operations>
+        <anyone>誰でも</anyone>
+        <anyone-with-token>トークン必須</anyone-with-token>
+        <any-authenticated-user>認証済みユーザー</any-authenticated-user>
+        <owner>所有者</owner>
+        <group-member>グループメンバー</group-member>
+        <create>作成</create>
+        <read>閲覧</read>
+        <update>更新</update>
+        <delete>削除</delete>
+        <list>一覧</list>
+    </dialog-permissions>
+    <dialog-workflow>
+        <label>ワークフローと権限</label>
+
+        <custom-operations>このフォームのカスタム操作を定義</custom-operations>
+        <operation-label>ラベル</operation-label>
+        <predefined-label>既定</predefined-label>
+        <custom-label>カスタム</custom-label>
+        <available-to>利用できるユーザー</available-to>
+        <availability-to-anyone>誰でも</availability-to-anyone>
+        <availability-to-no-one>誰も不可</availability-to-no-one>
+        <availability-to-users>次の条件に合うユーザー</availability-to-users>
+        <availability-to-users-before>条件</availability-to-users-before>
+        <availability-to-users-after>に一致するユーザー</availability-to-users-after>
+        <workflow-stage>ワークフロー段階</workflow-stage>
+        <workflow-role>ワークフローロール</workflow-role>
+        <authentication-role>認証ロール</authentication-role>
+        <show-button>詳細ページにボタンを表示</show-button>
+        <any>いずれか</any>
+        <all>すべて</all>
+        <actions>アクション</actions>
+        <no-action>アクションなし</no-action>
+        <change-stage-action>段階を変更</change-stage-action>
+        <run-process-action>プロセスを実行</run-process-action>
+        <remove-operation>操作を削除</remove-operation>
+        <is>が</is>
+        <is-not>ではない</is-not>
+
+        <stages>段階</stages>
+
+        <stage-name>段階名</stage-name>
+        <default-stage>既定</default-stage>
+
+        <operations>
+            <label>操作</label>
+            <item>
+                <label>新規入力</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>データの一覧・検索</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>データを編集</label>
+                <value>3</value>
+                <hint />
+            </item>
+            <item>
+                <label>データを閲覧</label>
+                <value>4</value>
+                <hint />
+            </item>
+            <item>
+                <label>PDF/TIFF にアクセス</label>
+                <value>5</value>
+                <hint />
+            </item>
+        </operations>
+
+    </dialog-workflow>
+    <dialog-keyboard-shortcuts>
+        <dialog-title>キーボードショートカット</dialog-title>
+    </dialog-keyboard-shortcuts>
+    <dialog-messages>
+        <label>メッセージ</label>
+        <language-header>言語</language-header>
+        <name-header>名前</name-header>
+        <value-header>値</value-header>
+    </dialog-messages>
+    <modes>
+        <editable>編集モード</editable>
+        <review>レビュー</review>
+        <pdf-automatic>自動PDF</pdf-automatic>
+        <pdf-template>PDFテンプレート</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>フィールド幅</field-width>
+        <default>既定を使う</default>
+        <full>全幅</full>
+        <natural>自然</natural>
+        <field-align>フィールド配置</field-align>
+        <left>左</left>
+        <right>右</right>
+        <learn-settings-below>以下の設定について詳しく見る</learn-settings-below>
+        <field-value-visibility>
+            <label>フィールド値の表示</label>
+            <hint>値の見せ方を制御します</hint>
+            <item id="visible">表示</item>
+            <item id="obscured">非表示（マスク）</item>
+            <item id="partial">一部のみ表示</item>
+            <item id="reveal">ユーザーが表示切替可</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <messages>
+        <delete-section>このセクションを削除してよろしいですか?</delete-section>
+        <delete-grid>このグリッドを削除してよろしいですか?</delete-grid>
+        <delete-column>この列を削除してよろしいですか?</delete-column>
+        <delete-row>この行を削除してよろしいですか?</delete-row>
+        <delete-resources>この言語のリソースをすべて削除してよろしいですか</delete-resources>
+        <delete-service>サービス "{0}" を削除してよろしいですか?{1,choice,0# 使用中のアクションはありません。|1# 1 件のアクションが使用中です。|1&lt; {1,number,integer} 件のアクションが使用中です。}</delete-service>
+        <delete-action>アクション "{0}" を削除してよろしいですか?</delete-action>
+        <controls-will-be-deleted>{0,choice,0#削除されるコントロールはありません|1#1 つのコントロール|1&lt;{0,number,integer} コントロール} が削除されます。</controls-will-be-deleted>
+        <metadata-edit-title>フォームメタデータ</metadata-edit-title>
+        <select-template-output>開始に使うフォームテンプレートを選択してください。</select-template-output>
+        <app-form-optional>フォームを識別するアプリ名とフォーム名を今入力できます。未定なら後で入力できます。保存または公開の前に入力を求められます。</app-form-optional>
+        <app-form-required>フォームを識別するアプリ名とフォーム名を入力してください。保存や公開の前に必要です。</app-form-required>
+        <save-as-metadata-output>このフォームのコピーに使う新しいアプリ名とフォーム名を入力してください:</save-as-metadata-output>
+        <xpath-errors>フォームに {0,choice,1#1件のXPathエラーがあります|1&lt;{0,number,integer} 件の計算式エラーがあります}。</xpath-errors>
+        <lhha-checkbox>HTMLタグを入力する場合はこのチェックボックスをオン</lhha-checkbox>
+    </messages>
+    <alerts>
+        <required>値が必要です</required>
+        <xpath>XPath式が不正です</xpath>
+    </alerts>
+    <template>
+        <untitled-form>無題のフォーム</untitled-form>
+        <items>
+            <item>
+                <label>1番目の選択肢</label>
+                <value>1</value>
+                <hint />
+            </item>
+            <item>
+                <label>2番目の選択肢</label>
+                <value>2</value>
+                <hint />
+            </item>
+            <item>
+                <label>3番目の選択肢</label>
+                <value>3</value>
+                <hint />
+            </item>
+        </items>
+    </template>
+</resource>

@@ -36,8 +36,6 @@ before_cache:
 - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
 - find $HOME/.sbt -name "*.lock" -delete
 before_install:
-  # The following line is a workaround for a problem that appeared on Travis on 2025-07-31 (error with apt.postgresql.org repository)
-  - sudo rm -f /etc/apt/sources.list.d/*postgresql* /etc/apt/sources.list.d/*pgdg* && sudo sed -i '/postgresql\|pgdg/d' /etc/apt/sources.list && sudo apt-get update
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get -y install docker-ce

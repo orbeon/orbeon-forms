@@ -671,6 +671,12 @@
 
     </xf:action>
 
+    <xf:action event="fr-send-response-action" if="not($is-export or $is-background)">
+        <xf:dispatch
+            name="fr-controls-and-actions-ready"
+            targetid="fr-view-component"/>
+    </xf:action>
+
     <!-- For export or in background mode, send out the service response -->
     <xf:action event="fr-send-response-action" if="$is-export or $is-background">
 

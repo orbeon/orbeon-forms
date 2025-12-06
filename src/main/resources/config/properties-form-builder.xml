@@ -135,7 +135,7 @@
     </property>
 
     <!-- Available languages -->
-    <property as="xs:string"  name="oxf.fr.available-languages.orbeon.builder"                  value="en es fr it de pt sv fi ar"/>
+    <property as="xs:string"  name="oxf.fr.available-languages.orbeon.builder"                  value="en fr es de it nl pl sv no fi pt ru ja ar"/>
 
     <!-- Processes associated with Form Builder buttons -->
     <property as="xs:string"  name="oxf.fr.detail.process.close.orbeon.builder">

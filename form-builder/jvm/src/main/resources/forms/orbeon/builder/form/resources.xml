@@ -14,16 +14,16 @@
 <resources xmlns:xi="http://www.w3.org/2001/XInclude">
     <xi:include href="fb-resources-en.xml"/>
     <xi:include href="fb-resources-fr.xml"/>
-    <xi:include href="fb-resources-no.xml"/>
-    <xi:include href="fb-resources-ru.xml"/>
-    <xi:include href="fb-resources-it.xml"/>
-    <xi:include href="fb-resources-de.xml"/>
-    <xi:include href="fb-resources-fi.xml"/>
     <xi:include href="fb-resources-es.xml"/>
+    <xi:include href="fb-resources-de.xml"/>
+    <xi:include href="fb-resources-it.xml"/>
     <xi:include href="fb-resources-nl.xml"/>
-    <xi:include href="fb-resources-pt.xml"/>
-    <xi:include href="fb-resources-sv.xml"/>
-    <xi:include href="fb-resources-ar.xml"/>
     <xi:include href="fb-resources-pl.xml"/>
+    <xi:include href="fb-resources-sv.xml"/>
+    <xi:include href="fb-resources-no.xml"/>
+    <xi:include href="fb-resources-fi.xml"/>
+    <xi:include href="fb-resources-pt.xml"/>
+    <xi:include href="fb-resources-ru.xml"/>
     <xi:include href="fb-resources-ja.xml"/>
+    <xi:include href="fb-resources-ar.xml"/>
 </resources>

@@ -28,6 +28,7 @@
         <display-name lang="sv">Intervall</display-name>
         <display-name lang="ar">نطاق</display-name>
         <display-name lang="pl">Zakres</display-name>
+        <display-name lang="ja">スライダー</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

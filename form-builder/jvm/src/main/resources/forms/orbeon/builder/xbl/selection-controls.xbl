@@ -27,6 +27,7 @@
         <display-name lang="sv">Val</display-name>
         <display-name lang="ar">عناصر التحكم في الاختيار</display-name>
         <display-name lang="pl">Kontrolki wyboru</display-name>
+        <display-name lang="ja">選択コントロール</display-name>
     </metadata>
 
 </xbl:xbl>

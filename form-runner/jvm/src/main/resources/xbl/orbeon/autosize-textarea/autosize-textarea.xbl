@@ -61,6 +61,7 @@
         <display-name lang="sv">Med storleksändring</display-name>
         <display-name lang="ar">مع تغيير الحجم</display-name>
         <display-name lang="pl">Ze zmianą rozmiaru</display-name>
+        <display-name lang="ja">リサイズ対応</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-arrow-down</icon-class>

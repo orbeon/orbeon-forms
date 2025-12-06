@@ -27,6 +27,7 @@
         <display-name lang="sv">Specialfält</display-name>
         <display-name lang="ar">عناصر التحكم المكتوبة</display-name>
         <display-name lang="pl">Kontrolki typowane</display-name>
+        <display-name lang="ja">型付きコントロール</display-name>
     </metadata>
 
 </xbl:xbl>

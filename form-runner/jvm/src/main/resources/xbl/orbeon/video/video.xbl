@@ -39,6 +39,7 @@
         <display-name lang="sv">Statisk video</display-name>
         <display-name lang="ar">فيديو ثابت</display-name>
         <display-name lang="pl">Wideo statyczne</display-name>
+        <display-name lang="ja">固定動画</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-video-o</icon-class>
             </icon>

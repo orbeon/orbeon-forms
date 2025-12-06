@@ -29,6 +29,7 @@
         <display-name lang="sv">Textyta</display-name>
         <display-name lang="ar">Plain Text Area</display-name>
         <display-name lang="pl">Plain Text Area</display-name>
+        <display-name lang="ja">テキストエリア</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-align-left</icon-class>
             </icon>

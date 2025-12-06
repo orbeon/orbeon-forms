@@ -85,6 +85,7 @@
         <display-name lang="sv">Numeriskt värde</display-name>
         <display-name lang="ar">رقم</display-name>
         <display-name lang="pl">Liczba</display-name>
+        <display-name lang="ja">数値</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-superscript</icon-class>
             </icon>
@@ -221,6 +222,258 @@
                                     <item id="5">Point (.)</item>
                                 </grouping-separators>
                             </resource>
+                            <resource xml:lang="no">
+                                <prefix>Prefiks</prefix>
+                                <suffix>Suffiks</suffix>
+                                <decimal-separator>Desimalskilletegn</decimal-separator>
+                                <grouping-separator>Tusenskilletegn</grouping-separator>
+                                <digits-after-decimal>Antall desimaler</digits-after-decimal>
+                                <round-when-formatting>Avrund ved visning</round-when-formatting>
+                                <round-when-storing>Avrund ved lagring</round-when-storing>
+                                <separators-must-differ>Desimal- og tusenskilletegn må være forskjellige</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nei</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Ingen skilletegn</item>
+                                    <item id="2">Ett mellomrom</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <prefix>Префикс</prefix>
+                                <suffix>Суффикс</suffix>
+                                <decimal-separator>Десятичный разделитель</decimal-separator>
+                                <grouping-separator>Разделитель групп</grouping-separator>
+                                <digits-after-decimal>Цифр после запятой</digits-after-decimal>
+                                <round-when-formatting>Округлять при форматировании</round-when-formatting>
+                                <round-when-storing>Округлять при сохранении</round-when-storing>
+                                <separators-must-differ>Десятичный и групповой разделители должны различаться</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Да</item>
+                                    <item id="2">Нет</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="4">Запятая (,)</item>
+                                    <item id="5">Точка (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Без разделителя</item>
+                                    <item id="2">Пробел</item>
+                                    <item id="3">Апостроф (')</item>
+                                    <item id="4">Запятая (,)</item>
+                                    <item id="5">Точка (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="it">
+                                <prefix>Prefisso</prefix>
+                                <suffix>Suffisso</suffix>
+                                <decimal-separator>Separatore decimale</decimal-separator>
+                                <grouping-separator>Separatore delle migliaia</grouping-separator>
+                                <digits-after-decimal>Cifre dopo la virgola</digits-after-decimal>
+                                <round-when-formatting>Arrotonda in formattazione</round-when-formatting>
+                                <round-when-storing>Arrotonda al salvataggio</round-when-storing>
+                                <separators-must-differ>Il separatore decimale e quello delle migliaia devono essere diversi</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Sì</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="4">Virgola (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Nessun separatore</item>
+                                    <item id="2">Spazio singolo</item>
+                                    <item id="3">Apostrofo (')</item>
+                                    <item id="4">Virgola (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="de">
+                                <prefix>Präfix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Dezimaltrennzeichen</decimal-separator>
+                                <grouping-separator>Tausendertrennzeichen</grouping-separator>
+                                <digits-after-decimal>Stellen nach dem Komma</digits-after-decimal>
+                                <round-when-formatting>Runden beim Formatieren</round-when-formatting>
+                                <round-when-storing>Beim Speichern runden</round-when-storing>
+                                <separators-must-differ>Dezimal- und Tausendertrennzeichen müssen verschieden sein</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nein</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Kein Trennzeichen</item>
+                                    <item id="2">Ein Leerzeichen</item>
+                                    <item id="3">Apostroph (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <prefix>Etuliite</prefix>
+                                <suffix>Pääte</suffix>
+                                <decimal-separator>Desimaalierotin</decimal-separator>
+                                <grouping-separator>Ryhmittelyerotin</grouping-separator>
+                                <digits-after-decimal>Numeroita desimaalin jälkeen</digits-after-decimal>
+                                <round-when-formatting>Pyöristä näytettäessä</round-when-formatting>
+                                <round-when-storing>Pyöristä tallennettaessa</round-when-storing>
+                                <separators-must-differ>Desimaali- ja ryhmittelyerottimen on oltava eri</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Kyllä</item>
+                                    <item id="2">Ei</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="4">Pilkku (,)</item>
+                                    <item id="5">Piste (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Ei erotinta</item>
+                                    <item id="2">Yksi välilyönti</item>
+                                    <item id="3">Heittomerkki (')</item>
+                                    <item id="4">Pilkku (,)</item>
+                                    <item id="5">Piste (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="es">
+                                <prefix>Prefijo</prefix>
+                                <suffix>Sufijo</suffix>
+                                <decimal-separator>Separador decimal</decimal-separator>
+                                <grouping-separator>Separador de miles</grouping-separator>
+                                <digits-after-decimal>Cifras decimales</digits-after-decimal>
+                                <round-when-formatting>Redondear al formatear</round-when-formatting>
+                                <round-when-storing>Redondear al guardar</round-when-storing>
+                                <separators-must-differ>El separador decimal y de miles deben ser distintos</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sí</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="4">Coma (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sin separador</item>
+                                    <item id="2">Un espacio</item>
+                                    <item id="3">Apóstrofo (')</item>
+                                    <item id="4">Coma (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Decimaal scheidingsteken</decimal-separator>
+                                <grouping-separator>Groeperingsteken</grouping-separator>
+                                <digits-after-decimal>Cijfers na decimalen</digits-after-decimal>
+                                <round-when-formatting>Afronden bij opmaak</round-when-formatting>
+                                <round-when-storing>Afronden bij opslag</round-when-storing>
+                                <separators-must-differ>Decimaal- en groeperingsteken moeten verschillen</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nee</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Geen scheidingsteken</item>
+                                    <item id="2">Eén spatie</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <prefix>Prefixo</prefix>
+                                <suffix>Sufixo</suffix>
+                                <decimal-separator>Separador decimal</decimal-separator>
+                                <grouping-separator>Separador de milhar</grouping-separator>
+                                <digits-after-decimal>Casas decimais</digits-after-decimal>
+                                <round-when-formatting>Arredondar ao formatar</round-when-formatting>
+                                <round-when-storing>Arredondar ao gravar</round-when-storing>
+                                <separators-must-differ>Os separadores decimal e de milhar devem ser diferentes</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sim</item>
+                                    <item id="2">Não</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="4">Vírgula (,)</item>
+                                    <item id="5">Ponto (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sem separador</item>
+                                    <item id="2">Um espaço</item>
+                                    <item id="3">Apóstrofo (')</item>
+                                    <item id="4">Vírgula (,)</item>
+                                    <item id="5">Ponto (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Decimaltecken</decimal-separator>
+                                <grouping-separator>Tusentalsavgränsare</grouping-separator>
+                                <digits-after-decimal>Siffror efter decimal</digits-after-decimal>
+                                <round-when-formatting>Avrunda vid formatering</round-when-formatting>
+                                <round-when-storing>Avrunda vid lagring</round-when-storing>
+                                <separators-must-differ>Decimal- och tusentalsavgränsare måste skilja sig åt</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nej</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Använd standard</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Ingen avgränsare</item>
+                                    <item id="2">Ett mellanslag</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </grouping-separators>
+                            </resource>
                             <resource xml:lang="ar">
                                 <prefix>بادئة</prefix>
                                 <suffix>لاحقة</suffix>
@@ -247,6 +500,62 @@
                                     <item id="3">علامة اقتباس (')</item>
                                     <item id="4">فاصلة (,)</item>
                                     <item id="5">نقطة (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <prefix>Prefiks</prefix>
+                                <suffix>Sufiks</suffix>
+                                <decimal-separator>Separator dziesiętny</decimal-separator>
+                                <grouping-separator>Separator grupujący</grouping-separator>
+                                <digits-after-decimal>Liczba miejsc po przecinku</digits-after-decimal>
+                                <round-when-formatting>Zaokrąglaj przy formatowaniu</round-when-formatting>
+                                <round-when-storing>Zaokrąglaj przy zapisie</round-when-storing>
+                                <separators-must-differ>Separator dziesiętny i grupujący muszą się różnić</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="1">Tak</item>
+                                    <item id="2">Nie</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="4">Przecinek (,)</item>
+                                    <item id="5">Kropka (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="1">Brak separatora</item>
+                                    <item id="2">Jedna spacja</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Przecinek (,)</item>
+                                    <item id="5">Kropka (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <prefix>プレフィックス</prefix>
+                                <suffix>サフィックス</suffix>
+                                <decimal-separator>小数点記号</decimal-separator>
+                                <grouping-separator>桁区切り記号</grouping-separator>
+                                <digits-after-decimal>小数点以下の桁数</digits-after-decimal>
+                                <round-when-formatting>表示時に丸める</round-when-formatting>
+                                <round-when-storing>保存時に丸める</round-when-storing>
+                                <separators-must-differ>小数点と桁区切り記号は異なる必要があります</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">はい</item>
+                                    <item id="2">いいえ</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">既定を使う</item>
+                                    <item id="4">カンマ (,)</item>
+                                    <item id="5">ピリオド (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">区切りなし</item>
+                                    <item id="2">スペース1つ</item>
+                                    <item id="3">アポストロフィ (')</item>
+                                    <item id="4">カンマ (,)</item>
+                                    <item id="5">ピリオド (.)</item>
                                 </grouping-separators>
                             </resource>
                         </_>

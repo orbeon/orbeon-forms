@@ -59,6 +59,7 @@
         <display-name lang="sv">Med sökning</display-name>
         <display-name lang="ar">مع بحث</display-name>
         <display-name lang="pl">Z wyszukiwaniem</display-name>
+        <display-name lang="ja">検索付き</display-name>
             <toolbox show="false"/>
             <form-settings show="false"/>
             <icon>

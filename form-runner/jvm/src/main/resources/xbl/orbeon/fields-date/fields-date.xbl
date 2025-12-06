@@ -43,6 +43,7 @@
         <display-name lang="sv">Datumväljare med separata fält</display-name>
         <display-name lang="ar">Fields Date</display-name>
         <display-name lang="pl">Fields Date</display-name>
+        <display-name lang="ja">日付（分割入力）</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

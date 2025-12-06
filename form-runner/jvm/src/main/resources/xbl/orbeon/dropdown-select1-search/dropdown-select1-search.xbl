@@ -44,6 +44,7 @@
         <display-name lang="sv">Rullgardinsmeny med sökning</display-name>
         <display-name lang="ar">قائمة منسدلة مع بحث</display-name>
         <display-name lang="pl">Lista rozwijana z wyszukiwaniem</display-name>
+        <display-name lang="ja">検索付きドロップダウン</display-name>
 
             <appearance-display-name lang="en">With Search</appearance-display-name>
             <appearance-display-name lang="es">Con búsqueda</appearance-display-name>
@@ -56,6 +57,9 @@
             <appearance-display-name lang="sv">Med sökning</appearance-display-name>
             <appearance-display-name lang="pt">Com pesquisa</appearance-display-name>
             <appearance-display-name lang="ar">مع بحث</appearance-display-name>
+            <appearance-display-name lang="no">Med søk</appearance-display-name>
+            <appearance-display-name lang="pl">Z wyszukiwaniem</appearance-display-name>
+            <appearance-display-name lang="ja">検索付き</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-search</icon-class>
@@ -104,10 +108,65 @@
                                 <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
                                 <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
                             </resource>
+                            <resource xml:lang="no">
+                                <automatic-pdf>Automatisk PDF</automatic-pdf>
+                                <selected-only>Vis bare valgt verdi</selected-only>
+                                <show-all>Vis alle verdier som radioknapper</show-all>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <automatic-pdf>Автоматический PDF</automatic-pdf>
+                                <selected-only>Показывать только выбранное значение</selected-only>
+                                <show-all>Показать все значения как переключатели</show-all>
+                            </resource>
+                            <resource xml:lang="it">
+                                <automatic-pdf>PDF automatico</automatic-pdf>
+                                <selected-only>Mostra solo il valore selezionato</selected-only>
+                                <show-all>Mostra tutti i valori come pulsanti di scelta</show-all>
+                            </resource>
+                            <resource xml:lang="de">
+                                <automatic-pdf>Automatisches PDF</automatic-pdf>
+                                <selected-only>Nur ausgewählten Wert anzeigen</selected-only>
+                                <show-all>Alle Werte als Optionsfelder anzeigen</show-all>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <automatic-pdf>Automaattinen PDF</automatic-pdf>
+                                <selected-only>Näytä vain valittu arvo</selected-only>
+                                <show-all>Näytä kaikki arvot radiopainikkeina</show-all>
+                            </resource>
+                            <resource xml:lang="es">
+                                <automatic-pdf>PDF automático</automatic-pdf>
+                                <selected-only>Mostrar solo el valor seleccionado</selected-only>
+                                <show-all>Mostrar todos los valores como botones de opción</show-all>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <automatic-pdf>Automatische PDF</automatic-pdf>
+                                <selected-only>Alleen geselecteerde waarde tonen</selected-only>
+                                <show-all>Alle waarden als keuzerondjes tonen</show-all>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <automatic-pdf>PDF automático</automatic-pdf>
+                                <selected-only>Mostrar apenas o valor selecionado</selected-only>
+                                <show-all>Mostrar todos os valores como botões de opção</show-all>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <automatic-pdf>Automatisk PDF</automatic-pdf>
+                                <selected-only>Visa bara valt värde</selected-only>
+                                <show-all>Visa alla värden som radioknappar</show-all>
+                            </resource>
                             <resource xml:lang="ar">
                                 <automatic-pdf>PDF تلقائي</automatic-pdf>
                                 <selected-only>إظهار القيمة المحددة فقط</selected-only>
                                 <show-all>إظهار جميع القيم كأزرار اختيار</show-all>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <automatic-pdf>Automatyczny PDF</automatic-pdf>
+                                <selected-only>Pokazuj tylko wybraną wartość</selected-only>
+                                <show-all>Pokaż wszystkie wartości jako przyciski opcji</show-all>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <automatic-pdf>自動PDF</automatic-pdf>
+                                <selected-only>選択値だけ表示</selected-only>
+                                <show-all>すべての値をラジオボタンで表示</show-all>
                             </resource>
                         </_>
                     </xf:instance>

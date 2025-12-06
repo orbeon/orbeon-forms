@@ -77,6 +77,7 @@
         <display-name lang="sv">Internationellt värdepappersidentifieringsnummer (ISIN)</display-name>
         <display-name lang="ar">رقم التعريف الدولي للأوراق المالية (ISIN)</display-name>
         <display-name lang="pl">International Securities Identification Number (ISIN)</display-name>
+        <display-name lang="ja">国際証券識別番号 (ISIN)</display-name>
 
             <icon>
                 <icon-class>fa fa-fw fa-coins</icon-class>

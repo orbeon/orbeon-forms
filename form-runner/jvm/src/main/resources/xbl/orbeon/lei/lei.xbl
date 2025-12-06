@@ -50,6 +50,7 @@
         <display-name lang="sv">Juridisk enhetsidentifierare (LEI)</display-name>
         <display-name lang="ar">معرّف الكيان القانوني (LEI)</display-name>
         <display-name lang="pl">Legal Entity Identifier (LEI)</display-name>
+        <display-name lang="ja">法人識別子 (LEI)</display-name>
 
             <icon>
                 <icon-class>fa fa-fw fa-scale-balanced</icon-class>

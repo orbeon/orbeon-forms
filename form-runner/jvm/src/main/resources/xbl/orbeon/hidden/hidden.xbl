@@ -38,6 +38,7 @@
         <display-name lang="sv">Dolt fält</display-name>
         <display-name lang="ar">حقل مخفي</display-name>
         <display-name lang="pl">Ukryte pole</display-name>
+        <display-name lang="ja">非表示フィールド</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-eye-slash</icon-class>
             </icon>

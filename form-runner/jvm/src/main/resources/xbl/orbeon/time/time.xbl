@@ -51,6 +51,7 @@
         <display-name lang="sv">Tid</display-name>
         <display-name lang="ar">الوقت</display-name>
         <display-name lang="pl">Czas</display-name>
+        <display-name lang="ja">時刻</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-clock-o</icon-class>
             </icon>
@@ -187,6 +188,424 @@
                                 <am-pm>
                                     <label>Format AM/PM</label>
                                     <item id="0">Aucun</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="no">
+                                <output-format>Tidsformat</output-format>
+                                <native-picker>
+                                    <label>Bruk nettleserens tidsvelger</label>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Automatisk</item>
+                                    <item id="2">Alltid</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Egendefinert format</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12- eller 24-timers</label>
+                                    <item id="0">12-timers</item>
+                                    <item id="1">24-timers</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Timeformat</label>
+                                    <item id="0">Ingen ledende null (1)</item>
+                                    <item id="1">Ledende null (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Inkluder sekunder</label>
+                                    <item id="0">Nei</item>
+                                    <item id="1">Ja</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM-format</label>
+                                    <item id="0">Ingen</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <output-format>Формат времени</output-format>
+                                <native-picker>
+                                    <label>Использовать встроенный выбор времени</label>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Автоматически</item>
+                                    <item id="2">Всегда</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Пользовательский формат</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12-/24-часовой</label>
+                                    <item id="0">12-часовой</item>
+                                    <item id="1">24-часовой</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Формат часа</label>
+                                    <item id="0">Без ведущего нуля (1)</item>
+                                    <item id="1">С ведущим нулем (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Включать секунды</label>
+                                    <item id="0">Нет</item>
+                                    <item id="1">Да</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>Формат AM/PM</label>
+                                    <item id="0">Нет</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="it">
+                                <output-format>Formato ora</output-format>
+                                <native-picker>
+                                    <label>Usa selettore del browser</label>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Automaticamente</item>
+                                    <item id="2">Sempre</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Formato personalizzato</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>Formato 12/24 ore</label>
+                                    <item id="0">12 ore</item>
+                                    <item id="1">24 ore</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Formato ore</label>
+                                    <item id="0">Senza zero iniziale (1)</item>
+                                    <item id="1">Con zero iniziale (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Includi secondi</label>
+                                    <item id="0">No</item>
+                                    <item id="1">Sì</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>Formato AM/PM</label>
+                                    <item id="0">Nessuno</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="de">
+                                <output-format>Zeitformat</output-format>
+                                <native-picker>
+                                    <label>Browser-Zeitwahl verwenden</label>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Automatisch</item>
+                                    <item id="2">Immer</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Benutzerdefiniertes Format</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12-/24-Stunden</label>
+                                    <item id="0">12 Stunden</item>
+                                    <item id="1">24 Stunden</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Stundenformat</label>
+                                    <item id="0">Ohne führende Null (1)</item>
+                                    <item id="1">Mit führender Null (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Sekunden anzeigen</label>
+                                    <item id="0">Nein</item>
+                                    <item id="1">Ja</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM-Format</label>
+                                    <item id="0">Keins</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <output-format>Aikamuoto</output-format>
+                                <native-picker>
+                                    <label>Käytä selaimen aikanäppäintä</label>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Automaattisesti</item>
+                                    <item id="2">Aina</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Mukautettu muoto</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12/24-tuntinen</label>
+                                    <item id="0">12 tuntia</item>
+                                    <item id="1">24 tuntia</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Tuntimuoto</label>
+                                    <item id="0">Ei etunollaa (1)</item>
+                                    <item id="1">Etunolla (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Näytä sekunnit</label>
+                                    <item id="0">Ei</item>
+                                    <item id="1">Kyllä</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM-muoto</label>
+                                    <item id="0">Ei mitään</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="es">
+                                <output-format>Formato de hora</output-format>
+                                <native-picker>
+                                    <label>Usar selector de hora del navegador</label>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Automáticamente</item>
+                                    <item id="2">Siempre</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Formato personalizado</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>Formato 12/24 horas</label>
+                                    <item id="0">12 horas</item>
+                                    <item id="1">24 horas</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Formato de hora</label>
+                                    <item id="0">Sin cero inicial (1)</item>
+                                    <item id="1">Con cero inicial (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Incluir segundos</label>
+                                    <item id="0">No</item>
+                                    <item id="1">Sí</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>Formato AM/PM</label>
+                                    <item id="0">Ninguno</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <output-format>Tijdnotatie</output-format>
+                                <native-picker>
+                                    <label>Browser-tijdkiezer gebruiken</label>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Automatisch</item>
+                                    <item id="2">Altijd</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Aangepast formaat</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12-/24-uurs</label>
+                                    <item id="0">12 uur</item>
+                                    <item id="1">24 uur</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Uurformaat</label>
+                                    <item id="0">Geen voorloopnul (1)</item>
+                                    <item id="1">Voorloopnul (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Seconden opnemen</label>
+                                    <item id="0">Nee</item>
+                                    <item id="1">Ja</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM-notatie</label>
+                                    <item id="0">Geen</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <output-format>Formato de hora</output-format>
+                                <native-picker>
+                                    <label>Usar seletor de hora do navegador</label>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Automaticamente</item>
+                                    <item id="2">Sempre</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Formato personalizado</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>Formato 12h/24h</label>
+                                    <item id="0">12 horas</item>
+                                    <item id="1">24 horas</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Formato da hora</label>
+                                    <item id="0">Sem zero à esquerda (1)</item>
+                                    <item id="1">Com zero à esquerda (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Incluir segundos</label>
+                                    <item id="0">Não</item>
+                                    <item id="1">Sim</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>Formato AM/PM</label>
+                                    <item id="0">Nenhum</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <output-format>Tidsformat</output-format>
+                                <native-picker>
+                                    <label>Använd webbläsarens tidsväljare</label>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Automatiskt</item>
+                                    <item id="2">Alltid</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Anpassat format</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12/24-timmars</label>
+                                    <item id="0">12-timmars</item>
+                                    <item id="1">24-timmars</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Timformat</label>
+                                    <item id="0">Utan inledande nolla (1)</item>
+                                    <item id="1">Med inledande nolla (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Inkludera sekunder</label>
+                                    <item id="0">Nej</item>
+                                    <item id="1">Ja</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM-format</label>
+                                    <item id="0">Inget</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <output-format>Format czasu</output-format>
+                                <native-picker>
+                                    <label>Użyj wybieraka czasu przeglądarki</label>
+                                    <item id="0">Użyj domyślnego</item>
+                                    <item id="1">Automatycznie</item>
+                                    <item id="2">Zawsze</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Użyj domyślnego</item>
+                                    <item id="1">Własny format</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>Format 12- lub 24-godzinny</label>
+                                    <item id="0">12 godzin</item>
+                                    <item id="1">24 godziny</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Format godzin</label>
+                                    <item id="0">Bez zera wiodącego (1)</item>
+                                    <item id="1">Z zerem wiodącym (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Uwzględnij sekundy</label>
+                                    <item id="0">Nie</item>
+                                    <item id="1">Tak</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>Format AM/PM</label>
+                                    <item id="0">Brak</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
+                                </am-pm>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <output-format>時刻の書式</output-format>
+                                <native-picker>
+                                    <label>ブラウザの時刻ピッカーを使う</label>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">自動</item>
+                                    <item id="2">常に</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">カスタム書式</item>
+                                </default-custom>
+                                <hour-system>
+                                    <label>12時間/24時間</label>
+                                    <item id="0">12時間</item>
+                                    <item id="1">24時間</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>時の表示</label>
+                                    <item id="0">先頭ゼロなし (1)</item>
+                                    <item id="1">先頭ゼロあり (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>秒を含める</label>
+                                    <item id="0">いいえ</item>
+                                    <item id="1">はい</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM 表記</label>
+                                    <item id="0">なし</item>
                                     <item id="1">am/pm</item>
                                     <item id="2">AM/PM</item>
                                     <item id="3">a.m./p.m.</item>

@@ -41,6 +41,7 @@
         <display-name lang="sv">Datum och tid</display-name>
         <display-name lang="ar">التاريخ والوقت</display-name>
         <display-name lang="pl">Data i czas</display-name>
+        <display-name lang="ja">日付と時刻</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar-o</icon-class>
             </icon>

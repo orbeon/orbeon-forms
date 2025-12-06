@@ -30,6 +30,7 @@
         <display-name lang="sv">Flera filbilagor</display-name>
         <display-name lang="ar">مرفقات ملفات متعددة</display-name>
         <display-name lang="pl">Wiele załączników plików</display-name>
+        <display-name lang="ja">複数添付ファイル</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-files-o</icon-class>
             </icon>

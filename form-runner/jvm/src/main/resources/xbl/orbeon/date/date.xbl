@@ -69,6 +69,7 @@
         <display-name lang="sv">Datum</display-name>
         <display-name lang="ar">تاريخ</display-name>
         <display-name lang="pl">Data</display-name>
+        <display-name lang="ja">日付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
@@ -259,6 +260,457 @@
                                 </week-start-day>
                                 <examples>
                                     <label>أمثلة</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="no">
+                                <output-format>Datoformat</output-format>
+                                <native-picker>
+                                    <label>Bruk nettleserens datovelger</label>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Automatisk</item>
+                                    <item id="2">Alltid</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Egendefinert format</item>
+                                </default-custom>
+                                <format>
+                                    <label>Start dato med</label>
+                                    <item id="0">Måned</item>
+                                    <item id="1">Dag</item>
+                                    <item id="2">År</item>
+                                </format>
+                                <separator>
+                                    <label>Skilletegn</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Mellomrom</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Fyll måned og dag</label>
+                                    <item id="0">Uten ledende null (1)</item>
+                                    <item id="1">Med ledende null (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Første ukedag</label>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Lørdag</item>
+                                    <item id="2">Søndag</item>
+                                    <item id="3">Mandag</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Eksempler</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <output-format>Формат даты</output-format>
+                                <native-picker>
+                                    <label>Использовать встроенный выбор даты</label>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Автоматически</item>
+                                    <item id="2">Всегда</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Пользовательский формат</item>
+                                </default-custom>
+                                <format>
+                                    <label>Начинать дату с</label>
+                                    <item id="0">Месяца</item>
+                                    <item id="1">Дня</item>
+                                    <item id="2">Года</item>
+                                </format>
+                                <separator>
+                                    <label>Разделитель</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Пробел</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Формат месяца и дня</label>
+                                    <item id="0">Без ведущего нуля (1)</item>
+                                    <item id="1">С ведущим нулем (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Первый день недели</label>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Суббота</item>
+                                    <item id="2">Воскресенье</item>
+                                    <item id="3">Понедельник</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Примеры</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="it">
+                                <output-format>Formato data</output-format>
+                                <native-picker>
+                                    <label>Usa il selettore del browser</label>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Automaticamente</item>
+                                    <item id="2">Sempre</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Formato personalizzato</item>
+                                </default-custom>
+                                <format>
+                                    <label>Inizia la data con</label>
+                                    <item id="0">Mese</item>
+                                    <item id="1">Giorno</item>
+                                    <item id="2">Anno</item>
+                                </format>
+                                <separator>
+                                    <label>Separatore</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Spazio</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Formato mese e giorno</label>
+                                    <item id="0">Senza zero iniziale (1)</item>
+                                    <item id="1">Con zero iniziale (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Primo giorno della settimana</label>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Sabato</item>
+                                    <item id="2">Domenica</item>
+                                    <item id="3">Lunedì</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Esempi</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="de">
+                                <output-format>Datumsformat</output-format>
+                                <native-picker>
+                                    <label>Browser-Datumsauswahl verwenden</label>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Automatisch</item>
+                                    <item id="2">Immer</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Benutzerdefiniertes Format</item>
+                                </default-custom>
+                                <format>
+                                    <label>Datum beginnen mit</label>
+                                    <item id="0">Monat</item>
+                                    <item id="1">Tag</item>
+                                    <item id="2">Jahr</item>
+                                </format>
+                                <separator>
+                                    <label>Trennzeichen</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Leerzeichen</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Format Monat/Tag</label>
+                                    <item id="0">Ohne führende Null (1)</item>
+                                    <item id="1">Mit führender Null (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Erster Wochentag</label>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Samstag</item>
+                                    <item id="2">Sonntag</item>
+                                    <item id="3">Montag</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Beispiele</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <output-format>Päivämäärämuoto</output-format>
+                                <native-picker>
+                                    <label>Käytä selaimen päivämäärävalitsinta</label>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Automaattisesti</item>
+                                    <item id="2">Aina</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Mukautettu muoto</item>
+                                </default-custom>
+                                <format>
+                                    <label>Aloita päivämäärä</label>
+                                    <item id="0">Kuukaudella</item>
+                                    <item id="1">Päivällä</item>
+                                    <item id="2">Vuodella</item>
+                                </format>
+                                <separator>
+                                    <label>Erotin</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Väli</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Kuukauden ja päivän muoto</label>
+                                    <item id="0">Ei etunollaa (1)</item>
+                                    <item id="1">Etunolla (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Viikon ensimmäinen päivä</label>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Lauantai</item>
+                                    <item id="2">Sunnuntai</item>
+                                    <item id="3">Maanantai</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Esimerkkejä</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="es">
+                                <output-format>Formato de fecha</output-format>
+                                <native-picker>
+                                    <label>Usar selector de fecha del navegador</label>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Automáticamente</item>
+                                    <item id="2">Siempre</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Formato personalizado</item>
+                                </default-custom>
+                                <format>
+                                    <label>Comenzar la fecha con</label>
+                                    <item id="0">Mes</item>
+                                    <item id="1">Día</item>
+                                    <item id="2">Año</item>
+                                </format>
+                                <separator>
+                                    <label>Separador</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Espacio</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Formato de mes y día</label>
+                                    <item id="0">Sin cero inicial (1)</item>
+                                    <item id="1">Con cero inicial (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Primer día de la semana</label>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sábado</item>
+                                    <item id="2">Domingo</item>
+                                    <item id="3">Lunes</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Ejemplos</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <output-format>Datumnotatie</output-format>
+                                <native-picker>
+                                    <label>Browser-datumkiezer gebruiken</label>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Automatisch</item>
+                                    <item id="2">Altijd</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Aangepast formaat</item>
+                                </default-custom>
+                                <format>
+                                    <label>Datum begint met</label>
+                                    <item id="0">Maand</item>
+                                    <item id="1">Dag</item>
+                                    <item id="2">Jaar</item>
+                                </format>
+                                <separator>
+                                    <label>Scheidingsteken</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Spatie</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Maand/dag-opmaak</label>
+                                    <item id="0">Geen voorloopnul (1)</item>
+                                    <item id="1">Voorloopnul (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Eerste dag van de week</label>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Zaterdag</item>
+                                    <item id="2">Zondag</item>
+                                    <item id="3">Maandag</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Voorbeelden</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <output-format>Formato de data</output-format>
+                                <native-picker>
+                                    <label>Usar seletor de data do navegador</label>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Automaticamente</item>
+                                    <item id="2">Sempre</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Formato personalizado</item>
+                                </default-custom>
+                                <format>
+                                    <label>Começar data com</label>
+                                    <item id="0">Mês</item>
+                                    <item id="1">Dia</item>
+                                    <item id="2">Ano</item>
+                                </format>
+                                <separator>
+                                    <label>Separador</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Espaço</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Formato de mês e dia</label>
+                                    <item id="0">Sem zero à esquerda (1)</item>
+                                    <item id="1">Com zero à esquerda (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Primeiro dia da semana</label>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sábado</item>
+                                    <item id="2">Domingo</item>
+                                    <item id="3">Segunda-feira</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Exemplos</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <output-format>Datumformat</output-format>
+                                <native-picker>
+                                    <label>Använd webbläsarens datumväljare</label>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Automatiskt</item>
+                                    <item id="2">Alltid</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Anpassat format</item>
+                                </default-custom>
+                                <format>
+                                    <label>Börja datum med</label>
+                                    <item id="0">Månad</item>
+                                    <item id="1">Dag</item>
+                                    <item id="2">År</item>
+                                </format>
+                                <separator>
+                                    <label>Avgränsare</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Mellanslag</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Format för månad och dag</label>
+                                    <item id="0">Utan inledande nolla (1)</item>
+                                    <item id="1">Med inledande nolla (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Första veckodagen</label>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Lördag</item>
+                                    <item id="2">Söndag</item>
+                                    <item id="3">Måndag</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Exempel</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <output-format>Format daty</output-format>
+                                <native-picker>
+                                    <label>Użyj wybieraka daty przeglądarki</label>
+                                    <item id="0">Użyj domyślnego</item>
+                                    <item id="1">Automatycznie</item>
+                                    <item id="2">Zawsze</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">Użyj domyślnego</item>
+                                    <item id="1">Własny format</item>
+                                </default-custom>
+                                <format>
+                                    <label>Rozpocznij datę od</label>
+                                    <item id="0">Miesiąca</item>
+                                    <item id="1">Dnia</item>
+                                    <item id="2">Roku</item>
+                                </format>
+                                <separator>
+                                    <label>Separator</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">Spacja</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>Format miesiąca i dnia</label>
+                                    <item id="0">Bez zera wiodącego (1)</item>
+                                    <item id="1">Z zerem wiodącym (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>Pierwszy dzień tygodnia</label>
+                                    <item id="0">Użyj domyślnego</item>
+                                    <item id="1">Sobota</item>
+                                    <item id="2">Niedziela</item>
+                                    <item id="3">Poniedziałek</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>Przykłady</label>
+                                </examples>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <output-format>日付の書式</output-format>
+                                <native-picker>
+                                    <label>ブラウザの日付ピッカーを使う</label>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">自動</item>
+                                    <item id="2">常に</item>
+                                </native-picker>
+                                <default-custom>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">カスタム書式</item>
+                                </default-custom>
+                                <format>
+                                    <label>日付の先頭</label>
+                                    <item id="0">月</item>
+                                    <item id="1">日</item>
+                                    <item id="2">年</item>
+                                </format>
+                                <separator>
+                                    <label>区切り</label>
+                                    <item id="0">/</item>
+                                    <item id="1">.</item>
+                                    <item id="2">-</item>
+                                    <item id="3">スペース</item>
+                                </separator>
+                                <pad-month-day>
+                                    <label>月と日の表示</label>
+                                    <item id="0">先頭ゼロなし (1)</item>
+                                    <item id="1">先頭ゼロあり (01)</item>
+                                </pad-month-day>
+                                <week-start-day>
+                                    <label>週の開始曜日</label>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">土曜日</item>
+                                    <item id="2">日曜日</item>
+                                    <item id="3">月曜日</item>
+                                </week-start-day>
+                                <examples>
+                                    <label>例</label>
                                 </examples>
                             </resource>
                         </_>

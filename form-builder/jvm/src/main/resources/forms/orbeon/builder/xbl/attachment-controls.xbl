@@ -27,6 +27,7 @@
         <display-name lang="no">Vedlegg</display-name>
         <display-name lang="ar">مرفقات</display-name>
         <display-name lang="pl">Załączniki</display-name>
+        <display-name lang="ja">添付ファイル</display-name>
     </metadata>
 
 </xbl:xbl>

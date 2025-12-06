@@ -43,6 +43,7 @@
         <display-name lang="sv">Dynamisk rullgardinsmeny</display-name>
         <display-name lang="ar">Dynamic Dropdown</display-name>
         <display-name lang="pl">Dynamic Dropdown</display-name>
+        <display-name lang="ja">動的ドロップダウン</display-name>
             <form-settings show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>

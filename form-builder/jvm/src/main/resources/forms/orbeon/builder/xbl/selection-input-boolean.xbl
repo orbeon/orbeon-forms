@@ -31,6 +31,7 @@
         <display-name lang="sv">Ensam kryssruta med etikett ovanför</display-name>
         <display-name lang="ar">خانة اختيار واحدة مع تسمية في الأعلى</display-name>
         <display-name lang="pl">Pojedyncze pole wyboru z etykietą u góry</display-name>
+        <display-name lang="ja">単一チェックボックス（ラベル上）</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>

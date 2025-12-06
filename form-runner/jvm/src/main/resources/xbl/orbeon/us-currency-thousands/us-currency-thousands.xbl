@@ -41,6 +41,7 @@
         <display-name lang="sv">Dollar (tusental)</display-name>
         <display-name lang="ar">Dollars (Thousand)</display-name>
         <display-name lang="pl">Dollars (Thousand)</display-name>
+        <display-name lang="ja">ドル（千単位）</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
             </icon>

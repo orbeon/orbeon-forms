@@ -34,6 +34,7 @@
         <display-name lang="sv">Med kopiering till urklipp</display-name>
         <display-name lang="ar">مع نسخ إلى الحافظة</display-name>
         <display-name lang="pl">Z kopiowaniem do schowka</display-name>
+        <display-name lang="ja">クリップボードコピー付き</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-copy</icon-class>

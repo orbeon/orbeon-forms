@@ -42,6 +42,7 @@
         <display-name lang="sv">Bild som bilaga</display-name>
         <display-name lang="ar">مرفق صورة</display-name>
         <display-name lang="pl">Załączony obraz</display-name>
+        <display-name lang="ja">画像添付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-image-o</icon-class>
             </icon>
@@ -163,6 +164,213 @@
                                     <item value="-2">Préserver</item>
                                 </format>
                             </resource>
+                            <resource xml:lang="no">
+                                <max-width>
+                                    <label>Juster maksimal bredde til</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="-2">Ingen justering</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Juster maksimal høyde til</label>
+                                </max-height>
+                                <quality>
+                                    <label>Kvalitet etter komprimering</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="90">Høy (90%)</item>
+                                    <item value="80">Middels (80%)</item>
+                                    <item value="70">Lav (70%)</item>
+                                    <item value="50">Svært lav (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Resultatformat</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="-2">Behold</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <max-width>
+                                    <label>Установить макс. ширину</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="-2">Без изменения</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Установить макс. высоту</label>
+                                </max-height>
+                                <quality>
+                                    <label>Качество сжатого изображения</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="90">Высокое (90%)</item>
+                                    <item value="80">Среднее (80%)</item>
+                                    <item value="70">Низкое (70%)</item>
+                                    <item value="50">Очень низкое (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Формат результирующего изображения</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="-2">Сохранить исходный</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="it">
+                                <max-width>
+                                    <label>Adatta la larghezza massima a</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="-2">Nessun adattamento</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Adatta l'altezza massima a</label>
+                                </max-height>
+                                <quality>
+                                    <label>Qualità dell'immagine dopo la compressione</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="90">Alta (90%)</item>
+                                    <item value="80">Media (80%)</item>
+                                    <item value="70">Bassa (70%)</item>
+                                    <item value="50">Molto bassa (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Formato immagine risultante</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="-2">Conserva</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="de">
+                                <max-width>
+                                    <label>Maximale Breite anpassen auf</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="-2">Keine Anpassung</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Maximale Höhe anpassen auf</label>
+                                </max-height>
+                                <quality>
+                                    <label>Qualität des komprimierten Bildes</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="90">Hoch (90%)</item>
+                                    <item value="80">Mittel (80%)</item>
+                                    <item value="70">Niedrig (70%)</item>
+                                    <item value="50">Sehr niedrig (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Ergebnis-Bildformat</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="-2">Beibehalten</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <max-width>
+                                    <label>Säädä enimmäisleveys arvoon</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="-2">Ei säätöä</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Säädä enimmäiskorkeus arvoon</label>
+                                </max-height>
+                                <quality>
+                                    <label>Pakatun kuvan laatu</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="90">Korkea (90%)</item>
+                                    <item value="80">Keskitaso (80%)</item>
+                                    <item value="70">Matala (70%)</item>
+                                    <item value="50">Hyvin matala (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Tuloksen kuvamuoto</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="-2">Säilytä</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="es">
+                                <max-width>
+                                    <label>Ajustar ancho máximo a</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="-2">Sin ajuste</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Ajustar alto máximo a</label>
+                                </max-height>
+                                <quality>
+                                    <label>Calidad de la imagen comprimida</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="90">Alta (90%)</item>
+                                    <item value="80">Media (80%)</item>
+                                    <item value="70">Baja (70%)</item>
+                                    <item value="50">Muy baja (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Formato de imagen resultante</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="-2">Conservar</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <max-width>
+                                    <label>Maximale breedte aanpassen naar</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="-2">Geen aanpassing</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Maximale hoogte aanpassen naar</label>
+                                </max-height>
+                                <quality>
+                                    <label>Kwaliteit van gecomprimeerde afbeelding</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="90">Hoog (90%)</item>
+                                    <item value="80">Midden (80%)</item>
+                                    <item value="70">Laag (70%)</item>
+                                    <item value="50">Zeer laag (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Resultaat afbeeldingsformaat</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="-2">Behouden</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <max-width>
+                                    <label>Ajustar largura máxima para</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="-2">Sem ajuste</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Ajustar altura máxima para</label>
+                                </max-height>
+                                <quality>
+                                    <label>Qualidade da imagem comprimida</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="90">Alta (90%)</item>
+                                    <item value="80">Média (80%)</item>
+                                    <item value="70">Baixa (70%)</item>
+                                    <item value="50">Muito baixa (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Formato da imagem resultante</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="-2">Preservar</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <max-width>
+                                    <label>Justera maxbredd till</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="-2">Ingen justering</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Justera maxhöjd till</label>
+                                </max-height>
+                                <quality>
+                                    <label>Kvalitet efter komprimering</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="90">Hög (90%)</item>
+                                    <item value="80">Medel (80%)</item>
+                                    <item value="70">Låg (70%)</item>
+                                    <item value="50">Mycket låg (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Resulterande bildformat</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="-2">Behåll</item>
+                                </format>
+                            </resource>
                             <resource xml:lang="ar">
                                 <max-width>
                                     <label>ضبط العرض الأقصى إلى</label>
@@ -184,6 +392,52 @@
                                     <label>تنسيق الصورة الناتج</label>
                                     <item value="-1">استخدام الإعداد الافتراضي</item>
                                     <item value="-2">الحفاظ على التنسيق</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <max-width>
+                                    <label>Ustaw maksymalną szerokość na</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="-2">Bez dostosowania</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Ustaw maksymalną wysokość na</label>
+                                </max-height>
+                                <quality>
+                                    <label>Jakość skompresowanego obrazu</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="90">Wysoka (90%)</item>
+                                    <item value="80">Średnia (80%)</item>
+                                    <item value="70">Niska (70%)</item>
+                                    <item value="50">Bardzo niska (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>Docelowy format obrazu</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="-2">Zachowaj</item>
+                                </format>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <max-width>
+                                    <label>最大幅を調整</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="-2">調整しない</item>
+                                </max-width>
+                                <max-height>
+                                    <label>最大高さを調整</label>
+                                </max-height>
+                                <quality>
+                                    <label>圧縮後の画質</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="90">高 (90%)</item>
+                                    <item value="80">中 (80%)</item>
+                                    <item value="70">低 (70%)</item>
+                                    <item value="50">最低 (50%)</item>
+                                </quality>
+                                <format>
+                                    <label>出力画像形式</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="-2">元の形式を保持</item>
                                 </format>
                             </resource>
                         </_>

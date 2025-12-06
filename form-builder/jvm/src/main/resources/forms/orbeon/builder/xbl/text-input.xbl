@@ -31,6 +31,7 @@
         <display-name lang="sv">Textrad</display-name>
         <display-name lang="ar">Text Field</display-name>
         <display-name lang="pl">Text Field</display-name>
+        <display-name lang="ja">テキストフィールド</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-font</icon-class>
             </icon>

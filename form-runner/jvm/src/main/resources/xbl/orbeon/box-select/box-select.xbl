@@ -48,6 +48,7 @@
         <display-name lang="sv">Rullbart multival</display-name>
         <display-name lang="ar">Scrollable Checkboxes</display-name>
         <display-name lang="pl">Scrollable Checkboxes</display-name>
+        <display-name lang="ja">スクロール付きチェックボックス</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>

@@ -51,6 +51,7 @@
         <display-name lang="sv">Autoförslag</display-name>
         <display-name lang="ar">إكمال تلقائي</display-name>
         <display-name lang="pl">Autouzupełnianie</display-name>
+        <display-name lang="ja">オートコンプリート</display-name>
             <form-settings show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>

@@ -27,6 +27,7 @@
         <display-name lang="sv">Textfält</display-name>
         <display-name lang="ar">عناصر التحكم في النص</display-name>
         <display-name lang="pl">Kontrolki tekstowe</display-name>
+        <display-name lang="ja">テキストコントロール</display-name>
     </metadata>
 
 </xbl:xbl>

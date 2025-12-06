@@ -44,6 +44,7 @@
         <display-name lang="sv">Ensam kryssruta</display-name>
         <display-name lang="ar">خانة اختيار واحدة</display-name>
         <display-name lang="pl">Pojedyncze pole wyboru</display-name>
+        <display-name lang="ja">単一チェックボックス</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>

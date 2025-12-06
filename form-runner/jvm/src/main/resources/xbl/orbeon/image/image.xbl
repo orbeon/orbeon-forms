@@ -39,6 +39,7 @@
         <display-name lang="sv">Bild</display-name>
         <display-name lang="ar">صورة</display-name>
         <display-name lang="pl">Static Image</display-name>
+        <display-name lang="ja">固定画像</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-image</icon-class>
             </icon>

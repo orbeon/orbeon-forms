@@ -29,6 +29,7 @@
         <display-name lang="sv">Knapp med länk</display-name>
         <display-name lang="ar">زر الرابط</display-name>
         <display-name lang="pl">Przycisk linku</display-name>
+        <display-name lang="ja">リンクボタン</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-link</icon-class>

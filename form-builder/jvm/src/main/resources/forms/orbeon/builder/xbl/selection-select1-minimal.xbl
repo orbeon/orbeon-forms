@@ -16,6 +16,7 @@
         <display-name lang="sv">Äldre rullgardinsmeny</display-name>
         <display-name lang="ar">Legacy Dropdown</display-name>
         <display-name lang="pl">Legacy Dropdown</display-name>
+        <display-name lang="ja">旧式ドロップダウン</display-name>
 
             <toolbox show="false" deprecated="true"/>
             <icon>

@@ -50,6 +50,7 @@
         <display-name lang="sv">Formaterad HTML-text</display-name>
         <display-name lang="ar">منطقة نص منسق</display-name>
         <display-name lang="pl">Formatted Text Area</display-name>
+        <display-name lang="ja">書式付きテキストエリア</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-html5</icon-class>
             </icon>

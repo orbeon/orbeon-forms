@@ -48,6 +48,7 @@
         <display-name lang="sv">Amerikanskt personnummer (SSN)</display-name>
         <display-name lang="ar">رقم الضمان الاجتماعي الأمريكي (SSN)</display-name>
         <display-name lang="pl">US Social Security Number (SSN)</display-name>
+        <display-name lang="ja">米国社会保障番号 (SSN)</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-id-card</icon-class>
             </icon>

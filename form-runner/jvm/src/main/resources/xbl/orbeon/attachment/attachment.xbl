@@ -40,6 +40,7 @@
         <display-name lang="sv">Fil som bilaga</display-name>
         <display-name lang="ar">مرفق ملف واحد</display-name>
         <display-name lang="pl">Załącznik pojedynczego pliku</display-name>
+        <display-name lang="ja">単一ファイル添付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-o</icon-class>
             </icon>
@@ -90,9 +91,53 @@
                                 <allow-download>Permettre le téléchargement</allow-download>
                                 <show-size>Montrer la taille</show-size>
                             </resource>
+                            <resource xml:lang="no">
+                                <allow-download>Tillat nedlasting</allow-download>
+                                <show-size>Vis størrelse</show-size>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <allow-download>Разрешить скачивание</allow-download>
+                                <show-size>Показывать размер</show-size>
+                            </resource>
+                            <resource xml:lang="it">
+                                <allow-download>Consenti download</allow-download>
+                                <show-size>Mostra dimensione</show-size>
+                            </resource>
+                            <resource xml:lang="de">
+                                <allow-download>Download erlauben</allow-download>
+                                <show-size>Größe anzeigen</show-size>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <allow-download>Salli lataus</allow-download>
+                                <show-size>Näytä koko</show-size>
+                            </resource>
+                            <resource xml:lang="es">
+                                <allow-download>Permitir descarga</allow-download>
+                                <show-size>Mostrar tamaño</show-size>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <allow-download>Download toestaan</allow-download>
+                                <show-size>Grootte tonen</show-size>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <allow-download>Permitir download</allow-download>
+                                <show-size>Mostrar tamanho</show-size>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <allow-download>Tillåt nedladdning</allow-download>
+                                <show-size>Visa storlek</show-size>
+                            </resource>
                             <resource xml:lang="ar">
                                 <allow-download>السماح بالتنزيل</allow-download>
                                 <show-size>إظهار الحجم</show-size>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <allow-download>Zezwól na pobieranie</allow-download>
+                                <show-size>Pokaż rozmiar</show-size>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <allow-download>ダウンロードを許可</allow-download>
+                                <show-size>サイズを表示</show-size>
                             </resource>
                         </_>
                     </xf:instance>

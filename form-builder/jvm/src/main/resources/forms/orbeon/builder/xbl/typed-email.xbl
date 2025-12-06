@@ -30,6 +30,7 @@
         <display-name lang="sv">Mejladress</display-name>
         <display-name lang="ar">عنوان البريد الإلكتروني</display-name>
         <display-name lang="pl">Adres e-mail</display-name>
+        <display-name lang="ja">メールアドレス</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-envelope</icon-class>
             </icon>

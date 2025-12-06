@@ -45,6 +45,7 @@
         <display-name lang="sv">Trädväljare</display-name>
         <display-name lang="ar">منتقي الشجرة</display-name>
         <display-name lang="pl">Selektor drzewa</display-name>
+        <display-name lang="ja">ツリーセレクター</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
             </icon>

@@ -58,6 +58,7 @@
         <display-name lang="sv">Telefonnummer i USA</display-name>
         <display-name lang="ar">رقم هاتف أمريكي</display-name>
         <display-name lang="pl">Numer telefonu USA</display-name>
+        <display-name lang="ja">米国電話番号</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-phone</icon-class>
             </icon>

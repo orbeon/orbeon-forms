@@ -29,6 +29,7 @@
         <display-name lang="sv">Enkelval</display-name>
         <display-name lang="ar">أزرار الاختيار</display-name>
         <display-name lang="pl">Przyciski opcji</display-name>
+        <display-name lang="ja">ラジオボタン</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-dot-circle-o</icon-class>
             </icon>

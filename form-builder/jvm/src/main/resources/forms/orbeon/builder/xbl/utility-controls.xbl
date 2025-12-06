@@ -27,6 +27,7 @@
         <display-name lang="sv">Verktygskontroller</display-name>
         <display-name lang="ar">عناصر تحكم المساعدة</display-name>
         <display-name lang="pl">Kontrolki narzędziowe</display-name>
+        <display-name lang="ja">ユーティリティコントロール</display-name>
     </metadata>
 
 </xbl:xbl>

@@ -35,6 +35,7 @@
         <display-name lang="sv">Karta</display-name>
         <display-name lang="ar">Map</display-name>
         <display-name lang="pl">Map</display-name>
+        <display-name lang="ja">地図</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-globe</icon-class>
             </icon>

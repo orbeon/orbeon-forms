@@ -42,6 +42,7 @@
         <display-name lang="sv">Amerikansk delstat</display-name>
         <display-name lang="ar">ولاية أمريكية</display-name>
         <display-name lang="pl">Stan USA</display-name>
+        <display-name lang="ja">米国州</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-flag</icon-class>
             </icon>

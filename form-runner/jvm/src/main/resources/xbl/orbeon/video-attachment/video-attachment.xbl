@@ -29,6 +29,7 @@
         <display-name lang="sv">Videobilaga</display-name>
         <display-name lang="ar">مرفق فيديو</display-name>
         <display-name lang="pl">Załącznik wideo</display-name>
+        <display-name lang="ja">動画添付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-video-o</icon-class>
             </icon>

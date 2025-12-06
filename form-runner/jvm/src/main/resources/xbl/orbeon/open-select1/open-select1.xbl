@@ -61,6 +61,7 @@
         <display-name lang="sv">Enkelval med "Annat"</display-name>
         <display-name lang="ar">أزرار اختيار مع "آخر"</display-name>
         <display-name lang="pl">Przyciski opcji z "Inne"</display-name>
+        <display-name lang="ja">「その他」付きラジオボタン</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-dot-circle-o</icon-class>
             </icon>

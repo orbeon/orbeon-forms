@@ -44,6 +44,7 @@
         <display-name lang="sv">Datumväljare med rullgardinsmeny</display-name>
         <display-name lang="ar">تاريخ منسدل</display-name>
         <display-name lang="pl">Data w liście rozwijanej</display-name>
+        <display-name lang="ja">ドロップダウン日付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
@@ -114,6 +115,116 @@
                                 <end-year>
                                     <label>سنة النهاية</label>
                                     <hint>قيمة ثابتة أو قالب XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="no">
+                                <start-year>
+                                    <label>Startår</label>
+                                    <hint>Konstant eller XPath-mal</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Sluttår</label>
+                                    <hint>Konstant eller XPath-mal</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <start-year>
+                                    <label>Начальный год</label>
+                                    <hint>Константа или шаблон значения XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Конечный год</label>
+                                    <hint>Константа или шаблон значения XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="it">
+                                <start-year>
+                                    <label>Anno iniziale</label>
+                                    <hint>Costante o modello di valore XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Anno finale</label>
+                                    <hint>Costante o modello di valore XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="de">
+                                <start-year>
+                                    <label>Startjahr</label>
+                                    <hint>Konstante oder XPath-Wertvorlage</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Endjahr</label>
+                                    <hint>Konstante oder XPath-Wertvorlage</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <start-year>
+                                    <label>Alkuvuosi</label>
+                                    <hint>Vakio tai XPath-arvopohja</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Loppuvuosi</label>
+                                    <hint>Vakio tai XPath-arvopohja</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="es">
+                                <start-year>
+                                    <label>Año inicial</label>
+                                    <hint>Constante o plantilla de valor XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Año final</label>
+                                    <hint>Constante o plantilla de valor XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <start-year>
+                                    <label>Startjaar</label>
+                                    <hint>Constante of XPath-waardesjabloon</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Eindjaar</label>
+                                    <hint>Constante of XPath-waardesjabloon</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <start-year>
+                                    <label>Ano inicial</label>
+                                    <hint>Constante ou modelo de valor XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Ano final</label>
+                                    <hint>Constante ou modelo de valor XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <start-year>
+                                    <label>Startår</label>
+                                    <hint>Konstant eller XPath-värdemall</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Slutår</label>
+                                    <hint>Konstant eller XPath-värdemall</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <start-year>
+                                    <label>Rok początkowy</label>
+                                    <hint>Stała lub szablon wartości XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Rok końcowy</label>
+                                    <hint>Stała lub szablon wartości XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <start-year>
+                                    <label>開始年</label>
+                                    <hint>定数またはXPath値テンプレート</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>終了年</label>
+                                    <hint>定数またはXPath値テンプレート</hint>
                                 </end-year>
                             </resource>
                         </_>

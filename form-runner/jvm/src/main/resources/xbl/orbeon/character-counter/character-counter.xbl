@@ -47,6 +47,7 @@
         <display-name lang="sv">Med teckenräknare</display-name>
         <display-name lang="ar">مع عداد الحروف</display-name>
         <display-name lang="pl">Z licznikiem znaków</display-name>
+        <display-name lang="ja">文字数カウンター付き</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-gauge</icon-class>

@@ -41,6 +41,7 @@
         <display-name lang="sv">Registreringsskylt från Kalifornien</display-name>
         <display-name lang="ar">لوحة كاليفورنيا</display-name>
         <display-name lang="pl">California Plate</display-name>
+        <display-name lang="ja">カリフォルニア州ナンバープレート</display-name>
             <icon>
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
             </icon>

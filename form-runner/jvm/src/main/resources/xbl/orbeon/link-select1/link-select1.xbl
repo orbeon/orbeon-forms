@@ -41,6 +41,7 @@
         <display-name lang="sv">Länkväljare</display-name>
         <display-name lang="ar">Link Selector</display-name>
         <display-name lang="pl">Link Selector</display-name>
+        <display-name lang="ja">リンクセレクター</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/link.png</small-icon>
             </icon>

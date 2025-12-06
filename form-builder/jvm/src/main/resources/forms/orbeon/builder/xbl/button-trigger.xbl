@@ -26,6 +26,10 @@
             <display-name lang="nl">Knop</display-name>
             <display-name lang="sv">Knapp</display-name>
             <display-name lang="pt">Botão</display-name>
+            <display-name lang="no">Knapp</display-name>
+            <display-name lang="ar">زر</display-name>
+            <display-name lang="pl">Przycisk</display-name>
+            <display-name lang="ja">ボタン</display-name>
             <appearance-display-name lang="en">Default</appearance-display-name>
             <appearance-display-name lang="es">Predeterminado</appearance-display-name>
             <appearance-display-name lang="fi">Oletus</appearance-display-name>
@@ -36,6 +40,10 @@
             <appearance-display-name lang="nl">Standaard</appearance-display-name>
             <appearance-display-name lang="sv">Standard</appearance-display-name>
             <appearance-display-name lang="pt">Padrão</appearance-display-name>
+            <appearance-display-name lang="no">Standard</appearance-display-name>
+            <appearance-display-name lang="ar">افتراضي</appearance-display-name>
+            <appearance-display-name lang="pl">Domyślny</appearance-display-name>
+            <appearance-display-name lang="ja">標準</appearance-display-name>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
@@ -62,6 +70,10 @@
             <display-name lang="nl">Knop (Primair)</display-name>
             <display-name lang="sv">Knapp (Primär)</display-name>
             <display-name lang="pt">Botão (Primário)</display-name>
+            <display-name lang="no">Knapp (Primær)</display-name>
+            <display-name lang="ar">زر (أساسي)</display-name>
+            <display-name lang="pl">Przycisk (Podstawowy)</display-name>
+            <display-name lang="ja">ボタン（プライマリ）</display-name>
             <appearance-display-name lang="en">Primary</appearance-display-name>
             <appearance-display-name lang="es">Primario</appearance-display-name>
             <appearance-display-name lang="fi">Ensisijainen</appearance-display-name>
@@ -72,6 +84,10 @@
             <appearance-display-name lang="nl">Primair</appearance-display-name>
             <appearance-display-name lang="sv">Primär</appearance-display-name>
             <appearance-display-name lang="pt">Primário</appearance-display-name>
+            <appearance-display-name lang="no">Primær</appearance-display-name>
+            <appearance-display-name lang="ar">أساسي</appearance-display-name>
+            <appearance-display-name lang="pl">Podstawowy</appearance-display-name>
+            <appearance-display-name lang="ja">プライマリ</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
@@ -99,6 +115,10 @@
             <display-name lang="nl">Knop (Omgekeerd)</display-name>
             <display-name lang="sv">Knapp (Omvänd)</display-name>
             <display-name lang="pt">Botão (Invertido)</display-name>
+            <display-name lang="no">Knapp (Invertert)</display-name>
+            <display-name lang="ar">زر (معكوس)</display-name>
+            <display-name lang="pl">Przycisk (Odwrotny)</display-name>
+            <display-name lang="ja">ボタン（反転）</display-name>
             <appearance-display-name lang="en">Inverse</appearance-display-name>
             <appearance-display-name lang="es">Inverso</appearance-display-name>
             <appearance-display-name lang="fi">Käänteinen</appearance-display-name>
@@ -109,6 +129,10 @@
             <appearance-display-name lang="nl">Omgekeerd</appearance-display-name>
             <appearance-display-name lang="sv">Omvänd</appearance-display-name>
             <appearance-display-name lang="pt">Invertido</appearance-display-name>
+            <appearance-display-name lang="no">Invertert</appearance-display-name>
+            <appearance-display-name lang="ar">معكوس</appearance-display-name>
+            <appearance-display-name lang="pl">Odwrotny</appearance-display-name>
+            <appearance-display-name lang="ja">反転</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
@@ -136,6 +160,10 @@
             <display-name lang="nl">Knop (Succes)</display-name>
             <display-name lang="sv">Knapp (Framgång)</display-name>
             <display-name lang="pt">Botão (Sucesso)</display-name>
+            <display-name lang="no">Knapp (Suksess)</display-name>
+            <display-name lang="ar">زر (نجاح)</display-name>
+            <display-name lang="pl">Przycisk (Sukces)</display-name>
+            <display-name lang="ja">ボタン（成功）</display-name>
             <appearance-display-name lang="en">Success</appearance-display-name>
             <appearance-display-name lang="es">Éxito</appearance-display-name>
             <appearance-display-name lang="fi">Onnistunut</appearance-display-name>
@@ -146,6 +174,10 @@
             <appearance-display-name lang="nl">Succes</appearance-display-name>
             <appearance-display-name lang="sv">Framgång</appearance-display-name>
             <appearance-display-name lang="pt">Sucesso</appearance-display-name>
+            <appearance-display-name lang="no">Suksess</appearance-display-name>
+            <appearance-display-name lang="ar">نجاح</appearance-display-name>
+            <appearance-display-name lang="pl">Sukces</appearance-display-name>
+            <appearance-display-name lang="ja">成功</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
@@ -173,6 +205,10 @@
             <display-name lang="nl">Knop (Gevaar)</display-name>
             <display-name lang="sv">Knapp (Farlig)</display-name>
             <display-name lang="pt">Botão (Perigo)</display-name>
+            <display-name lang="no">Knapp (Fare)</display-name>
+            <display-name lang="ar">زر (خطر)</display-name>
+            <display-name lang="pl">Przycisk (Zagrożenie)</display-name>
+            <display-name lang="ja">ボタン（危険）</display-name>
             <appearance-display-name lang="en">Danger</appearance-display-name>
             <appearance-display-name lang="es">Peligro</appearance-display-name>
             <appearance-display-name lang="fi">Vaara</appearance-display-name>
@@ -183,6 +219,10 @@
             <appearance-display-name lang="nl">Gevaar</appearance-display-name>
             <appearance-display-name lang="sv">Farlig</appearance-display-name>
             <appearance-display-name lang="pt">Perigo</appearance-display-name>
+            <appearance-display-name lang="no">Fare</appearance-display-name>
+            <appearance-display-name lang="ar">خطر</appearance-display-name>
+            <appearance-display-name lang="pl">Zagrożenie</appearance-display-name>
+            <appearance-display-name lang="ja">危険</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
@@ -210,6 +250,10 @@
             <display-name lang="nl">Knop (Waarschuwing)</display-name>
             <display-name lang="sv">Knapp (Varning)</display-name>
             <display-name lang="pt">Botão (Aviso)</display-name>
+            <display-name lang="no">Knapp (Advarsel)</display-name>
+            <display-name lang="ar">زر (تحذير)</display-name>
+            <display-name lang="pl">Przycisk (Ostrzeżenie)</display-name>
+            <display-name lang="ja">ボタン（警告）</display-name>
             <appearance-display-name lang="en">Warning</appearance-display-name>
             <appearance-display-name lang="es">Advertencia</appearance-display-name>
             <appearance-display-name lang="fi">Varoitus</appearance-display-name>
@@ -220,6 +264,10 @@
             <appearance-display-name lang="nl">Waarschuwing</appearance-display-name>
             <appearance-display-name lang="sv">Varning</appearance-display-name>
             <appearance-display-name lang="pt">Aviso</appearance-display-name>
+            <appearance-display-name lang="no">Advarsel</appearance-display-name>
+            <appearance-display-name lang="ar">تحذير</appearance-display-name>
+            <appearance-display-name lang="pl">Ostrzeżenie</appearance-display-name>
+            <appearance-display-name lang="ja">警告</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
@@ -247,6 +295,10 @@
             <display-name lang="nl">Knop (Informatie)</display-name>
             <display-name lang="sv">Knapp (Information)</display-name>
             <display-name lang="pt">Botão (Informação)</display-name>
+            <display-name lang="no">Knapp (Info)</display-name>
+            <display-name lang="ar">زر (معلومات)</display-name>
+            <display-name lang="pl">Przycisk (Informacja)</display-name>
+            <display-name lang="ja">ボタン（情報）</display-name>
             <appearance-display-name lang="en">Info</appearance-display-name>
             <appearance-display-name lang="es">Información</appearance-display-name>
             <appearance-display-name lang="fi">Tiedot</appearance-display-name>
@@ -257,6 +309,10 @@
             <appearance-display-name lang="nl">Informatie</appearance-display-name>
             <appearance-display-name lang="sv">Information</appearance-display-name>
             <appearance-display-name lang="pt">Informação</appearance-display-name>
+            <appearance-display-name lang="no">Info</appearance-display-name>
+            <appearance-display-name lang="ar">معلومات</appearance-display-name>
+            <appearance-display-name lang="pl">Informacja</appearance-display-name>
+            <appearance-display-name lang="ja">情報</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>

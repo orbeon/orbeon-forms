@@ -29,6 +29,7 @@
         <display-name lang="sv">Multival</display-name>
         <display-name lang="ar">خانات الاختيار</display-name>
         <display-name lang="pl">Pola wyboru</display-name>
+        <display-name lang="ja">チェックボックス</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>

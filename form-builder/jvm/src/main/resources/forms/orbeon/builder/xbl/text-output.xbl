@@ -25,6 +25,11 @@
             <display-name lang="nl">Berekende waarde</display-name>
             <display-name lang="sv">Beräknat värde</display-name>
             <display-name lang="pt">Valor calculado</display-name>
+            <display-name lang="no">Beregnet verdi</display-name>
+            <display-name lang="fi">Laskettu arvo</display-name>
+            <display-name lang="ar">قيمة محسوبة</display-name>
+            <display-name lang="pl">Wartość wyliczona</display-name>
+            <display-name lang="ja">計算値</display-name>
             <appearance-display-name lang="en">Use default</appearance-display-name>
             <appearance-display-name lang="es">Usar predeterminado</appearance-display-name>
             <appearance-display-name lang="fr">Défaut</appearance-display-name>
@@ -34,6 +39,11 @@
             <appearance-display-name lang="nl">Standaard gebruiken</appearance-display-name>
             <appearance-display-name lang="sv">Använd standard</appearance-display-name>
             <appearance-display-name lang="pt">Usar padrão</appearance-display-name>
+            <appearance-display-name lang="no">Bruk standard</appearance-display-name>
+            <appearance-display-name lang="fi">Käytä oletusta</appearance-display-name>
+            <appearance-display-name lang="ar">استخدم الافتراضي</appearance-display-name>
+            <appearance-display-name lang="pl">Użyj domyślnych</appearance-display-name>
+            <appearance-display-name lang="ja">デフォルトを使用</appearance-display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
             </icon>
@@ -61,6 +71,11 @@
             <display-name lang="nl">Berekende waarde met rand</display-name>
             <display-name lang="sv">Beräknat värde med ram</display-name>
             <display-name lang="pt">Valor calculado com borda</display-name>
+            <display-name lang="no">Beregnet verdi med kant</display-name>
+            <display-name lang="fi">Laskettu arvo reunuksella</display-name>
+            <display-name lang="ar">قيمة محسوبة بإطار</display-name>
+            <display-name lang="pl">Wartość wyliczona z obramowaniem</display-name>
+            <display-name lang="ja">枠付き計算値</display-name>
             <appearance-display-name lang="en">With border</appearance-display-name>
             <appearance-display-name lang="es">Con borde</appearance-display-name>
             <appearance-display-name lang="fr">Avec bord</appearance-display-name>
@@ -70,6 +85,11 @@
             <appearance-display-name lang="nl">Met rand</appearance-display-name>
             <appearance-display-name lang="sv">Med ram</appearance-display-name>
             <appearance-display-name lang="pt">Com borda</appearance-display-name>
+            <appearance-display-name lang="no">Med kant</appearance-display-name>
+            <appearance-display-name lang="fi">Reunuksella</appearance-display-name>
+            <appearance-display-name lang="ar">مع إطار</appearance-display-name>
+            <appearance-display-name lang="pl">Z obramowaniem</appearance-display-name>
+            <appearance-display-name lang="ja">枠あり</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
@@ -98,6 +118,11 @@
             <display-name lang="nl">Berekende waarde zonder rand</display-name>
             <display-name lang="sv">Beräknat värde utan ram</display-name>
             <display-name lang="pt">Valor calculado sem borda</display-name>
+            <display-name lang="no">Beregnet verdi uten kant</display-name>
+            <display-name lang="fi">Laskettu arvo ilman reunusta</display-name>
+            <display-name lang="ar">قيمة محسوبة دون إطار</display-name>
+            <display-name lang="pl">Wartość wyliczona bez obramowania</display-name>
+            <display-name lang="ja">枠なし計算値</display-name>
             <appearance-display-name lang="en">Without border</appearance-display-name>
             <appearance-display-name lang="es">Sin borde</appearance-display-name>
             <appearance-display-name lang="fr">Sans bord</appearance-display-name>
@@ -107,6 +132,11 @@
             <appearance-display-name lang="nl">Zonder rand</appearance-display-name>
             <appearance-display-name lang="sv">Utan ram</appearance-display-name>
             <appearance-display-name lang="pt">Sem borda</appearance-display-name>
+            <appearance-display-name lang="no">Uten kant</appearance-display-name>
+            <appearance-display-name lang="fi">Ilman reunaa</appearance-display-name>
+            <appearance-display-name lang="ar">بدون إطار</appearance-display-name>
+            <appearance-display-name lang="pl">Bez obramowania</appearance-display-name>
+            <appearance-display-name lang="ja">枠なし</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>

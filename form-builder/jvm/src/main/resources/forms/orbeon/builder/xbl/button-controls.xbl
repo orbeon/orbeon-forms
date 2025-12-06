@@ -27,6 +27,7 @@
         <display-name lang="sv">Knappar</display-name>
         <display-name lang="ar">أزرار</display-name>
         <display-name lang="pl">Przyciski</display-name>
+        <display-name lang="ja">ボタン</display-name>
     </metadata>
 
 </xbl:xbl>

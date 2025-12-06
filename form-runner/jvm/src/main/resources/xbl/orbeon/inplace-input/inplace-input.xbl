@@ -45,6 +45,7 @@
         <display-name lang="sv">Inmatning</display-name>
         <display-name lang="ar">إدخال في المكان</display-name>
         <display-name lang="pl">Wprowadzanie w miejscu</display-name>
+        <display-name lang="ja">インライン入力</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
             </icon>

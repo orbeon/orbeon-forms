@@ -26,8 +26,8 @@ import org.orbeon.scaxon.Implicits.*
 class XXFormsBinding extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
-    implicit val ctx = xpathContext
-    implicit val xfc = XFormsFunction.context
+    implicit val xpc: XPathContext           = xpathContext
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     findControls(0, followIndexes = true).headOption map (_.bindingEvenIfNonRelevant)
   }
 

@@ -10,7 +10,7 @@ import org.orbeon.scaxon.Implicits.*
 class XXFEvaluateInContext extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
-    implicit val xpc: XPathContext = xpathContext
+    implicit val xpc: XPathContext           = xpathContext
     implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
     EvaluateSupport.evaluateInContextFromXPathString(stringArgument(0), stringArgument(1))

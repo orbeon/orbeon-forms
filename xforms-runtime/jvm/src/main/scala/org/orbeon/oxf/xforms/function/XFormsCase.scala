@@ -25,8 +25,8 @@ import shapeless.syntax.typeable.*
 class XFormsCase extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
-    implicit val ctx = xpathContext
-    implicit val xfc = XFormsFunction.context
+    implicit val ctx: XPathContext           = xpathContext
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
     for {
       control      <- relevantControl(0)

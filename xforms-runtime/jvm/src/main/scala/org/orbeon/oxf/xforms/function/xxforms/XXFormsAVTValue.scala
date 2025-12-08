@@ -25,8 +25,8 @@ class XXFormsAVTValue extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
-    implicit val ctx = xpathContext
-    implicit val xfc = XFormsFunction.context
+    implicit val xpc: XPathContext           = xpathContext
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
     val forId   = stringArgument(0)
     val attName = stringArgument(1)

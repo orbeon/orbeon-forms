@@ -634,16 +634,16 @@ private object FormRunnerFunctions {
 
       implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
 
-      val modeQualifiedName =
+      val modePublicName =
         stringArgumentOpt(0).getOrElse(formRunnerParams.mode)
 
       val continuationMode =
-        ModeType.modeFromQualifiedName(
-          modeQualifiedName,
+        ModeType.modeFromPublicName(
+          modePublicName,
           excludeSecondaryModes = true,
           FormRunner.customModes
         )
-        .getOrElse(throw new IllegalArgumentException(s"Unknown mode requested: `$modeQualifiedName`"))
+        .getOrElse(throw new IllegalArgumentException(s"Unknown mode requested: `$modePublicName`"))
 
       FormRunnerExternalMode.saveState(
         data                = FormRunner.formInstance.root,

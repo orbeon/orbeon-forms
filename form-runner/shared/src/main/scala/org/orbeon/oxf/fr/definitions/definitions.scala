@@ -1,9 +1,10 @@
 package org.orbeon.oxf.fr.definitions
 
-import io.circe.syntax.EncoderOps
 import io.circe.*
+import io.circe.syntax.*
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.permission.Operations
+import org.orbeon.oxf.xml.SaxonUtils
 
 
 sealed trait ModeType
@@ -35,25 +36,26 @@ object ModeType {
     case _          => None
   }
 
-  def modeTypeFromQualifiedName(
-    modeQualifiedName    : String,
+  def modeTypeFromPublicName(
+    modePublicName       : String,
     excludeSecondaryModes: Boolean,
     customModes          : Iterable[FormRunnerDetailMode.Custom]
   ): Option[ModeType] =
-    modeFromQualifiedName(modeQualifiedName, excludeSecondaryModes, customModes).map(_.modeType)
+    modeFromPublicName(modePublicName, excludeSecondaryModes, customModes).map(_.modeType)
 
-  def modeFromQualifiedName(
-    modeQualifiedName    : String,
+  def modeFromPublicName(
+    modePublicName       : String,
     excludeSecondaryModes: Boolean,
     customModes          : Iterable[FormRunnerDetailMode.Custom]
   ): Option[FormRunnerDetailMode] =
-    (if (excludeSecondaryModes) primaryModes else primaryAndSecondaryModes).get(modeQualifiedName)
-      .orElse(customModes.find(_.name.qualifiedName == modeQualifiedName))
+    (if (excludeSecondaryModes) primaryModes else primaryAndSecondaryModes).get(modePublicName) // public and qualified names are the same for primary/secondary modes
+      .orElse(customModes.find(_.publicName == modePublicName))
 }
 
 case class ModeTypeAndOps(modeType: ModeType.ForExistingData, ops: Operations)
 
 sealed trait FormRunnerDetailMode {
+  val publicName : String
   val name       : QName
   val modeType   : ModeType
   val persistence: Boolean
@@ -64,18 +66,26 @@ object FormRunnerDetailMode {
   def isSupportedNonDetailMode(mode: String): Boolean =
     Set("summary", "home", "landing", "validate", "import").contains(mode) // xxx constants
 
-  case object New  extends FormRunnerDetailMode { val name = QName("new");  val modeType = ModeType.Creation; val persistence = true }
-  case object Edit extends FormRunnerDetailMode { val name = QName("edit"); val modeType = ModeType.Edition;  val persistence = true }
-  case object View extends FormRunnerDetailMode { val name = QName("view"); val modeType = ModeType.Readonly; val persistence = true }
-  case object Pdf  extends FormRunnerDetailMode { val name = QName("pdf");  val modeType = ModeType.Readonly; val persistence = true }
+  case object New  extends FormRunnerDetailMode { val publicName = "new";  val name = QName("new");  val modeType = ModeType.Creation; val persistence = true }
+  case object Edit extends FormRunnerDetailMode { val publicName = "edit"; val name = QName("edit"); val modeType = ModeType.Edition;  val persistence = true }
+  case object View extends FormRunnerDetailMode { val publicName = "view"; val name = QName("view"); val modeType = ModeType.Readonly; val persistence = true }
+  case object Pdf  extends FormRunnerDetailMode { val publicName = "pdf";  val name = QName("pdf");  val modeType = ModeType.Readonly; val persistence = true }
 
-  case class Secondary(name: QName, modeType: ModeType, persistence: Boolean) extends FormRunnerDetailMode {
+  case class Secondary(publicName: String, name: QName, modeType: ModeType, persistence: Boolean) extends FormRunnerDetailMode {
     require(! PrimaryModes.exists(_.name == name))
   }
 
-  case class Custom(name: QName, modeType: ModeType, persistence: Boolean) extends FormRunnerDetailMode {
+  // NOTE: App and form names match: `^[A-Za-z0-9\-_]+$`. By default, the public name is either a prefixed QName or an
+  // NCName. If a custom public name is provided, we then restrict it to a valid NCName, and restrict it further to
+  // keep things a little more in line with app and form names. We could consider allowing `.` as well.
+  private val PublicNameRe = """^[A-Za-z_][A-Za-z0-9\-_:]*$""".r
+
+  case class Custom(publicName: String, name: QName, modeType: ModeType, persistence: Boolean) extends FormRunnerDetailMode {
     require(! PrimaryModes.exists(_.name == name))
+    require(! PrimaryModes.exists(_.publicName == publicName))
     require(name.namespace.prefix.nonEmpty)
+    require(SaxonUtils.isValidNCName(publicName))
+    require(PublicNameRe.matches(publicName))
   }
 
   val PrimaryModes: Set[FormRunnerDetailMode] = Set(New, Edit, View, Pdf)
@@ -90,7 +100,7 @@ object FormRunnerDetailMode {
         "validate",
         "test"
       )
-      .map(n => Secondary(QName(n), ModeType.Creation, persistence = true))
+      .map(n => Secondary(n, QName(n), ModeType.Creation, persistence = true))
 
     val secondaryReadonlyModes =
       List(
@@ -101,7 +111,7 @@ object FormRunnerDetailMode {
         "export",
         "excel-export", // legacy
       )
-      .map(n => Secondary(QName(n), ModeType.Readonly, persistence = true))
+      .map(n => Secondary(n, QName(n), ModeType.Readonly, persistence = true))
 
     (secondaryCreationModes ++ secondaryReadonlyModes).toSet
   }
@@ -136,6 +146,7 @@ object FormRunnerDetailMode {
 
   implicit val encode: Encoder[FormRunnerDetailMode] = (m: FormRunnerDetailMode) =>
     Json.obj(
+      ("public-name", m.publicName.asJson),
       ("name",        m.name.asJson),
       ("modeType",    Json.fromString(m.modeType match {
         case ModeType.Creation => "creation"
@@ -147,6 +158,7 @@ object FormRunnerDetailMode {
 
   implicit val decode: Decoder[FormRunnerDetailMode] = (c: HCursor) =>
     for {
+      publicName  <- c.downField("public-name").as[String]
       name        <- c.downField("name").as[QName]
       modeTypeStr <- c.downField("modeType").as[String]
       modeType    <- ModeType.fromModeTypeString(modeTypeStr).toRight(DecodingFailure(s"invalid mode type: $modeTypeStr", c.history))
@@ -154,5 +166,5 @@ object FormRunnerDetailMode {
     } yield
       FormRunnerDetailMode.PrimaryModes.find(_.name == name)
         .orElse(FormRunnerDetailMode.SecondaryModes.find(_.name == name))
-        .getOrElse(FormRunnerDetailMode.Custom(name, modeType, persistence))
+        .getOrElse(FormRunnerDetailMode.Custom(publicName, name, modeType, persistence))
 }

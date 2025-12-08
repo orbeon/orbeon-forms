@@ -10,7 +10,7 @@
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/(service/)?([^/]+)/([^/]+)/(new|edit|view|pdf|test-pdf|tiff|excel-export|export|export-with-search|controls|email|validate|import|schema|duplicate|attachments|publish|compile)(/([^/]+))?(/([0-9A-Za-z\-]+)(?:/[^/]+)?\.(?:pdf|tiff))?</config></p:input>
+        <p:input name="config"><config>/fr/(service/)?([^/]+)/([^/]+)/([A-Za-z_][A-Za-z0-9\-_:]*)(/([^/]+))?(/([0-9A-Za-z\-]+)(?:/[^/]+)?\.(?:pdf|tiff))?</config></p:input>
         <p:input name="data" href="#data#xpointer(/_/path-query)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>

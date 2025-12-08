@@ -55,7 +55,7 @@ object CallbackRoute extends NativeRoute {
           FormRunnerPath.formRunnerPath(
             app        = modeState.publicMetadata.appFormVersion._1.app,
             form       = modeState.publicMetadata.appFormVersion._1.form,
-            mode       = modeState.publicMetadata.mode.name.qualifiedName,
+            mode       = modeState.publicMetadata.mode.publicName,
             documentId = modeState.publicMetadata.documentId,
             query      = Some(PathUtils.encodeSimpleQuery(queryParams))
           ),

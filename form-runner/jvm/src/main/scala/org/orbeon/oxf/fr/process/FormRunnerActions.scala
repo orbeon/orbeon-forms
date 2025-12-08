@@ -506,17 +506,17 @@ trait FormRunnerActions
     ActionResult.trySync {
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
-      val modeString = requiredParamByNameUseAvt(params, "change-mode", "mode")
+      val modePublicNameString = requiredParamByNameUseAvt(params, "change-mode", "mode")
 
       // For now, we don't exclude particular modes, but note:
       // - `new` -> `view` -> `new` should make sense
       // - `tiff` is excluded as it is a secondary mode
       // - `pdf` is explicitly excluded by symmetry with `tiff`
 
-      if (! isSupportedDetailMode(modeString, excludeSecondaryModes = true) || modeString == FormRunnerDetailMode.Pdf.name.qualifiedName)
-        throw new IllegalArgumentException(s"Unsupported detail mode navigation for moe: `$modeString`")
+      if (! isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = true) || modePublicNameString == FormRunnerDetailMode.Pdf.publicName)
+        throw new IllegalArgumentException(s"Unsupported detail mode navigation for moe: `$modePublicNameString`")
 
-      tryChangeModeImpl(ReplaceType.All, s"/fr/$app/$form/$modeString/$document" -> Nil, formRunnerParams.modeType(frc.customModes))
+      tryChangeModeImpl(ReplaceType.All, s"/fr/$app/$form/$modePublicNameString/$document" -> Nil, formRunnerParams.modeType(frc.customModes))
     }
 
   def tryOpenRenderedFormat(params: ActionParams): ActionResult =

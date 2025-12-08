@@ -61,7 +61,7 @@ case class FormRunnerParams(
     (appForm, formVersion)
 
   def modeType(customModes: Iterable[FormRunnerDetailMode.Custom]): ModeType =
-    ModeType.modeTypeFromQualifiedName(mode, excludeSecondaryModes = true, customModes)
+    ModeType.modeTypeFromPublicName(mode, excludeSecondaryModes = true, customModes)
       .getOrElse(throw new IllegalArgumentException(s"Invalid mode: `$mode`"))
 }
 
@@ -376,17 +376,17 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     }
 
   //@XPathFunction
-  def isSupportedMode(modeString: String): Boolean =
-    FormRunnerDetailMode.isSupportedNonDetailMode(modeString) ||
-      isSupportedDetailMode(modeString, excludeSecondaryModes = false)
+  def isSupportedMode(modePublicNameString: String): Boolean =
+    FormRunnerDetailMode.isSupportedNonDetailMode(modePublicNameString) ||
+      isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = false)
 
-  def isSupportedDetailMode(modeString: String, excludeSecondaryModes: Boolean): Boolean =
-    ModeType.modeFromQualifiedName(modeString, excludeSecondaryModes, customModes(FormRunnerParams())).isDefined
+  def isSupportedDetailMode(modePublicNameString: String, excludeSecondaryModes: Boolean): Boolean =
+    ModeType.modeFromPublicName(modePublicNameString, excludeSecondaryModes, customModes(FormRunnerParams())).isDefined
 
   // XSLT only
   //@XPathFunction
-  def isReadonlyModeFromString(app: String, form: String, modeString: String): Boolean =
-    ModeType.modeTypeFromQualifiedName(modeString, excludeSecondaryModes = false, customModes(FormRunnerParams(AppForm(app, form), modeString)))
+  def isReadonlyModeFromString(app: String, form: String, modePublicName: String): Boolean =
+    ModeType.modeTypeFromPublicName(modePublicName, excludeSecondaryModes = false, customModes(FormRunnerParams(AppForm(app, form), modePublicName /* unused */)))
       .contains(ModeType.Readonly)
 
   // Find the configured custom modes if any, throw if error in configuration

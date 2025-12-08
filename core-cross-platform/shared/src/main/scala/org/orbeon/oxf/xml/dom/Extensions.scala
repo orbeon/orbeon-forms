@@ -15,11 +15,10 @@ package org.orbeon.oxf.xml.dom
 
 import java.net.URI
 import java.util as ju
-
 import org.orbeon.dom.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants, XMLReceiverHelper}
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.jdk.CollectionConverters.*
@@ -224,6 +223,30 @@ object Extensions {
 
       QName(localName, Namespace(prefix, namespaceURI))
     }
+
+  def resolveValidateQNameOrThrow(
+    namespaces              : String => Option[String],
+    qNameStringOrig         : String,
+    unprefixedIsNoNamespace : Boolean
+  ): Option[QName] =
+    qNameStringOrig.trimAllToOpt.map { qNameString =>
+    val (localName, prefix, namespaceURI) =
+      SaxonUtils.parseQName(qNameString) match {
+        case (prefix @ "", local) =>
+          (
+            local,
+            prefix,
+            if (unprefixedIsNoNamespace) "" else namespaces(prefix).getOrElse("")
+          )
+        case (prefix, local) =>
+          (
+              local,
+              prefix,
+              namespaces(prefix).getOrElse(throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
+            )
+      }
+    QName(localName, Namespace(prefix, namespaceURI))
+  }
 
   def resolveAttValueQNameJava(elem: Element, attributeQName: QName, unprefixedIsNoNamespace: Boolean): QName =
     elem.resolveStringQName(elem.attributeValue(attributeQName), unprefixedIsNoNamespace).orNull

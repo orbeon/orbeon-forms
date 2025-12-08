@@ -18,6 +18,7 @@ object CustomModesJSON {
   // ```json
   // [
   //   {
+  //     "public-name": "sign", // optional
   //     "name": "fr:sign",
   //     "mode-type": "readonly",
   //     "persistence": false
@@ -25,6 +26,7 @@ object CustomModesJSON {
   // ]```
 
   private val AllowedMapKeys = Set(
+    "public-name",
     "name",
     "mode-type",
     "persistence",
@@ -44,8 +46,16 @@ object CustomModesJSON {
             if (! map.keys.forall(AllowedMapKeys))
               error()
 
+            val modeQName =
+              map
+                .get("name")
+                .flatMap(_.asString)
+                .flatMap(Extensions.resolveValidateQNameOrThrow(ns.mapping.get, _, unprefixedIsNoNamespace = true))
+                .getOrElse(error())
+
             FormRunnerDetailMode.Custom(
-              name        = map.get("name").flatMap(_.asString).flatMap(Extensions.resolveQName(ns.mapping.get, _, unprefixedIsNoNamespace = true)).getOrElse(error()),
+              publicName  = map.get("public-name").flatMap(_.asString).getOrElse(modeQName.qualifiedName),
+              name        = modeQName,
               modeType    = map.get("mode-type").flatMap(_.asString).map(ModeType.fromModeTypeString(_).getOrElse(error())).getOrElse(DefaultModeType),
               persistence = map.get("persistence").flatMap(_.asBoolean).getOrElse(DefaultPersistence)
             )
@@ -55,5 +65,4 @@ object CustomModesJSON {
       case None =>
         Success(Nil)
     }
-
 }

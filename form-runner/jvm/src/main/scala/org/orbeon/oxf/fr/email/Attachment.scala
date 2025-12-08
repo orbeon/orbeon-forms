@@ -118,7 +118,7 @@ object Attachment {
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    ctx                     : InDocFormRunnerDocContext
+    ctx                     : FormRunnerDocContext
   ): List[Attachment] = {
 
     // Determine which attachments to include from template or property

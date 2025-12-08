@@ -5,7 +5,7 @@ import org.orbeon.dom.{Element, Text}
 import org.orbeon.oxf.fr.FormRunnerCommon.{ControlBindPathHoldersResources, frc}
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
@@ -74,20 +74,26 @@ trait FormRunnerEmailBackend {
     }
 
   def evaluatedTemplateValue(
-    templateValue: TemplateValue)(implicit
-    ctx          : InDocFormRunnerDocContext
+    templateValue: TemplateValue
+  )(implicit
+    ctx           : FormRunnerDocContext,
+    indentedLogger: IndentedLogger
   ): List[String] =
     templateValue match {
-      case TemplateValue.Control(controlName, sectionOpt) => controlValueAsStrings(controlName, sectionOpt)
-      case TemplateValue.Expression(expression)           => evaluatedExpressionAsStrings(expression)
-      case TemplateValue.Text(text)                       => List(text)
+      case TemplateValue.Control(controlName, sectionOpt) =>
+        controlValueAsStrings(controlName, sectionOpt)
+      case TemplateValue.Expression(expression)           =>
+        implicit val namespaceMapping: NamespaceMapping = NamespaceMapping(ctx.modelElem.namespaceMappings.toMap)
+        evaluatedExpressionAsStrings(expression)
+      case TemplateValue.Text(text)                       =>
+        List(text)
     }
 
   def controlValueAsStrings(
     controlName: String,
-    ctx        : InDocFormRunnerDocContext
     sectionOpt : Option[String]
   )(implicit
+    ctx        : FormRunnerDocContext
   ): List[String] =
     controlValueAsNodeInfos(controlName, sectionOpt).map(_.getStringValue)
 
@@ -116,27 +122,29 @@ trait FormRunnerEmailBackend {
     }
 
   private def expressionWithProcessedVarReferences(
-    expression: String)(implicit
-    ctx       : InDocFormRunnerDocContext
-  ): String = {
-
-    FormRunner.replaceVarReferencesWithFunctionCallsFromString(
-      elemOrAtt   = ctx.modelElem,
-      xpathString = expression,
-      avt         = false,
-      libraryName = "",
-      norewrite   = Array()
+    expression      : String
+  )(implicit
+    namespaceMapping: NamespaceMapping,
+    indentedLogger  : IndentedLogger
+  ): String =
+    FormRunnerRename.replaceVarReferencesWithFunctionCalls(
+      xpathString      = expression,
+      namespaceMapping = namespaceMapping,
+      library          = FormRunner.componentsFunctionLibrary,
+      avt              = false,
+      libraryNameOpt   = None,
+      norewrite        = Set.empty
     )
-  }
 
   private def evaluatedExpression(
-    expression: String)(implicit
-    ctx       : InDocFormRunnerDocContext
+    expression      : String
+  )(implicit
+    namespaceMapping: NamespaceMapping
   ): List[Any] = {
 
     // TODO: check if another namespace is defined for "frf" and prevent namespace collision (renaming, etc.)
-    val namespaceMapping = NamespaceMapping(
-      ctx.modelElem.namespaceMappings.toMap +
+    val namespaceMappingWithFrf = NamespaceMapping(
+      namespaceMapping.mapping +
       ("frf" -> "java:org.orbeon.oxf.fr.FormRunner")
     )
 
@@ -153,7 +161,7 @@ trait FormRunnerEmailBackend {
     XPathCache.evaluate(
       contextItem        = frc.formInstance.rootElement,
       xpathString        = expression,
-      namespaceMapping   = namespaceMapping,
+      namespaceMapping   = namespaceMappingWithFrf,
       variableToValueMap = null,
       functionLibrary    = inScopeContainingDocument.functionLibrary,
       functionContext    = functionContext,
@@ -164,8 +172,10 @@ trait FormRunnerEmailBackend {
   }
 
   def evaluatedExpressionAsBoolean(
-    expression: String)(implicit
-    ctx       : InDocFormRunnerDocContext
+    expression      : String
+  )(implicit
+    namespaceMapping: NamespaceMapping,
+    indentedLogger  : IndentedLogger
   ): Boolean =
     evaluatedExpression(expressionWithProcessedVarReferences(expression)).flatMap {
       case b: java.lang.Boolean => Some(b)
@@ -175,8 +185,10 @@ trait FormRunnerEmailBackend {
     }
 
   def evaluatedExpressionAsStrings(
-    expression: String)(implicit
-    ctx       : InDocFormRunnerDocContext
+    expression      : String
+  )(implicit
+    namespaceMapping: NamespaceMapping,
+    indentedLogger  : IndentedLogger
   ): List[String] =
     evaluatedExpression(expressionWithProcessedVarReferences(expression)).map {
       case string: String     => string

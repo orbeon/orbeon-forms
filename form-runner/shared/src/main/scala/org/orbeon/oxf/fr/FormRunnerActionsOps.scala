@@ -16,18 +16,18 @@ package org.orbeon.oxf.fr
 import cats.syntax.option.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{NodeInfoFactory, function}
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions
@@ -77,13 +77,15 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     targetControlName      : String,
     followIndexes          : Boolean,
     libraryName            : String
-  ): SequenceIterator =
+  ): SequenceIterator = {
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId,
       targetControlName,
       followIndexes,
       libraryName.trimAllToOpt.map(Left.apply)
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
+  }
 
   //@XPathFunction
   def resolveTargetRelativeToActionSourceFromBinds(
@@ -91,12 +93,12 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     targetControlName      : String
   ): SequenceIterator = {
 
-    val functionContext = XFormsFunction.context
+    val xfc = XFormsFunction.context
 
     resolveTargetRelativeToActionSourceFromControlsFromBindOpt(
-      functionContext.container,
-      functionContext.modelOpt,
-      functionContext.sourceEffectiveId,
+      xfc.container,
+      xfc.modelOpt,
+      xfc.sourceEffectiveId,
       actionSourceAbsoluteId,
       targetControlName
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
@@ -106,13 +108,15 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   def controlVariableValue(
     targetControlName : String,
     libraryName       : String
-  ): SequenceIterator =
+  ): SequenceIterator = {
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
       targetControlName       = targetControlName,
       followIndexes           = false,
       libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
+  }
 
   // https://github.com/orbeon/orbeon-forms/issues/6837
   //@XPathFunction
@@ -120,13 +124,15 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     actionSourceAbsoluteId: String,
     targetControlName     : String,
     libraryName           : String
-  ): SequenceIterator =
+  ): SequenceIterator = {
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId  = actionSourceAbsoluteId,
       targetControlName       = targetControlName,
       followIndexes           = false,
       libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
+  }
 
   def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
     container              : XBLContainer,
@@ -257,9 +263,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       )
 
     val boundNodes =
-      findControls collect {
-        case control: XFormsSingleNodeControl if control.isRelevant => control.boundNodeOpt
-      } flatten
+      findControls
+        .collect { case control: XFormsSingleNodeControl if control.isRelevant => control.boundNodeOpt }
+        .flatten
 
     boundNodes.nonEmpty option boundNodes.iterator
   }
@@ -273,10 +279,13 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   ): Option[Iterator[Item]] = {
 
       def findBindForSource =
-        container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
-          case control: XFormsSingleNodeControl if control.isRelevant => control.bind
-          case runtimeBind: RuntimeBind                               => Some(runtimeBind)
-        } flatten
+        container
+          .resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId)
+          .collect {
+            case control: XFormsSingleNodeControl if control.isRelevant => control.bind
+            case runtimeBind: RuntimeBind                               => Some(runtimeBind)
+          }
+          .flatten
 
       def findBindNodeForSource =
         for (sourceRuntimeBind <- findBindForSource)
@@ -297,9 +306,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     targetControlName       : String,
     followIndexes           : Boolean,
     libraryOrSectionNameOpt : Option[Either[String, String]]
+  )(implicit
+    xfc                     : XFormsFunction.Context
   ): Option[Iterator[Item]] = {
 
-    val container = XFormsFunction.context.container
+    val container = xfc.container
 
     {
       libraryOrSectionNameOpt match {
@@ -330,8 +341,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     } orElse
       resolveTargetRelativeToActionSourceFromControlsFromBindOpt(
         container,
-        XFormsFunction.context.modelOpt,
-        XFormsFunction.context.sourceEffectiveId,
+        xfc.modelOpt,
+        xfc.sourceEffectiveId,
         actionSourceAbsoluteId,
         targetControlName
       )

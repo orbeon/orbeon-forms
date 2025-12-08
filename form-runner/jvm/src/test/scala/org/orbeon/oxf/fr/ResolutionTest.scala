@@ -23,9 +23,6 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.dom.Converter.*
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.value.Value
-import org.orbeon.scaxon.Implicits.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
@@ -185,6 +182,8 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
     actionSourceAbsoluteId: String,
     targetControlName     : String,
     followIndexes         : Boolean
+  )(implicit
+    xfc                   : XFormsFunction.Context
   ): List[String] =
     FormRunner
       .resolveTargetRelativeToActionSourceOpt(actionSourceAbsoluteId, targetControlName, followIndexes, None)
@@ -197,6 +196,8 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
       val model = resolveObject[XFormsModel](Names.FormModel).get
 
       XPath.withFunctionContext(XFormsFunction.Context(inScopeContainingDocument, null, model.getId, Some(model), None)) {
+
+        implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
         // 1. Resolution via concrete controls
 

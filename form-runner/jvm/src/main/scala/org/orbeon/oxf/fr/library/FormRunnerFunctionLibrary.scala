@@ -18,13 +18,16 @@ import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.ModeType
+import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
 import org.orbeon.oxf.fr.process.{FormRunnerExternalMode, FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
+import org.orbeon.oxf.xforms
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.function
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
@@ -43,6 +46,7 @@ import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.*
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
+import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 import org.orbeon.xbl.Wizard
@@ -194,6 +198,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("process-template", classOf[FRProcessTemplate], op = 0, min = 0, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+    )
   }
 }
 
@@ -320,7 +329,8 @@ private object FormRunnerFunctions {
 
     override def iterate(context: XPathContext): SequenceIterator = {
 
-      implicit val ctx = context
+      implicit val xpc: XPathContext           = context
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
       FormRunner.resolveTargetRelativeToActionSourceOpt(
         actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
@@ -337,7 +347,8 @@ private object FormRunnerFunctions {
 
     override def evaluateItem(context: XPathContext): Item = {
 
-      implicit val ctx = context
+      implicit val xpc: XPathContext           = context
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
       val resolvedItems =
         FormRunner.resolveTargetRelativeToActionSourceOpt(
@@ -629,8 +640,8 @@ private object FormRunnerFunctions {
 
   class FRSaveState extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): StringValue = {
-      implicit val xpc = xpathContext
-      implicit val xfc = XFormsFunction.context
+      implicit val xpc: XPathContext           = xpathContext
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
       implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
 
@@ -653,5 +664,38 @@ private object FormRunnerFunctions {
         privateModeMetadata = SimpleProcess.privateModeMetadataFromCurrent
       )
     }
+  }
+}
+
+class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+
+    implicit val xpc   : XPathContext             = xpathContext
+    implicit val xfcd  : XFormsContainingDocument = XFormsFunction.context.containingDocument
+    implicit val logger: IndentedLogger           = FormRunner.newIndentedLogger
+
+    // Create new function context based on the containing document, because that's what `EvaluatedParams` needs to
+    // resolve binds
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.Context(
+      container         = xfcd,
+      bindingContext    = frc.formModelOpt.get.getDefaultEvaluationContext,
+      sourceEffectiveId = xfcd.effectiveId,
+      modelOpt          = frc.formModelOpt,
+      bindNodeOpt       = None
+    )
+
+    val templateString =  stringArgument(0)
+
+    val isHtml = true // TODO: param
+
+    val paramElems = Implicits.asScalaIterator(itemsArgument(1)).collect {
+      case nodeInfo: NodeInfo if nodeInfo.getNodeKind == Type.ELEMENT =>
+        nodeInfo
+    }
+
+    val params = EmailMetadataParsing.parseParameters(paramElems.to(Iterable))
+
+    EvaluatedParams.fromEmailMetadataUsingContainingDocument(params.toList, Nil)
+      .processedTemplate(isHtml, templateString)
   }
 }

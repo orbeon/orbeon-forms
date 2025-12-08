@@ -21,8 +21,11 @@ object EmailMetadataParsing {
   def parseCurrentMetadata(emailMetadata: Option[NodeInfo], formDefinition: NodeInfo): EmailMetadata.Metadata =
     EmailMetadata.Metadata(
       templates = emailMetadata.toList.flatMap(_.child("templates").child("template").toList).map(parseCurrentTemplate(_, formDefinition)),
-      params    = emailMetadata.toList.flatMap(_.child("parameters").child("param").toList).map(parseParam)
+      params    = parseParameters(emailMetadata.toList.flatMap(_.child("parameters").child("param").toList)).toList
     )
+
+  def parseParameters(parameters: Iterable[NodeInfo]): Iterable[EmailMetadata.Param] =
+      parameters.map(parseParam)
 
   def parseLegacy2021Metadata(emailMetadata: Option[NodeInfo], formDefinition: NodeInfo): Legacy.Metadata2021 =
     Legacy.Metadata2021(

@@ -27,6 +27,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, TryUtils, URLRewriterUtils}
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
+import org.orbeon.xml.NamespaceMapping
 import software.amazon.awssdk.services.s3.S3Client
 
 import java.net.URI
@@ -56,11 +57,12 @@ object EmailContent {
     template                : EmailMetadata.Template,
     parameters              : List[EmailMetadata.Param],
     emailDataFormatVersion  : DataFormatVersion,
-    urisByRenderedFormat    : Map[RenderedFormat, URI])(implicit
-    logger                  : IndentedLogger,
+    urisByRenderedFormat    : Map[RenderedFormat, URI]
+  )(implicit
+    indentedLogger          : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    ctx                     : InDocFormRunnerDocContext
+    ctx                     : FormRunnerDocContext
   ): EmailContent = {
 
     val formDataMaybeMigrated = GridDataMigration.dataMaybeMigratedFromEdge(
@@ -78,7 +80,7 @@ object EmailContent {
       urisByRenderedFormat.get(RenderedFormat.Pdf).flatMap(Attachment.pdfAttachment(_, template)).toList ++
       Attachment.fileAttachments(template)
 
-    val evaluatedParams = EvaluatedParams.fromEmailMetadata(template, parameters)
+    val evaluatedParams = EvaluatedParams.fromEmailMetadata(parameters, template.controlsToExcludeFromAllControlValues)
 
     EmailContent(
       headers        = headers       (template),
@@ -89,9 +91,11 @@ object EmailContent {
   }
 
   private def headers(
-    template        : EmailMetadata.Template)(implicit
+    template        : EmailMetadata.Template
+  )(implicit
     formRunnerParams: FormRunnerParams,
-    ctx             : InDocFormRunnerDocContext
+    ctx             : FormRunnerDocContext,
+    indentedLogger  : IndentedLogger
   ): List[(HeaderName, String)] = {
 
     def evaluatedHeaderValues(headerName: HeaderName): List[String] =
@@ -151,12 +155,16 @@ object EmailContent {
     emailDataFormatVersion  : DataFormatVersion,
     templateMatch           : TemplateMatch,
     language                : String,
-    templateNameOpt         : Option[String])(implicit
+    templateNameOpt         : Option[String]
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    ctx                     : InDocFormRunnerDocContext
+    ctx                     : FormRunnerDocContext
   ): List[EmailContent] = {
+
+    // For evaluating expressions
+    implicit val namespaceMapping: NamespaceMapping = NamespaceMapping(ctx.modelElem.namespaceMappings.toMap)
 
     // 1) Filter templates by language and name
     val templatesFilteredByLanguageAndName = emailMetadata.templates.filter { template =>

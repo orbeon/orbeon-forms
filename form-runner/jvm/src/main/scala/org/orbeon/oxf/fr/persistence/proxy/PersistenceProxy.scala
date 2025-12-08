@@ -591,25 +591,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       response.setStatus(StatusCode.NoContent)
     } else {
 
-      val attachmentsProviderCxrOpt = attachmentsProviderCxr(
-        isAttachment,
-        request,
-        appForm,
-        formOrData,
-        path,
-        bodyContentOpt,
-        outgoingVersionHeaderOpt
-      )
-
-      val cxr = cxrOpt.getOrElse {
-        // If an attachments provider is available, always use it to store the actual attachment
-        val outgoingRequestContent = if (attachmentsProviderCxrOpt.isDefined && request.getMethod == HttpMethod.PUT) {
-          // Body content processed by attachments provider, no need to pass it further
-          None
-        } else {
-          bodyContentOpt
-        }
-
+      def establishConnection(bodyContent: Option[StreamedContent]): ConnectionResult = {
         val passSingletonHeader = isDataXmlRequest && request.getMethod == HttpMethod.PUT
         val singletonHeaderOpt  = passSingletonHeader.flatOption(getSingletonHeader(appForm, effectiveFormDefinitionVersionOpt))
         val allHeaders          =
@@ -620,20 +602,38 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
         proxyEstablishConnection(
           OutgoingRequest(request),
-          outgoingRequestContent,
+          bodyContent,
           serviceUri,
           allHeaders
         )
       }
 
-      // A connection might have been opened above, and if so we use it
-      proxyRequestImpl(
-        cxr,
-        request,
-        response,
-        responseTransforms,
-        attachmentsProviderCxrOpt
-      )
+      lazy val attachmentsProviderCxrOpt: Option[ConnectionResult] =
+        attachmentsProviderCxr(
+          isAttachment,
+          request,
+          appForm,
+          formOrData,
+          path,
+          bodyContentOpt,
+          outgoingVersionHeaderOpt
+        )
+
+      // For GET attachment with attachment provider, only call attachment provider if relational returns `Content-Length: 0`
+      if (request.getMethod == HttpMethod.GET && isAttachment && findAttachmentsProvider(appForm, formOrData).isDefined) {
+
+        val cxr                    = cxrOpt.getOrElse(establishConnection(bodyContentOpt))
+        val useAttachmentsProvider = StatusCode.isSuccessCode(cxr.statusCode) && ! cxr.hasContent
+        proxyRequestImpl(cxr, request, response, responseTransforms, useAttachmentsProvider.flatOption(attachmentsProviderCxrOpt))
+
+      } else {
+
+        // For PUT or non-attachment: establish attachments provider connection upfront
+        val useBodyContentOpt = ! (attachmentsProviderCxrOpt.isDefined && request.getMethod == HttpMethod.PUT)
+        val cxr               = cxrOpt.getOrElse(establishConnection(useBodyContentOpt.flatOption(bodyContentOpt)))
+        proxyRequestImpl(cxr, request, response, responseTransforms, attachmentsProviderCxrOpt)
+
+      }
 
       // The following logic matches the logic for attachment deletion found in CreateUpdateDelete
       if (
@@ -961,6 +961,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       // Proxy incoming headers
       proxyCapitalizeAndCombineHeaders(connectionResult.headers, request = false) foreach (response.setHeader _).tupled
 
+      // If an attachments provider is available, forward its headers and status
       request.getMethod match {
         case HttpMethod.GET | HttpMethod.HEAD if StatusCode.isSuccessCode(connectionResult.statusCode) =>
           attachmentsProviderCxrOpt.foreach { attachmentsProviderCxr =>
@@ -996,7 +997,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       val doTransforms =
         connectionResult.statusCode == HttpStatus.SC_OK
 
-      // If an attachments provider is available, always use it to retrieve the actual attachment
+      // If an attachments provider is available, use it stream
       val inputStream = attachmentsProviderCxrOpt match {
         case Some(attachmentsProviderCxr) if request.getMethod == HttpMethod.GET &&
                                              StatusCode.isSuccessCode(connectionResult.statusCode) =>

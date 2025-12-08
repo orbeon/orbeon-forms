@@ -32,7 +32,7 @@ class PageLoadPermissionsTest
         method              <- List(HttpMethod.GET, HttpMethod.POST)
         documentIdOpt       <- List(None, "12345".some)
         credentialsOpt      <- List(None, Credentials(UserAndGroup("my-user", None), List(SimpleRole("my-role")), Nil).some)
-        background          <- List(false, true)
+        background          <- if (org.orbeon.oxf.common.Version.isPE) List(false, true) else List(false)
         expectedStatusCode  = expectedCodeForParams((credentialsOpt, method, documentIdOpt, background))
         contentOpt          =
           (method == HttpMethod.POST) option

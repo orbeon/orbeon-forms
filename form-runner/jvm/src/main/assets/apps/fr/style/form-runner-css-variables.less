@@ -92,7 +92,7 @@
   --orbeon-repetition-number-font-size  : smaller;
   --orbeon-repetition-number-font-family: inherit;
   --orbeon-repetition-number-font-weight: bold;
-  --orbeon-repetition-number-color      : inherit;
+  --orbeon-repetition-number-color      : white;
 
   // Regular and wizard table of contents (TOC)
   --orbeon-toc-color                          : #0d6efd;
@@ -158,9 +158,10 @@
   --orbeon-h5-font-size: 1.08em; // 14px = 108% * 13px = 100% * 14px
   --orbeon-h6-font-size: 0.92em; // 12px =  92% * 13px =  85% * 14px
 
-  // Tooltips
-  --orbeon-tooltip-font-size: 0.85em; // 11px; e.g. tabs tooltips
-  --orbeon-tooltip-color    : inherit;
+  // Tooltips (e.g. tabs tooltips)
+  --orbeon-tooltip-font-size       : 0.85em; // 11px
+  --orbeon-tooltip-color           : @tooltipColor;
+  --orbeon-tooltip-background-color: @tooltipBackground;
 
   // Friendly Captcha
   --orbeon-friendly-captcha-font-size: 1.08em; // 14px

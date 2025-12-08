@@ -66,7 +66,11 @@ body.orbeon {
 
     .tooltip {
         font-size: var(--orbeon-tooltip-font-size);
-        color    : var(--orbeon-tooltip-color);
+
+        .tooltip-inner {
+            color           : var(--orbeon-tooltip-color);
+            background-color: var(--orbeon-tooltip-background-color);
+        }
     }
 
     // .label is used for status pills in the Forms Admin table and for character counters

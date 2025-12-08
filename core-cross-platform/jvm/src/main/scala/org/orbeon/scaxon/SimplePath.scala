@@ -237,7 +237,7 @@ object SimplePath {
     def sibling(test: Test): NodeColl = precedingSibling(test) ++ followingSibling(test)
 
     def namespaces        = find(Axis.NAMESPACE, AnyTest)
-    def namespaceMappings = {
+    def namespaceMappings: LazyList[(String, String)] = {
 
       // 2022-03-28: We use the namespace axis to get namespaces, and this doesn't work on an attribute node,
       // apparently. Unclear if this is by design or not, but the test below addresses that by looking at the

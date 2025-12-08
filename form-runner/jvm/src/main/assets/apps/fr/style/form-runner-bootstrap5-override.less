@@ -2,6 +2,15 @@
 
 .orbeon {
 
+  a {
+    color: var(--orbeon-link-color);
+  }
+
+  a:hover,
+  a:focus {
+    color: var(--orbeon-link-hover-color);
+  }
+
   // dropdown menu
   .dropdown-menu .btn-link {
     font-size: var(--orbeon-base-font-size);
@@ -29,7 +38,7 @@
 
   .dropdown-menu .btn-link:hover,
   .btn-link:focus {
-    color: #333;
+    color: var(--orbeon-base-color);
     text-decoration: none;
     background-color: #e9ecef;
   }
@@ -100,7 +109,7 @@
 
   // Use `.btn-link` instead of `.xforms-trigger` to catch cases where used directly in an `<xf:button>`
   .btn-link .fa {
-    color: @textColor;
+    color: var(--orbeon-base-color);
   }
 
   // Make disabled icons a bit opaque

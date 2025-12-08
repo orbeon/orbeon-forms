@@ -109,7 +109,7 @@ body.orbeon {
         .fb-body {
             .xforms-invalid.xforms-visited {
                 &> input, &> textarea, &> select {
-                    border-color: @minGrayDecorationVariable; // TODO: variable specifically for field border
+                    border-color: var(--orbeon-control-border-color);
                 }
             }
             .xforms-required.xforms-empty {
@@ -838,7 +838,7 @@ body.orbeon {
                     }
 
                     &.xforms-repeat-selected-item-1 {
-                        border-color: @focusBorderColor;
+                        border-color: var(--orbeon-focus-border-color);
                         .focusDecorations();
                     }
 
@@ -893,7 +893,7 @@ body.orbeon {
                     height: 50px;
                     text-align: center;
                     color: white;
-                    background-color: @textColor;
+                    background-color: var(--orbeon-base-color);
                     padding: 10%;
                     margin: 10px 10px 0 0;
                     border-radius: 50%;
@@ -1666,7 +1666,7 @@ body.orbeon {
                     line-height: 2rem;
                     padding: 0 10px;
                     font-weight: bold;
-                    color: @textColor;
+                    color: var(--orbeon-base-color);
                     border-top: 2px solid @frBorderColor; // see `.fr-dialog-buttons`
                 }
 

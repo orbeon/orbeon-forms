@@ -49,13 +49,14 @@
                 clear: both;
             }
 
-            .active > span>  .btn-link {
-                color: white;
+            .active > span > .btn-link,
+            .active > span > .btn-link:hover {
+                color: var(--orbeon-toc-selected-color);
+                background-color: var(--orbeon-toc-selected-background-color);
             }
 
             .btn-link {
                 text-decoration: none;
-                color: @linkColor;
 
                 .fr-toc-title {
                 }
@@ -79,22 +80,16 @@
                 }
             }
 
-            .visible-invalid > span > .btn-link {
-                color: @error;
-            }
-
-            .active.visible-invalid > span > .btn-link {
-                color: @white;
-                background-color: @error;
-            }
-
+            .visible-invalid > span > .btn-link,
             .visible-incomplete > span > .btn-link {
-                color: @error;
+                color: var(--orbeon-toc-error-color);
+                background-color: var(--orbeon-toc-error-background-color);
             }
 
-            .active.visible-incomplete > span > .btn-link {
-                color: @white;
-                background-color: @error;
+            .active.visible-invalid > span > .btn-link,
+            .active.visible-incomplete > span > .btn-link{
+                color: var(--orbeon-toc-selected-error-color);
+                background-color: var(--orbeon-toc-selected-error-background-color);
             }
 
             // Nested navigations

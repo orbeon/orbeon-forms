@@ -16,36 +16,63 @@
 
   // ***** Fonts *******************************************************************************************************
 
-  // Base font size
+  // Base font
   --orbeon-base-font-size  : 13px;
   --orbeon-base-font-family: @frBaseFontFamily;
+  --orbeon-base-color      : @grayDark; // Darker than Bootstrap default of #555
+
+  // Links
+  --orbeon-link-color      : #08c;
+  --orbeon-link-hover-color: darken(#08c, 15%);
 
   // Labels
   --orbeon-label-font-size  : 1.00em; // label and .xforms-label
   --orbeon-label-font-family: @frBaseFontFamily;
   --orbeon-label-font-weight: 600; // Help label stand out
+  --orbeon-label-color      : inherit;
 
   // Hints
   --orbeon-hint-font-size  : smaller;
   --orbeon-hint-font-family: @frBaseFontFamily;
   --orbeon-hint-font-weight: inherit;
+  --orbeon-hint-color      : @minGrayText;
 
   // Help
   --orbeon-help-title-font-size    : 1.08em;
   --orbeon-help-content-font-size  : 1.00em;
   --orbeon-help-font-family        : @frBaseFontFamily;
   --orbeon-help-title-font-weight  : inherit;
+  --orbeon-help-title-color        : inherit;
   --orbeon-help-content-font-weight: inherit;
+  --orbeon-help-content-color      : inherit;
 
   // Controls
-  --orbeon-control-font-size  : inherit;
-  --orbeon-control-font-family: @frBaseFontFamily;
-  --orbeon-control-font-weight: inherit;
+  --orbeon-control-font-size     : inherit;
+  --orbeon-control-font-family   : @frBaseFontFamily;
+  --orbeon-control-font-weight   : inherit;
+  --orbeon-control-color         : black; // Make text inside the fields stand out, as this is the most important information
+  --orbeon-control-border-color  : #ccc;
+  @media (prefers-contrast: more) {
+    --orbeon-control-border-color: #949494;
+  }
+
+  // Specific controls
+  --orbeon-attachment-drop-color               : @minGrayText;
+  --orbeon-attachment-dragover-color           : white;
+  --orbeon-attachment-dragover-background-color: #ccc;
+
+  // Focus
+  --orbeon-focus-border-color   : #3396ff;
+  --orbeon-focus-highlight-color: rgba(0,123,255,.25);
 
   // Buttons
   --orbeon-button-font-size  : 1.00em; // button and .btn
   --orbeon-button-font-family: @frBaseFontFamily;
   --orbeon-button-font-weight: normal;
+  --orbeon-button-color      : inherit;
+
+  // Body
+  --orbeon-body-border-color: darken(@wellBackground, 7%);
 
   // Sections
   --orbeon-section-title-font-size              : 1.38em; // 18px
@@ -54,25 +81,44 @@
   --orbeon-subsection-repetition-label-font-size: 0.89em; // 18px * 0.8 * 0.8
   --orbeon-section-font-family                  : @frBaseFontFamily;
   --orbeon-section-font-weight                  : normal;
+  --orbeon-section-color                        : #555;
+  --orbeon-section-background-color             : @grayLighter;
   --orbeon-repeater-add-button-font-size        : 1.00em;
   --orbeon-repeater-add-button-font-family      : inherit;
   --orbeon-repeater-add-button-font-weight      : inherit;
+  --orbeon-repeater-add-button-color            : inherit;
 
   // Grids
   --orbeon-repetition-number-font-size  : smaller;
   --orbeon-repetition-number-font-family: inherit;
   --orbeon-repetition-number-font-weight: bold;
+  --orbeon-repetition-number-color      : inherit;
+
+  // Regular and wizard table of contents (TOC)
+  --orbeon-toc-color                          : #0d6efd;
+  --orbeon-toc-background-color               : white;
+  --orbeon-toc-border-color                   : darken(@wellBackground, 7%);
+  --orbeon-toc-hover-background-color         : @grayLighter;
+  --orbeon-toc-selected-color                 : white;
+  --orbeon-toc-selected-background-color      : #0d6efd;
+  --orbeon-toc-error-color                    : @error;
+  --orbeon-toc-error-background-color         : transparent;
+  --orbeon-toc-selected-error-color           : white;
+  --orbeon-toc-selected-error-background-color: @error;
 
   // HTML elements
   --orbeon-blockquote-font-size  : 1.35em; // 18px
   --orbeon-blockquote-font-family: inherit;
   --orbeon-blockquote-font-weight: 300;
+  --orbeon-blockquote-color      : inherit;
   --orbeon-code-font-size        : 0.92em; // 12px; code and CodeMirror
   --orbeon-code-font-family      : monospace;
   --orbeon-code-font-weight      : inherit;
+  --orbeon-code-color            : inherit;
   --orbeon-pre-font-size         : 1.00em;
   --orbeon-pre-font-family       : monospace;
   --orbeon-pre-font-weight       : inherit;
+  --orbeon-pre-color             : inherit;
   --orbeon-sub-sup-font-size     : 0.75em;
 
   // Icons
@@ -86,6 +132,7 @@
   --orbeon-active-alert-font-size  : 1em; // TODO: overridden by "inherit" when visited => useless?
   --orbeon-active-alert-font-family: sans-serif;
   --orbeon-active-alert-font-weight: inherit;
+  --orbeon-active-alert-color      : white;
 
   // Required icon (left)
   --orbeon-required-icon-display-before: inline;
@@ -113,6 +160,7 @@
 
   // Tooltips
   --orbeon-tooltip-font-size: 0.85em; // 11px; e.g. tabs tooltips
+  --orbeon-tooltip-color    : inherit;
 
   // Friendly Captcha
   --orbeon-friendly-captcha-font-size: 1.08em; // 14px

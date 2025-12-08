@@ -21,6 +21,10 @@ html {
 
 .orbeon {
 
+    body& {
+        color: var(--orbeon-base-color); // Override Bootstrap's default
+    }
+
     .fr-mode-landing {
         .row {
             justify-content: start; // https://github.com/orbeon/orbeon-forms/issues/7239
@@ -70,7 +74,7 @@ html {
             text-overflow: ellipsis;
         }
         &:has(a:focus-visible) {
-            box-shadow: 0 0 0 0.2rem inset @focusHighlightColor;
+            box-shadow: 0 0 0 0.2rem inset var(--orbeon-focus-highlight-color);
         }
     }
 

@@ -19,20 +19,32 @@ body.orbeon {
 
 .orbeon {
 
+    a {
+        color: var(--orbeon-link-color);
+    }
+
+    a:hover,
+    a:focus {
+        color: var(--orbeon-link-hover-color);
+    }
+
     blockquote p {
         font-size  : var(--orbeon-blockquote-font-size);
         font-family: var(--orbeon-blockquote-font-family);
         font-weight: var(--orbeon-blockquote-font-weight);
+        color      : var(--orbeon-blockquote-color);
     }
     code {
         font-size  : var(--orbeon-code-font-size);
         font-family: var(--orbeon-code-font-family);
         font-weight: var(--orbeon-code-font-weight);
+        color      : var(--orbeon-code-color);
     }
     pre:not([role="textbox"]) {
         font-size  : var(--orbeon-pre-font-size);
         font-family: var(--orbeon-pre-font-family);
         font-weight: var(--orbeon-pre-font-weight);
+        color      : var(--orbeon-pre-color);
     }
     sub, sup {
         font-size: var(--orbeon-sub-sup-font-size);
@@ -52,7 +64,10 @@ body.orbeon {
     // Disable null font size hack (this doesn't seem to have any unwanted effect)
     .input-append, .input-prepend { font-size: inherit; }
 
-    .tooltip { font-size: var(--orbeon-tooltip-font-size); }
+    .tooltip {
+        font-size: var(--orbeon-tooltip-font-size);
+        color    : var(--orbeon-tooltip-color);
+    }
 
     // .label is used for status pills in the Forms Admin table and for character counters
     // .badge is used for document counters in dropdowns
@@ -79,18 +94,13 @@ body.orbeon {
         }
     }
 
-    --fr-min-gray-decoration: #ccc;
-    @media (prefers-contrast: more) {
-        --fr-min-gray-decoration: #949494;
-    }
-
     font-family: var(--orbeon-base-font-family);
     font-size: var(--orbeon-base-font-size);
     line-height: @fixedLineHeight;
     @media screen {
         line-height: @fluidLineHeight;
     }
-    color: @textColor;
+    color: var(--orbeon-base-color);
 
     body& {
         .container, .container-fluid {
@@ -104,6 +114,7 @@ body.orbeon {
         font-size  : var(--orbeon-button-font-size);
         font-family: var(--orbeon-button-font-family);
         font-weight: var(--orbeon-button-font-weight);
+        color      : var(--orbeon-button-color);
     }
 
     .btn .fa {
@@ -122,10 +133,11 @@ body.orbeon {
         @media screen {
             line-height: @fluidLineHeight;
         }
+        color: var(--orbeon-label-color);
     }
 
     a {
-        text-decoration: underline;     // Don't remove the underline for anchors; this is an important web convention
+        text-decoration: underline; // Don't remove the underline for anchors; this is an important web convention
     }
 
     .alert {
@@ -195,7 +207,7 @@ body.orbeon {
                 }
             }
         }
-        margin: 10px 0;                 // Space before and after the navbar
+        margin: 10px 0; // Space before and after the navbar
     }
 
     .navbar-inverse {
@@ -247,7 +259,7 @@ body.orbeon {
         padding: 4px 6px;
         margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
 
-        color: @textColor;                       // Darker than Bootstrap default of #555
+        color: var(--orbeon-base-color);
         background-image: none;                  // Liferay adds background images which don't mix well with Bootstrap
 
         // Let content wrap otherwise the user has no option to see the content
@@ -287,11 +299,11 @@ body.orbeon {
         @media screen {
             line-height: @fluidLineHeight;
         }
+        color: var(--orbeon-control-color);
 
         margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
-        color: black;                               // Make text inside the fields stand out, as this is the most important information
         box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
-        height: @fixedControlsHeight; // TODO: how to approximate calc(1em + 15px)?
+        height: @fixedControlsHeight;               // TODO: how to approximate calc(1em + 15px)?
         @media screen {
             height: calc(1em + 15px);
         }
@@ -323,13 +335,13 @@ body.orbeon {
         @media screen {
             line-height: @fluidLineHeight;
         }
+        color: var(--orbeon-control-color);
     }
 
     // Adapt read-only checkbox and radio button background images position
     .radio, .checkbox {
         padding-left: 1.5em;
     }
-
 
     @media (prefers-contrast: no-preference), (prefers-contrast: less) {
         // Follow BS5 styling
@@ -543,7 +555,7 @@ body.orbeon {
     // Style static readonly plain text and rich text the same as Bootstrap's pre (see code.less)
     .fr-grid .xforms-static.xforms-readonly {
         &.xforms-textarea pre {
-            color: @grayDark;
+            color: var(--orbeon-base-color);
             display: block;
 
             // We override these in form-runner-base.less, do we need this here?
@@ -565,7 +577,7 @@ body.orbeon {
         // Use `:not(.xforms-text)` above instead once supported by the PDF renderer.
         // `.xforms-text` is for the Explanatory Text control
         &.xforms-output.xforms-mediatype-text-html.xforms-text {
-            color: @textColor;
+            color: var(--orbeon-base-color);
             padding: 0;
             margin: 0;
             background-color: @bodyBackground;
@@ -597,7 +609,7 @@ body.orbeon {
 
     // Use `.btn-link` instead of `.xforms-trigger` to catch cases where used directly in an `<xf:button>`
     .btn-link .fa {
-        color: @textColor;
+        color: var(--orbeon-base-color);
     }
 
     // NAV LIST
@@ -628,6 +640,7 @@ body.orbeon {
     }
     .nav-list > .active > span > .btn-link,
     .nav-list > .active > span > .btn-link:hover {
+      // TODO: overridden in wizard.less, remove here?
       color: @white;
       text-shadow: none;
       background-color: @linkColor;

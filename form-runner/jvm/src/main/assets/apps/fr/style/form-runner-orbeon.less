@@ -17,7 +17,7 @@
 body.orbeon { background-color: @frBackground }
 
 .fr-body-decorations() {
-    border: 1px solid darken(@wellBackground, 7%);
+    border: 1px solid var(--orbeon-body-border-color);
     border-radius: @baseBorderRadius;
     background-color: white;
 }
@@ -71,7 +71,7 @@ body.orbeon { background-color: @frBackground }
 .fr-toc-styling() {
     margin-bottom: 0;
     height: fit-content;
-    background-color: white;
+    background-color: var(--orbeon-toc-background-color);
     a {
         text-decoration: none;
     }
@@ -92,9 +92,12 @@ body.orbeon { background-color: @frBackground }
             flex-grow: 1;
             .text-overflow();
         }
+        &:hover {
+            background-color: var(--orbeon-toc-hover-background-color);
+        }
     }
     .nav > li .btn-link {
-        color: @linkColor;
+        color: var(--orbeon-toc-color);
     }
     .fr-toc-body-styling();
     .nav .nav {
@@ -104,7 +107,7 @@ body.orbeon { background-color: @frBackground }
 
 .fr-toc-body-styling() {
     min-height: 20px;
-    border: 1px solid darken(@wellBackground, 7%);
+    border: 1px solid var(--orbeon-toc-border-color);
     border-radius: @baseBorderRadius;
 }
 
@@ -115,7 +118,7 @@ body.orbeon { background-color: @frBackground }
 // See https://github.com/orbeon/orbeon-forms/issues/3778
 .portlet .portlet-content .portlet-body .orbeon-portlet-div {
 
-    color: @textColor;
+    color: var(--orbeon-base-color);
     font-size: var(--orbeon-base-font-size);
     line-height: @fluidLineHeight;
 
@@ -363,7 +366,7 @@ body.orbeon { background-color: @frBackground }
         font-family: var(--orbeon-active-alert-font-family);
         font-size  : var(--orbeon-active-alert-font-size);
         font-weight: var(--orbeon-active-alert-font-weight);
-        color: white;
+        color: var(--orbeon-active-alert-color);
         position: relative;
         padding: 2px 8px;
         border-radius: 5px;
@@ -421,7 +424,7 @@ body.orbeon { background-color: @frBackground }
         font-size  : var(--orbeon-hint-font-size);
         font-family: var(--orbeon-hint-font-family);
         font-weight: var(--orbeon-hint-font-weight);
-        color      : @minGrayText;
+        color      : var(--orbeon-hint-color);
         margin-top : .2em;
         margin-left: 0;// used to have margin here but with new colors no margin seems better
     }
@@ -654,7 +657,7 @@ body.orbeon { background-color: @frBackground }
         a[href="#"] {
             text-decoration: none;
             &:link, &:visited {
-                color: @textColor !important;
+                color: var(--orbeon-base-color) !important;
             }
         }
 

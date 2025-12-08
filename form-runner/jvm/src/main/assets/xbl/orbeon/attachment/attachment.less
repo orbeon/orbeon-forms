@@ -52,12 +52,11 @@
         .fr-attachment-drop, .fr-attachment-empty {
             display: block;
             border-width: 2px;
-            border-color: @minGrayDecorationFallback;
-            border-color: @minGrayDecorationVariable;
+            border-color: var(--orbeon-control-border-color);
             border-radius: @inputBorderRadius;
             margin: 3px 0;
             padding: 1em;
-            color: @minGrayText;
+            color: var(--orbeon-attachment-drop-color);
             text-align: center;
         }
 
@@ -66,9 +65,8 @@
             border-style: dashed;
 
             &.fr-attachment-dragover {
-                background-color: @minGrayDecorationFallback;
-                background-color: @minGrayDecorationVariable;
-                color: white;
+                background-color: var(--orbeon-attachment-dragover-background-color);
+                color: var(--orbeon-attachment-dragover-color);
             }
         }
 
@@ -129,7 +127,7 @@
             .xforms-output-appearance-xxforms-download {
                 a {
                     text-decoration: none;
-                    color: @textColor !important; // because there is another `!important`
+                    color: var(--orbeon-base-color) !important; // because there is another `!important`
                 }
             }
 

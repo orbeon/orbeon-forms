@@ -85,15 +85,17 @@ trait FormRunnerEmailBackend {
 
   def controlValueAsStrings(
     controlName: String,
-    sectionOpt : Option[String])(implicit
     ctx        : InDocFormRunnerDocContext
+    sectionOpt : Option[String]
+  )(implicit
   ): List[String] =
     controlValueAsNodeInfos(controlName, sectionOpt).map(_.getStringValue)
 
   def controlValueAsNodeInfos(
     controlName: String,
-    sectionOpt : Option[String])(implicit
-    ctx        : InDocFormRunnerDocContext
+    sectionOpt : Option[String]
+  )(implicit
+    ctx        : FormRunnerDocContext
   ): List[NodeInfo] =
     sectionOpt match {
       case None =>

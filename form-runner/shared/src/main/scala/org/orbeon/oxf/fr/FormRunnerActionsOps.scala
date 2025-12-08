@@ -398,7 +398,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         controlId(targetControlName)
       )
 
-    controlsIt map (_.effectiveId) map XFormsId.effectiveIdToAbsoluteId toList
+    controlsIt.map(_.effectiveId).map(XFormsId.effectiveIdToAbsoluteId).toList
   }
 
   //@XPathFunction
@@ -414,7 +414,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   //@XPathFunction
   def updateTemplateFromInScopeItemsetMaps(startNode: NodeInfo, template: NodeInfo): NodeInfo = {
 
-    import XMLNames._
+    import XMLNames.*
 
     val allMappings =
       (startNode ancestor *).toList    flatMap // `toList` for `keepDistinctBy`, see comments
@@ -457,7 +457,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
   //@XPathFunction
   def garbageCollectMetadataItemsets(instance: NodeInfo): Unit =
-    (instance.rootElement child XMLNames.FRMetadata headOption) foreach { metadataElem =>
+    (instance.rootElement child XMLNames.FRMetadata).headOption.foreach { metadataElem =>
 
       val uniqueIdsInUse = itemsetIdsInUse(instance)
 

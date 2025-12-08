@@ -99,18 +99,15 @@ class ResourcesPropertyProvider extends api.PropertyProvider {
     // Remember the last time we checked so that `hasEnoughTimeElapsed()` can work
     lastCheckedTimestampOpt = Some(currentTime)
 
-    if (mustUpdate) {
-      val r =
-        readUnconditionally(eTag.isEmpty).map { case (newPropertyDefinitions, newETag) =>
-          new api.PropertyDefinitionsWithETag {
-            val getProperties: api.PropertyDefinitions = newPropertyDefinitions
-            val getETag: api.ETag = newETag
-          }
+    if (mustUpdate)
+      readUnconditionally(eTag.isEmpty).map { case (newPropertyDefinitions, newETag) =>
+        new api.PropertyDefinitionsWithETag {
+          val getProperties: api.PropertyDefinitions = newPropertyDefinitions
+          val getETag: api.ETag = newETag
         }
-        .toJava
-      println(s"xxx ResourcesPropertyProvider for eTag $eTag: called readUnconditionally, result = $r")
-      r
-    } else
+      }
+      .toJava
+    else
       ju.Optional.empty()
   }
 }

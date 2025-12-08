@@ -520,7 +520,7 @@ object FormBuilderXPathApi {
         sectionElem   <- FormRunner.findSectionsWithTemplates
         isRepeated    = FormRunner.isContentRepeat(sectionElem)
         sectionName   <- FormRunner.getControlNameOpt(sectionElem).toList
-        holder        <- FormRunner.findDataHolders(sectionName) // TODO: What about within repeated sections? Templates ok?
+        holder        <- FormRunner.findDataHolders(sectionName)
         componentElem <- FormRunner.findComponentElemForSection(sectionElem)
         bindingElem   <- FormRunner.findXblBinding(ctx.bodyElem, componentElem.uriQualifiedName)
         instance      <- FormRunner.findXblInstance(bindingElem, fr.Names.FormTemplate)

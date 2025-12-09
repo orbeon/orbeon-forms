@@ -438,7 +438,6 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       .collectFirst { case m if m.publicName == modePublicNameString => m.name.namespace.uri }
       .orNull
 
-  // XSLT only
   //@XPathFunction
   def modeQualifiedName(app: String, form: String, modePublicNameString: String): String =
     customModes(FormRunnerParams(AppForm(app, form), modePublicNameString))

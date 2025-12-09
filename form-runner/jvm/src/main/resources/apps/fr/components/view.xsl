@@ -525,7 +525,7 @@
                 } fr-view fr-mode-{{
                     replace(fr:mode(), ':', '-')
                 }}{{
-                    ' fr-mode-custom'[contains(fr:mode(), ':')]
+                    ' fr-mode-custom'[contains(frf:modeQualifiedName(fr:app-name(), fr:form-name(), fr:mode()), ':')]
                 }}{{
                     ' fr-static-readonly-required'[
                         fr:is-readonly-mode() and (

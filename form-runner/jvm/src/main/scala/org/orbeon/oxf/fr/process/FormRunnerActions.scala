@@ -1,4 +1,3 @@
-
 /**
  *  Copyright (C) 2013 Orbeon, Inc.
  *
@@ -617,7 +616,8 @@ trait FormRunnerActions
       created              = FormRunner.documentCreatedDateAsInstant,
       lastModified         = FormRunner.documentModifiedDateAsInstant,
       eTag                 = FormRunner.documentEtag,
-      dataStatus           = if (FormRunner.isFormDataSaved) DataStatus.Clean else DataStatus.Dirty
+      dataStatus           = if (FormRunner.isFormDataSaved) DataStatus.Clean else DataStatus.Dirty,
+      renderedFormats      = renderedFormatsMap
     )
 
   def filterParamsToExcludeUponModeChange[T](p: Iterable[(String, T)]): Iterable[(String, T)] =
@@ -683,8 +683,16 @@ trait FormRunnerActions
     }
   }
 
+  private def renderedFormatsMap: Map[String, URI] =
+    FormRunnerActionsCommon
+      .findUrlsInstanceRootElem
+      .toList
+      .child(*)
+      .collect { case elem if elem.stringValue.nonAllBlank => elem.localname -> URI.create(elem.stringValue)}
+      .toMap
+
   // Create if needed and return the element key name
-  private def tryCreateRenderedFormatIfNeeded(
+  def tryCreateRenderedFormatIfNeeded(
     params        : ActionParams,
     renderedFormat: RenderedFormat
   )(implicit

@@ -21,10 +21,9 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
-import org.orbeon.oxf.fr.process.{FormRunnerExternalMode, FormRunnerRenderedFormat, SimpleProcess}
+import org.orbeon.oxf.fr.process.{FormRunnerActionsSupport, FormRunnerExternalMode, FormRunnerRenderedFormat, RenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
-import org.orbeon.oxf.xforms
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
@@ -202,6 +201,14 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("process-template", classOf[FRProcessTemplate], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+    )
+
+    Fun("get-or-create-rendered-format-url", classOf[FRGetOrCreateRenderedFormatUrl], op = 0, min = 0, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+    )
+
+    Fun("filename-for-rendered-format", classOf[FRFilenameForRenderedFormat], op = 0, min = 0, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
     )
   }
 }
@@ -687,6 +694,8 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
 
     val templateString =  stringArgument(0)
 
+    // xxx lang?
+
     val isHtml = true // TODO: param
 
     val paramElems = Implicits.asScalaIterator(itemsArgument(1)).collect {
@@ -698,5 +707,24 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
 
     EvaluatedParams.fromEmailMetadataUsingContainingDocument(params.toList, Nil)
       .processedTemplate(isHtml, templateString)
+  }
+}
+
+class FRGetOrCreateRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    implicit val xpc             : XPathContext     = xpathContext
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+    SimpleProcess.tryCreateRenderedFormatIfNeeded(
+      params         = Map.empty, // TODO: add ability to pass `use-pdf-template`/`pdf-template-name`
+      renderedFormat = RenderedFormat.withName(stringArgument(0))
+    ).toOption.map(_._1.toString)
+  }
+}
+
+class FRFilenameForRenderedFormat extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    implicit val xpc             : XPathContext     = xpathContext
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+    FormRunnerActionsSupport.filenameForRenderedFormat(RenderedFormat.withName(stringArgument(0)))
   }
 }

@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 
@@ -88,17 +89,36 @@ object FormRunnerRenderedFormat {
 
     val key = s"${format.entryName}-${if (pdfTemplateOpt.isDefined) "template" else "automatic"}-$lang${nameOpt map ("-" +) getOrElse ""}"
 
-    List(urlsInstanceRootElem) child key headOption match {
+    urlsInstanceRootElem.child(key).headOption match {
       case None if create =>
         XFormsAPI.insert(
           into   = urlsInstanceRootElem,
-          after  = urlsInstanceRootElem child *,
+          after  = urlsInstanceRootElem.child(*),
           origin = NodeInfoFactory.elementInfo(key)
         ).headOption
       case someOrNone =>
         someOrNone
     }
   }
+
+  def updateOrCreateRenderedFormatPathElem(
+    urlsInstanceRootElem : NodeInfo,
+    key                  : String,
+    url                  : URI
+  ): Unit =
+    urlsInstanceRootElem.child(key).headOption match {
+      case Some(node) =>
+        XFormsAPI.setvalue(
+          ref   = List(node),
+          value = url.toString
+        )
+      case None =>
+        XFormsAPI.insert(
+          into   = urlsInstanceRootElem,
+          after  = urlsInstanceRootElem.child(*),
+          origin = NodeInfoFactory.elementInfo(key, List(url.toString: StringValue))
+        )
+    }
 
   def renderedFormatPathOpt(
     urlsInstanceRootElem: NodeInfo,

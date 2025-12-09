@@ -5,6 +5,7 @@ import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.definitions.FormRunnerDetailMode
 import org.orbeon.oxf.fr.permission.Operations
 
+import java.net.URI
 import java.time.Instant
 
 
@@ -25,6 +26,7 @@ trait FormRunnerExternalModeTrait {
     lastModified        : Option[Instant],
     eTag                : Option[String],
     dataStatus          : DataStatus,
+    renderedFormats     : Map[String, URI],
   )
 
   case class ModeState(

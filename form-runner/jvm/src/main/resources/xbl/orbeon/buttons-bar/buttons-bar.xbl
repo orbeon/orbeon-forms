@@ -50,6 +50,7 @@
             </xh:span>
 
             <xf:var
+                xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                 name="names-and-refs-if-relevant"
                 value="
                     let $buttons-property :=
@@ -57,7 +58,7 @@
                                 $buttons-property-opt
                             else if ($fr-mode = 'import') then
                                 'oxf.fr.import.buttons'
-                            else if ($fr-mode = 'view' or contains($fr-mode, ':')) then
+                            else if ($fr-mode = 'view' or contains(frf:modeQualifiedName(fr:app-name(), fr:form-name(), $fr-mode), ':')) then
                                 concat('oxf.fr.detail.buttons.', $fr-mode)
                             else
                                 'oxf.fr.detail.buttons',

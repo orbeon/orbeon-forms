@@ -77,6 +77,7 @@ class XmlInitialDataTest
             lastModified         = None,
             eTag                 = None,
             dataStatus           = DataStatus.Dirty,
+            renderedFormats      = Map.empty,
           )
         )
 

@@ -4,7 +4,7 @@ import org.log4s
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.process.FormRunnerExternalMode
+import org.orbeon.oxf.fr.process.{FormRunnerActionsCommon, FormRunnerExternalMode, FormRunnerRenderedFormat}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
@@ -72,6 +72,12 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
                 privateModeMetadata.eTag.map(attributeInfo(ETagLowerQName, _))
               ).flatten
           )
+
+        FormRunnerActionsCommon.findUrlsInstanceRootElem.foreach { urlsInstanceRootElem =>
+          privateModeMetadata.renderedFormats.foreach { case (key, uri) =>
+            FormRunnerRenderedFormat.updateOrCreateRenderedFormatPathElem(urlsInstanceRootElem, key, uri)
+          }
+        }
       }
 
   protected def decryptPrivateModeOperations(encryptedPrivateModeMetadataOpt: Option[String]): Option[Operations] =

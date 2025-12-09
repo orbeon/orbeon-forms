@@ -18,27 +18,43 @@
 
         <xbl:handlers>
             <xbl:handler event="fr-controls-and-actions-ready" phase="target">
-                <xf:message>fr-controls-and-actions-ready</xf:message>
                 <xf:var
                     name="config"
                     value="xxf:instance('fr-form-metadata')/modes/fr:confirmation"/>
-                <!-- TODO: logic to pick template/default -->
+
+                <xf:var
+                    name="template"
+                    value="
+                        let $templates := $config/templates/template
+                        return (
+                            $templates[@xml:lang = fr:lang()], (: give priority to templates that specify a language :)
+                            $templates[empty(@xml:lang)]
+                        )[1]"/>
+
                 <xf:setvalue
-                    if="xxf:non-blank($config/templates/template/subject)"
+                    if="xxf:non-blank($template/subject)"
                     ref="instance()/title"
                     value="
                         fr:process-template(
-                            $config/templates/template/subject,
+                            $template/subject,
                             $config/parameters/*
                         )"/>
                 <xf:setvalue
-                    if="xxf:non-blank($config/templates/template/body)"
+                    if="xxf:non-blank($template/body)"
                     ref="instance()/body"
                     value="
                         fr:process-template(
-                            $config/templates/template/body,
+                            $template/body,
                             $config/parameters/*
                         )"/>
+                <xf:action if="$template/attach/@pdf = 'true'">
+                    <xf:setvalue
+                        ref="instance()/pdf-attachment"
+                        value="fr:get-or-create-rendered-format-url('pdf')"/>
+                    <xf:setvalue
+                        ref="instance()/pdf-attachment/@filename"
+                        value="fr:filename-for-rendered-format('pdf')"/>
+                </xf:action>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -47,6 +63,53 @@
                     <_>
                         <title/>
                         <body/>
+                        <pdf-attachment mediatype="application/pdf" filename=""/>
+                    </_>
+                </xf:instance>
+                <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Download PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Télécharger PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="no">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Last ned PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Скачать PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="it">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Scarica PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="de">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF herunterladen</download-pdf>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Lataa PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="es">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Descargar PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Download PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Descarregar PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Ladda ner PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; تحميل PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Pobierz PDF</download-pdf>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDFをダウンロード</download-pdf>
+                        </resource>
                     </_>
                 </xf:instance>
             </xf:model>
@@ -66,6 +129,17 @@
                             class="alert alert-info fr-confirmation-body"
                             mediatype="text/html"
                             value="instance()/body"/>
+
+                        <xf:output
+                            class="btn"
+                            appearance="xxf:download"
+                            xxf:download="{@filename}"
+                            ref="instance()/pdf-attachment[xxf:non-blank()]">
+                            <xf:label mediatype="text/html" ref="xxf:r('download-pdf')"/>
+                            <xf:filename  ref="@filename"/>
+                            <xf:mediatype ref="@mediatype"/>
+                        </xf:output>
+
                     </xh:div>
                 </xsl:template>
             </xsl:transform>

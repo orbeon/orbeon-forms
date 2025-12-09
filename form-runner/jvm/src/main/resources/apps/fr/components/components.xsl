@@ -52,6 +52,14 @@
         as="xs:string?"/>
 
     <xsl:variable
+        name="mode-qualified-name"
+        select="
+            for $m in $mode
+            return
+                frf:modeQualifiedName($app, $form, $mode)"
+        as="xs:string"/>
+
+    <xsl:variable
         name="is-pdf-mode"
         select="$mode = ('pdf', 'tiff', 'test-pdf')"
         as="xs:boolean"/>
@@ -445,7 +453,7 @@
         as="xs:string"
         select="
             (
-                $mode[contains(., ':')],
+                $mode-qualified-name[contains(., ':')],
                 'fr:formula-debugger'[$fr-form-metadata/formula-debugger = 'true'],
                 'fr:wizard'[$fr-form-metadata/wizard = 'true' or $mode = 'import'],
                 for $p in
@@ -465,7 +473,7 @@
         name="use-view-appearance"
         as="xs:boolean"
         select="
-            contains($mode, ':') or
+            contains($mode-qualified-name, ':') or
             $mode = 'import'     or
             not(
                 not($mode = ('edit', 'new', 'test', 'compile')) or (: intentionally no test on 'test-pdf' :)

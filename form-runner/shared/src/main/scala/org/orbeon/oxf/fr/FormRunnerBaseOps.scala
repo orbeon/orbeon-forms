@@ -389,15 +389,19 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     ModeType.modeTypeFromPublicName(modePublicName, excludeSecondaryModes = false, customModes(FormRunnerParams(AppForm(app, form), modePublicName /* unused */)))
       .contains(ModeType.Readonly)
 
-  // Find the configured custom modes if any, throw if error in configuration
-  def customModes(implicit p: FormRunnerParams): Seq[FormRunnerDetailMode.Custom] =
-    formRunnerRawProperty("oxf.fr.detail.custom-modes") match {
+  private def customModesForProperty(name: String)(implicit p: FormRunnerParams): List[FormRunnerDetailMode.Custom] =
+    formRunnerRawProperty(name) match {
       case Some(p) if p.stringValue.nonAllBlank =>
         p.associatedValue { _ =>
-          CustomModesJSON.parseString(p.stringValue, p.namespaceMapping).get
+          CustomModesJSON.parseString(p.stringValue, p.namespaceMapping).get.toList
         }
       case _ => Nil
     }
+
+  // Find the configured custom modes if any, throw if error in configuration
+  def customModes(implicit p: FormRunnerParams): Seq[FormRunnerDetailMode.Custom] =
+    customModesForProperty("oxf.fr.detail.custom-modes") :::
+    customModesForProperty("oxf.fr.detail.builtin-modes")
 
   //@XPathFunction
   def landingCardsXml(): Option[DocumentNodeInfoType] = {
@@ -429,10 +433,17 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   // XSLT only
   //@XPathFunction
-  def customModeNamespace(app: String, form: String, modeString: String): String =
-    customModes(FormRunnerParams(AppForm(app, form), modeString))
-      .collectFirst { case m if m.name.qualifiedName == modeString => m.name.namespace.uri }
+  def customModeNamespace(app: String, form: String, modePublicNameString: String): String =
+    customModes(FormRunnerParams(AppForm(app, form), modePublicNameString))
+      .collectFirst { case m if m.publicName == modePublicNameString => m.name.namespace.uri }
       .orNull
+
+  // XSLT only
+  //@XPathFunction
+  def modeQualifiedName(app: String, form: String, modePublicNameString: String): String =
+    customModes(FormRunnerParams(AppForm(app, form), modePublicNameString))
+      .collectFirst { case m if m.publicName == modePublicNameString => m.name.qualifiedName }
+      .getOrElse(modePublicNameString)
 
   // Interrupt current processing and send an error code to the client.
   // NOTE: This could be done through ExternalContext

@@ -55,16 +55,4 @@
         </eh:resources>
     </eh:cache>
 
-    <!-- Form Runner persistence form metadata. Only modify if you know what you are doing! -->
-    <eh:cache alias="form-runner.persistence.form-metadata">
-        <eh:key-type>java.io.Serializable</eh:key-type>
-        <eh:value-type>java.io.Serializable</eh:value-type>
-        <eh:expiry>
-            <eh:none/>
-        </eh:expiry>
-        <eh:resources>
-            <eh:heap unit="entries">10</eh:heap>
-        </eh:resources>
-    </eh:cache>
-
 </eh:config>

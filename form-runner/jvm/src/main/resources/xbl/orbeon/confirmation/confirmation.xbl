@@ -1,0 +1,74 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+    <xbl:binding
+        id="fr-confirmation"
+        element="fr|confirmation"
+        xxbl:container="div"
+        xxbl:mode=""
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/confirmation/confirmation.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="fr-controls-and-actions-ready" phase="target">
+                <xf:message>fr-controls-and-actions-ready</xf:message>
+                <xf:var
+                    name="config"
+                    value="xxf:instance('fr-form-metadata')/modes/fr:confirmation"/>
+                <!-- TODO: logic to pick template/default -->
+                <xf:setvalue
+                    if="xxf:non-blank($config/templates/template/subject)"
+                    ref="instance()/title"
+                    value="
+                        fr:process-template(
+                            $config/templates/template/subject,
+                            $config/parameters/*
+                        )"/>
+                <xf:setvalue
+                    if="xxf:non-blank($config/templates/template/body)"
+                    ref="instance()/body"
+                    value="
+                        fr:process-template(
+                            $config/templates/template/body,
+                            $config/parameters/*
+                        )"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="local">
+                    <_>
+                        <title/>
+                        <body/>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <xsl:transform version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
+                <xsl:template match="/">
+                    <xh:div>
+                        <xh:h2 class="{{'xforms-hidden'[xxf:is-blank(instance()/title)]}}">
+                            <xf:output
+                                class="fr-confirmation-title"
+                                mediatype="text/plain"
+                                ref="instance()/title[xxf:non-blank()]"/>
+                        </xh:h2>
+
+                        <xf:output
+                            class="alert alert-info fr-confirmation-body"
+                            mediatype="text/html"
+                            value="instance()/body"/>
+                    </xh:div>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

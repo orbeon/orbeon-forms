@@ -831,4 +831,15 @@
         name="oxf.fr.detail.button.keyboard-shortcut.save"
         value="⌘S"/>
 
+    <property as="xs:string" name="oxf.fr.detail.builtin-modes.*.*">
+        [
+          {
+            "public-name": "confirmation",
+            "name"       : "fr:confirmation",
+            "mode-type"  : "readonly",
+            "persistence": false
+          }
+        ]
+    </property>
+
 </properties>

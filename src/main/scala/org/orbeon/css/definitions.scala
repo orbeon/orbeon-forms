@@ -23,7 +23,7 @@ import scala.jdk.CollectionConverters.IterableHasAsScala
 // A media query, from the most simple ones consisting of a media type only (e.g. "all", "screen", "print") to more
 // complex queries (e.g. "screen and (min-width: 800px)", "(min-width: 768px) and (max-width: 1024px)", etc.)
 case class MediaQuery(mediaQuery: String) {
-  def and(that: MediaQuery): MediaQuery = {
+  def and(that: MediaQuery): MediaQuery =
     MediaQuery(
       (this.mediaQuery.trim, that.mediaQuery.trim) match {
         case ("all", r)       => r
@@ -32,11 +32,20 @@ case class MediaQuery(mediaQuery: String) {
         case (l, r)           => s"$l and $r"
       }
     )
-  }
+
+  def simpleMatch(that: MediaQuery): Boolean =
+    (this.mediaQuery.trim, that.mediaQuery.trim) match {
+      case ("all", _)       => true
+      case (_, "all")       => true
+      case (l, r) if l == r => true
+      case (_, _)           => false
+    }
 }
 
 object MediaQuery {
-  val AllMediaQuery: MediaQuery = MediaQuery(MediaType.All)
+  val AllMediaQuery   : MediaQuery = MediaQuery(MediaType.All)
+  val PrintMediaQuery : MediaQuery = MediaQuery(MediaType.Print)
+  val ScreenMediaQuery: MediaQuery = MediaQuery(MediaType.Screen)
 
   // We can find media query lists in media rules in CSS (e.g. @media <media-query-list> { ... }) or in media
   // attributes in HTML documents (e.g. <style media="<media-query-list>"> or <link media="<media-query-list>">)
@@ -77,13 +86,15 @@ case class Style(css: String, mediaQueries: List[MediaQuery]) extends CSSResourc
 case class VariableDefinition(name: String, value: String, mediaQueries: List[MediaQuery], selectors: List[Selector])
 
 case class VariableDefinitions(variableDefinitions: List[VariableDefinition]) {
-  def variableValue(variableName: String, mediaQuery: MediaQuery, selectors: List[Selector]): Option[String] = {
-
-    // TODO: support very simple media queries and selectors
-
-    // Naive implementation, ignore all media queries and selectors
-    variableDefinitions.findLast(_.name == variableName).map(_.value)
-  }
+  // Naive implementation of variable value lookup (ignore complex media queries and ignore all selectors)
+  def variableValue(variableName: String, mediaQuery: MediaQuery, selectors: List[Selector]): Option[String] =
+    variableDefinitions.findLast { variableDefinition =>
+      // Match based on simple media queries ("print" matches "all" and "print", etc.) and variable name
+      variableDefinition.mediaQueries.exists(_.simpleMatch(mediaQuery)) &&
+      variableDefinition.name == variableName
+    }.map {
+      _.value
+    }
 
   def merged(variableDefinitions: VariableDefinitions): VariableDefinitions =
     VariableDefinitions(this.variableDefinitions ++ variableDefinitions.variableDefinitions)

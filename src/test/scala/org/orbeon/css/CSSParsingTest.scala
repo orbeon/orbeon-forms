@@ -13,6 +13,7 @@
  */
 package org.orbeon.css
 
+import cats.implicits.catsSyntaxOptionId
 import org.log4s.Logger
 import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.oxf.util.IndentedLogger
@@ -87,11 +88,10 @@ class CSSParsingTest extends AnyFunSpec {
   describe("Variable definitions") {
     implicit val cssCache: CSSCache = new CSSCache()
 
-    val cssWithVariableDefinitions = """|:root {
+    val cssWithVariableDefinitions1 = """|:root {
                                         |  --orbeon-test1: test1;
                                         |  --orbeon-test2: test2
                                         |}
-                                        |
                                         |@media print {
                                         |  .orbeon, .otherclass {
                                         |    --orbeon-test1: test1-print;
@@ -100,13 +100,13 @@ class CSSParsingTest extends AnyFunSpec {
                                         |}""".stripMargin
 
     it("must parse variable definitions from a CSS string") {
-      val variableDefinitions = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions, List(MediaQuery("all"))),
+      val variableDefinitions1 = CSSParsing.variableDefinitions(
+        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery("all"))),
         resolvedURL = _ => new URL("") // Won't be called
       )
 
       // Only check variable names and values for now
-      val actualVariableNamesAndValues = variableDefinitions.variableDefinitions.map(d => (d.name, d.value))
+      val actualVariableNamesAndValues = variableDefinitions1.variableDefinitions.map(d => (d.name, d.value))
 
       val expectedVariableNamesAndValues = List(
         "--orbeon-test1" -> "test1",
@@ -118,14 +118,14 @@ class CSSParsingTest extends AnyFunSpec {
       assert(actualVariableNamesAndValues == expectedVariableNamesAndValues)
     }
 
-    val testVariableDefinitions = VariableDefinitions(
-      List(
-        VariableDefinition(name = "--base-font-size", value = "13px"   , mediaQueries = List(MediaQuery("all")), selectors = List(Selector(".orbeon"))),
-        VariableDefinition(name = "--hint-font-size", value = "smaller", mediaQueries = List(MediaQuery("all")), selectors = List(Selector(".orbeon")))
-      )
-    )
-
     it("must inject a variable value into a single declaration value") {
+      val testVariableDefinitions = VariableDefinitions(
+        List(
+          VariableDefinition(name = "--base-font-size", value = "13px"   , mediaQueries = List(MediaQuery("all")), selectors = List(Selector(".orbeon"))),
+          VariableDefinition(name = "--hint-font-size", value = "smaller", mediaQueries = List(MediaQuery("all")), selectors = List(Selector(".orbeon")))
+        )
+      )
+
       val expected = List(
         "var(--base-font-size)"                                              -> "13px",
         "var(--hint-font-size)"                                              -> "smaller",
@@ -142,22 +142,22 @@ class CSSParsingTest extends AnyFunSpec {
       }
     }
 
-    val cssWithVariableEvaluations =
-      """|.orbeon {
-         |  font-size: var(--orbeon-test2);
-         |  font-family: var(--orbeon-test3);
-         |}""".stripMargin
-
     it("must inject variables into a CSS stylesheet") {
-      val variableDefinitions = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions, List(MediaQuery("all"))),
+      val variableDefinitions1 = CSSParsing.variableDefinitions(
+        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery("all"))),
         resolvedURL = _ => new URL("") // Won't be called
       )
 
+      val cssWithVariableEvaluations =
+        """|.orbeon {
+           |  font-size: var(--orbeon-test2);
+           |  font-family: var(--orbeon-test3);
+           |}""".stripMargin
+
       val actualModifiedCss = CSSParsing.injectVariablesIntoCss(
         cascadingStyleSheet = CSSParsing.parsedCss(cssWithVariableEvaluations).get,
-        variableDefinitions = variableDefinitions,
-        mediaQuery          = MediaQuery("screen")
+        variableDefinitions = variableDefinitions1,
+        mediaQuery          = MediaQuery("print")
       )
 
       val expectedModifiedCss =
@@ -174,6 +174,127 @@ class CSSParsingTest extends AnyFunSpec {
       // TODO: ignore comments, whitespace, etc.
 
       assert(actualModifiedCss == expectedModifiedCss)
+    }
+
+    trait ValueProvider {
+      def variableValue(variableName: String): Option[String]
+    }
+
+    def withDefinitions(cssWithVariableDefinitions: String,
+                        mediaQuery                : MediaQuery)(
+                        f                         : ValueProvider => Unit
+    ): Unit = {
+      val variableDefinitions = CSSParsing.variableDefinitions(
+        resource    = Style(cssWithVariableDefinitions, List(MediaQuery("all"))),
+        resolvedURL = _ => new URL("") // Won't be called
+      )
+
+      val variableValues = new ValueProvider {
+        def variableValue(variableName: String): Option[String] =
+          variableDefinitions.variableValue(
+            variableName = variableName,
+            mediaQuery   = mediaQuery,
+            selectors    = List(Selector(".orbeon"))
+          )
+      }
+
+      f(variableValues)
+    }
+
+    it("must respect simple media queries when retrieving variable values") {
+
+      import MediaQuery.{ScreenMediaQuery, PrintMediaQuery}
+
+      val vars1 = """.orbeon {
+                    |  --orbeon1: orbeon1-1st;
+                    |  --orbeon2: orbeon2;
+                    |}""".stripMargin
+
+      val vars2 = """.orbeon {
+                    |  --orbeon1: orbeon1-2nd;
+                    |  --orbeon3: orbeon3;
+                    |}""".stripMargin
+
+      val expectedValues = List(
+        List(
+          s"$vars1 $vars2",
+          s"@media all { $vars1 } $vars2"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some)
+        ),
+        List(
+          s"$vars1 @media all { $vars2 }",
+          s"@media all { $vars1 } @media all { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some)
+        ),
+        List(
+          s"$vars1 @media screen { $vars2 }",
+          s"@media all { $vars1 } @media screen { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None)
+        ),
+        List(
+          s"$vars1 @media print { $vars2 }",
+          s"@media all { $vars1 } @media print { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some)
+        ),
+        List(
+          s"@media screen { $vars1 } $vars2",
+          s"@media screen { $vars1 } @media all { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some)
+        ),
+        List(
+          s"@media screen { $vars1 } @media screen { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> None              , "--orbeon2" -> None          , "--orbeon3" -> None)
+        ),
+        List(
+          s"@media screen { $vars1 } @media print { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some)
+        ),
+        List(
+          s"@media print { $vars1 } $vars2",
+          s"@media print { $vars1 } @media all { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some)
+        ),
+        List(
+          s"@media print { $vars1 } @media screen { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None)
+        ),
+        List(
+          s"@media print { $vars1 } @media print { $vars2 }"
+        ) -> List(
+          ScreenMediaQuery -> List("--orbeon1" -> None              , "--orbeon2" -> None          , "--orbeon3" -> None),
+          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some)
+        ),
+      )
+
+      for  {
+        (cssDefinitions, mediaQueriesAndVariableValues) <- expectedValues
+        cssDefinition                                   <- cssDefinitions
+        (mediaQuery, variableValues)                    <- mediaQueriesAndVariableValues
+      } {
+        withDefinitions(cssDefinition, mediaQuery) { valueProvider =>
+          for ((variableName, variableValueOpt) <- variableValues) {
+            assert(valueProvider.variableValue(variableName) == variableValueOpt)
+          }
+        }
+      }
     }
   }
 }

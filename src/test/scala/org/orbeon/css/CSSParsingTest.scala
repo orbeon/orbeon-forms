@@ -218,12 +218,7 @@ class CSSParsingTest extends AnyFunSpec {
       val expectedValues = List(
         List(
           s"$vars1 $vars2",
-          s"@media all { $vars1 } $vars2"
-        ) -> List(
-          ScreenMediaQuery -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some),
-          PrintMediaQuery  -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some)
-        ),
-        List(
+          s"@media all { $vars1 } $vars2",
           s"$vars1 @media all { $vars2 }",
           s"@media all { $vars1 } @media all { $vars2 }"
         ) -> List(

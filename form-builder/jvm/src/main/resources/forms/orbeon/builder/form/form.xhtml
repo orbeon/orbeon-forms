@@ -905,14 +905,32 @@
                 fr-resources-ref="$fr-resources"
                 form-name="$metadata-instance/form-name">
 
-                <xf:action ev:event="fb-update">
+                <xf:action event="fb-update" if="event('dialog-mode') = 'email'">
                     <xf:delete
                         bind="email-bind"/>
                     <xf:insert
-                        if="exists(event('email'))"
+                        if="exists(event('config'))"
                         context="bind('metadata-bind')"
                         ref="*"
-                        origin="event('email')"/>
+                        origin="event('config')"/>
+                </xf:action>
+                <xf:action event="fb-update" if="event('dialog-mode') = 'confirmation'">
+                    <xf:delete
+                        bind="confirmation-bind"/>
+                    <xf:delete
+                        if="empty(bind('modes-bind')/*) and empty(event('config'))"
+                        bind="modes-bind"/>
+                    <xf:action if="exists(event('config'))">
+                        <xf:insert
+                            if="empty(bind('modes-bind'))"
+                            context="bind('metadata-bind')"
+                            ref="*"
+                            origin="xf:element('modes')"/>>
+                        <xf:insert
+                            context="bind('metadata-bind')/modes"
+                            ref="*"
+                            origin="event('config')"/>
+                    </xf:action>
                 </xf:action>
 
             </fb:dialog-email-settings>

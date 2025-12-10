@@ -1444,6 +1444,16 @@
         <delete-template>Verwijder sjabloon</delete-template>
         <template-parameters>Sjabloonparameters</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Instellingen bevestigingspagina</label>
+        <templates>Sjablonen</templates>
+        <template-name>
+            <label>Naam sjabloon bevestigingspagina</label>
+            <hint>Deze naam is niet zichtbaar voor eindgebruikers</hint>
+        </template-name>
+        <subject>Titel bevestigingspagina</subject>
+        <body>Inhoud bevestigingspagina</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Bevoegdheden</label>
         <enable-permissions>Activeer bevoegdheden voor dit form</enable-permissions>

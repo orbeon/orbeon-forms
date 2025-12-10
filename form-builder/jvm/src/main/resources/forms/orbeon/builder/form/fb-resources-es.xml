@@ -1457,6 +1457,16 @@
         <delete-template>Eliminar plantilla</delete-template>
         <template-parameters>Parámetros de plantilla</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Configuración de la página de confirmación</label>
+        <templates>Plantillas</templates>
+        <template-name>
+            <label>Nombre de la plantilla de la página de confirmación</label>
+            <hint>Este nombre no es visible para los usuarios finales</hint>
+        </template-name>
+        <subject>Título de la página de confirmación</subject>
+        <body>Cuerpo de la página de confirmación</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Permisos</label>
         <enable-permissions>Habilitar permisos para este formulario</enable-permissions>

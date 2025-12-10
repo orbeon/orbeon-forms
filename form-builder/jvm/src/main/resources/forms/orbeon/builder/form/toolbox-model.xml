@@ -212,6 +212,7 @@
             <workflow/>
             <permissions/>
             <email/>
+            <confirmation/>
             <messages/>
             <services>
                 <http/>
@@ -238,6 +239,7 @@
         <xf:bind ref="workflow"              id="fb-toolbox-workflow-bind"               relevant="xxf:property('oxf.fb.menu.workflow')"/>
         <xf:bind ref="permissions"           id="fb-toolbox-permissions-bind"            relevant="xxf:property('oxf.fb.menu.permissions')"/>
         <xf:bind ref="email"                 id="fb-toolbox-email-bind"                  relevant="xxf:property('oxf.fb.menu.email')"/>
+        <xf:bind ref="confirmation"          id="fb-toolbox-confirmation-bind"           relevant="xxf:property('oxf.fb.menu.confirmation')"/>
         <xf:bind ref="messages"              id="fb-toolbox-messages-bind"               relevant="xxf:property('oxf.fb.menu.messages')"/>
         <xf:bind ref="services/http"         id="fb-toolbox-services-http-bind"          relevant="xxf:property('oxf.fb.menu.services.http')"/>
         <xf:bind ref="services/http-add"     id="fb-toolbox-services-http-add-bind"      readonly="fr:is-readonly-mode()"/>

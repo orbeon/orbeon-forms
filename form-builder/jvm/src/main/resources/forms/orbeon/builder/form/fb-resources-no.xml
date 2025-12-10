@@ -1472,6 +1472,16 @@
         <delete-template>Slett mal</delete-template>
         <template-parameters>Malparametre</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Innstillinger for bekreftelsesside</label>
+        <templates>Maler</templates>
+        <template-name>
+            <label>Malnavn for bekreftelsesside</label>
+            <hint>Dette navnet er ikke synlig for sluttbrukere</hint>
+        </template-name>
+        <subject>Tittel på bekreftelsesside</subject>
+        <body>Innhold på bekreftelsesside</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Permissions</label>
         <enable-permissions>Aktiver tillatelser for dette skjemaet</enable-permissions>

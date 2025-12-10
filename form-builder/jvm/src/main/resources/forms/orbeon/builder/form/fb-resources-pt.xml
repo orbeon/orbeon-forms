@@ -1471,6 +1471,16 @@
         <delete-template>Apagar modelo</delete-template>
         <template-parameters>Parâmetros do modelo</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Configurações da Página de Confirmação</label>
+        <templates>Modelos</templates>
+        <template-name>
+            <label>Nome do modelo da página de confirmação</label>
+            <hint>Este nome não é visível para os usuários finais</hint>
+        </template-name>
+        <subject>Título da página de confirmação</subject>
+        <body>Corpo da página de confirmação</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Permissões</label>
         <enable-permissions>Activar as permissões para este formulário</enable-permissions>

@@ -1413,6 +1413,16 @@
         <delete-template>Vorlage löschen</delete-template>
         <template-parameters>Vorlagenparameter</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Einstellungen Bestätigungsseite</label>
+        <templates>Vorlagen</templates>
+        <template-name>
+            <label>Name der Bestätigungsseitenvorlage</label>
+            <hint>Dieser Name ist für Endbenutzer nicht sichtbar</hint>
+        </template-name>
+        <subject>Titel der Bestätigungsseite</subject>
+        <body>Inhalt der Bestätigungsseite</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Berechtigungen</label>
         <enable-permissions>Aktiviere Berechtigungen für dieses Formular</enable-permissions>

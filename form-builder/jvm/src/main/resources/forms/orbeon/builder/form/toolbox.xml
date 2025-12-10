@@ -426,9 +426,27 @@
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>
                             </xf:label>
                             <xf:action event="DOMActivate">
-                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
-                                    <xf:property name="lang"  value="$fb-lang"/>
-                                    <xf:property name="email" value="bind('email-bind')"/>
+                                <xf:dispatch if="$is-pe"            name="fb-show-dialog" targetid="dialog-email-settings">
+                                    <xf:property name="lang"        value="$fb-lang"/>
+                                    <xf:property name="config"      value="bind('email-bind')"/>
+                                    <xf:property name="dialog-mode" value="'email'"/>
+                                </xf:dispatch>
+                                <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
+                            </xf:action>
+                        </fr:trigger>
+                        <fr:trigger
+                                id="open-confirmation-settings-trigger"
+                                bind="fb-toolbox-confirmation-bind"
+                                name="toolbox.open-confirmation-settings">
+                            <xf:label>
+                                <xh:i class="fa fa-envelope fa-fw"/>
+                                <xf:output value="$form-resources/dialog-confirmation-settings/label"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch if="$is-pe"            name="fb-show-dialog" targetid="dialog-email-settings">
+                                    <xf:property name="lang"        value="$fb-lang"/>
+                                    <xf:property name="config"      value="bind('confirmation-bind')"/>
+                                    <xf:property name="dialog-mode" value="'confirmation'"/>
                                 </xf:dispatch>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>

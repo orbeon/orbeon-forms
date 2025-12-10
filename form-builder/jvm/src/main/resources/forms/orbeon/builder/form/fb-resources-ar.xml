@@ -1463,6 +1463,16 @@
         <delete-template>حذف القالب</delete-template>
         <template-parameters>معلمات القالب</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>إعدادات صفحة التأكيد</label>
+        <templates>قوالب</templates>
+        <template-name>
+            <label>اسم قالب صفحة التأكيد</label>
+            <hint>هذا الاسم غير مرئي للمستخدمين النهائيين</hint>
+        </template-name>
+        <subject>عنوان صفحة التأكيد</subject>
+        <body>محتوى صفحة التأكيد</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>الأذونات</label>
         <enable-permissions>تمكين الأذونات لهذا النموذج</enable-permissions>

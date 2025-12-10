@@ -1472,6 +1472,16 @@
         <delete-template>Ta bort mall</delete-template>
         <template-parameters>Mallparametrar</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Inställningar för bekräftelsesida</label>
+        <templates>Mallar</templates>
+        <template-name>
+            <label>Mallnamn för bekräftelsesida</label>
+            <hint>Detta namn är inte synligt för slutanvändare</hint>
+        </template-name>
+        <subject>Titel på bekräftelsesida</subject>
+        <body>Innehåll på bekräftelsesida</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Rättigheter</label>
         <enable-permissions>Tillämpa rättigheter för detta formulär</enable-permissions>

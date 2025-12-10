@@ -1455,6 +1455,16 @@
         <delete-template>テンプレートを削除</delete-template>
         <template-parameters>テンプレートパラメーター</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>確認ページ設定</label>
+        <templates>テンプレート</templates>
+        <template-name>
+            <label>確認ページテンプレート名</label>
+            <hint>この名前はエンドユーザーには表示されません</hint>
+        </template-name>
+        <subject>確認ページタイトル</subject>
+        <body>確認ページ本文</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>権限</label>
         <enable-permissions>このフォームで権限を有効にする</enable-permissions>

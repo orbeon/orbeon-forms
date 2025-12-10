@@ -1457,6 +1457,16 @@
         <delete-template>Poista malli</delete-template>
         <template-parameters>Mallin parametrit</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Vahvistussivun asetukset</label>
+        <templates>Mallit</templates>
+        <template-name>
+            <label>Vahvistussivun mallin nimi</label>
+            <hint>Tämä nimi ei näy loppukäyttäjille</hint>
+        </template-name>
+        <subject>Vahvistussivun otsikko</subject>
+        <body>Vahvistussivun sisältö</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Käyttöoikeudet</label>
         <enable-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</enable-permissions>

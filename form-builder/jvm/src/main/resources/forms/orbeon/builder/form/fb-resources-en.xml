@@ -1463,6 +1463,16 @@
         <delete-template>Delete template</delete-template>
         <template-parameters>Template parameters</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Confirmation Page Settings</label>
+        <templates>Templates</templates>
+        <template-name>
+            <label>Confirmation page template name</label>
+            <hint>This name is not visible to end users</hint>
+        </template-name>
+        <subject>Confirmation page title</subject>
+        <body>Confirmation page body</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Permissions</label>
         <enable-permissions>Enable permissions for this form</enable-permissions>

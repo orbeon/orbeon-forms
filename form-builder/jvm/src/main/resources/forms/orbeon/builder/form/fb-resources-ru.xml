@@ -1471,6 +1471,16 @@
         <delete-template>Удалить шаблон</delete-template>
         <template-parameters>Параметры шаблона</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Настройки страницы подтверждения</label>
+        <templates>Шаблоны</templates>
+        <template-name>
+            <label>Имя шаблона страницы подтверждения</label>
+            <hint>Это имя не видно конечным пользователям</hint>
+        </template-name>
+        <subject>Заголовок страницы подтверждения</subject>
+        <body>Тело страницы подтверждения</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Настройка прав</label>
         <enable-permissions>Включить для этой формы управление доступом</enable-permissions>

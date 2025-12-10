@@ -1460,6 +1460,16 @@
         <delete-template>Usuń szablon</delete-template>
         <template-parameters>Parametry szablonu</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Ustawienia strony potwierdzenia</label>
+        <templates>Szablony</templates>
+        <template-name>
+            <label>Nazwa szablonu strony potwierdzenia</label>
+            <hint>Ta nazwa nie jest widoczna dla użytkowników końcowych</hint>
+        </template-name>
+        <subject>Tytuł strony potwierdzenia</subject>
+        <body>Treść strony potwierdzenia</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Uprawnienia</label>
         <enable-permissions>Włącz uprawnienia dla tego formularza</enable-permissions>

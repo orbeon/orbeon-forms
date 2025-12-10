@@ -1416,6 +1416,16 @@
         <delete-template>Elimina modello</delete-template>
         <template-parameters>Parametri del modello</template-parameters>
     </dialog-email-settings>
+    <dialog-confirmation-settings>
+        <label>Impostazioni pagina di conferma</label>
+        <templates>Modelli</templates>
+        <template-name>
+            <label>Nome del modello della pagina di conferma</label>
+            <hint>Questo nome non è visibile agli utenti finali</hint>
+        </template-name>
+        <subject>Titolo della pagina di conferma</subject>
+        <body>Corpo della pagina di conferma</body>
+    </dialog-confirmation-settings>
     <dialog-permissions>
         <label>Autorizzazioni</label>
         <enable-permissions>Abilita autorizzazioni per questo modulo</enable-permissions>

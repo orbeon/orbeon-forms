@@ -619,20 +619,17 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
           outgoingVersionHeaderOpt
         )
 
-      // For GET attachment with attachment provider, only call attachment provider if relational returns `Content-Length: 0`
       if (request.getMethod == HttpMethod.GET && isAttachment && findAttachmentsProvider(appForm, formOrData).isDefined) {
-
-        val cxr                    = cxrOpt.getOrElse(establishConnection(bodyContentOpt))
+        // For reading an attachment with an attachment provider: only call the attachment provider if relational
+        // doesn't return a body
+        val cxr                    = cxrOpt.getOrElse(establishConnection(bodyContentOpt)) // `bodyContentOpt == None` for GET
         val useAttachmentsProvider = StatusCode.isSuccessCode(cxr.statusCode) && ! cxr.hasContent
         proxyRequestImpl(cxr, request, response, responseTransforms, useAttachmentsProvider.flatOption(attachmentsProviderCxrOpt))
-
       } else {
-
-        // For PUT or non-attachment: establish attachments provider connection upfront
+        // For all other cases: establish attachments provider connection upfront
         val useBodyContentOpt = ! (attachmentsProviderCxrOpt.isDefined && request.getMethod == HttpMethod.PUT)
         val cxr               = cxrOpt.getOrElse(establishConnection(useBodyContentOpt.flatOption(bodyContentOpt)))
         proxyRequestImpl(cxr, request, response, responseTransforms, attachmentsProviderCxrOpt)
-
       }
 
       // The following logic matches the logic for attachment deletion found in CreateUpdateDelete

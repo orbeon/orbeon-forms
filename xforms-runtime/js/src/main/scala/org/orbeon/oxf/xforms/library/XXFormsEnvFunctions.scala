@@ -346,13 +346,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def r(
-    resourceKey            : String,
-    instanceOpt            : Option[String]  = None,
-    fallbackLangInstanceOpt: Option[String]  = None,
-    templateParamsOpt      : Option[om.Item] = None // TODO: must be a `MapItem` (`map(*)`)
+    resourceKey      : String,
+    instanceOpt      : Option[String]  = None,
+    templateParamsOpt: Option[om.Item] = None // TODO: must be a `MapItem` (`map(*)`)
   )(implicit
-    xpc                    : XPathContext,
-    xfc                    : XFormsFunction.Context
+    xpc              : XPathContext,
+    xfc              : XFormsFunction.Context
   ): Option[String] = {
 
     def javaNamedParamsOpt: Option[List[(String, Any)]] =
@@ -369,10 +368,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       }
 
     XXFormsLangSupport.r(
-      resourceKey             = resourceKey,
-      instanceOpt             = instanceOpt,
-      javaNamedParamsOpt      = javaNamedParamsOpt,
-      fallbackLangInstanceOpt = fallbackLangInstanceOpt
+      resourceKey        = resourceKey,
+      instanceOpt        = instanceOpt,
+      javaNamedParamsOpt = javaNamedParamsOpt,
+      fallbackLangOpt    = xfc.containingDocument.rFallbackLang
     )
   }
 

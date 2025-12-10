@@ -345,6 +345,7 @@ object XFormsNames {
 
   val XXFORMS_FORMAT_QNAME                = xxformsQName("format")
   val XXFORMS_UNFORMAT_QNAME              = xxformsQName("unformat")
+  val XXFORMS_R_FALLBACK_LANG_QNAME       = xxformsQName("r-fallback-lang")
 
   val XXFORMS_UPDATE_QNAME                = xxformsQName("update")
   val XFORMS_FULL_UPDATE = "full"

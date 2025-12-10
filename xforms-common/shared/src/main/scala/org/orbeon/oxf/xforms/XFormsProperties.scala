@@ -37,6 +37,7 @@ object XFormsProperties {
   val DefaultOrderProperty                            = "label control help alert hint"
 
   val HostLanguage                                    = "host-language"
+  val RFallbackLang                                   = "r-fallback-lang"
 
   val LabelElementNameProperty                        = "label-element"
   val HintElementNameProperty                         = "hint-element"
@@ -186,6 +187,7 @@ object XFormsProperties {
       PropertyDefinition(ReadonlyAppearanceStaticSelect1Property,         "full",                      propagateToClient = false),
       PropertyDefinition(OrderProperty,                                   DefaultOrderProperty,        propagateToClient = false),
       PropertyDefinition(HostLanguage,                                    "xhtml",                     propagateToClient = false),
+      PropertyDefinition(RFallbackLang,                                   "",                          propagateToClient = false),
       PropertyDefinition(LabelElementNameProperty,                        "label",                     propagateToClient = false),
       PropertyDefinition(HintElementNameProperty,                         "span",                      propagateToClient = false),
       PropertyDefinition(HelpElementNameProperty,                         "span",                      propagateToClient = false),

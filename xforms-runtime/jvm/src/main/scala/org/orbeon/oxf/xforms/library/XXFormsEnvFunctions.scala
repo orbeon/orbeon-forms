@@ -190,7 +190,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Fun("r", classOf[XXFormsResource], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE),
-      Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(BuiltInAtomicType.ANY_ATOMIC, ALLOWS_ZERO_OR_ONE) // `map(*)`
     )
 

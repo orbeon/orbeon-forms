@@ -512,6 +512,12 @@ trait ContainingDocumentProperties {
       identity
     )
 
+  def rFallbackLang: Option[String] =
+    dynamicProperty(
+      RFallbackLang,
+      _.trimAllToOpt
+    )
+
   def isNoUpdates: Boolean =
     dynamicProperty(
       NoUpdates,

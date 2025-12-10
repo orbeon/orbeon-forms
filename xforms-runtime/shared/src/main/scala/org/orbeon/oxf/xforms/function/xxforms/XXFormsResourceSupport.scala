@@ -14,13 +14,9 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.XFormsFunction.resolveOrFindByStaticOrAbsoluteId
-import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
-import shapeless.syntax.typeable.*
 
 import scala.annotation.tailrec
 
@@ -72,11 +68,9 @@ object XXFormsResourceSupport {
   }
 
   def findResourceElementForLang(
-    resourcesElement       : om.NodeInfo,
-    requestedLang          : String,
-    fallbackLangInstanceOpt: Option[String]
-  )(implicit
-    xfc                    : XFormsFunction.Context
+    resourcesElement  : om.NodeInfo,
+    requestedLang     : String,
+    fallbackLangOpt   : Option[String]
   ): Option[om.NodeInfo] = {
 
     val availableLangs = resourcesElement / "resource" /@ "lang"
@@ -85,9 +79,7 @@ object XXFormsResourceSupport {
 
     exactMatch orElse {
       val firstFallback = for {
-        instanceName    <- fallbackLangInstanceOpt
-        instance        <- resolveOrFindByStaticOrAbsoluteId(instanceName).flatMap(_.narrowTo[XFormsInstance])
-        fallbackLangStr <- instance.rootElement.getStringValue.trimAllToOpt
+        fallbackLangStr <- fallbackLangOpt
         fallbackLang    <- availableLangs.find(_ === fallbackLangStr)
         parent          <- fallbackLang.parentOption
       } yield parent

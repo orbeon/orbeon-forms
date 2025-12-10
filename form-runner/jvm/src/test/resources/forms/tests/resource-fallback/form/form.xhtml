@@ -1,0 +1,72 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         fr:data-format-version="4.0.0">
+    <xh:head>
+        <xf:model id="fr-form-model">
+            <xf:instance id="fr-form-instance" xxf:index="id">
+                <form>
+                    <section-1>
+                        <control-1/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"/>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>korean-fallback</form-name>
+                    <title xml:lang="ko">한국어 폼</title>
+                    <description xml:lang="ko">이것은 한국어만 있는 테스트 폼입니다</description>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- Form resources: Korean only -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
+                <resources>
+                    <resource xml:lang="ko">
+                        <section-1>
+                            <label>섹션 1</label>
+                        </section-1>
+                        <control-1>
+                            <label>제어 1</label>
+                            <hint/>
+                        </control-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <fr:c x="1" y="1" w="12">
+                            <xf:input id="control-1-control" bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

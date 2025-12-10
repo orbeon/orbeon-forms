@@ -211,6 +211,7 @@ private object FormRunnerFunctions {
   val StringGettersByName: Seq[(String, () => Option[String])] = List(
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata),
     "lang"                        -> (() => Some(FormRunner.currentLang)),
+    "fr-lang"                     -> (() => Some(FormRunner.currentFRLang)),
     "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage),
     "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
     "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),

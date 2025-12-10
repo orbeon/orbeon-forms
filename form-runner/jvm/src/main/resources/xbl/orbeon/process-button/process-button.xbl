@@ -30,7 +30,7 @@
 
             <!-- Figure button label -->
             <xf:var name="button-name"  value="fr:component-param-value('name')"/>
-            <xf:var name="button-label" value="xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|', '|fr-fr-language-instance|')"/>
+            <xf:var name="button-label" value="xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|')"/>
 
             <!-- Figure what, if any, loading indicator to use -->
             <xf:var name="loading-indicator-property"

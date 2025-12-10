@@ -20,7 +20,6 @@ object XXFormsLangSupport {
       case LangRef.Literal(value) =>
         Some(value)
       case LangRef.AVT(att) =>
-        // TODO: resolve concrete ancestor `XXFormsAttributeControl` instead of just using static id
         val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
         Option(attributeControl.getExternalValue(EventCollector.Throw))
       case _ =>
@@ -28,20 +27,19 @@ object XXFormsLangSupport {
     }
 
   def r(
-    resourceKey            : String,
-    instanceOpt            : Option[String],
-    javaNamedParamsOpt     : => Option[List[(String, Any)]],
-    fallbackLangInstanceOpt: Option[String] = None
+    resourceKey       : String,
+    instanceOpt       : Option[String],
+    javaNamedParamsOpt: => Option[List[(String, Any)]],
+    fallbackLangOpt   : Option[String] = None
   )(implicit
-    xfc                    : XFormsFunction.Context
+    xfc               : XFormsFunction.Context
   ): Option[String] = {
 
-    def findInstance: Option[XFormsObject] = {
+    def findInstance: Option[XFormsObject] =
       instanceOpt match {
         case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)
         case None               => resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
       }
-    }
 
     def findResourcesElement: Option[om.NodeInfo] =
       findInstance.collect { case instance: XFormsInstance => instance.rootElement }
@@ -58,7 +56,7 @@ object XXFormsLangSupport {
         elementAnalysis <- elementAnalysisForSource
         resources       <- findResourcesElement
         requestedLang   <- XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis)
-        resourceRoot    <- findResourceElementForLang(resources, requestedLang, fallbackLangInstanceOpt)
+        resourceRoot    <- findResourceElementForLang(resources, requestedLang, fallbackLangOpt)
         leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKey)).headOption
       } yield
         processResourceString(leaf.getStringValue)

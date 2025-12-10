@@ -957,6 +957,7 @@
             xxf:upload-support="org.orbeon.oxf.fr.FormRunnerUploadSupport"
             xxf:xforms11-switch="false"
             xxf:xpath-analysis="true"
+            xxf:r-fallback-lang="{{fr:fr-lang()}}"
             xxf:label.appearance="{$label-appearance}"
             xxf:hint.appearance="{$hint-appearance}"
             xxf:assets.baseline.updates="{$assets-baseline-updates}"

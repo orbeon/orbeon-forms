@@ -1,41 +1,13 @@
 package org.orbeon.fr
 
-import org.orbeon.fr.DockerSupport.removeContainerByImage
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.web.DomSupport.*
-import org.scalatest.*
-import org.scalatest.funspec.FixtureAsyncFunSpecLike
 
-import java.util.concurrent.atomic.AtomicInteger
 import scala.async.Async.*
 import scala.scalajs.js
 
 
-class FormRunnerApiClientTest extends FixtureAsyncFunSpecLike with ClientTestSupport {
-
-  val ServerExternalPort = 8888
-  val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"
-
-  type FixtureParam = Unit
-
-  val testsStarted = new AtomicInteger(0)
-
-  def withFixture(test: OneArgAsyncTest): FutureOutcome = {
-    if (testsStarted.incrementAndGet() == 1)
-      async {
-        val r = await(runTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None, ehcacheFilename = "ehcache.xml"))
-        assert(r.isSuccess)
-      }
-    // Can't find a way to wait for Tomcat to be ready here as there is no way to directly create or map
-    // `FutureOutcome`. So we just launch the container above, then  individual tests have to check for the
-    // container and app to be ready.
-    complete {
-      withFixture(test.toNoArgAsyncTest(()))
-    } lastly {
-      if (testsStarted.get() == testNames.size)
-        removeContainerByImage(TomcatImageName)
-    }
-  }
+class FormRunnerApiClientTest extends SharedDocker {
 
   describe("Form Runner API client tests") {
     it("must find form controls by name, set values, get values, and activate") { _ =>

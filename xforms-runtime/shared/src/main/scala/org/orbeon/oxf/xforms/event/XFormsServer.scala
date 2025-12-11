@@ -14,7 +14,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpda
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
-import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
+import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
@@ -393,7 +393,9 @@ object XFormsServer {
                         isTestMode                     = testOutputAllActions
                       )
 
-                    case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
+                    case None if testOutputAllActions                       ||
+                                 containingDocument.isDirtySinceLastRequest ||
+                                 hasControlWithExternalValueMode(containingDocument, eventFindings) =>
                       diffControls(
                         containingDocument             = containingDocument,
                         state1                         = controls.getInitialControlTree.children,
@@ -727,4 +729,15 @@ object XFormsServer {
         atts      = List("control-id" -> containingDocument.namespaceId(helpControlEffectiveId))
       )
   }
+
+  def hasControlWithExternalValueMode(
+    containingDocument : XFormsContainingDocument,
+    eventFindings      : ClientEvents.EventsFindings
+  ): Boolean =
+    eventFindings.valueChangeControlIdsAndValues.keysIterator.exists { controlId =>
+      containingDocument.findControlByEffectiveId(controlId) match {
+        case Some(vc: XFormsValueComponentControl) => vc.staticControl.commonBinding.modeExternalValue
+        case _ => false
+      }
+    }
 }

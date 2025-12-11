@@ -1,0 +1,70 @@
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
+            <xf:instance id="fr-form-instance" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <my-number/>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="my-number-bind" ref="my-number" name="my-number" type="xf:decimal"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>number</form-name>
+                    <title xml:lang="en">Number Test Form</title>
+                </metadata>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-number>
+                            <label>My Number</label>
+                            <hint/>
+                        </my-number>
+                        <section-1>
+                            <label>Section 1</label>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <fr:number
+                                id="my-number-control"
+                                bind="my-number-bind"
+                                digits-after-decimal="2"
+                                round-when-formatting="true"
+                                round-when-storing="true">
+                                <xf:label ref="$form-resources/my-number/label"/>
+                                <xf:hint ref="$form-resources/my-number/hint"/>
+                            </fr:number>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

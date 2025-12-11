@@ -171,6 +171,10 @@ trait CommonContainerInitializer {
 
       // Listeners
 
+      // Cache shutdown listener
+      // Register first, see: https://github.com/orbeon/orbeon-forms/issues/7388
+      registerListener(ctx, "shutdown-listener",                    shutdownListenerClass)
+
       registerListener(ctx, "orbeon-servlet-context-listener",      orbeonServletContextListenerClass)
       // Context listener for deployment with replication
       registerListener(ctx, "replication-servlet-context-listener", replicationServletContextListenerClass)
@@ -178,8 +182,6 @@ trait CommonContainerInitializer {
       registerListener(ctx, "xforms-servlet-context-listener",      xFormsServletContextListenerClass)
       // General-purpose session listener
       registerListener(ctx, "orbeon-session-listener",              orbeonSessionListenerClass)
-      // Cache shutdown listener
-      registerListener(ctx, "shutdown-listener",                    shutdownListenerClass)
     }
   }
 

@@ -439,7 +439,7 @@
                                 bind="fb-toolbox-confirmation-bind"
                                 name="toolbox.open-confirmation-settings">
                             <xf:label>
-                                <xh:i class="fa fa-envelope fa-fw"/>
+                                <xh:i class="fa fa-file-lines fa-fw"/>
                                 <xf:output value="$form-resources/dialog-confirmation-settings/label"/>
                             </xf:label>
                             <xf:action event="DOMActivate">

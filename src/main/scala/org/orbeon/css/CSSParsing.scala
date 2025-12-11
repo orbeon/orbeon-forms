@@ -109,17 +109,23 @@ object CSSParsing {
     private val mediaQueriesStack = mutable.ArrayDeque[List[MediaQuery]]()
     private val selectorStack     = mutable.ArrayDeque[List[Selector]]()
 
-    override def onDeclaration(aDeclaration: CSSDeclaration): Unit =
-      variableBuffer.append(
-        VariableDefinition(
-          name         = aDeclaration.getProperty,
-          value        = aDeclaration.getExpression.getAsCSSString,
-          // Combine media query lists using AND operator
-          mediaQueries = mediaQueriesStack.toList.foldLeft(mediaQueries)((left, right) => MediaQuery.and(left, right)),
-          // Keep top selectors only (not supporting nested selectors)
-          selectors    = selectorStack.lastOption.getOrElse(Nil)
+    override def onDeclaration(aDeclaration: CSSDeclaration): Unit = {
+      val name = aDeclaration.getProperty
+
+      // Only consider CSS variables (i.e. custom properties starting with "--")
+      if (name.startsWith("--")) {
+        variableBuffer.append(
+          VariableDefinition(
+            name         = name,
+            value        = aDeclaration.getExpression.getAsCSSString,
+            // Combine media query lists using AND operator
+            mediaQueries = mediaQueriesStack.toList.foldLeft(mediaQueries)((left, right) => MediaQuery.and(left, right)),
+            // Keep top selectors only (not supporting nested selectors)
+            selectors    = selectorStack.lastOption.getOrElse(Nil)
+          )
         )
-      )
+      }
+    }
 
     override def onBeginStyleRule(aStyleRule: CSSStyleRule): Unit =
       selectorStack.append(aStyleRule.getAllSelectors.asScala.toList.map(s => Selector(s.getAsCSSString)))
@@ -179,8 +185,8 @@ object CSSParsing {
   def injectVariablesIntoDeclaration(
     declarationValue   : String,
     variableDefinitions: VariableDefinitions,
-    mediaQuery         : MediaQuery,
-    selectors          : List[Selector]
+    lookupMediaQuery   : MediaQuery,
+    lookupSelectors    : List[Selector]
   ): String =
     VarEvaluation.findAllMatchIn(declarationValue).toList.headOption match {
       case None =>
@@ -193,9 +199,9 @@ object CSSParsing {
         val fallbackOpt  = Option(m.group(2))
 
         val variableValueOpt = variableDefinitions.variableValue(
-          variableName = variableName,
-          mediaQuery   = mediaQuery,
-          selectors    = selectors
+          variableName       = variableName,
+          lookupMediaQuery   = lookupMediaQuery,
+          lookupSelectors    = lookupSelectors
         )
 
         variableValueOpt orElse fallbackOpt match {
@@ -208,8 +214,8 @@ object CSSParsing {
             injectVariablesIntoDeclaration(
               declarationValue    = declarationValue.replace(fullMatch, variableValue),
               variableDefinitions = variableDefinitions,
-              mediaQuery          = mediaQuery,
-              selectors           = selectors
+              lookupMediaQuery    = lookupMediaQuery,
+              lookupSelectors     = lookupSelectors
             )
         }
     }
@@ -217,16 +223,18 @@ object CSSParsing {
   def injectVariablesIntoCss(
     cascadingStyleSheet: CascadingStyleSheet,
     variableDefinitions: VariableDefinitions,
-    mediaQuery         : MediaQuery,
+    lookupMediaQuery   : MediaQuery,
+    lookupSelectors    : List[Selector]
   ): String = {
 
     cascadingStyleSheet.getAllRules.asScala.foreach {
       case styleRule: CSSStyleRule =>
-        val selectors = styleRule.getAllSelectors.asScala.toList.map(s => Selector(s.getAsCSSString))
+        // Ignore CSS selectors at injection location
+        //val selectors = styleRule.getAllSelectors.asScala.toList.map(s => Selector(s.getAsCSSString))
 
         for (declaration <- styleRule.getAllDeclarations.asScala) {
           val originalValue = declaration.getExpression.getAsCSSString()
-          val modifiedValue = injectVariablesIntoDeclaration(originalValue, variableDefinitions, mediaQuery, selectors)
+          val modifiedValue = injectVariablesIntoDeclaration(originalValue, variableDefinitions, lookupMediaQuery, lookupSelectors)
 
           if (modifiedValue != originalValue)
             declaration.setExpression(CSSExpression.createSimple(modifiedValue))

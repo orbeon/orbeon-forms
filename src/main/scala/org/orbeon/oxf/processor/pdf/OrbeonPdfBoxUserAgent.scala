@@ -19,7 +19,7 @@ import com.openhtmltopdf.swing.NaiveUserAgent
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.css.CSSParsing.CSSCache
-import org.orbeon.css.{CSSParsing, MediaQuery, MediaType, VariableDefinitions}
+import org.orbeon.css.{CSSParsing, MediaQuery, Selector, VariableDefinitions}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -43,6 +43,7 @@ class OrbeonPdfBoxUserAgent(
   override val pipelineContext         : PipelineContext,
   dotsPerPixel                         : Int,
   variableDefinitions                  : VariableDefinitions,
+  lookupSelectors                      : List[Selector],
   cssCache                             : CSSCache
 )(override implicit val externalContext: ExternalContext,
   override implicit val indentedLogger : IndentedLogger
@@ -160,7 +161,8 @@ class OrbeonPdfBoxUserAgent(
           CSSParsing.injectVariablesIntoCss(
             cascadingStyleSheet = cascadingStyleSheet,
             variableDefinitions = variableDefinitions,
-            mediaQuery          = MediaQuery(MediaType.Print)
+            lookupMediaQuery    = MediaQuery.PrintMediaQuery,
+            lookupSelectors     = lookupSelectors
           )
       }
 

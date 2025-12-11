@@ -17,6 +17,7 @@ import com.helger.css.ECSSVersion
 import com.helger.css.tools.MediaQueryTools
 
 import java.net.URI
+import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.IterableHasAsScala
 
 
@@ -33,7 +34,7 @@ case class MediaQuery(mediaQuery: String) {
       }
     )
 
-  def simpleMatch(that: MediaQuery): Boolean =
+  def variableLookupMatch(that: MediaQuery): Boolean =
     (this.mediaQuery.trim, that.mediaQuery.trim) match {
       case ("all", _)       => true
       case (_, "all")       => true
@@ -76,7 +77,12 @@ object MediaType {
 
 // A CSS selector, from the most simple ones (e.g. "*", ":root", "div", etc.) to more complex selectors (e.g.
 // "input[required]:invalid:not(:focus)", etc.)
-case class Selector(selector: String)
+case class Selector(selector: String) {
+  def variableLookupMatch(that: Selector): Boolean = {
+    // We only support very simple cases (strict equality)
+    this.selector.trim == that.selector.trim
+  }
+}
 
 // <link> and <style> elements in an HTML document
 sealed trait CSSResource { def mediaQueries: List[MediaQuery] }
@@ -86,11 +92,32 @@ case class Style(css: String, mediaQueries: List[MediaQuery]) extends CSSResourc
 case class VariableDefinition(name: String, value: String, mediaQueries: List[MediaQuery], selectors: List[Selector])
 
 case class VariableDefinitions(variableDefinitions: List[VariableDefinition]) {
-  // Naive implementation of variable value lookup (ignore complex media queries and ignore all selectors)
-  def variableValue(variableName: String, mediaQuery: MediaQuery, selectors: List[Selector]): Option[String] =
+  // Simple variable value lookup (ignore complex media queries and CSS selectors)
+  @tailrec
+  final def variableValue(
+    variableName    : String,
+    lookupMediaQuery: MediaQuery,
+    lookupSelectors : List[Selector]
+  ): Option[String] =
+    lookupSelectors match {
+      case Nil => None
+      case lookupSelector :: remainingLookupSelectors =>
+        // Try the selectors one by one until we find a value
+        variableValue(variableName, lookupMediaQuery, lookupSelector) match {
+          case Some(value) => Some(value)
+          case None        => variableValue(variableName, lookupMediaQuery, remainingLookupSelectors)
+        }
+    }
+
+  def variableValue(
+    variableName    : String,
+    lookupMediaQuery: MediaQuery,
+    lookupSelector  : Selector
+  ): Option[String] =
     variableDefinitions.findLast { variableDefinition =>
-      // Match based on simple media queries ("print" matches "all" and "print", etc.) and variable name
-      variableDefinition.mediaQueries.exists(_.simpleMatch(mediaQuery)) &&
+      // Match based on simple media queries ("print" matches "all" and "print", etc.), selector, and variable name
+      variableDefinition.mediaQueries.exists(_.variableLookupMatch(lookupMediaQuery)) &&
+      variableDefinition.selectors.exists(_.variableLookupMatch(lookupSelector)) &&
       variableDefinition.name == variableName
     }.map {
       _.value

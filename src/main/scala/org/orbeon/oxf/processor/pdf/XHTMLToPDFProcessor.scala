@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.processor.pdf
 
+import cats.implicits.catsSyntaxOptionId
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.css.CSSParsing.CSSCache
-import org.orbeon.css.{CSSParsing, VariableDefinitions}
+import org.orbeon.css.{CSSParsing, Selector, VariableDefinitions}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -29,6 +30,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, TransformerUtils, XMLParsing, XMLReceiver}
+import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
 import org.w3c.dom.Document
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -197,6 +199,25 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
           }
         )
 
+      // Extract classes from the div element with id="fr-view"
+      val frViewClasses =
+        StaticXPath.orbeonDomToTinyTree(TransformerUtils.domToOrbeonDomDocument(w3cDocument))
+          .descendant(*)
+          .find(_.attValue("id") == "fr-view")
+          .toList
+          .flatMap(div => (div /@ "class").stringValue.splitTo[List]())
+
+      // Look for PDF color mode class inserted in print-pdf-no-template.xsl
+      val pdfColorModeClassOpt = frViewClasses.find(_.startsWith("fr-pdf-color-mode-"))
+
+      // Simple CSS selectors listed by order of priority for static CSS variable lookup
+      val lookupSelectors = List(
+        pdfColorModeClassOpt.map(mode => s".orbeon .$mode"),
+        pdfColorModeClassOpt.map(mode => s".$mode"),
+        ".orbeon".some,
+        ":root".some
+      ).flatten.map(Selector.apply)
+
       // Cache will be written when variable definitions are parsed and read when variables values are injected
       implicit val cssCache: CSSCache = new CSSCache()
 
@@ -237,6 +258,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             pipelineContext,
             DefaultDotsPerPixel,
             variableDefinitions,
+            lookupSelectors,
             cssCache
           )
         )

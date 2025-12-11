@@ -101,7 +101,7 @@ class CSSParsingTest extends AnyFunSpec {
 
     it("must parse variable definitions from a CSS string") {
       val variableDefinitions1 = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery("all"))),
+        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
         resolvedURL = _ => new URL("") // Won't be called
       )
 
@@ -121,8 +121,8 @@ class CSSParsingTest extends AnyFunSpec {
     it("must inject a variable value into a single declaration value") {
       val testVariableDefinitions = VariableDefinitions(
         List(
-          VariableDefinition(name = "--base-font-size", value = "13px"   , mediaQueries = List(MediaQuery("all")), selectors = List(Selector(".orbeon"))),
-          VariableDefinition(name = "--hint-font-size", value = "smaller", mediaQueries = List(MediaQuery("all")), selectors = List(Selector(".orbeon")))
+          VariableDefinition(name = "--base-font-size", value = "13px"   , mediaQueries = List(MediaQuery.AllMediaQuery), selectors = List(Selector(".orbeon"))),
+          VariableDefinition(name = "--hint-font-size", value = "smaller", mediaQueries = List(MediaQuery.AllMediaQuery), selectors = List(Selector(".orbeon")))
         )
       )
 
@@ -138,13 +138,13 @@ class CSSParsingTest extends AnyFunSpec {
       )
 
       for ((param, result) <- expected) {
-        assert(CSSParsing.injectVariablesIntoDeclaration(param, testVariableDefinitions, MediaQuery("print"), Nil) == result)
+        assert(CSSParsing.injectVariablesIntoDeclaration(param, testVariableDefinitions, MediaQuery.PrintMediaQuery, List(Selector(".orbeon"))) == result)
       }
     }
 
     it("must inject variables into a CSS stylesheet") {
       val variableDefinitions1 = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery("all"))),
+        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
         resolvedURL = _ => new URL("") // Won't be called
       )
 
@@ -157,7 +157,8 @@ class CSSParsingTest extends AnyFunSpec {
       val actualModifiedCss = CSSParsing.injectVariablesIntoCss(
         cascadingStyleSheet = CSSParsing.parsedCss(cssWithVariableEvaluations).get,
         variableDefinitions = variableDefinitions1,
-        mediaQuery          = MediaQuery("print")
+        lookupMediaQuery    = MediaQuery.PrintMediaQuery,
+        lookupSelectors     = List(Selector(".orbeon"), Selector(":root"))
       )
 
       val expectedModifiedCss =
@@ -185,16 +186,16 @@ class CSSParsingTest extends AnyFunSpec {
                         f                         : ValueProvider => Unit
     ): Unit = {
       val variableDefinitions = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions, List(MediaQuery("all"))),
+        resource    = Style(cssWithVariableDefinitions, List(MediaQuery.AllMediaQuery)),
         resolvedURL = _ => new URL("") // Won't be called
       )
 
       val variableValues = new ValueProvider {
         def variableValue(variableName: String): Option[String] =
           variableDefinitions.variableValue(
-            variableName = variableName,
-            mediaQuery   = mediaQuery,
-            selectors    = List(Selector(".orbeon"))
+            variableName     = variableName,
+            lookupMediaQuery = mediaQuery,
+            lookupSelectors  = List(Selector(".orbeon"))
           )
       }
 
@@ -203,7 +204,7 @@ class CSSParsingTest extends AnyFunSpec {
 
     it("must respect simple media queries when retrieving variable values") {
 
-      import MediaQuery.{ScreenMediaQuery, PrintMediaQuery}
+      import MediaQuery.{PrintMediaQuery, ScreenMediaQuery}
 
       val vars1 = """.orbeon {
                     |  --orbeon1: orbeon1-1st;

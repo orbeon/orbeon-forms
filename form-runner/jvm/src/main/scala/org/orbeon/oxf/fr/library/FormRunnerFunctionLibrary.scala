@@ -203,11 +203,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
     )
 
-    Fun("get-or-create-rendered-format-url", classOf[FRGetOrCreateRenderedFormatUrl], op = 0, min = 0, STRING, EXACTLY_ONE,
+    Fun("rendered-format-url", classOf[FRRenderedFormatUrl], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
     )
 
-    Fun("filename-for-rendered-format", classOf[FRFilenameForRenderedFormat], op = 0, min = 0, STRING, EXACTLY_ONE,
+    Fun("rendered-format-filename", classOf[FRRenderedFormatFilename], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
     )
   }
@@ -710,7 +710,7 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
   }
 }
 
-class FRGetOrCreateRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction {
+class FRRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
     implicit val xpc             : XPathContext     = xpathContext
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
@@ -721,7 +721,7 @@ class FRGetOrCreateRenderedFormatUrl extends FunctionSupport with RuntimeDepende
   }
 }
 
-class FRFilenameForRenderedFormat extends FunctionSupport with RuntimeDependentFunction {
+class FRRenderedFormatFilename extends FunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
     implicit val xpc             : XPathContext     = xpathContext
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()

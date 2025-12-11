@@ -50,10 +50,10 @@
                 <xf:action if="$template/attach/@pdf = 'true'">
                     <xf:setvalue
                         ref="instance()/pdf-attachment"
-                        value="fr:get-or-create-rendered-format-url('pdf')"/>
+                        value="fr:rendered-format-url('pdf')"/>
                     <xf:setvalue
                         ref="instance()/pdf-attachment/@filename"
-                        value="fr:filename-for-rendered-format('pdf')"/>
+                        value="fr:rendered-format-filename('pdf')"/>
                 </xf:action>
             </xbl:handler>
         </xbl:handlers>
@@ -133,8 +133,8 @@
                         <xf:output
                             class="btn"
                             appearance="xxf:download"
-                            xxf:download="{@filename}"
-                            ref="instance()/pdf-attachment[xxf:non-blank()]">
+                            ref="instance()/pdf-attachment[xxf:non-blank()]"
+                            xxf:download="{@filename}">
                             <xf:label mediatype="text/html" ref="xxf:r('download-pdf')"/>
                             <xf:filename  ref="@filename"/>
                             <xf:mediatype ref="@mediatype"/>

@@ -56,7 +56,13 @@
                                             then
                                                 xf:element('_', (
                                                     xf:attribute('keyboard-shortcut', $keyboard-shortcut),
-                                                    xf:attribute('display-name'     , string($binding/fb:metadata/fb:display-name[@lang = 'en']))
+                                                    xf:attribute(
+                                                        'display-name',
+                                                        string((
+                                                            $binding/fb:metadata/fb:display-name[@lang = fr:lang()],
+                                                            $binding/fb:metadata/fb:display-name
+                                                        )[1])
+                                                    )
                                                 ))
                                             else ()
                                     "/>

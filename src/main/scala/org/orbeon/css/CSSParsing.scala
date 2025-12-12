@@ -246,8 +246,9 @@ object CSSParsing {
     lookupSelectors    : List[Selector]
   ): String = {
 
-    cascadingStyleSheet.getAllRules.asScala.foreach {
-      case styleRule: CSSStyleRule =>
+    // Use a visitor to make sure we update all style rules
+    val injector = new DefaultCSSVisitor {
+      override def onBeginStyleRule(styleRule: CSSStyleRule): Unit = {
         // Ignore CSS selectors at injection location
         //val selectors = styleRule.getAllSelectors.asScala.toList.map(s => Selector(s.getAsCSSString))
 
@@ -258,9 +259,10 @@ object CSSParsing {
           if (modifiedValue != originalValue)
             declaration.setExpression(CSSExpression.createSimple(modifiedValue))
         }
-
-      case _ =>
+      }
     }
+
+    CSSVisitor.visitCSS(cascadingStyleSheet, injector)
 
     // Serialize CSS
     val writer = new CSSWriter(new CSSWriterSettings(ECSSVersion.CSS30))

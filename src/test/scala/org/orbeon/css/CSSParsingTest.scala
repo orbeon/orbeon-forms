@@ -160,7 +160,14 @@ class CSSParsingTest extends AnyFunSpec {
         """|.orbeon {
            |  font-size: var(--orbeon-test2);
            |  font-family: var(--orbeon-test3);
-           |}""".stripMargin
+           |}
+           |@media print {
+           |  .orbeon {
+           |    font-size: var(--orbeon-test2);
+           |    font-family: var(--orbeon-test3);
+           |  }
+           |}
+           |""".stripMargin
 
       val actualModifiedCss = CSSParsing.injectVariablesIntoCss(
         cascadingStyleSheet = CSSParsing.parsedCss(cssWithVariableEvaluations).get,
@@ -177,6 +184,13 @@ class CSSParsingTest extends AnyFunSpec {
            |.orbeon {
            |  font-size:test2;
            |  font-family:test3-print;
+           |}
+           |
+           |@media print {
+           |  .orbeon {
+           |    font-size:test2;
+           |    font-family:test3-print;
+           |  }
            |}
            |""".stripMargin
 

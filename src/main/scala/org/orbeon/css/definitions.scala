@@ -89,7 +89,13 @@ sealed trait CSSResource { def mediaQueries: List[MediaQuery] }
 case class Link (uri: URI   , mediaQueries: List[MediaQuery]) extends CSSResource
 case class Style(css: String, mediaQueries: List[MediaQuery]) extends CSSResource
 
-case class VariableDefinition(name: String, value: String, mediaQueries: List[MediaQuery], selectors: List[Selector])
+case class VariableDefinition(
+  name                  : String,
+  value                 : String,
+  mediaQueries          : List[MediaQuery],
+  selectors             : List[Selector],
+  noPseudoClassSelectors: List[Selector]
+)
 
 case class VariableDefinitions(variableDefinitions: List[VariableDefinition]) {
   // Simple variable value lookup (ignore complex media queries and CSS selectors)
@@ -117,7 +123,7 @@ case class VariableDefinitions(variableDefinitions: List[VariableDefinition]) {
     variableDefinitions.findLast { variableDefinition =>
       // Match based on simple media queries ("print" matches "all" and "print", etc.), selector, and variable name
       variableDefinition.mediaQueries.exists(_.variableLookupMatch(lookupMediaQuery)) &&
-      variableDefinition.selectors.exists(_.variableLookupMatch(lookupSelector)) &&
+      variableDefinition.noPseudoClassSelectors.exists(_.variableLookupMatch(lookupSelector)) &&
       variableDefinition.name == variableName
     }.map {
       _.value

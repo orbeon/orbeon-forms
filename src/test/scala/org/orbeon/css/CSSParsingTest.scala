@@ -119,10 +119,18 @@ class CSSParsingTest extends AnyFunSpec {
     }
 
     it("must inject a variable value into a single declaration value") {
+      def variableDefinition(name: String, value: String) = VariableDefinition(
+        name                   = name,
+        value                  = value,
+        mediaQueries           = List(MediaQuery.AllMediaQuery),
+        selectors              = List(Selector(".orbeon")),
+        noPseudoClassSelectors = List(Selector(".orbeon"))
+      )
+
       val testVariableDefinitions = VariableDefinitions(
         List(
-          VariableDefinition(name = "--base-font-size", value = "13px"   , mediaQueries = List(MediaQuery.AllMediaQuery), selectors = List(Selector(".orbeon"))),
-          VariableDefinition(name = "--hint-font-size", value = "smaller", mediaQueries = List(MediaQuery.AllMediaQuery), selectors = List(Selector(".orbeon")))
+          variableDefinition(name = "--base-font-size", value = "13px"   ),
+          variableDefinition(name = "--hint-font-size", value = "smaller")
         )
       )
 

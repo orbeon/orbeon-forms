@@ -106,8 +106,9 @@ object CSSParsing {
   private class VariableVisitor(mediaQueries: List[MediaQuery]) extends DefaultCSSVisitor {
     val variableBuffer: mutable.ArrayBuffer[VariableDefinition] = mutable.ArrayBuffer[VariableDefinition]()
 
-    private val mediaQueriesStack = mutable.ArrayDeque[List[MediaQuery]]()
-    private val selectorStack     = mutable.ArrayDeque[List[Selector]]()
+    private val mediaQueriesStack          = mutable.ArrayDeque[List[MediaQuery]]()
+    private val selectorStack              = mutable.ArrayDeque[List[Selector]]()
+    private val noPseudoClassSelectorStack = mutable.ArrayDeque[List[Selector]]()
 
     override def onDeclaration(aDeclaration: CSSDeclaration): Unit = {
       val name = aDeclaration.getProperty
@@ -116,22 +117,40 @@ object CSSParsing {
       if (name.startsWith("--")) {
         variableBuffer.append(
           VariableDefinition(
-            name         = name,
-            value        = aDeclaration.getExpression.getAsCSSString,
+            name                   = name,
+            value                  = aDeclaration.getExpression.getAsCSSString,
             // Combine media query lists using AND operator
-            mediaQueries = mediaQueriesStack.toList.foldLeft(mediaQueries)((left, right) => MediaQuery.and(left, right)),
+            mediaQueries           = mediaQueriesStack.toList.foldLeft(mediaQueries)((left, right) => MediaQuery.and(left, right)),
             // Keep top selectors only (not supporting nested selectors)
-            selectors    = selectorStack.lastOption.getOrElse(Nil)
+            selectors              = selectorStack.lastOption.getOrElse(Nil),
+            noPseudoClassSelectors = noPseudoClassSelectorStack.lastOption.getOrElse(Nil)
           )
         )
       }
     }
 
-    override def onBeginStyleRule(aStyleRule: CSSStyleRule): Unit =
+    override def onBeginStyleRule(aStyleRule: CSSStyleRule): Unit = {
       selectorStack.append(aStyleRule.getAllSelectors.asScala.toList.map(s => Selector(s.getAsCSSString)))
 
-    override def onEndStyleRule(aStyleRule: CSSStyleRule): Unit =
+      // We keep :root, as it is often used to declare CSS variables globally
+      def pseudoClassToRemove(s: String) = s.startsWith(":") && s != ":root"
+
+      // Keep a version of the selectors without any pseudo-class
+      noPseudoClassSelectorStack.append(
+        aStyleRule
+          .getAllSelectors
+          .asScala
+          .toList
+          // Remove all pseudo-classes
+          .map(_.getAllMembers.asScala.map(_.getAsCSSString).filterNot(pseudoClassToRemove).mkString)
+          .map(Selector.apply)
+      )
+    }
+
+    override def onEndStyleRule(aStyleRule: CSSStyleRule): Unit = {
       selectorStack.removeLast()
+      noPseudoClassSelectorStack.removeLast()
+    }
 
     override def onBeginMediaRule(aMediaRule: CSSMediaRule): Unit =
       mediaQueriesStack.append(aMediaRule.getAllMediaQueries.asScala.toList.map(mq => MediaQuery(mq.getAsCSSString)))

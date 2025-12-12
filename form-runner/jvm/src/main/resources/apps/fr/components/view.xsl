@@ -1052,6 +1052,7 @@
 
     <xsl:template match="fr:navbar-home-link">
         <xf:switch
+            class="fr-navbar-home-link"
             xxf:update="full"
             caseref="
                 not(fr:mode() = 'test')                        and

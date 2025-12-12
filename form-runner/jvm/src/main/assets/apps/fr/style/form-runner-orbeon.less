@@ -14,12 +14,12 @@
 @import (reference) "../../../../../../../bootstrap-src/less/mixins";
 @import (reference) "form-runner-common";
 
-body.orbeon { background-color: @frBackground }
+body.orbeon { background-color: var(--orbeon-base-background-color); }
 
 .fr-body-decorations() {
-    border: 1px solid var(--orbeon-body-border-color);
+    border: 1px solid var(--orbeon-base-border-color);
     border-radius: @baseBorderRadius;
-    background-color: white;
+    background-color: var(--orbeon-base-background-color);
 }
 
 // This only for the top-level TOC
@@ -107,7 +107,7 @@ body.orbeon { background-color: @frBackground }
 
 .fr-toc-body-styling() {
     min-height: 20px;
-    border: 1px solid var(--orbeon-toc-border-color);
+    border: 1px solid var(--orbeon-base-border-color);
     border-radius: @baseBorderRadius;
 }
 
@@ -600,7 +600,7 @@ body.orbeon { background-color: @frBackground }
 
     html {
         &, body.orbeon {
-            background-color: white;
+            background-color: var(--orbeon-base-background-color);
             background-image: none
         }
         font-family: @frPrintBaseFontFamily;

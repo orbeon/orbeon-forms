@@ -14,7 +14,7 @@
 
 body.orbeon {
     margin: 0;
-    background-color: @bodyBackground;
+    background-color: var(--orbeon-base-background-color);
 }
 
 .orbeon {
@@ -304,6 +304,7 @@ body.orbeon {
             line-height: @fluidLineHeight;
         }
         color: var(--orbeon-control-color);
+        background-color: var(--orbeon-control-background-color);
 
         margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
         box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
@@ -313,7 +314,6 @@ body.orbeon {
         }
         background-image: none;                     // Liferay adds background images which don't mix well with Bootstrap
 
-        background-color: @inputBackground;
         .focusHighlight();
     }
 
@@ -582,9 +582,9 @@ body.orbeon {
         // `.xforms-text` is for the Explanatory Text control
         &.xforms-output.xforms-mediatype-text-html.xforms-text {
             color: var(--orbeon-base-color);
+            background-color: var(--orbeon-base-background-color);
             padding: 0;
             margin: 0;
-            background-color: @bodyBackground;
             border: none;
         }
     }

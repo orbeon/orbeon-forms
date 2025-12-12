@@ -14,7 +14,9 @@
 
 .orbeon {
 
-  // ***** Fonts *******************************************************************************************************
+  // General
+  --orbeon-base-background-color: white;
+  --orbeon-base-border-color    : #e3e3e3; // darken(@wellBackground, 7%);
 
   // Base font
   --orbeon-base-font-size  : 13px;
@@ -47,13 +49,14 @@
   --orbeon-help-content-color      : inherit;
 
   // Controls
-  --orbeon-control-font-size     : inherit;
-  --orbeon-control-font-family   : @frBaseFontFamily;
-  --orbeon-control-font-weight   : inherit;
-  --orbeon-control-color         : black; // Make text inside the fields stand out, as this is the most important information
-  --orbeon-control-border-color  : #ccc;
+  --orbeon-control-font-size       : inherit;
+  --orbeon-control-font-family     : @frBaseFontFamily;
+  --orbeon-control-font-weight     : inherit;
+  --orbeon-control-color           : black; // Make text inside the fields stand out, as this is the most important information
+  --orbeon-control-background-color: white;
+  --orbeon-control-border-color    : #ccc;  // Slightly darker than base border color
   @media (prefers-contrast: more) {
-    --orbeon-control-border-color: #949494;
+    --orbeon-control-border-color  : #949494;
   }
 
   // Specific controls
@@ -62,7 +65,7 @@
   --orbeon-attachment-dragover-background-color: #ccc;
 
   // Focus
-  --orbeon-focus-border-color   : #3396ff;
+  --orbeon-focus-border-color   : #3396ff; // Blueish
   --orbeon-focus-highlight-color: rgba(0,123,255,.25);
 
   // Buttons
@@ -70,9 +73,6 @@
   --orbeon-button-font-family: @frBaseFontFamily;
   --orbeon-button-font-weight: normal;
   --orbeon-button-color      : inherit;
-
-  // Body
-  --orbeon-body-border-color: darken(@wellBackground, 7%);
 
   // Sections
   --orbeon-section-title-font-size              : 1.38em; // 18px
@@ -97,7 +97,6 @@
   // Regular and wizard table of contents (TOC)
   --orbeon-toc-color                          : #0d6efd;
   --orbeon-toc-background-color               : white;
-  --orbeon-toc-border-color                   : darken(@wellBackground, 7%);
   --orbeon-toc-hover-background-color         : @grayLighter;
   --orbeon-toc-selected-color                 : white;
   --orbeon-toc-selected-background-color      : #0d6efd;
@@ -168,4 +167,21 @@
 
   // XForms inspector (by default, keep the font size absolute)
   --orbeon-inspector-font-size: 13px;
+}
+
+@media print {
+  .orbeon {
+    // For CSS debugging with "Preview" and the relevant .fr-pdf-color-mode-* classes
+    &:has(.fr-pdf-color-mode-black-and-white), &:has(.fr-pdf-color-mode-keep-field-colors) {
+      // Use !important instead of more complex selectors to win over .orbeon:not(:has(.fb-main)), etc.
+      --orbeon-base-background-color: white !important;
+    }
+
+    &, .fr-pdf-color-mode-black-and-white, .fr-pdf-color-mode-keep-field-colors {
+      --orbeon-base-background-color: white;
+      --orbeon-base-border-color    : #e3e3e3;
+      --orbeon-base-color           : @grayDark;
+      --orbeon-control-border-color : #ccc;
+    }
+  }
 }

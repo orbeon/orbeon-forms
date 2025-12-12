@@ -63,154 +63,154 @@
                             <xh:table class="table table-condensed table-bordered">
                                 <xh:tbody>
                                     <xh:tr>
-                                        <xh:td rowspan="2">Actions</xh:td>
+                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.actions', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⌘S</xh:kbd>/<xh:kbd>⌃S</xh:kbd></xh:td>
-                                        <xh:td>Save the form definition</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.save-form', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌘P</xh:kbd>/<xh:kbd>⌃P</xh:kbd></xh:td>
-                                        <xh:td>Open the Publish dialog</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-publish', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="3">Cut, Copy, Paste</xh:td>
+                                        <xh:td rowspan="3"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.cut-copy-paste', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⌘X</xh:kbd>/<xh:kbd>⌃X</xh:kbd></xh:td>
-                                        <xh:td>Cut the current control</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.cut-control', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌘C</xh:kbd>/<xh:kbd>⌃C</xh:kbd></xh:td>
-                                        <xh:td>Copy the current control</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.copy-control', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌘V</xh:kbd>/<xh:kbd>⌃V</xh:kbd></xh:td>
-                                        <xh:td>Paste from the toolbox</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.paste-toolbox', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="5">Grid Navigation</xh:td>
+                                        <xh:td rowspan="5"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.grid-navigation', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>←</xh:kbd>/<xh:kbd>→</xh:kbd></xh:td>
-                                        <xh:td>Move to the previous or next grid cell, including empty cells.</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-next-cell', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⇧←</xh:kbd>/<xh:kbd>⇧→</xh:kbd></xh:td>
-                                        <xh:td>Move to the previous or next grid cell, skipping empty cells.</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-next-skip-empty', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>↑</xh:kbd>/<xh:kbd>↓</xh:kbd></xh:td>
-                                        <xh:td>Move to the previous or next grid cell vertically, including empty cells.</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-vertical-cell', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌃⇧↑</xh:kbd></xh:td>
-                                        <xh:td>Move the current grid line up.</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-line-up', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌃⇧↓</xh:kbd></xh:td>
-                                        <xh:td>Move the current grid line down.</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-line-down', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="2">Undo and Redo</xh:td>
+                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.undo-redo', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⌘Z</xh:kbd>/<xh:kbd>⌃Z</xh:kbd></xh:td>
-                                        <xh:td>Undo the last operation</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.undo', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌘⇧Z</xh:kbd>/<xh:kbd>⌃Y</xh:kbd></xh:td>
-                                        <xh:td>Redo the last operation</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.redo', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="15">All dialogs</xh:td>
+                                        <xh:td rowspan="15"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⇧↵</xh:kbd></xh:td>
-                                        <xh:td>Open the Control Settings dialog</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-control-settings', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌘↵</xh:kbd>/<xh:kbd>⌃↵</xh:kbd></xh:td>
-                                        <xh:td>Apply/OK dialog (clicks primary button)</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.apply-ok-dialog', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌘J</xh:kbd>/<xh:kbd>⌃J</xh:kbd></xh:td>
-                                        <xh:td>Open the Quick control search</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-quick-search', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>O F</xh:kbd></xh:td>
-                                        <xh:td>Open Form Settings</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-form-settings', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>O P</xh:kbd></xh:td>
-                                        <xh:td>Open Permissions</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-permissions', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>O E</xh:kbd></xh:td>
-                                        <xh:td>Open Email Settings</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-email-settings', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>O M</xh:kbd></xh:td>
-                                        <xh:td>Open Messages</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-messages', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>O S</xh:kbd></xh:td>
-                                        <xh:td>Open Edit Source</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-edit-source', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>T W</xh:kbd></xh:td>
-                                        <xh:td>Test the web form</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-web-form', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>T P</xh:kbd></xh:td>
-                                        <xh:td>Test PDF production</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-pdf', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>T O</xh:kbd></xh:td>
-                                        <xh:td>Test the offline form</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-offline', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>T F</xh:kbd></xh:td>
-                                        <xh:td>Inspect formulas</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inspect-formulas', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                 </xh:tbody>
                             </xh:table>
                             <xh:table class="table table-condensed table-bordered">
                                 <xh:tbody>
                                     <xh:tr>
-                                        <xh:td rowspan="2">Control Settings dialog</xh:td>
+                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.control-settings-dialog', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⌃[</xh:kbd></xh:td>
-                                        <xh:td>Go to previous control</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.go-prev-control', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌃]</xh:kbd></xh:td>
-                                        <xh:td>Go to next control</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.go-next-control', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="2">Tab Navigation</xh:td>
+                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.tab-navigation', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⌃}</xh:kbd>/<xh:kbd>⌃Tab</xh:kbd></xh:td>
-                                        <xh:td>Move to next tab</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-next-tab', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>⌃{</xh:kbd>/<xh:kbd>⌃⇧Tab</xh:kbd></xh:td>
-                                        <xh:td>Move to previous tab</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-tab', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="3">Inserting Form Structure</xh:td>
+                                        <xh:td rowspan="3"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inserting-form-structure', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>I F S</xh:kbd></xh:td>
-                                        <xh:td>Insert a new section</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-section', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>I F G</xh:kbd></xh:td>
-                                        <xh:td>Insert a new grid</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-grid', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td><xh:kbd>I F R</xh:kbd></xh:td>
-                                        <xh:td>Insert a new repeated grid</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-repeated-grid', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xf:repeat ref="$controls-with-keyboard-shortcut">
                                         <xh:tr>
                                             <xf:group ref="if (position() = 1) then . else ()">
-                                                <xh:td rowspan="{count($controls-with-keyboard-shortcut)}">Inserting Form Controls</xh:td>
+                                                <xh:td rowspan="{count($controls-with-keyboard-shortcut)}"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inserting-form-controls', '|fr-form-resources|')"/></xh:td>
                                             </xf:group>
                                             <xh:td><xh:kbd><xf:output value="@keyboard-shortcut"/></xh:kbd></xh:td>
                                             <xh:td><xf:output value="@display-name"/></xh:td>
                                         </xh:tr>
                                     </xf:repeat>
                                     <xh:tr>
-                                        <xh:td>Reloading the Toolbox</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.reloading-toolbox', '|fr-form-resources|')"/></xh:td>
                                         <xh:td><xh:kbd>⌘⇧R</xh:kbd>/<xh:kbd>⌃⇧R</xh:kbd></xh:td>
-                                        <xh:td>Reload the toolbox</xh:td>
+                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.reload-toolbox', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                 </xh:tbody>
                             </xh:table>

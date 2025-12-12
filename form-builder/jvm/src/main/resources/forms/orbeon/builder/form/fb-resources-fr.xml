@@ -1545,6 +1545,50 @@
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
         <dialog-title>Raccourcis clavier</dialog-title>
+        <!-- En-têtes de section -->
+        <actions>Actions</actions>
+        <cut-copy-paste>Couper, Copier, Coller</cut-copy-paste>
+        <grid-navigation>Navigation dans la grille</grid-navigation>
+        <undo-redo>Annuler et Rétablir</undo-redo>
+        <all-dialogs>Toutes les fenêtres</all-dialogs>
+        <control-settings-dialog>Fenêtre des propriétés du contrôle</control-settings-dialog>
+        <tab-navigation>Navigation entre onglets</tab-navigation>
+        <inserting-form-structure>Insertion de structure de formulaire</inserting-form-structure>
+        <inserting-form-controls>Insertion de contrôles de formulaire</inserting-form-controls>
+        <reloading-toolbox>Rechargement de la boîte à outils</reloading-toolbox>
+        <!-- Descriptions des actions -->
+        <save-form>Enregistrer la définition du formulaire</save-form>
+        <open-publish>Ouvrir la fenêtre de publication</open-publish>
+        <cut-control>Couper le contrôle actuel</cut-control>
+        <copy-control>Copier le contrôle actuel</copy-control>
+        <paste-toolbox>Coller depuis la boîte à outils</paste-toolbox>
+        <move-prev-next-cell>Aller à la cellule précédente ou suivante de la grille, y compris les cellules vides.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Aller à la cellule précédente ou suivante de la grille, en ignorant les cellules vides.</move-prev-next-skip-empty>
+        <move-vertical-cell>Aller à la cellule précédente ou suivante de la grille verticalement, y compris les cellules vides.</move-vertical-cell>
+        <move-line-up>Déplacer la ligne de grille actuelle vers le haut.</move-line-up>
+        <move-line-down>Déplacer la ligne de grille actuelle vers le bas.</move-line-down>
+        <undo>Annuler la dernière opération</undo>
+        <redo>Rétablir la dernière opération</redo>
+        <open-control-settings>Ouvrir la fenêtre des propriétés du contrôle</open-control-settings>
+        <apply-ok-dialog>Appliquer/OK (cliquer sur le bouton principal)</apply-ok-dialog>
+        <open-quick-search>Ouvrir la recherche rapide de contrôle</open-quick-search>
+        <open-form-settings>Ouvrir les paramètres du formulaire</open-form-settings>
+        <open-permissions>Ouvrir les permissions</open-permissions>
+        <open-email-settings>Ouvrir les paramètres d'email</open-email-settings>
+        <open-messages>Ouvrir les messages</open-messages>
+        <open-edit-source>Ouvrir la modification du source</open-edit-source>
+        <test-web-form>Tester le formulaire web</test-web-form>
+        <test-pdf>Tester la production PDF</test-pdf>
+        <test-offline>Tester le formulaire hors ligne</test-offline>
+        <inspect-formulas>Inspecter les formules</inspect-formulas>
+        <go-prev-control>Aller au contrôle précédent</go-prev-control>
+        <go-next-control>Aller au contrôle suivant</go-next-control>
+        <move-next-tab>Aller à l'onglet suivant</move-next-tab>
+        <move-prev-tab>Aller à l'onglet précédent</move-prev-tab>
+        <insert-section>Insérer une nouvelle section</insert-section>
+        <insert-grid>Insérer une nouvelle grille</insert-grid>
+        <insert-repeated-grid>Insérer une nouvelle grille répétée</insert-repeated-grid>
+        <reload-toolbox>Recharger la boîte à outils</reload-toolbox>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Messages</label>

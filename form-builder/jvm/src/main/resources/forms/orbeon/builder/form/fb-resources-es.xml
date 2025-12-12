@@ -1538,6 +1538,50 @@
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
         <dialog-title>Atajos de teclado</dialog-title>
+        <!-- Encabezados de sección -->
+        <actions>Acciones</actions>
+        <cut-copy-paste>Cortar, Copiar, Pegar</cut-copy-paste>
+        <grid-navigation>Navegación en la cuadrícula</grid-navigation>
+        <undo-redo>Deshacer y Rehacer</undo-redo>
+        <all-dialogs>Todos los diálogos</all-dialogs>
+        <control-settings-dialog>Diálogo de configuración del control</control-settings-dialog>
+        <tab-navigation>Navegación entre pestañas</tab-navigation>
+        <inserting-form-structure>Inserción de estructura de formulario</inserting-form-structure>
+        <inserting-form-controls>Inserción de controles de formulario</inserting-form-controls>
+        <reloading-toolbox>Recarga de la caja de herramientas</reloading-toolbox>
+        <!-- Descripciones de acciones -->
+        <save-form>Guardar la definición del formulario</save-form>
+        <open-publish>Abrir el diálogo de publicación</open-publish>
+        <cut-control>Cortar el control actual</cut-control>
+        <copy-control>Copiar el control actual</copy-control>
+        <paste-toolbox>Pegar desde la caja de herramientas</paste-toolbox>
+        <move-prev-next-cell>Ir a la celda anterior o siguiente de la cuadrícula, incluyendo celdas vacías.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Ir a la celda anterior o siguiente de la cuadrícula, omitiendo celdas vacías.</move-prev-next-skip-empty>
+        <move-vertical-cell>Ir a la celda anterior o siguiente de la cuadrícula verticalmente, incluyendo celdas vacías.</move-vertical-cell>
+        <move-line-up>Mover la línea actual de la cuadrícula hacia arriba.</move-line-up>
+        <move-line-down>Mover la línea actual de la cuadrícula hacia abajo.</move-line-down>
+        <undo>Deshacer la última operación</undo>
+        <redo>Rehacer la última operación</redo>
+        <open-control-settings>Abrir el diálogo de configuración del control</open-control-settings>
+        <apply-ok-dialog>Aplicar/OK (hace clic en el botón principal)</apply-ok-dialog>
+        <open-quick-search>Abrir la búsqueda rápida de controles</open-quick-search>
+        <open-form-settings>Abrir configuración del formulario</open-form-settings>
+        <open-permissions>Abrir permisos</open-permissions>
+        <open-email-settings>Abrir configuración de correo electrónico</open-email-settings>
+        <open-messages>Abrir mensajes</open-messages>
+        <open-edit-source>Abrir edición del código fuente</open-edit-source>
+        <test-web-form>Probar el formulario web</test-web-form>
+        <test-pdf>Probar producción de PDF</test-pdf>
+        <test-offline>Probar el formulario sin conexión</test-offline>
+        <inspect-formulas>Inspeccionar fórmulas</inspect-formulas>
+        <go-prev-control>Ir al control anterior</go-prev-control>
+        <go-next-control>Ir al control siguiente</go-next-control>
+        <move-next-tab>Ir a la pestaña siguiente</move-next-tab>
+        <move-prev-tab>Ir a la pestaña anterior</move-prev-tab>
+        <insert-section>Insertar una nueva sección</insert-section>
+        <insert-grid>Insertar una nueva cuadrícula</insert-grid>
+        <insert-repeated-grid>Insertar una nueva cuadrícula repetida</insert-repeated-grid>
+        <reload-toolbox>Recargar la caja de herramientas</reload-toolbox>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Mensajes</label>

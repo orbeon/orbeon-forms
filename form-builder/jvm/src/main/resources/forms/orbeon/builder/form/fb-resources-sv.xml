@@ -1553,6 +1553,50 @@
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
         <dialog-title>Tangentbordsgenvägar</dialog-title>
+        <!-- Sektionsrubriker -->
+        <actions>Åtgärder</actions>
+        <cut-copy-paste>Klipp ut, Kopiera, Klistra in</cut-copy-paste>
+        <grid-navigation>Rutnätsnavigering</grid-navigation>
+        <undo-redo>Ångra och Gör om</undo-redo>
+        <all-dialogs>Alla dialogrutor</all-dialogs>
+        <control-settings-dialog>Kontrollinställningsdialogruta</control-settings-dialog>
+        <tab-navigation>Fliknavigering</tab-navigation>
+        <inserting-form-structure>Infoga formulärstruktur</inserting-form-structure>
+        <inserting-form-controls>Infoga formulärkontroller</inserting-form-controls>
+        <reloading-toolbox>Ladda om verktygslådan</reloading-toolbox>
+        <!-- Åtgärdsbeskrivningar -->
+        <save-form>Spara formulärdefinitionen</save-form>
+        <open-publish>Öppna publiceringsdialogrutan</open-publish>
+        <cut-control>Klipp ut aktuell kontroll</cut-control>
+        <copy-control>Kopiera aktuell kontroll</copy-control>
+        <paste-toolbox>Klistra in från verktygslådan</paste-toolbox>
+        <move-prev-next-cell>Gå till föregående eller nästa rutnätscell, inklusive tomma celler.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Gå till föregående eller nästa rutnätscell, hoppa över tomma celler.</move-prev-next-skip-empty>
+        <move-vertical-cell>Gå till föregående eller nästa rutnätscell vertikalt, inklusive tomma celler.</move-vertical-cell>
+        <move-line-up>Flytta aktuell rutnätsrad uppåt.</move-line-up>
+        <move-line-down>Flytta aktuell rutnätsrad nedåt.</move-line-down>
+        <undo>Ångra senaste åtgärden</undo>
+        <redo>Gör om senaste åtgärden</redo>
+        <open-control-settings>Öppna kontrollinställningsdialogrutan</open-control-settings>
+        <apply-ok-dialog>Tillämpa/OK (klickar på huvudknappen)</apply-ok-dialog>
+        <open-quick-search>Öppna snabbsökning för kontroller</open-quick-search>
+        <open-form-settings>Öppna formulärinställningar</open-form-settings>
+        <open-permissions>Öppna behörigheter</open-permissions>
+        <open-email-settings>Öppna e-postinställningar</open-email-settings>
+        <open-messages>Öppna meddelanden</open-messages>
+        <open-edit-source>Öppna redigera källa</open-edit-source>
+        <test-web-form>Testa webbformuläret</test-web-form>
+        <test-pdf>Testa PDF-produktion</test-pdf>
+        <test-offline>Testa offlineformuläret</test-offline>
+        <inspect-formulas>Inspektera formler</inspect-formulas>
+        <go-prev-control>Gå till föregående kontroll</go-prev-control>
+        <go-next-control>Gå till nästa kontroll</go-next-control>
+        <move-next-tab>Gå till nästa flik</move-next-tab>
+        <move-prev-tab>Gå till föregående flik</move-prev-tab>
+        <insert-section>Infoga en ny sektion</insert-section>
+        <insert-grid>Infoga ett nytt rutnät</insert-grid>
+        <insert-repeated-grid>Infoga ett nytt upprepande rutnät</insert-repeated-grid>
+        <reload-toolbox>Ladda om verktygslådan</reload-toolbox>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Meddelanden</label>

@@ -1496,8 +1496,52 @@
 
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
-         <dialog-title>Scorciatoie da tastiera</dialog-title>
-     </dialog-keyboard-shortcuts>
+        <dialog-title>Scorciatoie da tastiera</dialog-title>
+        <!-- Intestazioni di sezione -->
+        <actions>Azioni</actions>
+        <cut-copy-paste>Taglia, Copia, Incolla</cut-copy-paste>
+        <grid-navigation>Navigazione nella griglia</grid-navigation>
+        <undo-redo>Annulla e Ripristina</undo-redo>
+        <all-dialogs>Tutte le finestre di dialogo</all-dialogs>
+        <control-settings-dialog>Finestra impostazioni controllo</control-settings-dialog>
+        <tab-navigation>Navigazione tra schede</tab-navigation>
+        <inserting-form-structure>Inserimento struttura modulo</inserting-form-structure>
+        <inserting-form-controls>Inserimento controlli modulo</inserting-form-controls>
+        <reloading-toolbox>Ricaricamento della casella degli strumenti</reloading-toolbox>
+        <!-- Descrizioni delle azioni -->
+        <save-form>Salva la definizione del modulo</save-form>
+        <open-publish>Apri la finestra di pubblicazione</open-publish>
+        <cut-control>Taglia il controllo corrente</cut-control>
+        <copy-control>Copia il controllo corrente</copy-control>
+        <paste-toolbox>Incolla dalla casella degli strumenti</paste-toolbox>
+        <move-prev-next-cell>Vai alla cella precedente o successiva della griglia, incluse le celle vuote.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Vai alla cella precedente o successiva della griglia, saltando le celle vuote.</move-prev-next-skip-empty>
+        <move-vertical-cell>Vai alla cella precedente o successiva della griglia verticalmente, incluse le celle vuote.</move-vertical-cell>
+        <move-line-up>Sposta la riga corrente della griglia verso l'alto.</move-line-up>
+        <move-line-down>Sposta la riga corrente della griglia verso il basso.</move-line-down>
+        <undo>Annulla l'ultima operazione</undo>
+        <redo>Ripristina l'ultima operazione</redo>
+        <open-control-settings>Apri la finestra impostazioni controllo</open-control-settings>
+        <apply-ok-dialog>Applica/OK (clicca il pulsante principale)</apply-ok-dialog>
+        <open-quick-search>Apri la ricerca rapida controlli</open-quick-search>
+        <open-form-settings>Apri impostazioni modulo</open-form-settings>
+        <open-permissions>Apri permessi</open-permissions>
+        <open-email-settings>Apri impostazioni email</open-email-settings>
+        <open-messages>Apri messaggi</open-messages>
+        <open-edit-source>Apri modifica sorgente</open-edit-source>
+        <test-web-form>Testa il modulo web</test-web-form>
+        <test-pdf>Testa produzione PDF</test-pdf>
+        <test-offline>Testa il modulo offline</test-offline>
+        <inspect-formulas>Ispeziona formule</inspect-formulas>
+        <go-prev-control>Vai al controllo precedente</go-prev-control>
+        <go-next-control>Vai al controllo successivo</go-next-control>
+        <move-next-tab>Vai alla scheda successiva</move-next-tab>
+        <move-prev-tab>Vai alla scheda precedente</move-prev-tab>
+        <insert-section>Inserisci una nuova sezione</insert-section>
+        <insert-grid>Inserisci una nuova griglia</insert-grid>
+        <insert-repeated-grid>Inserisci una nuova griglia ripetuta</insert-repeated-grid>
+        <reload-toolbox>Ricarica la casella degli strumenti</reload-toolbox>
+    </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Messaggi</label>
         <language-header>Lingua</language-header>

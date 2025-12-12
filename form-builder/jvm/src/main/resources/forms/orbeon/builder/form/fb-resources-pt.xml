@@ -1552,6 +1552,50 @@
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
         <dialog-title>Atalhos de teclado</dialog-title>
+        <!-- Cabeçalhos de seção -->
+        <actions>Ações</actions>
+        <cut-copy-paste>Cortar, Copiar, Colar</cut-copy-paste>
+        <grid-navigation>Navegação na grade</grid-navigation>
+        <undo-redo>Desfazer e Refazer</undo-redo>
+        <all-dialogs>Todas as caixas de diálogo</all-dialogs>
+        <control-settings-dialog>Caixa de diálogo de configurações do controle</control-settings-dialog>
+        <tab-navigation>Navegação entre abas</tab-navigation>
+        <inserting-form-structure>Inserção de estrutura de formulário</inserting-form-structure>
+        <inserting-form-controls>Inserção de controles de formulário</inserting-form-controls>
+        <reloading-toolbox>Recarregamento da caixa de ferramentas</reloading-toolbox>
+        <!-- Descrições das ações -->
+        <save-form>Salvar a definição do formulário</save-form>
+        <open-publish>Abrir a caixa de diálogo de publicação</open-publish>
+        <cut-control>Cortar o controle atual</cut-control>
+        <copy-control>Copiar o controle atual</copy-control>
+        <paste-toolbox>Colar da caixa de ferramentas</paste-toolbox>
+        <move-prev-next-cell>Ir para a célula anterior ou seguinte da grade, incluindo células vazias.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Ir para a célula anterior ou seguinte da grade, pulando células vazias.</move-prev-next-skip-empty>
+        <move-vertical-cell>Ir para a célula anterior ou seguinte da grade verticalmente, incluindo células vazias.</move-vertical-cell>
+        <move-line-up>Mover a linha atual da grade para cima.</move-line-up>
+        <move-line-down>Mover a linha atual da grade para baixo.</move-line-down>
+        <undo>Desfazer a última operação</undo>
+        <redo>Refazer a última operação</redo>
+        <open-control-settings>Abrir a caixa de diálogo de configurações do controle</open-control-settings>
+        <apply-ok-dialog>Aplicar/OK (clica no botão principal)</apply-ok-dialog>
+        <open-quick-search>Abrir a pesquisa rápida de controles</open-quick-search>
+        <open-form-settings>Abrir configurações do formulário</open-form-settings>
+        <open-permissions>Abrir permissões</open-permissions>
+        <open-email-settings>Abrir configurações de e-mail</open-email-settings>
+        <open-messages>Abrir mensagens</open-messages>
+        <open-edit-source>Abrir edição do código-fonte</open-edit-source>
+        <test-web-form>Testar o formulário web</test-web-form>
+        <test-pdf>Testar produção de PDF</test-pdf>
+        <test-offline>Testar o formulário offline</test-offline>
+        <inspect-formulas>Inspecionar fórmulas</inspect-formulas>
+        <go-prev-control>Ir para o controle anterior</go-prev-control>
+        <go-next-control>Ir para o controle seguinte</go-next-control>
+        <move-next-tab>Ir para a aba seguinte</move-next-tab>
+        <move-prev-tab>Ir para a aba anterior</move-prev-tab>
+        <insert-section>Inserir uma nova seção</insert-section>
+        <insert-grid>Inserir uma nova grade</insert-grid>
+        <insert-repeated-grid>Inserir uma nova grade repetida</insert-repeated-grid>
+        <reload-toolbox>Recarregar a caixa de ferramentas</reload-toolbox>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Mensagens</label>

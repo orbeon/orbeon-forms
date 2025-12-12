@@ -1525,6 +1525,50 @@
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
         <dialog-title>Sneltoetsen</dialog-title>
+        <!-- Sectiekoppen -->
+        <actions>Acties</actions>
+        <cut-copy-paste>Knippen, Kopiëren, Plakken</cut-copy-paste>
+        <grid-navigation>Rasternavigatie</grid-navigation>
+        <undo-redo>Ongedaan maken en Opnieuw</undo-redo>
+        <all-dialogs>Alle dialoogvensters</all-dialogs>
+        <control-settings-dialog>Besturingselement instellingen dialoog</control-settings-dialog>
+        <tab-navigation>Tabnavigatie</tab-navigation>
+        <inserting-form-structure>Formulierstructuur invoegen</inserting-form-structure>
+        <inserting-form-controls>Formulierbesturingselementen invoegen</inserting-form-controls>
+        <reloading-toolbox>Gereedschapskist herladen</reloading-toolbox>
+        <!-- Actiebeschrijvingen -->
+        <save-form>Formulierdefinitie opslaan</save-form>
+        <open-publish>Publicatiedialoog openen</open-publish>
+        <cut-control>Huidig besturingselement knippen</cut-control>
+        <copy-control>Huidig besturingselement kopiëren</copy-control>
+        <paste-toolbox>Plakken vanuit gereedschapskist</paste-toolbox>
+        <move-prev-next-cell>Ga naar de vorige of volgende rastercel, inclusief lege cellen.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Ga naar de vorige of volgende rastercel, lege cellen overslaan.</move-prev-next-skip-empty>
+        <move-vertical-cell>Ga naar de vorige of volgende rastercel verticaal, inclusief lege cellen.</move-vertical-cell>
+        <move-line-up>Huidige rasterrij naar boven verplaatsen.</move-line-up>
+        <move-line-down>Huidige rasterrij naar beneden verplaatsen.</move-line-down>
+        <undo>Laatste bewerking ongedaan maken</undo>
+        <redo>Laatste bewerking opnieuw uitvoeren</redo>
+        <open-control-settings>Besturingselement instellingen openen</open-control-settings>
+        <apply-ok-dialog>Toepassen/OK (klikt op de hoofdknop)</apply-ok-dialog>
+        <open-quick-search>Snelzoeken voor besturingselementen openen</open-quick-search>
+        <open-form-settings>Formulierinstellingen openen</open-form-settings>
+        <open-permissions>Machtigingen openen</open-permissions>
+        <open-email-settings>E-mailinstellingen openen</open-email-settings>
+        <open-messages>Berichten openen</open-messages>
+        <open-edit-source>Broncode bewerken openen</open-edit-source>
+        <test-web-form>Webformulier testen</test-web-form>
+        <test-pdf>PDF-productie testen</test-pdf>
+        <test-offline>Offline formulier testen</test-offline>
+        <inspect-formulas>Formules inspecteren</inspect-formulas>
+        <go-prev-control>Ga naar vorig besturingselement</go-prev-control>
+        <go-next-control>Ga naar volgend besturingselement</go-next-control>
+        <move-next-tab>Ga naar volgend tabblad</move-next-tab>
+        <move-prev-tab>Ga naar vorig tabblad</move-prev-tab>
+        <insert-section>Nieuwe sectie invoegen</insert-section>
+        <insert-grid>Nieuw raster invoegen</insert-grid>
+        <insert-repeated-grid>Nieuw herhalend raster invoegen</insert-repeated-grid>
+        <reload-toolbox>Gereedschapskist herladen</reload-toolbox>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Berichten</label>

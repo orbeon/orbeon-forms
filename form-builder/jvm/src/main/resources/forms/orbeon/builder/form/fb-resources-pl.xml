@@ -1541,6 +1541,50 @@
     </dialog-workflow>
     <dialog-keyboard-shortcuts>
         <dialog-title>Skróty klawiaturowe</dialog-title>
+        <!-- Nagłówki sekcji -->
+        <actions>Akcje</actions>
+        <cut-copy-paste>Wytnij, Kopiuj, Wklej</cut-copy-paste>
+        <grid-navigation>Nawigacja po siatce</grid-navigation>
+        <undo-redo>Cofnij i Ponów</undo-redo>
+        <all-dialogs>Wszystkie okna dialogowe</all-dialogs>
+        <control-settings-dialog>Okno ustawień kontrolki</control-settings-dialog>
+        <tab-navigation>Nawigacja między zakładkami</tab-navigation>
+        <inserting-form-structure>Wstawianie struktury formularza</inserting-form-structure>
+        <inserting-form-controls>Wstawianie kontrolek formularza</inserting-form-controls>
+        <reloading-toolbox>Przeładowanie przybornika</reloading-toolbox>
+        <!-- Opisy akcji -->
+        <save-form>Zapisz definicję formularza</save-form>
+        <open-publish>Otwórz okno publikacji</open-publish>
+        <cut-control>Wytnij bieżącą kontrolkę</cut-control>
+        <copy-control>Kopiuj bieżącą kontrolkę</copy-control>
+        <paste-toolbox>Wklej z przybornika</paste-toolbox>
+        <move-prev-next-cell>Przejdź do poprzedniej lub następnej komórki siatki, włącznie z pustymi komórkami.</move-prev-next-cell>
+        <move-prev-next-skip-empty>Przejdź do poprzedniej lub następnej komórki siatki, pomijając puste komórki.</move-prev-next-skip-empty>
+        <move-vertical-cell>Przejdź do poprzedniej lub następnej komórki siatki pionowo, włącznie z pustymi komórkami.</move-vertical-cell>
+        <move-line-up>Przesuń bieżący wiersz siatki w górę.</move-line-up>
+        <move-line-down>Przesuń bieżący wiersz siatki w dół.</move-line-down>
+        <undo>Cofnij ostatnią operację</undo>
+        <redo>Ponów ostatnią operację</redo>
+        <open-control-settings>Otwórz okno ustawień kontrolki</open-control-settings>
+        <apply-ok-dialog>Zastosuj/OK (kliknij główny przycisk)</apply-ok-dialog>
+        <open-quick-search>Otwórz szybkie wyszukiwanie kontrolek</open-quick-search>
+        <open-form-settings>Otwórz ustawienia formularza</open-form-settings>
+        <open-permissions>Otwórz uprawnienia</open-permissions>
+        <open-email-settings>Otwórz ustawienia e-mail</open-email-settings>
+        <open-messages>Otwórz komunikaty</open-messages>
+        <open-edit-source>Otwórz edycję źródła</open-edit-source>
+        <test-web-form>Testuj formularz webowy</test-web-form>
+        <test-pdf>Testuj generowanie PDF</test-pdf>
+        <test-offline>Testuj formularz offline</test-offline>
+        <inspect-formulas>Sprawdź formuły</inspect-formulas>
+        <go-prev-control>Przejdź do poprzedniej kontrolki</go-prev-control>
+        <go-next-control>Przejdź do następnej kontrolki</go-next-control>
+        <move-next-tab>Przejdź do następnej zakładki</move-next-tab>
+        <move-prev-tab>Przejdź do poprzedniej zakładki</move-prev-tab>
+        <insert-section>Wstaw nową sekcję</insert-section>
+        <insert-grid>Wstaw nową siatkę</insert-grid>
+        <insert-repeated-grid>Wstaw nową siatkę powtarzalną</insert-repeated-grid>
+        <reload-toolbox>Przeładuj przybornik</reload-toolbox>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Komunikaty</label>

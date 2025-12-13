@@ -29,13 +29,13 @@ object KeyboardShortcuts {
     FormFieldTags.contains(element.tagName) ||
     element.asInstanceOf[js.Dynamic].isContentEditable.asInstanceOf[Boolean]
 
-  // Handle shortcuts with modifiers inside form fields, except for cut/copy/paste
+  // Handle shortcuts with modifiers inside form fields, except for native edit commands like cut/copy/paste/undo
   Mousetrap.asInstanceOf[js.Dynamic].prototype.stopCallback =
     (e: dom.KeyboardEvent, element: dom.Element, _: String) => {
       val isModifierKey   = (e.altKey || e.ctrlKey || e.metaKey)
-      val isCutCopyPaste  = (e.ctrlKey || e.metaKey) &&
-                            (e.key == "x" || e.key == "c" || e.key == "v")
-      isFormField(element) && (!isModifierKey || isCutCopyPaste)
+      val isNativeEditKey = (e.ctrlKey || e.metaKey) &&
+                            Set("x", "c", "v", "z").contains(e.key.toLowerCase)
+      isFormField(element) && (!isModifierKey || isNativeEditKey)
     }
 
   // If a single shortcut is provided, use '⌘' on Apple OS and '⌃' on other OSes

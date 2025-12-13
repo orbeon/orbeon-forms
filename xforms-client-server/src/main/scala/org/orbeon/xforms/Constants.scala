@@ -35,6 +35,8 @@ object Constants {
   val YuiSkinSamClass                   = "yui-skin-sam"
   val XFormsIosClass                    = "xforms-ios"
   val XFormsMobileClass                 = "xforms-mobile"
+  val XFormsPlatformAppleClass          = "xforms-platform-apple"
+  val XFormsPlatformOtherClass          = "xforms-platform-other"
   val FormClass                         = "xforms-form"
   val FormId                            = FormClass
   val InitiallyHiddenClass              = "xforms-initially-hidden"

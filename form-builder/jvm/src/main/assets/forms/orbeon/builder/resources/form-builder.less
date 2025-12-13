@@ -71,6 +71,14 @@ body.orbeon {
     }
 }
 
+// We'll be able to remove the `.orbeon ` <space> <selector> rule once the classes are produced on the `.orbeon`.
+.orbeon.xforms-platform-apple  kbd.fb-for-platform-other,
+.orbeon .xforms-platform-apple kbd.fb-for-platform-other,
+.orbeon.xforms-platform-other  kbd.fb-for-platform-apple,
+.orbeon .xforms-platform-other kbd.fb-for-platform-apple {
+    display: none;
+}
+
 .orbeon {
 
     .fb-main {

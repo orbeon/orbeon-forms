@@ -216,9 +216,13 @@ object InitSupport {
     // TODO: With embedding, consider placing those on the root element of the embedded code. Watch for dialogs behavior.
     if (Bowser.ios.contains(true))
       body.classList.add(Constants.XFormsIosClass)
-
     if (Bowser.mobile.contains(true))
       body.classList.add(Constants.XFormsMobileClass)
+    body.classList.add {
+      val isApple = Bowser.osname.exists(Set("macOS", "iOS"))
+      if (isApple) Constants.XFormsPlatformAppleClass
+      else         Constants.XFormsPlatformOtherClass
+    }
   }
 
   @JSExport

@@ -238,8 +238,10 @@ object SaxonUtils extends SaxonUtilsTrait {
   def newArrayItem(v: Vector[ValueRepresentationType]): Item =
     ArrayFunctions.createValue(v)
 
-  def hasXPathNumberer(lang: String): Boolean =
-    NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lang)
+  def hasXPathNumberer(lang: String): Boolean = {
+    val lettersOnlyLang = lang.filter(_.isLetter)
+    NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lettersOnlyLang)
+  }
 
   def isValidNCName(name: String): Boolean =
     Name10Checker.getInstance.isValidNCName(name)

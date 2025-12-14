@@ -88,6 +88,9 @@ trait SaxonUtilsTrait {
   // Types are different between Saxon 9 and 10
 //  def newArrayItem(v: Vector[ValueRepresentationType]): om.Item
 
+  // We pass a language in the format returned by `xxf:lang()`, which is a BCP47 tag, e.g. zh-Hans, while Saxon's
+  // numberer resolution takes only the letters from the language code, e.g. zhHans, so implementations need to do
+  // the conversion.
   def hasXPathNumberer(lang: String): Boolean
   def isValidNCName   (name: String): Boolean
   def isValidNmtoken  (name: String): Boolean

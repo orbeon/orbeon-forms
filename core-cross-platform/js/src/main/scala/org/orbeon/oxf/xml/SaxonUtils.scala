@@ -228,8 +228,10 @@ object SaxonUtils extends SaxonUtilsTrait {
   def newArrayItem(v: collection.Seq[ValueRepresentationType]): Item =
     new ImmutableArrayItem(ImmList.fromList(v.asJava))
 
-  def hasXPathNumberer(lang: String): Boolean =
-    GlobalConfiguration.makeNumberer(lang, null).getClass.getName.endsWith("Numberer_" + lang)
+  def hasXPathNumberer(lang: String): Boolean = {
+    val lettersOnlyLang = lang.filter(_.isLetter)
+    GlobalConfiguration.makeNumberer(lang, null).getClass.getName.endsWith("Numberer_" + lettersOnlyLang)
+  }
 
   def isValidNCName(name: String): Boolean =
     NameChecker.isValidNCName(name)

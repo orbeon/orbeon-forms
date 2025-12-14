@@ -243,7 +243,7 @@ body.orbeon {
     // cover field-ish aspects here.
     // See https://github.com/orbeon/orbeon-forms/issues/4004
     .xforms-field {
-        background-color: darken(@inputBackground, 5%);
+        background-color: var(--orbeon-control-read-only-background-color);
         cursor: not-allowed;
 
         .focusHighlight();
@@ -448,7 +448,7 @@ body.orbeon {
 
     input, textarea {
         &[readonly] {
-          background-color: darken(@inputBackground, 5%);
+          background-color: var(--orbeon-control-read-only-background-color);
         }
     }
 
@@ -559,7 +559,8 @@ body.orbeon {
     // Style static readonly plain text and rich text the same as Bootstrap's pre (see code.less)
     .fr-grid .xforms-static.xforms-readonly {
         &.xforms-textarea pre {
-            color: var(--orbeon-base-color);
+            color: var(--orbeon-control-color);
+            background-color: var(--orbeon-control-read-only-background-color);
             display: block;
 
             // We override these in form-runner-base.less, do we need this here?
@@ -572,7 +573,6 @@ body.orbeon {
                 line-height: @fluidLineHeight;
             }
 
-            background-color: darken(@inputBackground, 5%);
             .fieldBorder();
             border-radius: @inputBorderRadius;
         }

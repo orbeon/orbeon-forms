@@ -49,14 +49,15 @@
   --orbeon-help-content-color      : inherit;
 
   // Controls
-  --orbeon-control-font-size       : inherit;
-  --orbeon-control-font-family     : @frBaseFontFamily;
-  --orbeon-control-font-weight     : inherit;
-  --orbeon-control-color           : black; // Make text inside the fields stand out, as this is the most important information
-  --orbeon-control-background-color: white;
-  --orbeon-control-border-color    : #ccc;  // Slightly darker than base border color
+  --orbeon-control-font-size                 : inherit;
+  --orbeon-control-font-family               : @frBaseFontFamily;
+  --orbeon-control-font-weight               : inherit;
+  --orbeon-control-color                     : black;   // Make text inside the fields stand out, as this is the most important information
+  --orbeon-control-background-color          : white;
+  --orbeon-control-read-only-background-color: #f2f2f2; // darken(@inputBackground, 5%);
+  --orbeon-control-border-color              : #ccc;    // Slightly darker than base border color
   @media (prefers-contrast: more) {
-    --orbeon-control-border-color  : #949494;
+    --orbeon-control-border-color            : #949494;
   }
 
   // Specific controls
@@ -87,6 +88,7 @@
   --orbeon-repeater-add-button-font-family      : inherit;
   --orbeon-repeater-add-button-font-weight      : inherit;
   --orbeon-repeater-add-button-color            : inherit;
+  --orbeon-repeat-menu-background-color         : #f5f5f5; // @wellBackground
 
   // Grids
   --orbeon-repetition-number-font-size  : smaller;
@@ -178,10 +180,14 @@
     }
 
     &, .fr-pdf-color-mode-black-and-white, .fr-pdf-color-mode-keep-field-colors {
-      --orbeon-base-background-color: white;
-      --orbeon-base-border-color    : #e3e3e3;
-      --orbeon-base-color           : @grayDark;
-      --orbeon-control-border-color : #ccc;
+      --orbeon-base-background-color             : white;
+      --orbeon-base-border-color                 : #e3e3e3;
+      --orbeon-base-color                        : black; //@grayDark;
+      --orbeon-control-read-only-background-color: white;
+      --orbeon-control-border-color              : #ccc;
+      --orbeon-section-color                     : black;
+      --orbeon-section-background-color          : white;
+      --orbeon-repeat-menu-background-color      : white;
     }
   }
 }

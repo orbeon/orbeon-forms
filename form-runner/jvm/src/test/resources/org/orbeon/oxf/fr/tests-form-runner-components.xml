@@ -126,6 +126,12 @@
                 <xh:script src="/webjars/codemirror/5.65.20/addon/search/matchesonscrollbar.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/search/jump-to-line.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ar.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ca.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.zh-CN.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.zh-TW.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.hu.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ja.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.sv.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pt.min.js" class="xforms-baseline"/>

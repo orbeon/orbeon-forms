@@ -21,7 +21,7 @@
   // Base font
   --orbeon-base-font-size  : 13px;
   --orbeon-base-font-family: @frBaseFontFamily;
-  --orbeon-base-color      : @grayDark; // Darker than Bootstrap default of #555
+  --orbeon-base-color      : #333; // @grayDark; // Darker than Bootstrap default of #555
 
   // Links
   --orbeon-link-color      : #08c;
@@ -70,20 +70,40 @@
   --orbeon-focus-highlight-color: rgba(0,123,255,.25);
 
   // Buttons
-  --orbeon-button-font-size  : 1.00em; // button and .btn
-  --orbeon-button-font-family: @frBaseFontFamily;
-  --orbeon-button-font-weight: normal;
-  --orbeon-button-color      : inherit;
+  --orbeon-button-font-size                         : 1.00em; // button and .btn
+  --orbeon-button-font-family                       : @frBaseFontFamily;
+  --orbeon-button-font-weight                       : normal;
+  --orbeon-button-color                             : inherit;
+  --orbeon-button-background-color                  : #e8e8e8; // darken(@wellBackground, 5%)
+  --orbeon-button-highlight-background-color        : #e8e8e8; // darken(@wellBackground, 5%)
+  --orbeon-button-primary-color                     : white;
+  --orbeon-button-primary-background-color          : @btnPrimaryBackground;
+  --orbeon-button-primary-highlight-background-color: @btnPrimaryBackgroundHighlight;
+  --orbeon-button-warning-color                     : white;
+  --orbeon-button-warning-background-color          : @btnWarningBackground;
+  --orbeon-button-warning-highlight-background-color: @btnWarningBackgroundHighlight;
+  --orbeon-button-danger-color                      : white;
+  --orbeon-button-danger-background-color           : @btnDangerBackground;
+  --orbeon-button-danger-highlight-background-color : @btnDangerBackgroundHighlight;
+  --orbeon-button-success-color                     : white;
+  --orbeon-button-success-background-color          : @btnSuccessBackground;
+  --orbeon-button-success-highlight-background-color: @btnSuccessBackgroundHighlight;
+  --orbeon-button-info-color                        : white;
+  --orbeon-button-info-background-color             : @btnInfoBackground;
+  --orbeon-button-info-highlight-background-color   : @btnInfoBackgroundHighlight;
+  --orbeon-button-inverse-color                     : white;
+  --orbeon-button-inverse-background-color          : @btnInverseBackground;
+  --orbeon-button-inverse-highlight-background-color: @btnInverseBackgroundHighlight;
 
   // Sections
-  --orbeon-section-title-font-size              : 1.38em; // 18px
-  --orbeon-section-repetition-label-font-size   : 0.89em; // 18px * 0.8 * 0.8
-  --orbeon-subsection-title-font-size           : 1.11em; // 18px * 0.8
-  --orbeon-subsection-repetition-label-font-size: 0.89em; // 18px * 0.8 * 0.8
+  --orbeon-section-title-font-size              : 1.38em;  // 18px
+  --orbeon-section-repetition-label-font-size   : 0.89em;  // 18px * 0.8 * 0.8
+  --orbeon-subsection-title-font-size           : 1.11em;  // 18px * 0.8
+  --orbeon-subsection-repetition-label-font-size: 0.89em;  // 18px * 0.8 * 0.8
   --orbeon-section-font-family                  : @frBaseFontFamily;
   --orbeon-section-font-weight                  : normal;
   --orbeon-section-color                        : #555;
-  --orbeon-section-background-color             : @grayLighter;
+  --orbeon-section-background-color             : #eee;    // @grayLighter;
   --orbeon-repeater-add-button-font-size        : 1.00em;
   --orbeon-repeater-add-button-font-family      : inherit;
   --orbeon-repeater-add-button-font-weight      : inherit;
@@ -99,7 +119,7 @@
   // Regular and wizard table of contents (TOC)
   --orbeon-toc-color                          : #0d6efd;
   --orbeon-toc-background-color               : white;
-  --orbeon-toc-hover-background-color         : @grayLighter;
+  --orbeon-toc-hover-background-color         : #eee; // @grayLighter;
   --orbeon-toc-selected-color                 : white;
   --orbeon-toc-selected-background-color      : #0d6efd;
   --orbeon-toc-error-color                    : @error;
@@ -134,6 +154,19 @@
   --orbeon-active-alert-font-family: sans-serif;
   --orbeon-active-alert-font-weight: inherit;
   --orbeon-active-alert-color      : white;
+  --orbeon-alert-color             : #555;    // @gray
+  --orbeon-alert-background-color  : white;
+  --orbeon-alert-border-color      : #e3e3e3; // darken(@wellBackground, 7%);
+  --orbeon-alert-text-shadow       : rgba(255,255,255,.5);
+  --orbeon-error-color             : #842029;
+  --orbeon-error-background-color  : #f8d7da;
+  --orbeon-error-border-color      : #f5c2c7;
+  --orbeon-success-color           : #0f5132;
+  --orbeon-success-background-color: #d1e7dd;
+  --orbeon-success-border-color    : #badbcc;
+  --orbeon-warning-color           : #664d03;
+  --orbeon-warning-background-color: #fff3cd;
+  --orbeon-warning-border-color    : #ffecb5;
 
   // Required icon (left)
   --orbeon-required-icon-display-before: inline;
@@ -161,8 +194,8 @@
 
   // Tooltips (e.g. tabs tooltips)
   --orbeon-tooltip-font-size       : 0.85em; // 11px
-  --orbeon-tooltip-color           : @tooltipColor;
-  --orbeon-tooltip-background-color: @tooltipBackground;
+  --orbeon-tooltip-color           : #fff;   // @tooltipColor;
+  --orbeon-tooltip-background-color: #000;   // @tooltipBackground;
 
   // Friendly Captcha
   --orbeon-friendly-captcha-font-size: 1.08em; // 14px
@@ -182,12 +215,13 @@
     &, .fr-pdf-color-mode-black-and-white, .fr-pdf-color-mode-keep-field-colors {
       --orbeon-base-background-color             : white;
       --orbeon-base-border-color                 : #e3e3e3;
-      --orbeon-base-color                        : black; //@grayDark;
+      --orbeon-base-color                        : black;
       --orbeon-control-read-only-background-color: white;
       --orbeon-control-border-color              : #ccc;
       --orbeon-section-color                     : black;
       --orbeon-section-background-color          : white;
       --orbeon-repeat-menu-background-color      : white;
+      --orbeon-toc-color                         : black;
     }
   }
 }

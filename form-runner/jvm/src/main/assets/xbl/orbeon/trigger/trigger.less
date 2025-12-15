@@ -6,12 +6,17 @@
 
     // Make default button a little darker
     .btn {
-        background-color: darken(@wellBackground, 5%);
-    }
+        color: var(--orbeon-button-color);
+        background-color: var(--orbeon-button-background-color);
 
-    .btn {
         &.disabled, &[disabled] {
-            background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
+            color: var(--orbeon-button-color);
+            background-color: var(--orbeon-button-background-color); // restore default color or buttons are too dark when disabled
+        }
+
+        &:hover {
+            color: var(--orbeon-button-color);
+            background-color: var(--orbeon-button-highlight-background-color);
         }
     }
 
@@ -46,7 +51,7 @@
         }
     }
 
-    .buttonBackgroundOrbeon(@startColor, @endColor, @textColor: #fff) {
+    .buttonBackgroundOrbeon(@startColor, @endColor, @textColor) {
 
         color: @textColor;
         background-color: @startColor;
@@ -64,22 +69,22 @@
     }
 
     .xforms-trigger-appearance-xxforms-primary .btn, .btn-primary {
-        .buttonBackgroundOrbeon(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+        .buttonBackgroundOrbeon(var(--orbeon-button-primary-background-color), var(--orbeon-button-primary-highlight-background-color), var(--orbeon-button-primary-color));
     }
     .xforms-trigger-appearance-xxforms-warning .btn, .btn-warning {
-        .buttonBackgroundOrbeon(@btnWarningBackground, @btnWarningBackgroundHighlight);
+        .buttonBackgroundOrbeon(var(--orbeon-button-warning-background-color), var(--orbeon-button-warning-highlight-background-color), var(--orbeon-button-warning-color));
     }
     .xforms-trigger-appearance-xxforms-danger .btn, .btn-danger {
-        .buttonBackgroundOrbeon(@btnDangerBackground, @btnDangerBackgroundHighlight);
+        .buttonBackgroundOrbeon(var(--orbeon-button-danger-background-color), var(--orbeon-button-danger-highlight-background-color), var(--orbeon-button-danger-color ));
     }
     .xforms-trigger-appearance-xxforms-success .btn, .btn-success {
-        .buttonBackgroundOrbeon(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+        .buttonBackgroundOrbeon(var(--orbeon-button-success-background-color), var(--orbeon-button-success-highlight-background-color), var(--orbeon-button-success-color));
     }
     .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
-        .buttonBackgroundOrbeon(@btnInfoBackground, @btnInfoBackgroundHighlight);
+        .buttonBackgroundOrbeon(var(--orbeon-button-info-background-color), var(--orbeon-button-info-highlight-background-color), var(--orbeon-button-info-color));
     }
     .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
-        .buttonBackgroundOrbeon(@btnInverseBackground, @btnInverseBackgroundHighlight);
+        .buttonBackgroundOrbeon(var(--orbeon-button-inverse-background-color), var(--orbeon-button-inverse-highlight-background-color), var(--orbeon-button-inverse-color));
     }
 
     button.btn, label.btn {

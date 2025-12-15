@@ -257,7 +257,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     // Ideally this would be in box-select.less
     .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
         border-radius: @inputBorderRadius;
-        background-color: @inputBackground;
+        background-color: inherit;
         .fieldBorder();
         padding: 4px 6px;
     }
@@ -506,11 +506,11 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
             .fr-toc {
                 .black-and-white-properties();
                 .nav-header {
-                    color: black;
+                    color: var(--orbeon-toc-color);
                 }
                 .btn-link {
                     text-decoration: none;
-                    color: black;
+                    color: var(--orbeon-toc-color);
                 }
             }
         }

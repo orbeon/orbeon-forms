@@ -153,30 +153,31 @@ body.orbeon {
         padding: 8px 1em; // not sure why BS2 has different left/right padding
 
         // Increase contract for accessibility
-        color            : @gray;
-        background-color : @white;
-        border           : 1px solid #e3e3e3;
+        color            : var(--orbeon-alert-color);
+        background-color : var(--orbeon-alert-background-color);
+        border           : 1px solid var(--orbeon-alert-border-color);
+        text-shadow      : 0 1px 0 var(--orbeon-alert-text-shadow);
     }
 
     // These pass https://dequeuniversity.com/rules/axe/4.4/color-contrast
     .alert-error, .alert-danger {
-        color            : #842029;
-        background-color : #f8d7da;
-        border-color     : #f5c2c7;
+        color            : var(--orbeon-error-color);
+        background-color : var(--orbeon-error-background-color);
+        border-color     : var(--orbeon-error-border-color);
     }
 
     // These pass https://dequeuniversity.com/rules/axe/4.4/color-contrast
     .alert-success {
-        color            : #0f5132;
-        background-color : #d1e7dd;
-        border-color     : #badbcc;
+        color            : var(--orbeon-success-color);
+        background-color : var(--orbeon-success-background-color);
+        border-color     : var(--orbeon-success-border-color);
     }
 
     // These pass https://dequeuniversity.com/rules/axe/4.4/color-contrast
     .alert-warning {
-        color            : #664d03;
-        background-color : #fff3cd;
-        border-color     : #ffecb5;
+        color            : var(--orbeon-warning-color);
+        background-color : var(--orbeon-warning-background-color);
+        border-color     : var(--orbeon-warning-border-color);
     }
 
     .row, .row-fluid [class*="span"] {
@@ -263,7 +264,7 @@ body.orbeon {
         padding: 4px 6px;
         margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
 
-        color: var(--orbeon-base-color);
+        color: var(--orbeon-control-color);
         background-image: none;                  // Liferay adds background images which don't mix well with Bootstrap
 
         // Let content wrap otherwise the user has no option to see the content

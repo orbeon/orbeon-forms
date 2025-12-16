@@ -181,7 +181,7 @@ object FormRunnerPersistence {
   val OrbeonOperations                    = "Orbeon-Operations"
   val OrbeonPathToHolder                  = "Orbeon-Path-To-Holder"
   val OrbeonPathToHolderLower             = OrbeonPathToHolder.toLowerCase
-  val OrbeonHashAlogrithm                 = "Orbeon-Hash-Algorithm"
+  val OrbeonHashAlgorithm                 = "Orbeon-Hash-Algorithm"
   val OrbeonHashValue                     = "Orbeon-Hash-Value"
   val OrbeonDidEncryptHeader              = "Orbeon-Did-Encrypt"
   val OrbeonDidEncryptHeaderLower         = OrbeonDidEncryptHeader.toLowerCase
@@ -997,7 +997,7 @@ trait FormRunnerPersistence {
 
     val customPutHeaders =
       formVersion     .toList.map(OrbeonFormDefinitionVersion -> List(_)) :::
-      hashAlgorithmOpt.toList.map(OrbeonHashAlogrithm         -> List(_)) :::
+      hashAlgorithmOpt.toList.map(OrbeonHashAlgorithm         -> List(_)) :::
       hashValueOpt    .toList.map(OrbeonHashValue             -> List(_)) :::
       (OrbeonPathToHolder -> List(pathToHolder))                           ::
       Nil

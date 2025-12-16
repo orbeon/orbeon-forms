@@ -17,7 +17,7 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlogrithm, OrbeonHashValue}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlgorithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.*
@@ -142,7 +142,7 @@ trait Read {
         httpResponse.setHeader(Headers.OrbeonLastModifiedByUsername, lastModifiedBy.username)
       }
       fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
-      fromDatabase.hashAlgorithmOpt.foreach(httpResponse.setHeader(OrbeonHashAlogrithm, _))
+      fromDatabase.hashAlgorithmOpt.foreach(httpResponse.setHeader(OrbeonHashAlgorithm, _))
       fromDatabase.hashValueOpt.foreach(httpResponse.setHeader(OrbeonHashValue, _))
       httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime))
       httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime))

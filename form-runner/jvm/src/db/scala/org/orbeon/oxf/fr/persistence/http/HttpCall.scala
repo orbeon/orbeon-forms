@@ -212,7 +212,7 @@ private[persistence] object HttpCall {
       val stageHeader      = stage.map(_.name).map(StageHeader.HeaderName -> List(_))
       val httpRangeHeaders = httpRange.map(_.requestHeaders).getOrElse(Map.empty)
       val ifMatchHeader    = ifMatch.map(e => Headers.IfMatch -> List(e))
-      val hashHeaders      = hashAlgorithm.map(FormRunnerPersistence.OrbeonHashAlogrithm -> List(_)).toList ++
+      val hashHeaders      = hashAlgorithm.map(FormRunnerPersistence.OrbeonHashAlgorithm -> List(_)).toList ++
                              hashValue.map(FormRunnerPersistence.OrbeonHashValue -> List(_)).toList
       val headers          = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList ++ ifMatchHeader.toList ++ hashHeaders).toMap ++ httpRangeHeaders
 

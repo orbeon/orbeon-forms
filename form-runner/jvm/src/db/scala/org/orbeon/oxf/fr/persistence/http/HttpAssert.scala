@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.http
 
 import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext}
-import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlogrithm, OrbeonHashValue}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlgorithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
@@ -108,7 +108,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         assertETag(headers, expectedBody.etag)
         // Check hash algorithm header if specified
         expectedBody.hashAlgorithm.foreach { expectedHashAlgorithm =>
-          val hashAlgorithmHeader = headers.get(OrbeonHashAlogrithm.toLowerCase)
+          val hashAlgorithmHeader = headers.get(OrbeonHashAlgorithm.toLowerCase)
           assert(hashAlgorithmHeader.contains(List(expectedHashAlgorithm)))
         }
         // Check hash value header if specified

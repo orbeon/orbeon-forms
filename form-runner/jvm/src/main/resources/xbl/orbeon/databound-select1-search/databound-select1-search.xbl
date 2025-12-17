@@ -347,6 +347,8 @@
                                 </_>
                             </xf:instance>
 
+                            <xf:bind ref="instance('local')/label" readonly="true()"/>
+
                             <xf:instance id="result-raw" ><_/></xf:instance>
                             <xf:instance id="result-json"><_/></xf:instance>
 
@@ -595,7 +597,7 @@
                             <xh:select id="select1"/>
 
                         </xf:group>
-                        <xf:input ref="if ($view) then instance('local')/label/string() else ()"/>
+                        <xf:input ref="if ($view) then instance('local')/label else ()"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

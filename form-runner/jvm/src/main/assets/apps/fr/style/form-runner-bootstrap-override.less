@@ -220,14 +220,14 @@ body.orbeon {
 
             // No gradient to match Bootstrap 5
             color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
-            background-color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
+            background-color: var(--orbeon-navbar-background-color);
 
             .container {
                 h1 {
-                    color: @frNavBarTextColor;
+                    color: var(--orbeon-navbar-heading-color);
                 }
                 i {
-                    color: white;
+                    color: var(--orbeon-navbar-color);
                 }
             }
         }
@@ -472,6 +472,11 @@ body.orbeon {
                 & > .xforms-trigger { cursor: pointer }
                 & > .xforms-trigger.xforms-readonly { cursor: auto; }
                 .btn-link { text-decoration: none; }
+
+                & > a, & > span {
+                    background-color: var(--orbeon-base-background-color);
+                    border: 1px solid var(--orbeon-base-border-color);
+                }
 
                 // NOTE: Updated for Bootstrap 2.3.2
                 // 2022-12-28: Made smaller

@@ -108,7 +108,7 @@
 
             .fr-table {
                 max-width: 100%;
-                background-color: @tableBackground;
+                background-color: transparent;
             }
 
             // Space after non-empty grids and repeated grids
@@ -246,7 +246,7 @@
                 .fr-grid.fr-repeat {
                     &.fr-grid-css {
                         .fr-grid-repeat-iteration {
-                            border-top: 2px solid #ddd;
+                            border-top: 2px solid var(--orbeon-base-border-color);
                             margin-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                             padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                         }
@@ -257,7 +257,7 @@
                         .fr-grid-tr:first-child > {
                             .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
                                 // Use a mixin because Less CSS doesn't parse `@media` correctly
-                                border-top: 2px solid #ddd;
+                                border-top: 2px solid var(--orbeon-base-border-color);
                                 padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                             }
                         }
@@ -270,15 +270,15 @@
             .full-appearance-borders() {
                 .fr-grid.fr-repeat {
 
-                    border: 1px solid #ddd;
+                    border: 1px solid var(--orbeon-base-border-color);
                     border-radius: @baseBorderRadius;
 
                     .fr-repeat-column-left, .fr-repeat-column-number {
-                        border-right: 1px solid #ddd;
+                        border-right: 1px solid var(--orbeon-base-border-color);
                     }
 
                     .fr-repeat-column-right {
-                        border-left: 1px solid #ddd;
+                        border-left: 1px solid var(--orbeon-base-border-color);
                         vertical-align: top;
                         align-self: normal;
                     }
@@ -292,7 +292,7 @@
                             // Exception: readonly + multiple rows, where we have a head, but hide it with CSS, so here exclude it
                             .fr-grid-repeat-top-row:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
                             .fr-grid-repeat-iteration                                                ~ .fr-grid-repeat-iteration {
-                                border-top: 1px solid #ddd;
+                                border-top: 1px solid var(--orbeon-base-border-color);
                             }
                         }
 
@@ -307,7 +307,7 @@
                             // `.fr-grid-repeat-iteration`.
                             .fr-grid-repeat-top-row:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
                             .fr-grid-repeat-iteration                                                ~ .fr-grid-repeat-iteration {
-                                border-top: 1px solid #ddd;
+                                border-top: 1px solid var(--orbeon-base-border-color);
                             }
                         }
                     }
@@ -322,7 +322,7 @@
                             // See comment above for the CSS grid / wide layout
                             .fr-grid-head:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
                             .fr-grid-repeat-iteration                                      ~ .fr-grid-repeat-iteration {
-                                & > tr > td { border-top: 1px solid #ddd; }
+                                & > tr > td { border-top: 1px solid var(--orbeon-base-border-color); }
                             }
                         }
 
@@ -335,7 +335,7 @@
 
                             .fr-grid-head:not(.xforms-readonly .fr-repeat-multiple-rows *) ~ .fr-grid-repeat-iteration,
                             .fr-grid-repeat-iteration                                      ~ .fr-grid-repeat-iteration {
-                                & > tr > td { border-top: 1px solid #ddd; }
+                                & > tr > td { border-top: 1px solid var(--orbeon-base-border-color); }
                             }
                         }
 
@@ -344,7 +344,7 @@
                             // The PDF renderer supports `+` but not `~`
                             &.fr-repeat-single-row    .fr-grid-repeat-iteration,
                             &.fr-repeat-multiple-rows .fr-grid-repeat-iteration + .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                                & > tr > td { border-top: 1px solid #ddd; }
+                                & > tr > td { border-top: 1px solid var(--orbeon-base-border-color); }
                             }
                         }
                     }
@@ -782,6 +782,7 @@
                         font-family: var(--orbeon-repetition-number-font-family);
                         font-weight: var(--orbeon-repetition-number-font-weight);
                         color: var(--orbeon-repetition-number-color);
+                        background-color: var(--orbeon-repetition-number-background-color);
                     }
 
                     @media print {
@@ -796,7 +797,7 @@
                 .xforms-repeat-selected-item-1 {
                     .fr-repeat-column-left, .fr-repeat-column-number {
                         @media not print {
-                            background-color: @grayLighter;
+                            background-color: var(--orbeon-repetition-selected-item-background-color);
                         }
                     }
                 }

@@ -14,7 +14,10 @@
             background-color: var(--orbeon-button-background-color); // restore default color or buttons are too dark when disabled
         }
 
-        &:hover {
+        &:hover,
+        &:focus,
+        &:active,
+        &.active {
             color: var(--orbeon-button-color);
             background-color: var(--orbeon-button-highlight-background-color);
         }

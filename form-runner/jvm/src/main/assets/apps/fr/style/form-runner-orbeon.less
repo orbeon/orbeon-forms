@@ -439,7 +439,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
         &.navbar-inverse {
             .fr-language-choice .fr-link-select1, .fr-goto-content {
-                color: @frNavBarTextColor;
+                color: var(--orbeon-navbar-heading-color);
                 a, button.btn-link { color: @navbarInverseLinkColor }
             }
             
@@ -675,19 +675,19 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
             position: static; // override Bootstrap otherwise navbar appears on all pages
 
             .navbar-inner {
-                background-color: white;
-                border-bottom: 1px solid darken(@wellBackground, 7%);
+                background-color: var(--orbeon-navbar-background-color);
+                border-bottom: 1px solid var(--orbeon-base-border-color);
                 padding-left: 0;
 
                 .container h1 {
-                    font-size: 24px;
-                    color: black;
+                    color: var(--orbeon-navbar-heading-color);
                 }
 
                 .fr-language-choice {
                     display: none;
                 }
 
+                // Used in Form Builder and Embedding Demo
                 .brand {
                     color: @frHeaderColor;
                     font-size: 25px;

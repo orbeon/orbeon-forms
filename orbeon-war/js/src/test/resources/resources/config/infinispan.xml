@@ -14,7 +14,7 @@
         </serialization>
 
         <global-state>
-            <persistent-location path="java.io.tmpdir/orbeon/cache"/>
+            <persistent-location path="orbeon/cache" relative-to="java.io.tmpdir"/>
         </global-state>
 
         <!-- XForms state store -->

@@ -49,7 +49,8 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
 
   class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
     def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(k, v) }
-    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.putIfAbsent(k, v) }
+    // 2025-12-17: We encountered a curious behavior with Infinispan when using `putIfAbsent()`. So using `put()` for now.
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.put(k, v) }
     def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                    Option(cache.get(k)) }
     def remove(k: io.Serializable): Boolean                       = { trace("remove");                 cache.remove(k) }
     def getName: String                                           = { trace("getName");                cache.getName }
@@ -122,7 +123,7 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
       )
 
       def tryCreateCacheManager(uri: URI): Try[CacheManager] =
-        Try(provider.getCacheManager(uri, getClass.getClassLoader))
+        Try(provider.getCacheManager(uri, getClass.getClassLoader, System.getProperties))
           .onFailure(t => CacheSupport.Logger.error(s"failed to create `CacheManager`: ${t.getMessage}"))
 
       functions

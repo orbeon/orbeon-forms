@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <infinispan
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:infinispan:config:16.0 https://infinispan.org/schemas/infinispan-config-16.0.xsd"
-    xmlns="urn:infinispan:config:16.0">
+    xsi:schemaLocation="urn:infinispan:config:14.0 https://infinispan.org/schemas/infinispan-config-14.0.xsd"
+    xmlns="urn:infinispan:config:14.0">
 
     <cache-container name="orbeon-container" statistics="false">
 
@@ -40,13 +40,13 @@
 
         <!-- External mode store -->
         <local-cache name="form-runner.external-mode-store">
-            <expiration lifespan="16m" interval="2m"/>
+            <expiration lifespan="960000" interval="120000"/>
             <memory max-count="200" when-full="REMOVE"/>
         </local-cache>
 
         <!-- Form Runner form definition cache -->
         <local-cache name="form-runner.persistence.form-definition">
-            <expiration lifespan="5m" interval="2m"/>
+            <expiration lifespan="300000" interval="120000"/>
             <memory max-count="10" when-full="REMOVE"/>
         </local-cache>
 

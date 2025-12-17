@@ -1,38 +1,50 @@
+# Build outputs
 build/
-builder/target/
-tmp/
 target/
-build-local.properties
-.idea/
-.idea.bak*
-exist-data*
-_exist-data*
-lib/xerces-2.12-orbeon-jar/
-# SBT command history
-.target/.history
+builder/target/
 src/resources-packaged-target/
-src/resources-local/
-resources-local/
+
+# Local/temporary files
+tmp/
 scratch.txt
 *~
+build-local.properties
+
+# IDE/editor
+.idea/
+.idea.bak*
+.vscode
+
+# Scala tooling
 .bloop
 .bsp
 .metals
-.vscode
-# npm install
-package-lock.json
-# SQLite file used for tests
-form-runner/test-db.sqlite
-# jenv
+metals.sbt
+.target/.history
+
+# Java
 .java-version
-# JS dev
-.angular
+
+# JavaScript / Node
 node_modules/
 package-lock.json
+.angular
 angular/dist/
 angular-test/dist/
 react/dist/
 react-test/dist/
+
+# macOS
+.DS_Store
+
+# Project-specific
+exist-data*
+_exist-data*
+demo-sqlite-database/java.io.tmpdir/
+# SQLite file used for tests
+form-runner/test-db.sqlite
+lib/xerces-2.12-orbeon-jar/
+resources-local/
 # FormMetadataApiTest
 src/test/resources/properties-form-metadata-api-test.xml
 CLAUDE.md

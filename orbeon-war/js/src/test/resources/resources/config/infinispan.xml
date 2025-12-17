@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:16.0 https://infinispan.org/schemas/infinispan-config-16.0.xsd"
+    xmlns="urn:infinispan:config:16.0">
+
+    <cache-container name="orbeon-container" statistics="false">
+
+        <serialization marshaller="org.infinispan.commons.marshall.JavaSerializationMarshaller">
+          <allow-list>
+              <class>org.orbeon.oxf.xforms.state.DynamicState</class>
+              <regex>scala.*</regex>
+          </allow-list>
+        </serialization>
+
+        <global-state>
+            <persistent-location path="java.io.tmpdir/orbeon/cache"/>
+        </global-state>
+
+        <!-- XForms state store -->
+        <local-cache name="xforms.state">
+            <persistence passivation="true">
+                <file-store purge="true" path="xforms.state">
+                    <write-behind modification-queue-size="1024" />
+                </file-store>
+            </persistence>
+            <!-- `max-count="6"` is curiously needed for `XFormsStateManagerTest` -->
+            <memory max-count="6" when-full="REMOVE"/>
+        </local-cache>
+
+        <!-- XForms resources store -->
+        <local-cache name="xforms.resources">
+            <persistence passivation="true">
+                <file-store purge="true" path="xforms.resources">
+                    <write-behind modification-queue-size="1024" />
+                </file-store>
+            </persistence>
+            <memory max-count="200" when-full="REMOVE"/>
+        </local-cache>
+
+        <!-- External mode store -->
+        <local-cache name="form-runner.external-mode-store">
+            <expiration lifespan="16m" interval="2m"/>
+            <memory max-count="200" when-full="REMOVE"/>
+        </local-cache>
+
+        <!-- Form Runner form definition cache -->
+        <local-cache name="form-runner.persistence.form-definition">
+            <expiration lifespan="5m" interval="2m"/>
+            <memory max-count="10" when-full="REMOVE"/>
+        </local-cache>
+
+        <local-cache name="orbeon.properties">
+            <memory max-count="50" when-full="REMOVE"/>
+        </local-cache>
+
+    </cache-container>
+</infinispan>

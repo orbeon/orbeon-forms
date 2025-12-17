@@ -4,13 +4,16 @@ import cats.data.NonEmptyList
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.TryUtils.*
 
 import java.io
 import java.net.URI
 import javax.cache.configuration.MutableConfiguration
 import javax.cache.{CacheManager, Caching}
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
+import scala.util.chaining.scalaUtilChainingOps
+import scala.util.{Success, Try}
 
 
 class JCacheProvider(store: Boolean) extends CacheProviderApi {
@@ -105,20 +108,29 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
 
       info(s"Using the JCache provider found in the classpath with class name: `${provider.getClass.getName}`")
 
-      def fromResource: Option[URI] =
-        nonBlankString(store, CacheSupport.resourcePropertyName)(properties)
-          .flatMap { case (_, p) => Option(getClass.getResource(p)) }
-          .map(_.toURI)
+      val resourcePropertyOpt: Option[String] =
+        nonBlankString(store, CacheSupport.resourcePropertyName)(properties).map(_._2)
 
-      def fromUri: Option[URI] =
-        nonBlankString(store, CacheSupport.uriPropertyName)(properties)
-          .map { case (_, p) => URI.create(p) }
+      // With Infinispan, we have an issue whereby we get, at least during tests, an error about using the `jar:` URI
+      // scheme. So we first try using the resource as a resource, and then we try a plain `URI` from the property,
+      // after dropping the starting `/`.
+      val functions: LazyList[() => Option[URI]] = LazyList(
+        () => resourcePropertyOpt.flatMap(p => Option(getClass.getResource(p))).map(_.toURI),
+        () => resourcePropertyOpt.map(p => URI.create(p.dropStartingSlash)),
+        () => nonBlankString(store, CacheSupport.uriPropertyName)(properties).map { case (_, p) => URI.create(p) },
+        () => Some(provider.getDefaultURI)
+      )
 
-      val configUri =
-        fromResource.orElse(fromUri).getOrElse(provider.getDefaultURI)
+      def tryCreateCacheManager(uri: URI): Try[CacheManager] =
+        Try(provider.getCacheManager(uri, getClass.getClassLoader))
+          .onFailure(t => CacheSupport.Logger.error(s"failed to create `CacheManager`: ${t.getMessage}"))
 
-      provider.getCacheManager(configUri, getClass.getClassLoader) |!>
-        (_ => debug(s"initialized JCache cache manager with URI `$configUri`"))
+      functions
+        .flatMap(_.apply().map(uri => uri -> tryCreateCacheManager(uri)))
+        .collectFirst { case (uri, Success(cacheManager)) => uri -> cacheManager }
+        .get
+        .tap(t => debug(s"initialized JCache cache manager with URI `${t._1}`"))
+        ._2
     } catch {
       case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
         Try(PropertyLoader.getPropertyStore(None).globalPropertySet)

@@ -97,11 +97,12 @@ trait ClientTestSupport {
 
   self: AsyncTestSuite =>
 
-  val TomcatImageName         = "tomcat:9.0.109-jdk11-temurin-noble"
+  val TomcatImageName         = "tomcat:9.0.112-jre17-temurin-noble"
   val LocalResourcesDir       = "$BASE_DIRECTORY/orbeon-war/js/src/test/resources"
   val LocalOrbeonResourcesDir = s"$LocalResourcesDir/resources"
   val ImageTomcatDir          = "/usr/local/tomcat"
   val ImageResourcesDir       = s"$ImageTomcatDir/webapps/orbeon/WEB-INF/resources"
+  val DefaultConfigDirectory  = "config"
 
   val CookieTimeout           = 120.seconds
 
@@ -139,31 +140,31 @@ trait ClientTestSupport {
       }
     }
 
-  def runTomcatContainer(
+  protected def runTomcatContainer(
     containerName    : String,
     port             : Int,
     checkImageRunning: Boolean,
     network          : Option[String],
-    ehcacheFilename  : String
+    configDirectory  : String
   ): Future[Try[List[String]]] =
     runContainer(
       TomcatImageName,
       s"""
         |--name $containerName
         |${network.map(n => s"--network=$n ").getOrElse("")}-it
-        |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon:delegated
-        |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
-        |-v $$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml:$ImageTomcatDir/conf/Catalina/localhost/orbeon.xml:delegated
-        |-v $LocalOrbeonResourcesDir:$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources:delegated
-        |-v $LocalOrbeonResourcesDir/config/$ehcacheFilename:$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/config/ehcache.xml:delegated
-        |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml:delegated
-        |-v $LocalResourcesDir/tomcat/setenv.sh:$ImageTomcatDir/bin/setenv.sh:delegated
+        |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/jvm/target/webapp,dst=$ImageTomcatDir/webapps/orbeon
+        |--mount type=bind,src=$$HOME/.orbeon/license.xml,dst=/root/.orbeon/license.xml,ro
+        |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml,dst=$ImageTomcatDir/conf/Catalina/localhost/orbeon.xml,ro
+        |--mount type=bind,src=$LocalOrbeonResourcesDir/forms,dst=$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/forms,ro
+        |--mount type=bind,src=$LocalOrbeonResourcesDir/$configDirectory,dst=$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/config,ro
+        |--mount type=bind,src=$LocalResourcesDir/tomcat/server.xml,dst=$ImageTomcatDir/conf/server.xml,ro
+        |--mount type=bind,src=$LocalResourcesDir/tomcat/setenv.sh,dst=$ImageTomcatDir/bin/setenv.sh,ro
         |-p $port:8080""".stripMargin,
       checkImageRunning
     )
 
   def withRunTomcatContainer[T](containerName: String, port: Int, checkImageRunning: Boolean, network: Option[String])(block: => Future[T]): Future[T] = async {
-    val r = await(runTomcatContainer(containerName, port, checkImageRunning, network, ehcacheFilename = "ehcache.xml"))
+    val r = await(runTomcatContainer(containerName, port, checkImageRunning, network, configDirectory = DefaultConfigDirectory))
     assert(r.isSuccess)
     val result = await(block)
     await(removeContainerByImage(TomcatImageName))

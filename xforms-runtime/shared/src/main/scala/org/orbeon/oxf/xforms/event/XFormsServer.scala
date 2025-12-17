@@ -306,7 +306,7 @@ object XFormsServer {
     lockResult match {
       case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
         // See also `XFormsAssetServer`
-        info(s"session not found while processing client events")
+        info(s"session not found while processing client events: ${e.getMessage}")
         // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
         ClientEvents.errorResponse(e.code)
       case Failure(e) => // from downstream `acquireDocumentLock`

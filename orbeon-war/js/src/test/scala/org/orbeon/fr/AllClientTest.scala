@@ -30,7 +30,7 @@ class AllClientTest
           port              = ServerExternalPort,
           checkImageRunning = true,
           network           = None,
-          ehcacheFilename   = "ehcache.xml"
+          configDirectory   = DefaultConfigDirectory
         ))
         assert(r.isSuccess)
       }

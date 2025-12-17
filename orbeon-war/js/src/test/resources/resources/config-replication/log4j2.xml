@@ -1,0 +1,18 @@
+<Configuration status="error" dest="err" name="OrbeonWebAppTestConfig">
+
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{ISO8601} - %tid - %-5level %logger{1} - %message%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="net.sf.ehcache.distribution"   level="trace"/>
+        <Logger name="org.orbeon.lifecycle"          level="debug"/>
+
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

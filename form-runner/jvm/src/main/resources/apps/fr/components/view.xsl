@@ -544,13 +544,25 @@
                     (: In theory, this could be done statically, as this doesn't change for a given form, but we don't
                        have code to do this that is able to handle AVTs. :)
                     if (not(fr:is-design-time()) and not(fr:mode() = ('summary', 'home', 'landing', ''))) then
-                        concat(' fr-density-', frf:optionFromMetadataOrPropertiesDynamicXPath('density', 'compact'))
+                        let $density-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('density', 'compact')[. = ('compact', 'comfortable', 'roomy')]
+                        return
+                            if (exists($density-opt)) then
+                                concat(' fr-density-', $density-opt)
+                            else
+                                ''
                     else
                         ()
                 }}{{
                     ' fr-keyboard-shortcuts-hidden'[
                         not(xxf:property(string-join(('oxf.fr.keyboard-shortcuts.show-hints', fr:app-name(), fr:form-name()), '.')) = true())
                     ]
+                }}{{
+                    let $color-scheme-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('color-scheme', 'light')[. = ('light', 'dark', 'system')]
+                    return
+                        if (not(fr:is-design-time()) and exists($color-scheme-opt)) then
+                            concat(' fr-color-scheme-', $color-scheme-opt)
+                        else
+                            ''
                 }}"
                 xxf:element="div">
                 <xsl:choose>

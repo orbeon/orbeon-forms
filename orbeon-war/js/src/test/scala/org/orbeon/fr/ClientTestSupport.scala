@@ -97,7 +97,7 @@ trait ClientTestSupport {
 
   self: AsyncTestSuite =>
 
-  val TomcatImageName         = "tomcat:9.0.112-jre17-temurin-noble"
+  val TomcatImageName         = "tomcat:9.0.109-jdk11-temurin-noble"
   val LocalResourcesDir       = "$BASE_DIRECTORY/orbeon-war/js/src/test/resources"
   val LocalOrbeonResourcesDir = s"$LocalResourcesDir/resources"
   val ImageTomcatDir          = "/usr/local/tomcat"

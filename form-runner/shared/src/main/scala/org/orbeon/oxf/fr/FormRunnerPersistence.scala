@@ -208,6 +208,12 @@ object FormRunnerPersistence {
   val AttachmentAttributeNames            = List("filename", "mediatype", "size")
   val JsEnvProviderName                   = "javascript"
 
+  private def pathToHolderForEncryption(holder: NodeInfo): String = {
+    // For multiple attachments, point to the container (bound element), as it is the one marked for encryption.
+    val boundNode = if (holder.localname == "_") holder.parentUnsafe else holder // TODO: what about single attachment named `_`?
+    boundNode.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
+  }
+
   def findProvider(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Option[String] =
     if (CoreCrossPlatformSupport.isJsEnv)
       JsEnvProviderName.some
@@ -1133,9 +1139,9 @@ trait FormRunnerPersistence {
                           <- fs2.Stream.emits(attachmentsWithHolderAndFilename)
         getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
-        pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        hashAlgorithmOpt  = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_ALGORITHM_QNAME)
-        hashValueOpt      = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_VALUE_QNAME)
+        pathToHolder      = pathToHolderForEncryption(migratedHolder)
+        hashAlgorithmOpt  = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_ALGORITHM_QNAME.localName)
+        hashValueOpt      = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_VALUE_QNAME.localName)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
         putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, hashAlgorithmOpt, hashValueOpt, credentials))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))

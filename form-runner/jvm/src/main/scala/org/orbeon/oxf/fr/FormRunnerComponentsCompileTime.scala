@@ -14,7 +14,6 @@ import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping

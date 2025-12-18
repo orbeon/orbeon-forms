@@ -3,18 +3,15 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.CacheSupport
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.FormRunnerDetailMode
-import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.fr.{DataStatus, FormRunner, FormRunnerExternalModeToken, FormRunnerParams}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerExternalModeToken, FormRunnerParams}
 import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, SecureUtils}
+import org.orbeon.oxf.util.{LoggerFactory, SecureUtils}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.slf4j
 
 import java.nio.charset.StandardCharsets
-import java.time.Instant
 import scala.util.Try
 import scala.util.control.NonFatal
 

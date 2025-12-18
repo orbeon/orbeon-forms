@@ -21,8 +21,12 @@
 
         <!-- XForms state store -->
         <replicated-cache name="xforms.state">
-            <expiration max-idle="21600000" interval="120000"/>
-            <memory max-count="200" when-full="REMOVE"/>
+            <persistence passivation="true">
+                <file-store purge="true" path="xforms.state" shared="false">
+                    <write-behind modification-queue-size="1024" />
+                </file-store>
+            </persistence>
+            <memory max-count="1" when-full="REMOVE"/>
         </replicated-cache>
 
         <!-- XForms resources store -->

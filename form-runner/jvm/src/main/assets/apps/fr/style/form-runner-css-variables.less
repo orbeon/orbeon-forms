@@ -40,6 +40,8 @@
   --orbeon-hint-color      : @minGrayText;
 
   // Help
+  --orbeon-help-icon-font-size     : 0.86em;
+  --orbeon-help-icon-color         : black;
   --orbeon-help-title-font-size    : 1.08em;
   --orbeon-help-content-font-size  : 1.00em;
   --orbeon-help-font-family        : @frBaseFontFamily;
@@ -61,6 +63,7 @@
   }
 
   // Specific controls
+  --orbeon-dropdown-selected-background-color  : #ddd;
   --orbeon-attachment-drop-color               : @minGrayText;
   --orbeon-attachment-dragover-color           : white;
   --orbeon-attachment-dragover-background-color: #ccc;
@@ -111,12 +114,12 @@
   --orbeon-repeat-menu-background-color         : #f5f5f5; // @wellBackground
 
   // Grids
-  --orbeon-repetition-number-font-size              : smaller;
-  --orbeon-repetition-number-font-family            : inherit;
-  --orbeon-repetition-number-font-weight            : bold;
-  --orbeon-repetition-number-color                  : white;
-  --orbeon-repetition-number-background-color       : #999;
-  --orbeon-repetition-selected-item-background-color: #eee; // @grayLighter
+  --orbeon-repetition-number-font-size         : smaller;
+  --orbeon-repetition-number-font-family       : inherit;
+  --orbeon-repetition-number-font-weight       : bold;
+  --orbeon-repetition-number-color             : white;
+  --orbeon-repetition-number-background-color  : #999;
+  --orbeon-repetition-selected-background-color: #eee; // @grayLighter
 
   // Regular and wizard table of contents (TOC)
   --orbeon-toc-color                          : #0d6efd;
@@ -209,6 +212,91 @@
 
   // XForms inspector (by default, keep the font size absolute)
   --orbeon-inspector-font-size: 13px;
+
+  // Explicit dark mode
+  .fr-color-scheme-dark, &:has(.fr-color-scheme-dark) {
+    .dark-color-scheme()
+  }
+
+  // System-preference dark mode (screen only)
+  @media screen and (prefers-color-scheme: dark) {
+    .fr-color-scheme-system, &:has(.fr-color-scheme-system) {
+      .dark-color-scheme()
+    }
+  }
+
+  .dark-color-scheme() {
+    @blackish    : #222;
+    @whitish     : #ddd;
+    @desaturation: 15%;
+
+    --orbeon-base-background-color                    : @blackish;
+    --orbeon-base-border-color                        : #333;
+    --orbeon-base-color                               : #ccc;
+    --orbeon-hint-color                               : #888;
+    --orbeon-help-icon-color                          : @whitish;
+    //--orbeon-help-title-color                         : inherit;
+    //--orbeon-help-content-color                       : inherit;
+    --orbeon-control-color                            : @whitish;
+    --orbeon-control-background-color                 : @blackish;
+    --orbeon-control-read-only-background-color       : #333;
+    --orbeon-control-border-color                     : #444;
+    --orbeon-dropdown-selected-background-color       : #444;
+    --orbeon-attachment-drop-color                    : #aaa;
+    --orbeon-attachment-dragover-color                : @blackish;
+    --orbeon-attachment-dragover-background-color     : #444;
+    --orbeon-button-color                             : #333;
+    --orbeon-button-background-color                  : #aaa;
+    --orbeon-button-highlight-background-color        : #aaa;
+    --orbeon-button-primary-color                     : @whitish;
+    --orbeon-button-primary-background-color          : desaturate(@btnPrimaryBackground, @desaturation);
+    --orbeon-button-primary-highlight-background-color: desaturate(@btnPrimaryBackgroundHighlight, @desaturation);
+    --orbeon-button-warning-color                     : @whitish;
+    --orbeon-button-warning-background-color          : desaturate(@btnWarningBackground, @desaturation);
+    --orbeon-button-warning-highlight-background-color: desaturate(@btnWarningBackgroundHighlight, @desaturation);
+    --orbeon-button-danger-color                      : @whitish;
+    --orbeon-button-danger-background-color           : desaturate(@btnDangerBackground, @desaturation);
+    --orbeon-button-danger-highlight-background-color : desaturate(@btnDangerBackgroundHighlight, @desaturation);
+    --orbeon-button-success-color                     : @whitish;
+    --orbeon-button-success-background-color          : desaturate(@btnSuccessBackground, @desaturation);
+    --orbeon-button-success-highlight-background-color: desaturate(@btnSuccessBackgroundHighlight, @desaturation);
+    --orbeon-button-info-color                        : @whitish;
+    --orbeon-button-info-background-color             : desaturate(@btnInfoBackground, @desaturation);
+    --orbeon-button-info-highlight-background-color   : desaturate(@btnInfoBackgroundHighlight, @desaturation);
+    --orbeon-button-inverse-color                     : @whitish;
+    --orbeon-button-inverse-background-color          : desaturate(@btnInverseBackground, @desaturation);
+    --orbeon-button-inverse-highlight-background-color: desaturate(@btnInverseBackgroundHighlight, @desaturation);
+    --orbeon-section-color                            : #bbb;
+    --orbeon-section-background-color                 : #333;
+    --orbeon-repeater-add-button-color                : @blackish;
+    --orbeon-repeat-menu-background-color             : #2a2a2a;
+    --orbeon-repetition-number-color                  : @blackish;
+    --orbeon-repetition-number-background-color       : #666;
+    --orbeon-repetition-selected-background-color     : #444;
+    --orbeon-toc-color                                : desaturate(#0d6efd, @desaturation);
+    --orbeon-toc-background-color                     : @blackish;
+    --orbeon-toc-hover-background-color               : #333;
+    --orbeon-toc-selected-color                       : @blackish;
+    --orbeon-toc-selected-background-color            : desaturate(#0d6efd, @desaturation);
+     --orbeon-toc-error-color                         : desaturate(@error, @desaturation);
+    --orbeon-toc-selected-error-color                 : @blackish;
+    --orbeon-toc-selected-error-background-color      : desaturate(@error, @desaturation);
+    --orbeon-navbar-background-color                  : #020408;
+    --orbeon-active-alert-color                       : @blackish;
+    --orbeon-alert-color                              : #aaa;
+    --orbeon-alert-background-color                   : @blackish;
+    --orbeon-alert-border-color                       : #333;
+    --orbeon-alert-text-shadow                        : transparent;
+    --orbeon-error-color                              : desaturate(#842029, @desaturation);
+    --orbeon-error-background-color                   : desaturate(#f8d7da, @desaturation);
+    --orbeon-error-border-color                       : desaturate(#f5c2c7, @desaturation);
+    --orbeon-success-color                            : desaturate(#0f5132, @desaturation);
+    --orbeon-success-background-color                 : desaturate(#d1e7dd, @desaturation);
+    --orbeon-success-border-color                     : desaturate(#badbcc, @desaturation);
+    --orbeon-warning-color                            : desaturate(#664d03, @desaturation);
+    --orbeon-warning-background-color                 : desaturate(#fff3cd, @desaturation);
+    --orbeon-warning-border-color                     : desaturate(#ffecb5, @desaturation);
+  }
 }
 
 @media print {

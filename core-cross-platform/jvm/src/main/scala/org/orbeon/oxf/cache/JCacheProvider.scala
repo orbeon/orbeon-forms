@@ -4,7 +4,6 @@ import cats.data.NonEmptyList
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.TryUtils.*
 
 import java.io
@@ -12,7 +11,7 @@ import java.net.URI
 import javax.cache.configuration.MutableConfiguration
 import javax.cache.{CacheManager, Caching}
 import scala.jdk.CollectionConverters.*
-import scala.util.chaining.scalaUtilChainingOps
+import scala.util.chaining.*
 import scala.util.{Success, Try}
 
 
@@ -47,10 +46,9 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
   def close(): Unit =
     cacheManager.close()
 
-  class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
+  private class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
     def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(k, v) }
-    // 2025-12-17: We encountered a curious behavior with Infinispan when using `putIfAbsent()`. So using `put()` for now.
-    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.put(k, v) }
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.putIfAbsent(k, v) }
     def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                    Option(cache.get(k)) }
     def remove(k: io.Serializable): Boolean                       = { trace("remove");                 cache.remove(k) }
     def getName: String                                           = { trace("getName");                cache.getName }
@@ -112,12 +110,8 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
       val resourcePropertyOpt: Option[String] =
         nonBlankString(store, CacheSupport.resourcePropertyName)(properties).map(_._2)
 
-      // With Infinispan, we have an issue whereby we get, at least during tests, an error about using the `jar:` URI
-      // scheme. So we first try using the resource as a resource, and then we try a plain `URI` from the property,
-      // after dropping the starting `/`.
       val functions: LazyList[() => Option[URI]] = LazyList(
         () => resourcePropertyOpt.flatMap(p => Option(getClass.getResource(p))).map(_.toURI),
-        () => resourcePropertyOpt.map(p => URI.create(p.dropStartingSlash)),
         () => nonBlankString(store, CacheSupport.uriPropertyName)(properties).map { case (_, p) => URI.create(p) },
         () => Some(provider.getDefaultURI)
       )

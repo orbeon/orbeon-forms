@@ -64,10 +64,8 @@
     <property as="xs:boolean" name="oxf.xforms.allow-error-recovery-on-init"            value="false"/>
 
     <!-- XForms cache configuration -->
-    <!-- NOTE: These also configure some non-XForms caches, including the properties ETag cache -->
-    <property as="xs:string"  name="oxf.xforms.cache.provider"                          value="jcache"/>
-    <property as="xs:string"  name="oxf.xforms.cache.jcache.classname"                  value=".*infinispan.*"/>
-    <property as="xs:string"  name="oxf.xforms.cache.jcache.resource"                   value="/config/infinispan.xml"/>
+    <!-- NOTE: This also configures non-XForms caches, including the properties ETag cache -->
+    <property as="xs:string"  name="oxf.xforms.cache.provider"                          value="infinispan"/>
 
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>

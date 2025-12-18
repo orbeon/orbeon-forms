@@ -24,8 +24,7 @@
                     <write-behind modification-queue-size="1024" />
                 </file-store>
             </persistence>
-            <!-- `max-count="6"` is curiously needed for `XFormsStateManagerTest` -->
-            <memory max-count="6" when-full="REMOVE"/>
+            <memory max-count="1" when-full="REMOVE"/>
         </local-cache>
 
         <!-- XForms resources store -->

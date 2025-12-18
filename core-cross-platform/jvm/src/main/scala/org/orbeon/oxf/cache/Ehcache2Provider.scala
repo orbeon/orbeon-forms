@@ -33,7 +33,7 @@ object Ehcache2Provider extends CacheProviderApi {
     cacheManager.getCache(cacheName) match {
       case cache: ehcache.Cache =>
         debug(s"found Ehcache 2 cache for `$cacheName`")
-        new JCacheCacheApi(cache).some
+        new EhcacheCacheApi(cache).some
       case _ =>
         debug(s"did not find Ehcache 2 cache for `$cacheName`")
         None
@@ -48,9 +48,9 @@ object Ehcache2Provider extends CacheProviderApi {
       CacheManager.ALL_CACHE_MANAGERS.get(0).shutdown()
   }
 
-  class JCacheCacheApi(private val cache: ehcache.Cache) extends CacheApi {
+  private class EhcacheCacheApi(private val cache: ehcache.Cache) extends CacheApi {
     def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(new ehcache.Element(k, v)) }
-    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.put(new ehcache.Element(k, v)) } // TODO: does Ehache 2.x have a more efficient equivalent?
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.put(new ehcache.Element(k, v)) }
     def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                    Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[io.Serializable]) }
     def remove(k: io.Serializable): Boolean                       = { trace("remove");                 cache.remove(k) }
     def getName: String                                           = { trace("getName");                cache.getName }

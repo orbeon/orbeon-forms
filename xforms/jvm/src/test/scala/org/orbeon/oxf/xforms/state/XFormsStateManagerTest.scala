@@ -13,13 +13,14 @@
   */
 package org.orbeon.oxf.xforms.state
 
+import org.orbeon.oxf.cache.CacheApi
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsContainingDocumentSupport, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 
@@ -29,6 +30,23 @@ class XFormsStateManagerTest
      with AnyFunSpecLike {
 
   import Private.*
+
+  describe("Cache passivation to store using tuples") {
+
+    // The size of the memory cache is supposed to be 1, so anything beyond that should be passivated to the store.
+    val Count = 100
+
+    it("should store and retrieve values") {
+
+      val stateStore: CacheApi = XFormsStores.stateStore
+
+      for (i <- 1 to Count)
+        stateStore.put(i.toString, (s"v-$i", i))
+
+      for (i <- 1 to Count)
+        assert(stateStore.get(i.toString).map(_.asInstanceOf[(String, Int)]).contains((s"v-$i", i)))
+    }
+  }
 
   describe("Cache configurations") {
 

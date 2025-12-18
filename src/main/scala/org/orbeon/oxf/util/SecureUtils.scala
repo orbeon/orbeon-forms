@@ -151,8 +151,8 @@ object SecureUtils extends SecureUtilsTrait {
           fallbackAead.get.decrypt(ciphertext, null)
       }
 
-    def encrypt(plaintext  : String     ): String      = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
-    def decrypt(ciphertext : String     ): String      = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
+    def encrypt(plaintext  : String): String = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
+    def decrypt(ciphertext : String): String = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
   }
 
   private def checkPasswordStrengthProperty: Boolean =

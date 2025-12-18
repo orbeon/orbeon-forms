@@ -25,6 +25,7 @@
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nytt skjema</new>
         <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Opprett nye data</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliser</duplicate>
+        <sign>&lt;i class="fa fa-fw fa-file-signature"&gt;&lt;/i&gt; Signer</sign>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre</save>

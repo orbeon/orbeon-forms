@@ -28,7 +28,7 @@ import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
+import org.orbeon.oxf.fr.persistence.relational.Provider.*
 import org.orbeon.oxf.fr.s3.S3
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData, S3Tag, S3Test}

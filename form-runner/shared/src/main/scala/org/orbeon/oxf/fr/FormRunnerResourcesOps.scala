@@ -17,9 +17,6 @@ import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormResources
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsCrossPlatformSupport
-
-import java.net.URI
 
 
 trait FormRunnerResourcesOps {
@@ -37,17 +34,9 @@ trait FormRunnerResourcesOps {
   def formResourcesInGivenLangOrFirst(formResourcesRootElem: NodeInfo, lang: String): NodeInfo =
     allResources(formResourcesRootElem).find(_.attValue("*:lang") == lang).getOrElse(allResources(formResourcesRootElem).head)
 
-  // Same as above but doesn't require a Form Builder context
-  // NOTE: Support an entirely missing resources instance (for tests).
-  // TODO: Migrate to `findResourceHoldersWithLangUseDocUseContext`.
-  def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): collection.Seq[(String, NodeInfo)] =
-    resourcesInstanceRootElemOpt(inDoc)             orElse
-      resourcesInstanceDocFromUrlOpt(inDoc)         map
-      (findResourceHoldersWithLang(controlName, _)) getOrElse
-      Nil
-
   def findResourceHoldersWithLangUseDocUseContext(
-    controlName : String)(implicit
+    controlName : String
+  )(implicit
     ctx         : FormRunnerDocContext
   ): collection.Seq[(String, NodeInfo)] =
     findResourceHoldersWithLang(controlName, ctx.resourcesRootElem)
@@ -59,14 +48,6 @@ trait FormRunnerResourcesOps {
       holder           <- resource child controlName headOption // there *should* be only one
     } yield
       (lang, holder)
-
-  // Support for `<xf:instance id="" src=""/>`, only for Form Builder's Summary page
-  private def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
-    frc.instanceElem(inDoc, FormResources)           flatMap
-      (_.attValueOpt("src"))                         map
-      URI.create                                     map
-      XFormsCrossPlatformSupport.readTinyTreeFromUrl map
-      (_.rootElement)
 }
 
 object FormRunnerResourcesOps extends FormRunnerResourcesOps

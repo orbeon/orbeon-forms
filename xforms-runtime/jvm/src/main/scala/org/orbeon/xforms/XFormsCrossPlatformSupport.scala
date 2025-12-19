@@ -213,7 +213,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       readTinyTree(
         XPath.GlobalConfiguration,
         is,
-        null,
+        url.toString,
         handleXInclude = false,
         handleLexical  = false
       )

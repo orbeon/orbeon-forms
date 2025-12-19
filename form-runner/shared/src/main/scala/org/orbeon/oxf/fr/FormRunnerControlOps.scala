@@ -378,7 +378,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       bindId                               <- control.attValueOpt(XFormsNames.BIND_QNAME).toList
       controlName                          <- controlNameFromIdOpt(bindId).toList
       BindPathHolders(bind, path, holders) <- findBindPathHoldersInDocument(controlName, contextItemOpt).toList
-      resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName)
+      resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDocUseContext(controlName)
     } yield
       ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 

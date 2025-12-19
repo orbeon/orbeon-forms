@@ -214,10 +214,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   // TODO: This is used by `XFormsOutputControl` when proxying resources.
   def getLastModifiedIfFast(absoluteURL: String): Long = 0
 
-  // Must not be called, see comment in trait
-  def readTinyTreeFromUrl(url: URI): DocumentNodeInfoType =
-    throw new UnsupportedOperationException
-
 //  object ErrorHandler extends org.xml.sax.ErrorHandler {
 //
 //    // NOTE: We used to throw here, but we probably shouldn't.

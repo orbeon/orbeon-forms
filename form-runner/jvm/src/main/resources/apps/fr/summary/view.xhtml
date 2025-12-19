@@ -464,6 +464,9 @@
             </xf:action>
 
             <!-- 4. Rest of initialization -->
+
+            <!-- Out of the box,this submission is used only for the Form Builder Summary page, as it is the only one with
+                 an external resources instance (using the `src` attribute). -->
             <xf:submission
                 id="fr-load-form-resources-submission"
                 method="get"
@@ -471,11 +474,15 @@
                 serialization="none"
                 replace="instance"
                 instance="fr-form-resources"
+                xxf:readonly="true"
+                xxf:cache="true"
                 xxf:xinclude="true"/>
+
             <xf:action event="xforms-submit-done" observer="fr-get-source-form-submission">
 
                 <!-- Load resources -->
                 <!-- Dereference `@src` for Form Builder if needed -->
+                <!-- It seems that we do need content in this instance, and not only when we call `frf:searchableValues()`. -->
                 <xf:var
                     name="resources-instance"
                     value="instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']"/>
@@ -506,7 +513,7 @@
 
                 <xf:insert
                     context="instance('fr-search-labels-instance')"
-                    origin="frf:searchableValues(instance('fr-source-form-instance')/root(), $app, $form, $version)/*"/>
+                    origin="frf:searchableValues(instance('fr-source-form-instance')/root(), $app, $form, $version, instance('fr-form-resources'))/*"/>
 
                 <xf:insert
                     context="instance('fr-search-instance')"

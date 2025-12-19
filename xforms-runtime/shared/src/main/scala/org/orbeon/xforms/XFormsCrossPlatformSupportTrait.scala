@@ -216,10 +216,6 @@ trait XFormsCrossPlatformSupportTrait {
 
   def getLastModifiedIfFast(absoluteURL: String): Long
 
-  // NOTE: Only referred to indirectly by Form Builder Summary page in order to load
-  // external resources. This will not be called when offline!
-  def readTinyTreeFromUrl(url: URI): DocumentNodeInfoType
-
   def readTinyTree(
     configuration  : SaxonConfiguration,
     inputStream    : InputStream,

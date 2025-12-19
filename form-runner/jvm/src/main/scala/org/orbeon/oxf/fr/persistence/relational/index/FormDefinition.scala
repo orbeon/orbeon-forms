@@ -17,6 +17,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.fr.Names.FormResources
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -29,6 +30,9 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsCrossPlatformSupport
+
+import java.net.URI
 
 
 trait FormDefinition {
@@ -73,7 +77,8 @@ trait FormDefinition {
     formDoc                  : DocumentNodeInfoType,
     appForm                  : AppForm,
     searchVersionOpt         : Option[SearchVersion],
-    databaseDataFormatVersion: DataFormatVersion
+    databaseDataFormatVersion: DataFormatVersion,
+    resourcesRootElemOpt     : Option[NodeInfo] = None // present for the Form Builder Summary page only
   )(implicit
     indentedLogger: IndentedLogger
   ): SearchableValues = {
@@ -85,6 +90,11 @@ trait FormDefinition {
         frc.findFormRunnerBodyElem(formDoc) orElse
           (formDoc.rootElement / "*:body" / "*:div" find (_.id == "fb-pseudo-body"))
       }
+
+      // Support override for the Form Builder Summary page
+      override lazy val resourcesRootElem: om.NodeInfo =
+        resourcesRootElemOpt
+          .getOrElse(resourcesInstanceElem.firstChildOpt(*).get)
     }
 
     // Look for indexed controls with fr:index sub-element or fr-index, fr-summary, etc. classes (legacy)

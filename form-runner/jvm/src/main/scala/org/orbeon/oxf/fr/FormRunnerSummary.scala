@@ -86,7 +86,7 @@ trait FormRunnerSummary {
       .getOrElse(htmlString)
 
   //@XPathFunction
-  def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo = {
+  def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int, resourcesRootElem: NodeInfo): NodeInfo = {
     implicit val indentedLogger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-runner")
     implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
     val appForm = AppForm(app, form)
@@ -94,7 +94,8 @@ trait FormRunnerSummary {
       formDoc,
       appForm,
       Some(SearchVersion.Specific(version)),
-      FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
+      Option(resourcesRootElem)
     ).toXML
   }
 

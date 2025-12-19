@@ -180,6 +180,7 @@
                     <xf:output id="my-form-name"               value="fr:form-name()"/>
                     <xf:output id="my-document-id"             value="fr:document-id()"/>
                     <xf:output id="my-is-draft"                value="fr:is-draft()"/>
+                    <xf:output id="my-is-form-builder"         value="fr:is-form-builder()"/>
                     <xf:output id="my-is-design-time"          value="fr:is-design-time()"/>
                     <xf:output id="my-is-readonly-mode"        value="fr:is-readonly-mode()"/>
                     <xf:output id="my-form-version"            value="fr:form-version()"/>
@@ -245,6 +246,11 @@
                                 <instance>fr-parameters-instance</instance>
                             </dependent-instances>
                         </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-is-form-builder" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:is-form-builder())[1])" analyzed="true"/>
                     </value>
                 </output>
                 <output scope="" prefixed-id="my-is-design-time" model-prefixed-id="m" binding="false" value="true">

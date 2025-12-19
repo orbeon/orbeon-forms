@@ -31,7 +31,7 @@
     <xf:var name="document-element"     value="$parameters/document"/>
     <xf:var name="document"             value="$document-element/string()"/>
     <xf:var name="mode"                 value="fr:mode()"/>
-    <xf:var name="is-fb"                value="fr:is-design-time()"/>
+    <xf:var name="is-fb"                value="fr:is-form-builder()"/>
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
     <xf:var name="autosave-elem"        value="$persistence-instance/autosave"/>

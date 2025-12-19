@@ -207,14 +207,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def getLastModifiedIfFast(absoluteURL: String): Long =
     NetUtils.getLastModifiedIfFast(absoluteURL)
 
-  // See comment in trait
-  def readTinyTreeFromUrl(url: URI): DocumentNodeInfoType =
+  def readTinyTreeFromUrl(url: URI, handleXInclude: Boolean = false): DocumentNodeInfoType =
     useAndClose(URLFactory.createURL(url).openStream()) { is =>
       readTinyTree(
         XPath.GlobalConfiguration,
         is,
         url.toString,
-        handleXInclude = false,
+        handleXInclude = handleXInclude,
         handleLexical  = false
       )
     }

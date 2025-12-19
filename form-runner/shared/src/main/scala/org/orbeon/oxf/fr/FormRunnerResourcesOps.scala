@@ -45,7 +45,7 @@ trait FormRunnerResourcesOps {
   def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): collection.Seq[(String, NodeInfo)] =
     for {
       (lang, resource) <- allLangsWithResources(resourcesRootElem)
-      holder           <- resource child controlName headOption // there *should* be only one
+      holder           <- resource.firstChildOpt(controlName) // there *should* be only one
     } yield
       (lang, holder)
 }

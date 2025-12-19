@@ -88,6 +88,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("document-id",                 classOf[FRDocumentId],           op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
 
     Fun("is-draft",                    classOf[FRIsDraft],              op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
+    Fun("is-form-builder",             classOf[FRIsFormBuilder],        op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
     Fun("is-design-time",              classOf[FRIsDesignTime],         op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
     Fun("is-readonly-mode",            classOf[FRIsReadonlyMode],       op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
 
@@ -579,6 +580,12 @@ private object FormRunnerFunctions {
   class FRIsDraft extends FRParamsFunction[BooleanValue] {
     override val elemNames: List[String] = List("draft")
     override def fromParams(params: FormRunnerParams): Option[BooleanValue] = Some(booleanToBooleanValue(params.isDraft.getOrElse(false)))
+  }
+
+  // Cannot change between form-builder and non-form-builder over the course of the form's lifetime
+  class FRIsFormBuilder extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      FormRunnerParamsOpt().exists(FormRunner.isFormBuilder(_))
   }
 
   // Cannot change between design-time and non-design-time over the course of the form's lifetime

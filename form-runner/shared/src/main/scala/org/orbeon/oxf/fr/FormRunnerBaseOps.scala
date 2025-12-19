@@ -595,6 +595,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     }
   }
 
+  def isFormBuilder(implicit p: FormRunnerParams) : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = isReadonlyModeFromString(p.app, p.form, p.mode)
 

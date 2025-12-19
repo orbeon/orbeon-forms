@@ -33,7 +33,7 @@
                 <xf:var name="fr-lease-enabled"        as="xs:boolean"   value="$fr-persistence-instance/lease-enabled = 'true'"/>
                 <xf:var name="fr-lease-state"          as="xs:string"    value="$fr-persistence-instance/lease-state/string()"/>
 
-                <xf:var name="is-fb"                   as="xs:boolean"   value="fr:is-design-time()"/>
+                <xf:var name="is-fb"                   as="xs:boolean"   value="fr:is-form-builder()"/>
                 <xf:var name="fb-form-not-loaded"      as="xs:boolean"   value="$is-fb and empty(xxf:instance('fb-form-instance')/*)"/>
 
                 <xf:var

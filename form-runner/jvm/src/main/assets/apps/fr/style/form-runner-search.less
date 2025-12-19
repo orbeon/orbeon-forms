@@ -56,10 +56,10 @@
       display: flex;
       flex-wrap: wrap;
 
-      border: 1px solid #e1e1e8;
+      border: 1px solid var(--orbeon-base-border-color);
       border-radius: @baseBorderRadius;
 
-      background-color: white;
+      background-color: var(--orbeon-base-background-color);
 
       padding: 0 @spacing 0 @spacing; // there is enough padding from the controls at the bottom already
       margin: @spacing 0;
@@ -156,7 +156,6 @@
   .fr-search-results {
 
     overflow: auto;
-    background: white;
     border-collapse: collapse;
 
     .alert  {
@@ -165,13 +164,20 @@
     }
 
     table {
+      background-color: var(--orbeon-table-background-color);
       margin-bottom: 0;
       max-width: none;                                        // Because table can scrolls beyond size of container
-    }
 
-    tr:hover td {
-      background-color: @frRowHoverBackground;
-      filter: brightness(0.95);
+      // Override table border color from Bootstrap
+      &.table-bordered {
+        border-color: var(--orbeon-table-border-color);
+        thead tr th {
+          border-color: var(--orbeon-table-border-color);
+        }
+        tbody tr td {
+          border-color: var(--orbeon-table-border-color);
+        }
+      }
     }
 
     thead {
@@ -188,7 +194,7 @@
           span.fr-sortable-th button.btn-link {
             &:hover, &:focus {
               color: inherit;
-              background-color: @frRowHoverBackground;
+              background-color: var(--orbeon-table-hover-background-color);
               cursor: pointer;
             }
           }
@@ -235,8 +241,14 @@
     }
 
     // We can't use .table-striped, as xf:repeat adds delimiters, so we do our own zebra-striping
-    tbody tr:nth-child(4n+3) > td {
-      background-color: @tableBackgroundAccent;
+    tbody {
+      tr:nth-child(4n+3) > td {
+        background-color: var(--orbeon-table-striped-background-color);
+      }
+      tr:hover > td {
+        background-color: var(--orbeon-table-hover-background-color);
+        filter: brightness(0.95);
+      }
     }
 
     tbody {

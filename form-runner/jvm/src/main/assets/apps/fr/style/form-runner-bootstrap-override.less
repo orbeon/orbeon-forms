@@ -57,6 +57,9 @@ body.orbeon {
     h5 { font-size: var(--orbeon-h5-font-size); }
     h6 { font-size: var(--orbeon-h6-font-size); }
 
+    // Used in search options, etc.
+    legend { color: var(--orbeon-base-color); }
+
     // Disable null font size hack for now
     // TODO: fix gap between buttons in button group properly
     .btn-group, .btn-toolbar      { font-size: inherit; }
@@ -156,7 +159,7 @@ body.orbeon {
         color            : var(--orbeon-alert-color);
         background-color : var(--orbeon-alert-background-color);
         border           : 1px solid var(--orbeon-alert-border-color);
-        text-shadow      : 0 1px 0 var(--orbeon-alert-text-shadow);
+        text-shadow      : 0 1px 0 var(--orbeon-alert-text-shadow-color);
     }
 
     // These pass https://dequeuniversity.com/rules/axe/4.4/color-contrast
@@ -447,9 +450,10 @@ body.orbeon {
         }
     }
 
-    input, textarea {
-        &[readonly] {
+    input, select, textarea {
+        &[readonly], &[disabled] {
           background-color: var(--orbeon-control-read-only-background-color);
+          opacity: 1;
         }
     }
 
@@ -504,6 +508,10 @@ body.orbeon {
         .add-on {
             display: flex;
             align-items: center;
+
+            color: var(--orbeon-add-on-color);
+            background-color: var(--orbeon-add-on-background-color);
+            text-shadow: 0 1px 0 var(--orbeon-add-on-text-shadow-color);
 
             height: (@fixedLineHeight - 2px); // TODO: how to approximate calc(1em + 5px)?
             @media screen {

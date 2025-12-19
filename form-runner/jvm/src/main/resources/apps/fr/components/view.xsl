@@ -559,7 +559,7 @@
                 }}{{
                     let $color-scheme-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('color-scheme', 'light')[. = ('light', 'dark', 'system')]
                     return
-                        if (not(fr:is-design-time()) and exists($color-scheme-opt)) then
+                        if ((not(fr:is-design-time()) or $fr-mode='summary') and exists($color-scheme-opt)) then
                             concat(' fr-color-scheme-', $color-scheme-opt)
                         else
                             ''

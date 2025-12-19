@@ -543,7 +543,10 @@
                 }}{{
                     (: In theory, this could be done statically, as this doesn't change for a given form, but we don't
                        have code to do this that is able to handle AVTs. :)
-                    if (not(fr:is-form-builder()) and not(fr:mode() = ('summary', 'home', 'landing', ''))) then
+                    if (
+                        not(fr:is-form-builder()) and
+                        not(fr:mode() = ('summary', 'home', 'landing', ''))
+                    ) then
                         let $density-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('density', 'compact')[. = ('compact', 'comfortable', 'roomy')]
                         return
                             if (exists($density-opt)) then
@@ -559,7 +562,15 @@
                 }}{{
                     let $color-scheme-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('color-scheme', 'light')[. = ('light', 'dark', 'system')]
                     return
-                        if ((not(fr:is-form-builder() and not($fr-mode = 'summary')) and exists($color-scheme-opt)) then
+                        if (
+                            (
+                                not(
+                                    fr:is-form-builder() and
+                                    not($fr-mode = 'summary')
+                                ) and
+                                exists($color-scheme-opt)
+                            )
+                        ) then
                             concat(' fr-color-scheme-', $color-scheme-opt)
                         else
                             ''

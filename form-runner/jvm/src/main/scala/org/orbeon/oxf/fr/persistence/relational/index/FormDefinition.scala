@@ -92,9 +92,23 @@ trait FormDefinition {
       }
 
       // Support override for the Form Builder Summary page
-      override lazy val resourcesRootElem: om.NodeInfo =
+      override lazy val resourcesRootElem: om.NodeInfo = {
+
+        def fromSrc: Option[NodeInfo] =
+          resourcesInstanceElem
+            .attValueOpt("src")
+            .map(URI.create)
+            .map(XFormsCrossPlatformSupport.readTinyTreeFromUrl(_, handleXInclude = true))
+            .map(_.rootElement)
+
+        def fromInline: Option[NodeInfo] =
+          resourcesInstanceElem.firstChildOpt(*)
+
         resourcesRootElemOpt
-          .getOrElse(resourcesInstanceElem.firstChildOpt(*).get)
+          .orElse(fromSrc)
+          .orElse(fromInline)
+          .getOrElse(throw new IllegalStateException("Could not find form resources"))
+      }
     }
 
     // Look for indexed controls with fr:index sub-element or fr-index, fr-summary, etc. classes (legacy)

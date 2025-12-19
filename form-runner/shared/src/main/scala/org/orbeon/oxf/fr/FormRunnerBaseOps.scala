@@ -596,8 +596,14 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   }
 
   def isFormBuilder(implicit p: FormRunnerParams) : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
-  def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = isReadonlyModeFromString(p.app, p.form, p.mode)
+
+  private val DesignTimeModes: Set[String] = Set("new", "edit", "view")
+
+  def isDesignTime(implicit p: FormRunnerParams, xfc: XFormsFunction.Context): Boolean =
+    isFormBuilder &&
+      DesignTimeModes(p.mode) &&
+      ! xfc.container.innerScope.isTopLevelScope
 
   // https://github.com/orbeon/orbeon-forms/issues/5323
   // https://github.com/orbeon/orbeon-forms/issues/5325

@@ -21,16 +21,16 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
-import org.orbeon.oxf.fr.process.{FormRunnerActionsSupport, FormRunnerExternalMode, FormRunnerRenderedFormat, RenderedFormat, SimpleProcess}
+import org.orbeon.oxf.fr.process.{SimpleProcess, *}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils, XMLUtils}
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
@@ -590,8 +590,11 @@ private object FormRunnerFunctions {
 
   // Cannot change between design-time and non-design-time over the course of the form's lifetime
   class FRIsDesignTime extends DefaultFunctionSupport with AddToPathMap {
-    override def evaluateItem(context: XPathContext): BooleanValue =
-      FormRunnerParamsOpt().exists(FormRunner.isDesignTime(_))
+    override def evaluateItem(context: XPathContext): BooleanValue = {
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+      implicit val frp: FormRunnerParams       = FormRunnerParams()
+      FormRunner.isDesignTime
+    }
   }
 
   // Cannot change between readonly and non-readonly mode over the course of the form's lifetime
@@ -608,8 +611,11 @@ private object FormRunnerFunctions {
 
   // A given attachment form version does not change over the course of the form's lifetime
   class FRAttachmentFormVersion extends DefaultFunctionSupport with AddToPathMap {
-    override def evaluateItem(context: XPathContext): IntegerValue =
-      FRComponentParamSupport.attachmentFormVersion(FormRunnerParams())
+    override def evaluateItem(context: XPathContext): IntegerValue = {
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+      implicit val frp: FormRunnerParams       = FormRunnerParams()
+      FRComponentParamSupport.attachmentFormVersion
+    }
   }
 
   class FRAttachmentId extends FunctionSupport with RuntimeDependentFunction {

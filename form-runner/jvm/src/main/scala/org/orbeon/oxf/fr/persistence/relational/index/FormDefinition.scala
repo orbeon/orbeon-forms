@@ -14,10 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.*
-import org.orbeon.oxf.fr.Names.FormResources
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -74,11 +73,11 @@ trait FormDefinition {
 
   // Returns the controls and other values that are searchable from a form definition
   def searchableValues(
-    formDoc                  : DocumentNodeInfoType,
-    appForm                  : AppForm,
-    searchVersionOpt         : Option[SearchVersion],
-    databaseDataFormatVersion: DataFormatVersion,
-    resourcesRootElemOpt     : Option[NodeInfo] = None // present for the Form Builder Summary page only
+    formDoc                     : DocumentNodeInfoType,
+    appForm                     : AppForm,
+    searchVersionOpt            : Option[SearchVersion],
+    databaseDataFormatVersion   : DataFormatVersion,
+    providedResourcesRootElemOpt: Option[NodeInfo] = None // present for the Form Builder Summary page only
   )(implicit
     indentedLogger: IndentedLogger
   ): SearchableValues = {
@@ -92,22 +91,21 @@ trait FormDefinition {
       }
 
       // Support override for the Form Builder Summary page
-      override lazy val resourcesRootElem: om.NodeInfo = {
+      override lazy val resourcesRootElemOpt: Option[om.NodeInfo] = {
 
         def fromSrc: Option[NodeInfo] =
-          resourcesInstanceElem
-            .attValueOpt("src")
+          resourcesInstanceElemOpt
+            .flatMap(_.attValueOpt("src"))
             .map(URI.create)
             .map(XFormsCrossPlatformSupport.readTinyTreeFromUrl(_, handleXInclude = true))
             .map(_.rootElement)
 
         def fromInline: Option[NodeInfo] =
-          resourcesInstanceElem.firstChildOpt(*)
+          resourcesInstanceElemOpt.flatMap(_.firstChildOpt(*))
 
-        resourcesRootElemOpt
+        providedResourcesRootElemOpt
           .orElse(fromSrc)
           .orElse(fromInline)
-          .getOrElse(throw new IllegalStateException("Could not find form resources"))
       }
     }
 

@@ -25,16 +25,17 @@ trait FormRunnerDocContext {
   lazy val modelElem               : om.NodeInfo         = frc.getModelElem(formDefinitionRootElem)
   lazy val dataInstanceElem        : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get
   lazy val metadataInstanceElemOpt : Option[om.NodeInfo] = frc.instanceElemFromModelElem(modelElem, Names.MetadataInstance)
-  lazy val resourcesInstanceElem   : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormResources).get
+  lazy val resourcesInstanceElemOpt: Option[om.NodeInfo] = frc.instanceElemFromModelElem(modelElem, Names.FormResources)
   lazy val topLevelBindElemOpt     : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
   lazy val bodyElemOpt             : Option[om.NodeInfo] = frc.findFormRunnerBodyElem(formDefinitionRootElem)
 
-  lazy val dataRootElem            : om.NodeInfo         = dataInstanceElem      / * head
-  lazy val metadataRootElemOpt     : Option[om.NodeInfo] = metadataInstanceElemOpt.toList firstChildOpt *
-  lazy val resourcesRootElem       : om.NodeInfo         = resourcesInstanceElem / * head
+  lazy val dataRootElem            : om.NodeInfo         = dataInstanceElem.child(*).head
+  lazy val metadataRootElemOpt     : Option[om.NodeInfo] = metadataInstanceElemOpt.toList.firstChildOpt(*)
+  lazy val resourcesRootElemOpt    : Option[om.NodeInfo] = resourcesInstanceElemOpt.toList.firstChildOpt(*)
 
   def metadataInstanceElem         : om.NodeInfo         = metadataInstanceElemOpt.get
   def metadataRootElem             : om.NodeInfo         = metadataRootElemOpt.get
+  def resourcesRootElem            : om.NodeInfo         = resourcesRootElemOpt.get
   def bodyElem                     : om.NodeInfo         = bodyElemOpt.get
 }
 

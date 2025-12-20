@@ -39,7 +39,7 @@ trait FormRunnerResourcesOps {
   )(implicit
     ctx         : FormRunnerDocContext
   ): collection.Seq[(String, NodeInfo)] =
-    findResourceHoldersWithLang(controlName, ctx.resourcesRootElem)
+    ctx.resourcesRootElemOpt.toList.flatMap(findResourceHoldersWithLang(controlName, _))
 
   // Find control resource holders with their language
   def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): collection.Seq[(String, NodeInfo)] =

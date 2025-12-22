@@ -394,25 +394,25 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
             border-color: @color transparent;
         }
     }
-    .xforms-invalid > .xforms-alert.xforms-active { .fr-alert-color(@error  ) }
-    .xforms-warning > .xforms-alert.xforms-active { .fr-alert-color(@warning) }
-    .xforms-info    > .xforms-alert.xforms-active { .fr-alert-color(@info   ) }
+    .xforms-invalid > .xforms-alert.xforms-active { .fr-alert-color(var(--orbeon-error-color)  ) }
+    .xforms-warning > .xforms-alert.xforms-active { .fr-alert-color(var(--orbeon-warning-color)) }
+    .xforms-info    > .xforms-alert.xforms-active { .fr-alert-color(var(--orbeon-info-color)   ) }
 
     .xforms-invalid.xforms-visited {
         &> input, &> textarea, &> select {
-            border-color: @error;
+            border-color: var(--orbeon-error-color);
         }
     }
 
     .xforms-warning.xforms-visited {
         &> input, &> textarea, &> select {
-            border-color: @warning;
+            border-color: var(--orbeon-warning-color);
         }
     }
 
     .xforms-info.xforms-visited {
         &> input, &> textarea, &> select {
-            border-color: @info;
+            border-color: var(--orbeon-info-color);
         }
     }
 
@@ -486,7 +486,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
         .xforms-required.xforms-empty {
             .xforms-label:before {
-                color: @error;                      // Error-red when empty
+                color: var(--orbeon-error-color);                      // Error-red when empty
             }
         }
     }

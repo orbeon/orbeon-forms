@@ -30,8 +30,12 @@
         box-sizing: border-box;
         width: 100%;
         padding: 5px 10px;
-        color: white;
+        color: var(--orbeon-error-summary-title-color);
+        border-bottom: 1px solid var(--orbeon-error-summary-title-bottom-border-color);
         border-radius: @baseBorderRadius;
+        &.xforms-label {
+            font-weight: inherit;
+        }
     }
 
     .fr-show-more-errors {
@@ -39,9 +43,9 @@
     }
 
     // Multiple levels can be mixed so make sure the strongest wins
-    .fr-level-info    > .fr-error-title { background-color: @info; }
-    .fr-level-warning > .fr-error-title { background-color: @warning; }
-    .fr-level-error   > .fr-error-title { background-color: @error; }
+    .fr-level-info    > .fr-error-title { background-color: var(--orbeon-info-color); }
+    .fr-level-warning > .fr-error-title { background-color: var(--orbeon-warning-color); }
+    .fr-level-error   > .fr-error-title { background-color: var(--orbeon-error-color); }
 
     .fr-error-group {
 
@@ -58,12 +62,12 @@
             margin-bottom: 5px;
             list-style: none; // Don't show list number, instead we output it in the label, otherwise the button with
                               // the label shows below the number with long error messages.
-            background-color: white;
+            background-color: var(--orbeon-error-summary-item-background-color);
 
             // Multiple levels can be mixed so make sure the strongest wins
-            &.fr-level-info    { border-color: @info; }
-            &.fr-level-warning { border-color: @warning; }
-            &.fr-level-error   { border-color: @error; }
+            &.fr-level-info    { border-color: var(--orbeon-info-color); }
+            &.fr-level-warning { border-color: var(--orbeon-warning-color); }
+            &.fr-level-error   { border-color: var(--orbeon-error-color); }
         }
 
         .fr-error-link {
@@ -100,17 +104,17 @@
         //
         .fr-level-info {
             .fr-error-label, .fr-error-alert {
-                color: @info
+                color: var(--orbeon-info-color);
             }
         }
         .fr-level-warning {
             .fr-error-label, .fr-error-alert {
-                color: @warning
+                color: var(--orbeon-warning-color);
             }
         }
         .fr-level-error {
             .fr-error-label, .fr-error-alert {
-                color: @error
+                color: var(--orbeon-error-color);
             }
         }
     }

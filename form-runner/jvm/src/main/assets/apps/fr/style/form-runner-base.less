@@ -376,6 +376,8 @@
             font-size  : var(--orbeon-base-font-size);
             font-family: var(--orbeon-help-font-family);
             line-height: @fluidLineHeight;
+            background-color: var(--orbeon-help-background-color);
+            border-color: var(--orbeon-help-border-color);
             // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
             z-index: 1040;
 
@@ -384,12 +386,49 @@
                 font-weight: var(--orbeon-help-title-font-weight);
                 line-height: 1.3; // Override Bootstrap's value (18px for a font size of 14px)
                 color: var(--orbeon-help-title-color);
+                background-color: var(--orbeon-help-title-background-color);
+                border-bottom-color: var(--orbeon-help-title-border-color);
             }
 
             .popover-content {
                 font-size: var(--orbeon-help-content-font-size);
                 font-weight: var(--orbeon-help-content-font-weight);
                 color: var(--orbeon-help-content-color);
+            }
+
+            &.popover.top .arrow {
+                border-top-color: var(--orbeon-help-border-color);
+                &:after {
+                    border-top-color: var(--orbeon-help-background-color);
+                }
+            }
+
+            &.popover.right .arrow {
+                border-right-color: var(--orbeon-help-border-color);
+                &:after {
+                    border-right-color: var(--orbeon-help-background-color);
+                }
+            }
+
+            &.popover.bottom .arrow {
+                border-bottom-color: var(--orbeon-help-border-color);
+                &:after {
+                    border-bottom-color: var(--orbeon-help-background-color);
+                }
+            }
+
+            &.popover.left .arrow {
+                border-left-color: var(--orbeon-help-border-color);
+                &:after {
+                    border-left-color: var(--orbeon-help-background-color);
+                }
+            }
+
+            .close {
+                text-shadow: 0 1px 0 var(--orbeon-help-close-text-shadow-color);
+                &, &:hover, &:focus {
+                    color: var(--orbeon-help-close-color);
+                }
             }
         }
     }

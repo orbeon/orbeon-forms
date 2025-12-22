@@ -22,6 +22,9 @@
             	padding: 1em;
             	border-radius: .5em;
             }
+            .orbeon .fr-color-scheme-dark .xbl-fr-explanation {
+                background-color: #333;
+            }
         </xh:style>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 

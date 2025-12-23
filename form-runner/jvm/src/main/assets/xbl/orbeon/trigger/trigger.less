@@ -33,6 +33,33 @@
         display: inline-block;
     }
 
+    .btn-group.open button.btn.dropdown-toggle {
+        background-color: var(--orbeon-dropdown-open-toggle-background-color);
+    }
+
+    // Dropdowns overrides
+    .dropdown.open {
+        .btn {
+            background-color: var(--orbeon-dropdown-item-background-color);
+
+            &.disabled, &[disabled] {
+                background-color: var(--orbeon-dropdown-item-background-color);
+            }
+
+            &:hover,
+            &:focus,
+            &:active,
+            &.active {
+                background-color: var(--orbeon-dropdown-item-highlight-background-color);
+            }
+        }
+
+        .dropdown-menu > .disabled > a:hover,
+        .dropdown-menu > .disabled > a:focus {
+            background-color: var(--orbeon-dropdown-item-disabled-highlight-background-color);
+        }
+    }
+
     button.btn kbd, a kbd {
         background-color: transparent;
         border: 1px solid var(--orbeon-base-color);

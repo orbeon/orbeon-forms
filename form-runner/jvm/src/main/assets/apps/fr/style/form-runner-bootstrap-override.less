@@ -503,19 +503,21 @@ body.orbeon {
     }
 
     .input-append, .input-prepend {
+        display: flex;
+        align-items: stretch;
+
         margin-bottom: 0;                   // Not sure why Bootstrap adds a @baseLineHeight / 2 margin here
         .add-on {
             display: flex;
             align-items: center;
 
+            font-size: var(--orbeon-control-font-size);
+            line-height: 1em;
+            height: auto;
+
             color: var(--orbeon-add-on-color);
             background-color: var(--orbeon-add-on-background-color);
             text-shadow: 0 1px 0 var(--orbeon-add-on-text-shadow-color);
-
-            height: (@fixedLineHeight - 2px); // TODO: how to approximate calc(1em + 5px)?
-            @media screen {
-                height: calc(1em + 5px);
-            }
 
             .fieldBorder();
         }

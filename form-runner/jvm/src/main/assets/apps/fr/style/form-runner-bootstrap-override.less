@@ -434,11 +434,10 @@ body.orbeon {
     }
 
     label.radio, label.checkbox {
-        align-items: center; // Do not vertically align using margin
         margin-bottom: @controlsBottomMargin;
         input[type="radio"],
         input[type="checkbox"] {
-            margin-top: 0;    // override Bootstrap
+            margin-top: 3px; // override Bootstrap
             &[disabled] {
                 @media (prefers-contrast: no-preference), (prefers-contrast: less) {
                     // BS5 style for disabled

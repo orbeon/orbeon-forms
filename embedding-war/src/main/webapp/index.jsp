@@ -46,6 +46,7 @@
     <style>
         body    { padding-top: 50px }
         .navbar { font-size: 13px }
+        .navbar.navbar-fixed-top { z-index: 1040 } <%-- For the dropdown to show above the Form Builder navbar, at 1030 (Bootstrap default) --%>
     </style>
     <link rel="stylesheet" href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
 

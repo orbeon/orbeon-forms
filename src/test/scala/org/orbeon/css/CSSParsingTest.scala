@@ -118,15 +118,15 @@ class CSSParsingTest extends AnyFunSpec {
       assert(actualVariableNamesAndValues == expectedVariableNamesAndValues)
     }
 
-    it("must inject a variable value into a single declaration value") {
-      def variableDefinition(name: String, value: String) = VariableDefinition(
-        name                   = name,
-        value                  = value,
-        mediaQueries           = List(MediaQuery.AllMediaQuery),
-        selectors              = List(Selector(".orbeon")),
-        noPseudoClassSelectors = List(Selector(".orbeon"))
-      )
+    def variableDefinition(name: String, value: String) = VariableDefinition(
+      name                   = name,
+      value                  = value,
+      mediaQueries           = List(MediaQuery.AllMediaQuery),
+      selectors              = List(Selector(".orbeon")),
+      noPseudoClassSelectors = List(Selector(".orbeon"))
+    )
 
+    it("must inject a variable value into a single declaration value") {
       val testVariableDefinitions = VariableDefinitions(
         List(
           variableDefinition(name = "--base-font-size", value = "13px"   ),
@@ -136,13 +136,44 @@ class CSSParsingTest extends AnyFunSpec {
 
       val expected = List(
         "var(--base-font-size)"                                              -> "13px",
+        "var(--base-font-size, 15px)"                                        -> "13px",
         "var(--hint-font-size)"                                              -> "smaller",
+        "var(--hint-font-size, 15px)"                                        -> "smaller",
         "var(--undefined)"                                                   -> "var(--undefined)",
         "var(--undefined-with-fallback, 20px)"                               -> "20px",
         "calc(var(--base-font-size) * 2)"                                    -> "calc(13px * 2)",
         "calc(var(--undefined) * 2)"                                         -> "calc(var(--undefined) * 2)",
         "calc(var(--undefined-with-fallback, 10px) * 2)"                     -> "calc(10px * 2)",
-        "calc(var(--base-font-size) + var(--undefined-with-fallback, 40px))" -> "calc(13px + 40px)",
+        "calc(var(--base-font-size) + var(--undefined-with-fallback, 40px))" -> "calc(13px + 40px)"
+      )
+
+      for ((param, result) <- expected) {
+        assert(CSSParsing.injectVariablesIntoDeclaration(param, testVariableDefinitions, MediaQuery.PrintMediaQuery, List(Selector(".orbeon"))) == result)
+      }
+    }
+
+    it("must work with a variable name being the prefix of another variable name") {
+      val testVariableDefinitions = VariableDefinitions(
+        List(
+          variableDefinition(name = "--prefix"         , value = "10px"),
+          variableDefinition(name = "--prefix-and-more", value = "20px")
+        )
+      )
+
+      val expected = List(
+        "var(--prefix)"                                            -> "10px",
+        "var(--prefix-and-more)"                                   -> "20px",
+        "var(--undefined)"                                         -> "var(--undefined)",
+        "calc(var(--prefix) * 2)"                                  -> "calc(10px * 2)",
+        "calc(var(--prefix-and-more) * 2)"                         -> "calc(20px * 2)",
+        "calc(var(--prefix) + var(--prefix-and-more))"             -> "calc(10px + 20px)",
+        "calc(var(--prefix, 30px) + var(--prefix-and-more))"       -> "calc(10px + 20px)",
+        "calc(var(--prefix) + var(--prefix-and-more, 30px))"       -> "calc(10px + 20px)",
+        "calc(var(--prefix, 30px) + var(--prefix-and-more, 30px))" -> "calc(10px + 20px)",
+        "calc(var(--prefix-and-more) + var(--prefix))"             -> "calc(20px + 10px)",
+        "calc(var(--prefix-and-more, 30px) + var(--prefix))"       -> "calc(20px + 10px)",
+        "calc(var(--prefix-and-more) + var(--prefix, 30px))"       -> "calc(20px + 10px)",
+        "calc(var(--prefix-and-more, 30px) + var(--prefix, 30px))" -> "calc(20px + 10px)"
       )
 
       for ((param, result) <- expected) {

@@ -2,13 +2,13 @@
 
 # In case of device space issues, make the "Disk usage limit" higher under "Resource Allocation" (Docker Desktop)
 
-REMOTE_PUBLISH=true
+REMOTE_PUBLISH=false
 
-VERSION=${1:-'2024.1.3-pe'}
-RELEASE_TAG=${2:-'tag-release-2024.1.3-pe-pseudo'}
-FILE=${3:-'orbeon-2024.1.3.202510220124-PE.zip'}
-SHA256_CHECKSUM=${4:-'61d2612e82904fd4e8e478468e8da8134871fffa85775d15353bb2dc6609e75b'}
-SQL_FILE=${5:-'2024.1/postgresql-2024_1.sql'}
+VERSION=${1:-'2025.1-pe'}
+RELEASE_TAG=${2:-'tag-release-2025.1-ce'}
+FILE=${3:-'orbeon-2025.1.202512302330-PE.zip'}
+SHA256_CHECKSUM=${4:-'db0d1828c959a25d347db37bbab9f564f0daa63d6d84e38d1a998551734563ad'}
+SQL_FILE=${5:-'2025.1/postgresql-2025_1.sql'}
 PLATFORMS=${6:-'linux/amd64,linux/arm64'}
 DEMO_FORMS_LICENSE_FILE=${7:-"$HOME/.orbeon/license.xml"}
 DEMO_FORMS_POSTGRES_NETWORK=${8:-'demo_forms_network'}
@@ -160,7 +160,7 @@ cleanup() {
     fi
   done
 
-  images=("$POSTGRES_IMAGE" "$ORBEON_FORMS_BASE_IMAGE" "$ORBEON_FORMS_IMAGE" "$DEMO_FORMS_POSTGRES_IMAGE" )
+  images=("$POSTGRES_IMAGE" "$ORBEON_FORMS_TOMCAT_BASE_IMAGE" "$ORBEON_FORMS_TOMCAT_IMAGE" "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" "$ORBEON_FORMS_WILDFLY_IMAGE" "$DEMO_FORMS_POSTGRES_IMAGE" )
   for image in "${images[@]}"; do
     if [ "$(docker images -q "$image")" ]; then
       docker rmi "$image"

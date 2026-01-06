@@ -19,7 +19,8 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary">
+         xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!--
         Component to represent a reusable error summary.
@@ -449,7 +450,7 @@
                                                                 concat(
                                                                     '&lt;span class=&quot;fr-error-label&quot;>',
                                                                     position(), '. ',
-                                                                    @label,
+                                                                    frf:removeHtmlTags(@label),
                                                                     '&lt;/span>'
                                                                 )
                                                             else

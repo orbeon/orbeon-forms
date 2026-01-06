@@ -53,11 +53,9 @@
                     </_>
                 </xf:instance>
 
-                <!-- TODO: change this when #5056 is implemented -->
                 <xf:bind
                     ref="instance('i')/show-in-view-mode-trigger"
-                    readonly="
-                        $is-fb or
+                    relevant="
                         not(
                             xxf:evaluate(
                                 xxf:property(

@@ -98,6 +98,7 @@
 
             <xbl:handler event="fr-relinquish-lease">
                 <xf:dispatch target="fr-lease-renew-dialog" name="fr-hide"/>
+                <xxf:hide dialog="fr-validation-dialog" xxbl:scope="outer"/>
                 <xf:setvalue ref="$fr-persistence-instance/found-document-message-to-show"/>
                 <xf:action type="xpath">
                     xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')

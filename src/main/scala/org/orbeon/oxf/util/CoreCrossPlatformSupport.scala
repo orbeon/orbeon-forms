@@ -16,7 +16,6 @@ package org.orbeon.oxf.util
 import cats.effect.unsafe.{IORuntime, IORuntimeBuilder, IORuntimeConfig}
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.{PropertyLoader, PropertyStore}
 
 import java.util.concurrent.ExecutorService
@@ -85,7 +84,4 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def randomHexId: String = SecureUtils.randomHexId
   def getApplicationResourceVersion: Option[String] = URLRewriterUtils.getApplicationResourceVersion
   def propertyStore: PropertyStore = PropertyLoader.getPropertyStore(requestOpt)
-
-  def setExternalContext(ec: ExternalContext): Unit = externalContextDyn.value = ec
-  def clearExternalContext()                 : Unit = externalContextDyn.clear()
 }

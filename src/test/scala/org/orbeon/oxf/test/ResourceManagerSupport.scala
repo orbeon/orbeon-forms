@@ -15,7 +15,7 @@ package org.orbeon.oxf.test
 
 import org.log4s.Logger
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory}
+import org.orbeon.oxf.util.{ExternalContextSupport, LoggerFactory}
 import org.scalatest.{BeforeAndAfter, Suite}
 
 
@@ -34,6 +34,6 @@ trait ResourceManagerSupport extends Suite with BeforeAndAfter {
     var pipelineContext: Option[PipelineContext] = None
 
     before { pipelineContext = Some(PipelineSupport.createPipelineContextAndExternalContext()) }
-    after  { pipelineContext.foreach(_.destroy(true)); CoreCrossPlatformSupport.clearExternalContext() }
+    after  { pipelineContext.foreach(_.destroy(true)); ExternalContextSupport.clearExternalContext() }
   }
 }

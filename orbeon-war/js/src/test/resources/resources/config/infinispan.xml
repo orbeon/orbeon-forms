@@ -7,14 +7,14 @@
     <cache-container name="orbeon-container" statistics="false">
 
         <serialization marshaller="org.infinispan.commons.marshall.JavaSerializationMarshaller">
-          <allow-list>
-              <class>org.orbeon.oxf.xforms.state.DynamicState</class>
-              <regex>scala.*</regex>
-          </allow-list>
+            <allow-list>
+                <class>org.orbeon.oxf.xforms.state.DynamicState</class>
+                <regex>scala.*</regex>
+            </allow-list>
         </serialization>
 
         <global-state>
-            <persistent-location path="orbeon/cache" relative-to="java.io.tmpdir"/>
+            <persistent-location path="orbeon/cache" relative-to="orbeon.webapp.tmpdir"/>
         </global-state>
 
         <!-- XForms state store -->

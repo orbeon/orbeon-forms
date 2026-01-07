@@ -21,8 +21,7 @@ object FileUtils {
 
   def isTemporaryFileUri(uri: URI): Boolean =
     findFileUriPath(uri) exists { uriPath =>
-      val tmpPath = new File(System.getProperty("java.io.tmpdir")).getCanonicalPath
-      new File(uriPath).getCanonicalPath.startsWith(tmpPath)
+      new File(uriPath).getCanonicalPath.startsWith(canonicalTemporaryDirectoryPath)
     }
 
   def findFileUriPath(uri: URI): Option[String] =
@@ -30,4 +29,7 @@ object FileUtils {
 
   def findTemporaryFilePath(uri: URI): Option[String] =
     isTemporaryFileUri(uri) flatOption findFileUriPath(uri)
+
+  def canonicalTemporaryDirectoryPath: String =
+    new File(System.getProperty("java.io.tmpdir")).getCanonicalPath
 }

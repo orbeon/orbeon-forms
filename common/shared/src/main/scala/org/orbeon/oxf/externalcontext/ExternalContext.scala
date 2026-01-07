@@ -324,6 +324,9 @@ trait ExternalContext {
 
 // Abstraction for ServletContext and PortletContext
 trait WebAppContext {
+
+  def getContextPath: String
+
   // Resource handling
   def getResource(s: String): URL
   def getResourceAsStream(s: String): InputStream
@@ -331,9 +334,6 @@ trait WebAppContext {
 
   // Immutable context initialization parameters
   def initParameters: Map[String, String]
-
-  def jInitParameters: ju.Map[String, String] = initParameters.asJava
-  def getInitParametersMap: ju.Map[String, String] = jInitParameters
 
   // Mutable context attributes backed by the actual context
   def attributes: collection.mutable.Map[String, AnyRef]

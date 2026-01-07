@@ -14,6 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.servlet.ServletContext
+import org.orbeon.oxf.util.ExternalContextSupport
 import org.orbeon.oxf.webapp.Orbeon
 
 import javax.portlet.PortletContext
@@ -52,12 +53,22 @@ trait OrbeonWebApp {
   // Run initialization only once per web app
   WebAppContext.synchronized {
     val WebAppInitialized = "oxf.webapp.initialized"
-    self.attributes.getOrElseUpdate(WebAppInitialized, { Orbeon.initialize(self); "true" })
+    self.attributes.getOrElseUpdate(
+      WebAppInitialized,
+      {
+        ExternalContextSupport.withExternalContext(new WebAppExternalContext(self, None)) {
+          Orbeon.initialize(self)
+        }
+        "true"
+      }
+    )
   }
 }
 
 // Servlet implementation
 class ServletWebAppContext(val servletContext: ServletContext) extends WebAppContext with ParametersAndAttributes with OrbeonWebApp {
+
+  def getContextPath: String = servletContext.getContextPath
 
   def getResource(s: String) = servletContext.getResource(s)
   def getResourceAsStream(s: String) = servletContext.getResourceAsStream(s)
@@ -77,6 +88,8 @@ class ServletWebAppContext(val servletContext: ServletContext) extends WebAppCon
 
 // Portlet implementation
 class PortletWebAppContext(val portletContext: PortletContext) extends WebAppContext with ParametersAndAttributes with OrbeonWebApp {
+
+  def getContextPath: String = portletContext.getContextPath
 
   def getResource(s: String) = portletContext.getResource(s)
   def getResourceAsStream(s: String) = portletContext.getResourceAsStream(s)

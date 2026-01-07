@@ -154,18 +154,20 @@ object InitUtils {
    // Run a processor based on definitions found in properties or the web app context. This is
    // useful for context/session listeners. Don't run if a definition is not found, no exception is thrown.
   def runWithServletContext(
-    servletContext         : ServletContext,
-    session                : Option[HttpSession],
-    logMessagePrefix       : String,
-    message                : String,
-    uriNamePropertyPrefix  : String,
-    processorInputProperty : String)(implicit
-    logger                 : log4s.Logger
+    servletContext        : ServletContext,
+    session               : Option[HttpSession],
+    logMessagePrefix      : String,
+    message               : String,
+    uriNamePropertyPrefix : String,
+    processorInputProperty: String
+  )(implicit
+    logger                : log4s.Logger
   ): Unit = {
 
     require(servletContext ne null)
 
     // Make sure the Web app context is initialized
+    // This causes properties and cache initialization to happen
     val webAppContext = ServletWebAppContext(servletContext)
 
     if (message != null)

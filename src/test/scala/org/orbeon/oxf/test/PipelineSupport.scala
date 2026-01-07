@@ -18,7 +18,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport}
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -33,7 +33,7 @@ object PipelineSupport {
   def destroyPipelineContextAndExternalContextJava(pipelineContext: PipelineContext): Unit = {
     if (pipelineContext ne null)
       pipelineContext.destroy(true)
-    CoreCrossPlatformSupport.clearExternalContext()
+    ExternalContextSupport.clearExternalContext()
   }
 
   def createPipelineContextAndExternalContext(
@@ -50,7 +50,7 @@ object PipelineSupport {
         sessionCreated,
         sessionDestroyed
       )
-    CoreCrossPlatformSupport.setExternalContext(externalContext)
+    ExternalContextSupport.setExternalContext(externalContext)
     pipelineContext
   }
 

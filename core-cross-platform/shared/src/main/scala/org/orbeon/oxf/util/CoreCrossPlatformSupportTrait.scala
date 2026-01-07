@@ -43,13 +43,25 @@ trait CoreCrossPlatformSupportTrait {
   def requestOpt: Option[Request] =
     Option(externalContext).flatMap(ec => Option(ec.getRequest))
 
+  def externalContext: ExternalContext = ExternalContextSupport.externalContext
+  def withExternalContext[T](ec: ExternalContext)(body: => T): T = ExternalContextSupport.withExternalContext(ec)(body)
+}
+
+object ExternalContextSupport {
+
   protected val externalContextDyn  = new DynamicVariable[ExternalContext](initial = None, isInheritable = false)
 
   def externalContext: ExternalContext =
-    externalContextDyn.value.orNull //.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+    externalContextOpt.orNull //.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+
+  def externalContextOpt: Option[ExternalContext] =
+    externalContextDyn.value
 
   def withExternalContext[T](ec: ExternalContext)(body: => T): T =
     externalContextDyn.withValue(ec) {
       body
     }
+
+  def setExternalContext(ec: ExternalContext): Unit = externalContextDyn.value = ec
+  def clearExternalContext()                 : Unit = externalContextDyn.clear()
 }

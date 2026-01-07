@@ -25,6 +25,7 @@ trait ServletContext {
   // javax/jakarta.servlet.ServletContext
   def getNativeServletContext: AnyRef
 
+  def getContextPath: String
   def addFilter(filterName: String, filterClass: Class[? <: JavaxOrJakartaFilter]): FilterRegistration
   def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit
   def addServlet(servletName: String, servletClass: Class[? <: JavaxOrJakartaServlet]): ServletRegistration
@@ -46,6 +47,7 @@ trait ServletContext {
 class JavaxServletContext(servletContext: javax.servlet.ServletContext) extends ServletContext {
   override def getNativeServletContext: javax.servlet.ServletContext = servletContext
 
+  def getContextPath: String = servletContext.getContextPath
   override def addFilter(filterName: String, filterClass: Class[? <: JavaxOrJakartaFilter]): FilterRegistration = FilterRegistration(servletContext.addFilter(filterName, filterClass.asInstanceOf[Class[? <: javax.servlet.Filter]]))
   override def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit = servletContext.addListener(listenerClass)
   override def addServlet(servletName: String, servletClass: Class[? <: JavaxOrJakartaServlet]): ServletRegistration = ServletRegistration(servletContext.addServlet(servletName, servletClass.asInstanceOf[Class[? <: javax.servlet.Servlet]]))
@@ -67,6 +69,7 @@ class JavaxServletContext(servletContext: javax.servlet.ServletContext) extends 
 class JakartaServletContext(servletContext: jakarta.servlet.ServletContext) extends ServletContext {
   override def getNativeServletContext: jakarta.servlet.ServletContext = servletContext
 
+  def getContextPath: String = servletContext.getContextPath
   override def addFilter(filterName: String, filterClass: Class[? <: JavaxOrJakartaFilter]): FilterRegistration = FilterRegistration(servletContext.addFilter(filterName, filterClass.asInstanceOf[Class[? <: jakarta.servlet.Filter]]))
   override def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit = servletContext.addListener(listenerClass)
   override def addServlet(servletName: String, servletClass: Class[? <: JavaxOrJakartaServlet]): ServletRegistration = ServletRegistration(servletContext.addServlet(servletName, servletClass.asInstanceOf[Class[? <: jakarta.servlet.Servlet]]))

@@ -1,16 +1,24 @@
 package org.orbeon.oxf.cache
 
+import org.infinispan.commons.configuration.io.ConfigurationResourceResolvers
+import org.infinispan.commons.dataconversion.MediaType
+import org.infinispan.configuration.parsing.ParserRegistry
 import org.infinispan.manager.DefaultCacheManager
+import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.PropertyLoader
+import org.orbeon.oxf.util.ExternalContextSupport
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 import java.io
+import java.util.Properties
 import scala.util.{Try, Using}
 
 
 object InfinispanProvider extends CacheProviderApi {
 
-  private val DefaultResourcePath = "/config/infinispan.xml"
+  private val DefaultResourcePath  = "/config/infinispan.xml"
+  private val WebappTmpDirProperty = "orbeon.webapp.tmpdir"
 
   import CacheSupport.Logger.*
 
@@ -34,7 +42,27 @@ object InfinispanProvider extends CacheProviderApi {
   private lazy val cacheManager: DefaultCacheManager =
     try {
       Option(getClass.getResource(DefaultResourcePath))
-        .map(url => Using.resource(url.openStream())(new DefaultCacheManager(_)))
+        .map(url => Using.resource(url.openStream()) { configurationStream =>
+
+          import org.orbeon.oxf.util.PathUtils.*
+
+          // Prefix the temporary directory with the web app context path to avoid clashes between multiple web apps
+          // https://github.com/orbeon/orbeon-forms/issues/7415
+          val contextPathOpt = ExternalContextSupport.externalContextOpt.map(_.getWebAppContext.getContextPath)
+          val contextOpt     = contextPathOpt.map(_.dropStartingSlash.dropTrailingSlash).flatMap(_.trimAllToOpt)
+
+          val webappTmpDir =
+            contextOpt match {
+              case Some(context) => FileUtils.canonicalTemporaryDirectoryPath + java.io.File.separatorChar + context
+              case None          => FileUtils.canonicalTemporaryDirectoryPath
+            }
+
+          val properties = new Properties(System.getProperties)
+          properties.put(WebappTmpDirProperty, webappTmpDir)
+
+          new DefaultCacheManager(new ParserRegistry(getClass.getClassLoader, false, properties)
+            .parse(configurationStream, ConfigurationResourceResolvers.DEFAULT, MediaType.APPLICATION_XML), true)
+        })
         .get
     } catch {
       case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`

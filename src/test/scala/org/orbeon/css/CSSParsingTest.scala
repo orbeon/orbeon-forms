@@ -235,7 +235,8 @@ class CSSParsingTest extends AnyFunSpec {
     }
 
     def withDefinitions(cssWithVariableDefinitions: String,
-                        mediaQuery                : MediaQuery)(
+                        lookupMediaQuery          : MediaQuery,
+                        lookupSelectors           : List[Selector])(
                         f                         : ValueProvider => Unit
     ): Unit = {
       val variableDefinitions = CSSParsing.variableDefinitions(
@@ -247,8 +248,8 @@ class CSSParsingTest extends AnyFunSpec {
         def variableValue(variableName: String): Option[String] =
           variableDefinitions.variableValue(
             variableName     = variableName,
-            lookupMediaQuery = mediaQuery,
-            lookupSelectors  = List(Selector(".orbeon"))
+            lookupMediaQuery = lookupMediaQuery,
+            lookupSelectors  = lookupSelectors
           )
       }
 
@@ -336,9 +337,74 @@ class CSSParsingTest extends AnyFunSpec {
       for  {
         (cssDefinitions, mediaQueriesAndVariableValues) <- expectedValues
         cssDefinition                                   <- cssDefinitions
-        (mediaQuery, variableValues)                    <- mediaQueriesAndVariableValues
+        (lookupMediaQuery, variableValues)              <- mediaQueriesAndVariableValues
       } {
-        withDefinitions(cssDefinition, mediaQuery) { valueProvider =>
+        withDefinitions(cssDefinition, lookupMediaQuery, lookupSelectors = List(Selector(".orbeon"))) { valueProvider =>
+          for ((variableName, variableValueOpt) <- variableValues) {
+            assert(valueProvider.variableValue(variableName) == variableValueOpt)
+          }
+        }
+      }
+    }
+
+    it("must respect simple selector queries when retrieving variable values") {
+
+      val vars1 = """:root {
+                    |  --orbeon1: orbeon1-1st;
+                    |  --orbeon2: orbeon2;
+                    |}""".stripMargin
+
+      val vars2 = """.orbeon {
+                    |  --orbeon1: orbeon1-2nd;
+                    |  --orbeon3: orbeon3;
+                    |}""".stripMargin
+
+      val vars3 = """.otherclass {
+                    |  --orbeon1: orbeon1-3rd;
+                    |  --orbeon4: orbeon4;
+                    |}""".stripMargin
+
+      val expectedValues = List(
+        // Single selector definitions
+        s"$vars1" -> List(
+          List(Selector(":root"))       -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None, "--orbeon4" -> None),
+          List(Selector(".orbeon"))     -> List("--orbeon1" -> None              , "--orbeon2" -> None          , "--orbeon3" -> None, "--orbeon4" -> None),
+          List(Selector(".otherclass")) -> List("--orbeon1" -> None              , "--orbeon2" -> None          , "--orbeon3" -> None, "--orbeon4" -> None)
+        ),
+        s"$vars2" -> List(
+          List(Selector(":root"))       -> List("--orbeon1" -> None              , "--orbeon2" -> None, "--orbeon3" -> None          , "--orbeon4" -> None),
+          List(Selector(".orbeon"))     -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None, "--orbeon3" -> "orbeon3".some, "--orbeon4" -> None),
+          List(Selector(".otherclass")) -> List("--orbeon1" -> None              , "--orbeon2" -> None, "--orbeon3" -> None          , "--orbeon4" -> None)
+        ),
+        // Multiple selector definitions: last one wins for same selector
+        s"$vars1 $vars2" -> List(
+          List(Selector(":root"))       -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None          , "--orbeon4" -> None),
+          List(Selector(".orbeon"))     -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some, "--orbeon4" -> None),
+          List(Selector(".otherclass")) -> List("--orbeon1" -> None              , "--orbeon2" -> None          , "--orbeon3" -> None          , "--orbeon4" -> None)
+        ),
+        s"$vars1 $vars2 $vars3" -> List(
+          List(Selector(":root"))       -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None          , "--orbeon4" -> None),
+          List(Selector(".orbeon"))     -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some, "--orbeon4" -> None),
+          List(Selector(".otherclass")) -> List("--orbeon1" -> "orbeon1-3rd".some, "--orbeon2" -> None          , "--orbeon3" -> None          , "--orbeon4" -> "orbeon4".some)
+        ),
+        // Multiple lookup selectors: tries each selector in order until finding a match (fallback mechanism)
+        s"$vars1 $vars2 $vars3" -> List(
+          List(Selector(":root")      , Selector(".orbeon"))     -> List("--orbeon1" -> "orbeon1-1st".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some, "--orbeon4" -> None),
+          List(Selector(".orbeon")    , Selector(":root"))       -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> "orbeon3".some, "--orbeon4" -> None),
+          List(Selector(".otherclass"), Selector(":root"))       -> List("--orbeon1" -> "orbeon1-3rd".some, "--orbeon2" -> "orbeon2".some, "--orbeon3" -> None          , "--orbeon4" -> "orbeon4".some),
+          List(Selector(".orbeon")    , Selector(".otherclass")) -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None          , "--orbeon3" -> "orbeon3".some, "--orbeon4" -> "orbeon4".some)
+        ),
+        // Redefinition of same variable in same selector: last one wins
+        s"$vars2 $vars2" -> List(
+          List(Selector(".orbeon")) -> List("--orbeon1" -> "orbeon1-2nd".some, "--orbeon2" -> None, "--orbeon3" -> "orbeon3".some, "--orbeon4" -> None)
+        )
+      )
+
+      for {
+        (cssDefinition, selectorAndVariableValues) <- expectedValues
+        (lookupSelectors, variableValues)          <- selectorAndVariableValues
+      } {
+        withDefinitions(cssDefinition, lookupMediaQuery = MediaQuery.AllMediaQuery, lookupSelectors) { valueProvider =>
           for ((variableName, variableValueOpt) <- variableValues) {
             assert(valueProvider.variableValue(variableName) == variableValueOpt)
           }

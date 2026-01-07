@@ -27,7 +27,7 @@ object FormBuilderPrivateAPI extends js.Object {
 
     val location = dom.window.location
 
-    dom.window.history.replaceState(
+    replaceStateLogError(
       statedata = dom.window.history.state,
       title     = "",
       url       = s"$documentId${location.search}${location.hash}"
@@ -71,5 +71,4 @@ object FormBuilderPrivateAPI extends js.Object {
     } locally {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
     }
-
 }

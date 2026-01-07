@@ -17,7 +17,7 @@ import org.log4s.Logger
 import org.orbeon.fr.rpc.FormRunnerRpcClient
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.FrWizard
 import org.orbeon.xforms
 import org.orbeon.xforms.Page
@@ -87,7 +87,7 @@ object FormRunnerPrivateAPI extends js.Object {
 
         // `newSearch`: for example `?form-version=42`
         // `hash`: for now not used by Form Runner, but it is safer to keep it
-        dom.window.history.replaceState(
+        replaceStateLogError(
           statedata = dom.window.history.state,
           title     = "",
           url       = s"edit/$documentId$newSearch${location.hash}"
@@ -113,7 +113,7 @@ object FormRunnerPrivateAPI extends js.Object {
 
         // `newSearch`: for example `?form-version=42`
         // `hash`: for now not used by Form Runner, but it is safer to keep it
-        dom.window.history.replaceState(
+        replaceStateLogError(
           statedata = dom.window.history.state,
           title     = "",
           url       = s"$context$app/$form/new$newSearch${location.hash}"
@@ -156,7 +156,7 @@ object FormRunnerPrivateAPI extends js.Object {
     val newQuery = PathUtils.removeReplaceOrAddUrlParameter(query, name, newValueOpt)
 
     if (query != newQuery)
-      dom.window.history.replaceState(
+      replaceStateLogError(
         statedata = dom.window.history.state,
         title     = "",
         url       = PathUtils.recombineQuery(location.pathname, newQuery) + location.hash

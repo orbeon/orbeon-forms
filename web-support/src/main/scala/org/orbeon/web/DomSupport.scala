@@ -3,7 +3,7 @@ package org.orbeon.web
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
-import org.scalajs.dom.{DocumentReadyState, Event, HTMLCollection, MutationObserver, MutationObserverInit, document, html}
+import org.scalajs.dom.*
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
@@ -310,4 +310,12 @@ object DomSupport {
     observer.observe(container, config)
     observer
   }
+
+  def replaceStateLogError(statedata: js.Any, title: String, url: String): Unit =
+    try {
+      dom.window.history.replaceState(statedata, title, url)
+    } catch {
+      case e: Throwable =>
+        dom.console.log(s"error replacing state with url `$url`: ${e.getMessage}")
+    }
 }

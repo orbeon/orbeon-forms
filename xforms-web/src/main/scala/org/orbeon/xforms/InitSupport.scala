@@ -299,6 +299,7 @@ object InitSupport {
             elem                           = formElem,
             ns                             = namespacedFormId.substring(0, namespacedFormId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
             contextAndNamespaceOpt         = contextAndNamespaceOpt,
+            orbeonClientOpt                = initializations.orbeonClient,
             xformsServerPath               = initializations.xformsServerPath,
             xformsServerSubmitActionPath   = initializations.xformsServerSubmitActionPath,
             xformsServerSubmitResourcePath = initializations.xformsServerSubmitResourcePath,

@@ -60,19 +60,21 @@ object Support {
 
   // TODO: Rename as we are returning a `dom.Document`?
   def fetchText(
-    url         : String,
-    requestBody : String | dom.FormData,
-    contentType : Option[String],
-    acceptLang  : Option[String],
-    transform   : (String, String) => String,
-    abortSignal : Option[dom.AbortSignal]
+    url             : String,
+    requestBody     : String | dom.FormData,
+    contentType     : Option[String],
+    acceptLang      : Option[String],
+    transform       : (String, String) => String,
+    abortSignal     : Option[dom.AbortSignal],
+    orbeonClientOpt : Option[String] = None
   )(implicit
     executor    : ExecutionContext
   ): Future[(Int, String, Option[dom.Document])] = {
 
     val customHeaders = js.Dictionary[String]()
-    contentType.foreach(customHeaders(Headers.ContentType)    = _)
-    acceptLang .foreach(customHeaders(Headers.AcceptLanguage) = _)
+    orbeonClientOpt.foreach(customHeaders(Headers.OrbeonClient)   = _)
+    contentType    .foreach(customHeaders(Headers.ContentType)    = _)
+    acceptLang     .foreach(customHeaders(Headers.AcceptLanguage) = _)
 
     val fetchPromise =
       dom.Fetch.fetch(

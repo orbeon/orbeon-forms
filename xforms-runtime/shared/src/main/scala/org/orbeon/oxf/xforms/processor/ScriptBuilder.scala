@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor
 
 import io.circe.generic.auto.*
 import io.circe.syntax.*
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
@@ -206,6 +207,7 @@ object ScriptBuilder {
             details = ServerError.errorsAsHtmlString(containingDocument.getServerErrors),
             formId  = containingDocument.getNamespacedFormId
           ),
+      orbeonClient = containingDocument.getFirstHeaderIgnoreCase(Headers.OrbeonClient),
       configuration =
         findConfigurationProperties(containingDocument, versionedResources, maxInactiveIntervalMillis, sessionId),
     ).asJson.noSpaces

@@ -41,6 +41,7 @@ case class Initializations(
   dialogsToShow                 : List[Dialog],
   focusElementId                : Option[String],
   errorsToShow                  : Option[Error],
+  orbeonClient                  : Option[String],
   configuration                 : ConfigurationProperties,
 )
 

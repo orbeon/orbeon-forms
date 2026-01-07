@@ -29,6 +29,7 @@ class Form(
   val elem                          : html.Form,
   val ns                            : String,
   val contextAndNamespaceOpt        : Option[(String, String)],
+  val orbeonClientOpt               : Option[String],
   val xformsServerPath              : String,                          // could move to configuration
   val xformsServerSubmitActionPath  : Option[String],                  // could move to configuration
   val xformsServerSubmitResourcePath: Option[String],                  // could move to configuration

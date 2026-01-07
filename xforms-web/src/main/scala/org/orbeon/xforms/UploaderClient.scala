@@ -113,12 +113,13 @@ object UploaderClient {
 
       val responseF =
         Support.fetchText(
-          url         = currentForm.xformsServerUploadPath,
-          requestBody = formData,
-          contentType = None,
-          acceptLang  = Language.getLang().some, // this language can be used for messages returned by a file scanner
-          transform   = (content, _) => content,
-          abortSignal = controller.signal.some
+          url             = currentForm.xformsServerUploadPath,
+          requestBody     = formData,
+          contentType     = None,
+          acceptLang      = Language.getLang().some, // this language can be used for messages returned by a file scanner
+          transform       = (content, _) => content,
+          abortSignal     = controller.signal.some,
+          orbeonClientOpt = currentForm.orbeonClientOpt
         )
 
       askForProgressUpdate(currentForm)

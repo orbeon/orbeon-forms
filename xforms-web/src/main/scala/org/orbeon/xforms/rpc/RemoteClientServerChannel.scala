@@ -90,12 +90,13 @@ object RemoteClientServerChannel extends ClientServerChannel {
       val promise = Promise[dom.Document]()
 
       Support.fetchText(
-        url         = requestForm.xformsServerPath,
-        requestBody = requestBody,
-        contentType = ContentTypes.XmlContentType.some,
-        acceptLang  = None,
-        transform   = requestForm.transform,
-        abortSignal = controller.signal.some
+        url             = requestForm.xformsServerPath,
+        requestBody     = requestBody,
+        contentType     = ContentTypes.XmlContentType.some,
+        acceptLang      = None,
+        transform       = requestForm.transform,
+        abortSignal     = controller.signal.some,
+        orbeonClientOpt = requestForm.orbeonClientOpt
       ).onComplete { response =>
 
         // Ignore response if for a form we don't have anymore on the page

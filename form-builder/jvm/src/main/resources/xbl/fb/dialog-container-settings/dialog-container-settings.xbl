@@ -752,8 +752,8 @@
                                             <xf:label ref="$resources/dialog-container-settings/repeat/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/repeat/hint"/>
 
-                                            <!-- Reset dependent values upon value change -->
-                                            <xf:action event="xforms-value-changed">
+                                            <!-- Reset dependent values upon user switching the repeat on or off -->
+                                            <xf:action event="xforms-select xforms-deselect">
                                                 <xf:setvalue ref="$i/is-custom-iteration-name" value="false()"/>
                                                 <xf:setvalue ref="$i/custom-iteration-name"    value="''"/>
                                                 <xf:setvalue ref="$i/iteration-relevant"       value="'true()'"/>

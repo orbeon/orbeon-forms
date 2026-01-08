@@ -106,7 +106,7 @@ class XBLContainer(
       Iterator.empty
 
   def effectiveId: String = _effectiveId
-  def partAnalysis: PartAnalysis = parentXBLContainer.map(_.partAnalysis).orNull
+  def partAnalysis: PartAnalysis = parentXBLContainer.map(_.partAnalysis).orNull // should not be null, right?
 
   def getEffectiveId = _effectiveId // for `XFormsObject` trait only
 

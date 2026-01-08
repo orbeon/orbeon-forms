@@ -36,7 +36,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 import java.io.{FileInputStream, OutputStream}
-import java.net.{URI, URL}
+import java.net.URI
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
 import scala.util.Try

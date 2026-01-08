@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{Connection, ImageMetadata, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
 import java.io.*
-import java.net.{URI, URL}
+import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.logging.Level
@@ -150,7 +150,7 @@ class OrbeonPdfBoxUserAgent(
       lazy val originalCss = IOUtils.readStreamAsStringAndClose(reader)
 
       // Retrieve parsed CSS from cache or parse from reader
-      val cascadingStyleSheetOpt = cssCache.get(new URL(resolveURI(uri)), CSSParsing.parsedCss(originalCss))
+      val cascadingStyleSheetOpt = cssCache.get(resolveURI(uri), CSSParsing.parsedCss(originalCss))
 
       val modifiedCss = cascadingStyleSheetOpt match {
         case None =>

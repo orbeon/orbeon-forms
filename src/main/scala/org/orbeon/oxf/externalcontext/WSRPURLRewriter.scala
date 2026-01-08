@@ -16,7 +16,7 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport.*
 
-import java.net.URL
+import java.net.URI
 import java.util.concurrent.Callable
 import java.util as ju
 
@@ -80,8 +80,8 @@ class WSRPURLRewriter(
 
     // Parse URL
     // TODO: Use URI instead?
-    val baseURL = new URL("http", "example.org", request.getRequestPath)
-    val u = new URL(baseURL, urlString)
+    val baseURI = new URI("http", "example.org", request.getRequestPath, null)
+    val u = baseURI.resolve(urlString)
     // Decode query string
     val parameters = Option(u.getQuery).map(PathUtils.decodeQueryStringPortlet).getOrElse(Map.empty)
     // Add special path parameter
@@ -98,7 +98,7 @@ class WSRPURLRewriter(
     val navigationalState = PathUtils.encodeQueryString(parameters + (PathParameterName -> Array(path)))
 
     // Encode the URL a la WSRP
-    encodeURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)
+    encodeURL(urlType, navigationalState, portletMode, windowState, u.getFragment, secure = false)
   }
 
   private def rewriteResourceURL(urlString: String): String = {

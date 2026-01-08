@@ -36,12 +36,12 @@ object CSSParsing {
   class CSSCache {
     private val cascadingStyleSheets = mutable.Map[String, CascadingStyleSheet]()
 
-    def get(url: URL, cascadingStyleSheetOpt: => Option[CascadingStyleSheet]): Option[CascadingStyleSheet] =
+    def get(url: String, cascadingStyleSheetOpt: => Option[CascadingStyleSheet]): Option[CascadingStyleSheet] =
       cascadingStyleSheets
-        .get(url.toString)
+        .get(url)
         .orElse {
           cascadingStyleSheetOpt.map { cascadingStyleSheet =>
-            cascadingStyleSheets.update(url.toString, cascadingStyleSheet)
+            cascadingStyleSheets.update(url, cascadingStyleSheet)
             cascadingStyleSheet
           }
         }

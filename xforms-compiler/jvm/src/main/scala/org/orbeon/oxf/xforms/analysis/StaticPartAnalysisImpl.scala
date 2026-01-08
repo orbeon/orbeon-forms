@@ -42,6 +42,12 @@ trait PartAnalysisContextImmutable {
 
   def scopeForPrefixedId(prefixedId: String): Scope
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
+
+  // Design time = we are in the `<xxf:dynamic>` used by Form Builder to render the form.
+  // We test on `<xxf:dynamic>` being the one with `id="fb"` to exclude the `<xxf:dynamic>` used in the
+  // Control Settings dialog for XBL custom properties.
+  def isDesignTimePart: Boolean =
+    ! isTopLevelPart && startScope.scopeId == "fb"
 }
 
 trait PartAnalysisContextMutable extends TransientState {

@@ -601,9 +601,9 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   private val DesignTimeModes: Set[String] = Set("new", "edit", "view")
 
   def isDesignTime(implicit p: FormRunnerParams, xfc: XFormsFunction.Context): Boolean =
-    isFormBuilder &&
-      DesignTimeModes(p.mode) &&
-      ! xfc.container.innerScope.isTopLevelScope
+    isFormBuilder           &&
+    DesignTimeModes(p.mode) &&
+    xfc.container.partAnalysis.isDesignTimePart
 
   // https://github.com/orbeon/orbeon-forms/issues/5323
   // https://github.com/orbeon/orbeon-forms/issues/5325

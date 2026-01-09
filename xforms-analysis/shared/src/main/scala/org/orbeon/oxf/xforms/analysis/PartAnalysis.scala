@@ -64,6 +64,7 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
   def parent: Option[PartAnalysis]
   def startScope: Scope
   def isTopLevelPart: Boolean
+  def isDesignTimePart: Boolean
 
   def iterateGlobals: Iterator[Global]
   def iterateModels: Iterator[Model]

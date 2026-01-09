@@ -1228,6 +1228,7 @@ object TopLevelPartAnalysisImpl {
 
         def parent: Option[PartAnalysis] = None
         def isTopLevelPart: Boolean = true
+        def isDesignTimePart: Boolean = false
 
         val functionLibrary: FunctionLibrary = _functionLibrary
 

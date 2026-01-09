@@ -19,12 +19,12 @@ body.orbeon {
 
 .orbeon {
 
-    a {
+    a, .btn-link {
         color: var(--orbeon-link-color);
     }
 
-    a:hover,
-    a:focus {
+    a:hover, a:focus,
+    .btn-link:hover, .btn-link:focus {
         color: var(--orbeon-link-hover-color);
     }
 
@@ -601,20 +601,6 @@ body.orbeon {
             padding: 0;
             margin: 0;
             border: none;
-        }
-    }
-
-    // Force white icons
-    .btn-danger,
-    .btn-warning,
-    .btn-primary,
-    .btn-inverse,
-    .xforms-trigger-appearance-xxforms-danger,
-    .xforms-trigger-appearance-xxforms-warning,
-    .xforms-trigger-appearance-xxforms-primary,
-    .xforms-trigger-appearance-xxforms-inverse {
-        i.fa {
-            color: white;
         }
     }
 

@@ -625,7 +625,7 @@
             xxf:element="nav"
             model="fr-form-model"
             ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
-            class="navbar navbar-expand-lg navbar-dark bg-dark {if ($bs5) then 'fixed-top' else 'position-sticky'}">
+            class="navbar navbar-expand-lg {if ($bs5) then 'fixed-top' else 'position-sticky'}">
             <xh:div class="container-fluid">
                 <xsl:variable name="default-objects" as="element()+">
                     <fr:goto-content/>

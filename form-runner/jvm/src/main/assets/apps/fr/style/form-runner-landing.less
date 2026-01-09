@@ -21,10 +21,6 @@ html {
 
 .orbeon {
 
-    body& {
-        color: var(--orbeon-base-color); // Override Bootstrap's default
-    }
-
     .fr-mode-landing {
         .row {
             justify-content: start; // https://github.com/orbeon/orbeon-forms/issues/7239
@@ -60,14 +56,30 @@ html {
         }
         a {
             &:hover {
-                color: var(--bs-body-color);
+                color: var(--orbeon-base-color);
             }
         }
     }
 
+    .card {
+        background-color: var(--orbeon-base-background-color);
+        border: 1px solid var(--orbeon-landing-card-border-color);
+        .card-header {
+            color: var(--orbeon-landing-card-header-color);
+            background-color: var(--orbeon-landing-card-header-background-color);
+            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+        }
+    }
+
     .card .list-group-item {
+        background-color: var(--orbeon-base-background-color);
+        border-bottom: 1px solid var(--orbeon-landing-card-border-color);
         padding: 0.5em 1em;
         a {
+            color: var(--orbeon-landing-card-link-color);
+            &:hover {
+                color: var(--orbeon-landing-card-link-hover-color);
+            }
             display: block;
             padding: 0;
             overflow: hidden;
@@ -98,8 +110,8 @@ html {
     .xbl-fr-card-form-data {
         .card {
             .card-body {
-                img.img-thumbnail, .img-thumbnail img {
-                    box-shadow: 0 0 0 1px @grayLighter;
+                .img-thumbnail img {
+                    box-shadow: 0 0 0 1px var(--orbeon-landing-card-image-border);
                     padding: .5%;
                 }
             }
@@ -108,7 +120,7 @@ html {
 
     a figure, .card .list-group-item {
         &:hover {
-            background-color: @frRowHoverBackground;
+            background-color: var(--orbeon-landing-card-hover-background-color);
         }
     }
 
@@ -145,13 +157,22 @@ html {
     .card {
         figure {
             margin-bottom: 0;
-            border: 1px solid rgba(0, 0, 0, 0.125);
+            border: 1px solid var(--orbeon-landing-card-border-color);
             border-radius: 10px;
         }
         figcaption {
-            color: var(--bs-body-color);
+            color: var(--orbeon-base-color);
             font-weight: 500;
             margin: 0 0 .5em;
+        }
+    }
+
+    .fr-landing-quick-links-card, .xbl-fr-card-published-forms, .xbl-fr-card-form-data {
+        .img-thumbnail {
+            background-color: transparent;
+            .img-invertible, &.img-invertible {
+                opacity: 0.8;
+            }
         }
     }
 
@@ -159,10 +180,8 @@ html {
         .img-thumbnail {
             padding: 15%;
             border: none;
-            background-color: transparent;
-            border-top-left-radius: 10px; // avoid stepping over enclosing border
+            border-top-left-radius: 10px; // Avoid stepping over enclosing border
             border-top-right-radius: 10px;
-            opacity: .8;
             transition: all ease 100ms;
         }
     }
@@ -292,4 +311,14 @@ html {
             }
         }
     }
+
+    .dark-mode({
+        .fr-landing-quick-links-card, .xbl-fr-card-published-forms .card-body {
+            .img-thumbnail {
+                .img-invertible, &.img-invertible {
+                    filter: invert(1);
+                }
+            }
+        }
+    });
 }

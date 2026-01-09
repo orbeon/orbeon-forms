@@ -2,6 +2,10 @@
 
 .orbeon {
 
+  body& {
+    color: var(--orbeon-base-color); // Override Bootstrap's default
+  }
+
   a {
     color: var(--orbeon-link-color);
   }
@@ -165,15 +169,38 @@
   }
 
   .navbar {
+    background-color: var(--orbeon-navbar-background-color);
+
     .navbar-brand {
       padding: 0;
       font-size: 1em;
     }
+
     .container, .container-fluid {
       h1 {
         font-size: var(--orbeon-navbar-heading-font-size);
         font-weight: @frNavBarFontWeight;
       }
     }
+  }
+
+  // TODO: use common LESS section for both Bootstrap 2 and 5
+
+  .alert-error, .alert-danger {
+    color            : var(--orbeon-alert-error-color);
+    background-color : var(--orbeon-alert-error-background-color);
+    border-color     : var(--orbeon-alert-error-border-color);
+  }
+
+  .alert-success {
+    color            : var(--orbeon-alert-success-color);
+    background-color : var(--orbeon-alert-success-background-color);
+    border-color     : var(--orbeon-alert-success-border-color);
+  }
+
+  .alert-warning {
+    color            : var(--orbeon-alert-warning-color);
+    background-color : var(--orbeon-alert-warning-background-color);
+    border-color     : var(--orbeon-alert-warning-border-color);
   }
 }

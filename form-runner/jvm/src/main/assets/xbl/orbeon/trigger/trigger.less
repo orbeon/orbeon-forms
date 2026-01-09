@@ -6,21 +6,7 @@
 
     // Make default button a little darker
     .btn {
-        color: var(--orbeon-button-color);
-        background-color: var(--orbeon-button-background-color);
-
-        &.disabled, &[disabled] {
-            color: var(--orbeon-button-color);
-            background-color: var(--orbeon-button-background-color); // restore default color or buttons are too dark when disabled
-        }
-
-        &:hover,
-        &:focus,
-        &:active,
-        &.active {
-            color: var(--orbeon-button-color);
-            background-color: var(--orbeon-button-highlight-background-color);
-        }
+        .buttonBackgroundOrbeon(var(--orbeon-button-background-color), var(--orbeon-button-highlight-background-color), var(--orbeon-button-color), var(--orbeon-button-disabled-background-color), var(--orbeon-button-disabled-color));
     }
 
     button.btn {
@@ -35,6 +21,15 @@
 
     .btn-group.open button.btn.dropdown-toggle {
         background-color: var(--orbeon-dropdown-open-toggle-background-color);
+    }
+
+    button.btn.dropdown-toggle .caret {
+        border-top: 4px solid var(--orbeon-dropdown-caret-color);
+    }
+
+    .btn-group.dropup button.btn.dropdown-toggle .caret {
+        border-top: 0;
+        border-bottom: 4px solid var(--orbeon-dropdown-caret-color);
     }
 
     // Dropdowns overrides
@@ -81,40 +76,54 @@
         }
     }
 
-    .buttonBackgroundOrbeon(@startColor, @endColor, @textColor) {
+    .buttonBackgroundOrbeon(@backgroundColor, @highlightBackgroundColor, @color, @disabledBackgroundColor, @disabledColor) {
 
-        color: @textColor;
-        background-color: @startColor;
+        color: @color;
+        background-color: @backgroundColor;
         background-image: none;
         text-shadow: none;
 
-        &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
-            color: @textColor;
-            background-color: @endColor;
+        &:not(.disabled):not([disabled]) {
+            &:hover, &:focus, &:active, &.active {
+                color: @color;
+                background-color: @highlightBackgroundColor;
+            }
+            .fa {
+                color: @color;
+            }
+            kbd {
+                border-color: @color;
+            }
         }
 
-        kbd {
-            border-color: @textColor;
+        &.disabled, &[disabled] {
+            color: @disabledColor;
+            background-color: @disabledBackgroundColor;
+            opacity: var(--orbeon-button-disabled-opacity);
+            .fa {
+                color: @disabledColor;
+                opacity: var(--orbeon-button-disabled-icon-opacity);
+            }
         }
     }
 
     .xforms-trigger-appearance-xxforms-primary .btn, .btn-primary {
-        .buttonBackgroundOrbeon(var(--orbeon-button-primary-background-color), var(--orbeon-button-primary-highlight-background-color), var(--orbeon-button-primary-color));
+        .buttonBackgroundOrbeon(var(--orbeon-button-primary-background-color), var(--orbeon-button-primary-highlight-background-color), var(--orbeon-button-primary-color), var(--orbeon-button-primary-disabled-background-color), var(--orbeon-button-primary-disabled-color));
     }
     .xforms-trigger-appearance-xxforms-warning .btn, .btn-warning {
-        .buttonBackgroundOrbeon(var(--orbeon-button-warning-background-color), var(--orbeon-button-warning-highlight-background-color), var(--orbeon-button-warning-color));
+        .buttonBackgroundOrbeon(var(--orbeon-button-warning-background-color), var(--orbeon-button-warning-highlight-background-color), var(--orbeon-button-warning-color), var(--orbeon-button-warning-disabled-background-color), var(--orbeon-button-warning-disabled-color));
     }
     .xforms-trigger-appearance-xxforms-danger .btn, .btn-danger {
-        .buttonBackgroundOrbeon(var(--orbeon-button-danger-background-color), var(--orbeon-button-danger-highlight-background-color), var(--orbeon-button-danger-color ));
+        .buttonBackgroundOrbeon(var(--orbeon-button-danger-background-color), var(--orbeon-button-danger-highlight-background-color), var(--orbeon-button-danger-color), var(--orbeon-button-danger-disabled-background-color), var(--orbeon-button-danger-disabled-color));
     }
     .xforms-trigger-appearance-xxforms-success .btn, .btn-success {
-        .buttonBackgroundOrbeon(var(--orbeon-button-success-background-color), var(--orbeon-button-success-highlight-background-color), var(--orbeon-button-success-color));
+        .buttonBackgroundOrbeon(var(--orbeon-button-success-background-color), var(--orbeon-button-success-highlight-background-color), var(--orbeon-button-success-color), var(--orbeon-button-success-disabled-background-color), var(--orbeon-button-success-disabled-color));
     }
     .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
-        .buttonBackgroundOrbeon(var(--orbeon-button-info-background-color), var(--orbeon-button-info-highlight-background-color), var(--orbeon-button-info-color));
+        .buttonBackgroundOrbeon(var(--orbeon-button-info-background-color), var(--orbeon-button-info-highlight-background-color), var(--orbeon-button-info-color), var(--orbeon-button-info-disabled-background-color), var(--orbeon-button-info-disabled-color));
     }
     .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
-        .buttonBackgroundOrbeon(var(--orbeon-button-inverse-background-color), var(--orbeon-button-inverse-highlight-background-color), var(--orbeon-button-inverse-color));
+        .buttonBackgroundOrbeon(var(--orbeon-button-inverse-background-color), var(--orbeon-button-inverse-highlight-background-color), var(--orbeon-button-inverse-color), var(--orbeon-button-inverse-disabled-background-color), var(--orbeon-button-inverse-disabled-color));
     }
 
     button.btn, label.btn {
@@ -135,4 +144,13 @@
         text-underline-offset: 0.2rem;        // otherwise the line touches the bottom of the characters
         text-decoration-skip-ink: auto;       // `auto` is the default, but we want to be explicit
     }
+
+    .dark-mode({
+        .btn {
+            // Disable box shadows in dark mode
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+        }
+    });
 }

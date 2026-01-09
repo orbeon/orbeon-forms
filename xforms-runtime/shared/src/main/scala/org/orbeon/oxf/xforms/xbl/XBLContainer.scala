@@ -108,7 +108,7 @@ class XBLContainer(
   def effectiveId: String = _effectiveId
   def partAnalysis: PartAnalysis = parentXBLContainer.map(_.partAnalysis).orNull // should not be null, right?
 
-  def getEffectiveId = _effectiveId // for `XFormsObject` trait only
+  def getEffectiveId: String = _effectiveId // for `XFormsObject` trait only
 
   // Create a new container child of the given control
   // NOTE: Require passing the `ConcreteBinding` to help ensure that the control does have it.
@@ -441,7 +441,7 @@ trait ContainerResolver {
       throw new OXFException("Source not resolvable in container: " + sourceEffectiveId)
 
     // 3. Search in controls
-    // NOTE: in the future, sub-tree of components might be rooted in this class
+    // NOTE: in the future, subtree of components might be rooted in this class
     resolveControlById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes)
   }
 

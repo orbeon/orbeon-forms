@@ -19,11 +19,21 @@ import org.orbeon.xforms.XFormsId
 object ControlOps {
 
   // Get the control name based on the control, bind, grid, section or template id
-  def controlNameFromIdOpt(controlOrBindId: String): Option[String] =
-    XFormsId.getStaticIdFromId(controlOrBindId) match {
-      case ControlName(name, _) => Some(name)
-      case _                    => None
+  def controlNameFromIdOpt(controlOrBindId: String): Option[String] = {
+    val staticId = XFormsId.getStaticIdFromId(controlOrBindId)
+    staticId.lastIndexOf('-') match {
+      case -1 | 0                                          => None
+      case i if ControlSuffixes(staticId.substring(i + 1)) => Some(staticId.substring(0, i))
+      case _                                               => None
     }
+  }
 
-  private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // `repeat` is for legacy FB
+  private val ControlSuffixes = Set(
+    "control",
+    "bind",
+    "grid",
+    "section",
+    "template",
+    "repeat" // for legacy FB
+  )
 }

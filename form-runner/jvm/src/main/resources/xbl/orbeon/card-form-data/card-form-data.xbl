@@ -282,7 +282,7 @@
                         class="img-thumbnail"/>
                     <xh:img
                         src="{fr:component-param-value('thumbnail')}"
-                        class="img-thumbnail"/>
+                        class="img-thumbnail img-invertible"/>
                 </fr:card-thumbnail>
 
                     <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">

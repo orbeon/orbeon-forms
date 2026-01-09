@@ -41,7 +41,7 @@
       input {
         width: 100%;
         &[readonly] {
-          background-color: darken(@wellBackground, 5%);
+          background-color: var(--orbeon-search-free-input-read-only-background-color);
         }
       }
     }
@@ -247,7 +247,6 @@
       }
       tr:hover > td {
         background-color: var(--orbeon-table-hover-background-color);
-        filter: brightness(0.95);
       }
     }
 

@@ -20,17 +20,40 @@
         line-height: 1.2;
         text-decoration: none;
         background-color: initial;
-        color: #222
+        color: var(--orbeon-base-color);
     }
 
     position: relative;
     min-width: 250px;
     max-width: 312px;
-    border: 1px solid #f4f4f4;
+    border: 1px solid var(--orbeon-base-border-color);
     padding-bottom: 12px;
-    background-color: #fff;
+    background-color: var(--orbeon-base-background-color);
 
     b {
         font-weight: 700
+    }
+
+    @media screen {
+        .fr-color-scheme-dark & {
+            .dark-color-scheme()
+        }
+    }
+
+    // System-preference dark mode (screen only)
+    @media screen and (prefers-color-scheme: dark) {
+        .fr-color-scheme-system & {
+            .dark-color-scheme()
+        }
+    }
+
+    .dark-color-scheme() {
+        svg {
+            filter: invert(1) !important;
+        }
+
+        .frc-banner * {
+            opacity: 1;
+        }
     }
 }

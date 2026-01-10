@@ -239,8 +239,11 @@ class FlatViewTest
                 createdColumn          = true,
                 lastModifiedTimeColumn = true,
                 lastModifiedByColumn   = true,
-                columns                = Seq("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz01"),
-                values                 = Seq(Seq("1", "Value"))
+                columns                = Seq(
+                  "_",
+                  "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz01"
+                ),
+                values                 = Seq(Seq("1", "Value", "Value"))
               )
             )
           ),
@@ -254,8 +257,11 @@ class FlatViewTest
                 createdColumn          = true,
                 lastModifiedTimeColumn = true,
                 lastModifiedByColumn   = true,
-                columns                = Seq("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0"),
-                values                 = Seq(Seq("1", "Value"))
+                columns                = Seq(
+                  "_",
+                  "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0"
+                ),
+                values                 = Seq(Seq("1", "Value", "Value"))
               )
             )
           )

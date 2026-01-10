@@ -91,7 +91,8 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
       "first_name"     -> "first-name",
       "first___name"   -> "___first___name___",
       "0first_name0"   -> "0first-name0",
-      "firstname"      -> "first$n%a.m/e "
+      "firstname"      -> "first$n%a.m/e ",
+      "_"              -> "_"
     )
 
     for ((expected, xml) <- expectedForValues)

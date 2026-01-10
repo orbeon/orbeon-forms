@@ -416,12 +416,13 @@ private object FlatView {
   // On Oracle names: http://docs.oracle.com/cd/E11882_01/server.112/e10592/sql_elements008.htm
   def xmlToSQLId(id: String): String =
     id
-    .replace("-", "_")                   // dash to underscore
-    .replaceAll("""[^A-Za-z0-9_]""", "") // only keep alphanumeric or underscore
-    .dropWhile(_ == '_')                 // remove starting underscores
-    .reverse
-    .dropWhile(_ == '_')                 // remove trailing underscores
-    .reverse
+      .replace("-", "_")                   // dash to underscore
+      .replaceAll("""[^A-Za-z0-9_]""", "") // only keep alphanumeric or underscore
+      .dropWhile(_ == '_')                 // remove starting underscores
+      .reverse
+      .dropWhile(_ == '_')                 // remove trailing underscores
+      .reverse
+      .pipe(i => if (i.isEmpty) "_" else i)
 
   // Try to truncate reasonably smartly when needed to maximize the characters we keep
   private def fitParts(parts: Seq[String], maxIdentifierLength: Int): Seq[String] = {

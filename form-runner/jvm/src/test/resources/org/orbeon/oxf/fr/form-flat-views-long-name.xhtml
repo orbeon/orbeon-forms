@@ -6,16 +6,22 @@
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
-                    <section-1><grid-1><abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789></abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789></grid-1>
-
+                    <section-1>
+                        <grid-1>
+                            <_/>
+                            <abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789/>
+                        </grid-1>
                     </section-1>
                 </form>
             </xf:instance>
 
             <!-- Bindings -->
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-                <xf:bind id="section-1-bind" name="section-1" ref="section-1"><xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789-bind" name="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789" ref="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789" xxf:whitespace="trim"></xf:bind></xf:bind>
-
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="_-bind" name="_" ref="_" xxf:whitespace="trim"/>
+                        <xf:bind id="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789-bind" name="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789" ref="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789" xxf:whitespace="trim"/>
+                    </xf:bind>
                 </xf:bind>
             </xf:bind>
 
@@ -41,10 +47,13 @@
                         <section-1>
                             <label>Section 1</label>
                         </section-1>
-                        <abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789><label>Long control name</label><hint></hint>
-
-
-
+                        <_>
+                            <label>Control _</label>
+                            <hint/>
+                        </_>
+                        <abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789>
+                            <label>Long control name</label>
+                            <hint/>
                         </abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789>
                     </resource>
                 </resources>
@@ -57,12 +66,18 @@
             <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-1-section" bind="section-1-bind"><xf:label ref="$form-resources/section-1/label"></xf:label>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind"><fr:c y="1" x="1" w="6">
+                                <xf:input id="_-control" bind="_-bind">
+                                    <xf:label ref="$form-resources/_/label"></xf:label>
+                                    <xf:hint ref="$form-resources/_/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+                                </xf:input>
+                            </fr:c><fr:c y="1" x="7" w="6">
                                 <xf:input id="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789-control" bind="abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789-bind">
                                     <xf:label ref="$form-resources/abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789/label"></xf:label>
                                     <xf:hint ref="$form-resources/abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
 
                                 </xf:input>
-                            </fr:c><fr:c y="1" x="7" w="6"></fr:c></fr:grid>
+                            </fr:c></fr:grid>
                 </fr:section>
             </fr:body>
         </fr:view>

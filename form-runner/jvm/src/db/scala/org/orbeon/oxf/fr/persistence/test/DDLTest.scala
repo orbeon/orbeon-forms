@@ -120,6 +120,8 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assertSameTable(provider, "2017_2" , "2018_2")
         assertSameTable(provider, "2018_2" , "2019_1")
         assertSameTable(provider, "2019_1" , "2024_1")
+        assertSameTable(provider, "2024_1" , "2025_1")
+        assertSameTable(provider, "2025_1" , "2026_1")
       case provider @ PostgreSQL =>
         assertSameTable(provider, "4_8"    , "2016_2")
         assertSameTable(provider, "2016_2" , "2016_3")
@@ -128,6 +130,8 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assertSameTable(provider, "2018_2" , "2019_1")
         assertSameTable(provider, "2019_1" , "2023_1")
         assertSameTable(provider, "2023_1" , "2024_1")
+        assertSameTable(provider, "2024_1" , "2025_1")
+        assertSameTable(provider, "2025_1" , "2026_1")
       case provider @ SQLite =>
         assertSameTable(provider, "2024_1" , "2025_1")
     }

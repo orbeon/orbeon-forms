@@ -58,7 +58,7 @@ trait FormRunnerSupport extends DocumentTestBase {
     System.setProperty("orbeon.test.sqlite.path", sqliteFile.toAbsolutePath.toString)
     Class.forName("org.sqlite.JDBC")
     useAndClose(DriverManager.getConnection(s"jdbc:sqlite:${sqliteFile.toAbsolutePath}")) { connection =>
-      val stringStatements = SqlReader.read("2025.1/sqlite-2025_1.sql")
+      val stringStatements = SqlReader.read("2026.1/sqlite-2026_1.sql")
       useAndClose(connection.createStatement()) { sqlStatement =>
         stringStatements.foreach(sqlStatement.executeUpdate)
       }

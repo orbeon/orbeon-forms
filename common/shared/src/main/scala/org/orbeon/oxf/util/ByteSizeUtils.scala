@@ -23,28 +23,19 @@ object ByteSizeUtils {
   def byteCountToCompactDisplaySize(size: Long): String = {
     val sizeBI = BigInteger.valueOf(size)
     if (sizeBI.divide(ONE_EB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${formatSize(sizeBI, ONE_EB_BI, 5)} EB"
+      s"${formatSize(sizeBI, ONE_EB_BI, 6)} EB"
     else if (sizeBI.divide(ONE_PB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${formatSize(sizeBI, ONE_PB_BI, 4)} PB"
+      s"${formatSize(sizeBI, ONE_PB_BI, 5)} PB"
     else if (sizeBI.divide(ONE_TB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${formatSize(sizeBI, ONE_TB_BI, 3)} TB"
+      s"${formatSize(sizeBI, ONE_TB_BI, 4)} TB"
     else if (sizeBI.divide(ONE_GB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${formatSize(sizeBI, ONE_GB_BI, 2)} GB"
+      s"${formatSize(sizeBI, ONE_GB_BI, 3)} GB"
     else if (sizeBI.divide(ONE_MB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${formatSize(sizeBI, ONE_MB_BI, 1)} MB"
+      s"${formatSize(sizeBI, ONE_MB_BI, 2)} MB"
     else if (sizeBI.divide(ONE_KB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"${sizeBI.divide(ONE_KB_BI)} KB"
+      s"${formatSize(sizeBI, ONE_KB_BI, 1)} KB"
     else
       s"${size} B"
-  }
-
-  def byteCountToFullDisplaySize(size: Long): String = {
-    val compactSize = byteCountToCompactDisplaySize(size)
-    val sizeBI = BigInteger.valueOf(size)
-    if (sizeBI.divide(ONE_KB_BI).compareTo(BigInteger.ZERO) > 0)
-      s"$compactSize (${size} B)"
-    else
-      compactSize
   }
 
   private def formatSize(size: BigInteger, divisor: BigInteger, decimalPlaces: Int): String =

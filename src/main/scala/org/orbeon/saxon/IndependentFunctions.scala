@@ -22,7 +22,9 @@ import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.*
+import org.orbeon.saxon.functions.Doc
 import org.orbeon.saxon.om.SequenceIterator
+import org.orbeon.saxon.pattern.NodeKindTest
 
 // TODO: Separate pure functions from this
 trait IndependentFunctions extends OrbeonFunctionLibrary {
@@ -110,6 +112,11 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     Fun("serialize", classOf[saxon.functions.Serialize], op = 0, min = 2, STRING, EXACTLY_ONE,
       Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(ITEM_TYPE, EXACTLY_ONE)
+    )
+
+    // Same as the standard `doc()`, but doesn't cause cache invalidation, see https://github.com/orbeon/orbeon-forms/issues/1239
+    Fun("doc", classOf[Doc], op = 0, min = 1, NodeKindTest.DOCUMENT, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
     Fun("property", classOf[Property], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,

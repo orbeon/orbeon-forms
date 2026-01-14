@@ -946,7 +946,8 @@
                 string-join(
                     (
                         @xxf:external-events,
-                        if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else (),
+                        (: Make sure to use `p:doc()` in order to allow caching :)
+                        if ($copy-custom-model) then p:doc($custom-model)/*/@xxf:external-events else (),
                         'fr-rpc-request',
                         'fb-test-pdf-prepare-data'
                     ),
@@ -1260,7 +1261,8 @@
 
             <!-- Custom XForms model content to include -->
             <xsl:if test="$copy-custom-model">
-                <xsl:copy-of select="doc($custom-model)/*/node()"/>
+                <!-- Make sure to use `p:doc()` in order to allow caching -->
+                <xsl:copy-of select="p:doc($custom-model)/*/node()"/>
             </xsl:if>
 
             <!-- "Universal" submission. We scope this in fr-form-model so that variables are accessible with

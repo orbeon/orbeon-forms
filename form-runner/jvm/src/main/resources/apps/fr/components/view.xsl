@@ -750,9 +750,10 @@
                     select="distinct-values(for $n in $property-names return p:split(p:property($n)))"
                     as="xs:string*"/>
 
+                <!-- Make sure to use `p:doc()` in order to allow caching -->
                 <xsl:variable
                     name="resources"
-                    select="for $uri in $resources-names return doc($uri)"
+                    select="for $uri in $resources-names return p:doc($uri)"
                     as="document-node()*"/>
 
                 <xsl:if test="$resources">
@@ -1119,7 +1120,8 @@
             name="custom-dialogs"
             select="p:split(p:property(string-join(('oxf.fr.detail.dialogs.custom', $app, $form), '.')))"/>
         <xsl:for-each select="$custom-dialogs">
-            <xsl:copy-of select="doc(.)"/>
+            <!-- Make sure to use `p:doc()` in order to allow caching -->
+            <xsl:copy-of select="p:doc(.)"/>
         </xsl:for-each>
 
         <!-- Error dialog -->

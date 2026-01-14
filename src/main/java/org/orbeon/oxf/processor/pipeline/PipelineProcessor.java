@@ -104,16 +104,15 @@ public class PipelineProcessor extends ProcessorImpl {
             @Override
             public OutputCacheKey getKeyImpl(final PipelineContext pipelineContext) {
 
-                if (configFromAST == null && !isInputInCache(pipelineContext, INPUT_CONFIG))
+                if (configFromAST == null && ! isInputInCache(pipelineContext, INPUT_CONFIG))
                     return null;
 
                 final ProcessorInput bottomInput = getInput(pipelineContext);
                 final OutputCacheKey[] bottomInputKey = new OutputCacheKey[1];
-                executeChildren(pipelineContext, new Runnable() {
-                    public void run() {
-                        bottomInputKey[0] = (bottomInput != null) ? getInputKey(pipelineContext, bottomInput) : null;
-                    }
-                });
+                executeChildren(
+                    pipelineContext,
+                    () -> bottomInputKey[0] = (bottomInput != null) ? getInputKey(pipelineContext, bottomInput) : null
+                );
                 return bottomInputKey[0];
             }
 
@@ -123,16 +122,15 @@ public class PipelineProcessor extends ProcessorImpl {
             @Override
             public Object getValidityImpl(final PipelineContext pipelineContext) {
 
-                if (configFromAST == null && !isInputInCache(pipelineContext, INPUT_CONFIG))
+                if (configFromAST == null && ! isInputInCache(pipelineContext, INPUT_CONFIG))
                     return null;
 
                 final ProcessorInput bottomInput = getInput(pipelineContext);
                 final Object[] bottomInputValidity = new Object[1];
-                executeChildren(pipelineContext, new Runnable() {
-                    public void run() {
-                        bottomInputValidity[0] = (bottomInput != null) ? getInputValidity(pipelineContext, bottomInput) : null;
-                    }
-                });
+                executeChildren(
+                    pipelineContext,
+                    () -> bottomInputValidity[0] = (bottomInput != null) ? getInputValidity(pipelineContext, bottomInput) : null
+                );
                 return bottomInputValidity[0];
             }
 
@@ -655,7 +653,7 @@ public class PipelineProcessor extends ProcessorImpl {
     private void addSelfAsParent(PipelineContext pipelineContext) {
         Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) pipelineContext.getAttribute(PARENT_PROCESSORS);
         if (parents == null) {
-            parents = new Stack<ProcessorImpl>();
+            parents = new Stack<>();
             pipelineContext.setAttribute(PARENT_PROCESSORS, parents);
         }
         parents.push(this);

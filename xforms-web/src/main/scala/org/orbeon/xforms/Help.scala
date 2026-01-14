@@ -43,12 +43,22 @@ object Help {
       // Exclude help button
       jCommonAncestor(jControlEl.find(":input:visible:not(.xforms-help), output:visible"))
 
+    def labelElementOpt: Option[dom.Element] =
+      Controls.getControlLHHA(controlEl, "label").toOption
+
+    def hasVisibleDimensions(el: dom.Element): Boolean = {
+      val rect = el.getBoundingClientRect()
+      rect.width > 0 && rect.height > 0
+    }
+
     // We want the arrow to point to the form field, not somewhere between the label and the field,
     // hence here we look for the first element which is not an LHHA. If we don't find any such element
     // we use the container as a fallback (e.g. `xf:group` that only contains the help and a label).
     val containerOpt =
       explicitContainerWithClassOpt
         .orElse(fieldsCommonAncestorOpt)
+        // If the container has no visible dimensions, point to the label element.
+        .flatMap(c => if (hasVisibleDimensions(c)) Some(c) else labelElementOpt)
         .getOrElse(controlEl)
 
     val elPos     = Placement.getPositionDetails($(containerOpt))

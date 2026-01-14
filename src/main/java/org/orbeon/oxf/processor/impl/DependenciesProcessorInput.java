@@ -60,6 +60,15 @@ public abstract class DependenciesProcessorInput extends DelegatingProcessorInpu
                 addOutput(outputName, output);
                 return output;
             }
+
+            @Override
+            public ProcessorInput getInputByName(String name) {
+                if (name.equals(INPUT_CONFIG)) {
+                    return super.getInputByName(name);
+                } else {
+                    return processor.getInputByName(name);
+                }
+            }
         };
 
         // Create data input and output

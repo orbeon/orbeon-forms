@@ -1230,7 +1230,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void setLastModified(String urlString, Long lastModified) {
             if (map == null)
-                map = new HashMap<String, Object>();
+                map = new HashMap<>();
             map.put(urlString, lastModified == null ? "" : lastModified);
         }
 

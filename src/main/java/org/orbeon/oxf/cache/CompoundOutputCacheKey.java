@@ -28,7 +28,7 @@ public class CompoundOutputCacheKey extends OutputCacheKey {
         if (keys == null) {
             throw new IllegalArgumentException("key must not be null");
         }
-        this.keys = new ArrayList<CacheKey>(keys.length);
+        this.keys = new ArrayList<>(keys.length);
         this.keys.addAll(Arrays.asList(keys));
 
         int tmp = 1;

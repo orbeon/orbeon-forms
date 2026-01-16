@@ -181,6 +181,48 @@ class CSSParsingTest extends AnyFunSpec {
       }
     }
 
+    it("must substitute variables referencing other variables") {
+      val variableDefinitionsAndExpectedValues = Seq(
+        // Direct value
+        VariableDefinitions(
+          List(
+            variableDefinition(name = "--a", value = "10px")
+          )
+        ) -> List(
+          "var(--a)" -> "10px"
+        ),
+        // One level of indirection
+        VariableDefinitions(
+          List(
+            variableDefinition(name = "--a", value = "var(--b)"),
+            variableDefinition(name = "--b", value = "20px")
+          )
+        ) -> List(
+          "var(--a)" -> "20px",
+          "var(--b)" -> "20px"
+        ),
+        // Two levels of indirection
+        VariableDefinitions(
+          List(
+            variableDefinition(name = "--a", value = "var(--b)"),
+            variableDefinition(name = "--b", value = "var(--c)"),
+            variableDefinition(name = "--c", value = "30px")
+          )
+        ) -> List(
+          "var(--a)" -> "30px",
+          "var(--b)" -> "30px",
+          "var(--c)" -> "30px"
+        )
+      )
+
+      for {
+        (variableDefinitions, expectedValues) <- variableDefinitionsAndExpectedValues
+        (declarationValue, expectedValue)     <- expectedValues
+      } {
+        assert(CSSParsing.injectVariablesIntoDeclaration(declarationValue, variableDefinitions, MediaQuery.PrintMediaQuery, List(Selector(".orbeon"))) == expectedValue)
+      }
+    }
+
     it("must inject variables into a CSS stylesheet") {
       val variableDefinitions1 = CSSParsing.variableDefinitions(
         resource    = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
@@ -257,7 +299,6 @@ class CSSParsingTest extends AnyFunSpec {
     }
 
     it("must respect simple media queries when retrieving variable values") {
-
       import MediaQuery.{PrintMediaQuery, ScreenMediaQuery}
 
       val vars1 = """.orbeon {
@@ -348,7 +389,6 @@ class CSSParsingTest extends AnyFunSpec {
     }
 
     it("must respect simple selector queries when retrieving variable values") {
-
       val vars1 = """:root {
                     |  --orbeon1: orbeon1-1st;
                     |  --orbeon2: orbeon2;

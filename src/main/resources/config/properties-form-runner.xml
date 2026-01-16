@@ -340,6 +340,23 @@
         )
     </property>
 
+    <!-- Default S3 path for send-s3 action (content type "xml") -->
+    <property as="xs:string" name="oxf.fr.send-s3.xml.s3-path.*.*">
+        concat(
+            fr:app-name(),
+            '/',
+            fr:form-name(),
+            '/',
+            fr:form-version(),
+            '/',
+            fr:process-dateTime(),
+            '-',
+            fr:document-id(),
+            '/',
+            'data.xml'
+        )
+    </property>
+
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                       value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                            value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                   value="false"/>

@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.fr.email
 
-import org.orbeon.oxf.fr.*
-import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunner.formRunnerProperty
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.FormRunnerParams
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
+import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 import org.orbeon.xforms.XFormsNames
 
 

@@ -25,6 +25,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import software.amazon.awssdk.services.s3.S3Client
 
 import java.util.UUID
+import scala.util.Failure
 
 
 // There's apparently no way to tag a "describe" section globally, so we need to tag all "it" statements individually
@@ -73,23 +74,23 @@ class S3Test
 
   describe("Form Runner S3 storage") {
 
-    describe("#6751: Store all attachments sent by email in AWS S3") {
+    def testWithS3Config(configName: String, form: String)(body: S3Config => String => S3Client => Unit): Unit =
+      withTestExternalContext { _ =>
+        // It's important to use a new document for each test, as URLs to dynamic resources for rendered formats
+        // (e.g. PDF) are stored in a document instance, but dynamic resources are tracked in XFormsAssetServerRoute
+        // in the session attributes, and a new session is used for each test.
+        val (processorService, docOpt, _) = runFormRunner("issue", form, "new", initialize = true)
 
-      def testWithS3Config(configName: String)(body: S3Config => String => S3Client => Unit): Unit =
-        withTestExternalContext { _ =>
-          // It's important to use a new document for each test, as URLs to dynamic resources for rendered formats
-          // (e.g. PDF) are stored in a document instance, but dynamic resources are tracked in XFormsAssetServerRoute
-          // in the session attributes, and a new session is used for each test.
-          val (processorService, docOpt, _) = runFormRunner("issue", "6751", "new", initialize = true)
-
-          withFormRunnerDocument(processorService, doc = docOpt.get) {
-            S3Test.withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>
-              S3.withS3Client { implicit s3Client =>
-                body(s3Config)(s3Path)(s3Client)
-              }
+        withFormRunnerDocument(processorService, doc = docOpt.get) {
+          S3Test.withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>
+            S3.withS3Client { implicit s3Client =>
+              body(s3Config)(s3Path)(s3Client)
             }
           }
         }
+      }
+
+    describe("#6751: Store all attachments sent by email in AWS S3") {
 
       def sendEmail(s3Store: Boolean, s3PathOpt: Option[String], param: (String, String)*): Unit = {
         // Disable actual email sending, just test the S3 storage
@@ -109,7 +110,7 @@ class S3Test
       }
 
       it("must leave S3 bucket untouched if S3 storage disabled", S3Tag) {
-        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config", form = "6751") { implicit s3Config => s3Path => implicit s3Client =>
           sendEmail(s3Store = false, s3PathOpt = None)
           assert(S3.objects(s3Config.bucket, prefix = s3Path).get.isEmpty)
         }
@@ -134,7 +135,7 @@ class S3Test
           // Try with no match param (defaults to "first) and match=first
           matchParam                            <- List(None, Some("first"))
         } {
-          testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
+          testWithS3Config(configName = "test-s3-config", form = "6751") { implicit s3Config => s3Path => implicit s3Client =>
             // Select email template by name and match first template only
             val params = List("template" -> templateName) ++ matchParam.map("match" -> _).toList
 
@@ -151,7 +152,7 @@ class S3Test
       }
 
       it("must store expected S3 objects when all email templates are selected", S3Tag) {
-        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config", form = "6751") { implicit s3Config => s3Path => implicit s3Client =>
           // Select all email templates (current language is the default one, i.e. "en")
           sendEmail(s3Store = true, s3PathOpt = s3Path.some, "match" -> "all")
 
@@ -166,7 +167,7 @@ class S3Test
       }
 
       it("must store expected S3 objects when non-default language is selected", S3Tag) {
-        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config", form = "6751") { implicit s3Config => s3Path => implicit s3Client =>
           // Select a non-default language
           setLang("fr")
 
@@ -190,7 +191,7 @@ class S3Test
           "enabled"  -> List("9")
         )
 
-        testWithS3Config(configName = "test-s3-config") { implicit s3Config => s3Path => implicit s3Client =>
+        testWithS3Config(configName = "test-s3-config", form = "6751") { implicit s3Config => s3Path => implicit s3Client =>
 
           for ((controlValue, expectedTemplateNames) <- expectedTemplates) {
             // Set the control value to enable or disable the template
@@ -205,6 +206,58 @@ class S3Test
               s"Unexpected stored templates: expected=${expectedTemplateNames.mkString(", ")}, actual=${actualTemplateNames.mkString(", ")}"
             )
           }
+        }
+      }
+    }
+
+    describe("#7478: send-s3 action") {
+
+      it("must write XML form data to S3", S3Tag) {
+        testWithS3Config(configName = "test-s3-config", form = "7478") { implicit s3Config => s3Path => implicit s3Client =>
+          val s3Key = s"$s3Path/data.xml"
+
+          process.SimpleProcess.trySendS3(
+            Map(
+              Some("s3-config") -> "test-s3-config",
+              Some("s3-path")   -> s"'$s3Key'"
+            )
+          )
+
+          // Verify exactly one object was created
+          val objects = S3.objects(s3Config.bucket, prefix = s3Path).get
+          assert(objects.size == 1, s"Expected 1 S3 object, got ${objects.size}")
+
+          // Verify content type
+          val metadata = S3.objectMetadata(s3Config.bucket, s3Key).get
+          assert(
+            metadata.contentType() == "application/xml; charset=UTF-8",
+            s"Unexpected content type: ${metadata.contentType()}"
+          )
+
+          // Verify content is XML form data
+          val content = S3.objectAsString(s3Config.bucket, s3Key).get
+          assert(content.contains("<form"), s"Expected XML form data, got: ${content.take(200)}")
+        }
+      }
+
+      it("must fail when s3-path evaluates to empty", S3Tag) {
+        testWithS3Config(configName = "test-s3-config", form = "7478") { implicit s3Config => s3Path => implicit s3Client =>
+          val result = process.SimpleProcess.trySendS3(
+            Map(
+              Some("s3-config") -> "test-s3-config",
+              Some("s3-path")   -> "''"
+            )
+          )
+
+          result match {
+            case process.ProcessInterpreter.ActionResult.Sync(Failure(e: IllegalArgumentException)) =>
+              assert(e.getMessage.contains("s3-path"))
+            case other =>
+              fail(s"Expected IllegalArgumentException, got: $other")
+          }
+
+          // Verify nothing was written to S3
+          assert(S3.objects(s3Config.bucket, prefix = s3Path).get.isEmpty)
         }
       }
     }

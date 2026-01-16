@@ -14,6 +14,8 @@
 package org.orbeon.oxf.fr.process
 
 import cats.syntax.option.*
+import org.orbeon.connection.StreamedContent
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
@@ -33,7 +35,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, tinyTreeToOrbeonDom}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
@@ -47,6 +49,7 @@ import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.route.XFormsAssetServerRoute
 import org.orbeon.xml.NamespaceMapping
+import software.amazon.awssdk.services.s3.S3Client
 
 import java.net.URI
 import scala.language.postfixOps
@@ -65,6 +68,7 @@ trait FormRunnerActions
     CommonAllowedFormRunnerActions                      +
       ("email"                  -> trySendEmail          _) +
       ("send"                   -> trySend               _) +
+      ("send-s3"                -> trySendS3             _) +
       ("review"                 -> tryNavigateToReview   _) +
       ("edit"                   -> tryNavigateToEdit     _) +
       ("change-mode"            -> tryChangeMode         _) +
@@ -198,15 +202,55 @@ trait FormRunnerActions
       } yield
         renderedFormat -> uri).toMap
 
+    val formDataMaybeMigrated = formDataMaybeMigratedFromEdge(
+      dataFormatVersion = emailDataFormatVersion,
+      pruneMetadata     = false
+    )
+
     EmailContent.emailContents(
+      formDataMaybeMigrated  = formDataMaybeMigrated,
       emailMetadata          = emailMetadata,
       urisByRenderedFormat   = urisByRenderedFormat,
-      emailDataFormatVersion = emailDataFormatVersion,
       templateMatch          = templateMatch,
       language               = language,
       templateNameOpt        = templateNameOpt
     )
   }
+
+  private def formDataMaybeMigratedFromEdge(
+    dataFormatVersion: DataFormatVersion,
+    pruneMetadata    : Boolean
+  )(implicit
+    formRunnerParams : FormRunnerParams
+  ): DocumentNodeInfoType =
+    GridDataMigration.dataMaybeMigratedFromEdge(
+      app                        = formRunnerParams.app,
+      form                       = formRunnerParams.form,
+      data                       = frc.formInstance.root,
+      metadataOpt                = frc.metadataInstance.map(_.root),
+      dstDataFormatVersionString = dataFormatVersion.entryName,
+      pruneMetadata              = pruneMetadata,
+      pruneTmpAttMetadata        = true
+    )
+
+  private def paramFromParamsOrProperties(
+    params           : ActionParams,
+    propertyPrefix   : String,
+    name             : String,
+    default          : String,
+    defaultNamespaces: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+  )(implicit
+    formRunnerParams : FormRunnerParams
+  ): (String, NamespaceMapping) =
+    paramByNameUseAvt(params, name)
+      .map((_, defaultNamespaces))
+      .orElse(formRunnerPropertyWithNs(s"oxf.fr.$propertyPrefix.$name"))
+      .getOrElse((default, defaultNamespaces))
+
+  private def withS3FromProperties[T](s3ConfigName: String)(body: (S3Config, S3Client) => T): Try[T] =
+    S3Config.fromProperties(s3ConfigName).map { s3Config =>
+      S3.withS3Client(body(s3Config, _))(s3Config)
+    }
 
   private def storeEmailContentsToS3(
     params                    : ActionParams,
@@ -217,19 +261,8 @@ trait FormRunnerActions
 
     val formData = frc.formInstance.root
 
-    // Retrieve S3 parameters either from action parameters or from properties
-    def fromParamsOrProperties(
-      name             : String,
-      default          : String,
-      defaultNamespaces: NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
-    ): (String, NamespaceMapping) =
-      paramByNameUseAvt(params, name)
-        .map((_, defaultNamespaces))
-        .orElse(formRunnerPropertyWithNs(s"oxf.fr.email.$name"))
-        .getOrElse((default, defaultNamespaces))
-
-    val (s3ConfigName, _               ) = fromParamsOrProperties("s3-config", default = "default")
-    val (s3Path      , s3PathNamespaces) = fromParamsOrProperties("s3-path"  , default = "")
+    val (s3ConfigName, _               ) = paramFromParamsOrProperties(params, propertyPrefix = "email", name = "s3-config", default = "default")
+    val (s3Path      , s3PathNamespaces) = paramFromParamsOrProperties(params, propertyPrefix = "email", name = "s3-path"  , default = "")
 
     def s3PathPrefixTry: Try[String] = Try {
       // Evaluate S3 path prefix
@@ -240,25 +273,62 @@ trait FormRunnerActions
         .getOrElse("")
     }
 
-    for {
-      s3Config      <- S3Config.fromProperties(s3ConfigName)
-      _             <- {
-        // Implicits in for comprehensions supported in Scala 3 only
-        implicit val _s3Config: S3Config = s3Config
-
-        S3.withS3Client { implicit s3Client =>
-          TryUtils.sequenceLazily(emailContentsFromTemplates) { emailContent =>
-            for {
-              // Evaluate the s3-path parameter/property for each email, as the evaluation might return a different
-              // value for each call (e.g. date/time function)
-              s3PathPrefix <- s3PathPrefixTry
-              _            <- emailContent.storeToS3(s3PathPrefix)
-            } yield ()
-          }
-        }
+    withS3FromProperties(s3ConfigName) { (s3Config, s3Client) =>
+      TryUtils.sequenceLazily(emailContentsFromTemplates) { emailContent =>
+        for {
+          // Evaluate the s3-path parameter/property for each email, as the evaluation might return a different
+          // value for each call (e.g. date/time function)
+          s3PathPrefix <- s3PathPrefixTry
+          _            <- emailContent.storeToS3(s3PathPrefix)(s3Config, s3Client)
+        } yield ()
       }
-    } yield ()
+    }
   }
+
+  def trySendS3(params: ActionParams): ActionResult =
+    ActionResult.trySync {
+
+      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+      ensureDataCalculationsAreUpToDate()
+
+      // Only "xml" supported for now (default)
+      val contentToSend = paramByNameUseAvt(params, "content").getOrElse("xml")
+      if (contentToSend != "xml")
+        throw new IllegalArgumentException(s"content parameter only supports 'xml', got '$contentToSend'")
+
+      val (s3ConfigName, _               ) = paramFromParamsOrProperties(params, propertyPrefix = "send-s3"                , name = "s3-config", default = "default")
+      val (s3Path      , s3PathNamespaces) = paramFromParamsOrProperties(params, propertyPrefix = s"send-s3.$contentToSend", name = "s3-path"  , default = "")
+
+      // Data format version for migration
+      val dataFormatVersion =
+        paramByNameUseAvt(params, DataFormatVersionName)
+          .map(DataFormatVersion.withName)
+          .getOrElse(DataFormatVersion.V400)
+
+      // Migrate data if needed
+      val formDataMaybeMigrated = formDataMaybeMigratedFromEdge(
+        dataFormatVersion = dataFormatVersion,
+        pruneMetadata     = dataFormatVersion != DataFormatVersion.Edge // Same as default value for "send" action
+      )
+
+      // Evaluate S3 path
+      val s3Key =
+        s3Path
+          .trimAllToOpt
+          .flatMap(process.SimpleProcess.evaluateString(_, frc.formInstance.root, s3PathNamespaces).trimAllToOpt)
+          .getOrElse(throw new IllegalArgumentException("s3-path parameter or property is required"))
+
+      // Serialize XML data
+      val contentType = ContentTypes.makeContentTypeCharset(ContentTypes.XmlContentType, Some(CharsetNames.Utf8))
+      val xmlBytes    = tinyTreeToOrbeonDom(formDataMaybeMigrated).serializeToString().getBytes(CharsetNames.Utf8)
+      val s3Content   = StreamedContent.fromBytes(xmlBytes, contentType.some)
+
+      // Write to S3
+      withS3FromProperties(s3ConfigName) { (s3Config, s3Client) =>
+        S3.write(s3Key, s3Content)(s3Config, s3Client).map(_ => ())
+      }.get
+    }
 
   def trySend(params: ActionParams): ActionResult = {
 

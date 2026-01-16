@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, TryUtils, URLRewriterUtils}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
 import org.orbeon.xml.NamespaceMapping
 import software.amazon.awssdk.services.s3.S3Client
@@ -56,7 +57,7 @@ object EmailContent {
   def apply(
     template                : EmailMetadata.Template,
     parameters              : List[EmailMetadata.Param],
-    emailDataFormatVersion  : DataFormatVersion,
+    formDataMaybeMigrated   : NodeInfo,
     urisByRenderedFormat    : Map[RenderedFormat, URI]
   )(implicit
     indentedLogger          : IndentedLogger,
@@ -64,16 +65,6 @@ object EmailContent {
     formRunnerParams        : FormRunnerParams,
     ctx                     : FormRunnerDocContext
   ): EmailContent = {
-
-    val formDataMaybeMigrated = GridDataMigration.dataMaybeMigratedFromEdge(
-      app                        = formRunnerParams.app,
-      form                       = formRunnerParams.form,
-      data                       = frc.formInstance.root,
-      metadataOpt                = frc.metadataInstance.map(_.root),
-      dstDataFormatVersionString = emailDataFormatVersion.entryName,
-      pruneMetadata              = false,
-      pruneTmpAttMetadata        = true
-    )
 
     val attachments =
       Attachment.xmlAttachment(formDataMaybeMigrated, template).toList ++
@@ -150,9 +141,9 @@ object EmailContent {
   }
 
   def emailContents(
+    formDataMaybeMigrated   : NodeInfo,
     emailMetadata           : EmailMetadata.Metadata,
     urisByRenderedFormat    : Map[RenderedFormat, URI],
-    emailDataFormatVersion  : DataFormatVersion,
     templateMatch           : TemplateMatch,
     language                : String,
     templateNameOpt         : Option[String]
@@ -185,10 +176,10 @@ object EmailContent {
     // For each email template, generate email content
     firstOrAllTemplates.map { template =>
       EmailContent(
-        template               = template,
-        parameters             = emailMetadata.params,
-        emailDataFormatVersion = emailDataFormatVersion,
-        urisByRenderedFormat   = urisByRenderedFormat
+        template              = template,
+        parameters            = emailMetadata.params,
+        formDataMaybeMigrated = formDataMaybeMigrated,
+        urisByRenderedFormat  = urisByRenderedFormat
       )
     }
   }

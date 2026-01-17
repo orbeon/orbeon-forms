@@ -51,14 +51,14 @@ public class ScopeGenerator extends ScopeProcessorBase {
                 }
             }
 
-            protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
+            public byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
                 if (digestState.digest == null) {
                     fillOutState(pipelineContext, digestState);
                 }
                 return digestState.digest;
             }
 
-            protected boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
+            public boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
                 try {
                     State state = (State) digestState;
                     if (state.saxStore == null) {

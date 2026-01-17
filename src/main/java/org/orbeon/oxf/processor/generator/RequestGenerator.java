@@ -206,7 +206,7 @@ public class RequestGenerator extends ProcessorImpl {
                 });
             }
 
-            protected boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
+            public boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
                 final State state = (State) digestState;
                 if (state.requestDocument == null) {
                     // Read config document
@@ -229,7 +229,7 @@ public class RequestGenerator extends ProcessorImpl {
                 return !context.hasUpload && !state.bodyRequested;
             }
 
-            protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
+            public byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
                 final State state = (State) digestState;
                 return DigestContentHandler.getDigest(new DocumentSource(state.requestDocument));
             }

@@ -590,6 +590,23 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     }
 }
 
+// ***** Dark mode checkbox/radio images *******************************************************************************
+
+.dark-mode({
+    .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
+        &.xforms-static {
+            .xforms-selected, .xforms-deselected {
+                filter: invert(1);
+
+                // TODO: is there a better way to do this than a double inversion?
+                .checkbox, .radio {
+                    filter: invert(1);
+                }
+            }
+        }
+    }
+});
+
 // ***** Retina displays ***********************************************************************************************
 
 // 2022-10-11: Using SVG images so no needs for overrides right now.

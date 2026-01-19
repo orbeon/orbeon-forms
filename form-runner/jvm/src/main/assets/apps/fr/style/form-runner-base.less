@@ -16,6 +16,14 @@
 
 .orbeon {
 
+    // Scrollbars are problematic in macOS if "Show scroll bars" is set to "Always
+    /*.dark-mode({
+        // TODO: support Safari
+        &, * {
+            scrollbar-color: var(--orbeon-scrollbar-thumb-color) var(--orbeon-scrollbar-track-color);
+        }
+    });*/
+
     position: relative; // Needed for datepicker and other absolutely positioned elements
 
     // RTL languages

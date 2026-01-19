@@ -287,6 +287,10 @@
   // XForms inspector (by default, keep the font size absolute)
   --orbeon-inspector-font-size: 13px;
 
+  // Diagonal stripes background
+  --orbeon-stripe-color-1: #f5f5f5; // @wellBackground
+  --orbeon-stripe-color-2: white;   // @inputBackground
+
   .dark-mode(.dark-color-scheme());
 
   .dark-color-scheme() {
@@ -437,6 +441,8 @@
     --orbeon-landing-card-hover-background-color             : @gray-20;
     --orbeon-landing-card-link-color                         : hsl(@base-blue, 93%, 62%);
     --orbeon-landing-card-link-hover-color                   : var(--orbeon-landing-card-link-color);
+    --orbeon-stripe-color-1                                  : @gray-20;
+    --orbeon-stripe-color-2                                  : @base-bg;
   }
 }
 

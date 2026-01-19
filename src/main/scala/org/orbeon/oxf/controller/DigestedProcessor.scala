@@ -29,7 +29,7 @@ class DigestedProcessor(content: XMLReceiver => Unit) extends ProcessorImpl {
 
       def fillOutState(pipelineContext: PipelineContext, digestState: DigestState) = true
 
-      def computeDigest(pipelineContext: PipelineContext, digestState: DigestState) = {
+      def computeDigest(pipelineContext: PipelineContext, digestState: DigestState): Array[Byte] = {
         val digester = new DigestContentHandler
         content(digester)
         digester.getResult

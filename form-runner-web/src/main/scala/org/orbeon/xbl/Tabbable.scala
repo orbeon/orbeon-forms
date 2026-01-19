@@ -205,8 +205,8 @@ object Tabbable {
       if (isOutermostTabbable) {
         val isAppleOs            = KeyboardShortcuts.isAppleOs
         def addIcon(kbd: String) = s"$KeyBoardIconCharacter $kbd"
-        val nextTabShortcut      = addIcon(if (isAppleOs) "Ctrl + }" else "Ctrl + Tab")
-        val previousTabShortcut  = addIcon(if (isAppleOs) "Ctrl + {" else "Ctrl + Shift + Tab")
+        val nextTabShortcut      = addIcon("Ctrl + }")
+        val previousTabShortcut  = addIcon("Ctrl + {")
         def setTooltip(position: Int, title: String): Unit =
           allLis.lift(position).foreach(_.querySelectorOpt("a").foreach { aElem =>
             aElem.setAttribute("title", title)
@@ -244,7 +244,6 @@ object Tabbable {
     private def onDOMKeydown(event: dom.KeyboardEvent): Unit = {
       // Only handle keyboard shortcuts on the outermost tabbable
       if (isOutermostTabbable) {
-        // macOS-like
         if (event.ctrlKey && !event.altKey) {
             event.key match {
               case "}" =>
@@ -256,19 +255,6 @@ object Tabbable {
               case _ =>
             }
           }
-        // Windows-like
-        else if (event.ctrlKey && event.altKey) {
-          event.key match {
-            case "Tab" =>
-              event.preventDefault()
-              if (event.shiftKey) {
-                moveToPreviousTab()
-              } else {
-                moveToNextTab()
-              }
-            case _ =>
-          }
-        }
       }
     }
 

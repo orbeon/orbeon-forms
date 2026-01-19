@@ -211,17 +211,11 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.tab-navigation', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌃}</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃Tab</xh:kbd>
-                                        </xh:td>
+                                        <xh:td><xh:kbd>⌃}</xh:kbd></xh:td>
                                         <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-next-tab', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌃{</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃⇧Tab</xh:kbd>
-                                        </xh:td>
+                                        <xh:td><xh:kbd>⌃{</xh:kbd></xh:td>
                                         <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-tab', '|fr-form-resources|')"/></xh:td>
                                     </xh:tr>
                                     <xh:tr>

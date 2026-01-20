@@ -97,14 +97,14 @@ class XFormsOutputDefaultHandler(
         )
 
       handleAriaByAtts(containerAttributes, ariaByCondition)
-      // See https://github.com/orbeon/orbeon-forms/issues/3583
-      // Also do static readonly, see:
-      // - https://github.com/orbeon/orbeon-forms/issues/5525
-      // - https://github.com/orbeon/orbeon-forms/issues/5367
-      containerAttributes.addOrReplace(AriaReadonly, "true")
       if (isField) {
         containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
         containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, "textbox")
+        // See https://github.com/orbeon/orbeon-forms/issues/3583
+        // Also do static readonly, see:
+        // - https://github.com/orbeon/orbeon-forms/issues/5525
+        // - https://github.com/orbeon/orbeon-forms/issues/5367
+        containerAttributes.addOrReplace(AriaReadonly, "true")
       }
     }
 

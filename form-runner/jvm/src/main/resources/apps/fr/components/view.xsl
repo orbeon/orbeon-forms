@@ -575,6 +575,7 @@
                         else
                             ''
                 }}"
+                role="main"
                 xxf:element="div">
                 <xsl:choose>
                     <xsl:when test="$is-detail and not($is-form-builder)">

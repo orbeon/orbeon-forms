@@ -698,6 +698,7 @@
     <property as="xs:string"  name="oxf.fr.import.allowed-formats.*.*"                             value="excel-headings xml-form-structure-and-data"/>
     <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                         value="true"/>
     <property as="xs:string"  name="oxf.fr.import.forward-parameters.*.*"                          value=""/>
+    <property as="xs:string"  name="oxf.fr.import.attachment-callback.uri.*.*"                     value=""/>
     <property as="xs:string"  name="oxf.fr.import.buttons.*.*"                                     value="home summary close"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                         value="free"/>

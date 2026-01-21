@@ -167,6 +167,7 @@
                 <xf:bind ref="upload" id="upload-bind">
                     <xf:bind
                         ref="file"
+                        type="xf:anyURI"
                         id="file-bind"
                         name="file"
                         required="true()"
@@ -386,6 +387,31 @@
                             )
                 }"
                 replace="all"/>
+
+            <xf:submission
+                id="fr-import-attachment-callback-submission"
+                ref="instance('fr-form-instance')/upload/file"
+                method="post"
+                serialization="application/octet-stream"
+                mediatype="{instance('fr-form-instance')/upload/file/@mediatype}"
+                action="{
+                    event('url')
+                }?filename={
+                    encode-for-uri(instance('fr-form-instance')/upload/file/@filename)
+                }&amp;app={
+                    encode-for-uri($app)
+                }&amp;form={
+                    encode-for-uri($form)
+                }&amp;form-version={
+                    instance('fr-form-instance')/version/selected-version
+                }&amp;document={
+                    xxf:get-request-parameter('document-id')
+                }"
+                replace="none"
+            >
+                <xf:message level="xxf:log-error" event="xforms-submit-error">Import attachment upload failed.</xf:message>
+                <xf:message level="xxf:log-debug" event="xforms-submit-done">Import attachment upload succeeded.</xf:message>
+            </xf:submission>
 
             <!-- Statistics gathered upon polling event -->
             <xf:instance id="fr-import-batch-stats" xxf:expose-xpath-types="true">
@@ -811,6 +837,18 @@
 
                                     name="fr-import-clear-validation-and-import"
                                     targetid="fr-form-model"/>
+
+                                <!-- Optional file upload callback -->
+                                <xf:action event="xxforms-upload-done">
+                                    <xf:var
+                                        name="url-opt"
+                                        value="xxf:property(string-join(('oxf.fr.import.attachment-callback.uri', $app, $form), '.'))[xxf:non-blank()]"/>
+                                    <xf:send
+                                        if="exists($url-opt)"
+                                        submission="fr-import-attachment-callback-submission">
+                                        <xf:property name="url" value="$url-opt"/>
+                                    </xf:send>
+                                </xf:action>
 
                             </fr:attachment>
                         </fr:c>

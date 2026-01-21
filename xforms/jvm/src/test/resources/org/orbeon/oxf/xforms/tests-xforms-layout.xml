@@ -573,7 +573,7 @@
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename">help.png</xh:span>
                             <xh:span class="xforms-upload-mediatype">image/png</xh:span>
-                            <xh:span class="xforms-upload-size">120 KB</xh:span>
+                            <xh:span class="xforms-upload-size">120.6 KB</xh:span>
                             <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>

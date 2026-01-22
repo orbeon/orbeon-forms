@@ -12,8 +12,8 @@ ThisBuild / githubOwner := "orbeon"
 
 ThisBuild / evictionErrorLevel := Level.Info
 
-lazy val scala213 = "2.13.17"
-lazy val scala3   = "3.7.3"
+lazy val scala213 = "2.13.18"
+lazy val scala3   = "3.7.4"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala213)
 
@@ -48,11 +48,11 @@ val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                      = "2.13.0"
-val CatsFs2Version                   = "3.12.0"
+val CatsFs2Version                   = "3.12.2"
 val ScalaTestVersion                 = "3.2.19"
 val CirceVersion                     = "0.14.15"
-val EnumeratumVersion                = "1.9.1"
-val EnumeratumCirceVersion           = "1.9.1"
+val EnumeratumVersion                = "1.9.2"
+val EnumeratumCirceVersion           = "1.9.2"
 val ShapelessVersion                 = "2.3.7"
 val ScalaXmlVersion                  = "2.4.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaParallelCollectionsVersion  = "1.2.0"
@@ -77,7 +77,7 @@ val TinkVersion                      = "1.6.1"
 val GsonVersionForTink               = "2.9.0"
 val ProtobufJavaVersionForTink       = "3.25.5"
 val JavaMailApiVersion               = "2.1.3"
-val AngusMailVersion                 = "2.0.3"
+val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
@@ -109,7 +109,7 @@ val CoreLibraryDependencies = Seq(
   "com.sun.xml.bind"            % "jaxb-core"                       % "2.3.0.1", // for Ehcache 3
   "com.sun.xml.bind"            % "jaxb-impl"                       % "2.3.1",   // for Ehcache 3
   "javax.xml.bind"              % "jaxb-api"                        % "2.3.1",   // for Ehcache 3
-  "commons-codec"               % "commons-codec"                   % "1.15",
+  "commons-codec"               % "commons-codec"                   % "1.19.0",
   "org.apache.commons"          % "commons-collections4"            % "4.4",
   "commons-fileupload"          % "commons-fileupload"              % "1.6.0",
   "commons-io"                  % "commons-io"                      % CommonsIoVersion,
@@ -151,7 +151,7 @@ val CoreLibraryDependencies = Seq(
   "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
   "org.apache.pdfbox"           % "pdfbox"                          % PdfBoxVersion,
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
-  "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.78", // for `openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.82", // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.19.0",
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",

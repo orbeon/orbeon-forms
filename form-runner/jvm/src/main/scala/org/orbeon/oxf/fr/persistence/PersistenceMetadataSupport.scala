@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr.persistence
 import cats.Eval
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
 import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.fr.FormRunnerPersistence.PersistenceProxyPropertyPrefix
 import org.orbeon.oxf.fr.permission.{Operation, Permission, Permissions, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
@@ -19,7 +20,7 @@ import org.orbeon.scaxon.SimplePath.*
 import scala.util.{Success, Try}
 
 
-// This handles query the persistence layer for various metadata. including:
+// This handles query the persistence layer for various metadata, including:
 //
 // - controls to encrypt
 // - controls to index
@@ -31,7 +32,7 @@ import scala.util.{Success, Try}
 object PersistenceMetadataSupport {
 
   private def cacheEnabled =
-    ! Properties.instance.getPropertySet.getBooleanOpt("oxf.fr.persistence.form-definition-cache.enable").contains(false)
+    ! Properties.instance.getPropertySet.getBooleanOpt(s"$PersistenceProxyPropertyPrefix.form-definition-cache.enable").contains(false)
 
   // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
   private lazy val formDefinitionCache =

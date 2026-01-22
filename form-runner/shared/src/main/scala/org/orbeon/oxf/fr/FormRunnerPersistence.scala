@@ -198,6 +198,7 @@ object FormRunnerPersistence {
   val FormMetadataBasePath                = "/fr/service/persistence/form"
   val PersistencePropertyPrefix           = "oxf.fr.persistence"
   val PersistenceProviderPropertyPrefix   = PersistencePropertyPrefix + ".provider"
+  val PersistenceProxyPropertyPrefix      = PersistencePropertyPrefix + ".proxy"
   val AttachmentsSuffix                   = "attachments"
 
   val NewFromServiceUriPropertyPrefix     = "oxf.fr.detail.new.service"
@@ -586,10 +587,7 @@ trait FormRunnerPersistence {
   }
 
   def isVersionHistoryDisabled(app: String, form: String)(implicit propertySet: PropertySet): Boolean =
-    findProvider(AppForm(app, form), FormOrData.Data) match {
-      case Some(provider) => propertySet.getBoolean(PersistencePropertyPrefix :: provider :: "disable-version-history" :: app :: form :: Nil mkString ".", default = false)
-      case None           => false
-    }
+    propertySet.getBoolean(PersistenceProxyPropertyPrefix :: "disable-version-history" :: app :: form :: Nil mkString ".", default = false)
 
   def isActiveProvider(provider: String)(implicit propertySet: PropertySet): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)

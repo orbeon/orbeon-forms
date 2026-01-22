@@ -36,6 +36,10 @@
     <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-4.*.attachments" value="fs-attachments-4"/>
     <property as="xs:string" name="oxf.fr.persistence.fs-attachments-4.directory"              value="{environment-variable('PATH')}"/>
 
+    <!-- DisableVersionHistoryTest -->
+    <property as="xs:boolean" name="oxf.fr.persistence.*.disable-version-history.*.disable-version-history-false" value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.*.disable-version-history.*.disable-version-history-true"  value="true"/>
+
     <property as="xs:string"  processor-name="oxf:page-flow" name="service-public-methods"  value="GET HEAD POST PUT DELETE"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="page-public-methods"     value="GET HEAD POST PUT DELETE"/>
 

@@ -585,6 +585,12 @@ trait FormRunnerPersistence {
     providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "sort", default = false)
   }
 
+  def isVersionHistoryDisabled(app: String, form: String)(implicit propertySet: PropertySet): Boolean =
+    findProvider(AppForm(app, form), FormOrData.Data) match {
+      case Some(provider) => propertySet.getBoolean(PersistencePropertyPrefix :: provider :: "disable-version-history" :: app :: form :: Nil mkString ".", default = false)
+      case None           => false
+    }
+
   def isActiveProvider(provider: String)(implicit propertySet: PropertySet): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)
 

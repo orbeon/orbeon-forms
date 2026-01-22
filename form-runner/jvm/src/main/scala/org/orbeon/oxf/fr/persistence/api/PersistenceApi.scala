@@ -5,7 +5,7 @@ import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.scaxon.SimplePath.*
 

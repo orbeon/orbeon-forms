@@ -156,13 +156,14 @@ object CRUDRoute
           (httpRequest.getMethod == HttpMethod.DELETE || httpRequest.getMethod == HttpMethod.HEAD) &&
             httpRequest.getFirstParamAsString(PersistenceApi.ForceDeleteParam).flatMap(_.trimAllToOpt).contains(true.toString)
 
-        if (forceDelete && (
-          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only (for now, as a safeguard)
+        // Only validate forceDelete for DELETE requests, not HEAD (i.e. calls to connectToObtainHeadersAndCheckPreconditions from proxy)
+        if (httpRequest.getMethod == HttpMethod.DELETE && forceDelete && (
+          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only
           filenameOpt.isEmpty && lastModifiedOpt.isEmpty                || // and only for historical data
           filenameOpt.isDefined && lastModifiedOpt.isDefined               // or for attachments
           )
         ) {
-          throw HttpStatusCodeException(throw HttpStatusCodeException(StatusCode.BadRequest))
+          throw HttpStatusCodeException(StatusCode.BadRequest)
         }
 
         CrudRequest(

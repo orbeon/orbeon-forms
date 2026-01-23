@@ -411,6 +411,10 @@
                     generate-id()
             )"/>
 
+    <xsl:variable
+        name="fr-form-model-vars"
+        select="$fr-form-model/xf:var/@name/string()"/>
+
     <!-- Remove service `xf:instance`s (they will be placed in `fr-actions-model`) and existing Form Runner service instances if any -->
     <xsl:template
         match="

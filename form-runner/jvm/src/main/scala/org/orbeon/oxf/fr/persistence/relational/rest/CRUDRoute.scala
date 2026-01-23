@@ -158,7 +158,7 @@ object CRUDRoute
 
         // Only validate forceDelete for DELETE requests, not HEAD (i.e. calls to connectToObtainHeadersAndCheckPreconditions from proxy)
         if (httpRequest.getMethod == HttpMethod.DELETE && forceDelete && (
-          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only
+          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only (for now, as a safeguard)
           filenameOpt.isEmpty && lastModifiedOpt.isEmpty                || // and only for historical data
           filenameOpt.isDefined && lastModifiedOpt.isDefined               // or for attachments
           )

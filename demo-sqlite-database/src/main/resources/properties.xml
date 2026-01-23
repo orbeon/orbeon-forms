@@ -22,7 +22,7 @@
     <xi:include href="oxf:/config/properties-form-runner.xml"/>
     <xi:include href="oxf:/config/properties-form-builder.xml"/>
 
-    <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable" value="false"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"               value="sqlite"/>
-    <property as="xs:anyURI"  name="oxf.log4j2-config"                               value="oxf:/log4j2.xml"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.proxy.form-definition-cache.enable" value="false"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                     value="sqlite"/>
+    <property as="xs:anyURI"  name="oxf.log4j2-config"                                     value="oxf:/log4j2.xml"/>
 </properties>

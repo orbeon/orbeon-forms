@@ -231,7 +231,7 @@
                                 <xh:span class="fr-toc-edit {{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}}"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
                                 <xsl:if test="$static-is-top-level-section">
                                     <!-- NOTE: Hide labels when not in `separate-toc` mode as they take a lot of space -->
-                                    <xh:span class="fr-toc-status {{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}} label{{
+                                    <xh:span class="fr-toc-status {{'sr-only'[not(xxf:instance('local')/section-status/data(.))]}} label{{
                                         if ($top-level-section-tokens = 'invalid') then
                                             ' label-important'
                                         else if ($top-level-section-tokens = 'incomplete') then

@@ -98,6 +98,7 @@
     <!-- Either the model with id fr-form-model, or the first model -->
     <xsl:variable name="fr-form-model"       select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
     <xsl:variable name="fr-form-model-id"    select="generate-id($fr-form-model)"/>
+    <xsl:variable name="fr-form-model-vars"  select="$fr-form-model/xf:var/@name/string()"/>
 
     <xsl:variable name="fr-form-metadata"    select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
     <xsl:variable name="fr-form-resources"   select="($fr-form-model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>

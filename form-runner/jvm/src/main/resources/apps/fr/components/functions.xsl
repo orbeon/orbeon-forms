@@ -157,7 +157,7 @@
                                                         $p/(*:expr, *:value)[1],
                                                         false(),
                                                         $library-name,
-                                                        ()
+                                                        $fr-form-model-vars
                                                     ),
                                                     ')[1])',
                                                     if ($for-text-html-mediatype) then ')' else ''
@@ -239,7 +239,7 @@
                                                         $p/*:visible,
                                                         false(),
                                                         $library-name,
-                                                        ()
+                                                        $fr-form-model-vars
                                                     ),
                                                     ') then ''&quot; element(logo) &quot;'' else '''''
                                                 )

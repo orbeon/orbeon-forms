@@ -72,5 +72,24 @@ class ControlsTest
         }
       }
     }
+
+    describe("#7445: fr:param in label with ExpressionParam") {
+      val (processorService, docOpt, _) =
+        runFormRunner("issue", "7445", "new")
+
+      val doc = docOpt.get
+
+      it("must substitute parameter value in label template") {
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+
+            val myInputControl = resolveObject[XFormsSingleNodeControl]("my-input-control").get
+            val actualLabel = myInputControl.getLabel(EventCollector.Throw)
+
+            assert(actualLabel.contains("Value: my-value"))
+          }
+        }
+      }
+    }
   }
 }

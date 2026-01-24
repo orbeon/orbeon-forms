@@ -1,0 +1,87 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <section-1>
+                        <iban/>
+                        <isin/>
+                        <lei/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="iban-bind" ref="iban" name="iban" type="fr:iban"/>
+                    <xf:bind id="isin-bind" ref="isin" name="isin" type="fr:isin"/>
+                    <xf:bind id="lei-bind" ref="lei" name="lei" type="fr:lei"/>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>standard-codes-validation</form-name>
+                    <title xml:lang="en">Standard Codes Validation Test</title>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <iban>
+                            <label>IBAN</label>
+                            <hint/>
+                        </iban>
+                        <isin>
+                            <label>ISIN</label>
+                            <hint/>
+                        </isin>
+                        <lei>
+                            <label>LEI</label>
+                            <hint/>
+                        </lei>
+                        <section-1>
+                            <label>Section 1</label>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid>
+                        <fr:c x="1" y="1" w="12">
+                            <fr:iban id="iban-control" bind="iban-bind">
+                                <xf:label ref="$form-resources/iban/label"/>
+                                <xf:hint ref="$form-resources/iban/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:iban>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="12">
+                            <fr:isin id="isin-control" bind="isin-bind">
+                                <xf:label ref="$form-resources/isin/label"/>
+                                <xf:hint ref="$form-resources/isin/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:isin>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="12">
+                            <fr:lei id="lei-control" bind="lei-bind">
+                                <xf:label ref="$form-resources/lei/label"/>
+                                <xf:hint ref="$form-resources/lei/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:lei>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

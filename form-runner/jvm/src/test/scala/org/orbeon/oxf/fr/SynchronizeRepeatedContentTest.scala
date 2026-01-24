@@ -63,7 +63,7 @@ class SynchronizeRepeatedContentTest
           doc.synchronizeAndRefresh()
           assertBothValues(index = 2, BobValue)
 
-          setControlValueWithEventSearchNested(controlEffectiveId = travelerControl(index = 3).effectiveId, value = AliceValue)
+          setControlValueWithEventSearchNested(staticOrAbsoluteId = travelerControl(index = 3).effectiveId, value = AliceValue)
 
           assertBothValues(index = 2, BobValue)
           assertBothValues(index = 3, AliceValue)

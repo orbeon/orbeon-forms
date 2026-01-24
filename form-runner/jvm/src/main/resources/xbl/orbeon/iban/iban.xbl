@@ -1,0 +1,91 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-iban"
+        element="fr|iban"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input"
+        xxbl:type="xs:string"
+        xxbl:constraint="
+            let $iban := upper-case(replace(string(.), '[\s-]+', ''))
+            return
+              xxf:is-blank($iban) or
+              (
+                matches($iban, '^[A-Z]{2}[0-9]{2}[A-Z0-9]+$') and
+                (
+                  let $rearranged := concat(substring($iban, 5), substring($iban, 1, 4))
+                  let $converted :=
+                    string-join(
+                      for $c in string-to-codepoints($rearranged)
+                      return
+                        if ($c >= 65 and $c le 90) then
+                          (: Letters A-Z :)
+                          xs:string($c - 65 + 10)
+                        else if ($c >= 48 and $c le 57) then
+                          (: Digits 0-9 :)
+                          xs:string($c - 48)
+                        else
+                          (: Unrecognized characters :)
+                          '',
+                      ''
+                    )
+                  return
+                    xs:decimal($converted) mod 97 = 1
+                )
+              )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">International Bank Account Number (IBAN)</display-name>
+            <display-name lang="fr">Numéro de compte bancaire international (IBAN)</display-name>
+            <display-name lang="no">Internasjonalt bankkontonummer (IBAN)</display-name>
+            <display-name lang="ru">Международный номер банковского счета (IBAN)</display-name>
+            <display-name lang="it">Numero di Conto Bancario Internazionale (IBAN)</display-name>
+            <display-name lang="de">Internationale Bankkontonummer (IBAN)</display-name>
+            <display-name lang="fi">Kansainvälinen tilinumero (IBAN)</display-name>
+            <display-name lang="es">Número de Cuenta Bancaria Internacional (IBAN)</display-name>
+            <display-name lang="nl">Internationaal bankrekeningnummer (IBAN)</display-name>
+            <display-name lang="pt">Número de Conta Bancária Internacional (IBAN)</display-name>
+            <display-name lang="sv">Internationellt bankkontonummer (IBAN)</display-name>
+            <display-name lang="ar">رقم الحساب المصرفي الدولي (IBAN)</display-name>
+            <display-name lang="pl">Międzynarodowy Numer Rachunku Bankowego (IBAN)</display-name>
+            <display-name lang="ja">国際銀行口座番号 (IBAN)</display-name>
+
+            <icon>
+                <icon-class>fa fa-fw fa-university</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:iban"/>
+                <view>
+                    <fr:iban>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:iban>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xh:span class="input-append">
+                <xf:input
+                    id="input"
+                    xbl:attr="navindex navindex=tabindex autocomplete"
+                    ref="xxf:binding('fr-iban')">
+                </xf:input>
+                <xh:span class="add-on">
+                    <xh:i class="fa fa-fw fa-university"/>
+                </xh:span>
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

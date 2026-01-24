@@ -31,6 +31,7 @@ import java.net.URI
 import java.util.regex.Pattern
 import java.{lang as jl, util as ju}
 import scala.collection.mutable
+import scala.util.control.NonFatal
 import scala.jdk.CollectionConverters.*
 
 
@@ -121,7 +122,7 @@ object PropertySet {
     }
 
     globalProperties.foreach { case PropertyParams(namespaces, name, typ, stringValue) =>
-      setProperty(namespaces, name, typ, getObjectFromStringValue(stringValue, typ, namespaces))
+      setProperty(namespaces, name, typ, getObjectFromStringValue(name, stringValue, typ, namespaces))
     }
 
     new PropertySetImpl(propertiesByName, propertiesTree, eTag)
@@ -148,8 +149,16 @@ object PropertySet {
 //        XS_NONNEGATIVEINTEGER_QNAME -> convertNonNegativeInteger
       )
 
-    def getObjectFromStringValue(stringValue: String, typ: QName, namespaces: Map[String, String]): AnyRef =
-      SupportedTypes.get(typ).map(_(stringValue, namespaces)).orNull
+    def getObjectFromStringValue(propertyName: String, stringValue: String, typ: QName, namespaces: Map[String, String]): AnyRef =
+      try {
+        SupportedTypes.get(typ).map(_(stringValue, namespaces)).orNull
+      } catch {
+        case NonFatal(e) =>
+          throw new OXFException(
+            s"Error converting value for property `$propertyName` " +
+            s"of type `${typ.qualifiedName}` (${e.toString})"
+          )
+      }
 
     def convertString (value: String, namespaces: Map[String, String]) = value
     def convertInteger(value: String, namespaces: Map[String, String]) = jl.Integer.valueOf(value)

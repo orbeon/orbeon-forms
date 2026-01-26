@@ -31,8 +31,8 @@ class StandardCodesValidationTest
     it(s"must ${if (isValid) "accept" else "reject"} value $value for control $controlId") {
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {
-          setControlValueWithEventSearchNested(controlId, value)
           val control = resolveObject[XFormsValueControl](controlId).get
+          setControlValueWithEventSearchNested(control.effectiveId, value)
           if (isValid) {
             assert(control.getAlert(EventCollector.Throw).isEmpty  , s"Valid value $value should be accepted for control $controlId")
           } else {

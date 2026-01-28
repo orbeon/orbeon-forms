@@ -62,12 +62,12 @@ public abstract class ProcessorImpl implements Processor {
     private String id;
     private QName name;
 
-    private final Map<String, List<ProcessorInput>> inputMap = new LinkedHashMap<String, List<ProcessorInput>>();
-    private final Map<String, ProcessorOutput> outputMap = new LinkedHashMap<String, ProcessorOutput>();
+    private final Map<String, List<ProcessorInput>> inputMap = new LinkedHashMap<>();
+    private final Map<String, ProcessorOutput> outputMap = new LinkedHashMap<>();
     private int outputCount = 0;
 
-    private final List<ProcessorInputOutputInfo> inputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
-    private final List<ProcessorInputOutputInfo> outputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
+    private final List<ProcessorInputOutputInfo> inputsInfo = new ArrayList<>(0);
+    private final List<ProcessorInputOutputInfo> outputsInfo = new ArrayList<>(0);
 
     private LocationData locationData;
 
@@ -171,7 +171,7 @@ public abstract class ProcessorImpl implements Processor {
     public void addInput(String inputName, ProcessorInput input) {
         List<ProcessorInput> inputs = inputMap.get(inputName);
         if (inputs == null) {
-            inputs = new ArrayList<ProcessorInput>();
+            inputs = new ArrayList<>();
             inputMap.put(inputName, inputs);
         }
 //        if (inputs.size() > 0)
@@ -290,7 +290,7 @@ public abstract class ProcessorImpl implements Processor {
 
 
     public Document readCacheInputAsDOM(PipelineContext context, String inputName) {
-        return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<Document>() {
+        return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<>() {
             public Document read(PipelineContext context, ProcessorInput input) {
                 return readInputAsDOM(context, input);
             }
@@ -304,7 +304,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public org.orbeon.dom.Document readCacheInputAsOrbeonDom(PipelineContext context, String inputName) {
-        return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<org.orbeon.dom.Document>() {
+        return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<>() {
             public org.orbeon.dom.Document read(PipelineContext context, ProcessorInput input) {
                 return readInputAsOrbeonDom(context, input);
             }
@@ -312,7 +312,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public DocumentInfo readCacheInputAsTinyTree(PipelineContext pipelineContext, final Configuration configuration, String inputName) {
-        return readCacheInputAsObject(pipelineContext, getInputByName(inputName), new CacheableInputReader<DocumentInfo>() {
+        return readCacheInputAsObject(pipelineContext, getInputByName(inputName), new CacheableInputReader<>() {
             public DocumentInfo read(PipelineContext context, ProcessorInput input) {
                 return readInputAsTinyTree(context, input, configuration);
             }
@@ -330,13 +330,16 @@ public abstract class ProcessorImpl implements Processor {
      */
     public <T> T readCacheInputAsObject(PipelineContext pipelineContext, ProcessorInput input, CacheableInputReader<T> reader) {
 
-        // Get associated output
-        final ProcessorOutput output = input.getOutput();
+        final String debugInfo;
+        {
+            // Get associated output
+            final ProcessorOutput output = input.getOutput();
 
-        final String debugInfo = logger.isDebugEnabled()
-                ? "[" + output.getName() + ", " + output.getProcessorClass() + ", "
-                + input.getName() + ", " + input.getProcessorClass() + "]"
-                : null;
+            debugInfo = logger.isDebugEnabled()
+                    ? "[" + output.getName() + ", " + output.getProcessorClass() + ", "
+                    + input.getName() + ", " + input.getProcessorClass() + "]"
+                    : null;
+        }
 
         // Get cache instance
         final Cache cache = ObjectCache.instance();
@@ -502,7 +505,7 @@ public abstract class ProcessorImpl implements Processor {
         return isInputInCache(context, getInputByName(inputName));
     }
 
-    public boolean isInputInCache(PipelineContext context, KeyValidity keyValidity) {
+    private boolean isInputInCache(KeyValidity keyValidity) {
         return ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity) != null;
     }
 
@@ -546,7 +549,7 @@ public abstract class ProcessorImpl implements Processor {
         final long lastModified;
         {
             final KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
-            if (keyValidity == null || inputMustBeInCache && !isInputInCache(pipelineContext, keyValidity)) {
+            if (keyValidity == null || inputMustBeInCache && !isInputInCache(keyValidity)) {
                 lastModified = 0;
             } else {
                 lastModified = (keyValidity.validity != null) ? findLastModified(keyValidity.validity) : 0;
@@ -588,7 +591,7 @@ public abstract class ProcessorImpl implements Processor {
         private List<WeakReference<ProcessorImpl>> processors;
 
         public ProcessorKey(Stack<ProcessorImpl> parents, ProcessorImpl child) {
-            processors = new ArrayList<WeakReference<ProcessorImpl>>();
+            processors = new ArrayList<>();
             if (parents != null)
                 for (ProcessorImpl parent: parents)
                     processors.add(new WeakReference(parent));
@@ -633,7 +636,7 @@ public abstract class ProcessorImpl implements Processor {
                 if (processor == null) {
                     result.append("Garbage collected processor");
                 } else {
-                    result.append(Integer.toString(processor.get().hashCode()));
+                    result.append(processor.get().hashCode());
                     result.append(": ");
                     result.append(processor.get().getClass().getName());
                 }

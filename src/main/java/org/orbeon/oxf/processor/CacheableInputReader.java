@@ -23,9 +23,9 @@ public abstract class CacheableInputReader<T> {
      * Method called back when it is necessary to read the input. It may not be called when the input data is already
      * in cache.
      *
-     * @param pipelineContext   current PipelineContext
-     * @param processorInput    input being read
-     * @return                  object created from the input
+     * @param pipelineContext current PipelineContext
+     * @param input           input being read
+     * @return                object created from the input
      */
     public abstract T read(PipelineContext pipelineContext, ProcessorInput input);
 

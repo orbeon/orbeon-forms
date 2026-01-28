@@ -365,8 +365,8 @@ body.orbeon {
             background-size: contain;
             -webkit-print-color-adjust: exact;
             &:checked {
-                background-color: @btnPrimaryBackground;
-                border-color: @btnPrimaryBackground;
+                background-color: var(--orbeon-button-primary-background-color);
+                border-color: var(--orbeon-button-primary-background-color);
             }
         }
 
@@ -620,6 +620,8 @@ body.orbeon {
     // NAV LIST
     // --------
 
+    // TODO: most of this seems overridden in wizard.less, remove here?
+
     // Copy Bootstrap rules but add span between li and a
     // Make links block level
     .nav > li > span > .btn-link {
@@ -645,7 +647,6 @@ body.orbeon {
     }
     .nav-list > .active > span > .btn-link,
     .nav-list > .active > span > .btn-link:hover {
-      // TODO: overridden in wizard.less, remove here?
       color: @white;
       text-shadow: none;
       background-color: @linkColor;
@@ -675,6 +676,14 @@ body.orbeon {
 
     .dropdown-menu {
 
+        background-color: var(--orbeon-dropdown-menu-background-color);
+        border: 1px solid var(--orbeon-dropdown-menu-border-color);
+
+        .divider {
+            background-color: var(--orbeon-dropdown-menu-divider-top);
+            border-bottom: 1px solid var(--orbeon-dropdown-menu-divider-bottom);
+        }
+
         z-index: 2000; // because YUI dialogs are > 1000
 
         // <a> nested one more level
@@ -686,9 +695,15 @@ body.orbeon {
             font-size: var(--orbeon-button-font-size);
             font-weight: normal;
             line-height: @fluidLineHeight;
-            color: @dropdownLinkColor;
+            color: var(--orbeon-dropdown-menu-color);
             white-space: nowrap;
             text-decoration: none;
+        }
+
+        // Dropups
+        > li > a,
+        > li > .btn-link {
+            color: var(--orbeon-dropdown-menu-color);
         }
 
         a,
@@ -717,10 +732,16 @@ body.orbeon {
     .dropdown-menu > li > span > .btn-link:focus,
     .dropdown-submenu:hover > a,
     .dropdown-submenu:hover > .btn-link {
-      text-decoration: none;
-      color: @dropdownLinkColorHover;
-      background-color: @dropdownLinkBackgroundHover;
-      #gradient > .vertical(@dropdownLinkBackgroundHover, darken(@dropdownLinkBackgroundHover, 5%));
+        text-decoration: none;
+        color: var(--orbeon-dropdown-menu-hover-color);
+        background-color: var(--orbeon-dropdown-menu-hover-background-color);
+        background-image: none;
+    }
+    .dropdown-menu > li > a:hover,
+    .dropdown-menu > li > .btn-link:hover,
+    .dropdown-menu > li > a:focus,
+    .dropdown-menu > li > .btn-link:focus {
+        background-image: none;
     }
 
     // Active state
@@ -729,11 +750,10 @@ body.orbeon {
     .dropdown-menu > .active > span > .btn-link,
     .dropdown-menu > .active > span > a:hover,
     .dropdown-menu > .active > span > .btn-link:hover {
-      color: @dropdownLinkColorHover;
-      text-decoration: none;
-      outline: 0;
-      background-color: @dropdownLinkBackgroundActive;
-      #gradient > .vertical(@dropdownLinkBackgroundActive, darken(@dropdownLinkBackgroundActive, 5%));
+        text-decoration: none;
+        color: var(--orbeon-dropdown-menu-selected-color);
+        background-color: var(--orbeon-dropdown-menu-selected-background-color);
+        outline: 0;
     }
 
     // Disabled state
@@ -743,20 +763,25 @@ body.orbeon {
     .dropdown-menu > .disabled > span > .btn-link,
     .dropdown-menu > .disabled > span > a:hover,
     .dropdown-menu > .disabled > span > .btn-link:hover {
-      color: @grayLight;
+        color: var(--orbeon-dropdown-menu-disabled-color);
     }
     // Nuke hover effects
     .dropdown-menu > .disabled > span > a:hover,
     .dropdown-menu > .disabled > span > .btn-link:hover {
-      text-decoration: none;
-      background-color: transparent;
-      background-image: none;
-      cursor: default;
+        text-decoration: none;
+        background-color: transparent;
+        background-image: none;
+        cursor: default;
+    }
+
+    // Caret for navbar dropdowns
+    .navbar .nav > li > .dropdown-menu:after {
+        border-bottom: 6px solid var(--orbeon-dropdown-menu-background-color);
     }
 
     // Make color consistent with primary button color
     .badge-info {
-        background-color: @btnPrimaryBackground;
+        background-color: var(--orbeon-button-primary-background-color);
     }
 
     .tooltip.in {

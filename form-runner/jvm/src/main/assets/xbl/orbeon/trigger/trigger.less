@@ -15,6 +15,8 @@
         justify-content: center;
     }
 
+    // Buttons used as dropdown toggles
+
     button.btn.dropdown-toggle {
         display: inline-block;
     }
@@ -32,26 +34,34 @@
         border-bottom: 4px solid var(--orbeon-dropdown-caret-color);
     }
 
+    // TODO: find a better way to do this: 1) trigger.less shouldn't have to care about dropdowns 2) why do we use
+    //  .btn and .btn-link elements in dropdown menus?
+
     // Dropdowns overrides
     .dropdown.open {
         .btn {
-            background-color: var(--orbeon-dropdown-item-background-color);
+            color: var(--orbeon-dropdown-menu-color);
+            background-color: var(--orbeon-dropdown-menu-background-color);
 
             &.disabled, &[disabled] {
-                background-color: var(--orbeon-dropdown-item-background-color);
+                color: var(--orbeon-dropdown-menu-disabled-color);
+                background-color: transparent;
             }
 
-            &:hover,
-            &:focus,
-            &:active,
-            &.active {
-                background-color: var(--orbeon-dropdown-item-highlight-background-color);
+            &:hover, &:focus {
+                color: var(--orbeon-dropdown-menu-hover-color);
+                background-color: var(--orbeon-dropdown-menu-hover-background-color);
+            }
+
+            &:active, &.active {
+                color: var(--orbeon-dropdown-menu-selected-color);
+                background-color: var(--orbeon-dropdown-menu-selected-background-color);
             }
         }
 
         .dropdown-menu > .disabled > a:hover,
         .dropdown-menu > .disabled > a:focus {
-            background-color: var(--orbeon-dropdown-item-disabled-highlight-background-color);
+            background-color: transparent;
         }
     }
 

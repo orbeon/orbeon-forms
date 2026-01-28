@@ -34,6 +34,10 @@
         select="$fr-form-model/generate-id()"/>
 
     <xsl:variable
+        name="fr-form-model-vars"
+        select="$fr-form-model/xf:var/@name/string()"/>
+
+    <xsl:variable
         name="candidate-action-models-ids"
         select="$fr-form-model-id"/>
 

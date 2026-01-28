@@ -53,10 +53,10 @@
         <p:output name="data" id="xhtml"/>
     </p:processor>
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="pdf-view.xpl"/>
-        <p:input name="instance" href="#parameters"/>
-        <p:input name="data" href="#xhtml"/>
-        <p:output name="data" id="form-pdf"/>
+        <p:input  name="config"   href="pdf-view.xpl"/>
+        <p:input  name="instance" href="#parameters"/>
+        <p:input  name="data"     href="#xhtml"/>
+        <p:output name="data"     id="form-pdf"/>
     </p:processor>
 
     <!-- Store PDF data -->

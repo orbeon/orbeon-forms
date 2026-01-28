@@ -11,21 +11,14 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
-
-    <!-- Form in XHTML+XForms format -->
-    <p:param type="input" name="instance"/>
-    <!-- Form in XHTML+XForms format -->
-    <p:param type="output" name="data"/>
-    <!-- Page detail (app, form, document, and mode) -->
-    <p:param type="output" name="instance"/>
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+>
+    <p:param type="input"  name="instance"/><!-- Empty, or current form data -->
+    <p:param type="output" name="data"/>    <!-- XHTML+FR+XForms for the form, obtained from persistence layer          -->
+    <p:param type="output" name="instance"/><!-- Updated parameters with actual `form-version` from the persistence     -->
 
     <!-- NOTE: It's disappointing that we have to use oxf:request/oxf:regexp rather than using the page flow
          directly, but because we want to support the PUT and POST methods, this is currently the only solution. -->

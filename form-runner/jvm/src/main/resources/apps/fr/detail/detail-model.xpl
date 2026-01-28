@@ -14,15 +14,11 @@
 <p:config
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-    <!-- Empty, or current form data -->
-    <p:param type="input" name="instance"/>
-
-    <!-- XHTML+FR+XForms for the form obtained from persistence layer -->
-    <p:param type="output" name="data"/>
-    <!-- Request parameters (app, form, document, and mode) from URL -->
-    <p:param type="output" name="instance"/>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+    <p:param type="input"  name="instance"/><!-- Empty, or current form data -->
+    <p:param type="output" name="data"/>    <!-- XHTML+FR+XForms for the form, obtained from persistence layer          -->
+    <p:param type="output" name="instance"/><!-- Updated parameters with actual `form-version` from the persistence     -->
 
     <!-- Extract request parameters (app, form, document, and mode) from URL -->
     <p:processor name="oxf:pipeline">
@@ -47,9 +43,9 @@
 
     <!-- Obtain the form definition -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="read-form.xpl"/>
-        <p:input name="instance" href="#parameters"/>
-        <p:output name="data" id="xhtml-fr-xforms" ref="data"/>
+        <p:input  name="config"   href="read-form.xpl"/>
+        <p:input  name="instance" href="#parameters"/>
+        <p:output name="data"     ref="data" id="xhtml-fr-xforms" />
         <p:output name="instance" ref="instance"/>
     </p:processor>
 

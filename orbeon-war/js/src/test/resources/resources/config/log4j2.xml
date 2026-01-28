@@ -7,8 +7,9 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="net.sf.ehcache.distribution"   level="trace"/>
-        <Logger name="org.orbeon.lifecycle"          level="debug"/>
+        <Logger name="org.orbeon.oxf.xforms.processor.XFormsServer" level="debug"/>
+        <Logger name="net.sf.ehcache.distribution"                  level="trace"/>
+        <Logger name="org.orbeon.lifecycle"                         level="debug"/>
 
         <Root level="info">
             <AppenderRef ref="ConsoleAppender"/>

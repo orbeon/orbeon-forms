@@ -159,6 +159,7 @@ object S3 {
       .credentialsProvider(StaticCredentialsProvider.create(credentials))
       .region(config.region)
       .pipeIf(nonDefaultEndpoint, _.endpointOverride(URI.create(config.endpoint)))
+      .forcePathStyle(config.forcePathStyle)
       .build()
   }
 }

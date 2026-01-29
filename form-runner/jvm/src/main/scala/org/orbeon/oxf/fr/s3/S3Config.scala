@@ -26,7 +26,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success, Try}
 
 
-case class S3Config(endpoint: String, region: Region, bucket: String, accessKey: String, secretAccessKey: String)
+case class S3Config(endpoint: String, region: Region, bucket: String, accessKey: String, secretAccessKey: String, forcePathStyle: Boolean)
 
 object S3Config {
   val PropertyPrefix        = "oxf.fr.s3."
@@ -89,6 +89,15 @@ object S3Config {
           }
       }
 
+    def booleanValue(name: String, default: Boolean): Try[Boolean] =
+      valueFromName(name).map(_.trimAllToEmpty) match {
+        case Some("true")  => Success(true)
+        case Some("false") => Success(false)
+        case Some("")      => Success(default)
+        case Some(value)   => Failure(new Exception(s"Boolean value expected for $name, got: $value"))
+        case None          => Success(default)
+      }
+
     def regionTry: Try[Region] =
       nonEmptyValue("region", DefaultRegion.some).flatMap { regionName =>
         // Convert region name into Region instance
@@ -104,13 +113,15 @@ object S3Config {
       bucket          <- nonEmptyValue("bucket")
       accessKey       <- nonEmptyValue("accesskey")
       secretAccessKey <- nonEmptyValue("secretaccesskey")
+      forcePathStyle  <- booleanValue("force-path-style", default = false)
     } yield
       S3Config(
         endpoint        = endpoint,
         region          = region,
         bucket          = bucket,
         accessKey       = accessKey,
-        secretAccessKey = secretAccessKey
+        secretAccessKey = secretAccessKey,
+        forcePathStyle  = forcePathStyle
       )
   }
 }

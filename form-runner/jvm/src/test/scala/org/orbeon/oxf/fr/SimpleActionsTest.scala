@@ -58,6 +58,29 @@ class SimpleActionsTest
         }
       }
     }
+
+    describe("#7464: Action targeting repeated iteration on same line doesn't work") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("issue", "7464", "new", initialize = true)
+
+      val doc = docOpt.get
+
+      it("must resolve the correct repeated iterations and set the control values") {
+        withTestExternalContext { implicit ec =>
+          withFormRunnerDocument(processorService, doc) {
+
+            def assertOne(value: String, index: Int): Unit = {
+              setControlValueWithEventSearchNested(resolveObject[XFormsControl]("source-control-control", indexes = List(index)).get.effectiveId, value)
+              assert(resolveObject[XFormsValueControl]("destination-control-control", indexes = List(index)).map(_.getValue(EventCollector.Throw)).contains(s"$value result!"))
+            }
+
+            assertOne("one", 1)
+            assertOne("two", 2)
+          }
+        }
+      }
+    }
   }
 }
 

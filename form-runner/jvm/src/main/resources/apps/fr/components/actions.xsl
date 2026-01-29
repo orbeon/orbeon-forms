@@ -547,6 +547,30 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Transform xf:header elements within service submissions to read header values from dynamically-set instance
+         first (with a fallback to the default value) -->
+    <xsl:template
+        match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $candidate-action-models-ids
+                ]/xf:submission[
+                    generate-id() = $service-submissions-ids
+                ]/xf:header">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="xf:name"/>
+            <xsl:variable name="header-name" select="normalize-space(xf:name)"/>
+            <!-- Read header value from instance, fallback to default value (with support for attribute and text content) -->
+            <xf:value value="(xxf:instance('fr-service-headers-instance')/header[@name = '{$header-name}'][xxf:non-blank(.)], {
+                if (xf:value/@value) then
+                    xf:value/@value
+                else
+                    concat('''', xf:value/string(), '''')
+            })[1]"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Match and modify action `xf:action`s -->
     <xsl:template
         match="
@@ -619,6 +643,7 @@
                     <xf:insert
                         ref="xxf:instance('fr-service-request-instance')"
                         origin="xf:parse(xxf:instance($request-instance-name))"/>
+                    <xf:delete ref="xxf:instance('fr-service-headers-instance')/header"/>
 
                     <xf:var
                         name="current-action-id"
@@ -681,6 +706,12 @@
                                                         //*          [local-name() = $parameter-name]
                                                     )[1]"
                                                     value="$value"/>
+                                            </xsl:if>
+                                            <xsl:if test="exists(*:var[@name = 'header-name'])">
+                                                <xsl:copy-of select="*:var[@name = 'header-name']"/>
+                                                <xf:insert
+                                                    context="xxf:instance('fr-service-headers-instance')"
+                                                    origin="xf:element('header', (xf:attribute('name', $header-name), string($value)))"/>
                                             </xsl:if>
                                         </xsl:when>
                                         <xsl:when test="p:has-class('fr-set-database-service-value-action')">
@@ -1010,6 +1041,7 @@
 
         <xf:instance id="fr-service-request-instance"  xxf:exclude-result-prefixes="#all"><request/></xf:instance>
         <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all"><response/></xf:instance>
+        <xf:instance id="fr-service-headers-instance"  xxf:exclude-result-prefixes="#all"><headers/></xf:instance>
 
         <xsl:copy-of select="$model/xf:instance[p:has-class('fr-service') or p:has-class('fr-database-service')]"/>
 

@@ -1129,8 +1129,10 @@
         <tab-advanced><label>詳細</label></tab-advanced>
         <tab-test><label>テスト結果</label></tab-test>
         <url-parameters><label>URLパラメーター</label></url-parameters>
-        <parameter-name><label>名前</label></parameter-name>
+        <parameter-or-header-name><label>名前</label></parameter-or-header-name>
         <parameter-default-value><label>デフォルト値</label></parameter-default-value>
+        <request-headers><label>HTTPヘッダー</label></request-headers>
+        <header-default-value><label>デフォルト値</label></header-default-value>
         <no-headers>ヘッダーは受信していません。</no-headers>
         <service-name>
             <label>サービス名</label>
@@ -1330,6 +1332,8 @@
         <destination-xpath>
             <label>宛先の式</label>
         </destination-xpath>
+        <parameters-group>URLパラメーター</parameters-group>
+        <headers-group>HTTPヘッダー</headers-group>
         <parameter-number>
             <label>パラメーター番号</label>
         </parameter-number>

@@ -1134,8 +1134,10 @@
         <tab-advanced><label>Zaawansowane</label></tab-advanced>
         <tab-test><label>Wyniki testu</label></tab-test>
         <url-parameters><label>Parametry URL</label></url-parameters>
-        <parameter-name><label>Nazwa</label></parameter-name>
+        <parameter-or-header-name><label>Nazwa</label></parameter-or-header-name>
         <parameter-default-value><label>Wartość domyślna</label></parameter-default-value>
+        <request-headers><label>Nagłówki HTTP</label></request-headers>
+        <header-default-value><label>Wartość domyślna</label></header-default-value>
         <no-headers>Nie odebrano nagłówków.</no-headers>
         <service-name>
             <label>Nazwa usługi</label>
@@ -1335,6 +1337,8 @@
         <destination-xpath>
             <label>Formuła docelowa</label>
         </destination-xpath>
+        <parameters-group>Parametry URL</parameters-group>
+        <headers-group>Nagłówki HTTP</headers-group>
         <parameter-number>
             <label>Numer parametru</label>
         </parameter-number>

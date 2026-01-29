@@ -1103,8 +1103,10 @@
         <tab-advanced><label>Avanzado</label></tab-advanced>
         <tab-test><label>Probar Resultados</label></tab-test>
         <url-parameters><label>Parámetros del la URL</label></url-parameters>
-        <parameter-name><label>Nombre</label></parameter-name>
+        <parameter-or-header-name><label>Nombre</label></parameter-or-header-name>
         <parameter-default-value><label>Valor por Defecto</label></parameter-default-value>
+        <request-headers><label>Encabezados HTTP</label></request-headers>
+        <header-default-value><label>Valor por Defecto</label></header-default-value>
         <no-headers>No se recibieron los cabezales.</no-headers>
         <service-name>
             <label>Nombre del Servicio</label>
@@ -1332,6 +1334,8 @@
         <destination-xpath>
             <label>Destino Expresión XPath</label>
         </destination-xpath>
+        <parameters-group>Parámetros de URL</parameters-group>
+        <headers-group>Encabezados HTTP</headers-group>
         <parameter-number>
             <label>Número de parámetro</label>
         </parameter-number>

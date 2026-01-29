@@ -1137,8 +1137,10 @@
         <tab-advanced><label>Advanced</label></tab-advanced>
         <tab-test><label>Test Results</label></tab-test>
         <url-parameters><label>URL Parameters</label></url-parameters>
-        <parameter-name><label>Name</label></parameter-name>
+        <parameter-or-header-name><label>Name</label></parameter-or-header-name>
         <parameter-default-value><label>Default Value</label></parameter-default-value>
+        <request-headers><label>HTTP Headers</label></request-headers>
+        <header-default-value><label>Default Value</label></header-default-value>
         <no-headers>No headers received.</no-headers>
         <service-name>
             <label>Service Name</label>
@@ -1338,6 +1340,8 @@
         <destination-xpath>
             <label>Destination formula</label>
         </destination-xpath>
+        <parameters-group>URL Parameters</parameters-group>
+        <headers-group>HTTP Headers</headers-group>
         <parameter-number>
             <label>Parameter number</label>
         </parameter-number>

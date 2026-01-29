@@ -40,6 +40,7 @@
                 <xf:setvalue ref="$request/is-auth"            value="false()"/>
                 <xf:delete   ref="$request/params/param"/>
                 <xf:setvalue ref="$request/is-binary-response" value="false()"/>
+                <xf:delete   ref="$request/headers/header"/>
                 <xf:delete   ref="$response/headers/header"/>
 
                 <!--
@@ -127,6 +128,18 @@
                     <xf:setvalue ref="$request/username"           value="$submission/@xxf:username"/>
                     <xf:setvalue ref="$request/password"           value="$submission/@xxf:password"/>
                     <xf:setvalue ref="$request/is-binary-response" value="$submission/@replace = 'xxf:binary'"/>
+
+                    <xf:insert
+                        context="$request/headers"
+                        origin="
+                            for $h in $submission/xf:header
+                                return xf:element(
+                                    'header',
+                                    (
+                                        xf:attribute('name',  string($h/xf:name)),
+                                        xf:attribute('value', string($h/xf:value))
+                                    )
+                                )"/>
 
                 </xf:action>
 
@@ -283,6 +296,19 @@
                         <xf:action if="not($is-binary-response)">
                             <xf:delete context="." ref="@replace"/>
                         </xf:action>
+
+                        <xf:delete ref="xf:header"/>
+                        <xf:insert
+                            context="."
+                            origin="
+                                for $h in $request/headers/header
+                                    return xf:element(
+                                        'xf:header',
+                                        (
+                                            xf:element('xf:name',  string($h/@name)),
+                                            xf:element('xf:value', string($h/@value))
+                                        )
+                                    )"/>
                     </xf:action>
 
                     <!-- Insert new instance just before submission if needed -->
@@ -385,6 +411,7 @@
                             <mediatype/>
                             <body/>
                             <params/>
+                            <headers/>
                             <is-binary-response>false</is-binary-response>
                         </request>
                         <response>
@@ -496,6 +523,10 @@
                             ref="params/param/@name"
                             required="true()"/>
                         <xf:bind
+                            name="header-names"
+                            ref="headers/header/@name"
+                            required="true()"/>
+                        <xf:bind
                             ref="is-binary"
                             type="xs:boolean"
                         />
@@ -545,6 +576,13 @@
                     <param name="" value=""/>
                 </xf:instance>
 
+                <xf:instance
+                    id="fb-header-template"
+                    xxf:readonly="true"
+                    xxf:exclude-result-prefixes="#all">
+                    <header name="" value=""/>
+                </xf:instance>
+
                 <!-- Submission to test a service -->
                 <xf:submission id="fb-test-service-submission"
                     ref="
@@ -565,7 +603,13 @@
                     mediatype="{$request/mediatype}"
                     replace="none"
                     xxf:username="{$request/username}"
-                    xxf:password="{$request/password}"/>
+                    xxf:password="{$request/password}">
+
+                    <xf:header ref="$request/headers/header">
+                        <xf:name  value="@name"/>
+                        <xf:value value="@value"/>
+                    </xf:header>
+                </xf:submission>
 
             </xf:model>
         </xbl:implementation>
@@ -675,7 +719,7 @@
                                                 <xh:tr>
                                                     <xh:td>
                                                         <xf:input ref="@name" id="request-param-name-input">
-                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-name.label', '|fr-form-resources|')"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-or-header-name.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
@@ -694,6 +738,29 @@
                                             <xf:hint ref="$resources/dialog-http-services/request-body/hint"/>
                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:textarea>
+
+                                        <xf:group appearance="xxf:fieldset">
+                                            <xf:label value="xxf:r('dialog-http-services.request-headers.label', '|fr-form-resources|')"/>
+                                            <fr:grid
+                                                ref="$request/headers"
+                                                repeat="content"
+                                                template="instance('fb-header-template')">
+                                                <xh:tr>
+                                                    <xh:td>
+                                                        <xf:input ref="@name" id="request-header-name-input">
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-or-header-name.label', '|fr-form-resources|')"/>
+                                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                                                        </xf:input>
+                                                    </xh:td>
+                                                    <xh:td>
+                                                        <xf:input ref="@value" id="request-header-value-input">
+                                                            <xf:label ref="xxf:r('dialog-http-services.header-default-value.label', '|fr-form-resources|')"/>
+                                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                                                        </xf:input>
+                                                    </xh:td>
+                                                </xh:tr>
+                                            </fr:grid>
+                                        </xf:group>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>
@@ -792,7 +859,7 @@
                                                 <xh:tr>
                                                     <xh:td class="fb-nowrap">
                                                         <xf:output value="name" id="response-header-name-output">
-                                                            <xf:label ref="xxf:r('dialog-http-services.header-name.label', '|fr-form-resources|')"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-or-header-name.label', '|fr-form-resources|')"/>
                                                         </xf:output>
                                                     </xh:td>
                                                     <xh:td>

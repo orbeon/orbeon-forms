@@ -1118,8 +1118,10 @@
         <tab-advanced><label>Geavanceerd</label></tab-advanced>
         <tab-test><label>Testresultaten</label></tab-test>
         <url-parameters><label>URL parameters</label></url-parameters>
-        <parameter-name><label>Naam</label></parameter-name>
+        <parameter-or-header-name><label>Naam</label></parameter-or-header-name>
         <parameter-default-value><label>Standaardwaarde</label></parameter-default-value>
+        <request-headers><label>HTTP-headers</label></request-headers>
+        <header-default-value><label>Standaardwaarde</label></header-default-value>
         <no-headers>Geen headers ontvangen.</no-headers>
         <service-name>
             <label>Servicenaam</label>
@@ -1319,6 +1321,8 @@
         <destination-xpath>
             <label>Doel XPath expressie</label>
         </destination-xpath>
+        <parameters-group>URL-parameters</parameters-group>
+        <headers-group>HTTP-headers</headers-group>
         <parameter-number>
             <label>Parameter aantal</label>
         </parameter-number>

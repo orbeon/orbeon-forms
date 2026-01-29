@@ -1117,8 +1117,10 @@
         <tab-advanced><label>Расширенные</label></tab-advanced>
         <tab-test><label>Результаты тестирования</label></tab-test>
         <url-parameters><label>URL-параметры</label></url-parameters>
-        <parameter-name><label>Название</label></parameter-name>
+        <parameter-or-header-name><label>Название</label></parameter-or-header-name>
         <parameter-default-value><label>Значение по умолчанию</label></parameter-default-value>
+        <request-headers><label>HTTP-заголовки</label></request-headers>
+        <header-default-value><label>Значение по умолчанию</label></header-default-value>
         <no-headers>Заголовки не получены.</no-headers>
         <service-name>
             <label>Название сервиса</label>
@@ -1346,6 +1348,8 @@
         <destination-xpath>
             <label>Выражение XPath для приемника</label>
         </destination-xpath>
+        <parameters-group>URL-параметры</parameters-group>
+        <headers-group>HTTP-заголовки</headers-group>
         <parameter-number>
             <label>Номер параметра</label>
         </parameter-number>

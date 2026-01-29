@@ -68,6 +68,9 @@
         <xf:setvalue ref="$instance/name"/>
         <xf:setvalue ref="$instance/initial-name"/>
         <xf:setvalue ref="$instance/parameter-names"/>
+        <xf:setvalue ref="$instance/parameter-names/@count" value="0"/>
+        <xf:setvalue ref="$instance/header-names"/>
+        <xf:setvalue ref="$instance/header-names/@count" value="0"/>
         <xf:delete   ref="$instance/fb:action"/>
 
         <!-- Update items -->
@@ -104,6 +107,18 @@
                     ))"/>
             </xf:action>
         </xf:action>
+
+        <!-- Create common dropdown-value binding for parameter/header names -->
+        <xf:action iterate="$instance//xf:action[@class = 'fr-set-service-value-action'][xf:var[@name = ('parameter-name', 'header-name')]]">
+            <xf:var name="var"            value="xf:var[@name = ('parameter-name', 'header-name')]"/>
+            <xf:var name="prefix"         value="if ($var/@name = 'header-name') then 'h:' else 'p:'"/>
+            <xf:var name="dropdown-value" value="concat($prefix, $var/@value)"/>
+            <!-- Insert dropdown-value element with "p:" (parameter) or "h:" (header) prefix -->
+            <xf:insert context="." origin="xf:element('dropdown-value', $dropdown-value)"/>
+            <!-- Delete original parameter-name or header-name var -->
+            <xf:delete ref="$var"/>
+        </xf:action>
+
         <xf:dispatch name="fb-update-how-service-value-are-set" targetid="fb-action-dialog"/>
 
     </xf:action>
@@ -114,15 +129,21 @@
         <xf:var name="selected-service"     value="$model/fb:submission[@id = $action1/xf:send/@submission]"/>
         <xf:var name="service-uses-request-parameters" value="$selected-service/@method = ('get', 'delete')"/>
 
+        <!-- Compute possible header names (available for all HTTP methods) -->
+        <xf:var      name="header-names"                 value="$selected-service/xf:header/xf:name/string()"/>
+        <xf:setvalue ref="$instance/header-names"        value="string-join($header-names, ' ')"/>
+        <xf:setvalue ref="$instance/header-names/@count" value="count($header-names)"/>
+
         <xf:action if="$service-uses-request-parameters">
 
             <!-- Compute possible parameter names, and save in local instance -->
-            <xf:var      name="service-id"               value="substring-before($selected-service/@id, '-submission')"/>
-            <xf:var      name="instance-id"              value="concat($service-id, '-instance')"/>
-            <xf:var      name="instance-body-string"     value="$model/fb:instance[@id = $instance-id]/*"/>
-            <xf:var      name="instance-body"            value="xf:parse($instance-body-string)"/>
-            <xf:var      name="parameter-names"          value="$instance-body/*/((@name, local-name())[1])"/>
-            <xf:setvalue ref="$instance/parameter-names" value="string-join($parameter-names, ' ')"/>
+            <xf:var      name="service-id"                      value="substring-before($selected-service/@id, '-submission')"/>
+            <xf:var      name="instance-id"                     value="concat($service-id, '-instance')"/>
+            <xf:var      name="instance-body-string"            value="$model/fb:instance[@id = $instance-id]/*"/>
+            <xf:var      name="instance-body"                   value="xf:parse($instance-body-string)"/>
+            <xf:var      name="parameter-names"                 value="$instance-body/*/((@name, local-name())[1])"/>
+            <xf:setvalue ref="$instance/parameter-names"        value="string-join($parameter-names, ' ')"/>
+            <xf:setvalue ref="$instance/parameter-names/@count" value="count($parameter-names)"/>
 
             <!-- Upgrade syntax for setting parameter names:
                  - From : `<xf:var name="path"           value="//my-param"/>`
@@ -311,19 +332,24 @@
                     <xf:var
                         name="request-actions-container"
                         value="."/>
-                    <xf:var
-                        name="set-by"
-                        value="
-                            if ($selected-service/@method = ('get', 'delete'))
-                            then 'parameter-name'
-                            else 'path'"/>
+
+                    <!-- Template selection:
+                         - if GET/DELETE and parameter names are defined, use parameter/header template
+                         - if any HTTP method and header names are defined, use parameter/header template
+                         - otherwise, use path template
+                         Note that parameter/header names are stored into a single dropdown-value element
+                    -->
                     <xf:var
                         name="template"
                         value="
                             instance('fb-binding-action-template')/
                             xf:action[
                                 @class = 'fr-set-service-value-action' and
-                                exists(xf:var[@name = $set-by])
+                                exists(
+                                    if (($selected-service/@method = ('get', 'delete') and $instance/parameter-names/@count > 0) or $instance/header-names/@count > 0)
+                                    then dropdown-value
+                                    else xf:var[@name = 'path']
+                                )
                             ]"/>
 
                     <fr:dnd-repeat
@@ -389,15 +415,29 @@
                                     </xf:case>
                                 </xf:switch>
 
-                                <!-- Dropdown to select request parameter -->
-                                <fr:dropdown-select1
-                                    ref="xf:var[@name = 'parameter-name']/@value"
+                                <!-- Dropdown to select request parameter or header -->
+                                <xf:select1
+                                    id="fb-request-param-or-header"
+                                    ref="dropdown-value"
+                                    appearance="search"
                                     class="fb-action-option-3-col-span-1">
-                                    <xf:itemset ref="xxf:split($instance/parameter-names)">
-                                        <xf:label ref="."/>
-                                        <xf:value ref="concat('''', ., '''')"/>
-                                    </xf:itemset>
-                                </fr:dropdown-select1>
+                                    <!-- Parameters group -->
+                                    <xf:choices ref=".[xxf:non-blank($instance/parameter-names)]">
+                                        <xf:label ref="$form-resources/dialog-actions/parameters-group"/>
+                                        <xf:itemset ref="xxf:split($instance/parameter-names)">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="concat('p:', '''', ., '''')"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                    <!-- Headers group -->
+                                    <xf:choices ref=".[xxf:non-blank($instance/header-names)]">
+                                        <xf:label ref="$form-resources/dialog-actions/headers-group"/>
+                                        <xf:itemset ref="xxf:split($instance/header-names)">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="concat('h:', '''', ., '''')"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                </xf:select1>
 
                                 <!-- Input for XPath expression to request body -->
                                 <xf:input
@@ -808,6 +848,24 @@
                 <!-- Save changes to form -->
                 <xf:action event="DOMActivate">
 
+                    <!-- Translate dropdown-value back to parameter-name/header-name vars -->
+                    <xf:action iterate="$instance//xf:action[@class = 'fr-set-service-value-action'][dropdown-value]">
+                        <xf:var name="dropdown-value" value="string(dropdown-value)"/>
+                        <xf:var name="is-header"      value="starts-with($dropdown-value, 'h:')"/>
+                        <xf:var name="var-name"       value="if ($is-header) then 'header-name' else 'parameter-name'"/>
+                        <xf:var name="var-value"      value="substring($dropdown-value, 3)"/>
+                        <!-- Insert the appropriate var element -->
+                        <xf:insert
+                            context="."
+                            ref="*[last()]"
+                            origin="xf:element('xf:var', (
+                                xf:attribute('name', $var-name),
+                                xf:attribute('value', $var-value)
+                            ))"/>
+                        <!-- Remove dropdown-value (used for binding only) -->
+                        <xf:delete ref="dropdown-value"/>
+                    </xf:action>
+
                     <xf:var
                         name="existing-binding-opt"
                         value="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
@@ -864,7 +922,8 @@
                 <name/>
                 <initial-name/>
                 <instance-id/>
-                <parameter-names/>
+                <parameter-names count="0"/>
+                <header-names count="0"/>
                 <delete-trigger/>
                 <save-test-trigger/>
                 <fb:action/>
@@ -994,10 +1053,10 @@
                     <xf:var name="control-name" value=""/>
                     <xf:var name="path" value=""/>
                 </xf:action>
-                <!-- Set service value with parameter name -->
+                <!-- Set service value with parameter or header name -->
                 <xf:action class="fr-set-service-value-action">
                     <xf:var name="control-name" value=""/>
-                    <xf:var name="parameter-name" value=""/>
+                    <dropdown-value/>
                 </xf:action>
                 <!-- Set database service value -->
                 <xf:action class="fr-set-database-service-value-action">

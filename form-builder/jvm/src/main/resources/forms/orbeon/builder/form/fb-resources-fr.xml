@@ -1138,8 +1138,10 @@
         <tab-advanced><label>Fonctions avancées</label></tab-advanced>
         <tab-test><label>Résultat du test</label></tab-test>
         <url-parameters><label>Paramètres d'URL</label></url-parameters>
-        <parameter-name><label>Nom</label></parameter-name>
+        <parameter-or-header-name><label>Nom</label></parameter-or-header-name>
         <parameter-default-value><label>Valeur par défaut</label></parameter-default-value>
+        <request-headers><label>En-têtes HTTP</label></request-headers>
+        <header-default-value><label>Valeur par défaut</label></header-default-value>
         <no-headers>Pas d'en-têtes reçus.</no-headers>
         <service-name>
             <label>Nom du service</label>
@@ -1339,6 +1341,8 @@
         <destination-xpath>
             <label>Expression XPath destination</label>
         </destination-xpath>
+        <parameters-group>Paramètres d'URL</parameters-group>
+        <headers-group>En-têtes HTTP</headers-group>
         <parameter-number>
             <label>Numéro de paramètre</label>
         </parameter-number>

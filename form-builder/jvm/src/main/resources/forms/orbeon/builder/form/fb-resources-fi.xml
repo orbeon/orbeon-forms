@@ -1131,8 +1131,10 @@
         <tab-advanced><label>Kehittynyt</label></tab-advanced>
         <tab-test><label>Testitulokset</label></tab-test>
         <url-parameters><label>URL-parametrit</label></url-parameters>
-        <parameter-name><label>Nimi</label></parameter-name>
+        <parameter-or-header-name><label>Nimi</label></parameter-or-header-name>
         <parameter-default-value><label>Oletusarvo</label></parameter-default-value>
+        <request-headers><label>HTTP-otsakkeet</label></request-headers>
+        <header-default-value><label>Oletusarvo</label></header-default-value>
         <no-headers>Ei otsakkeita vastaanotettu.</no-headers>
         <service-name>
             <label>Palvelun nimi</label>
@@ -1332,6 +1334,8 @@
         <destination-xpath>
             <label>Kohde XPath-lauseke</label>
         </destination-xpath>
+        <parameters-group>URL-parametrit</parameters-group>
+        <headers-group>HTTP-otsakkeet</headers-group>
         <parameter-number>
             <label>Parametrin numero</label>
         </parameter-number>

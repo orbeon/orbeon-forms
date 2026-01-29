@@ -1137,8 +1137,10 @@
         <tab-advanced><label>متقدم</label></tab-advanced>
         <tab-test><label>نتائج الاختبار</label></tab-test>
         <url-parameters><label>معلمات URL</label></url-parameters>
-        <parameter-name><label>الاسم</label></parameter-name>
+        <parameter-or-header-name><label>الاسم</label></parameter-or-header-name>
         <parameter-default-value><label>القيمة الافتراضية</label></parameter-default-value>
+        <request-headers><label>ترويسات HTTP</label></request-headers>
+        <header-default-value><label>القيمة الافتراضية</label></header-default-value>
         <no-headers>لم يتم استلام أي ترويسات.</no-headers>
         <service-name>
             <label>اسم الخدمة</label>
@@ -1338,6 +1340,8 @@
         <destination-xpath>
             <label>صيغة الوجهة</label>
         </destination-xpath>
+        <parameters-group>معلمات URL</parameters-group>
+        <headers-group>ترويسات HTTP</headers-group>
         <parameter-number>
             <label>رقم المعلمة</label>
         </parameter-number>

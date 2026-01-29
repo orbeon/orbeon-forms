@@ -418,6 +418,7 @@
                             'source-path',
                             'control-value',
                             'path',
+                            'header-name',
                             'parameter-name',
                             'parameter',
                             'response-items',

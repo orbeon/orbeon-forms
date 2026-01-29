@@ -1118,8 +1118,10 @@
         <tab-advanced><label>Avancerat</label></tab-advanced>
         <tab-test><label>Testresultat</label></tab-test>
         <url-parameters><label>URL-parametrar</label></url-parameters>
-        <parameter-name><label>Namn</label></parameter-name>
+        <parameter-or-header-name><label>Namn</label></parameter-or-header-name>
         <parameter-default-value><label>Standardvärde</label></parameter-default-value>
+        <request-headers><label>HTTP-huvuden</label></request-headers>
+        <header-default-value><label>Standardvärde</label></header-default-value>
         <no-headers>Inga headers mottagna</no-headers>
         <service-name>
             <label>Namn</label>
@@ -1347,6 +1349,8 @@
         <destination-xpath>
             <label>XPath-uttryck för destinationen</label>
         </destination-xpath>
+        <parameters-group>URL-parametrar</parameters-group>
+        <headers-group>HTTP-huvuden</headers-group>
         <parameter-number>
             <label>Parameternummer</label>
         </parameter-number>

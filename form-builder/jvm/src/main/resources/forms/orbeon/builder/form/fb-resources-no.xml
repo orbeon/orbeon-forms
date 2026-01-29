@@ -1118,8 +1118,10 @@
         <tab-advanced><label>Avansert</label></tab-advanced>
         <tab-test><label>Testresultater</label></tab-test>
         <url-parameters><label>URL-parametre</label></url-parameters>
-        <parameter-name><label>Navn</label></parameter-name>
+        <parameter-or-header-name><label>Navn</label></parameter-or-header-name>
         <parameter-default-value><label>Standardverdi</label></parameter-default-value>
+        <request-headers><label>HTTP-hoder</label></request-headers>
+        <header-default-value><label>Standardverdi</label></header-default-value>
         <no-headers>Ingen headere mottatt.</no-headers>
         <service-name>
             <label>Tjenestenavn</label>
@@ -1347,6 +1349,8 @@
         <destination-xpath>
             <label>Xpath-uttrykk for destinasjonen</label>
         </destination-xpath>
+        <parameters-group>URL-parametre</parameters-group>
+        <headers-group>HTTP-hoder</headers-group>
         <parameter-number>
             <label>Parameter number</label>
         </parameter-number>

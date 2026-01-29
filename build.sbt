@@ -104,7 +104,6 @@ val CoreLibraryDependencies = Seq(
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "javax.cache"                 % "cache-api"                       % "1.1.1",
   "org.infinispan"              % "infinispan-core"                 % "14.0.35.Final",
-  "org.infinispan"              % "infinispan-jcache"               % "14.0.35.Final",
   "net.sf.ehcache"              % "ehcache"                         % "2.10.9.2" % Provided,
   "org.ehcache"                 % "ehcache"                         % "3.10.8",
 //  "jakarta.xml.bind"            % "jakarta.xml.bind-api"            % "4.0.2",

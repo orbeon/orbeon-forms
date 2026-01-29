@@ -597,7 +597,7 @@
                             <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', (event('action-source'), event('xxf:absolute-targetid'))[1])</xf:action>
                         </xsl:otherwise>
                     </xsl:choose>
-                    <xsl:for-each select="$action/* except $iterate-control-name-var">`
+                    <xsl:for-each select="$action/* except $iterate-control-name-var">
                         <xsl:copy>
                             <xsl:copy-of select="@* | node()"/>
                             <!-- We should only have nested `<xf:send>` children elements, right? -->

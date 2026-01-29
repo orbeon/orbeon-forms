@@ -427,7 +427,7 @@
                                                         </xsl:if>
                                                         <!-- Alert message -->
                                                         <xsl:if test="exists(fr:alert)">
-                                                            <xf:output class="fr-error-alert fr-error-alert-error">
+                                                            <xf:output class="fr-error-alert fr-error-alert-error" xxf:element="div">
                                                                 <xsl:copy-of select="fr:alert/(@*|node())"/>
                                                             </xf:output>
                                                         </xsl:if>
@@ -467,11 +467,11 @@
                                                                     <xf:output
                                                                         mediatype="text/html"
                                                                         value="$label-or-placeholder"/>
-                                                                    <span class="fr-error-alert fr-error-alert-{{@level}}">
+                                                                    <div class="fr-error-alert fr-error-alert-{{@level}}">
                                                                         <xf:output
                                                                             mediatype="text/html"
                                                                             value="@alert"/>
-                                                                    </span>
+                                                                    </div>
                                                                 </xf:label>
                                                                 <xf:dispatch event="DOMActivate" name="fr-internal-focus-error" target="fr-error-summary-binding">
                                                                     <xf:property name="error"    value="."/>
@@ -484,6 +484,7 @@
                                                                 mediatype="text/html"
                                                                 value="$label-or-placeholder"/>
                                                             <xf:output
+                                                                xxf:element="div"
                                                                 class="fr-error-alert fr-error-alert-{{@level}}"
                                                                 mediatype="text/html"
                                                                 value="@alert"/>

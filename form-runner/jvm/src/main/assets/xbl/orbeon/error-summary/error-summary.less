@@ -94,6 +94,11 @@
         }
 
         .fr-error-alert {
+            // The error summary produces a div, instead of a span, so block elements it contains are not moved in
+            // the DOM, but, if possible, we still want the message to be shown on the same line as the control label.
+            display: inline;
+            vertical-align: middle;
+
             ul {
                 list-style-type: square;
                 margin-bottom: 0;

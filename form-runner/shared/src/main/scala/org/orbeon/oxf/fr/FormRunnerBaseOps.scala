@@ -35,7 +35,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.{ElemFilter, SaxonUtils}
+import org.orbeon.oxf.xml.{ElemFilter, ForwardingXMLReceiver, HTMLBodyXMLReceiver, SaxonUtils, SimpleHtmlSerializer}
+import org.xml.sax.Attributes
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -672,6 +673,31 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       value           = html,
       extraElemFilter = _ => ElemFilter.Remove
     )
+
+  //@XPathFunction
+  def removeOuterDiv(html: String): String = {
+    val sb = new java.lang.StringBuilder
+
+    val outerDivRemovingReceiver = new ForwardingXMLReceiver(new SimpleHtmlSerializer(sb)) {
+      private var depth = 0
+      private def isTopLevelDiv(localname: String): Boolean = depth == 1 && localname == "div"
+
+      override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+        depth += 1
+        if (! isTopLevelDiv(localname))
+          super.startElement(uri, localname, qName, attributes)
+      }
+
+      override def endElement(uri: String, localname: String, qName: String): Unit = {
+        if (! isTopLevelDiv(localname))
+          super.endElement(uri, localname, qName)
+        depth -= 1
+      }
+    }
+
+    HtmlParsing.parseHtmlString(html, new HTMLBodyXMLReceiver(outerDivRemovingReceiver, ""))
+    sb.toString
+  }
 
   //@XPathFunction
   def sanitizeHtml(html: String): String =

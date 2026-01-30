@@ -220,16 +220,32 @@
                         <!-- Model -->
                         <xf:var name="models" value="instance('inspector-itemset')/model"/>
                         <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
-                            <xf:select1 ref="instance('inspector-instance')/current-model" appearance="search">
-                                <xf:label>Model</xf:label>
-                                <xf:itemset ref="$models">
-                                    <xf:label ref="@id"/>
-                                    <xf:value ref="@id"/>
-                                </xf:itemset>
-                                <xf:action event="xforms-value-changed">
-                                    <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
-                                </xf:action>
-                            </xf:select1>
+                            <xf:switch xxf:xforms11-switch="true" caseref="xxf:open-dialogs() = 0"><!-- See https://github.com/orbeon/orbeon-forms/issues/7259 -->
+                                <xf:case id="model-case-search" value="true()">
+                                    <xf:select1 ref="instance('inspector-instance')/current-model" appearance="search">
+                                        <xf:label>Model</xf:label>
+                                        <xf:itemset ref="$models">
+                                            <xf:label ref="@id"/>
+                                            <xf:value ref="@id"/>
+                                        </xf:itemset>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
+                                        </xf:action>
+                                    </xf:select1>
+                                </xf:case>
+                                <xf:case id="model-case-minimal" value="false()">
+                                    <xf:select1 ref="instance('inspector-instance')/current-model" appearance="minimal">
+                                        <xf:label>Model</xf:label>
+                                        <xf:itemset ref="$models">
+                                            <xf:label ref="@id"/>
+                                            <xf:value ref="@id"/>
+                                        </xf:itemset>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
+                                        </xf:action>
+                                    </xf:select1>
+                                </xf:case>
+                            </xf:switch>
                             <xf:trigger>
                                 <xf:label>Refresh</xf:label>
                                 <xf:dispatch
@@ -245,13 +261,26 @@
                         </xf:group>
                         <!-- Instance -->
                         <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
-                            <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="search">
-                                <xf:label>Instance</xf:label>
-                                <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
-                                    <xf:label ref="@id"/>
-                                    <xf:value ref="@id"/>
-                                </xf:itemset>
-                            </xf:select1>
+                            <xf:switch xxf:xforms11-switch="true" caseref="xxf:open-dialogs() = 0"><!-- See https://github.com/orbeon/orbeon-forms/issues/7259 -->
+                                <xf:case id="instance-case-search" value="true()">
+                                    <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="search">
+                                        <xf:label>Instance</xf:label>
+                                        <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
+                                            <xf:label ref="@id"/>
+                                            <xf:value ref="@id"/>
+                                        </xf:itemset>
+                                    </xf:select1>
+                                </xf:case>
+                                <xf:case id="instance-case-minimal" value="false()">
+                                    <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="minimal">
+                                        <xf:label>Instance</xf:label>
+                                        <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
+                                            <xf:label ref="@id"/>
+                                            <xf:value ref="@id"/>
+                                        </xf:itemset>
+                                    </xf:select1>
+                                </xf:case>
+                            </xf:switch>
                         </xf:group>
                         <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) = 1]" class="fr-xforms-inspector-instance">
                             <xf:output value="instance('inspector-instance')/current-instance">

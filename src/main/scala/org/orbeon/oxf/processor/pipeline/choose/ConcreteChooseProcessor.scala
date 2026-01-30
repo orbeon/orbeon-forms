@@ -111,6 +111,9 @@ class ConcreteChooseProcessor(
   private def getStateT(pipelineContext: PipelineContext): State =
     getState(pipelineContext).asInstanceOf[ConcreteChooseProcessor.State]
 
+  private def stateOpt(pipelineContext: PipelineContext): Option[ConcreteChooseProcessor.State] =
+    hasState(pipelineContext).option(getStateT(pipelineContext))
+
   override def createOutput(name: String): ProcessorOutput =
     new ProcessorOutputImpl(thisConcreteChooseProcessor, name) {
 
@@ -123,24 +126,30 @@ class ConcreteChooseProcessor(
       }
 
       override def getKeyImpl(pipelineContext: PipelineContext): OutputCacheKey =
-        if (isInputInCache(pipelineContext, AbstractChooseProcessor.CHOOSE_DATA_INPUT)) {
-          val state = getState(pipelineContext).asInstanceOf[ConcreteChooseProcessor.State]
-          if (! state.started)
-            start(pipelineContext)
-          state.selectedBranchOutputs(name)
-            .getKey(pipelineContext)
-        } else
-          null
+        stateOpt(pipelineContext).filter(_.started).flatMap(_.selectedBranchOutputs.get(name)) match {
+          case Some(processorOutput) => processorOutput.getKey(pipelineContext)
+          case _ if isInputInCache(pipelineContext, AbstractChooseProcessor.CHOOSE_DATA_INPUT) =>
+            val state = getStateT(pipelineContext)
+            if (! state.started)
+              start(pipelineContext)
+            state.selectedBranchOutputs(name)
+              .getKey(pipelineContext)
+          case _ =>
+            null
+        }
 
       override protected def getValidityImpl(pipelineContext: PipelineContext): AnyRef =
-        if (isInputInCache(pipelineContext, AbstractChooseProcessor.CHOOSE_DATA_INPUT)) {
-          val state = getState(pipelineContext).asInstanceOf[ConcreteChooseProcessor.State]
-          if (! state.started)
-            start(pipelineContext)
-          state.selectedBranchOutputs(name)
-            .getValidity(pipelineContext)
-        } else
-          null
+        stateOpt(pipelineContext).filter(_.started).flatMap(_.selectedBranchOutputs.get(name)) match {
+          case Some(processorOutput) => processorOutput.getValidity(pipelineContext)
+          case _ if isInputInCache(pipelineContext, AbstractChooseProcessor.CHOOSE_DATA_INPUT) =>
+            val state = getStateT(pipelineContext)
+            if (! state.started)
+              start(pipelineContext)
+            state.selectedBranchOutputs(name)
+              .getValidity(pipelineContext)
+          case _ =>
+            null
+        }
     }
     .tap(addOutput(name, _))
 

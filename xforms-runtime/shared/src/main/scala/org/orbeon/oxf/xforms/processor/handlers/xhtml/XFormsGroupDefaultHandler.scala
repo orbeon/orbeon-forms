@@ -90,7 +90,7 @@ class XFormsGroupDefaultHandler(
     }
 
     // After the above so that attributes can be overridden
-    forwardAccessibilityAttributes(attributes, atts)
+    forwardAccessibilityAttributes(attributes, atts, handlerContext)
   }
 
   override protected def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = {

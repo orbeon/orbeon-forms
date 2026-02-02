@@ -99,7 +99,7 @@ class XFormsUploadHandler(
         uploadControl foreach
           (_.addExtensionAttributesExceptClassAndAcceptForHandler(atts, XXFORMS_NAMESPACE_URI))
 
-        XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts)
+        XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts, handlerContext)
         handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)
 
         // `@multiple="multiple"`

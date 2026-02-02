@@ -46,7 +46,7 @@ class XFormsSecretHandler(
       containerAttributes.addOrReplace("name", getEffectiveId)
       containerAttributes.addOrReplace("value", if (secretControl == null || secretControl.getExternalValue(handlerContext.collector) == null) "" else secretControl.getExternalValue(handlerContext.collector))
       // Handle accessibility attributes
-      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
       handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
       // Output all extension attributes

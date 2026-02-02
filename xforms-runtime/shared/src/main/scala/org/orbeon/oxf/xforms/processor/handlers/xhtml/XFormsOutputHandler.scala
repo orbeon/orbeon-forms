@@ -85,7 +85,7 @@ class XFormsOutputDefaultHandler(
       getContainerAttributes(getEffectiveId, outputControl, isField)
 
     // Handle accessibility attributes on control element
-    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
     if (hasDirectOrByLabel) {
 
       // NOTE: No need to handle `LHHA.Alert` as that's not handled by `handleAriaByAtts`
@@ -177,7 +177,7 @@ class XFormsOutputHTMLHandler(
     val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
 
     // Handle accessibility attributes on <div>
-    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
 
     withElement("div", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
@@ -226,7 +226,7 @@ class XFormsOutputImageHandler(
     val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
     containerAttributes.addOrReplace("src", if (srcValue ne null) srcValue else DummyImageUri)
 
-    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
     currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
@@ -272,7 +272,7 @@ class XFormsOutputVideoHandler(
       containerAttributes.appendToClassAttribute("empty-source")
     }
 
-    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
     currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     withElement("video", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
@@ -387,7 +387,7 @@ class XFormsOutputDownloadHandler(
       }
 
       val aAttributes = anchorAttributes
-      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, aAttributes)
+      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, aAttributes, handlerContext)
 
       withElement(localName = "a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
         val labelValueOpt          = currentControl.getLabel(handlerContext.collector)

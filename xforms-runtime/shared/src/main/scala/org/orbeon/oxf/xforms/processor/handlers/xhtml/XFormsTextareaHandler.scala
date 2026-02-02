@@ -61,7 +61,7 @@ class XFormsTextareaHandler(
       val textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea")
       htmlTextareaAttributes.addOrReplace("name", getEffectiveId)
 
-      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, htmlTextareaAttributes)
+      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, htmlTextareaAttributes, handlerContext)
       handleAriaByAtts(htmlTextareaAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
       // Output all extension attributes

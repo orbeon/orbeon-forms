@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -72,7 +73,11 @@ object XFormsBaseHandler {
     }
   }
 
-  def forwardAccessibilityAttributes(srcAttributes: Attributes, destAttributes: AttributesImpl): Unit = {
+  def forwardAccessibilityAttributes(
+    srcAttributes  : Attributes,
+    destAttributes : AttributesImpl,
+    handlerContext : HandlerContext
+  ): Unit = {
 
     // Handle "tabindex"
     locally {
@@ -106,7 +111,29 @@ object XFormsBaseHandler {
       if (value ne null)
         destAttributes.addOrReplace(XFormsNames.ROLE_QNAME, value)
     }
+
+    // Handle "aria-labelledby"
+    locally {
+      val value = srcAttributes.getValue("aria-labelledby")
+      if (value ne null) {
+        val transformedValue = transformAriaIdReferences(value, srcAttributes, handlerContext)
+        destAttributes.addOrReplace("aria-labelledby", transformedValue)
+      }
+    }
   }
+
+  private def transformAriaIdReferences(value: String, attributes: Attributes, handlerContext: HandlerContext): String =
+    value.splitTo[List]().map { maybeReferenceStaticId =>
+
+      val currentEffectiveId        = handlerContext.getEffectiveId(attributes)
+      val maybeReferenceEffectiveId = XFormsId.getRelatedEffectiveId(currentEffectiveId, maybeReferenceStaticId)
+      val containingDocument        =  handlerContext.containingDocument
+      containingDocument
+        .findControlByEffectiveId(maybeReferenceEffectiveId)
+        .map(_ => containingDocument.namespaceId(maybeReferenceEffectiveId))
+        .getOrElse(maybeReferenceStaticId)
+
+    }.mkString(" ")
 
   def handleAriaAttributes(required: Boolean, valid: Boolean, visited: Boolean, destAttributes: AttributesImpl): Unit = {
     if (required)

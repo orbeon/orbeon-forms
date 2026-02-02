@@ -56,7 +56,7 @@ abstract class XFormsTriggerHandler(
       hintValue.foreach(containerAttributes.addOrReplace("title", _))
     }
 
-    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
     containerAttributes
   }
 }

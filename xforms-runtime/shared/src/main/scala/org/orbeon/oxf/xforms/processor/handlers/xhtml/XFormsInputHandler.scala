@@ -151,7 +151,7 @@ class XFormsInputHandler(
 
           atts.addOrReplace("class", inputClasses.toString)
 
-          forwardAccessibilityAttributes(attributes, atts)
+          forwardAccessibilityAttributes(attributes, atts, handlerContext)
           handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)
 
           if (isXFormsReadonlyButNotStaticReadonly(inputControl))

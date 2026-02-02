@@ -165,7 +165,7 @@ object XFormsSelect1Handler {
           if (isSelected)
             atts.addOrReplace("checked", "checked")
           if (isFirst)
-            XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts)
+            XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts, handlerContext)
         }
 
         // See:
@@ -369,7 +369,7 @@ class XFormsSelect1Handler(
         containerAttributes.addOrReplace("multiple", "multiple")
 
       // Handle accessibility attributes
-      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
       handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
       if (control ne null)

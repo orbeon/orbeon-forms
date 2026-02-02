@@ -148,7 +148,7 @@
                                             <!-- Actual section title -->
                                             <xsl:choose>
                                                  <xsl:when test="$collapsible">
-                                                     <xf:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'open' else 'closed'}}">
+                                                     <xf:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'open' else 'closed'}}" id="title">
                                                          <xf:label value="xxf:label('fr-section')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
                                                          <xf:help  value="xxf:help ('fr-section')"><xsl:copy-of select="$root/xf:help /@mediatype"/></xf:help>
                                                          <xf:hint  value="xxf:hint ('fr-section')"><xsl:copy-of select="$root/xf:hint /@mediatype"/></xf:hint>
@@ -158,7 +158,7 @@
                                                      <!-- We can't use a trigger in all cases, making the trigger readonly if the section isn't collapsible,
                                                           as readonly triggers are removed when in static-readonly (as a result, section titles wouldn't show
                                                           on the review page if the section isn't collapsible) -->
-                                                     <xf:output appearance="minimal" class="fr-section-label" value="xxf:label('fr-section')">
+                                                     <xf:output appearance="minimal" class="fr-section-label" value="xxf:label('fr-section')" id="title">
                                                          <xsl:copy-of select="$root/xf:label/@mediatype"/>
                                                          <xf:help  value="xxf:help ('fr-section')"><xsl:copy-of select="$root/xf:help /@mediatype"/></xf:help>
                                                          <xf:hint  value="xxf:hint ('fr-section')"><xsl:copy-of select="$root/xf:hint /@mediatype"/></xf:hint>
@@ -182,6 +182,8 @@
                                 -->
                                 <xf:switch
                                     id="switch"
+                                    role="group"
+                                    aria-labelledby="title"
                                     xxf:readonly-appearance="dynamic"
                                     xxf:element="div"
                                     xxf:xforms11-switch="{$editable or $content-nonrelevant-if-collapsed}"

@@ -215,13 +215,14 @@ object Help {
           val controlTopPopover = controlTopDoc - newPopoverOffset.top
           val arrowTop = (controlTopPopover / popover.outerHeight().getOrElse(0d)) * 100
           popover.children(".arrow").css("top", arrowTop.toString + "%")
-        case Placement.Top | Placement.Bottom =>
-          popover.children(".arrow").css("left", "10%")
-          // Smaller max-width to avoid popover having no padding on the right, especially for mobile
-          val altMaxWidth = dom.document.documentElement.clientWidth - 2 * newPopoverOffset.left
+        case Placement.Top | Placement.Bottom | Placement.Over =>
+          if (placement != Placement.Over)
+            popover.children(".arrow").css("left", "10%")
+          val altMaxWidth =
+            dom.document.documentElement.clientWidth -
+            2 * (if (placement == Placement.Over) padding else newPopoverOffset.left)
           if (popover.width() > altMaxWidth)
             popover.css("max-width", altMaxWidth.toString + "px")
-        case _ =>
       }
     }
 

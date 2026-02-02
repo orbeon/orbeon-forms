@@ -29,6 +29,8 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2024.1.4](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.4)
+- [Orbeon Forms 2023.1.8](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.8)
 - [Orbeon Forms 2025.1](https://doc.orbeon.com/release-notes/orbeon-forms-2025.1)
 - [Orbeon Forms 2024.1.3](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.3)
 - [Orbeon Forms 2024.1.2](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.2)

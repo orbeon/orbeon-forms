@@ -30,6 +30,7 @@
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="print-pdf-template.xpl"/>
                 <p:input name="xforms" href="#unrolled-form"/>
+                <p:input name="form-definition" href="#data"/>
                 <p:input name="parameters" href="#instance"/>
                 <p:output name="data" id="pdf-data"/>
             </p:processor>

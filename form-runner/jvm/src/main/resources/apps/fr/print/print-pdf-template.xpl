@@ -11,28 +11,25 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+>
 
-    <!-- Unrolled XHTML+XForms -->
-    <p:param type="input" name="xforms"/>
-    <!-- Request parameters -->
-    <p:param type="input" name="parameters"/>
-    <!-- PDF document -->
-    <p:param type="output" name="data"/>
+    <p:param type="input"  name="xforms"/>         <!-- Unrolled XHTML+XForms  -->
+    <p:param type="input"  name="parameters"/>     <!-- Request parameters     -->
+    <p:param type="input"  name="form-definition"/><!-- Form definition source -->
+    <p:param type="output" name="data"/>           <!-- PDF document           -->
 
     <!-- Call XForms epilogue -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="/ops/pfc/xforms-epilogue.xpl"/>
-        <p:input name="data" href="#xforms"/>
-        <p:input name="model-data"><null xsi:nil="true"/></p:input>
-        <p:input name="instance" href="#parameters"/>
+        <p:input  name="config"     href="/ops/pfc/xforms-epilogue.xpl"/>
+        <p:input  name="data"       href="#xforms"/>
+        <p:input  name="model-data"><null xsi:nil="true"/></p:input>
+        <p:input  name="instance"   href="#parameters"/>
         <p:output name="xformed-data" id="xformed-data"/>
     </p:processor>
 
@@ -81,21 +78,10 @@
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
-    <!-- Obtain original form document -->
-    <p:processor name="oxf:scope-generator">
-        <p:input name="config">
-            <config>
-                <key>fr-form-definition</key>
-                <scope>request</scope>
-            </config>
-        </p:input>
-        <p:output name="data" id="form-document"/>
-    </p:processor>
-
     <!-- Create mapping file -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input  name="data"       href="#xhtml-data"/>
-        <p:input  name="form"       href="#form-document"/>
+        <p:input  name="form"       href="#form-definition"/>
         <p:input  name="parameters" href="#parameters"/>
         <p:input  name="config"     href="print-pdf-template.xsl"/>
         <p:output name="data"       id="mapping"/>
@@ -104,7 +90,7 @@
     <!-- Call up persistence layer to obtain the PDF file -->
     <p:processor name="oxf:url-generator">
         <!-- NOTE: Depend on #request for request parameters to avoid caching issues -->
-        <p:input name="config" href="aggregate('root', #form-document, #parameters, #request)" transform="oxf:unsafe-xslt">
+        <p:input name="config" href="aggregate('root', #form-definition, #parameters, #request)" transform="oxf:unsafe-xslt">
             <config xsl:version="2.0" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
                 <xsl:variable name="form"   select="/*/*[1]"/>
@@ -114,6 +100,7 @@
                 <xsl:variable name="pdf-template-name-opt" select="p:get-request-parameter('fr-pdf-template-name')[frf:isServicePath(p:get-request-path()) or p:get-request-method() = 'POST']"/>
                 <xsl:variable name="pdf-template-lang-opt" select="p:get-request-parameter('fr-pdf-template-lang')[frf:isServicePath(p:get-request-path()) or p:get-request-method() = 'POST']"/>
 
+                <!-- TODO: use function -->
                 <xsl:variable name="attach" select="$form//xf:instance[@id = 'fr-form-attachments']/*"/>
 
                 <url>
@@ -147,10 +134,10 @@
 
     <!-- Produce PDF document -->
     <p:processor name="oxf:pdf-template">
-        <p:input name="data" href="#xhtml-data"/>
-        <p:input name="model" href="#mapping"/>
-        <p:input name="template" href="#pdf-template"/>
-        <p:output name="data" ref="data"/>
+        <p:input  name="data"     href="#xhtml-data"/>
+        <p:input  name="model"    href="#mapping"/>
+        <p:input  name="template" href="#pdf-template"/>
+        <p:output name="data"     ref="data"/>
     </p:processor>
 
     <!-- TODO: example of oxf:add-attribute processor adding content-disposition information -->

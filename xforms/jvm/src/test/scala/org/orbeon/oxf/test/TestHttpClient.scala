@@ -50,8 +50,8 @@ import scala.jdk.CollectionConverters.*
 object TestHttpClient {
 
   sealed trait CacheEvent
-  case class DigestAndTemplate(digestIfFound: Option[String]) extends CacheEvent
-  case class StaticState(found: Boolean, digest: String)      extends CacheEvent
+  case class DigestAndTemplate(digestIfFound: Option[String])           extends CacheEvent
+  case class StaticState(read: Boolean, found: Boolean, digest: String) extends CacheEvent
 
   private val Logger = LoggerFactory.createLogger(TestHttpClient.getClass)
 
@@ -94,11 +94,6 @@ object TestHttpClient {
 
     val events = mutable.ListBuffer[CacheEvent]()
 
-    val tracer = new CacheTracer {
-      override def digestAndTemplateStatus(digestIfFound: Option[String]) = events += DigestAndTemplate(digestIfFound)
-      override def staticStateStatus(found: Boolean, digest: String)      = events += StaticState(found, digest)
-    }
-
     val (response, sessionOpt) =
       withNewPipelineContext("TestHttpClient.connect()") { pipelineContext =>
 
@@ -129,6 +124,11 @@ object TestHttpClient {
 
           (externalContext, response)
         }
+
+       val tracer = new CacheTracer {
+        def digestAndTemplateStatus(digestIfFound: Option[String]): Unit = events += DigestAndTemplate(digestIfFound)
+        def staticStateStatus(read: Boolean, found: Boolean, digest: String): Unit = events += StaticState(read, found, digest)
+      }
 
         pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
         pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", true) // the default

@@ -14,10 +14,8 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option.*
-import org.orbeon.connection.StreamedContent
-import org.orbeon.oxf.test.TestHttpClient.{CacheEvent, StaticState}
+import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -30,62 +28,97 @@ class CacheTest
 
   describe("Form Runner static cache") {
 
-    val Id1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
-    val Id2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
+    val AppName  = "tests"
+    val FormName = "noscript-false-pdf-template-wizard-true"
+
+    val DocumentId1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
+    val DocumentId2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
 
     def runAndAssert(
-      form              : String,
-      mode              : String,
-      query             : IterableOnce[(String, String)] = Nil,
-      content           : Option[StreamedContent]        = None,
+      form               : String,
+      mode               : String,
+      query              : IterableOnce[(String, String)] = Nil,
+      background         : Boolean                        = false,
     )(
-      expectedInitialHit: Boolean
+      expectedInitialHit : Boolean,
+      expectedInitialRead: Boolean,
     ): Unit = {
 
-      def staticStateFoundOpt(events: List[CacheEvent]): Option[Boolean] =
-        events collectFirst { case StaticState(found, _) => found }
+      def testOne(documentIdOpt: Option[String], expectedInitialHit : Boolean, expectedInitialRead: Boolean): Unit = {
 
-      def staticStateHasTemplateOpt(events: List[CacheEvent]): Option[Boolean] =
-        events
-          .collectFirst { case StaticState(_, digest) => digest }
-          .flatMap(XFormsStaticStateCache.findDocument)
-          .map(_._1.template.isDefined)
+        val (_, _, events) =
+          runFormRunner(
+            AppName,
+            form,
+            mode,
+            documentId = documentIdOpt,
+            query      = query,
+            background = background
+          )
 
-      // First time may or may not pass
-      val (_, _, events1) = runFormRunner("tests", form, mode, documentId = Id1.some, query = query, content = content,  initialize = true)
+        def staticStateFoundOpt: Option[Boolean] =
+          events.collectFirst { case StaticState(_, found, _) => found }
 
-      it(s"initial hit `$expectedInitialHit` for $form/$mode/${PathUtils.encodeSimpleQuery(query)}") {
-        assert(staticStateFoundOpt(events1).contains(expectedInitialHit))
-        // NOTE: no XFCD because the form has `xxf:no-updates="true"`.
+        def documentInputRead: Boolean =
+          events.exists {
+            case StaticState(read, _, _) => read
+            case _                       => false
+          }
+
+        def staticStateHasTemplateOpt: Option[Boolean] =
+          events
+            .collectFirst { case StaticState(_, _, digest) => digest }
+            .flatMap(XFormsStaticStateCache.findDocument)
+            .map(_._1.template.isDefined)
+
+        val path = buildFormRunnerPath(AppName, form, mode, documentIdOpt, query, background)
+
+        describe(s"$path") {
+          it(s"initial hit `$expectedInitialHit`") {
+            assert(staticStateFoundOpt.contains(expectedInitialHit))
+          }
+
+          it(s"initial read `$expectedInitialRead`") {
+            if (documentInputRead != expectedInitialRead) {
+              pprint.pprintln(s"xxx failed, events:")
+              pprint.pprintln(events)
+            }
+            assert(documentInputRead == expectedInitialRead)
+          }
+
+          it(s"template exists") {
+            assert(staticStateHasTemplateOpt.contains(true))
+          }
+        }
       }
 
-      // Second time with different document must always pass
-      val (_, _, events2) = runFormRunner("tests", form, mode, documentId = Id2.some, query = query, content = content, initialize = true)
-
-      it(s"second hit `true` for $form/$mode/${PathUtils.encodeSimpleQuery(query)}") {
-        assert(staticStateFoundOpt(events2).contains(true))
-        // NOTE: no XFCD because the form has `xxf:no-updates="true"`.
-      }
-
-      it(s"template exists for $form/$mode/${PathUtils.encodeSimpleQuery(query)}") {
-        assert(staticStateHasTemplateOpt(events2) contains true)
+      if (mode == "new") {
+        testOne(None, expectedInitialHit, expectedInitialRead)
+      } else {
+        testOne(DocumentId1.some, expectedInitialHit,        expectedInitialRead)
+        testOne(DocumentId2.some, expectedInitialHit = true, expectedInitialRead = false)
       }
     }
 
-    locally {
-      val Form = "noscript-false-pdf-template-wizard-true"
-
-      runAndAssert(Form, "new" )(expectedInitialHit = false)
-      runAndAssert(Form, "edit")(expectedInitialHit = true)
-      runAndAssert(Form, "view")(expectedInitialHit = false)
-      // Pass `content` as `fr-use-pdf-template` is only honored for `POST` or service requests
-      runAndAssert(Form, "pdf", query = List("fr-use-pdf-template" -> "false"), content = Some(StreamedContent.Empty))(expectedInitialHit = true)
-      // This will use the PDF template
-      runAndAssert(Form, "pdf" )(expectedInitialHit = false)
-
-      // NOTE: Need to run schema.xpl or FR PFC for this to work
-      // See https://github.com/orbeon/orbeon-forms/issues/1731
-      // runAndAssert(Form, "schema")(expectedFound = false)
-    }
+    runAndAssert(FormName, "new")(
+      expectedInitialHit = false,
+      expectedInitialRead = true
+    )
+    runAndAssert(FormName, "edit")(
+      expectedInitialHit = true,  // there should not be any differences in compiled forms between `new` and `edit`
+      expectedInitialRead = false // and this is also reflected in `FormRunnerConfig`, unless for example TOC settings are different
+    )
+    runAndAssert(FormName, "view")(
+      expectedInitialHit = false, // for `view`, the compiled form is different
+      expectedInitialRead = true
+    )
+    runAndAssert(FormName, "pdf", query = List("fr-use-pdf-template" -> "false"), background = true)(
+      expectedInitialHit = true,  // it happens that when not using PDF templates, the compiled form is the same as in `view`
+      expectedInitialRead = true  // but `FormRunnerConfig` is different, so we read the input again
+    )
+    runAndAssert(FormName, "pdf")(
+      expectedInitialHit = false, // when using PDF templates, the compiled form is different
+      expectedInitialRead = true
+    )
   }
 }

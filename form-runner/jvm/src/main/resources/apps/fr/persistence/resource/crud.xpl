@@ -41,7 +41,7 @@
 
     <p:choose href="#request">
         <!-- Handle binary and XML GET -->
-        <p:when test="/*/method = 'GET'">
+        <p:when test="/*/method = ('GET', 'HEAD')">
             <!-- Read URL -->
             <p:processor name="oxf:url-generator">
                 <p:input name="config" transform="oxf:unsafe-xslt" href="#matcher-groups">

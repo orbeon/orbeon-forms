@@ -23,7 +23,7 @@ object XFormsStaticStateCache {
 
   trait CacheTracer {
     def digestAndTemplateStatus(digestIfFound: Option[String]): Unit
-    def staticStateStatus(found: Boolean, digest: String): Unit
+    def staticStateStatus(read: Boolean, found: Boolean, digest: String): Unit
   }
 
   def storeDocument(staticState: XFormsStaticState): Unit =

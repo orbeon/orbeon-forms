@@ -202,7 +202,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
               XFormsStaticStateCache.findDocument(stage2CacheableState.staticStateDigest) match {
                 case Some((cachedState, _)) if cachedState.topLevelPart.bindingsIncludesAreUpToDate =>
                   // Found static state in cache
-                  cacheTracer.staticStateStatus(found = true, cachedState.digest)
+                  cacheTracer.staticStateStatus(read = false, found = true, cachedState.digest)
                   cachedState
                 case other =>
                   // Not found static state in cache OR it is out of date, create static state from input
@@ -219,7 +219,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                         readInputAsSAX(pipelineContext, InputAnnotatedDocument, _)
                       )
                     )
-                  cacheTracer.staticStateStatus(found = false, staticState.digest)
+                  cacheTracer.staticStateStatus(read = true, found = false, staticState.digest)
                   XFormsStaticStateCache.storeDocument(staticState)
                   staticState
               }
@@ -309,7 +309,7 @@ private object XFormsProcessorBase {
     val staticState =
       XFormsStaticStateCache.findDocument(staticStateBits.staticStateDigest) match {
         case Some((cachedState, _)) if cachedState.topLevelPart.bindingsIncludesAreUpToDate =>
-          cacheTracer.staticStateStatus(found = true, cachedState.digest)
+          cacheTracer.staticStateStatus(read = true, found = true, cachedState.digest)
           cachedState
         case other =>
           // Not found static state in cache OR it is out of date, create and initialize static state object
@@ -319,7 +319,7 @@ private object XFormsProcessorBase {
           }
 
           val newStaticState = PartAnalysisBuilder.createFromStaticStateBits(staticStateBits)
-          cacheTracer.staticStateStatus(found = false, newStaticState.digest)
+          cacheTracer.staticStateStatus(read = true, found = false, newStaticState.digest)
           XFormsStaticStateCache.storeDocument(newStaticState)
           newStaticState
       }

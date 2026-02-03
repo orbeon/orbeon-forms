@@ -91,7 +91,9 @@ trait FormRunnerSupport extends DocumentTestBase {
     query      : IterableOnce[(String, String)] = Nil,
     initialize : Boolean                        = true,
     content    : Option[StreamedContent]        = None,
-    attributes : Map[String, AnyRef]            = Map.empty
+    attributes : Map[String, AnyRef]            = Map.empty,
+    background : Boolean                        = false
+
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
     val (processorService, docOpt, events, _) =
@@ -104,7 +106,8 @@ trait FormRunnerSupport extends DocumentTestBase {
         query,
         initialize,
         content,
-        attributes
+        attributes,
+        background = background
       )
 
     (processorService, docOpt, events)
@@ -159,7 +162,7 @@ trait FormRunnerSupport extends DocumentTestBase {
 
     val (processorService, response, _, events) =
       TestHttpClient.connect(
-        url         = PathUtils.recombineQuery(s"/fr/${if (background) "service/" else ""}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query),
+        url         = buildFormRunnerPath(app, form, mode, documentId, query, background),
         method      = if (content.isDefined) POST else GET,
         headers     = headers,
         content     = content,
@@ -186,4 +189,15 @@ trait FormRunnerSupport extends DocumentTestBase {
       }
     )
   }
+
+  // TODO: add form version parameter
+  def buildFormRunnerPath(
+    app       : String,
+    form      : String,
+    mode      : String,
+    documentId: Option[String]                 = None,
+    query     : IterableOnce[(String, String)] = Nil,
+    background: Boolean                        = false
+  ): String =
+    PathUtils.recombineQuery(s"/fr/${if (background) "service/" else ""}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query)
 }

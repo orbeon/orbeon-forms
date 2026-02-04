@@ -319,7 +319,7 @@ private object XFormsProcessorBase {
     instanceDependencies ++ xmlSchemaDependencies ++ xblBindingDependencies
   }
 
-  def readStaticState(
+  private def readStaticState(
     read          : XMLReceiver => Unit,
     cacheTracer   : XFormsStaticStateCache.CacheTracer
   )(implicit

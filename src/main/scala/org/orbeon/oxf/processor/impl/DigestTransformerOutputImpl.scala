@@ -37,10 +37,8 @@ abstract class DigestTransformerOutputImpl(processor: ProcessorImpl, name: Strin
   override protected def getLocalKey(pipelineContext: PipelineContext): CacheKey = {
 
     for (inputName <- getProcessor(pipelineContext).getInputNames.asScala)
-      if (! getProcessor(pipelineContext).isInputInCache(pipelineContext, inputName)) { // NOTE: We don't really support multiple inputs with the same name.
-        System.out.println("yyy DigestTransformerOutputIMpl: config not in cache")
+      if (! getProcessor(pipelineContext).isInputInCache(pipelineContext, inputName)) // NOTE: We don't really support multiple inputs with the same name.
         return null
-      }
     getFilledOutState(pipelineContext).key
   }
 

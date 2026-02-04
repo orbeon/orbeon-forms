@@ -1132,9 +1132,8 @@
         <tab-test><label>Testitulokset</label></tab-test>
         <url-parameters><label>URL-parametrit</label></url-parameters>
         <parameter-or-header-name><label>Nimi</label></parameter-or-header-name>
-        <parameter-default-value><label>Oletusarvo</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Oletusarvo</label></parameter-or-header-default-value>
         <request-headers><label>HTTP-otsakkeet</label></request-headers>
-        <header-default-value><label>Oletusarvo</label></header-default-value>
         <no-headers>Ei otsakkeita vastaanotettu.</no-headers>
         <service-name>
             <label>Palvelun nimi</label>

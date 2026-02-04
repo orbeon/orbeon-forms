@@ -1119,9 +1119,8 @@
         <tab-test><label>Testresultat</label></tab-test>
         <url-parameters><label>URL-parametrar</label></url-parameters>
         <parameter-or-header-name><label>Namn</label></parameter-or-header-name>
-        <parameter-default-value><label>Standardvärde</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Standardvärde</label></parameter-or-header-default-value>
         <request-headers><label>HTTP-huvuden</label></request-headers>
-        <header-default-value><label>Standardvärde</label></header-default-value>
         <no-headers>Inga headers mottagna</no-headers>
         <service-name>
             <label>Namn</label>

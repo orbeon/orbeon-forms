@@ -1118,9 +1118,8 @@
         <tab-test><label>Resultados do Teste</label></tab-test>
         <url-parameters><label>Parâmetros de URL</label></url-parameters>
         <parameter-or-header-name><label>Nome</label></parameter-or-header-name>
-        <parameter-default-value><label>Valor Predefinido</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Valor Predefinido</label></parameter-or-header-default-value>
         <request-headers><label>Cabeçalhos HTTP</label></request-headers>
-        <header-default-value><label>Valor Predefinido</label></header-default-value>
         <no-headers>Nenhum cabeçalho recebido.</no-headers>
         <service-name>
             <label>Nome do Serviço</label>

@@ -1119,9 +1119,8 @@
         <tab-test><label>Testresultater</label></tab-test>
         <url-parameters><label>URL-parametre</label></url-parameters>
         <parameter-or-header-name><label>Navn</label></parameter-or-header-name>
-        <parameter-default-value><label>Standardverdi</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Standardverdi</label></parameter-or-header-default-value>
         <request-headers><label>HTTP-hoder</label></request-headers>
-        <header-default-value><label>Standardverdi</label></header-default-value>
         <no-headers>Ingen headere mottatt.</no-headers>
         <service-name>
             <label>Tjenestenavn</label>

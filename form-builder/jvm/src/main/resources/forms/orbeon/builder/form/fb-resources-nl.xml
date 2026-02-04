@@ -1119,9 +1119,8 @@
         <tab-test><label>Testresultaten</label></tab-test>
         <url-parameters><label>URL parameters</label></url-parameters>
         <parameter-or-header-name><label>Naam</label></parameter-or-header-name>
-        <parameter-default-value><label>Standaardwaarde</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Standaardwaarde</label></parameter-or-header-default-value>
         <request-headers><label>HTTP-headers</label></request-headers>
-        <header-default-value><label>Standaardwaarde</label></header-default-value>
         <no-headers>Geen headers ontvangen.</no-headers>
         <service-name>
             <label>Servicenaam</label>

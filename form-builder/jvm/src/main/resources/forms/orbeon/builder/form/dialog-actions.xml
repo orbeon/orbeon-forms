@@ -420,18 +420,18 @@
                                     id="fb-request-param-or-header"
                                     ref="dropdown-value"
                                     appearance="search"
-                                    class="fb-action-option-3-col-span-1">
+                                    class="fb-action-option-3-col-span-1 fb-request-param-or-header-select">
                                     <!-- Parameters group -->
-                                    <xf:choices ref=".[xxf:non-blank($instance/parameter-names)]">
-                                        <xf:label ref="$form-resources/dialog-actions/parameters-group"/>
+                                    <xf:choices>
+                                        <xf:label ref="$form-resources/dialog-actions/parameters-group[xxf:non-blank($instance/parameter-names)]"/>
                                         <xf:itemset ref="xxf:split($instance/parameter-names)">
                                             <xf:label ref="."/>
                                             <xf:value ref="concat('p:', '''', ., '''')"/>
                                         </xf:itemset>
                                     </xf:choices>
                                     <!-- Headers group -->
-                                    <xf:choices ref=".[xxf:non-blank($instance/header-names)]">
-                                        <xf:label ref="$form-resources/dialog-actions/headers-group"/>
+                                    <xf:choices>
+                                        <xf:label ref="$form-resources/dialog-actions/headers-group[xxf:non-blank($instance/header-names)]"/>
                                         <xf:itemset ref="xxf:split($instance/header-names)">
                                             <xf:label ref="."/>
                                             <xf:value ref="concat('h:', '''', ., '''')"/>

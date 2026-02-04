@@ -725,7 +725,7 @@
                                                     </xh:td>
                                                     <xh:td>
                                                         <xf:input ref="@value" id="request-param-value-input">
-                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-default-value.label', '|fr-form-resources|')"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-or-header-default-value.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
@@ -754,7 +754,7 @@
                                                     </xh:td>
                                                     <xh:td>
                                                         <xf:input ref="@value" id="request-header-value-input">
-                                                            <xf:label ref="xxf:r('dialog-http-services.header-default-value.label', '|fr-form-resources|')"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-or-header-default-value.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>

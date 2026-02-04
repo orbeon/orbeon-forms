@@ -1091,9 +1091,8 @@
         <tab-test><label>Risultati test</label></tab-test>
         <url-parameters><label>Parametri URL</label></url-parameters>
         <parameter-or-header-name><label>Nome</label></parameter-or-header-name>
-        <parameter-default-value><label>Valore predefinito</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Valore predefinito</label></parameter-or-header-default-value>
         <request-headers><label>Intestazioni HTTP</label></request-headers>
-        <header-default-value><label>Valore predefinito</label></header-default-value>
         <no-headers>Nessuna intestazione ricevuta.</no-headers>
         <service-name>
             <label>Nome del servizio</label>

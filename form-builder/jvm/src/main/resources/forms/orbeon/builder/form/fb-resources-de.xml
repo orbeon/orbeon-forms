@@ -1088,9 +1088,8 @@
         <tab-test><label>Testergebnisse</label></tab-test>
         <url-parameters><label>URL Parameter</label></url-parameters>
         <parameter-or-header-name><label>Name</label></parameter-or-header-name>
-        <parameter-default-value><label>Standardwert</label></parameter-default-value>
+        <parameter-or-header-default-value><label>Standardwert</label></parameter-or-header-default-value>
         <request-headers><label>HTTP-Header</label></request-headers>
-        <header-default-value><label>Standardwert</label></header-default-value>
         <no-headers>Keine Kopfzeilen empfangen.</no-headers>
         <service-name>
             <label>Name des Dienstes</label>

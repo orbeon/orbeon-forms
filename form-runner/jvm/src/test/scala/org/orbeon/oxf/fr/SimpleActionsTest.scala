@@ -81,6 +81,28 @@ class SimpleActionsTest
         }
       }
     }
+
+    describe("#6199: HTTP Service Editor to support HTTP headers") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("issue", "6199", "new", initialize = true)
+
+      val doc = docOpt.get
+
+      it("must set a control value as request header, send to echo service, and read back correctly") {
+        withTestExternalContext { implicit ec =>
+          withFormRunnerDocument(processorService, doc) {
+            val testValue = "my-test-header-value"
+
+            // The form defines an HTTP service and actions, so that the test value should be propagated from a source
+            // control to a destination control: source-control -> X-Test-Header -> httpbin -> body -> destination-control
+
+            setControlValueWithEventSearchNested(resolveObject[XFormsControl]("source-control").get.effectiveId, testValue)
+
+            assert(resolveObject[XFormsValueControl]("destination-control").map(_.getValue(EventCollector.Throw)).contains(testValue))
+          }
+        }
+      }
+    }
   }
 }
-

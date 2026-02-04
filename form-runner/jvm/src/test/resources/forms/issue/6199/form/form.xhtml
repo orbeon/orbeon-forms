@@ -1,0 +1,173 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <source></source>
+                            <destination></destination>
+                        </grid-1>
+
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="source-bind" ref="source" name="source" xxf:whitespace="trim"></xf:bind>
+                        <xf:bind id="destination-bind" ref="destination" name="destination"
+                                 xxf:whitespace="trim"></xf:bind>
+                    </xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6199</form-name>
+                    <title xml:lang="en">HTTP Service Editor to support HTTP headers #6199</title>
+                    <description xml:lang="en"></description>
+                    <grid-tab-order>default</grid-tab-order>
+                    <library-versions>
+
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers></headers>
+                                <exclude-from-all-control-values></exclude-from-all-control-values>
+                            </template>
+                        </templates>
+                        <parameters></parameters>
+                    </email>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">
+                        {"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"source"},{"value":"destination"}],"topLevel":true}]}
+                    </migration>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments></attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <source><label>Source</label>
+                            <hint></hint>
+                        </source>
+                        <destination><label>Destination</label>
+                            <hint></hint>
+                        </destination>
+                        <section-1>
+                            <label></label>
+                        </section-1>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <xf:instance id="echo-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                &lt;params/&gt;
+                </body>
+            </xf:instance>
+            <xf:submission id="echo-service-submission" class="fr-service" resource="http://localhost:8084/headers"
+                           method="get" serialization="none" mediatype="">
+                <xf:header xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                           xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                    <xf:name>X-Test-Header</xf:name>
+                    <xf:value>default-value</xf:value>
+                </xf:header>
+            </xf:submission>
+            <xf:action id="echo-action-binding">
+                <xf:action xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                           xmlns:d="DAV:" xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
+                           xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                           xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                           xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" xmlns:Wizard="java:org.orbeon.xbl.Wizard"
+                           event="xforms-value-changed" ev:observer="source-control" if="true()">
+                    <xf:send submission="echo-service-submission"></xf:send>
+                </xf:action>
+                <xf:action xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                           xmlns:d="DAV:" xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
+                           xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                           xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                           xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" xmlns:Wizard="java:org.orbeon.xbl.Wizard"
+                           event="xforms-submit" ev:observer="echo-service-submission">
+                    <xf:var name="request-instance-name" value="'echo-service-instance'"></xf:var>
+                    <xf:action>
+                        <xf:action class="fr-set-service-value-action">
+                            <xf:var name="control-name" value="'source'"></xf:var>
+                            <xf:var name="header-name" value="'X-Test-Header'"></xf:var>
+
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
+                <xf:action xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                           xmlns:d="DAV:" xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
+                           xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                           xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                           xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" xmlns:Wizard="java:org.orbeon.xbl.Wizard"
+                           event="xforms-submit-done" ev:observer="echo-service-submission">
+                    <xf:action class="fr-set-control-value-action">
+                        <xf:var name="control-name" value="'destination'"></xf:var>
+                        <xf:var name="control-value" value="/json/headers/X-Test-Header/text()"></xf:var>
+                    </xf:action>
+                </xf:action>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="source-control"
+                                      bind="source-bind">
+                                <xf:label ref="$form-resources/source/label"></xf:label>
+                                <xf:hint ref="$form-resources/source/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="destination-control"
+                                      bind="destination-bind">
+                                <xf:label ref="$form-resources/destination/label"></xf:label>
+                                <xf:hint ref="$form-resources/destination/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

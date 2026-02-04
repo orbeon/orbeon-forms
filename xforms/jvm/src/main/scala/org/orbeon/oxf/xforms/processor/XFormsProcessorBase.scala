@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.processor
 
 import cats.syntax.option.*
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{BasicCredentials, URIReferences}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferencesState
 import org.orbeon.oxf.processor.*
+import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferencesState
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
@@ -272,32 +272,11 @@ private object XFormsProcessorBase {
     var stage1CacheableState: Stage1CacheableState = null
   }
 
-  def collectDependencies(
+  private def collectDependencies(
     containingDocument : XFormsContainingDocument
   )(implicit
     indentedLogger     : IndentedLogger
   ): Iterator[(String, Option[BasicCredentials])] = {
-
-    val instanceDependencies = {
-      // Add static instance source dependencies for top-level models
-      // TODO: check all models/instances
-      val topLevelPart = containingDocument.staticState.topLevelPart
-      for {
-        model                 <- topLevelPart.getModelsForScope(topLevelPart.startScope).iterator
-        (_, instance)         <- model.instances
-        if instance.dependencyURL.isDefined && ! instance.cache
-        resolvedDependencyURL =
-          XFormsCrossPlatformSupport.resolveServiceURL(
-            containingDocument,
-            instance.element,
-            instance.dependencyURL.get,
-            UrlRewriteMode.Absolute
-          )
-      } yield {
-        debug("adding document cache dependency for non-cacheable instance", List("instance URI" -> resolvedDependencyURL))
-        (resolvedDependencyURL, instance.credentials)
-      }
-    }
 
     // Set caching dependencies if the input was actually read
     // Q: should use static dependency information instead? what about schema imports and instance replacements?
@@ -316,7 +295,7 @@ private object XFormsProcessorBase {
       for (include <- containingDocument.staticState.topLevelPart.bindingIncludes)
         yield ("oxf:" + include, None)
 
-    instanceDependencies ++ xmlSchemaDependencies ++ xblBindingDependencies
+    xmlSchemaDependencies ++ xblBindingDependencies
   }
 
   private def readStaticState(

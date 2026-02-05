@@ -3162,4 +3162,97 @@
             </controls>
         </output>
     </test>
+
+    <test description="`aria-labelledby` pointing to an XForms control" name="oxf:pipeline" exclude="true">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xh:head>
+                    <xf:model>
+                        <xf:instance>
+                            <data>
+                                <a>
+                                    <b/>
+                                    <b/>
+                                </a>
+                                <a>
+                                    <b/>
+                                    <b/>
+                                </a>
+                            </data>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="a">
+                        <xf:trigger appearance="minimal" id="t">
+                            <xf:label>Title</xf:label>
+                        </xf:trigger>
+                        <xf:repeat ref="b">
+                            <xf:group aria-labelledby="t">Group with `aria-labelledby`</xf:group>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="repeat-begin-xf-3" class="xforms-repeat-begin-end xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="t⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-repeat-selected-item-1 xforms-update-full">
+                    <xh:button id="t≡≡c⊙1" class="btn-link">Title</xh:button>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="repeat-begin-xf-5⊙1" class="xforms-repeat-begin-end xforms-update-full xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-2 xforms-update-full xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="xf-6⊙1-1" class="xforms-group xforms-repeat-selected-item-2 xforms-update-full xforms-repeat-selected-item-1 xforms-update-full" aria-labelledby="t⊙1">Group with `aria-labelledby`</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-2 xforms-update-full xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-update-full xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="xf-6⊙1-2" class="xforms-group xforms-update-full xforms-repeat-selected-item-1 xforms-update-full" aria-labelledby="t⊙1">Group with `aria-labelledby`</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-update-full xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="repeat-end-xf-5⊙1" class="xforms-repeat-begin-end xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="t⊙2" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-update-full">
+                    <xh:button id="t≡≡c⊙2" class="btn-link">Title</xh:button>
+                </xh:span>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="repeat-begin-xf-5⊙2" class="xforms-repeat-begin-end xforms-update-full xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span class="xforms-update-full xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="xf-6⊙2-1" class="xforms-group xforms-update-full xforms-update-full" aria-labelledby="t⊙2">Group with `aria-labelledby`</xh:span>
+                <xh:span class="xforms-update-full"/>
+                <xh:span class="xforms-update-full xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span class="xforms-repeat-delimiter xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span class="xforms-update-full xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="xf-6⊙2-2" class="xforms-group xforms-update-full xforms-update-full" aria-labelledby="t⊙2">Group with `aria-labelledby`</xh:span>
+                <xh:span class="xforms-update-full"/>
+                <xh:span class="xforms-update-full xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="repeat-end-xf-5⊙2" class="xforms-repeat-begin-end xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="repeat-end-xf-3" class="xforms-repeat-begin-end"/>
+            </controls>
+        </output>
+    </test>
 </group>

@@ -48,15 +48,18 @@ import scala.collection.immutable
 
 // The standard Form Runner parameters
 case class FormRunnerParams(
-  app         : String, // curiously we allow this to be `"*"`
-  form        : String, // curiously we allow this to be `"*"`
-  formVersion : Int,
-  document    : Option[String],
-  isDraft     : Option[Boolean],
-  mode        : String
+  app           : String, // curiously we allow this to be `"*"`
+  form          : String, // curiously we allow this to be `"*"`
+  formVersionOpt: Option[Int],
+  document      : Option[String],
+  isDraft       : Option[Boolean],
+  mode          : String
 ) {
   def appForm: AppForm =
     AppForm(app, form)
+
+  def formVersion: Int =
+    formVersionOpt.getOrElse(1)
 
   def appFormVersion: FormRunnerParams.AppFormVersion =
     (appForm, formVersion)
@@ -73,22 +76,22 @@ object FormRunnerParams {
 
   def apply(paramsRootElem: NodeInfo): FormRunnerParams =
     FormRunnerParams(
-      app         = paramsRootElem.elemValue("app"),
-      form        = paramsRootElem.elemValue("form"),
-      formVersion = paramsRootElem.elemValue("form-version").toIntOption.getOrElse(1), // in `test` mode, for example, `form-version` is blank
-      document    = paramsRootElem.elemValue("document").trimAllToOpt,
-      isDraft     = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
-      mode        = paramsRootElem.elemValue("mode")
+      app            = paramsRootElem.elemValue("app"),
+      form           = paramsRootElem.elemValue("form"),
+      formVersionOpt = paramsRootElem.elemValue("form-version").toIntOption, // in `test` mode, for example, `form-version` is blank
+      document       = paramsRootElem.elemValue("document").trimAllToOpt,
+      isDraft        = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
+      mode           = paramsRootElem.elemValue("mode")
     )
 
   def apply(appForm: AppForm, mode: String): FormRunnerParams =
     FormRunnerParams(
-      app         = appForm.app,
-      form        = appForm.form,
-      formVersion = 1,
-      document    = None,
-      isDraft     = None,
-      mode        = mode
+      app            = appForm.app,
+      form           = appForm.form,
+      formVersionOpt = Some(1),
+      document       = None,
+      isDraft        = None,
+      mode           = mode
     )
 
   type AppFormVersion = (AppForm, Int)

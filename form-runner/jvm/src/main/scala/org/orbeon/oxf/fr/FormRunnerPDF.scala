@@ -141,7 +141,7 @@ trait FormRunnerPDF {
       metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
       featureName                 = featureName
     )(
-      formRunnerParams            = FormRunnerParams(app, form, 1, None, None, mode)
+      formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
     )
 
   import URLFinder._

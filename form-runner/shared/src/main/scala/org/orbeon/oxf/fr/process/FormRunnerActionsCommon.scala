@@ -152,7 +152,9 @@ trait FormRunnerActionsCommon {
       implicit val connectionCtx  : ConnectionContexts       = ConnectionContextSupport.findContext(Map.empty)
       implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
       implicit val propertySet    : PropertySet              = CoreCrossPlatformSupport.properties
-      implicit val formRunnerParams @ FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
+      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+
+      val formVersion = formRunnerParams.formVersion
 
       ensureDataCalculationsAreUpToDate()
 

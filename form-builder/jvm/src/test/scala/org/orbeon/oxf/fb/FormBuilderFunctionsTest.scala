@@ -415,7 +415,7 @@ class FormBuilderFunctionsTest
         assertUniqueIds()
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "", "")
@@ -432,7 +432,7 @@ class FormBuilderFunctionsTest
         assertUniqueIds()
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         // First 2 sections will have `my-` prefixes, but other 2 sections not as they are the same
         // section templates and using `my-` would cause conflicts.
@@ -462,7 +462,7 @@ class FormBuilderFunctionsTest
     it("Must merge a section template that is the only section") {
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
-        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         // Remove all but one section
         for (i <- 0 to 4)
@@ -489,7 +489,7 @@ class FormBuilderFunctionsTest
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         // Remove all but two sections
         for (i <- 2 to 5)

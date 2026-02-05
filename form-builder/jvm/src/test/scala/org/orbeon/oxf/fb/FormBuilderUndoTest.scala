@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fb
 
+import cats.syntax.option.*
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl.resolveId
 import org.orbeon.datatypes.Direction
@@ -23,6 +24,7 @@ import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
+
 
 class FormBuilderUndoTest
   extends DocumentTestBase
@@ -53,7 +55,7 @@ class FormBuilderUndoTest
           val doc = ctx.formDefinitionRootElem
 
           implicit val formRunnerParams: FormRunnerParams =
-            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
           def countContainers    = FormBuilderXPathApi.countAllContainers(doc)
           def countNonContainers = FormBuilderXPathApi.countAllNonContainers(doc)
@@ -122,7 +124,7 @@ class FormBuilderUndoTest
         withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
           implicit val formRunnerParams: FormRunnerParams =
-            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
           // Move grid wall
           locally {

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import cats.syntax.option.*
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fr.FormRunner.*
@@ -20,7 +21,6 @@ import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
-
 
 
 // These functions run on a simplified "Form Builder" which loads a source form and goes through annotation.
@@ -48,7 +48,7 @@ class ClipboardTest
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         val selectedCell = FormBuilder.findSelectedCell.get
 
@@ -90,7 +90,7 @@ class ClipboardTest
           val doc = ctx.formDefinitionRootElem
 
           implicit val formRunnerParams: FormRunnerParams =
-            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
           def countContainers = FormBuilderXPathApi.countAllContainers(doc)
 
@@ -160,7 +160,7 @@ class ClipboardTest
       withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx =>
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         def findValues(controlName: String) =
           ctx.dataRootElem descendant controlName map (_.stringValue)
@@ -223,7 +223,7 @@ class ClipboardTest
       withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx =>
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         def findValues(controlName: String) =
           ctx.dataRootElem descendant controlName map (_.stringValue)
@@ -248,7 +248,7 @@ class ClipboardTest
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
         implicit val formRunnerParams: FormRunnerParams =
-          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
 
         // This section does not contain an element with an `id`
         FormBuilderRpcApiImpl.containerCopy("section-1-section")

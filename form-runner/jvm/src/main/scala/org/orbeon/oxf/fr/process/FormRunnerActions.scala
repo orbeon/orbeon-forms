@@ -263,7 +263,8 @@ trait FormRunnerActions
   def trySend(params: ActionParams): ActionResult = {
 
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
-    val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
+    val FormRunnerParams(currentApp, currentForm, _, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
+    val currentFormVersion = formRunnerParams.formVersion
 
     implicit val xfcd       : XFormsContainingDocument = inScopeContainingDocument
     implicit val propertySet: PropertySet              = CoreCrossPlatformSupport.properties

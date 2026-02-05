@@ -661,6 +661,12 @@
     </processor>
 
     <!-- Form Runner / Form Builder processors -->
+    <processor name="fr:read-form">
+        <class name="org.orbeon.oxf.fr.persistence.ReadFormProcessor"/>
+    </processor>
+    <processor name="fr:form-runner-config">
+        <class name="org.orbeon.oxf.fr.persistence.FormRunnerConfigProcessor"/>
+    </processor>
     <processor name="fr:resources-patcher">
         <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>
     </processor>

@@ -39,61 +39,30 @@
     <xsl:import href="legacy-repeat.xsl"/>    <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
-    <xsl:variable name="app"  select="doc('input:instance')/*/app"  as="xs:string"/>
-    <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
-    <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
+    <xsl:variable name="app"  select="doc('input:form-runner-config')/*/app"  as="xs:string"/>
+    <xsl:variable name="form" select="doc('input:form-runner-config')/*/form" as="xs:string"/>
+
+    <xsl:variable name="major-mode" select="doc('input:form-runner-config')/*/major-mode" as="xs:string"/>
 
     <xsl:variable
         name="mode-namespace-uri-opt"
-        select="
-            for $m in $mode
-            return
-                frf:customModeNamespace($app, $form, $mode)"
+        select="doc('input:form-runner-config')/*/mode-namespace-uri-opt"
         as="xs:string?"/>
 
     <xsl:variable
-        name="mode-qualified-name"
-        select="
-            for $m in $mode
-            return
-                frf:modeQualifiedName($app, $form, $mode)"
-        as="xs:string"/>
+        name="is-pdf-mode"
+        select="exists(doc('input:form-runner-config')/*/is-pdf[. = 'true'])"
+        as="xs:boolean"/>
 
     <xsl:variable
-        name="is-pdf-mode"
-        select="$mode = ('pdf', 'tiff', 'test-pdf')"
+        name="is-test-mode"
+        select="exists(doc('input:form-runner-config')/*/is-test[. = 'true'])"
         as="xs:boolean"/>
 
     <xsl:variable
         name="is-readonly-mode"
         as="xs:boolean"
-        select="$is-pdf-mode or frf:isReadonlyModeFromString($app, $form, $mode)"/>
-
-    <!-- Same logic as `fr:is-service-path()` -->
-    <xsl:variable
-        name="is-service-path"
-        as="xs:boolean"
-        select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"/>
-
-<!--    not(-->
-<!--        (-->
-<!--            frf:isServicePath(p:get-request-path()) or-->
-<!--            p:get-request-method() = 'POST'-->
-<!--        ) and-->
-<!--            p:get-request-parameter('fr-use-pdf-template') = 'false'-->
-<!--    ) and-->
-<!--        (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')-->
-
-<!--    listPdfTemplates.nonEmpty && ! (-->
-<!--      req.getMethod == HttpMethod.POST &&-->
-<!--      req.getFirstParamAsString(s"fr-$UsePdfTemplateParam").contains(false.toString)-->
-<!--    )-->
-
-    <!-- Same logic as in `fr:is-background()` -->
-    <xsl:variable
-        name="is-background"
-        as="xs:boolean"
-        select="$is-service-path and $mode = ('new', 'edit', 'export')"/>
+        select="exists(doc('input:form-runner-config')/*/is-readonly-mode[. = 'true'])"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
     <xsl:variable name="fr-form-model"       select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
@@ -104,10 +73,12 @@
     <xsl:variable name="fr-form-resources"   select="($fr-form-model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>
     <xsl:variable name="fr-form-attachments" select="($fr-form-model/xf:instance[@id = 'fr-form-attachments']/*)[1]"/>
 
-    <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', 'landing', ''))" as="xs:boolean"/>
-    <xsl:variable name="is-summary"          select="$mode = 'summary'"                               as="xs:boolean"/>
-    <xsl:variable name="is-landing"          select="$mode = 'landing'"                               as="xs:boolean"/>
-    <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"           as="xs:boolean"/>
+    <xsl:variable name="is-detail"           select="$major-mode = 'detail'"                as="xs:boolean"/>
+    <xsl:variable name="is-summary"          select="$major-mode = 'summary'"               as="xs:boolean"/>
+    <xsl:variable name="is-landing"          select="$major-mode = 'landing'"               as="xs:boolean"/>
+    <xsl:variable name="is-import"           select="$major-mode = 'import'"                as="xs:boolean"/>
+
+    <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
 
     <!-- For now, only enable Bootstrap 5 for the landing page -->
     <xsl:variable name="bs5"                 select="$is-landing"                                     as="xs:boolean"/>
@@ -116,28 +87,12 @@
 
     <xsl:variable
         name="use-pdf-template"
-        select="
-            $is-pdf-mode                            and
-            $fr-form-attachments/pdf/p:trim() != '' and
-            not(
-                (
-                    (: TODO: should check `$is-service-path`? :)
-                    doc('input:request')/*/method = 'POST'
-                ) and
-                    doc('input:request')/*/parameters/parameter[
-                        name  = 'fr-use-pdf-template' and
-                        value = ('true', 'false')
-                    ]/value/xs:boolean(.) = false()
-            )"
+        select="exists(doc('input:form-runner-config')/*/use-pdf-template[. = 'true'])"
         as="xs:boolean"/>
 
-    <!-- Move static readonly detection here -->
-    <!-- https://github.com/orbeon/orbeon-forms/issues/6707-->
     <xsl:variable
         name="is-static-readonly"
-        select="
-            ($mode = 'view' and not($is-form-builder)) or
-            ($is-pdf-mode   and not($use-pdf-template))"
+        select="exists(doc('input:form-runner-config')/*/is-static-readonly[. = 'true'])"
         as="xs:boolean"/>
 
     <!-- Actions -->
@@ -160,88 +115,23 @@
 
     <!-- MIP filtering -->
     <xsl:variable
-        name="disable-relevant-param-opt"
-        as="xs:boolean?"
-        select="
-            doc('input:request')/*/parameters/parameter[
-                name  = ('disable-relevant', 'fr-disable-relevant') and
-                value = ('true', 'false')
-            ]/value/xs:boolean(.)"/>
-
-    <xsl:variable
-        name="disable-default-param-opt"
-        as="xs:boolean?"
-        select="
-            doc('input:request')/*/parameters/parameter[
-                name  = ('disable-default', 'fr-disable-default') and
-                value = ('true', 'false')
-            ]/value/xs:boolean(.)"/>
-
-    <xsl:variable
-        name="disable-calculate-in-readonly-modes"
-        as="xs:boolean"
-        select="
-            $fr-form-metadata/readonly-disable-calculate = 'true' or (
-                not($fr-form-metadata/readonly-disable-calculate = 'false') and
-                p:property(string-join(('oxf.fr.detail.readonly.disable-calculate', $app, $form), '.')) = true()
-            )"/>
-
-    <xsl:variable
         name="disable-relevant"
-        select="($is-service-path or $mode = 'test-pdf') and $disable-relevant-param-opt"
+        select="exists(doc('input:form-runner-config')/*/disable-relevant[.  = 'true'])"
         as="xs:boolean"/>
 
     <xsl:variable
         name="disable-default"
-        select="($is-service-path or $mode = 'test-pdf') and $disable-default-param-opt"
-        as="xs:boolean"/>
-
-    <xsl:variable
-        name="disable-calculate-param-opt"
-        as="xs:boolean?"
-        select="
-            doc('input:request')/*/parameters/parameter[
-                name  = ('disable-calculations', 'disable-calculate', 'fr-disable-calculate') and
-                value = ('true', 'false')
-            ]/value/xs:boolean(.)"/>
+        select="exists(doc('input:form-runner-config')/*/disable-default[.  = 'true'])" as="xs:boolean"/>
 
     <xsl:variable
         name="disable-calculate"
-        select="
-            (: The parameter takes precedence :)
-            if (($is-service-path or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
-                $disable-calculate-param-opt
-            else
-                $is-readonly-mode and
-                $disable-calculate-in-readonly-modes"
+        select="exists(doc('input:form-runner-config')/*/disable-calculate[.  = 'true'])"
         as="xs:boolean"/>
 
     <!-- Itemset validation -->
     <xsl:variable
-        name="validate-selection-controls-choices-param-opt"
-        as="xs:boolean?"
-        select="
-            xs:boolean(
-                doc('input:request')/*/parameters/parameter[
-                    name = 'fr-internal-validate-selection-controls-choices'
-                ][1]/value/frf:decryptParameterIfNeeded(.)[
-                    . = ('true', 'false')
-                ]
-            )"/>
-
-    <xsl:variable
         name="validate-selection-controls-choices"
-        select="
-            if ($is-detail and not($is-readonly-mode) and not($is-form-builder)) then
-                (
-                    $validate-selection-controls-choices-param-opt,
-                    $fr-form-metadata/validate-selection-controls-choices = 'true' or (
-                        not($fr-form-metadata/validate-selection-controls-choices = 'false') and
-                        p:property(string-join(('oxf.fr.detail.validate-selection-controls-choices', $app, $form), '.')) = true()
-                    )
-                )[1]
-            else
-                false()"
+        select="exists(doc('input:form-runner-config')/*/validate-selection-controls-choices[.  = 'true'])"
         as="xs:boolean"/>
 
     <!-- Properties -->
@@ -251,69 +141,10 @@
         select="version:versionStringIfAllowedOrEmpty()"
         xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
-    <!-- TOC properties -->
-    <xsl:variable
-        name="toc-min-sections"
-        as="xs:integer"
-        select="
-            (
-                $fr-form-metadata/xbl/fr:toc/@min-sections[p:non-blank()],
-                (: Use `-2` as internal magic value to indicate that the property is not set :)
-                p:property(string-join(('oxf.fr.detail.toc',              $app, $form), '.'))[. != -2],
-                p:property(string-join(('oxf.fr.detail.toc.min-sections', $app, $form), '.'))[. != -2],
-                -1
-            )[1]"/>
-
-    <xsl:variable
-        name="toc-position-raw-opt"
-        as="xs:string?"
-        select="
-            (
-                $fr-form-metadata/xbl/fr:toc/@position[p:non-blank()],
-                p:property(string-join(('oxf.fr.detail.toc.position', $app, $form), '.'))[p:non-blank()],
-                'top'
-            )[1][
-                . = ('top', 'left') (: `none` is allowed to be explicit and is the same as blank :)
-            ]"/>
-
     <xsl:variable
         name="toc-position-opt"
         as="xs:string?"
-        select="
-            (: Normalize TOC position for PDF :)
-            if (exists($toc-position-raw-opt) and $is-pdf-mode) then
-                'top'
-            else
-                $toc-position-raw-opt"/>
-
-    <xsl:variable
-        name="toc-modes"
-        as="xs:string*"
-        select="
-            p:split(
-                (
-                    $fr-form-metadata/xbl/fr:toc/@modes[p:non-blank()],
-                    p:property(string-join(('oxf.fr.detail.toc.modes', $app, $form), '.'))[p:non-blank()],
-                    'new edit'
-                )[1]
-            )[
-                . = ('new', 'edit', 'view', 'pdf', 'tiff', 'test', 'test-pdf')
-            ]"/>
-
-    <xsl:variable
-        name="has-toc"
-        as="xs:boolean"
-        select="
-            not($is-form-builder)     and                 (: Form Builder never has a TOC               :)
-            not(
-                $use-view-appearance and
-                $view-appearance = 'fr:wizard'
-            )                         and                 (: Wizard view never has a separate TOC       :)
-            $toc-min-sections ge 0    and                 (: negative value disables the TOC            :)
-            exists($toc-position-opt) and                 (: missing position disables the TOC          :)
-            $mode = $toc-modes        and                 (: mode must match                            :)
-            count($body//fr:section) ge $toc-min-sections (: meet constraint on number of form sections :)
-        "/>
+        select="doc('input:form-runner-config')/*/toc-position[p:non-blank()]"/>
 
     <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
     <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.')))[p:non-blank()]"   as="xs:string?"/>
@@ -450,37 +281,9 @@
         select="p:property(string-join(('oxf.fr.detail.attachment.mediatypes', $app, $form), '.'))"/>
 
     <xsl:variable
-        name="view-appearance"
-        as="xs:string"
-        select="
-            (
-                $mode-qualified-name[contains(., ':')],
-                'fr:formula-debugger'[$fr-form-metadata/formula-debugger = 'true'],
-                'fr:wizard'[$fr-form-metadata/wizard = 'true' or $mode = 'import'],
-                for $p in
-                    p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.'))[
-                        normalize-space() and not($fr-form-metadata/wizard = 'false')
-                    ]
-                return
-                    if (contains($p, ':')) then
-                        $p
-                    else
-                        concat('fr:', $p)
-                ,
-                'fr:full'
-            )[1]"/>
-
-    <xsl:variable
-        name="use-view-appearance"
-        as="xs:boolean"
-        select="
-            contains($mode-qualified-name, ':') or
-            $mode = 'import'     or
-            not(
-                not($mode = ('edit', 'new', 'test', 'compile')) or (: intentionally no test on 'test-pdf' :)
-                $is-form-builder                                or
-                $view-appearance = 'fr:full'
-            )"/>
+        name="view-appearance-opt"
+        as="xs:string?"
+        select="doc('input:form-runner-config')/*/view-appearance"/>
 
     <xsl:variable
         name="wizard-mode"
@@ -902,11 +705,7 @@
                 else
                     'dynamic'
             }"
-            xxf:encrypt-item-values="{
-                not(
-                    $is-pdf-mode and $use-pdf-template
-                )
-            }"
+            xxf:encrypt-item-values="{not($use-pdf-template)}"
             xxf:order="{{
                 xxf:property(
                     string-join(
@@ -964,7 +763,7 @@
             xxf:hint.appearance="{$hint-appearance}"
             xxf:assets.baseline.updates="{$assets-baseline-updates}"
             xxf:static-readonly-hint="{
-                if ($mode = 'test-pdf') then
+                if ($is-test-mode and $is-pdf-mode) then
                     '{
                         let $use-pdf-template := fr:use-pdf-template()
                         return
@@ -1001,7 +800,7 @@
                     }'
             }"
             xxf:static-readonly-alert="{
-                if ($mode = 'test-pdf') then
+                if ($is-test-mode and $is-pdf-mode) then
                     '{
                         let $use-pdf-template := fr:use-pdf-template()
                         return
@@ -1037,8 +836,8 @@
                                 xxf:evaluate-avt(string($p))
                     }'
             }"
-            xxf:single-use-static-state="{$mode = ('test', 'test-pdf')}"
-            xxf:allow-error-recovery-on-init="{$mode = ('test', 'test-pdf')}"
+            xxf:single-use-static-state="{$is-test-mode}"
+            xxf:allow-error-recovery-on-init="{$is-test-mode}"
         >
 
             <!-- Override if specified -->

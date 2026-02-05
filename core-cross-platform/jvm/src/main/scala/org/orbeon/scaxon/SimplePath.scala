@@ -144,8 +144,9 @@ object SimplePath {
 //        def //@(attName: (String, String)): Seq[NodeInfo] = //@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
 //        def //@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
-    def root = nodeInfo.getDocumentRoot
-    def rootElement = root / * head
+    def root: DocumentInfo = nodeInfo.getDocumentRoot
+    def rootElement: NodeInfo = (root / *).head
+    def rootElementOpt: Option[NodeInfo] = (root / *).headOption
 
     def att(attName: String) = /@(attName)
     def att(test: Test) = /@(test)

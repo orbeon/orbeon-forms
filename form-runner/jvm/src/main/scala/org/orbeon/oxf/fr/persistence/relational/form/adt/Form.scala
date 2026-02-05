@@ -41,7 +41,7 @@ case class FormMetadata(
 ) {
 
   // As of 2024-09-09, we only extract the titles, form availability, and permissions from the metadata SQL column. The
-  // metadata fields present in that column are defined in RequestReader.MetadataElementsToKeep.
+  // metadata fields present in that column are defined in `MetadataElementsToKeep`.
 
   def toXML: (Seq[xml.Elem], Seq[xml.Attribute]) = {
 

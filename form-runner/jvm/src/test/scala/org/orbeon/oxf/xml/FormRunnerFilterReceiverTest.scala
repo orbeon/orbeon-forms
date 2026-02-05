@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.fr.persistence.relational.rest.RequestReader
+import org.orbeon.oxf.fr.FormRunnerMetadataSupport
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
@@ -41,7 +41,7 @@ class FormRunnerFilterReceiverTest
       val metadataFilter =
         new FilterReceiver(
           collector,
-          RequestReader.isMetadataElement
+          FormRunnerMetadataSupport.isMetadataElement
         )
 
       def urlToSAX(

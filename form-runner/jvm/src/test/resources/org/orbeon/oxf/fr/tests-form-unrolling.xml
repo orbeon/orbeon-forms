@@ -98,7 +98,7 @@
         <input name="data">
             <_>
                 <method>POST</method>
-                <path-query>/fr/issue/6707/pdf/1234?fr-use-pdf-template=false</path-query>
+                <path-query>/fr/service/issue/6707/pdf/1234?fr-use-pdf-template=false</path-query>
             </_>
         </input>
         <input name="config" href="unrolling/unroll.xpl"/>

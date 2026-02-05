@@ -45,7 +45,7 @@ public abstract class DependenciesProcessorInput extends DelegatingProcessorInpu
                             }
 
                             @Override
-                            public void foundInCache() {
+                            public void foundInCache(URIReferences t) {
                                 foundInCache[0] = true;
                             }
                         });

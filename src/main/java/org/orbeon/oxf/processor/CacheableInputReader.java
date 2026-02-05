@@ -32,7 +32,7 @@ public abstract class CacheableInputReader<T> {
     /**
      * Method called back when the input data is already in cache. If this is called, read() won't be called.
      */
-    public void foundInCache() {}
+    public void foundInCache(T t) {}
 
     /**
      * Method called back after read() to check whether the result can be stored in cache.

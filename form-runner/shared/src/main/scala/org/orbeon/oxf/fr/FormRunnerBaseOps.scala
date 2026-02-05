@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
 import org.log4s
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.fr.rpc.Router
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon.*
@@ -159,6 +160,11 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   //@XPathFunction
   val InternalAdminTokenParam = "fr-internal-admin-token"
+
+  //@XPathFunction
+  val InternalValidateSelectionControlsChoicesParam = "fr-internal-validate-selection-controls-choices"
+
+  val UsePdfTemplateParam = "fr-use-pdf-template"
 
   //@XPathFunction
   val InternalStateParam      = "fr-internal-state"
@@ -365,6 +371,20 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
     CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.stringValue, p.namespaceMapping) }
 
+  // `None` if property not defined or blank
+  def formRunnerQNameProperty(name: String)(implicit p: FormRunnerParams): Option[QName] =
+    for {
+      property            <- CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name))
+      trimmedValue        <- property.stringValue.trimAllToOpt
+      ns                  = property.namespaceMapping
+      (prefix, localname) = SaxonUtils.parseQName(trimmedValue)
+    } yield {
+      if (prefix.isAllBlank)
+        QName(localname)
+      else
+        QName(localname, Namespace(prefix, ns.mapping.getOrElse(prefix, throw new IllegalArgumentException(s"Unknown namespace prefix: `$prefix`")) ))
+    }
+
   def intFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[Int] =
     CoreCrossPlatformSupport.properties.getIntOpt(buildPropertyName(name))
 
@@ -381,14 +401,12 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   //@XPathFunction
   def isSupportedMode(modePublicNameString: String): Boolean =
-    FormRunnerDetailMode.isSupportedNonDetailMode(modePublicNameString) ||
+    FormRunnerDetailMode.SupportedNonDetailModes(modePublicNameString) ||
       isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = false)
 
   def isSupportedDetailMode(modePublicNameString: String, excludeSecondaryModes: Boolean): Boolean =
     ModeType.modeFromPublicName(modePublicNameString, excludeSecondaryModes, customModes(FormRunnerParams())).isDefined
 
-  // XSLT only
-  //@XPathFunction
   def isReadonlyModeFromString(app: String, form: String, modePublicName: String): Boolean =
     ModeType.modeTypeFromPublicName(modePublicName, excludeSecondaryModes = false, customModes(FormRunnerParams(AppForm(app, form), modePublicName /* unused */)))
       .contains(ModeType.Readonly)
@@ -435,18 +453,14 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       case _ => None
     }
 
-  // XSLT only
-  //@XPathFunction
-  def customModeNamespace(app: String, form: String, modePublicNameString: String): String =
+  def modeQName(app: String, form: String, modePublicNameString: String):QName =
     customModes(FormRunnerParams(AppForm(app, form), modePublicNameString))
-      .collectFirst { case m if m.publicName == modePublicNameString => m.name.namespace.uri }
-      .orNull
+      .collectFirst { case m if m.publicName == modePublicNameString => m.name }
+      .getOrElse(QName(modePublicNameString))
 
   //@XPathFunction
   def modeQualifiedName(app: String, form: String, modePublicNameString: String): String =
-    customModes(FormRunnerParams(AppForm(app, form), modePublicNameString))
-      .collectFirst { case m if m.publicName == modePublicNameString => m.name.qualifiedName }
-      .getOrElse(modePublicNameString)
+    modeQName(app, form, modePublicNameString).qualifiedName
 
   // Interrupt current processing and send an error code to the client.
   // NOTE: This could be done through ExternalContext
@@ -460,7 +474,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def formInstance                : XFormsInstance         = topLevelInstance(FormModel,        FormInstance).get
   def metadataInstance            : Option[XFormsInstance] = topLevelInstance(FormModel,        MetadataInstance)
   def urlsInstance                : Option[XFormsInstance] = topLevelInstance(PersistenceModel, "fr-urls-instance")
-  def formAttachmentsInstance     : Option[XFormsInstance] = topLevelInstance(FormModel,        "fr-form-attachments")
+  def formAttachmentsInstance     : Option[XFormsInstance] = topLevelInstance(FormModel,        AttachmentsInstance)
 
   def parametersInstance          : Option[XFormsInstance] = topLevelInstance(ParametersModel,   "fr-parameters-instance")
   def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance").get
@@ -629,7 +643,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.
   def isBackground(implicit xfc: XFormsFunction.Context, p: FormRunnerParams): Boolean =
-    isServicePath && (p.mode == "new" || p.mode == "edit")
+    isBackground(xfc.containingDocument.getRequestPath, p.mode)
+
+  def isBackground(path: String, modeString: String): Boolean =
+    isServicePath(path) && (modeString == "new" || modeString == "edit")
 
   // Display a success message
   // TODO: support `dialog` appearance, for symmetry with `error-message`

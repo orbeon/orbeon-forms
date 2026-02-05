@@ -21,7 +21,7 @@ import scala.collection.mutable
 
 
 class TestWebAppContext(logger: Logger, val attributes: mutable.Map[String, AnyRef]) extends WebAppContext {
-  def getContextPath                            : String              = throw new UnsupportedOperationException
+  def getContextPath                            : String              = "" // "If this context is the "root" context rooted at the base of the Web server's URL name space, this path will be an empty string."
   def getResource(s: String)                    : URL                 = throw new UnsupportedOperationException
   def getResourceAsStream(s: String)            : InputStream         = throw new UnsupportedOperationException
   def getRealPath(s: String)                    : String              =

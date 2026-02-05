@@ -75,9 +75,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
         override protected def supportsLocalKeyValidity = true
 
-        // NOTE: As of 2010-03, caching of the output should never happen
-        // - more work is needed to make this work properly
-        // - not many use cases benefit
+        // Output is never cacheable
         override def getLocalKeyValidity(pipelineContext: PipelineContext, uriReferences: URIReferences): ProcessorImpl.KeyValidity =
           null
       }
@@ -178,7 +176,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
               stage2CacheableState
             }
 
-            override def foundInCache(): Unit =
+            override def foundInCache(stage2CacheableState: Stage2CacheableState): Unit =
               cachedStatus = true
           }
         )

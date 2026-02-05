@@ -352,7 +352,7 @@ public abstract class ProcessorImpl implements Processor {
                 if (logger.isDebugEnabled())
                     logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + inputObject);
 
-                reader.foundInCache();
+                reader.foundInCache((T) inputObject);
                 return (T) inputObject;
             }
         }
@@ -504,6 +504,15 @@ public abstract class ProcessorImpl implements Processor {
 
     public boolean isInputInCache(PipelineContext context, KeyValidity keyValidity) {
         return ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity) != null;
+    }
+
+    public Object findInputInCache(PipelineContext context, ProcessorInput input) {
+        final KeyValidity keyValidity = getInputKeyValidity(context, input);
+        if (keyValidity != null) {
+            return ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity);
+        } else {
+            return null;
+        }
     }
 
     /**

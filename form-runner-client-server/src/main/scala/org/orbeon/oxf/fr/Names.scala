@@ -29,6 +29,7 @@ object Names {
   val FormInstance        = "fr-form-instance"
   val FormBinds           = "fr-form-binds"
   val MetadataInstance    = "fr-form-metadata"
+  val AttachmentsInstance = "fr-form-attachments"
   val FormResources       = "fr-form-resources"
   val FormTemplate        = "fr-form-template" // for section templates
   val FormInitialInstance = "fr-initial-instance"

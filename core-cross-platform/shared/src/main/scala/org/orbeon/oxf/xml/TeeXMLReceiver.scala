@@ -15,6 +15,11 @@ class TeeXMLReceiver extends XMLReceiver {
     xmlReceivers = new Array[XMLReceiver](receivers.size)
     receivers.toArray(xmlReceivers)
   }
+  
+  def this(receivers: List[XMLReceiver]) = {
+    this()
+    xmlReceivers = receivers.toArray
+  }
 
   def this(xmlReceiver1: XMLReceiver, xmlReceiver2: XMLReceiver) = {
     this()

@@ -1,35 +1,16 @@
-<!--
-    Copyright (C) 2011 Orbeon, Inc.
-
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
-
-    <!-- Page detail (app, form, document, and mode) -->
-    <p:param type="input" name="instance"/>
-    <!-- XHTML+FR+XForms for the form -->
-    <p:param type="input" name="data"/>
-    <!-- XHTML+XForms -->
-    <p:param type="output" name="data"/>
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+>
+    <p:param type="input"  name="instance"/>          <!-- Parameters: `app`, `form`, `form-version`, `document`, `mode` -->
+    <p:param type="input"  name="data"/>              <!-- XHTML+FR+XForms                                               -->
+    <p:param type="output" name="data"/>              <!-- XHTML+XForms                                                  -->
+    <p:param type="output" name="form-runner-config"/><!-- Form Runner configuration                                     -->
 
     <!-- Apply project-specific theme -->
     <p:choose href="#instance">
         <p:when test="doc-available(concat('oxf:/forms/', /*/app, '/theme.xsl'))">
-            <!-- TODO: Also fetch theme from persistence layer -->
             <p:processor name="oxf:url-generator">
                 <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
                                                 'oxf:/forms/', /*/app, '/theme.xsl'))))"/>
@@ -49,50 +30,19 @@
         </p:otherwise>
     </p:choose>
 
-    <!-- NOTE: First pass of XInclude is handled when reading the form from the persistence layer -->
-
-    <!-- Get request information -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config>
-                <include>/request/method</include>
-                <include>/request/request-path</include>
-                <include>/request/request-uri</include>
-                <include>
-                    /request/parameters/parameter[name = (
-                        'disable-calculations',
-                        'disable-calculate',
-                        'disable-default',
-                        'disable-relevant',
-                        'fr-disable-calculate',
-                        'fr-disable-default',
-                        'fr-disable-relevant',
-                        'fr-internal-validate-selection-controls-choices',
-                        'fr-use-pdf-template'
-                    )]</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
-
-    <!--
-        DO NOT REMOVE THIS UNLESS YOU REALLY KNOW WHAT YOU ARE DOING! This is in place to make sure we read the
-        #request output above. components.xsl below may not read it at times, which causes oxf:request to never cache
-        its output, leading to oxf:xforms-to-xhtml's input to not be cacheable. Tricky.
-    -->
-    <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#request"/>
+    <p:processor name="fr:form-runner-config">
+        <p:input  name="data"               href="#themed-data"/>
+        <p:input  name="params"             href="#instance"/>
+        <p:output name="data"               id="raw-form-definition"/>
+        <p:output name="form-runner-config" id="form-runner-config" ref="form-runner-config"/>
     </p:processor>
 
     <!-- Apply UI components -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="config"   href="components/components.xsl"/>
-
-        <p:input name="data"     href="#themed-data"/>
-        <p:input name="instance" href="#instance"/>
-        <p:input name="request"  href="#request"/>
-
-        <p:output name="data"    id="after-components"/>
+        <p:input  name="config"             href="components/components.xsl"/>
+        <p:input  name="data"               href="#raw-form-definition"/>
+        <p:input  name="form-runner-config" href="#form-runner-config"/>
+        <p:output name="data"               id="after-components"/>
 
         <!-- This is here just so that we can reload the form when the properties or the resources change -->
         <p:input name="properties-xforms"       href="oxf:/config/properties-xforms.xml"/>

@@ -142,7 +142,7 @@ object FormRunnerRenderedFormat {
       req.getFirstParamAsString(s"fr-$UsePdfTemplateParam").contains(false.toString)
     )
 
-  private def extractPdfTemplates(attachmentsRootElem: NodeInfo): LazyList[PdfTemplate] =
+  def extractPdfTemplates(attachmentsRootElem: NodeInfo): LazyList[PdfTemplate] =
     for {
       pdfElem <- attachmentsRootElem child PdfElemName
       path    <- pdfElem.stringValue.trimAllToOpt

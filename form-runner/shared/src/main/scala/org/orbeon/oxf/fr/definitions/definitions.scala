@@ -63,8 +63,8 @@ sealed trait FormRunnerDetailMode {
 
 object FormRunnerDetailMode {
 
-  def isSupportedNonDetailMode(mode: String): Boolean =
-    Set("summary", "home", "landing", "validate", "import").contains(mode) // xxx constants
+  val SupportedNonDetailModes: Set[String] =
+    Set("summary", "home", "landing", "validate", "import") // xxx constants
 
   case object New  extends FormRunnerDetailMode { val publicName = "new";  val name = QName("new");  val modeType = ModeType.Creation; val persistence = true }
   case object Edit extends FormRunnerDetailMode { val publicName = "edit"; val name = QName("edit"); val modeType = ModeType.Edition;  val persistence = true }

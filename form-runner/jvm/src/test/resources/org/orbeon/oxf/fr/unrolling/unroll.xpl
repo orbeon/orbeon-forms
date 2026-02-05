@@ -15,12 +15,9 @@
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="config" href="/apps/fr/components/components.xsl"/>
-
-        <p:input name="data"   href="/forms/issue/6707/form/form.xhtml"/>
-
-        <p:input name="instance" transform="oxf:unsafe-xslt" href="#matcher-groups">
+    <p:processor name="fr:form-runner-config">
+        <p:input  name="data"               href="/forms/issue/6707/form/form.xhtml"/>
+        <p:input  name="params" transform="oxf:unsafe-xslt" href="#matcher-groups">
             <request xsl:version="2.0">
                 <app><xsl:value-of select="/*/group[2]"/></app>
                 <form><xsl:value-of select="/*/group[3]"/></form>
@@ -29,7 +26,6 @@
                 <mode><xsl:value-of select="/*/group[4]"/></mode>
             </request>
         </p:input>
-
         <p:input name="request" transform="oxf:unsafe-xslt" href="aggregate('_', #data, #matcher-groups)">
             <request xsl:version="2.0">
                 <method><xsl:value-of select="/_/_/method"/></method>
@@ -50,8 +46,15 @@
                 </parameters>
             </request>
         </p:input>
+        <p:output name="data"               id="raw-form-definition"/>
+        <p:output name="form-runner-config" id="form-runner-config"/>
+    </p:processor>
 
-        <p:output name="data"    id="unrolled-form"/>
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="config"             href="/apps/fr/components/components.xsl"/>
+        <p:input name="data"               href="#raw-form-definition"/>
+        <p:input name="form-runner-config" href="#form-runner-config"/>
+        <p:output name="data"              id="unrolled-form"/>
     </p:processor>
 
      <p:processor name="oxf:unsafe-xslt">

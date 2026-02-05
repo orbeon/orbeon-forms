@@ -32,7 +32,8 @@
     <xsl:import href="toc.xsl"/>
 
     <xsl:variable name="metadata"      select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
-    <xsl:variable name="page-layout"   select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, $mode) else ()"/>
+    <!-- Mode is not used by `frf:optionFromMetadataOrPropertiesXPath()`  -->
+    <xsl:variable name="page-layout"   select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, 'view') else ()"/>
 
     <xsl:variable name="view"                 select="(/xh:html/xh:body/fr:view)[1]"                   as="element(fr:view)?"/>
     <xsl:variable name="fluid"                select="$view/@fluid = 'true' or $page-layout = 'fluid'" as="xs:boolean"/>
@@ -65,11 +66,11 @@
         <fr:row>
             <fr:top-messages/>
         </fr:row>
-        <fr:row class="{if ($has-toc) then concat('fr-toc-with-body fr-toc-position-', $toc-position-opt) else ()}">
+        <fr:row class="{if (exists($toc-position-opt)) then concat('fr-toc-with-body fr-toc-position-', $toc-position-opt) else ()}">
             <fr:toc/>
             <fr:body/>
         </fr:row>
-        <xsl:if test="$mode = 'test'">
+        <xsl:if test="$is-test-mode and not($is-pdf-mode)">
             <fr:row>
                 <fr:console-server id="fr-console-server"/>
             </fr:row>
@@ -306,7 +307,7 @@
 
     </xsl:template>
 
-    <xsl:template match="fr:body[not($is-detail)]">
+    <xsl:template match="fr:body[not($is-detail or $is-import)]">
         <xf:group
             id="fr-form-group"
             class="fr-body"
@@ -347,7 +348,7 @@
         </xf:group>
     </xsl:template>
 
-    <xsl:template match="fr:body[$is-detail]">
+    <xsl:template match="fr:body[$is-detail or $is-import]">
 
         <!--
             Form content. Set context on form instance and define this group as `#fr-form-group` as observers will refer to it.
@@ -392,7 +393,7 @@
             <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
             <xh:a name="fr-form"/>
             <xsl:choose>
-                <xsl:when test="not($use-view-appearance)">
+                <xsl:when test="empty($view-appearance-opt)">
                     <xf:group id="fr-view-component" class="fr-view-appearance-full">
                         <xsl:apply-templates
                             select="if ($body) then $body/(node() except fr:buttons) else node()"
@@ -427,21 +428,15 @@
                     <!-- NOTE: Once we support XBL matching on @appearance, use instead
                          <fr:view appearance="{$view-appearance}">. -->
                     <xsl:element
-                        name="{$view-appearance}"
-                        namespace="{
-                            if (starts-with($view-appearance, 'fr:')) then
-                                'http://orbeon.org/oxf/xml/form-runner'
-                            else if (starts-with($view-appearance, 'fb:')) then
-                                'http://orbeon.org/oxf/xml/form-builder'
-                            else
-                                $mode-namespace-uri-opt}">
+                        name="{$view-appearance-opt}"
+                        namespace="{$mode-namespace-uri-opt}">
                         <xsl:attribute name="id"              select="'fr-view-component'"/>
-                        <xsl:attribute name="class"           select="concat('fr-view-appearance-', $view-appearance)"/>
+                        <xsl:attribute name="class"           select="concat('fr-view-appearance-', $view-appearance-opt)"/>
 
                         <xsl:attribute name="app"             select="$app"/>
                         <xsl:attribute name="form"            select="$form"/>
 
-                        <xsl:for-each select="('strict'[$mode = 'import'], $wizard-mode)[1]">
+                        <xsl:for-each select="('strict'[$is-import], $wizard-mode)[1]">
                             <!--
                                 We'd prefer `mode` to match the term used in the documentation, or maybe
                                 `forward-validation-mode`. But `validate` is how the property was named.
@@ -578,7 +573,7 @@
                 role="main"
                 xxf:element="div">
                 <xsl:choose>
-                    <xsl:when test="$is-detail and not($is-form-builder)">
+                    <xsl:when test="($is-detail or $is-import) and not($is-form-builder)">
                         <xsl:call-template name="fr-detail-page-global-variables"/>
                         <xsl:apply-templates select="$default-page-template"/>
                     </xsl:when>
@@ -690,7 +685,7 @@
                         then $property
                         else xxf:evaluate-avt($property) = 'true'
                     "/>
-            <xsl:if test="$is-detail and not($mode = ('import'))">
+            <xsl:if test="$is-detail and not($is-import)">
                 <xf:action
                     event    = "xforms-enabled"
                     observer = "fr-data-safe">
@@ -1556,7 +1551,7 @@
 
     </xsl:template>
 
-    <xsl:template match="fr:toc[$has-toc]" name="fr-toc">
+    <xsl:template match="fr:toc[exists($toc-position-opt)]" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
         <xh:div class="fr-toc sidebar-nav">
             <xh:ul class="nav nav-list">

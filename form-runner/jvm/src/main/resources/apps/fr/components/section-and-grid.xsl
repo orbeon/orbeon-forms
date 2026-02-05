@@ -81,24 +81,17 @@
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
 
-            <xsl:if
-                test="
-                    ($use-view-appearance and $view-appearance = 'fr:wizard' and not($is-readonly-mode)) or
-                    (: 2025-10-24: Which case does this cover exactly? :)
-                    not($use-view-appearance and $view-appearance = 'fr:wizard')
-                ">
-                <xsl:variable name="page-size-opt"            as="xs:integer?" select="xs:integer(@page-size[. castable as xs:integer])"/>
-                <xsl:variable name="use-wizard-repeat-paging" as="xs:boolean"  select="$view-appearance = 'fr:wizard' and $page-size-opt = 1 and not(@wizard-paging = 'false')"/>
-                <xsl:variable name="use-pager"                as="xs:boolean"  select="exists($page-size-opt) and not($is-pdf-mode) and not($use-wizard-repeat-paging)"/>
+            <xsl:variable name="page-size-opt"            as="xs:integer?" select="xs:integer(@page-size[. castable as xs:integer])"/>
+            <xsl:variable name="use-wizard-repeat-paging" as="xs:boolean"  select="$view-appearance-opt = 'fr:wizard' and $page-size-opt = 1 and not(@wizard-paging = 'false')"/>
+            <xsl:variable name="use-pager"                as="xs:boolean"  select="exists($page-size-opt) and not($is-pdf-mode) and not($use-wizard-repeat-paging)"/>
 
-                <xsl:if test="$use-wizard-repeat-paging">
-                    <xsl:copy-of select="@page-size"/>
-                    <xsl:attribute name="fr-use-wizard-repeat-paging">true</xsl:attribute>
-                </xsl:if>
-                <xsl:if test="$use-pager">
-                    <xsl:copy-of select="@page-size"/>
-                    <xsl:attribute name="fr-use-pager">true</xsl:attribute>
-                </xsl:if>
+            <xsl:if test="$use-wizard-repeat-paging">
+                <xsl:copy-of select="@page-size"/>
+                <xsl:attribute name="fr-use-wizard-repeat-paging">true</xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$use-pager">
+                <xsl:copy-of select="@page-size"/>
+                <xsl:attribute name="fr-use-pager">true</xsl:attribute>
             </xsl:if>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint | @clear-constraint | @class">
@@ -160,7 +153,7 @@
             <xsl:attribute
                 name="markup"
                 select="
-                    if ($mode = ('pdf', 'tiff', 'test-pdf')) then
+                    if ($is-pdf-mode) then
                         'html-table' (: CSS grids are not supported by the PDF renderer as of 2022-10-11 :)
                     else if (exists(@markup)) then
                         @markup      (: local attribute takes precedence :)

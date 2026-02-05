@@ -17,8 +17,8 @@ import cats.implicits.catsSyntaxOptionId
 import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.FormRunnerMetadataSupport.*
 import org.orbeon.oxf.fr.Version.*
-import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
@@ -31,11 +31,10 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.{DateUtils, IndentedLogger, Whitespace, XPath}
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger, XPath}
 import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, Writer}
@@ -48,38 +47,11 @@ import javax.xml.transform.stream.StreamResult
 
 object RequestReader {
 
-  private object IdAtt {
-    private val IdQName = JXQName("id")
-    def unapply(atts: Atts): Option[String] = atts.atts collectFirst { case (IdQName, value) => value }
-  }
-
   sealed trait                                         Body
   object Body {
     case class Cached   (bytes  : Array[Byte]) extends Body
     case class Streamed (stream : InputStream) extends Body
   }
-
-  // See https://github.com/orbeon/orbeon-forms/issues/2385
-  private val MetadataElementsToKeep = Set(
-    "metadata",
-    "title",
-    Names.Permissions,
-    "available"
-  )
-
-  // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, `JQName.unapply` is
-  // called 17 times and `IdAtt.unapply` 2 times until the match is found, which is what is expected.
-  def isMetadataElement(stack: List[StartElement]): Boolean =
-    stack match {
-      case
-        StartElement(JXQName("", "metadata"), _)                             ::
-        StartElement(JXQName(XF, "instance"), IdAtt(Names.MetadataInstance)) ::
-        StartElement(JXQName(XF, "model"),    IdAtt(Names.FormModel))        ::
-        StartElement(JXQName(XH, "head"), _)                                 ::
-        StartElement(JXQName(XH, "html"), _)                                 ::
-        Nil => true
-      case _  => false
-    }
 
   private def requestInputStream(bodyOpt: Option[Body]): Option[InputStream] =
     bodyOpt.map {
@@ -145,24 +117,10 @@ object RequestReader {
     }
 
     val metadataWriterAndReceiver = metadata option {
-
       val metadataWriter = new StringBuilderWriter()
-
-      // MAYBE: strip enclosing namespaces; truncate long titles
-      val metadataFilter =
-        new FilterReceiver(
-          new WhitespaceXMLReceiver(
-            new ElementFilterXMLReceiver(
-              newIdentityReceiver(metadataWriter),
-              (level, uri, localname, _) => level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
-            ),
-            Whitespace.Policy.Normalize,
-            (_, _, _, _) => Whitespace.Policy.Normalize
-          ),
-          isMetadataElement
-        )
-
-      (metadataWriter, metadataFilter)
+      (
+        metadataWriter,
+        newInstanceFilter(newIdentityReceiver(metadataWriter), isMetadataElement, MetadataElementsToKeep))
     }
 
     val source     = new SAXSource(XMLParsing.newXMLReader(ParserConfiguration.Plain), new InputSource(inputStream))

@@ -85,7 +85,7 @@
             display: inline;        // probably unneeded
         }
 
-        .fr-error-label, .fr-error-alert {
+        .fr-error-number, .fr-error-label, .fr-error-alert {
             text-decoration: underline;
         }
 
@@ -93,7 +93,7 @@
             content: ": "
         }
 
-        .fr-error-alert {
+        .fr-error-label, .fr-error-alert {
             // The error summary produces a div, instead of a span, so block elements it contains are not moved in
             // the DOM, but, if possible, we still want the message to be shown on the same line as the control label.
             display: inline;
@@ -106,19 +106,18 @@
         }
 
         // Make label and alert both the same color
-        //
         .fr-level-info {
-            .fr-error-label, .fr-error-alert {
+            .fr-error-number, .fr-error-label, .fr-error-alert {
                 color: var(--orbeon-info-color);
             }
         }
         .fr-level-warning {
-            .fr-error-label, .fr-error-alert {
+            .fr-error-number, .fr-error-label, .fr-error-alert {
                 color: var(--orbeon-warning-color);
             }
         }
         .fr-level-error {
-            .fr-error-label, .fr-error-alert {
+            .fr-error-number, .fr-error-label, .fr-error-alert {
                 color: var(--orbeon-error-color);
             }
         }

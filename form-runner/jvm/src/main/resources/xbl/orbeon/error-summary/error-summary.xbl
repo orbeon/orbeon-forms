@@ -448,10 +448,10 @@
                                                         value="
                                                             if (xxf:non-blank(@label)) then
                                                                 concat(
-                                                                    '&lt;span class=&quot;fr-error-label&quot;>',
-                                                                    position(), '. ',
+                                                                    '&lt;span class=&quot;fr-error-number&quot;>', position(), '. &lt;/span>',
+                                                                    '&lt;div class=&quot;fr-error-label&quot;>',
                                                                     frf:removeOuterDiv(@label),
-                                                                    '&lt;/span>'
+                                                                    '&lt;/div>'
                                                                 )
                                                             else
                                                                 '&lt;span/>'

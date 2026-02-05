@@ -54,18 +54,29 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
     FormRunnerParams(readCacheInputAsTinyTree(pc, XPath.GlobalConfiguration, "params").rootElement)
 
   // Only used for tests by connecting a `request` input
-  private def readRequestForTests(implicit pc: PipelineContext): Option[(String, Map[String, List[String]])] =
+  private def readRequestForTests(implicit pc: PipelineContext): Option[(String, String => Option[String])] =
     getInputNames.asScala.contains("request").option {
-      val doc = readCacheInputAsTinyTree(pc, XPath.GlobalConfiguration, "request").rootElement
-      (
-        doc elemValue "request-path",
-        (doc / "parameters" / "parameter")
-          .map { paramElem =>
-            val name  = paramElem elemValue "name"
-            val values = paramElem / "value" map (_.stringValue)
-            (name, values.toList)
-          }
-          .toMap
+      readCacheInputAsObject(
+        pc,
+        getInputByName("request"),
+        (pc: PipelineContext, input: ProcessorInput) => {
+          val doc = readInputAsTinyTree(pc, input, XPath.GlobalConfiguration).rootElement
+          (
+            doc elemValue "request-path",
+            {
+              val paramsMap =
+                (doc / "parameters" / "parameter")
+                  .map { paramElem =>
+                    val name = paramElem elemValue "name"
+                    val values = paramElem / "value" map (_.stringValue)
+                    (name, values.toList)
+                  }
+                  .toMap
+
+              (name: String) => paramsMap.get(name).flatMap(_.headOption)
+            }
+          )
+        }
       )
     }
 
@@ -237,7 +248,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
     final type StateType  = FormRunnerConfigProcessor.StateType
 
     final protected def newState(implicit pc: PipelineContext, ec: ExternalContext): StateType = {
-      val (requestPath, requestParams) = readRequestForTests.getOrElse(ec.getRequest.getRequestPath, ec.getRequest.parametersMap)
+      val (requestPath, requestParams) = readRequestForTests.getOrElse((ec.getRequest.getRequestPath, ec.getRequest.getFirstParamAsString _))
       new FormRunnerConfigProcessorState(
         computeParams           = readParams,
         computeMetadata         = findMetadataInCache,
@@ -358,11 +369,8 @@ private object FormRunnerConfigProcessor {
     updatedParams: FormRunnerParams,
     metadata     : CacheableFormMetadata,
     requestPath  : String,
-    requestParams: Map[String, List[String]]
+    getParam     : String => Option[String]
   ): FormRunnerConfig = {
-
-    def getFirstParamAsString(name: String): Option[String] =
-      requestParams.get(name).flatMap(_.headOption)
 
     val isFormBuilder = FormRunner.isFormBuilder(updatedParams)
     val isService     = FormRunner.isServicePath(requestPath)
@@ -378,7 +386,7 @@ private object FormRunnerConfigProcessor {
     val usePdfTemplate =
       isPdf                      &&
       metadata.hasPdfAttachments &&
-      ! (isService && getFirstParamAsString(UsePdfTemplateParam).contains(false.toString))
+      ! (isService && getParam(UsePdfTemplateParam).contains(false.toString))
 
     val isStaticReadonly =
       updatedParams.mode == "view" && ! isFormBuilder ||
@@ -484,7 +492,7 @@ private object FormRunnerConfigProcessor {
       ! viewAppearanceOpt.contains(WizardQName)    // Wizard view never has a separate TOC
 
     val validateSelectionControlsChoicesFromEncryptedParamOpt =
-      getFirstParamAsString(InternalValidateSelectionControlsChoicesParam)
+      getParam(InternalValidateSelectionControlsChoicesParam)
         .flatMap(FormRunner.decryptParameterIfNeeded(_).trimAllToOpt)
         .map(_.toBoolean)
 
@@ -503,7 +511,7 @@ private object FormRunnerConfigProcessor {
     def paramOpts(paramNames: Set[String]): Option[Boolean] =
       paramNames
         .iterator
-        .flatMap(getFirstParamAsString)
+        .flatMap(getParam)
         .flatMap(_.toBooleanOption)
         .nextOption()
 

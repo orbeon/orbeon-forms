@@ -3163,7 +3163,7 @@
         </output>
     </test>
 
-    <test description="`aria-labelledby` pointing to an XForms control" name="oxf:pipeline" exclude="true">
+    <test description="`aria-labelledby` pointing to an XForms control" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"

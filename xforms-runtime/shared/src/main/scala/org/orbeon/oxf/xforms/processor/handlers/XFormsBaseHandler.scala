@@ -6,6 +6,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
+import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
@@ -125,12 +126,16 @@ object XFormsBaseHandler {
   private def transformAriaIdReferences(value: String, attributes: Attributes, handlerContext: HandlerContext): String =
     value.splitTo[List]().map { maybeReferenceStaticId =>
 
-      val currentEffectiveId        = handlerContext.getEffectiveId(attributes)
-      val maybeReferenceEffectiveId = XFormsId.getRelatedEffectiveId(currentEffectiveId, maybeReferenceStaticId)
-      val containingDocument        =  handlerContext.containingDocument
-      containingDocument
-        .findControlByEffectiveId(maybeReferenceEffectiveId)
-        .map(_ => containingDocument.namespaceId(maybeReferenceEffectiveId))
+      val currentEffectiveId = handlerContext.getEffectiveId(attributes)
+      val containingDocument = handlerContext.containingDocument
+
+      Controls.resolveControlsById(
+        containingDocument,
+        currentEffectiveId,
+        maybeReferenceStaticId,
+        followIndexes = true
+      ).headOption
+        .map(control => containingDocument.namespaceId(control.effectiveId))
         .getOrElse(maybeReferenceStaticId)
 
     }.mkString(" ")

@@ -190,6 +190,18 @@ body.orbeon {
         min-height: 1px; // Bootstrap has 30px, which is different from `.row` where it is 1px
     }
 
+    .navbar-inverse .fr-language-choice .nav > li > a {
+        color: var(--orbeon-navbar-language-dropdown-color);
+
+        &:focus, &:hover {
+            color: var(--orbeon-navbar-language-dropdown-hover-color);
+        }
+    }
+
+    .navbar-inverse .nav li.dropdown.open > .dropdown-toggle {
+        background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
+    }
+
     .navbar, .navbar-inverse {
 
         &.navbar-fixed-top .container {
@@ -680,8 +692,8 @@ body.orbeon {
         border: 1px solid var(--orbeon-dropdown-menu-border-color);
 
         .divider {
-            background-color: var(--orbeon-dropdown-menu-divider-top);
-            border-bottom: 1px solid var(--orbeon-dropdown-menu-divider-bottom);
+            background-color: var(--orbeon-dropdown-menu-divider);
+            border-bottom: 1px solid var(--orbeon-dropdown-menu-background-color);
         }
 
         z-index: 2000; // because YUI dialogs are > 1000

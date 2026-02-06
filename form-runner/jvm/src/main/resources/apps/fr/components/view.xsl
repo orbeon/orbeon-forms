@@ -928,7 +928,8 @@
                 </xh:a>
             </xh:li>
 
-            <xh:li role="presentation" class="divider {{$logged-in-class}}"/>
+            <!-- divider for BS2, dropdown-divider for BS5 -->
+            <xh:li role="presentation" class="divider dropdown-divider {{$logged-in-class}}"/>
 
             <!-- Logout -->
             <xf:var

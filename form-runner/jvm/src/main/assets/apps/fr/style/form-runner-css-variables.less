@@ -144,8 +144,7 @@
   --orbeon-dropdown-menu-selected-background-color: @btnPrimaryBackground;
   --orbeon-dropdown-menu-disabled-color           : #999;
   --orbeon-dropdown-menu-border-color             : rgba(0, 0, 0, 0.15);
-  --orbeon-dropdown-menu-divider-top              : #e5e5e5;
-  --orbeon-dropdown-menu-divider-bottom           : white;
+  --orbeon-dropdown-menu-divider                  : #e5e5e5;
 
   // Sections
   --orbeon-section-title-font-size              : 1.38em;  // 18px
@@ -183,10 +182,13 @@
   --orbeon-toc-selected-error-background-color: @error;
 
   // Navbar
-  --orbeon-navbar-color            : white;
-  --orbeon-navbar-background-color : rgb(33, 37, 41);         // temporary, copied from the default Bootstrap 5 theme
-  --orbeon-navbar-heading-font-size: 1.54em;                  // 20px
-  --orbeon-navbar-heading-color    : rgba(255, 255, 255, .5); // @frNavBarTextColor, match Bootstrap 5
+  --orbeon-navbar-color                                : white;
+  --orbeon-navbar-background-color                     : rgb(33, 37, 41);         // temporary, copied from the default Bootstrap 5 theme
+  --orbeon-navbar-heading-font-size                    : 1.54em;                  // 20px
+  --orbeon-navbar-heading-color                        : #909395;
+  --orbeon-navbar-dropdown-open-toggle-background-color: #111;
+  --orbeon-navbar-language-dropdown-color              : #999999;
+  --orbeon-navbar-language-dropdown-hover-color        : var(--orbeon-navbar-color);
 
   // Tables
   --orbeon-table-background-color        : white;
@@ -397,15 +399,14 @@
     --orbeon-button-disabled-icon-opacity                    : 1;
     --orbeon-dropdown-open-toggle-background-color           : var(--orbeon-button-highlight-background-color);
     --orbeon-dropdown-menu-color                             : @text-light;
-    --orbeon-dropdown-menu-background-color                  : @gray-16;                                           
+    --orbeon-dropdown-menu-background-color                  : @gray-16;
     --orbeon-dropdown-menu-hover-color                       : @text-light;
     --orbeon-dropdown-menu-hover-background-color            : var(--orbeon-button-primary-background-color);
     --orbeon-dropdown-menu-selected-color                    : @text-light;
     --orbeon-dropdown-menu-selected-background-color         : var(--orbeon-dropdown-menu-hover-background-color);
     --orbeon-dropdown-menu-disabled-color                    : @gray-46;
     --orbeon-dropdown-menu-border-color                      : fade(@gray-27, 75%);
-    --orbeon-dropdown-menu-divider-top                       : @gray-27;
-    --orbeon-dropdown-menu-divider-bottom                    : var(--orbeon-dropdown-menu-background-color);
+    --orbeon-dropdown-menu-divider                           : @gray-27;
     --orbeon-section-color                                   : @gray-80;
     --orbeon-section-background-color                        : @gray-20;
     --orbeon-repeater-add-button-color                       : @text-light;

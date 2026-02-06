@@ -890,7 +890,7 @@
                                                 <xf:label ref="$resources/dialog-container-settings/use-paging/label"/>
                                             </fr:checkbox-input>
                                         </xh:td>
-                                        <xh:td>
+                                        <xh:td class="fb-custom-iteration-name">
                                             <fr:checkbox-input ref="is-custom-iteration-name">
                                                 <xf:label ref="$resources/dialog-container-settings/custom-iteration-name/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-settings/custom-iteration-name/hint"/>

@@ -281,6 +281,11 @@
                                 true()
                             )[1]"/>
 
+                <!-- https://github.com/orbeon/orbeon-forms/issues/7482 -->
+                <xf:instance id="readonly-instance" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                    <_/>
+                </xf:instance>
+
                 <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <_>
                         <resource xml:lang="en">
@@ -524,7 +529,7 @@
                     <xf:upload
                         id="xf-upload"
                         class="fr-attachment-upload"
-                        ref="if ($readonly) then '' else instance()"
+                        ref="if ($readonly) then instance('readonly-instance') else instance()"
                         xbl:attr="xxf:multiple=multiple"
                         accept="{
                             (
@@ -534,11 +539,11 @@
                         }"
                         xxf:title="{xxf:label('fr-attachment')}">
 
-                        <xf:filename        ref="if ($readonly) then '' else @filename"/>
-                        <xf:mediatype       ref="if ($readonly) then '' else @mediatype"/>
-                        <xxf:size           ref="if ($readonly) then '' else @size"/>
-                        <xxf:hash-algorithm ref="if ($readonly) then '' else @hash-algorithm"/>
-                        <xxf:hash-value     ref="if ($readonly) then '' else @hash-value"/>
+                        <xf:filename        ref="if ($readonly) then instance('readonly-instance') else @filename"/>
+                        <xf:mediatype       ref="if ($readonly) then instance('readonly-instance') else @mediatype"/>
+                        <xxf:size           ref="if ($readonly) then instance('readonly-instance') else @size"/>
+                        <xxf:hash-algorithm ref="if ($readonly) then instance('readonly-instance') else @hash-algorithm"/>
+                        <xxf:hash-value     ref="if ($readonly) then instance('readonly-instance') else @hash-value"/>
 
                         <!-- Propagate the value to the binding *before* propagating the event (for #3061) -->
                         <xf:action event="xxforms-upload-done">

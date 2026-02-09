@@ -112,6 +112,18 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           }
         }
 
+        // Remove `role="textbox"` and ARIA attributes on child element, as:
+        // - It isn't useful since it doesn't get the focus.
+        // - It is problematic for Accessibility checkers as it isn't labeled.
+        Option(comboboxElement.querySelector("[role=textbox]")).foreach { childElement =>
+          childElement.removeAttribute("role")
+          val ariaAttrNames =
+            (0 until childElement.attributes.length)
+              .map(childElement.attributes.item(_).name)
+              .filter(_.startsWith("aria-"))
+          ariaAttrNames.foreach(childElement.removeAttribute)
+        }
+
         // Open the dropdown on up/down arrow key press
         containerElem
           .querySelector(".select2-selection")
@@ -299,10 +311,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     val dropdownElement = document.querySelector(".select2-dropdown")
     val inputElement    = dropdownElement.querySelector("input")
     val listboxElement  = dropdownElement.querySelector("[role=listbox]")
-    inputElement.setAttribute("aria-owns"     , listboxElement.id)
-    inputElement.setAttribute("aria-expanded" , "true")
-    inputElement.setAttribute("aria-haspopup" , "listbox")
-    inputElement.setAttribute("role"          , "combobox")
+    val comboboxElement = containerElem.querySelector(".select2-selection")
+    val labelledBy      = comboboxElement.getAttribute("aria-labelledby")
+    inputElement   .setAttribute("aria-owns"      , listboxElement.id)
+    inputElement   .setAttribute("aria-haspopup"  , "listbox")
+    inputElement   .setAttribute("aria-labelledby", labelledBy)
+    comboboxElement.setAttribute("aria-controls"  , listboxElement.id)
     inputElementOpt = Some(inputElement)
   }
 

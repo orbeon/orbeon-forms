@@ -101,7 +101,7 @@ trait ProcessInterpreter extends Logging {
 
     // Scope an empty stack around a process execution
     def withEmptyStack[T](scope: String)(body: => T): T = {
-      processStackDyn.withValue(Process(scope, createUniqueProcessId, Nil)) {
+      processStackDyn.withValue(Process(scope, createUniqueProcessId, Nil, System.currentTimeMillis())) {
         body
       }
     }
@@ -135,7 +135,7 @@ trait ProcessInterpreter extends Logging {
       (process.processId, serializedContinuation)
     }
 
-    case class Process(scope: String, processId: String, var frames: List[StackFrame])
+    case class Process(scope: String, processId: String, var frames: List[StackFrame], dateTime: Long)
     case class StackFrame(group: GroupNode, actionCounter: Int)
 
     def runSubProcess(process: String, initialTry: Try[Any]): InternalActionResult = {
@@ -309,8 +309,11 @@ trait ProcessInterpreter extends Logging {
       // TODO: `transactionEnd()` to clean transient state?
     }
 
-  // Id of the currently running process
+  // ID of the currently running process
   def runningProcessId: Option[String] = processStackDyn.value.map(_.processId)
+
+  // Date/time of the currently running process
+  def runningProcessDateTime: Option[Long] = processStackDyn.value.map(_.dateTime)
 
   // Interrupt the process and complete with a success
   private def tryTerminateWithSuccess(params: ActionParams): ActionResult =

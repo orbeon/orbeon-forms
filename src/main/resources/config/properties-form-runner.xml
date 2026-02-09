@@ -334,7 +334,7 @@
             '/',
             fr:form-version(),
             '/',
-            current-dateTime(),
+            fr:process-dateTime(),
             '-',
             fr:document-id()
         )

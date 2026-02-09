@@ -473,4 +473,63 @@ extends DocumentTestBase
       }
     }
   }
+
+  describe("`runningProcessDateTime`") {
+
+    class DateTimeCapturingInterpreter extends TestProcessInterpreter {
+
+      var capturedDateTime1: Option[Long] = None
+      var capturedDateTime2: Option[Long] = None
+
+      override def extensionActions: Iterable[(String, Action)] =
+        super.extensionActions ++ List(
+          "readProcessDateTime1" -> ((_: ActionParams) => ActionResult.trySync { capturedDateTime1 = runningProcessDateTime }),
+          "readProcessDateTime2" -> ((_: ActionParams) => ActionResult.trySync { capturedDateTime2 = runningProcessDateTime })
+        )
+    }
+
+    val interpreter = new DateTimeCapturingInterpreter
+
+    it("must return None outside of a process context") {
+      assert(interpreter.runningProcessDateTime.isEmpty)
+
+      interpreter.runProcess("", "a1 then a2")
+
+      assert(interpreter.runningProcessDateTime.isEmpty)
+    }
+
+    it("must return a constant date/time within a process execution") {
+
+      interpreter.capturedDateTime1 = None
+      interpreter.capturedDateTime2 = None
+
+      interpreter.runProcess("", "readProcessDateTime1 then readProcessDateTime2")
+
+      // Both must have captured a value
+      assert(interpreter.capturedDateTime1.isDefined)
+      assert(interpreter.capturedDateTime2.isDefined)
+
+      // Both must be the same (i.e. constant within the process)
+      assert(interpreter.capturedDateTime1 == interpreter.capturedDateTime2)
+
+      // Value must be reasonable
+      val now = System.currentTimeMillis()
+      assert(interpreter.capturedDateTime1.get > 0)
+      assert(interpreter.capturedDateTime1.get <= now)
+    }
+
+    it("must return different values for separate process executions") {
+
+      interpreter.capturedDateTime1 = None
+      interpreter.capturedDateTime2 = None
+
+      interpreter.runProcess("", "readProcessDateTime1")
+      Thread.sleep(10)
+      interpreter.runProcess("", "readProcessDateTime2")
+
+      assert(interpreter.capturedDateTime1.isDefined)
+      assert(interpreter.capturedDateTime2.isDefined)
+      assert(interpreter.capturedDateTime1.get <= interpreter.capturedDateTime2.get)
+    }
+  }
 }

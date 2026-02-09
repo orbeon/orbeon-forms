@@ -81,6 +81,9 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Fun(name, classOf[DateTimeFunction], index, 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
     }
 
+    // Process date/time function (constant within a process execution)
+    Fun("process-dateTime", classOf[FRProcessDateTime], op = 0, min = 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
+
     // Form runner parameter functions
     Fun("mode",                        classOf[FRMode],                 op = 0, min = 0, STRING, EXACTLY_ONE)
     Fun("app-name",                    classOf[FRAppName],              op = 0, min = 0, STRING, EXACTLY_ONE)
@@ -289,6 +292,14 @@ private object FormRunnerFunctions {
       IndexedDateTimeFunctions(operation).apply() map
         (new java.util.Date(_))                   map
         DateTimeValue.fromJavaDate                orNull
+  }
+
+  class FRProcessDateTime extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): DateTimeValue =
+      SimpleProcess.runningProcessDateTime match {
+        case Some(millis) => DateTimeValue.fromJavaDate(new java.util.Date(millis))
+        case None         => throw new IllegalStateException("fr:process-dateTime() called outside of a process context")
+      }
   }
 
   class FRRunProcessByName extends FunctionSupport with RuntimeDependentFunction {

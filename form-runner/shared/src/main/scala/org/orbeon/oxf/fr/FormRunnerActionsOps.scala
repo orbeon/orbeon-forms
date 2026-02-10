@@ -550,10 +550,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       repeatTemplate                            = templateInstance.rootElement
     } locally {
       XFormsAPI.insert(
-        origin = updateTemplateFromInScopeItemsetMaps(startNode = repeatContextElem, template = repeatTemplate),
-        into   = repeatContextElem,
-        before = if (position == PositionType.Start) findChildElemAtPosition(repeatContextElem, position).toList else Nil,
-        after  = findChildElemAtPosition(repeatContextElem, position).toList
+        origin               = updateTemplateFromInScopeItemsetMaps(startNode = repeatContextElem, template = repeatTemplate),
+        into                 = repeatContextElem,
+        before               = if (position == PositionType.Start) findChildElemAtPosition(repeatContextElem, position).toList else Nil,
+        after                = findChildElemAtPosition(repeatContextElem, position).toList,
+        requireDefaultValues = applyDefaults
       )
     }
 

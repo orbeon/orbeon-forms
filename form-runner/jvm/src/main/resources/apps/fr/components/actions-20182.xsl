@@ -712,13 +712,23 @@
 
     <xsl:template match="fr:repeat-add-iteration" mode="within-action-2018.2">
 
-        <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
-        <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
+        <xsl:param tunnel="yes" name="view-elem"    as="element()"/>
 
-        <!-- TODO -->
-        <xsl:variable name="apply-defaults" select="true()"/>
+        <xsl:variable name="repeat-name"             select="@repeat/string()"              as="xs:string"/>
+        <xsl:variable name="at"                      select="@at/string()"                  as="xs:string?"/>
+        <xsl:variable name="override-apply-defaults" select="@apply-defaults/xs:boolean(.)" as="xs:boolean?"/>
 
-        <!-- NOTE: We might like to support `after-current | before-current`, for for that we need the `index()` function which
+        <xsl:variable
+            name="apply-defaults"
+            as="xs:boolean"
+            select="
+                (
+                    $override-apply-defaults,
+                    frf:findControlByNameUnderXPath($repeat-name, $view-elem)/@apply-defaults/xs:boolean(.),
+                    false()
+                )[1]"/>
+
+        <!-- NOTE: We might like to support `after-current | before-current`, but for that we need the `index()` function which
              needs a repeat id, and we don't have it right now. -->
 
         <xxf:log
@@ -726,9 +736,10 @@
             name="orbeon.action"
             level="info"
             value="'Starting action'">
-            <xf:property name="fr-action-id" value="$current-action-id"/>
-            <xf:property name="action-type"  value="{name(.)}"/>
-            <xf:property name="repeat-name"  value="'{$repeat-name}'"/>
+            <xf:property name="fr-action-id"   value="$current-action-id"/>
+            <xf:property name="action-type"    value="{name(.)}"/>
+            <xf:property name="repeat-name"    value="'{$repeat-name}'"/>
+            <xf:property name="apply-defaults" value="'{$apply-defaults}'"/>
         </xxf:log>
 
         <xf:action type="xpath" class="fr-action-impl">

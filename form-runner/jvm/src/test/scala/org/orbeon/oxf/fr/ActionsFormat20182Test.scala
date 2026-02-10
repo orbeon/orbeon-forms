@@ -14,9 +14,8 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsId
@@ -237,6 +236,42 @@ class ActionsFormat20182Test
         withTestExternalContext { implicit ec =>
           withFormRunnerDocument(processorService, doc) {
             assert("Overview" == resolveObject[XFormsValueControl]("foo-c-control").get.getValue(EventCollector.Throw))
+          }
+        }
+      }
+    }
+
+    describe("#7491: `<fr:repeat-add-iteration>` doesn't handle initial values") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("issue", "7491", "new", initialize = true)
+
+      it("must follow `apply-defaults`") {
+        withTestExternalContext { implicit ec =>
+          withFormRunnerDocument(processorService, docOpt.get) {
+
+            val InitialValueFromFormula = "42"
+
+            val Expected = List(
+              "control-1" -> List(
+                InitialValueFromFormula,
+                InitialValueFromFormula,
+                "",
+              ),
+              "control-2" -> List(
+                "",
+                InitialValueFromFormula,
+                "",
+              )
+            )
+
+            for {
+              (controlName, expectedValues) <- Expected
+              (expectedValue, index) <- expectedValues.zipWithIndex
+            } locally {
+              assert(resolveObject[XFormsValueControl](s"$controlName-control", indexes = List(index + 1))
+                .map(_.getValue(EventCollector.Throw)).contains(expectedValue))
+            }
           }
         }
       }

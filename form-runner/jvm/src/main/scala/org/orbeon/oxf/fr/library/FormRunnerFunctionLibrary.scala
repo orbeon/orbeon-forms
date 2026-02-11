@@ -297,8 +297,8 @@ private object FormRunnerFunctions {
   class FRProcessDateTime extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): DateTimeValue =
       SimpleProcess.runningProcessDateTime match {
-        case Some(millis) => DateTimeValue.fromJavaDate(new java.util.Date(millis))
-        case None         => throw new IllegalStateException("fr:process-dateTime() called outside of a process context")
+        case Some(instant) => DateTimeValue.fromJavaDate(java.util.Date.from(instant))
+        case None          => throw new IllegalStateException("fr:process-dateTime() called outside of a process context")
       }
   }
 

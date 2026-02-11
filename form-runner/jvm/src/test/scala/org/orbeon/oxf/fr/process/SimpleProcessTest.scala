@@ -32,6 +32,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.time.Instant
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
@@ -478,8 +479,8 @@ extends DocumentTestBase
 
     class DateTimeCapturingInterpreter extends TestProcessInterpreter {
 
-      var capturedDateTime1: Option[Long] = None
-      var capturedDateTime2: Option[Long] = None
+      var capturedDateTime1: Option[Instant] = None
+      var capturedDateTime2: Option[Instant] = None
 
       override def extensionActions: Iterable[(String, Action)] =
         super.extensionActions ++ List(
@@ -513,9 +514,9 @@ extends DocumentTestBase
       assert(interpreter.capturedDateTime1 == interpreter.capturedDateTime2)
 
       // Value must be reasonable
-      val now = System.currentTimeMillis()
-      assert(interpreter.capturedDateTime1.get > 0)
-      assert(interpreter.capturedDateTime1.get <= now)
+      val now = Instant.now()
+      assert(interpreter.capturedDateTime1.get.toEpochMilli > 0)
+      assert(interpreter.capturedDateTime1.get.compareTo(now) <= 0)
     }
 
     it("must return different values for separate process executions") {
@@ -529,7 +530,7 @@ extends DocumentTestBase
 
       assert(interpreter.capturedDateTime1.isDefined)
       assert(interpreter.capturedDateTime2.isDefined)
-      assert(interpreter.capturedDateTime1.get <= interpreter.capturedDateTime2.get)
+      assert(interpreter.capturedDateTime1.get.compareTo(interpreter.capturedDateTime2.get) <= 0)
     }
   }
 }

@@ -297,8 +297,9 @@ trait FormRunnerActions
       if (contentToSend != "xml")
         throw new IllegalArgumentException(s"content parameter only supports 'xml', got '$contentToSend'")
 
-      val (s3ConfigName, _               ) = paramFromParamsOrProperties(params, propertyPrefix = "send-s3"                , name = "s3-config", default = "default")
-      val (s3Path      , s3PathNamespaces) = paramFromParamsOrProperties(params, propertyPrefix = s"send-s3.$contentToSend", name = "s3-path"  , default = "")
+      // S3 parameters
+      val (s3ConfigName , _               ) = paramFromParamsOrProperties(params, propertyPrefix = "send-s3"                , name = "s3-config"      , default = "default")
+      val (s3Path       , s3PathNamespaces) = paramFromParamsOrProperties(params, propertyPrefix = s"send-s3.$contentToSend", name = "s3-path"        , default = "")
 
       // Data format version for migration
       val dataFormatVersion =
@@ -306,10 +307,19 @@ trait FormRunnerActions
           .map(DataFormatVersion.withName)
           .getOrElse(DataFormatVersion.V400)
 
+      // Metadata pruning logic (same as "send" action)
+      val pruneMetadata =
+        paramFromParamsOrProperties(params, propertyPrefix = "send-s3", name = PruneMetadataName, default = "")
+          ._1
+          .some
+          .flatMap(_.trimAllToOpt)
+          .map(_.toBoolean)
+          .getOrElse(dataFormatVersion != DataFormatVersion.Edge)
+
       // Migrate data if needed
       val formDataMaybeMigrated = formDataMaybeMigratedFromEdge(
         dataFormatVersion = dataFormatVersion,
-        pruneMetadata     = dataFormatVersion != DataFormatVersion.Edge // Same as default value for "send" action
+        pruneMetadata     = pruneMetadata
       )
 
       // Evaluate S3 path

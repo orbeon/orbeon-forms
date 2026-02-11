@@ -32,6 +32,7 @@ import org.orbeon.scaxon.XPath.*
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xml.NamespaceMapping
 
+import java.time.Instant
 import scala.annotation.tailrec
 import scala.concurrent.Future
 import scala.util.control.NoStackTrace
@@ -101,7 +102,7 @@ trait ProcessInterpreter extends Logging {
 
     // Scope an empty stack around a process execution
     def withEmptyStack[T](scope: String)(body: => T): T = {
-      processStackDyn.withValue(Process(scope, createUniqueProcessId, Nil, System.currentTimeMillis())) {
+      processStackDyn.withValue(Process(scope, createUniqueProcessId, Nil, Instant.now())) {
         body
       }
     }
@@ -135,7 +136,7 @@ trait ProcessInterpreter extends Logging {
       (process.processId, serializedContinuation)
     }
 
-    case class Process(scope: String, processId: String, var frames: List[StackFrame], dateTime: Long)
+    case class Process(scope: String, processId: String, var frames: List[StackFrame], dateTime: Instant)
     case class StackFrame(group: GroupNode, actionCounter: Int)
 
     def runSubProcess(process: String, initialTry: Try[Any]): InternalActionResult = {
@@ -313,7 +314,7 @@ trait ProcessInterpreter extends Logging {
   def runningProcessId: Option[String] = processStackDyn.value.map(_.processId)
 
   // Date/time of the currently running process
-  def runningProcessDateTime: Option[Long] = processStackDyn.value.map(_.dateTime)
+  def runningProcessDateTime: Option[Instant] = processStackDyn.value.map(_.dateTime)
 
   // Interrupt the process and complete with a success
   private def tryTerminateWithSuccess(params: ActionParams): ActionResult =

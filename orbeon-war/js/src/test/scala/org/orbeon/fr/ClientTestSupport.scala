@@ -227,11 +227,28 @@ trait ClientTestSupport {
 
       val cookieJar            = myCookieJar
       val virtualConsole       = new VirtualConsole().sendTo(g.console.asInstanceOf[js.Object], new js.Object {
-        val omitJSDOMErrors = true
+        val omitJSDOMErrors = false
       })
 
       val resources            = "usable"
       val runScripts           = "dangerously" // "outside-only"
+
+      // On JSDOM, mock matchMedia, used by TinyMCE, so we can avoid `omitJSDOMErrors = false`
+      val beforeParse: js.Function1[dom.Window, Unit] = (window: dom.Window) => {
+        val noop: js.Function0[Unit] = () => ()
+        window.asInstanceOf[js.Dynamic].matchMedia = ((query: String) =>
+          js.Dynamic.literal(
+            matches             = false,
+            media               = query,
+            onchange            = null,
+            addListener         = noop,
+            removeListener      = noop,
+            addEventListener    = noop,
+            removeEventListener = noop,
+            dispatchEvent       = (() => false): js.Function0[Boolean]
+          )
+        ): js.Function1[String, js.Dynamic]
+      }
     }
 
     for {

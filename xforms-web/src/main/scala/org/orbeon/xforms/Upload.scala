@@ -88,9 +88,11 @@ class Upload {
       val markup =
         s"""
            |<span class="$UploadProgressClass">
-           |  <span class="$UploadProgressClass-bar">
+           |  <span class="$UploadProgressBarClass">
            |    <div class="progress progress-striped active">
+           |      <div class="$UploadProgressMessageClass $UploadProgressMessageUnfilledClass"></div>
            |      <div class="bar"></div>
+           |      <div class="$UploadProgressMessageClass $UploadProgressMessageFilledClass"></div>
            |    </div>
            |  </span>
            |  <a href="#" class="$UploadCancelClass">Cancel</a>
@@ -122,11 +124,9 @@ class Upload {
         XFormsApp.clientServerChannel.cancel(doAbort = true, XXFormsUploadError)
         logger.debug("cancel")
       case _ =>
-        findProgressBar foreach { bar =>
-          val pctString = Support.computePercentStringToOneDecimal(received, expected)
-          logger.debug(s"update progress $pctString%")
-          bar.style.width = s"$pctString%"
-        }
+        val pctString = Support.computePercentStringToOneDecimal(received, expected)
+        logger.debug(s"update progress $pctString%")
+        setProgressWidth(pctString)
     }
 
   // Called by UploadServer when the upload for this control is finished.
@@ -159,11 +159,10 @@ class Upload {
 
     $(_container).addClass(StateClassPrefix + state)
 
-    if (state == "progress")
-      findProgressBar foreach {
-        val pctString = Support.computePercentStringToOneDecimal(0, 1000)
-        _.style.width = s"$pctString%" // https://github.com/orbeon/orbeon-forms/issues/6666
-      }
+    if (state == "progress") {
+      setProgressWidth(Support.computePercentStringToOneDecimal(0, 1000)) // https://github.com/orbeon/orbeon-forms/issues/6666
+      updateProgressMessage()
+    }
   }
 
   // Clears the upload field by recreating it.
@@ -191,8 +190,23 @@ class Upload {
   private def findDescendantElem(className: String): Option[html.Element] =
     _container.querySelectorOpt(s".$className")
 
+  private def updateProgressMessage(): Unit = {
+    val message = _container.dataset.get("rUploading").getOrElse("")
+    _container.querySelectorAllT(s".$UploadProgressMessageClass").foreach(_.textContent = message)
+  }
+
+  private def setProgressWidth(pctString: String): Unit = {
+    findProgressBar.foreach(_.style.width = s"$pctString%")
+    findProgressElement.foreach(_.style.setProperty(UploadProgressWidthPropertyName, s"$pctString%"))
+  }
+
+  private def findProgressElement: Option[html.Element] =
+    findDescendantElem(UploadProgressBarClass) map {
+      _.querySelectorT(".progress")
+    }
+
   private def findProgressBar: Option[html.Element] =
-    findDescendantElem(s"$UploadProgressClass-bar") map {
+    findDescendantElem(UploadProgressBarClass) map {
       _.querySelectorT(".bar")
     }
 }

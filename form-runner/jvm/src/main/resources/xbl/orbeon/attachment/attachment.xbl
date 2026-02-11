@@ -27,7 +27,7 @@
         xxbl:label-for="fr-attachment-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                            <display-name lang="en">Single File Attachment</display-name>
+        <display-name lang="en">Single File Attachment</display-name>
         <display-name lang="fr">Fichier joint unique</display-name>
         <display-name lang="no">Enkelt filvedlegg</display-name>
         <display-name lang="ru">Загрузка файла</display-name>
@@ -294,6 +294,7 @@
                             <download>Download</download>
                             <empty>No attachment.</empty>
                             <remove>Remove Attachment</remove>
+                            <uploading>Uploading…</uploading>
                         </resource>
                         <resource xml:lang="es">
                             <drag-single>Arrastra el archivo aquí o {0}selecciona el archivo{1}.</drag-single>
@@ -301,6 +302,7 @@
                             <download>Descargar</download>
                             <empty>No hay adjunto</empty>
                             <remove>Quitar archivo adjunto</remove>
+                            <uploading>Subiendo…</uploading>
                         </resource>
                         <resource xml:lang="fi">
                             <drag-single>Raahaa tiedosto tähän tai {0}valitse tiedosto{1}.</drag-single>
@@ -308,6 +310,7 @@
                             <download>Lataa</download>
                             <empty>Ei liitettä</empty>
                             <remove>Poista liite</remove>
+                            <uploading>Lähetetään…</uploading>
                         </resource>
                         <resource xml:lang="fr">
                             <drag-single>Déposer le fichier ici ou {0}sélectionner le fichier{1}.</drag-single>
@@ -315,6 +318,7 @@
                             <download>Télécharger</download>
                             <empty>Pas de fichier joint.</empty>
                             <remove>Supprimer le fichier joint</remove>
+                            <uploading>Téléchargement…</uploading>
                         </resource>
                         <resource xml:lang="ru">
                             <drag-single>Перетащите файл сюда или {0}выберите файл{1}.</drag-single>
@@ -322,6 +326,7 @@
                             <download>Скачать</download>
                             <empty>Нет вложения.</empty>
                             <remove>Удалить вложение</remove>
+                            <uploading>Загрузка…</uploading>
                         </resource>
                         <resource xml:lang="it">
                             <drag-single>Trascina qui il file o {0}seleziona il file{1}.</drag-single>
@@ -329,6 +334,7 @@
                             <download>Scaricare</download>
                             <empty>Nessun allegato.</empty>
                             <remove>Rimuovi allegato</remove>
+                            <uploading>Caricamento…</uploading>
                         </resource>
                         <resource xml:lang="de">
                             <drag-single>Ziehen Sie die Datei hierher oder {0}wählen Sie eine Datei aus{1}.</drag-single>
@@ -336,6 +342,7 @@
                             <download>Herunterladen</download>
                             <empty>Kein Anhang</empty>
                             <remove>Anhang entfernen</remove>
+                            <uploading>Hochladen…</uploading>
                         </resource>
                         <resource xml:lang="sv">
                             <drag-single>Dra filen hit eller {0}välj fil{1}.</drag-single>
@@ -343,6 +350,7 @@
                             <download>Ladda ner</download>
                             <empty>Ingen bilaga.</empty>
                             <remove>Ta bort bilaga</remove>
+                            <uploading>Laddar upp…</uploading>
                         </resource>
                         <resource xml:lang="nl">
                             <drag-single>Sleep bestand hierheen of {0}selecteer bestand{1}.</drag-single>
@@ -350,6 +358,7 @@
                             <download>Downloaden</download>
                             <empty>Geen bijlage.</empty>
                             <remove>Bijlage verwijderen</remove>
+                            <uploading>Uploaden…</uploading>
                         </resource>
                         <resource xml:lang="pt">
                             <drag-single>Arraste o arquivo aqui ou {0}selecione o arquivo{1}.</drag-single>
@@ -357,6 +366,7 @@
                             <download>Baixar</download>
                             <empty>Sem anexo.</empty>
                             <remove>Remover anexo</remove>
+                            <uploading>Enviando…</uploading>
                         </resource>
                         <resource xml:lang="lt">
                             <drag-single>Nuvilkite failą čia arba {0}pasirinkite failą{1}.</drag-single>
@@ -364,6 +374,7 @@
                             <download>Parsisiųsti</download>
                             <empty>Nėra priedo.</empty>
                             <remove>Pašalinti priedą</remove>
+                            <uploading>Įkeliama…</uploading>
                         </resource>
                         <resource xml:lang="da">
                             <drag-single>Træk fil her eller {0}vælg fil{1}.</drag-single>
@@ -371,6 +382,7 @@
                             <download>Hent</download>
                             <empty>Ingen vedhæftning.</empty>
                             <remove>Fjern vedhæftning</remove>
+                            <uploading>Uploader…</uploading>
                         </resource>
                     </_>
                 </xf:instance>
@@ -527,6 +539,7 @@
                             mediatype="text/html"/>
                     </xh:div>
                     <xf:upload
+                        data-r-uploading="{xxf:r('uploading')}"
                         id="xf-upload"
                         class="fr-attachment-upload"
                         ref="if ($readonly) then instance('readonly-instance') else instance()"

@@ -335,6 +335,31 @@
             .yui-pb, .xforms-upload-cancel { vertical-align: middle }
             .xforms-upload-cancel { padding-left: .5em }
             .yui-pb { display: inline-block; }
+
+            .progress {
+                position: relative;
+                --xforms-upload-progress-width: 0%;
+
+                .xforms-upload-progress-message {
+                    position: absolute;
+                    inset: 0;
+                    text-align: center;
+                }
+
+                .xforms-upload-progress-message-unfilled {
+                    color: #555;
+                    clip-path: inset(0 0 0 var(--xforms-upload-progress-width));
+                }
+
+                .xforms-upload-progress-message-filled {
+                    color: #fff;
+                    clip-path: inset(0 calc(100% - var(--xforms-upload-progress-width)) 0 0);
+                }
+
+                .bar {
+                    transition: none;
+                }
+            }
         }
 
         &.xforms-readonly {

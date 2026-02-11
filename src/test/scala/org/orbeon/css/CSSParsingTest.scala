@@ -19,7 +19,6 @@ import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.oxf.util.IndentedLogger
 import org.scalatest.funspec.AnyFunSpec
 
-import java.net.URL
 
 
 class CSSParsingTest extends AnyFunSpec {
@@ -101,8 +100,8 @@ class CSSParsingTest extends AnyFunSpec {
 
     it("must parse variable definitions from a CSS string") {
       val variableDefinitions1 = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
-        resolvedURL = _ => new URL("") // Won't be called
+        resource             = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
+        resolveAndOpenStream = _ => throw new UnsupportedOperationException // Won't be called
       )
 
       // Only check variable names and values for now
@@ -225,8 +224,8 @@ class CSSParsingTest extends AnyFunSpec {
 
     it("must inject variables into a CSS stylesheet") {
       val variableDefinitions1 = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
-        resolvedURL = _ => new URL("") // Won't be called
+        resource             = Style(cssWithVariableDefinitions1, List(MediaQuery.AllMediaQuery)),
+        resolveAndOpenStream = _ => throw new UnsupportedOperationException // Won't be called
       )
 
       val cssWithVariableEvaluations =
@@ -282,8 +281,8 @@ class CSSParsingTest extends AnyFunSpec {
                         f                         : ValueProvider => Unit
     ): Unit = {
       val variableDefinitions = CSSParsing.variableDefinitions(
-        resource    = Style(cssWithVariableDefinitions, List(MediaQuery.AllMediaQuery)),
-        resolvedURL = _ => new URL("") // Won't be called
+        resource             = Style(cssWithVariableDefinitions, List(MediaQuery.AllMediaQuery)),
+        resolveAndOpenStream = _ => throw new UnsupportedOperationException // Won't be called
       )
 
       val variableValues = new ValueProvider {

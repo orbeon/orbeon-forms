@@ -18,7 +18,7 @@ import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase,
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.css.CSSParsing.CSSCache
-import org.orbeon.css.{CSSParsing, Selector, VariableDefinitions}
+import org.orbeon.css.{CSSParsing, ResolvedCSSLink, Selector}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -35,7 +35,7 @@ import org.w3c.dom.Document
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-import java.io.{FileInputStream, IOException, OutputStream}
+import java.io.{FileInputStream, OutputStream}
 import java.net.{URI, URL}
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
@@ -228,22 +228,20 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
         override val pipelineContext         : PipelineContext = outerPipelineContext
         override implicit val externalContext: ExternalContext = outerExternalContext
         override implicit val indentedLogger : IndentedLogger  = outerIndentedLogger
+
+        def resolveAndOpenStream(uri: String): ResolvedCSSLink =
+          ResolvedCSSLink(
+            resolvedURL = resolveURI(uri),
+            inputStream = openStream(uri)
+          )
       }
 
-      val variableDefinitions = {
-        try {
-          CSSParsing.variableDefinitions(
-            // Retrieve CSS resources from the document (link and style elements)
-            resources   = CSSParsing.cssResources(w3cDocument),
-            resolvedURL = (uri: URI) => new URL(uriResolver.resolveURI(uri.toString))
-          )
-        } catch {
-          case e: IOException =>
-            // This is a workaround for the fact that CSS files from Webjars are not accessible while running tests (see #6642)
-            logger.error(e)("CSS file content could not be read while parsing variable definitions")
-            VariableDefinitions(Nil)
-        }
-      }
+      val variableDefinitions =
+        CSSParsing.variableDefinitions(
+          // Retrieve CSS resources from the document (link and style elements)
+          resources            = CSSParsing.cssResources(w3cDocument),
+          resolveAndOpenStream = (uri: URI) => uriResolver.resolveAndOpenStream(uri.toString)
+        )
 
       pdfRendererBuilder.withW3cDocument(
         w3cDocument,

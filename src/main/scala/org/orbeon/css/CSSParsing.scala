@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{IndentedLogger, StringUtils}
 import org.w3c.dom.{Document, Element, Node}
 
-import java.net.{URI, URL}
+import java.net.URI
 import java.nio.charset.StandardCharsets
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.ListHasAsScala
@@ -58,20 +58,20 @@ object CSSParsing {
   }
 
   def variableDefinitions(
-    resources     : List[CSSResource],
-    resolvedURL   : URI => URL
+    resources           : List[CSSResource],
+    resolveAndOpenStream: URI => ResolvedCSSLink
   )(implicit
     cssCache      : CSSCache,
     indentedLogger: IndentedLogger,
   ): VariableDefinitions =
     resources.foldLeft(VariableDefinitions(Nil)) { case (previousVariableDefinitions, resource) =>
       // Merge variables definitions from all resources
-      previousVariableDefinitions.merged(variableDefinitions(resource, resolvedURL))
+      previousVariableDefinitions.merged(variableDefinitions(resource, resolveAndOpenStream))
     }
 
   def variableDefinitions(
-    resource      : CSSResource,
-    resolvedURL   : URI => URL
+    resource            : CSSResource,
+    resolveAndOpenStream: URI => ResolvedCSSLink
   )(implicit
     cssCache      : CSSCache,
     indentedLogger: IndentedLogger
@@ -83,10 +83,10 @@ object CSSParsing {
           (parsedCss(css), s"inline CSS: ${StringUtils.truncateWithEllipsis(css, 20, 1)}")
 
         case Link(uri, _) =>
-          val url = resolvedURL(uri)
+          val resolvedCSSLink = resolveAndOpenStream(uri)
 
           val cascadingStyleSheetOpt =
-            cssCache.get(url, parsedCss(IOUtils.readStreamAsStringAndClose(url.openStream(), charset = None)))
+            cssCache.get(resolvedCSSLink.resolvedURL, parsedCss(IOUtils.readStreamAsStringAndClose(resolvedCSSLink.inputStream, charset = None)))
 
           (cascadingStyleSheetOpt, uri.toString)
       }

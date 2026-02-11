@@ -16,6 +16,7 @@ package org.orbeon.css
 import com.helger.css.ECSSVersion
 import com.helger.css.tools.MediaQueryTools
 
+import java.io.InputStream
 import java.net.URI
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.IterableHasAsScala
@@ -88,6 +89,9 @@ case class Selector(selector: String) {
 sealed trait CSSResource { def mediaQueries: List[MediaQuery] }
 case class Link (uri: URI   , mediaQueries: List[MediaQuery]) extends CSSResource
 case class Style(css: String, mediaQueries: List[MediaQuery]) extends CSSResource
+
+// Resolved CSS link: resolved URL (used as cache key) and input stream to read the content
+case class ResolvedCSSLink(resolvedURL: String, inputStream: InputStream)
 
 case class VariableDefinition(
   name                  : String,

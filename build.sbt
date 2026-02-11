@@ -93,6 +93,22 @@ val LiferayPortalServiceVersion      = "6.2.5"
 val LiferayPortalKernelVersion       = "166.0.0"
 
 
+val WebJarDependencies = Seq(
+  "org.webjars.npm" % "bowser"           % "1.9.4",
+  "org.webjars"     % "clipboard.js"     % "2.0.11",
+  "org.webjars.npm" % "codemirror"       % "5.65.20",
+  "org.webjars.npm" % "dragula"          % "3.7.3",
+  "org.webjars.npm" % "fflate"           % "0.6.10",
+  "org.webjars.npm" % "jquery"           % "3.6.1",
+  "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
+  "org.webjars.npm" % "mousetrap"        % "1.6.5",
+  "org.webjars"     % "nprogress"        % "0.2.0",
+  "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
+  "org.webjars.npm" % "select2"          % "4.0.13",
+  "org.webjars.npm" % "tinymce"          % "6.8.6",
+  "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
+)
+
 val CoreLibraryDependencies = Seq(
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -788,6 +804,8 @@ lazy val formRunnerJVM = formRunner.jvm
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
+
+    libraryDependencies ++= WebJarDependencies.map(_ % Test),
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
@@ -1457,21 +1475,7 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(
     Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue,
 
-    libraryDependencies ++= Seq(
-      "org.webjars.npm" % "bowser"           % "1.9.4",
-      "org.webjars"     % "clipboard.js"     % "2.0.11",
-      "org.webjars.npm" % "codemirror"       % "5.65.20",
-      "org.webjars.npm" % "dragula"          % "3.7.3",
-      "org.webjars.npm" % "fflate"           % "0.6.10",
-      "org.webjars.npm" % "jquery"           % "3.6.1",
-      "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
-      "org.webjars.npm" % "mousetrap"        % "1.6.5",
-      "org.webjars"     % "nprogress"        % "0.2.0",
-      "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
-      "org.webjars.npm" % "select2"          % "4.0.13",
-      "org.webjars.npm" % "tinymce"          % "6.8.6",
-      "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
-    )
+    libraryDependencies ++= WebJarDependencies
   )
 
 lazy val orbeonWarJS = orbeonWar.js

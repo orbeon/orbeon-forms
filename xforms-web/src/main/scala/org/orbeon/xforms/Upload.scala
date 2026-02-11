@@ -19,7 +19,6 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.*
-import org.orbeon.xforms.controls.Upload.*
 import org.scalajs.dom
 import org.scalajs.dom.{FileList, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -32,6 +31,20 @@ import scala.scalajs.js.annotation.JSExport
 object Upload {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
+
+  private val States = Set("empty", "progress", "file")
+
+  private val Prefix = "xforms-upload-"
+
+  private val StateClassPrefix                  = Prefix + "state-"
+  private val UploadProgressClass               = Prefix + "progress"
+  private val UploadProgressBarClass            = Prefix + "progress-bar"
+  private val UploadProgressMessageClass        = Prefix + "progress-message"
+  private val UploadProgressMessageFilledClass  = Prefix + "progress-message-filled"
+  private val UploadProgressMessageUnfilledClass = Prefix + "progress-message-unfilled"
+  private val UploadProgressWidthPropertyName   = "--xforms-upload-progress-width"
+  private val UploadSelectClass                 = Prefix + "select"
+  private val UploadCancelClass                 = Prefix + "cancel"
 
   logger.debug("init object")
 

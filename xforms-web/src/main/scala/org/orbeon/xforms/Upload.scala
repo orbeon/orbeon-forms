@@ -202,9 +202,17 @@ class Upload {
     _container.querySelectorAllT(s".$UploadProgressMessageClass").foreach(_.textContent = message)
   }
 
+  private def adjustedProgressPercent(pctString: String): String = {
+    val InitialProgressPercent = 5.0
+    val realPercent            = pctString.toDouble
+    val adjustedPercent        = InitialProgressPercent + realPercent * (100.0 - InitialProgressPercent) / 100.0
+    f"$adjustedPercent%.1f"
+  }
+
   private def setProgressWidth(pctString: String): Unit = {
-    findProgressBar.foreach(_.style.width = s"$pctString%")
-    findProgressElement.foreach(_.style.setProperty(UploadProgressWidthPropertyName, s"$pctString%"))
+    val adjustedPctString = adjustedProgressPercent(pctString)
+    findProgressBar.foreach(_.style.width = s"$adjustedPctString%")
+    findProgressElement.foreach(_.style.setProperty(UploadProgressWidthPropertyName, s"$adjustedPctString%"))
   }
 
   private def findProgressElement: Option[html.Element] =

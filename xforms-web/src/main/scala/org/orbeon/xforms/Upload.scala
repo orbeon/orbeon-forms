@@ -32,19 +32,16 @@ object Upload {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
 
-  private val States = Set("empty", "progress", "file")
-
-  private val Prefix = "xforms-upload-"
-
-  private val StateClassPrefix                  = Prefix + "state-"
-  private val UploadProgressClass               = Prefix + "progress"
-  private val UploadProgressBarClass            = Prefix + "progress-bar"
-  private val UploadProgressMessageClass        = Prefix + "progress-message"
-  private val UploadProgressMessageFilledClass  = Prefix + "progress-message-filled"
-  private val UploadProgressMessageUnfilledClass = Prefix + "progress-message-unfilled"
-  private val UploadProgressWidthPropertyName   = "--xforms-upload-progress-width"
-  private val UploadSelectClass                 = Prefix + "select"
-  private val UploadCancelClass                 = Prefix + "cancel"
+  private val States                             = Set("empty", "progress", "file")
+  private val StateClassPrefix                   = "xforms-upload-state-"
+  private val UploadSelectClass                  = "xforms-upload-select"
+  private val UploadCancelClass                  = "xforms-upload-cancel"
+  private val UploadProgressClass                = "xforms-upload-progress"
+  private val UploadProgressBarClass             = "xforms-upload-progress-bar"
+  private val UploadProgressMessageClass         = "xforms-upload-progress-message"
+  private val UploadProgressMessageFilledClass   = "xforms-upload-progress-message-filled"
+  private val UploadProgressMessageUnfilledClass = "xforms-upload-progress-message-unfilled"
+  private val UploadProgressWidthPropertyName    = "--xforms-upload-progress-width"
 
   logger.debug("init object")
 
@@ -79,17 +76,15 @@ object Upload {
 
 class Upload {
 
-  self =>
-
   import Upload.*
 
   private var _container: html.Element = null
-  def container: html.Element = self._container
+  def container: html.Element = _container
 
   // Creates markup for loading progress indicator element, if necessary
   def init(container: html.Element): Unit = {
 
-    self._container = container
+    _container = container
 
     logger.debug("init class")
 
@@ -111,11 +106,11 @@ class Upload {
            |  <a href="#" class="$UploadCancelClass">Cancel</a>
            |</span>""".stripMargin
 
-      $(markup).insertAfter(getInput)
+      getInput.insertAdjacentHTML("afterend", markup)
 
       // Register listener on the cancel link
       findDescendantElem(UploadCancelClass) foreach { cancelAnchor =>
-        cancelAnchor.addEventListener(DomEventNames.Click, self.cancelButtonActivated _)
+        cancelAnchor.addEventListener(DomEventNames.Click, cancelButtonActivated _)
       }
     }
   }
@@ -125,7 +120,7 @@ class Upload {
   @JSExport
   def change(): Unit = {
     logger.debug("change -> queueing")
-    processFileList(getInput.files, self)
+    processFileList(getInput.files, this)
   }
 
   // This method is called when the server sends us a progress update for this upload control. If the upload was
@@ -168,9 +163,8 @@ class Upload {
 
     // Switch class
     for (s <- States)
-      $(_container).removeClass(StateClassPrefix + s)
-
-    $(_container).addClass(StateClassPrefix + state)
+      _container.classList.remove(StateClassPrefix + s)
+    _container.classList.add(StateClassPrefix + state)
 
     if (state == "progress") {
       setProgressWidth(Support.computePercentStringToOneDecimal(0, 1000)) // https://github.com/orbeon/orbeon-forms/issues/6666

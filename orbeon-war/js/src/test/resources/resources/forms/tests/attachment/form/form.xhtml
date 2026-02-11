@@ -1,0 +1,87 @@
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:math="http://www.w3.org/2005/xpath-functions/math">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
+            <xf:instance id="fr-form-instance" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <single filename="" mediatype="" size=""/>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="single-bind" ref="single" name="single" type="xf:anyURI"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>attachment</form-name>
+                    <title xml:lang="en">Attachment Test</title>
+                    <description xml:lang="en">Test form for attachment control</description>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1>
+                            <label>Attachment Section</label>
+                        </section-1>
+                        <single>
+                            <label>Single</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </single>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="12">
+                            <fr:attachment bind="single-bind" id="single-control" class="fr-attachment">
+                                <xf:label ref="$form-resources/single/label"/>
+                                <xf:hint ref="$form-resources/single/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

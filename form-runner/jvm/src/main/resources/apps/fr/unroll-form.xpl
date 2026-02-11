@@ -37,10 +37,31 @@
         <p:output name="form-runner-config" id="form-runner-config" ref="form-runner-config"/>
     </p:processor>
 
-    <!-- Apply UI components -->
+    <!-- Provide section template implementation -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="config">
+            <xsl:transform
+                version="2.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+                <xsl:import href="components/section-templates.xsl"/>
+
+                <!-- Used by `section-templates.xsl` -->
+                <xsl:variable
+                    name="implement-section-templates"
+                    as="xs:boolean"
+                    select="true()"/>
+            </xsl:transform>
+        </p:input>
+        <p:input  name="data"               href="#raw-form-definition"/>
+        <p:output name="data"               id="after-section-templates"/>
+    </p:processor>
+
     <p:processor name="oxf:unsafe-xslt">
         <p:input  name="config"             href="components/components.xsl"/>
-        <p:input  name="data"               href="#raw-form-definition"/>
+        <p:input  name="data"               href="#after-section-templates"/>
         <p:input  name="form-runner-config" href="#form-runner-config"/>
         <p:output name="data"               id="after-components"/>
 

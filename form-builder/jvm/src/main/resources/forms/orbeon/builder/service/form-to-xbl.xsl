@@ -363,6 +363,7 @@
         <xbl:binding
                 id="{$binding-id}-component"
                 element="component|{$section-name}"
+                data-library-version="{doc('input:parameters')/*/form-version}"
                 class="fr-section-component">
 
             <!-- Orbeon Form Builder Component Metadata -->
@@ -516,13 +517,8 @@
             <!-- XBL implementation -->
             <xbl:implementation>
                 <xf:model id="{$model-id}">
-                    <!-- Copy schema attribute if present -->
+                    <!-- Copy schema and MIP attributes if present -->
                     <xsl:copy-of select="$fr-form-model/(@schema | @xxf:custom-mips)"/>
-
-                    <!-- Section data model -->
-                    <xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id">
-                        <_/>
-                    </xf:instance>
 
                     <!-- Template -->
                     <xf:instance id="fr-form-template">
@@ -551,96 +547,9 @@
                         </resources>
                     </xf:instance>
 
-                    <!-- Keep track of whether fields should be readonly because the node we're bound to is readonly -->
-                    <xf:instance id="readonly"><readonly/></xf:instance>
-
-                    <!-- This is also at the top-level in components.xsl -->
-                    <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
-                    <xf:var name="fr-mode"   value="$fr-params/mode"/>
-                    <!-- NOTE: Make content readonly at design time too because if the form author enters initial
-                         data or adds a repeat iteration into the section template, that data will be either incorrect
-                         or lost if the toolbox is reloaded. A better fix can be considered, but more complex at the
-                         Form Builder level. -->
-                    <xf:bind
-                        ref="instance('fr-form-instance')"
-                        readonly="
-                            fr:is-readonly-mode()         or
-                            instance('readonly') = 'true' or
-                            fr:is-design-time()"/>
-
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could be optimized to check if any of the types are actually used -->
                     <xsl:copy-of select="$fr-form-model/xs:schema"/>
-
-                    <!-- Section becomes relevant -->
-                    <xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
-                        <!-- At this point, the outside instance has already been copied inside. If there are no child
-                             elements, it means that the data has not yet been copied out (the section could also be
-                             empty, but this is not allowed currently). See also:
-                             https://github.com/orbeon/orbeon-forms/issues/786 -->
-                        <xf:var name="is-empty" value="empty(instance()/*)"/>
-                        <!-- If empty, initialize from the template (the mirror copies it out too) -->
-                        <xf:action if="$is-empty">
-                            <xf:insert
-                                context="instance()"
-                                origin="instance('fr-form-template')/*"/>
-                            <!-- RRR with defaults -->
-                            <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
-                            <xf:recalculate xxf:defaults="true"/>
-                        </xf:action>
-                        <!-- If not empty, update with instance where holes have been filled if necessary -->
-                        <xf:action if="not($is-empty)">
-                            <xf:var
-                                name="simply-migrated"
-                                value="
-                                    migration:dataMaybeWithSimpleMigration(
-                                        event('xxf:absolute-targetid'),
-                                        instance('fr-form-template'),
-                                        instance()
-                                    )"
-                                xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"/>
-
-                            <xf:action if="exists($simply-migrated)">
-                                <xf:delete ref="instance()/*"/>
-                                <xf:insert
-                                    context="instance()"
-                                    origin="$simply-migrated/*"/>
-                                <!-- RRR with defaults -->
-                                <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
-                                <xf:recalculate xxf:defaults="true"/>
-                            </xf:action>
-                        </xf:action>
-                    </xf:action>
-
-                    <!-- Annotate section, grid, iteration, and control elements as initially non-relevant. Then, as the controls become
-                         relevant, they will remove the annotations. See https://github.com/orbeon/orbeon-forms/issues/3829. -->
-                    <xf:action event="xforms-model-construct-done">
-                        <xf:insert
-                            iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())"
-                            context= "."
-                            origin= "xf:attribute('fr:relevant', 'false')"
-                            xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"/>
-                    </xf:action>
-
-                    <!--
-                        Propagate out relevance, see https://github.com/orbeon/orbeon-forms/issues/3829. We use `xxf:phantom="true"` so
-                        we can catch the relevance events for the grid. See https://github.com/orbeon/orbeon-forms/issues/1947. -->
-                    <xf:insert
-                        observer="fr-section-template-view"
-                        event="xforms-disabled"
-                        xxf:phantom="true"
-                        if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())"
-
-                        context="event('xxf:binding')"
-                        origin="xf:attribute('fr:relevant', 'false')"/>
-
-                    <xf:delete
-                        observer="fr-section-template-view"
-                        event="xforms-enabled"
-                        xxf:phantom="true"
-                        if="(event('xxf:binding') instance of element()) and (event('xxf:binding')/root() is instance('fr-form-instance')/root())"
-
-                        ref="event('xxf:binding')/@fr:relevant"/>
 
                     <!-- Services and actions -->
                     <xsl:if test="exists(($relevant-services, $relevant-actions, $relevant-model-listeners-20182, $relevant-actions-20182))">
@@ -657,45 +566,6 @@
             <xbl:template>
                 <!-- Set `model`, see https://github.com/orbeon/orbeon-forms/issues/3243 -->
                 <xf:group appearance="xxf:internal" model="{$model-id}" id="fr-section-template-view">
-
-                    <!-- Point to the context of the current element.
-                         NOTE: FB doesn't place a @ref. -->
-                    <xf:var name="context" id="context" value="xxf:binding-context('{$binding-id}-component')"/>
-
-                    <!-- Propagate readonly of containing section -->
-                    <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
-                        <xf:setvalue
-                            event="xforms-enabled xforms-value-changed"
-                            ref="instance('readonly')"
-                            value="exf:readonly($context)"
-                            class="fr-design-time-preserve"/>
-                    </xf:var>
-
-                    <!-- Expose internally a variable pointing to Form Runner resources -->
-                    <xf:var name="fr-resources" as="element()?">
-                        <xxf:value value="$fr-resources" xxbl:scope="outer"/>
-                    </xf:var>
-
-                    <!-- Try to match the current form language, or use the first language available if not found -->
-                    <!-- NOTE: Put this in the view, as the variable doesn't update properly if in the model.
-                         See: https://github.com/orbeon/orbeon-forms/issues/738 -->
-                    <!-- NOTE: This won't be needed once all code uses xxf:r(). -->
-                    <xf:var
-                        fr:keep-if-design-time="false"
-                        name="form-resources"
-                        value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
-                        as="element(resource)"/>
-                    <xf:var
-                        fr:keep-if-design-time="true"
-                        name="form-resources"
-                        value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]"
-                        as="element(resource)"/>
-
-                    <xh:div fr:keep-if-design-time="true" class="fb-section-template-details">
-                        <xh:i class="fa fa-fw fa-puzzle-piece"/>
-                        <xsl:value-of select="concat(doc('input:parameters')/*/app, ' / ',  $section-name, ' / v', doc('input:parameters')/*/form-version, '')"/>
-                    </xh:div>
-
                     <!-- Copy section content -->
                     <!-- Dont' copy label, see https://github.com/orbeon/orbeon-forms/issues/3243 -->
                     <xsl:copy-of select="$fr-section/(* except xf:label)"/>

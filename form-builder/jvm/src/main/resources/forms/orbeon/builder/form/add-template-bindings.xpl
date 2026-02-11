@@ -33,6 +33,7 @@
                     xmlns:xbl="http://www.w3.org/ns/xbl">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/apps/fr/components/section-templates.xsl"/>
 
                 <!--
                     When publishing, only embed XBL for section templates that are in use. On the other hand, if we're
@@ -53,6 +54,11 @@
                     name="for-form-builder"
                     as="xs:boolean"
                     select="doc('input:for-form-builder') = 'true'"/>
+                <!-- Used by `section-templates.xsl` -->
+                <xsl:variable
+                    name="implement-section-templates"
+                    as="xs:boolean"
+                    select="$for-form-builder"/>
                 <xsl:variable
                     name="bindings-to-insert"
                     select="

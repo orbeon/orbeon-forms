@@ -499,7 +499,8 @@ lazy val assetsSettings = Seq(
     f.toPath.iterator().asScala.map(_.toString).toList.endsWith("ponyfill.es2018.js" :: Nil)        ||
     f.toPath.iterator().asScala.map(_.toString).toList.endsWith("text-expander-element-bundle.js" :: Nil)
   ),
-  uglifyCompressOptions                    := Seq("warnings=false"),
+  uglifyCompressOptions                    := Seq.empty,
+  //uglifyOps                                := UglifyOps.singleFile, // Disable source map generation (2026-02-12: not currently needed)
 
   // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.
   // Also filter out a few things.

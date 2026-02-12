@@ -132,7 +132,7 @@ class Upload {
         XFormsApp.clientServerChannel.cancel(doAbort = true, XXFormsUploadError)
         logger.debug("cancel")
       case _ =>
-        val pctString = Support.computePercentStringToOneDecimal(received, expected)
+        val pctString = Support.computePercentStringToOneDecimal(adjustedReceived(received, expected), expected)
         logger.debug(s"update progress $pctString%")
         setProgressWidth(pctString)
     }
@@ -167,7 +167,7 @@ class Upload {
     _container.classList.add(StateClassPrefix + state)
 
     if (state == "progress") {
-      setProgressWidth(Support.computePercentStringToOneDecimal(0, 1000)) // https://github.com/orbeon/orbeon-forms/issues/6666
+      setProgressWidth(Support.computePercentStringToOneDecimal(adjustedReceived(0, 1000), 1000)) // https://github.com/orbeon/orbeon-forms/issues/6666
       updateProgressMessage()
     }
   }
@@ -202,17 +202,13 @@ class Upload {
     _container.querySelectorAllT(s".$UploadProgressMessageClass").foreach(_.textContent = message)
   }
 
-  private def adjustedProgressPercent(pctString: String): String = {
-    val InitialProgressPercent = 5.0
-    val realPercent            = pctString.toDouble
-    val adjustedPercent        = InitialProgressPercent + realPercent * (100.0 - InitialProgressPercent) / 100.0
-    f"$adjustedPercent%.1f"
-  }
+  // Make progress start at 5%, so the bar is visible right away, providing feedback the upload started.
+  private def adjustedReceived(received: Long, expected: Long): Long =
+    (5L * expected + 95L * received) / 100L
 
   private def setProgressWidth(pctString: String): Unit = {
-    val adjustedPctString = adjustedProgressPercent(pctString)
-    findProgressBar.foreach(_.style.width = s"$adjustedPctString%")
-    findProgressElement.foreach(_.style.setProperty(UploadProgressWidthPropertyName, s"$adjustedPctString%"))
+    findProgressBar.foreach(_.style.width = s"$pctString%")
+    findProgressElement.foreach(_.style.setProperty(UploadProgressWidthPropertyName, s"$pctString%"))
   }
 
   private def findProgressElement: Option[html.Element] =

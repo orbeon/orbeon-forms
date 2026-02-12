@@ -115,7 +115,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // Remove `role="textbox"` and ARIA attributes on child element, as:
         // - It isn't useful since it doesn't get the focus.
         // - It is problematic for Accessibility checkers as it isn't labeled.
-        Option(comboboxElement.querySelector("[role=textbox]")).foreach { childElement =>
+        comboboxElement.querySelectorOpt("[role=textbox]").foreach { childElement =>
           childElement.removeAttribute("role")
           val ariaAttrNames =
             (0 until childElement.attributes.length)

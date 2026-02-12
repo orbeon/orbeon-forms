@@ -386,7 +386,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                     legend.innerHTML = message;
             } else if ($(control).is('.xforms-output-appearance-xxforms-download')) {
                 // Download link
-                var anchor = YAHOO.util.Dom.getChildren(control)[0];
+                var anchor = control.children[0];
                 anchor.innerHTML = message;
             } else {
                 ORBEON.xforms.Controls._setMessage(control, "label", message);
@@ -562,7 +562,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             } else if (jControl.is('.xforms-upload')) {
                 // Upload control
                 ORBEON.xforms.Controls.setDisabledOnFormElement(
-                        YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, control)[0], isReadonly);
+                        control.getElementsByClassName("xforms-upload-select")[0], isReadonly);
             } else if (jControl.is('.xforms-textarea')) {
                 // Textarea
                 var textarea = control.getElementsByTagName("textarea")[0];
@@ -920,7 +920,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             var currentNode = startNode;
             var currentValue = startValue;
             while (true) {
-                currentNode = YAHOO.util.Dom.getPreviousSibling(currentNode);
+                currentNode = currentNode.previousElementSibling;
                 if (currentNode == null) break;
                 if (currentNode.nodeType == ELEMENT_TYPE) {
                     if (FN.isEnd(currentNode)) depth++;
@@ -956,7 +956,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             var valueStack = [];
             var currentValue = startValue;
             while (true) {
-                currentNode = YAHOO.util.Dom.getNextSibling(currentNode);
+                currentNode = currentNode.nextElementSibling;
                 if (currentNode == null) break;
                 if (currentNode.nodeType == ELEMENT_TYPE) {
                     if (this.isBegin(currentNode)) {
@@ -1543,11 +1543,9 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                 const subclass = ORBEON.xforms.XFormsXbl.createSubclass(xblClass);
 
                 const containerElem =
-                    targetElem == null || ! YAHOO.util.Dom.inDocument(targetElem, document)
+                    targetElem == null || ! document.contains(targetElem)
                     ? null
-                    : targetElem.classList.contains(cssClass)
-                        ? targetElem
-                        : YAHOO.util.Dom.getAncestorByClassName(targetElem, cssClass);
+                    : targetElem.closest("." + cssClass);
 
                 if (containerElem == null) {
                     // If we get an event for a target which is not in the document, return a mock object

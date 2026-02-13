@@ -326,8 +326,8 @@ private object FormRunnerConfigProcessor {
   }
 
   class FormRunnerConfigProcessorState(
-    computeParams               : ()                                        => FormRunnerParams,
-    computeMetadata             : ()                                        => Option[CacheableFormMetadata],
+    computeParams          : ()                                        => FormRunnerParams,
+    computeMetadata        : ()                                        => Option[CacheableFormMetadata],
     computeFormRunnerConfig: (FormRunnerParams, CacheableFormMetadata) => FormRunnerConfig
   ) {
     lazy val params: FormRunnerParams = computeParams().tap(_ => debugLog(s"Computed FormRunnerParams"))

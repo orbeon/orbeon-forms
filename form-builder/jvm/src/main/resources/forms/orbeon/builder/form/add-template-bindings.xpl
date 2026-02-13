@@ -61,6 +61,7 @@
                     select="$for-form-builder"/>
                 <xsl:variable
                     name="bindings-to-insert"
+                    as="element(xbl:binding)*"
                     select="
                         $available-section-bindings[
                             $for-form-builder or

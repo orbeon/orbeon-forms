@@ -168,7 +168,7 @@ object PathMapXPathAnalysisBuilder {
         }
 
       pathmap match {
-        case Some(pathmap) if ! pathmap.isInvalidated =>
+        case somePathmap @ Some(pathmap) if ! pathmap.isInvalidated =>
 
           // Try to reduce ancestor axis before anything else
           reduceAncestorAxis(pathmap)
@@ -266,7 +266,8 @@ object PathMapXPathAnalysisBuilder {
               returnablePaths        = returnablePaths,
               dependentModels        = dependentModels,
               dependentInstances     = dependentInstances,
-              pathmap                = pathmap
+            )(
+              pathmap                = somePathmap
             )
           else
             // Failure

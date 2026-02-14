@@ -30,25 +30,3 @@ case class PathMapXPathAnalysis(
   def pathMapOrThrow: PathMap = pathmap.getOrElse(throw new IllegalStateException("transient state already freed"))
   override def freeTransientState(): Unit = pathmap = None
 }
-
-object PathMapXPathAnalysis {
-
-  def apply(
-    xpathString           : String,
-    figuredOutDependencies: Boolean,
-    valueDependentPaths   : MapSet[String, String],
-    returnablePaths       : MapSet[String, String],
-    dependentModels       : collection.Set[String],
-    dependentInstances    : collection.Set[String],
-    pathmap               : PathMap
-  ): PathMapXPathAnalysis =
-    PathMapXPathAnalysis(
-      xpathString,
-      figuredOutDependencies,
-      valueDependentPaths,
-      returnablePaths,
-      dependentModels,
-      dependentInstances)(
-      Some(pathmap)
-    )
-}

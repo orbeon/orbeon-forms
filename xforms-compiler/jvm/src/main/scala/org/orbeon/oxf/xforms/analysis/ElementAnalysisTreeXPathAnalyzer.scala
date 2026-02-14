@@ -626,7 +626,8 @@ object ElementAnalysisTreeXPathAnalyzer {
                   pmxpa.returnablePaths combine other.returnablePaths,
                   pmxpa.dependentModels ++ other.dependentModels,
                   pmxpa.dependentInstances ++ other.dependentInstances,
-                  {
+                )(
+                  Some {
                     val newPathmap = pmxpa.pathMapOrThrow.clone
                     newPathmap.addRoots(other.pathMapOrThrow.clone.getPathMapRoots)
                     newPathmap
@@ -649,7 +650,8 @@ object ElementAnalysisTreeXPathAnalyzer {
             returnablePaths        = MapSet.empty[String, String],
             dependentModels        = pmxpa.dependentModels,
             dependentInstances     = pmxpa.dependentInstances,
-            pathmap                = pmxpa.pathMapOrThrow.clone
+          )(
+            pathmap                = Some(pmxpa.pathMapOrThrow.clone)
           )
       }
 

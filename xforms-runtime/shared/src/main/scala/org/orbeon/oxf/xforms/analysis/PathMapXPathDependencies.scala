@@ -28,17 +28,16 @@ import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
-
-import scala.collection.mutable as m
 import shapeless.syntax.typeable.*
 
+import scala.collection.mutable as m
 
 
 class PathMapXPathDependencies(
   containingDocument: XFormsContainingDocument
 ) extends XPathDependencies {
 
-  import PathMapXPathDependencies._
+  import PathMapXPathDependencies.*
 
   private implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("dependencies")
 
@@ -154,9 +153,8 @@ class PathMapXPathDependencies(
       } else
         new MapSet[ModelOrInstanceKey, String]
 
-    def refreshDone(): Unit = {
+    def refreshDone(): Unit =
       evaluateAllUntilRefreshDone = false
-    }
 
     def isMIPInitiallyDirty(mip: StaticBind.MIP): Boolean =
       mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
@@ -315,8 +313,8 @@ class PathMapXPathDependencies(
     var itemsetHitCount            = 0
   }
 
-  import RefreshState._
-  import Stats._
+  import RefreshState.*
+  import Stats.*
 
   // Returns the list of dependent models that should be recalculated as a result of the value change
   def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo): Iterable[XFormsModel] = {

@@ -45,7 +45,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
   }
 
   def markValueChange(nodeInfoOpt: Option[om.NodeInfo], isCalculate: Boolean): Unit = {
-    // Set the flags
+
     deferredActionContext.markValueChange(isCalculate)
 
     nodeInfoOpt.foreach { nodeInfo =>

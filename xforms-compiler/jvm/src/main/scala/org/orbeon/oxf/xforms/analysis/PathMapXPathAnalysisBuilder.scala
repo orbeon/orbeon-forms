@@ -178,10 +178,10 @@ object PathMapXPathAnalysisBuilder {
 
           // We use LinkedHashMap/LinkedHashSet in part to keep unit tests reproducible
           val valueDependentPaths = new MapSet[String, String]
-          val returnablePaths = new MapSet[String, String]
+          val returnablePaths     = new MapSet[String, String]
 
-          val dependentModels = new LinkedHashSet[String]
-          val dependentInstances = new LinkedHashSet[String]
+          val dependentModels     = new LinkedHashSet[String]
+          val dependentInstances  = new LinkedHashSet[String]
 
           case class InstancePath(instancePrefixedId: String, path: String)
 
@@ -223,7 +223,7 @@ object PathMapXPathAnalysisBuilder {
                     val instancePrefixedId = instancePath.instancePrefixedId
                     val model = partAnalysisCtx.getModelByInstancePrefixedId(instancePrefixedId)
                     if (model eq null)
-                      throw new OXFException("Reference to invalid instance: " + instancePrefixedId)
+                      throw new IllegalStateException(s"Reference to invalid instance: `$instancePrefixedId`")
                     dependentModels.add(model.prefixedId)
                     dependentInstances.add(instancePrefixedId)
 
@@ -344,10 +344,11 @@ object PathMapXPathAnalysisBuilder {
                   // absolute id. However, it is unlikely that literal absolute ids will be passed, so
                   // this is probably not a big deal.
                   partAnalysisCtx.findInstancePrefixedId(scope, originalInstanceId).orNull // can return `None`
-                else if (originalInstanceId.indexOf(ComponentSeparator) != -1)
+                else if (originalInstanceId.indexOf(ComponentSeparator) != -1) {
                   // HACK: datatable e.g. uses instance(prefixedId)!
+                  // 2026-02-12: obsolete comment above
                   originalInstanceId // TODO: warn: could be a non-existing instance id
-                else
+                } else
                   // Normal use of instance()
                   scope.prefixedIdForStaticId(originalInstanceId) // TODO: warn: could be a non-existing instance id
 

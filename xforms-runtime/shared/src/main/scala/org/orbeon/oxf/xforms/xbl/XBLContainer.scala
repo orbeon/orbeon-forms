@@ -172,8 +172,9 @@ class XBLContainer(
   // Find the root container for the given scope, starting with the current container.
   // This is the container which has the given scope as inner scope.
   def findScopeRoot(scope: Scope): XBLContainer =
-    ancestorsIterator find (_.innerScope == scope) getOrElse
-      (throw new OXFException("XBL resolution scope not found for scope id: " + scope.scopeId))
+    ancestorsIterator
+      .find(_.innerScope == scope)
+      .getOrElse(throw new OXFException("XBL resolution scope not found for scope id: " + scope.scopeId))
 
   // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container
   // control componentControl will be null if we are at the top-level
@@ -308,11 +309,7 @@ trait RefreshSupport {
   }
 
   def setDeferredFlagsForSetindex(): Unit =
-    // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization and by
-    // setting the deferred update flags for recalculate, revalidate and refresh."
     for (model <- models)
-      // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
-      //currentModel.getBinds.rebuild()
       model.markValueChange(None, isCalculate = false)
 }
 

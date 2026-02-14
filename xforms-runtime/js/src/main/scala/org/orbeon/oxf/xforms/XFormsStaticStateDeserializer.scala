@@ -1276,8 +1276,6 @@ object TopLevelPartAnalysisImpl {
     partAnalysis.indexAttributeControls(attributes)
     partAnalysis.indexSelect1Groups(select1Groups)
 
-//    ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, container)
-
     partAnalysis
   }
 }

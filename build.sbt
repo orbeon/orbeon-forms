@@ -94,7 +94,7 @@ val LiferayPortalKernelVersion       = "166.0.0"
 
 
 val WebJarDependencies = Seq(
-  "org.webjars.npm" % "bowser"           % "1.9.4",
+  "org.webjars.npm" % "bowser"           % "2.11.0",
   "org.webjars"     % "clipboard.js"     % "2.0.11",
   "org.webjars.npm" % "codemirror"       % "5.65.20",
   "org.webjars.npm" % "dragula"          % "3.7.3",

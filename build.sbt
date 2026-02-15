@@ -100,7 +100,7 @@ val WebJarDependencies = Seq(
   "org.webjars.npm" % "dragula"          % "3.7.3",
   "org.webjars.npm" % "fflate"           % "0.6.10",
   "org.webjars.npm" % "jquery"           % "3.6.1",
-  "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
+  "org.webjars.npm" % "jquery.fancytree" % "2.38.5",
   "org.webjars.npm" % "mousetrap"        % "1.6.5",
   "org.webjars"     % "nprogress"        % "0.2.0",
   "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",

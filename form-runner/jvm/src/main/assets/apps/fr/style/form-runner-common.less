@@ -52,9 +52,9 @@
 
 // Static line heights (for PDF generator)
 @fixedLineHeight: @baseLineHeight;                 // For larger font sizes, the line height will stay fixed (TODO: use a specific CSS variable if needed)
-@fixedControlsHeight: (@baseLineHeight + 8px);     // Because of the border-box on the controls
-@fixedTextareaHeight: (@baseLineHeight * 3 + 8px); // 3 lines
-@fixedMultipleSelectHeight: ((@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px); // 3 lines including margins
+@fixedControlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
+@fixedTextareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
+@fixedMultipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
 
 @minGrayText: #6E6E6E;
 

@@ -55,11 +55,10 @@ install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
 - npm install
-- nvm install 18
-- nvm use 18
+- nvm install 24
+- nvm use 24
 - |
   export SBT_OPTS="-Dfile.encoding=UTF-8"
-  export NODE_OPTIONS="--no-deprecation" # Avoid warnings shown as errors running UglifyJS, to be removed when #6642 is done
 before_script:
 - sudo /etc/init.d/mysql stop # We use MySQL through Docker, so avoid conflict with port 3306
 - if [ "$TARGET" == "test-unit"                              ]; then docker pull tomcat:9.0.109-jdk11-temurin-noble; fi

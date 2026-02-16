@@ -214,6 +214,8 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-specific optimizations (for development).")
 val skipUglify                     = settingKey[Boolean]("Skip JavaScript minification with Uglify")
+val lintCss                        = taskKey[Unit]("Lint compiled CSS with stylelint")
+val skipLintCss                    = settingKey[Boolean]("Skip CSS linting with stylelint")
 
 // "ThisBuild is a Scope encompassing all projects"
 ThisBuild / scalaVersion                := mainScalaVersion
@@ -224,6 +226,7 @@ ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOr
 ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
 ThisBuild / preferFastOptJS             := sys.props.get("orbeon.prefer-fast-opt-js").isDefined
 ThisBuild / skipUglify                  := sys.props.get("orbeon.skip-uglify"       ).isDefined
+ThisBuild / skipLintCss                 := sys.props.get("orbeon.skip-lint-css"     ).isDefined
 
 // Restrict the number of concurrent linker processes so we don't run out of memory
 Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 1)
@@ -502,9 +505,33 @@ lazy val assetsSettings = Seq(
   uglifyCompressOptions                    := Seq.empty,
   //uglifyOps                                := UglifyOps.singleFile, // Disable source map generation (2026-02-12: not currently needed)
 
+  // CSS linting (after LESS compilation)
+  lintCss := {
+    if (!skipLintCss.value) {
+      val log       = streams.value.log
+      val _         = (Assets / LessKeys.less).value
+      val rootDir   = (ThisBuild / baseDirectory).value
+      val targetDir = (Assets / WebKeys.webTarget).value / "less" / "main"
+
+      if (targetDir.exists()) {
+        import scala.sys.process._
+        val stylelint = (rootDir / "node_modules" / ".bin" / "stylelint").getAbsolutePath
+        val exitCode  = Process(
+          Seq(stylelint, s"${targetDir.getAbsolutePath}/**/*.css"),
+          rootDir
+        ).!
+        if (exitCode != 0)
+          throw new MessageOnlyException("stylelint found CSS errors in compiled LESS output")
+        log.info(s"CSS lint passed")
+      }
+    }
+  },
+
   // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.
   // Also filter out a few things.
   Assets / WebKeys.exportedMappings := {
+
+    lintCss.value
 
     val FullWebJarPrefix = s"${org.webjars.WebJarAssetLocator.WEBJARS_PATH_PREFIX}/${moduleName.value}/${version.value}/"
 

@@ -11,5 +11,11 @@
     "node-fetch": "2.6.7",
     "nwsapi": "2.2.4"
   },
+  "devDependencies": {
+    "stylelint": "^16.26.1"
+  },
+  "scripts": {
+    "lint:css": "stylelint '**/target/web/less/**/*.css'"
+  },
   "license": "LGPL-2.1"
 }

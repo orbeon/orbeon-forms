@@ -35,8 +35,8 @@ abstract class XPathAnalysis {
   // Used by `intersectsValue`
   val returnablePaths: MapSet[String, String]     // instance prefixed id -> paths
 
-  val dependentModels: collection.Set[String]
-  val dependentInstances: collection.Set[String]
+  val dependentModels: collection.Set[String]     // has some real uses
+  val dependentInstances: collection.Set[String]  // doesn't have any real uses, but is useful for tests
 
   // Only used to set `BindTree`
   def returnableInstances: Iterable[String] = returnablePaths.map.keys

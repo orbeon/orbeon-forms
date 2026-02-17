@@ -387,7 +387,6 @@ object XFormsStaticStateDeserializer {
         _valueDependentPaths <- c.getOrElse[MapSet[String, String]]("valueDependentPaths")(MapSet.empty)
         _returnablePaths     <- c.getOrElse[MapSet[String, String]]("returnablePaths")(MapSet.empty)
         _dependentModels     <- c.getOrElse[Set[String]]("dependentModels")(Set.empty)
-        _dependentInstances  <- c.getOrElse[Set[String]]("dependentInstances")(Set.empty)
       } yield
         new XPathAnalysis {
           val xpathString            = "N/A"
@@ -395,7 +394,7 @@ object XFormsStaticStateDeserializer {
           val valueDependentPaths    = _valueDependentPaths
           val returnablePaths        = _returnablePaths
           val dependentModels   : collection.Set[String] = _dependentModels
-          val dependentInstances: collection.Set[String] = _dependentInstances
+          val dependentInstances: collection.Set[String] = Set.empty
         }
 
     var currentIndex = 0

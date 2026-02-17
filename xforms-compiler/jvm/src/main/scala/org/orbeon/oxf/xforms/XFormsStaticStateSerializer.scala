@@ -653,14 +653,13 @@ object XFormsStaticStateSerializer {
 
       // Don't serialize `xpathString` as it's used only for debugging
       // Don't serialize `figuredOutDependencies` as it's always true
+      // Don't serialize `dependentInstances` as it's not actually used
       if (a.valueDependentPaths.nonEmpty)
         b += "valueDependentPaths"    -> a.valueDependentPaths.asJson
       if (a.returnablePaths.nonEmpty)
         b += "returnablePaths"        -> a.returnablePaths.asJson
       if (a.dependentModels.nonEmpty)
         b += "dependentModels"        -> a.dependentModels.asJson
-      if (a.dependentInstances.nonEmpty)
-        b += "dependentInstances"     -> a.dependentInstances.asJson
 
       Json.fromFields(b)
     }

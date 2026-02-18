@@ -17,6 +17,7 @@ package org.orbeon.oxf.fr.s3
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.function.Property.evaluateAsAvt
 import org.orbeon.xml.NamespaceMapping
@@ -32,6 +33,8 @@ object S3Config {
   val PropertyPrefix        = "oxf.fr.s3."
   val DefaultEndpoint       = "s3.amazonaws.com"
   private val DefaultRegion = "aws-global"
+  private val AwsRegionIds  = Region.regions().asScala.map(_.id()).toSet
+  private val Logger        = LoggerFactory.createLogger(S3Config.getClass)
 
   def fromProperties(configName: String): Try[S3Config] = {
 
@@ -99,12 +102,10 @@ object S3Config {
       }
 
     def regionTry: Try[Region] =
-      nonEmptyValue("region", DefaultRegion.some).flatMap { regionName =>
-        // Convert region name into Region instance
-        Region.regions().asScala.find(_.id() == regionName) match {
-          case Some(region) => Success(region)
-          case None         => Failure(new Exception(s"Invalid region $regionName"))
-        }
+      nonEmptyValue("region", DefaultRegion.some).map { regionName =>
+        if (! AwsRegionIds.contains(regionName))
+          Logger.warn(s"using non-standard S3 region `$regionName`")
+        Region.of(regionName)
       }
 
     for {

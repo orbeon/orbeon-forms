@@ -74,38 +74,37 @@ class PathMapXPathDependencies(
       }
     }
 
-    def markValueChanged(node: om.NodeInfo): Unit = {
-      // Only care about path changes if there is no structural change for this model, since structural changes
-      // for now disable any more subtle path-based check.
-      if (! hasStructuralChanges) {
+    def markValueChanged(node: om.NodeInfo): Unit =
+      if (! hasStructuralChanges) // only care about path changes if there is no structural change for this model
+        containingDocument.instanceForNodeOpt(node).foreach { instance =>
 
-        // Create instance/path combo
-        val instance = containingDocument.instanceForNodeOpt(node).orNull // TODO: `Option`
+          // With #7492, `instance` does not match `model` for nodes coming from dependency models
 
-        def processNode(n: om.NodeInfo): Unit = {
-          val path = SaxonUtils.createFingerprintedPath(n)
+          val instanceKey = ModelOrInstanceKey(instance)
 
-          val instanceKey  = ModelOrInstanceKey(instance)
-          val instancePath = instanceKey -> path
+          RefreshState.instancesByKey += instanceKey -> instance
 
-          // Update model and view changesets
-          recalculateChangeset += instancePath
-          if (revalidateChangeset ne recalculateChangeset)
-            revalidateChangeset += instancePath // also add to revalidate changeset if it is different
+          def processNode(n: om.NodeInfo): Unit = {
+            val path = SaxonUtils.createFingerprintedPath(n)
 
-          RefreshState.instancesByKey   += instanceKey -> instance
-          RefreshState.refreshChangeset += instancePath
+            val instancePath = instanceKey -> path
 
-          // Add parent elements as well. The idea is that if the string value of /a/b/c changed, then the
-          // string value of /a/b did as well, and so did /a's.
-          // This adds more entries to the changeset, but handles cases such as detecting changes impacting
-          // the string() or serialize() functions.
-          n parent * foreach processNode
+            // Update model and view changesets
+            recalculateChangeset += instancePath
+            if (revalidateChangeset ne recalculateChangeset)
+              revalidateChangeset += instancePath // also add to revalidate changeset if it is different
+
+            RefreshState.refreshChangeset += instancePath
+
+            // Add parent elements as well. The idea is that if the string value of /a/b/c changed, then the
+            // string value of /a/b did as well, and so did /a's.
+            // This adds more entries to the changeset, but handles cases such as detecting changes impacting
+            // the string() or serialize() functions.
+            n.parentOption.foreach(processNode)
+          }
+
+          processNode(node)
         }
-
-        processNode(node)
-      }
-    }
 
     def markStructuralChange(): Unit = {
 

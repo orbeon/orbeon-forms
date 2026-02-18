@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <my-top-level-section>
+                        <grid-1>
+                            <top-level-current-workflow-stage/>
+                        </grid-1>
+                    </my-top-level-section>
+                    <my-repeated-workflow-stage-section>
+                        <my-repeated-workflow-stage-section-iteration>
+                            <grid-5 xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                    xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                    xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library" fr:relevant="false">
+                                <current-workflow-stage/>
+                            </grid-5>
+                        </my-repeated-workflow-stage-section-iteration>
+                        <my-repeated-workflow-stage-section-iteration>
+                            <grid-5 xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                    xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                    xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library" fr:relevant="false">
+                                <current-workflow-stage/>
+                            </grid-5>
+                        </my-repeated-workflow-stage-section-iteration>
+                    </my-repeated-workflow-stage-section>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-top-level-section-bind" name="my-top-level-section" ref="my-top-level-section">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="top-level-current-workflow-stage-bind" ref="top-level-current-workflow-stage" name="top-level-current-workflow-stage" xxf:whitespace="trim"
+                                 calculate="fr:workflow-stage-value()" readonly="false()"/>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="my-repeated-workflow-stage-section-bind" ref="my-repeated-workflow-stage-section" name="my-repeated-workflow-stage-section">
+                    <xf:bind id="my-repeated-workflow-stage-section-iteration-bind" ref="my-repeated-workflow-stage-section-iteration" name="my-repeated-workflow-stage-section-iteration"/>
+                </xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7492</form-name>
+                    <title xml:lang="en">`fr:workflow-stage-value()` formula not evaluating in section template #7492</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+                        <orbeon>2</orbeon>
+                        <app>2</app>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">
+                        {"migrations":[{"containerPath":[{"value":"my-top-level-section"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"top-level-current-workflow-stage"}],"topLevel":true},{"containerPath":[{"value":"my-repeated-workflow-stage-section"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"current-workflow-stage"}],"topLevel":false}]}
+                    </migration>
+                </metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <top-level-current-workflow-stage><label/>
+                            <hint/>
+                        </top-level-current-workflow-stage>
+                        <my-top-level-section>
+                            <label>workflow</label>
+                        </my-top-level-section>
+                        <my-repeated-workflow-stage-section><label>my-repeated-section</label></my-repeated-workflow-stage-section>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="my-repeated-workflow-stage-section-template">
+                <my-repeated-workflow-stage-section-iteration/>
+            </xf:instance>
+
+        </xf:model>
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                         xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library" id="issue-workflow-stage-section-component" element="component|workflow-stage-section"
+                         data-library-version="2" class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="workflow-stage-section-model">
+                        <xf:instance id="fr-form-template">
+                            <workflow-stage-section>
+                                <grid-5>
+                                    <current-workflow-stage/>
+                                </grid-5>
+                            </workflow-stage-section>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
+                                <xf:bind id="current-workflow-stage-bind" ref="current-workflow-stage" name="current-workflow-stage" xxf:whitespace="trim" calculate="fr:workflow-stage-value()"
+                                         readonly="false()"/>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources" xxf:readonly="true">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <workflow-stage-section><label>Section with workflow stage</label></workflow-stage-section>
+                                    <current-workflow-stage><label>Current workflow stage</label>
+                                        <hint/>
+                                    </current-workflow-stage>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                            <metadata>
+                                <email>
+                                    <templates>
+                                        <template name="default">
+                                            <headers/>
+                                            <exclude-from-all-control-values/>
+                                        </template>
+                                    </templates>
+                                    <parameters/>
+                                </email>
+                            </metadata>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:group appearance="xxf:internal" model="workflow-stage-section-model" id="fr-section-template-view">
+                        <fr:grid id="grid-5-grid" bind="grid-5-bind">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="current-workflow-stage-control" bind="current-workflow-stage-bind">
+                                    <xf:label ref="$form-resources/current-workflow-stage/label"/>
+                                    <xf:hint ref="$form-resources/current-workflow-stage/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6"/>
+                        </fr:grid>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="my-top-level-section-section" bind="my-top-level-section-bind">
+                    <xf:label ref="$form-resources/my-top-level-section/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="top-level-current-workflow-stage-control" bind="top-level-current-workflow-stage-bind">
+                                <xf:label ref="$form-resources/top-level-current-workflow-stage/label"/>
+                                <xf:hint ref="$form-resources/top-level-current-workflow-stage/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="my-repeated-workflow-stage-section-section" bind="my-repeated-workflow-stage-section-bind" repeat="content" min="1"
+                            template="instance('my-repeated-workflow-stage-section-template')" apply-defaults="true" fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/my-repeated-workflow-stage-section/label"/>
+                    <component:workflow-stage-section xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library"
+                                                      id="my-repeated-workflow-stage-section-content-control" bind="my-repeated-workflow-stage-section-content-bind"/>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

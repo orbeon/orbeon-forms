@@ -135,5 +135,27 @@ trait ModelBinds extends BindTree {
     iterateBinds(topLevelBinds.iterator)
   }
 
+  def externalDependencyModelPrefixedIds: Set[String] = {
+
+    val modelsIt =
+      for {
+        bind            <- iterateAllBinds
+        mipName         <- MipName.AllXPathMipsByName.values // `Default` might not be needed
+        mip             <- bind.getXPathMIPs(mipName)
+        modelPrefixedId <- mip.analysis.dependentModels
+        if modelPrefixedId != selfModel.prefixedId
+      } yield
+        modelPrefixedId
+
+    modelsIt.toSet
+  }
+
+  private var _dependentModels = Set.empty[Model]
+
+  def addDependentModel(model: Model): Unit =
+    _dependentModels += model
+
+  def dependentModels: Set[Model] = _dependentModels
+
   // TODO: use and produce variables introduced with `xf:bind/@name`
 }

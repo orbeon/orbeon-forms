@@ -37,17 +37,21 @@ trait XFormsModelRebuildRecalculateRevalidate {
     hasSchema option _schemaValidator.getSchemaURIs
 
   def markStructuralChange(instanceOpt: Option[XFormsInstance], defaultsStrategy: DefaultsStrategy): Unit = {
-    deferredActionContext.markStructuralChange(defaultsStrategy, instanceOpt map (_.getId))
-    // NOTE: PathMapXPathDependencies doesn't yet make use of the `instance` parameter.
-    containingDocument.xpathDependencies.markStructuralChange(selfModel, instanceOpt)
+    val instanceIdOpt = instanceOpt.map(_.getId)
+    deferredActionContext.markStructuralChange(defaultsStrategy, instanceIdOpt)
+    // LATER: We should not need to mark dependent instances as needed a rebuild, but just a recalculate/revalidate
+    containingDocument.xpathDependencies.markStructuralChange(selfModel, instanceOpt)         // `PathMapXPathDependencies` doesn't yet make use of the `instance` parameter.
+      .foreach(_.deferredActionContext.markStructuralChange(defaultsStrategy, instanceIdOpt)) // notify dependent models of the change (#7492)
   }
 
-  def markValueChange(nodeInfo: om.NodeInfo, isCalculate: Boolean): Unit = {
+  def markValueChange(nodeInfoOpt: Option[om.NodeInfo], isCalculate: Boolean): Unit = {
     // Set the flags
     deferredActionContext.markValueChange(isCalculate)
-    // Notify dependencies of the change
-    if (nodeInfo ne null)
-      containingDocument.xpathDependencies.markValueChanged(selfModel, nodeInfo)
+
+    nodeInfoOpt.foreach { nodeInfo =>
+      containingDocument.xpathDependencies.markValueChanged(selfModel, nodeInfo) // `nodeInfo` belongs to `selfModel` (asserted in callee)
+        .foreach(_.deferredActionContext.markValueChange(isCalculate = false))   // notify dependent models of the change (#7492)
+    }
   }
 
   def doRebuildIfNeeded(): Unit =
@@ -119,7 +123,8 @@ trait XFormsModelRebuildRecalculateRevalidate {
                   } finally {
                     for {
                       instanceId <- deferredActionContext.flaggedInstances
-                      doc        <- getInstance(instanceId).underlyingDocumentOpt
+                      instance   <- findInstance(instanceId) // xxx check: flaggedInstances can contain instances not in this model with cross-model deps
+                      doc        <- instance.underlyingDocumentOpt
                     } locally {
                       InstanceDataOps.clearRequireDefaultValueRecursively(doc)
                     }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
@@ -32,6 +31,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.mutable as m
 import shapeless.syntax.typeable.*
+
 
 
 class PathMapXPathDependencies(
@@ -243,6 +243,8 @@ class PathMapXPathDependencies(
       val touchedModelsEffectiveIds = structuralChangeModelKeys
 
       // Assumption: a given analysis typically has only one dependent model
+      // 2026-02-17: There can be more dependent models when using `xxf:instance()` and #7492,but I don't see that
+      // `compareWithPredicate()` depends on that assumption.
       compareWithPredicate(
         analysis.dependentModels,
         touchedModelsEffectiveIds,
@@ -317,17 +319,29 @@ class PathMapXPathDependencies(
   import RefreshState._
   import Stats._
 
-  def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo): Unit = {
+  // Returns the list of dependent models that should be recalculated as a result of the value change
+  def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo): Iterable[XFormsModel] = {
 
     // Caller must only call this for a mutable node belonging to the given model
     require(nodeInfo.isInstanceOf[VirtualNodeType])
-    require(model.findInstanceForNode(nodeInfo) exists (_.model eq model))
+    require(model.findInstanceForNode(nodeInfo).exists(_.model eq model))
 
     getOrCreateModelState(model).markValueChanged(nodeInfo)
+
+    model.findDependentModels
+      .tapEach(getOrCreateModelState(_).markValueChanged(nodeInfo))
   }
 
-  def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit =
+  // Returns the list of dependent models that should be recalculated as a result of the value change
+  def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]): Iterable[XFormsModel] = {
+
     getOrCreateModelState(model).markStructuralChange()
+
+    // LATER: We should not need to mark dependent instances as needed a rebuild, but just a recalculate/revalidate.
+    // However, here, we need a `NodeInfo to call `markValueChanged()`.
+    model.findDependentModels
+      .tapEach(getOrCreateModelState(_).markStructuralChange())
+  }
 
   def rebuildDone    (model: XFormsModel): Unit = getOrCreateModelState(model).rebuildDone()
   def recalculateDone(model: XFormsModel): Unit = getOrCreateModelState(model).recalculateDone()
@@ -723,9 +737,6 @@ class PathMapXPathDependencies(
           case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 
-        def dependsOnOtherModel(analysis: XPathAnalysis) =
-          analysis.dependentModels exists (_ != model.getPrefixedId)
-
         def logDebug(valueAnalysis: Option[XPathAnalysis], updateResult: UpdateResult): Unit = {
           if (updateResult.requireUpdate)
             debug(
@@ -739,11 +750,8 @@ class PathMapXPathDependencies(
         }
 
         val updateResult = valueAnalysisIt.map {
-          case someAnalysis @ Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) =>
-            // Value dependencies are unknown OR we depend on another model
-            // A this time, if we depend on another model, we have to update because we don't have
-            // the other model's dependencies reliably available, e.g. if the other model has
-            // already done a recalculate, its dependencies are cleared.
+          case someAnalysis @ Some(analysis) if ! analysis.figuredOutDependencies =>
+            // Value dependencies are unknown
             MustUpdateResultOne |!> (logDebug(someAnalysis, _))
           case someAnalysis @ Some(analysis) =>
             // Value dependencies are known

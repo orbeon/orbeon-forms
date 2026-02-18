@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentatio
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.*
@@ -59,7 +60,8 @@ class XFormsModel(
 ) extends XFormsModelRebuildRecalculateRevalidate
      with XFormsModelVariables
      with XFormsModelInstances
-     with XFormsModelEventTarget {
+     with XFormsModelEventTarget
+     with XFormsModelDependenciesSupport {
 
   selfModel =>
 
@@ -597,4 +599,52 @@ trait XFormsModelInstances {
       )
     )
   }
+}
+
+trait XFormsModelDependenciesSupport {
+
+  selfModel: XFormsModel =>
+
+  // TODO: Can we cache some or all of the dependent models? For repetitions, this somehow needs to be invalidated.
+  def findDependentModels: Set[XFormsModel] =
+    selfModel
+      .staticModel
+      .dependentModels
+      .flatMap { dependentModel =>
+
+        if (dependentModel.scope.isTopLevelScope) {
+
+          val modelOpt =
+            containingDocument
+              .findObjectByEffectiveId(dependentModel.prefixedId) // `prefixedId` is the same as the effective id for top-level models
+              .collect { case m: XFormsModel => m }
+
+          require(modelOpt.isDefined)
+
+          modelOpt
+        } else {
+          val associatedControlPrefixedId = dependentModel.scope.scopeId
+
+          val associatedStaticControl =
+            containingDocument
+              .staticOps
+              .findControlAnalysis(associatedControlPrefixedId)
+              .getOrElse(throw new IllegalStateException(s"`markValueChanged()`: no control found for dependent model `${dependentModel.prefixedId}` with associated control prefixed id `$associatedControlPrefixedId`"))
+
+          Controls.resolveControlsEffectiveIds(
+            containingDocument.staticOps,
+            containingDocument.controls.getCurrentControlTree,
+            containingDocument.effectiveId,
+            associatedStaticControl.prefixedId,
+            followIndexes = false // we want all repetitions
+          )
+          .flatMap { associatedControlEffectiveId =>
+            containingDocument
+              .findControlByEffectiveId(associatedControlEffectiveId)
+              .collect { case c: XFormsComponentControl if c.isRelevant => c }
+              .flatMap(_.nestedContainerOpt)
+              .flatMap(_.models.find(_.getPrefixedId == dependentModel.prefixedId))
+          }
+        }
+    }
 }

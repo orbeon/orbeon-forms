@@ -23,8 +23,8 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 
 // This implementation of dependencies simply says that everything must be updated all the time.
 class DumbXPathDependencies extends XPathDependencies {
-  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo): Unit = ()
-  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit = ()
+  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo): Iterable[XFormsModel] = Nil
+  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance]): Iterable[XFormsModel] = Nil
   def rebuildDone          (model: XFormsModel): Unit = ()
   def recalculateDone      (model: XFormsModel): Unit = ()
   def revalidateDone       (model: XFormsModel): Unit = ()

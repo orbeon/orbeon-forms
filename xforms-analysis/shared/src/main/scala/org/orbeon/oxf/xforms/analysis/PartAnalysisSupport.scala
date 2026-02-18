@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.FOR_QNAME
@@ -140,5 +141,12 @@ object PartAnalysisSupport {
           elementAnalysis     = rootControlAnalysis,
           lang                = e.element.attributeValue(XML_LANG_QNAME)
         )
+    }
+
+  def connectDependentModels(models: Iterable[Model], getModel: String => Model): Unit =
+    models.foreach { model =>
+      model.externalDependencyModelPrefixedIds.foreach { modelPrefixedId =>
+        getModel(modelPrefixedId).addDependentModel(model)
+      }
     }
 }

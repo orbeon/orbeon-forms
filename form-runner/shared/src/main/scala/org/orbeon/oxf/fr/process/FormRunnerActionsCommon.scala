@@ -324,10 +324,17 @@ trait FormRunnerActionsCommon {
   }
 
   def trySetWorkflowStage(params: ActionParams): ActionResult = ActionResult.trySync {
-    val name = paramByNameOrDefaultUseAvt(params, "name")
-    frc.documentWorkflowStage = name
-    // Manual dependency HACK: RR fr-form-model, as it might use the stage that we just set
-    recalculate(FormModel)
+    val workflowStageValue = paramByNameOrDefaultUseAvt(params, "name")
+    frc.documentWorkflowStage = workflowStageValue
+    // Since #7492, we have some level of inter-model dependency management. We used to call:
+    //
+    //     recalculate(FormModel)
+    //
+    // here, but that should no longer be needed. Actions which need updated data will call:
+    //
+    //     synchronizeAndRefreshIfNeeded()
+    //
+    // before accessing the data, and re-evaluated what is needed thanks to the support added by #7492.
   }
 
   private case class TextOrHtml(string: String, isHtml: Boolean) {

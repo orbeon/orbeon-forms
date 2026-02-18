@@ -1070,6 +1070,9 @@ object XFormsStaticStateDeserializer {
           model.defaultValueOrder = defaultValueOrder map (_ map model.bindsById toList)
         }
 
+        // Connect dependent models
+        PartAnalysisSupport.connectDependentModels(Index.models, Index.controlAnalysisMap(_).asInstanceOf[Model])
+
         XFormsStaticStateImpl(
           nonDefaultProperties,
           Int.MaxValue,

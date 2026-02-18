@@ -313,7 +313,7 @@ trait RefreshSupport {
     for (model <- models)
       // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
       //currentModel.getBinds.rebuild()
-      model.markValueChange(null, isCalculate = false)
+      model.markValueChange(None, isCalculate = false)
 }
 
 trait ContainerResolver {

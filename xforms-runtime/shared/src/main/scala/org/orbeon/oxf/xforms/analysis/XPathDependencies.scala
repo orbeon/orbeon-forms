@@ -23,8 +23,8 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 
 trait XPathDependencies {
 
-  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo): Unit
-  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit
+  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo): Iterable[XFormsModel]
+  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance]): Iterable[XFormsModel]
 
   def rebuildDone          (model: XFormsModel): Unit // called even if no work was done during `doRebuild()`
   def recalculateDone      (model: XFormsModel): Unit

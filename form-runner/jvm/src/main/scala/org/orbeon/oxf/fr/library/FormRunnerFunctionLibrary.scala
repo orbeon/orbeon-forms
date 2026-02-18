@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
-import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
+import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsInstance}
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
@@ -83,6 +83,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     // Process date/time function (constant within a process execution)
     Fun("process-dateTime", classOf[FRProcessDateTime], op = 0, min = 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
+
+    Fun("workflow-stage-value",        classOf[FRWorkflowStageValue],   op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
 
     // Form runner parameter functions
     Fun("mode",                        classOf[FRMode],                 op = 0, min = 0, STRING, EXACTLY_ONE)
@@ -223,7 +225,6 @@ private object FormRunnerFunctions {
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata),
     "lang"                        -> (() => Some(FormRunner.currentLang)),
     "fr-lang"                     -> (() => Some(FormRunner.currentFRLang)),
-    "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage),
     "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
     "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
     "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false, Nil))),
@@ -750,5 +751,43 @@ class FRRenderedFormatFilename extends FunctionSupport with RuntimeDependentFunc
     implicit val xpc             : XPathContext     = xpathContext
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     FormRunnerActionsSupport.filenameForRenderedFormat(RenderedFormat.withName(stringArgument(0)))
+  }
+}
+
+class FRWorkflowStageValue extends FunctionSupport with RuntimeDependentFunction {
+
+  override def evaluateItem(context: XPathContext): StringValue =
+   FormRunner.documentWorkflowStage
+
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+
+    // TODO: reduce duplication with other place
+    def newInstanceExpression: XXFormsInstance = {
+      val instanceExpression = new XXFormsInstance // Use `XXFormsInstance` so that we'll search ancestor models for dependencies
+
+      instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
+      instanceExpression.setArguments(Array(new StringLiteral("fr-document-metadata")))
+
+      instanceExpression.setContainer(getContainer)
+
+      instanceExpression
+    }
+
+    locally {
+      new AxisExpression(
+        Axis.ATTRIBUTE,
+        new NameTest(Type.ATTRIBUTE, "", Names.WorkflowStage, getExecutable.getConfiguration.getNamePool)
+      )
+      .addToPathMap(
+        pathMap,
+        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
+      )
+      .setAtomized()
+    }
+
+    null
   }
 }

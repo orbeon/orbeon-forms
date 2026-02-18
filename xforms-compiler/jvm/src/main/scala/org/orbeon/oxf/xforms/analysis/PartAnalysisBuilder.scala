@@ -489,6 +489,8 @@ object PartAnalysisBuilder {
           ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, _))
       }
 
+      PartAnalysisSupport.connectDependentModels(models, partAnalysisCtx.getModel)
+
       debugResults(Seq("controls" -> partAnalysisCtx.controlAnalysisMap.size.toString))
 
       // Clean-up to finish initialization

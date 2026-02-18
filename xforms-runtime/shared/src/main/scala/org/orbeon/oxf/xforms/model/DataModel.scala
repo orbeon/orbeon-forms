@@ -184,7 +184,7 @@ object DataModel {
       case Some(modifiedInstance) =>
         // Tell the model about the value change
         modifiedInstance.markModified()
-        modifiedInstance.model.markValueChange(nodeInfo, isCalculate)
+        modifiedInstance.model.markValueChange(Some(nodeInfo), isCalculate)
 
         // Dispatch extension event to instance
         collector(new XXFormsValueChangedEvent(modifiedInstance, nodeInfo, oldValue, newValue))

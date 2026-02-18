@@ -117,10 +117,11 @@ trait GridSectionMenus {
 
     // Position the menu just below the button
     val buttonRect                = button.getBoundingClientRect()
-    val offsetParentRect          = globalMenuElem.offsetParent.asInstanceOf[html.Element].getBoundingClientRect()
+    val offsetParent              = globalMenuElem.offsetParent
+    val offsetParentRect          = offsetParent.asInstanceOf[html.Element].getBoundingClientRect()
     globalMenuElem.style.position = "absolute"
-    globalMenuElem.style.left     = s"${buttonRect.left   - offsetParentRect.left}px"
-    globalMenuElem.style.top      = s"${buttonRect.bottom - offsetParentRect.top }px"
+    globalMenuElem.style.left     = s"${buttonRect.left   - offsetParentRect.left + offsetParent.scrollLeft }px"
+    globalMenuElem.style.top      = s"${buttonRect.bottom - offsetParentRect.top  + offsetParent.scrollTop  }px"
 
     Operation.values foreach { op =>
       val menuItems = globalMenuElem.querySelectorAllT(s".dropdown-menu .fr-${op.entryName}").toList

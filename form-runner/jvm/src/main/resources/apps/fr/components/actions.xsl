@@ -932,7 +932,7 @@
                                         concat(
                                             @ref,
                                             '[boolean(',
-                                            frf:replaceVarReferencesWithFunctionCallsForAction(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
+                                            frf:replaceVarReferencesWithFunctionCallsFromString(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
                                             ')]'
                                         )
                                     else
@@ -952,7 +952,7 @@
                                 if (exists(fr:filter/fr:expr)) then
                                     concat(
                                         '[boolean(',
-                                        frf:replaceVarReferencesWithFunctionCallsForAction(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
+                                        frf:replaceVarReferencesWithFunctionCallsFromString(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
                                         ')]'
                                     )
                                 else
@@ -976,7 +976,7 @@
                                 concat(
                                     @ref,
                                     '[boolean(',
-                                    frf:replaceVarReferencesWithFunctionCallsForAction(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
+                                    frf:replaceVarReferencesWithFunctionCallsFromString(fr:filter/fr:expr, fr:filter/fr:expr, false(), $library-name, $fr-form-model-vars),
                                     ')]'
                                 )"/>
                     </xsl:if>

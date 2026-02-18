@@ -314,7 +314,7 @@
                     </xh:div>
                     <xh:div class="fb-action-option-3-col-span-1">
                         <xf:label
-                            for="fb-request-destination-path"
+                            for="fb-request-param-or-header"
                             ref="$form-resources/dialog-actions/destination/label"/>
                     </xh:div>
                 </xh:div>

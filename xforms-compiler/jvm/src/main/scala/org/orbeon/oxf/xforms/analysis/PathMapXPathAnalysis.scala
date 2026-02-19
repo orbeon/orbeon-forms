@@ -20,8 +20,8 @@ import org.orbeon.saxon.expr.*
 case class PathMapXPathAnalysis(
   xpathString            : String,
   figuredOutDependencies : Boolean,
-  valueDependentPaths    : MapSet[String, String],
-  returnablePaths        : MapSet[String, String],
+  valueDependentPaths    : MapSet[String, InstancePath],
+  returnablePaths        : MapSet[String, InstancePath],
   dependentModels        : collection.Set[String],
   dependentInstances     : collection.Set[String]
 )(

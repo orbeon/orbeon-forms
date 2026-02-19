@@ -3,12 +3,13 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.MipName.{NeverCustomMipUris, StandardCustomMipQNames}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, InstancePath, WithChildrenTrait}
 import org.orbeon.xforms.XFormsNames.XXFORMS_CUSTOM_MIPS_QNAME
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
+import scala.util.chaining.*
 
 
 class Model(
@@ -67,8 +68,8 @@ trait ModelInstances {
 
   // General info about instances
   lazy val hasInstances = instances.nonEmpty
-  lazy val defaultInstanceOpt = instances.headOption map (_._2)
-  lazy val defaultInstanceStaticId = instances.headOption map (_._1) orNull
+  lazy val defaultInstanceOpt = instances.headOption.map(_._2)
+  lazy val defaultInstanceStaticId = instances.headOption.map(_._1).orNull
   lazy val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
   // TODO: instances on which MIPs depend
 }
@@ -79,7 +80,7 @@ trait ModelVariables {
 
   // `lazy` because the children are evaluated after the container
   lazy val variablesSeq: Iterable[VariableAnalysisTrait] = children collect { case v: VariableAnalysisTrait => v }
-  lazy val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
+  lazy val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq.map(variable => variable.name -> variable).toMap
 
   def freeVariablesTransientState(): Unit =
     for (variable <- variablesSeq)
@@ -135,27 +136,29 @@ trait ModelBinds extends BindTree {
     iterateBinds(topLevelBinds.iterator)
   }
 
-  def externalDependencyModelPrefixedIds: Set[String] = {
+  def findMipExternalDependencyModels(getModel: String => Model): Set[InstancePath] = {
 
     val modelsIt =
       for {
         bind            <- iterateAllBinds
         mipName         <- MipName.AllXPathMipsByName.values // `Default` might not be needed
         mip             <- bind.getXPathMIPs(mipName)
-        modelPrefixedId <- mip.analysis.dependentModels
-        if modelPrefixedId != selfModel.prefixedId
+        analysis = mip.analysis
+        if analysis.dependentModels.exists(_ != selfModel.prefixedId) // quick check
+        instancePath <- analysis.allInstancePaths
+        if instancePath.modelPrefixedId != selfModel.prefixedId
       } yield
-        modelPrefixedId
+        instancePath
 
     modelsIt.toSet
   }
 
-  private var _dependentModels = Set.empty[Model]
+  private var _dependentModels = Map.empty[Model, Set[InstancePath]]
 
-  def addDependentModel(model: Model): Unit =
-    _dependentModels += model
+  def addDependentModel(model: Model, instancePaths: Set[InstancePath]): Unit =
+    _dependentModels = _dependentModels.updated(model, _dependentModels.getOrElse(model, Set.empty) ++ instancePaths)
 
-  def dependentModels: Set[Model] = _dependentModels
+  def dependentModels: Map[Model, Set[InstancePath]] = _dependentModels
 
   // TODO: use and produce variables introduced with `xf:bind/@name`
 }

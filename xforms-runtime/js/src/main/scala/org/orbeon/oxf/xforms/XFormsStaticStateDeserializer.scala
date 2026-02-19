@@ -8,12 +8,12 @@ import io.circe.{Decoder, DecodingFailure, HCursor, KeyDecoder}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.properties.{PropertyLoader, PropertySet, PropertyStore, SimplePropertyStore}
+import org.orbeon.oxf.properties.{PropertyLoader, PropertySet, SimplePropertyStore}
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, ResourceResolver, StaticXPath, Whitespace, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, Modifier, ResourceResolver, StaticXPath, Whitespace, XPath}
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.EventHandler.{isMessageAction, isValueAction}
 import org.orbeon.oxf.xforms.analysis.controls.*
@@ -353,39 +353,45 @@ object XFormsStaticStateDeserializer {
         r
       }
 
-    implicit val decodeMapSet: Decoder[MapSet[String, String]] = (c: HCursor) => {
+    implicit val decodeMapSet: Decoder[MapSet[String, InstancePath]] = (c: HCursor) => {
 
       def splitAnalysisPath(path: String): List[String] =
-        path match {
-          case "" => Nil
-          case s  =>
-            s.splitTo[List]("/") map { e =>
-              val isAtt = e.startsWith("@")
-              val code = (if (isAtt) e.substring(1) else e).toInt
+        path.splitTo[List]("/") map { e =>
+          val isAtt = e.startsWith("@")
+          val code = (if (isAtt) e.substring(1) else e).toInt
 
-              val qName = collectedQNames(code)
-              val fp = namePool.allocateFingerprint(qName.namespace.uri, qName.localName)
+          val qName = collectedQNames(code)
+          val fp = namePool.allocateFingerprint(qName.namespace.uri, qName.localName)
 
-              if (isAtt) "@" + fp.toString else fp.toString
-            }
+          if (isAtt) "@" + fp.toString else fp.toString
+        }
+
+      def convertPaths(path: String): String =
+        splitAnalysisPath(path).mkString("/")
+
+      def convertMap(m: mutable.LinkedHashMap[String, mutable.LinkedHashSet[InstancePath]]): Iterable[(String, mutable.LinkedHashSet[InstancePath])] = {
+        m.view.mapValues { set =>
+          set.map {
+            case ip @ InstancePath(_, _, "") => ip
+            case InstancePath(m, i, p) =>
+              InstancePath(m, i, convertPaths(p))
           }
-
-      def convertPaths(path: String) =
-        splitAnalysisPath(path) mkString "/"
+        }
+      }
 
       for {
-        map <- c.as[mutable.LinkedHashMap[String, mutable.LinkedHashSet[String]]]
+        map <- c.as[mutable.LinkedHashMap[String, mutable.LinkedHashSet[InstancePath]]]
       } yield {
-        val ms = new MapSet[String, String]
-        ms.map ++= map.view.mapValues(_ map convertPaths)
+        val ms = new MapSet[String, InstancePath]
+        ms.map ++= convertMap(map)
         ms
       }
     }
 
     implicit val decodeXPathAnalysis: Decoder[XPathAnalysis] = (c: HCursor) =>
       for {
-        _valueDependentPaths <- c.getOrElse[MapSet[String, String]]("valueDependentPaths")(MapSet.empty)
-        _returnablePaths     <- c.getOrElse[MapSet[String, String]]("returnablePaths")(MapSet.empty)
+        _valueDependentPaths <- c.getOrElse[MapSet[String, InstancePath]]("valueDependentPaths")(MapSet.empty)
+        _returnablePaths     <- c.getOrElse[MapSet[String, InstancePath]]("returnablePaths")(MapSet.empty)
         _dependentModels     <- c.getOrElse[Set[String]]("dependentModels")(Set.empty)
       } yield
         new XPathAnalysis {

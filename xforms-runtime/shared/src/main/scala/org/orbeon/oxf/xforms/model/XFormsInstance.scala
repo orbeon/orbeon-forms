@@ -181,7 +181,7 @@ class XFormsInstance(
   def rootElement: om.NodeInfo = DataModel.firstChildElement(_documentInfo)
 
   def getId = instance.staticId
-  def getPrefixedId = XFormsId.getPrefixedId(effectiveId)
+  def getPrefixedId = instance.prefixedId
   def effectiveId = XFormsId.getRelatedEffectiveId(parent.effectiveId, instance.staticId)
 
   def scope = model.staticModel.scope

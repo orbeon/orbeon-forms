@@ -31,6 +31,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable.*
 
 import scala.collection.mutable as m
+import scala.util.chaining.*
 
 
 class PathMapXPathDependencies(
@@ -73,9 +74,9 @@ class PathMapXPathDependencies(
       }
     }
 
-    def markValueChanged(node: om.NodeInfo): Unit =
+    def markValueChanged(node: om.NodeInfo, buildPaths: Boolean): List[(String, String)] =
       if (! hasStructuralChanges) // only care about path changes if there is no structural change for this model
-        containingDocument.instanceForNodeOpt(node).foreach { instance =>
+        containingDocument.instanceForNodeOpt(node).toList.flatMap { instance =>
 
           // With #7492, `instance` does not match `model` for nodes coming from dependency models
 
@@ -83,7 +84,7 @@ class PathMapXPathDependencies(
 
           RefreshState.instancesByKey += instanceKey -> instance
 
-          def processNode(n: om.NodeInfo): Unit = {
+          def processNode(n: om.NodeInfo): List[(String, String)] = {
             val path = SaxonUtils.createFingerprintedPath(n)
 
             val instancePath = instanceKey -> path
@@ -95,15 +96,21 @@ class PathMapXPathDependencies(
 
             RefreshState.refreshChangeset += instancePath
 
-            // Add parent elements as well. The idea is that if the string value of /a/b/c changed, then the
-            // string value of /a/b did as well, and so did /a's.
+            // Add parent elements as well. The idea is that if the string value of `/a/b/c` changed, then the
+            // string value of `/a/b` did as well, and so did `/a`'s.
             // This adds more entries to the changeset, but handles cases such as detecting changes impacting
-            // the string() or serialize() functions.
-            n.parentOption.foreach(processNode)
+            // the `string()` or `serialize()` functions.
+            val parentPaths = n.parent(*).toList.flatMap(processNode)
+            if (buildPaths)
+              (instance.getPrefixedId -> path) :: parentPaths
+            else
+              Nil // don't build the list of handled paths if not requested
           }
 
           processNode(node)
         }
+      else
+        Nil
 
     def markStructuralChange(): Unit = {
 
@@ -206,14 +213,14 @@ class PathMapXPathDependencies(
       }
 
     private def setsHaveIntersection(
-      first  : collection.Set[String],
+      first  : Iterable[String],
       second : collection.Set[String]
     ): Boolean =
       first.exists(second.contains)
 
     private def searchMatchesForInstances(
       controlIndexes         : Array[Int],
-      firstWithPrefixedIds   : MapSet[String, String],
+      firstWithPrefixedIds   : MapSet[String, InstancePath],
       secondWithInstanceKeys : MapSet[ModelOrInstanceKey, String]
     ): Boolean =
       compareWithPredicate(
@@ -227,16 +234,15 @@ class PathMapXPathDependencies(
 
           matchesRepeatIterations &&
             setsHaveIntersection(
-              firstWithPrefixedIds.map(instanceKey.prefixedId),
-              secondWithInstanceKeys.map(instanceKey)
+              firstWithPrefixedIds.map.apply(instanceKey.prefixedId).view.map(_.path),
+              secondWithInstanceKeys.map.apply(instanceKey)
             )
         }
       )
 
     def intersectsStructuralChangeModel(controlIndexes: Array[Int], analysis: XPathAnalysis): Boolean = {
 
-      val controlIsWithinRepeat = controlIndexes.nonEmpty
-
+      val controlIsWithinRepeat     = controlIndexes.nonEmpty
       val touchedModelsEffectiveIds = structuralChangeModelKeys
 
       // Assumption: a given analysis typically has only one dependent model
@@ -323,10 +329,27 @@ class PathMapXPathDependencies(
     require(nodeInfo.isInstanceOf[VirtualNodeType])
     require(model.findInstanceForNode(nodeInfo).exists(_.model eq model))
 
-    getOrCreateModelState(model).markValueChanged(nodeInfo)
+    val dependentStaticModels = model.staticModel.dependentModels
 
-    model.findDependentModels
-      .tapEach(getOrCreateModelState(_).markValueChanged(nodeInfo))
+    val markedPaths = getOrCreateModelState(model).markValueChanged(nodeInfo, buildPaths = dependentStaticModels.nonEmpty)
+
+    // In most cases, there shouldn't be any dependent models. But if there is, before marking dependent models, we
+    // perform a first static intersection check, in order to avoid unnecessary marking and recalculations of dependent
+    // models.
+    dependentStaticModels.flatMap { case (dependentStaticModel, dependentPaths) =>
+
+      val changeMightImpactDependentModel =
+        markedPaths.exists { case (markedPathInstancePrefixedId, markedPathPath) =>
+          dependentPaths.exists { case InstancePath(m, i, p) =>
+            markedPathInstancePrefixedId == i && markedPathPath == p
+          }
+        }
+
+      changeMightImpactDependentModel.flatList(
+        XFormsModel.findAllConcreteModels(dependentStaticModel)(containingDocument)
+          .tapEach(getOrCreateModelState(_).markValueChanged(nodeInfo, buildPaths = false))
+      )
+    }
   }
 
   // Returns the list of dependent models that should be recalculated as a result of the value change
@@ -336,8 +359,18 @@ class PathMapXPathDependencies(
 
     // LATER: We should not need to mark dependent instances as needed a rebuild, but just a recalculate/revalidate.
     // However, here, we need a `NodeInfo to call `markValueChanged()`.
-    model.findDependentModels
-      .tapEach(getOrCreateModelState(_).markStructuralChange())
+    model.staticModel.dependentModels.flatMap { case (dependentStaticModel, dependentPaths) =>
+
+      val changeMightImpactDependentModel =
+        instanceOpt.isEmpty || dependentPaths.exists { case InstancePath(_, i, _) =>
+          instanceOpt.exists(_.getPrefixedId == i)
+        }
+
+      changeMightImpactDependentModel.flatList(
+        XFormsModel.findAllConcreteModels(dependentStaticModel)(containingDocument)
+          .tapEach(getOrCreateModelState(_).markStructuralChange())
+      )
+    }
   }
 
   def rebuildDone    (model: XFormsModel): Unit = getOrCreateModelState(model).rebuildDone()
@@ -454,15 +487,15 @@ class PathMapXPathDependencies(
   private val MustNotUpdateResultZero = UpdateResult(requireUpdate = false, savedEvaluations = 0)
 
   private def buildRepeatResultCacheKey(
-    control        : ElementAnalysis,
-    analyses       : List[XPathAnalysis],
-    controlIndexes : Array[Int]
-  ): Option[RepeatCacheKey] = {
+    control       : ElementAnalysis,
+    analyses      : List[XPathAnalysis], // can have multiple for LHHA (probably just alerts)
+    controlIndexes: Array[Int]
+  ): Option[RepeatCacheKey] =
     if (control.isWithinRepeat) {
       analyses match {
-        case analyses if analyses.nonEmpty && (analyses forall (_.figuredOutDependencies)) =>
+        case analyses if analyses.nonEmpty && analyses.forall(_.figuredOutDependencies) =>
 
-          val allDependentModelsPrefixedIdsIt = analyses.iterator flatMap (_.dependentModels.iterator)
+          val allDependentModelsPrefixedIdsIt = analyses.iterator.flatMap(_.dependentModels.iterator)
 
           // TODO: This could be cached in the ElementAnalysis. Would need for binding, value, LHHA, itemset.
           val maxDependentModelDepth =
@@ -490,7 +523,6 @@ class PathMapXPathDependencies(
       }
     } else
       None
-  }
 
   def requireBindingUpdate(control: ElementAnalysis, controlIndexes: Array[Int]): Boolean = {
 

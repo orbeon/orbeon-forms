@@ -647,7 +647,7 @@ object ElementAnalysisTreeXPathAnalyzer {
             xpathString            = pmxpa.xpathString,
             figuredOutDependencies = true,
             valueDependentPaths    = pmxpa.valueDependentPaths combine pmxpa.returnablePaths,
-            returnablePaths        = MapSet.empty[String, String],
+            returnablePaths        = MapSet.empty[String, InstancePath],
             dependentModels        = pmxpa.dependentModels,
             dependentInstances     = pmxpa.dependentInstances,
           )(

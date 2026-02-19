@@ -214,7 +214,7 @@ object XFormsStaticStateSerializer {
             pathSet     <- mapSet.map.values
             path        <- pathSet
           } locally {
-            splitAnalysisPath(path) foreach { case (_, qName) =>
+            splitAnalysisPath(path.path) foreach { case (_, qName) =>
               distinct += qName
             }
           }
@@ -269,17 +269,6 @@ object XFormsStaticStateSerializer {
 
       (distinct, distinct.zipWithIndex.toMap)
     }
-
-    def convertMapSet(m: MapSet[String, String]): Map[String, mutable.LinkedHashSet[String]] =
-      m.map.view.mapValues { set =>
-        set map {
-          case "" => ""
-          case s  => splitAnalysisPath(s) map { case (isAtt, qName) =>
-            val p = collectedQNamesWithPositions(qName)
-            if (isAtt) "@" + p.toString else p.toString
-          } mkString "/"
-        }
-      } toMap
 
     implicit val encodeScope: Encoder[Scope] = (a: Scope) => {
 
@@ -644,8 +633,28 @@ object XFormsStaticStateSerializer {
         b += "sizeBinding"      -> c.sizeBinding.asJson
     }
 
-    implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>
-      convertMapSet(a).asJson
+    // Because paths are encoded with node numbers for names, we need to reconstitute the paths first
+    def convertMapSet(m: MapSet[String, InstancePath]): Map[String, mutable.LinkedHashSet[InstancePath]] =
+      m.map
+        .view
+        .mapValues { set =>
+          set.map {
+            case ip @ InstancePath(_, _, "") => ip
+            case InstancePath(m, i, s)  =>
+              InstancePath(
+                m,
+                i,
+                splitAnalysisPath(s).map { case (isAtt, qName) =>
+                  val p = collectedQNamesWithPositions(qName)
+                  if (isAtt) "@" + p.toString else p.toString
+                } mkString "/"
+              )
+          }
+        }
+        .toMap
+
+    implicit lazy val encodeMapSet: Encoder[MapSet[String, InstancePath]] =
+      (a: MapSet[String, InstancePath]) => convertMapSet(a).asJson
 
     implicit lazy val encodeXPathAnalysis: Encoder[XPathAnalysis] = (a: XPathAnalysis) => {
 

@@ -16,15 +16,15 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
-import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
+import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.VariableTrait
 import org.orbeon.oxf.xforms.function.{InstanceTrait, XXFormsInstanceTrait}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.expr.PathMap.PathMapArc
 import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.expr.PathMap.PathMapArc
 import org.orbeon.saxon.om.Axis
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
@@ -32,8 +32,8 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable.LinkedHashSet
-import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 
 object PathMapXPathAnalysisBuilder {
@@ -177,35 +177,37 @@ object PathMapXPathAnalysisBuilder {
 //                    dumpPathMap(XPath.GlobalConfiguration, xpathString, pathmap)
 
           // We use LinkedHashMap/LinkedHashSet in part to keep unit tests reproducible
-          val valueDependentPaths = new MapSet[String, String]
-          val returnablePaths     = new MapSet[String, String]
+          val valueDependentPaths = new MapSet[String, InstancePath]
+          val returnablePaths     = new MapSet[String, InstancePath]
 
           val dependentModels     = new LinkedHashSet[String]
           val dependentInstances  = new LinkedHashSet[String]
-
-          case class InstancePath(instancePrefixedId: String, path: String)
 
           // Process the pathmap to extract paths and other information useful for handling dependencies.
           def processPaths(): Boolean = {
 
             var stack = List[Expression]()
 
-            def createInstancePath(node: PathMap.PathMapNode): String Either Option[InstancePath] = {
+            def createInstancePathFromStack: String Either Option[InstancePath] = {
 
               // Expressions from root to leaf
               val expressions = stack.reverse
 
               // Start with first expression
               extractInstancePrefixedId(partAnalysisCtx, scope, expressions.head, defaultInstancePrefixedId) match {
-                // First expression is instance() expression we can handle
+                // First expression is `instance()` expression we can handle
                 case Right(Some(instancePrefixedId)) =>
                   // Continue with rest of expressions
+                  val model =
+                    partAnalysisCtx.findModelByInstancePrefixedId(instancePrefixedId)
+                      .getOrElse(throw new IllegalStateException(s"Reference to invalid instance: `$instancePrefixedId`"))
                   buildPath(expressions.tail) match {
-                    case Right(path)  => Right(Some(InstancePath(instancePrefixedId, path)))
+                    case Right(path)  => Right(Some(InstancePath(model.prefixedId, instancePrefixedId, path)))
                     case Left(reason) => Left(reason)
                   }
-                // First expression is instance() but there is no default instance so we don't add the path
-                // (This can happen because we translate everything to start with instance() even if there is actually no default instance.)
+                // First expression is `instance()` but there is no default instance so we don't add the path
+                // This can happen because we translate everything to start with `instance()` even if there is actually
+                // no default instance.
                 case Right(None) => Right(None)
                 // Unable to handle first expression
                 case Left(reason) => Left(reason)
@@ -215,23 +217,19 @@ object PathMapXPathAnalysisBuilder {
             def processNode(node: PathMap.PathMapNode, ancestorAtomized: Boolean = false): Boolean = {
 
               if (node.getArcs.isEmpty || node.isReturnable || node.isAtomized || ancestorAtomized)
-                createInstancePath(node) match {
+                createInstancePathFromStack match {
                   case Right(Some(instancePath)) =>
                     // An instance path was created
 
                     // Remember dependencies for this path
-                    val instancePrefixedId = instancePath.instancePrefixedId
-                    val model = partAnalysisCtx.getModelByInstancePrefixedId(instancePrefixedId)
-                    if (model eq null)
-                      throw new IllegalStateException(s"Reference to invalid instance: `$instancePrefixedId`")
-                    dependentModels.add(model.prefixedId)
-                    dependentInstances.add(instancePrefixedId)
+                    dependentModels.add(instancePath.modelPrefixedId)
+                    dependentInstances.add(instancePath.instancePrefixedId)
 
                     // NOTE: A same node can be both returnable AND atomized in a given expression
                     if (node.isReturnable)
-                      returnablePaths.put(instancePath.instancePrefixedId, instancePath.path)
+                      returnablePaths.put(instancePath.instancePrefixedId, instancePath)
                     if (node.isAtomized)
-                      valueDependentPaths.put(instancePath.instancePrefixedId, instancePath.path)
+                      valueDependentPaths.put(instancePath.instancePrefixedId, instancePath)
                   case Right(None) => // NOP: don't add the path as this is not considered a dependency
                   case Left(_) => return false // we can't deal with this path so stop here
                 }

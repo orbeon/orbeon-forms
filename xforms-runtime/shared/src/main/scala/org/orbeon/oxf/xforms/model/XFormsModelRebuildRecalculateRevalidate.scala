@@ -40,7 +40,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
     val instanceIdOpt = instanceOpt.map(_.getId)
     deferredActionContext.markStructuralChange(defaultsStrategy, instanceIdOpt)
     // LATER: We should not need to mark dependent instances as needed a rebuild, but just a recalculate/revalidate
-    containingDocument.xpathDependencies.markStructuralChange(selfModel, instanceOpt)         // `PathMapXPathDependencies` doesn't yet make use of the `instance` parameter.
+    containingDocument.xpathDependencies.markStructuralChange(selfModel, instanceOpt)
       .foreach(_.deferredActionContext.markStructuralChange(defaultsStrategy, instanceIdOpt)) // notify dependent models of the change (#7492)
   }
 

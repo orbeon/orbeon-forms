@@ -21,6 +21,8 @@ import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 
 
+case class InstancePath(modelPrefixedId: String, instancePrefixedId: String, path: String)
+
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.
  */
@@ -30,12 +32,16 @@ abstract class XPathAnalysis {
   val figuredOutDependencies: Boolean
 
   // Used by `intersectsBinding`
-  val valueDependentPaths: MapSet[String, String] // instance prefixed id -> paths
+  val valueDependentPaths: MapSet[String, InstancePath] // instance prefixed id -> paths
 
   // Used by `intersectsValue`
-  val returnablePaths: MapSet[String, String]     // instance prefixed id -> paths
+  val returnablePaths: MapSet[String, InstancePath]     // instance prefixed id -> paths
 
-  val dependentModels: collection.Set[String]     // has some real uses
+  // NOTE: There can be duplicate paths
+  def allInstancePaths: Iterator[InstancePath] =
+    valueDependentPaths.iterator.map(_._2) ++ returnablePaths.iterator.map(_._2)
+
+  val dependentModels: collection.Set[String]     // has some real uses in `PathMapXPathDependencies` (repeat depth; model change intersection for structural change)
   val dependentInstances: collection.Set[String]  // doesn't have any real uses, but is useful for tests
 
   // Only used to set `BindTree`
@@ -52,8 +58,8 @@ sealed abstract class ConstantXPathAnalysis(val xpathString: String, val figured
 
   val dependentInstances  : Set[String] = Set.empty
   val dependentModels     : Set[String] = Set.empty
-  val returnablePaths     : MapSet[String, String] = MapSet.empty
-  val valueDependentPaths : MapSet[String, String] = MapSet.empty
+  val returnablePaths     : MapSet[String, InstancePath] = MapSet.empty
+  val valueDependentPaths : MapSet[String, InstancePath] = MapSet.empty
 }
 
 class NegativeAnalysis(xpathString: String)
@@ -67,8 +73,8 @@ object XPathAnalysis {
   def buildInstanceString(instanceId: String): String =
     s"instance('${instanceId.replace("'", "''")}')"
 
-  def mapSetToIterable(mapSet: MapSet[String, String]): Iterable[String] =
-    mapSet map (entry => buildInstanceString(entry._1) + "/" + entry._2)
+  private def mapSetToIterable(mapSet: MapSet[String, InstancePath]): Iterable[String] =
+    mapSet map (entry => buildInstanceString(entry._1) + "/" + entry._2.path)
 
   def writeXPathAnalysis(
     xpa      : XPathAnalysis,

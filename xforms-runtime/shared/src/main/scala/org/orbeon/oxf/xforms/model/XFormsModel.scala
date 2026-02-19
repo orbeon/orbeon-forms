@@ -49,10 +49,6 @@ import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 
-object XFormsModel {
-  val LoggingCategory = "model"
-}
-
 class XFormsModel(
   val container   : XBLContainer,
   var effectiveId : String, // not final because can change if model within repeat iteration
@@ -60,8 +56,7 @@ class XFormsModel(
 ) extends XFormsModelRebuildRecalculateRevalidate
      with XFormsModelVariables
      with XFormsModelInstances
-     with XFormsModelEventTarget
-     with XFormsModelDependenciesSupport {
+     with XFormsModelEventTarget {
 
   selfModel =>
 
@@ -601,50 +596,43 @@ trait XFormsModelInstances {
   }
 }
 
-trait XFormsModelDependenciesSupport {
+object XFormsModel {
 
-  selfModel: XFormsModel =>
+  val LoggingCategory = "model"
 
-  // TODO: Can we cache some or all of the dependent models? For repetitions, this somehow needs to be invalidated.
-  def findDependentModels: Set[XFormsModel] =
-    selfModel
-      .staticModel
-      .dependentModels
-      .flatMap { dependentModel =>
+  def findAllConcreteModels(staticModel: Model)(containingDocument: XFormsContainingDocument): List[XFormsModel] =
+    if (staticModel.scope.isTopLevelScope) {
 
-        if (dependentModel.scope.isTopLevelScope) {
+      val modelOpt =
+        containingDocument
+          .findObjectByEffectiveId(staticModel.prefixedId) // `prefixedId` is the same as the effective id for top-level models
+          .collect { case m: XFormsModel => m }
 
-          val modelOpt =
-            containingDocument
-              .findObjectByEffectiveId(dependentModel.prefixedId) // `prefixedId` is the same as the effective id for top-level models
-              .collect { case m: XFormsModel => m }
+      require(modelOpt.isDefined)
 
-          require(modelOpt.isDefined)
+      modelOpt.toList
+    } else {
+      val associatedControlPrefixedId = staticModel.scope.scopeId
 
-          modelOpt
-        } else {
-          val associatedControlPrefixedId = dependentModel.scope.scopeId
+      val associatedStaticControl =
+        containingDocument
+          .staticOps
+          .findControlAnalysis(associatedControlPrefixedId)
+          .getOrElse(throw new IllegalStateException(s"`markValueChanged()`: no control found for dependent model `${staticModel.prefixedId}` with associated control prefixed id `$associatedControlPrefixedId`"))
 
-          val associatedStaticControl =
-            containingDocument
-              .staticOps
-              .findControlAnalysis(associatedControlPrefixedId)
-              .getOrElse(throw new IllegalStateException(s"`markValueChanged()`: no control found for dependent model `${dependentModel.prefixedId}` with associated control prefixed id `$associatedControlPrefixedId`"))
-
-          Controls.resolveControlsEffectiveIds(
-            containingDocument.staticOps,
-            containingDocument.controls.getCurrentControlTree,
-            containingDocument.effectiveId,
-            associatedStaticControl.prefixedId,
-            followIndexes = false // we want all repetitions
-          )
-          .flatMap { associatedControlEffectiveId =>
-            containingDocument
-              .findControlByEffectiveId(associatedControlEffectiveId)
-              .collect { case c: XFormsComponentControl if c.isRelevant => c }
-              .flatMap(_.nestedContainerOpt)
-              .flatMap(_.models.find(_.getPrefixedId == dependentModel.prefixedId))
-          }
-        }
+      Controls.resolveControlsEffectiveIds(
+        containingDocument.staticOps,
+        containingDocument.controls.getCurrentControlTree,
+        containingDocument.effectiveId,
+        associatedStaticControl.prefixedId,
+        followIndexes = false // we want all repetitions
+      )
+      .flatMap { associatedControlEffectiveId =>
+        containingDocument
+          .findControlByEffectiveId(associatedControlEffectiveId)
+          .collect { case c: XFormsComponentControl if c.isRelevant => c }
+          .flatMap(_.nestedContainerOpt)
+          .flatMap(_.models.find(_.getPrefixedId == staticModel.prefixedId))
+      }
     }
 }

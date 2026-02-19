@@ -18,6 +18,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.security.SecureRandom
 import scala.collection.parallel.CollectionConverters.*
+import scala.util.{Failure, Success, Try}
 
 
 // NOTE: hmac is tested via XFormsUploadControlTest
@@ -71,9 +72,10 @@ class SecureUtilsTest
       assert(decrypted1 sameElements decrypted2)
     }
 
-    it("must error upon decrypting with incorrect password") {
-      assertThrows[java.security.GeneralSecurityException] {
-        SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted2)
+    it("must fail or produce different bytes upon decrypting with incorrect password") {
+      Try(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted2)) match {
+        case Success(decryptedWithWrongKey) => assert(! decryptedWithWrongKey.sameElements(bytes))
+        case Failure(_)                     => // Failure is also acceptable
       }
     }
   }

@@ -373,8 +373,8 @@ class XFormsContextStack {
       val (newModelOpt, isNewModel) =
         if (modelId != null) {
           val resolutionScopeContainer = container.findScopeRoot(scope)
-          resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, None) match {
-            case model: XFormsModel =>
+          resolutionScopeContainer.resolveObjectByIdOpt(sourceEffectiveId, modelId, None) match {
+            case Some(model: XFormsModel) =>
               // Don't say it's a new model unless it has really changed
               (model.some, baseBindingContext.modelOpt.forall(_ ne model))
             case _ =>
@@ -403,13 +403,13 @@ class XFormsContextStack {
         // Resolve the `bind` id to a nodeset
         // NOTE: For now, only the top-level models in a resolution scope are considered.
         val resolutionScopeContainer = container.findScopeRoot(scope)
-        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.singleItemOpt) match {
-          case runtimeBind: RuntimeBind =>
+        resolutionScopeContainer.resolveObjectByIdOpt(sourceEffectiveId, bindId, baseBindingContext.singleItemOpt) match {
+          case Some(runtimeBind: RuntimeBind) =>
             bind = runtimeBind
             newItems = bind.items
             contextItem = baseBindingContext.getSingleItemOrNull
             newPosition = Math.min(newItems.size, 1)
-          case null if resolutionScopeContainer.containsBind(bindId) =>
+          case None if resolutionScopeContainer.containsBind(bindId) =>
             // The `bind` attribute was valid for this scope, but no runtime object was found.
             // This can happen e.g. if a nested `bind` is within a `bind` with an empty sequence.
             bind = null

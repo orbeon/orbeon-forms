@@ -377,7 +377,7 @@ trait ContainerResolver {
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
     val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
 
-    Option(resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt))
+    resolutionScopeContainer.resolveObjectByIdOpt(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt)
   }
 
   /**
@@ -386,15 +386,15 @@ trait ContainerResolver {
    * @param sourceEffectiveId   effective id of the source (control, model, instance, submission, ...) (can be null
    *                            only for absolute ids)
    * @param staticOrAbsoluteId  static or absolute id of the object
-   * @param contextItemOpt      context item, or null (used for bind resolution only)
-   * @return                    object, or null if not found
+   * @param contextItemOpt      some context item, or `None` (used for bind resolution only)
+   * @return                    some object, or `None` if not found
    */
-  def resolveObjectById(
-    sourceEffectiveId  : String,
-    staticOrAbsoluteId : String,
-    contextItemOpt     : Option[om.Item]
-  ): XFormsObject =
-    resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes = true).headOption.orNull
+  def resolveObjectByIdOpt(
+    sourceEffectiveId : String,
+    staticOrAbsoluteId: String,
+    contextItemOpt    : Option[om.Item]
+  ): Option[XFormsObject] =
+    resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes = true).headOption
 
   def resolveObjectsById(
     sourceEffectiveId  : String,

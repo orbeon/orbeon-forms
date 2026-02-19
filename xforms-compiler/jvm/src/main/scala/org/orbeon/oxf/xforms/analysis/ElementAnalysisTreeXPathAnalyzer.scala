@@ -162,13 +162,16 @@ object ElementAnalysisTreeXPathAnalyzer {
       e.bind match {
         case Some(bindStaticId) =>
           // Use `@bind` analysis directly from model
-          val model = partAnalysisCtx.getModelByScopeAndBind(e.scope, bindStaticId)
-          if (model eq null)
-            throw new ValidationException(
-              s"Reference to non-existing bind id `$bindStaticId`",
-              ElementAnalysis.createLocationData(e.element)
+          partAnalysisCtx.findModelByScopeAndBind(e.scope, bindStaticId)
+            .getOrElse(
+              throw new ValidationException(
+                s"Reference to non-existing bind id `$bindStaticId`",
+                ElementAnalysis.createLocationData(e.element)
+              )
             )
-          model.bindsById.get(bindStaticId) map (_.bindingAnalysis) orNull
+            .bindsById
+            .get(bindStaticId)
+            .flatMap(_.bindingAnalysis)
         case None =>
           // No `@bind`
           e.ref match {

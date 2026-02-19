@@ -364,7 +364,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     for ((modelId, modelElement) <- groupChanges(bindChanges)) {
 
       val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
-      val staticModel = partAnalysis.getModel(modelPrefixedId)
+      val staticModel     = partAnalysis.findModel(modelPrefixedId).getOrElse(throw new IllegalStateException(s"model with prefixed id `$modelPrefixedId` not found in part analysis"))
 
       PartAnalysisBuilder.rebuildBindTree(partAnalysis, staticModel, modelElement)
 

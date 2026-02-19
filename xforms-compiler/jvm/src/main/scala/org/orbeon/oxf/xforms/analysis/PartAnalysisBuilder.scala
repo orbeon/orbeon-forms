@@ -489,7 +489,7 @@ object PartAnalysisBuilder {
           ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, _))
       }
 
-      PartAnalysisSupport.connectDependentModels(models, partAnalysisCtx.getModel)
+      PartAnalysisSupport.connectDependentModels(models, partAnalysisCtx.findModel(_).getOrElse(throw new IllegalStateException))
 
       debugResults(Seq("controls" -> partAnalysisCtx.controlAnalysisMap.size.toString))
 

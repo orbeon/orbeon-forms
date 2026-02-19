@@ -60,7 +60,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
     // TODO: test computedBindExpressionsInstances and validationBindInstances
     locally {
-      val model1 = partAnalysis.getModel("model1")
+      val model1 = partAnalysis.findModel("model1").getOrElse(throw new IllegalStateException)
       assertTrue(model1.figuredAllBindRefAnalysis)
       assertTrue(model1.bindInstances.contains("instance11"))
       assertTrue(model1.bindInstances.contains("instance12"))
@@ -68,27 +68,27 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     }
 
     locally {
-      val model2 = partAnalysis.getModel("model2")
+      val model2 = partAnalysis.findModel("model2").getOrElse(throw new IllegalStateException)
       assertTrue(model2.figuredAllBindRefAnalysis)
       assertFalse(model2.bindInstances.contains("instance21"))
     }
 
     locally {
-      val model3 = partAnalysis.getModel("model3")
+      val model3 = partAnalysis.findModel("model3").getOrElse(throw new IllegalStateException)
       assertTrue(model3.figuredAllBindRefAnalysis)
       assertFalse(model3.bindInstances.contains("instance31"))
       assertTrue(model3.bindInstances.contains("instance32"))
     }
 
     locally {
-      val model4 = partAnalysis.getModel("model4")
+      val model4 = partAnalysis.findModel("model4").getOrElse(throw new IllegalStateException)
       assertTrue(model4.figuredAllBindRefAnalysis)
       assertTrue(model4.bindInstances.contains("instance41"))
       assertFalse(model4.bindInstances.contains("instance42"))
     }
 
     locally {
-      val model5 = partAnalysis.getModel("model5")
+      val model5 = partAnalysis.findModel("model5").getOrElse(throw new IllegalStateException)
       assertTrue(model5.figuredAllBindRefAnalysis)
       assertTrue(model5.validationBindInstances.contains("instance51"))
       assertFalse(model5.computedBindExpressionsInstances.contains("instance51"))

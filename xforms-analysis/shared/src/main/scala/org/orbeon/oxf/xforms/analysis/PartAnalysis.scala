@@ -74,7 +74,7 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
   def hasControls: Boolean
   def findDefaultModel: Option[Model]
-  def getModel(prefixedId: String): Model
+  def findModel(prefixedId: String): Option[Model]
   def getTopLevelControls: List[ElementAnalysis]
   def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
   def controlElement(prefixedId: String): Option[om.NodeInfo]

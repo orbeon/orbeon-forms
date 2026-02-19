@@ -75,11 +75,10 @@ object ElementAnalysisTreeBuilder {
             case localModelStaticId: String =>
               // Get model prefixed id and verify it belongs to this scope
               val localModelPrefixedId = e.scope.prefixedIdForStaticId(localModelStaticId)
-              val localModel = partAnalysisCtx.getModel(localModelPrefixedId)
-              if (localModel eq null)
+              val localModelOpt        = partAnalysisCtx.findModel(localModelPrefixedId)
+              if (localModelOpt.isEmpty)
                 throw new ValidationException(s"Reference to non-existing model id: `$localModelStaticId`", ElementAnalysis.createLocationData(e.element))
-
-              Some(localModel)
+              localModelOpt
             case _ =>
               // Use inherited model
               e.closestAncestorInScope match {

@@ -99,9 +99,9 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
 
   def iterateControlsNoModels: Iterator[ElementAnalysis]
   def iterateModels: Iterator[Model]
-  def getModel(prefixedId: String): Model
-  def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
-  def getModelByInstancePrefixedId(prefixedId: String): Model
+  def findModel(prefixedId: String): Option[Model]
+  def findModelByScopeAndBind(scope: Scope, bindStaticId: String): Option[Model]
+  def findModelByInstancePrefixedId(prefixedId: String): Option[Model]
   def findDefaultModelForScope(scope: Scope): Option[Model]
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 

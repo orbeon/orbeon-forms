@@ -51,7 +51,7 @@ trait PartModelAnalysis extends TransientState {
     findDefaultModelForScope(startScope)
 
   def findDefaultModelForScope(scope: Scope): Option[Model] =
-    modelsByScope.get(scope) flatMap (_.headOption)
+    modelsByScope.get(scope).flatMap(_.headOption)
 
   def findModelByScopeAndBind(scope: Scope, bindStaticId: String): Option[Model] =
     modelsByScope

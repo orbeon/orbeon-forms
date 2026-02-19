@@ -397,10 +397,10 @@ trait ContainerResolver {
     resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes = true).headOption
 
   def resolveObjectsById(
-    sourceEffectiveId  : String,
-    staticOrAbsoluteId : String,
-    contextItemOpt     : Option[om.Item],
-    followIndexes      : Boolean
+    sourceEffectiveId : String,
+    staticOrAbsoluteId: String,
+    contextItemOpt    : Option[om.Item],
+    followIndexes     : Boolean
   ): List[XFormsObject] = {
 
     // Handle "absolute ids"

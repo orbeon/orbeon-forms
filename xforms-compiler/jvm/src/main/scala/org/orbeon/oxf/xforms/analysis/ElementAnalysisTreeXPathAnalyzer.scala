@@ -155,9 +155,9 @@ object ElementAnalysisTreeXPathAnalyzer {
       }
 
     def computeBasicBindingAnalysis(
-      partAnalysisCtx : PartAnalysisContextAfterTree,
-      e               : ElementAnalysis)(implicit
-      logger          : IndentedLogger)
+      partAnalysisCtx: PartAnalysisContextAfterTree,
+      e              : ElementAnalysis)(implicit
+      logger         : IndentedLogger)
     : Option[XPathAnalysis] =
       e.bind match {
         case Some(bindStaticId) =>

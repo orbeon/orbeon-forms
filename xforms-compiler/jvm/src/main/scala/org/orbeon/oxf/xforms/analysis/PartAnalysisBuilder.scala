@@ -332,10 +332,11 @@ object PartAnalysisBuilder {
   }
 
   def rebuildBindTree(
-    partAnalysisCtx : NestedPartAnalysis,
-    model           : Model,
-    rawModelElement : Element)(implicit
-    logger          : IndentedLogger
+    partAnalysisCtx: NestedPartAnalysis,
+    model          : Model,
+    rawModelElement: Element
+  )(implicit
+    logger         : IndentedLogger
   ): Unit =
     withDebug("performing static analysis of bind tree", Seq("prefixed id" -> model.prefixedId)) {
 

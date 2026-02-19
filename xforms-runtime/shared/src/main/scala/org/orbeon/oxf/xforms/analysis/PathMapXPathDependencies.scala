@@ -380,7 +380,9 @@ class PathMapXPathDependencies(
   def modelDestruct(model: XFormsModel): Unit = {
 
     // Remove all references to concrete models and instances
-    modelStates -= getOrCreateModelState(model).modelKey
+    val modelKey = ModelOrInstanceKey(model)
+    modelStates -= modelKey
+    structuralChangeModelKeys -= modelKey
 
     for (instance <- model.instancesIterator)
       instancesByKey -= ModelOrInstanceKey(instance)

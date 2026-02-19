@@ -26,6 +26,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.ResponseHeaders
 import org.orbeon.oxf.fr.persistence.relational.form.FormProxyLogic
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend

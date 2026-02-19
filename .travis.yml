@@ -68,6 +68,6 @@ before_script:
 - if [ "$TARGET" == "test-db"   ] && [ "$DB" == "mysql"      ]; then docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 --sql-mode=ALLOW_INVALID_DATES --character-set-server=utf8mb4 --collation-server=utf8mb4_bin; fi
 - if [ "$TARGET" == "test-db"   ] && [ "$DB" == "postgresql" ]; then ./tools/postgresql-prepare.sh; fi
 script:
-- if [ "$TARGET" == "orbeon-dist"                            ]; then ant orbeon-dist                  ; fi
-- if [ "$TARGET" == "test-unit"                              ]; then sbt test:compile ; sbt test:test ; fi
-- if [ "$TARGET" == "test-db"                                ]; then sbt test:compile ; sbt db:test   ; fi
+- if [ "$TARGET" == "orbeon-dist"                            ]; then ant orbeon-dist ; fi
+- if [ "$TARGET" == "test-unit"                              ]; then sbt Test/compile ; sbt Test/test ; fi
+- if [ "$TARGET" == "test-db"                                ]; then sbt Test/compile ; sbt dbToS3AttachmentMigration/proguard ; sbt Db/test ; fi

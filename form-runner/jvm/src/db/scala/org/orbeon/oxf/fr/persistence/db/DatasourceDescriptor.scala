@@ -32,11 +32,13 @@ object DatasourceDescriptor {
 
   def apply(provider: Provider): DatasourceDescriptor = {
 
+    val driverClass = Provider.driverClass(provider)
+
     provider match {
       case MySQL =>
         DatasourceDescriptor(
           name      = provider.entryName,
-          driver    = "com.mysql.cj.jdbc.Driver",
+          driver    = driverClass,
           url       = "jdbc:mysql://localhost:3306/",
           username  = "root",
           password  = "",
@@ -45,7 +47,7 @@ object DatasourceDescriptor {
       case PostgreSQL =>
         DatasourceDescriptor(
           name      = provider.entryName,
-          driver    = "org.postgresql.Driver",
+          driver    = driverClass,
           url       = "jdbc:postgresql://localhost:5432/",
           username  = "orbeon",
           password  = "",
@@ -56,14 +58,14 @@ object DatasourceDescriptor {
 
         val sqliteFile = Paths.get("test-db.sqlite")
         Files.deleteIfExists(sqliteFile)
-        sqliteDatasourceDescriptor(sqliteFile)
+        sqliteDatasourceDescriptor(sqliteFile, driverClass)
     }
   }
 
-  def sqliteDatasourceDescriptor(file: Path): DatasourceDescriptor =
+  def sqliteDatasourceDescriptor(file: Path, driver: String): DatasourceDescriptor =
     DatasourceDescriptor(
       name      = Provider.SQLite.entryName,
-      driver    = "org.sqlite.JDBC",
+      driver    = driver,
       url       = s"jdbc:sqlite:$file",
       username  = "",
       password  = "",

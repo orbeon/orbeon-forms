@@ -1,5 +1,9 @@
 FROM quay.io/wildfly/wildfly:35.0.0.Final-jdk21
 
+LABEL org.opencontainers.image.title="Orbeon Forms" \
+      org.opencontainers.image.vendor="Orbeon, Inc." \
+      org.opencontainers.image.url="https://www.orbeon.com"
+
 ARG tag
 ARG file
 ARG sha256_checksum

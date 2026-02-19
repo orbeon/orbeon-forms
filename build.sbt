@@ -773,23 +773,22 @@ lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType
     name := "orbeon-form-runner"
   )
 
-def s3ScalaTestArguments: Seq[String] = {
-  val onTravis             = sys.env.contains("TRAVIS")
-  val s3TestEnvVarsPresent = Seq(
-    "S3_TEST_REGION",
-    "S3_TEST_ACCESSKEY",
-    "S3_TEST_SECRETACCESSKEY"
-  ).forall(sys.env.contains)
-
-  println(s"On Travis: $onTravis")
-  println(s"S3_TEST_* environment variables present: $s3TestEnvVarsPresent")
-
-  if (!onTravis && !s3TestEnvVarsPresent) Seq("-l", "S3") else Seq()
-}
-
 lazy val s3TestSettings = Seq(
   // If not on Travis and missing required environment variables, exclude S3 tests
-  Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, s3ScalaTestArguments*)
+  Test / testOptions += {
+    val project       = thisProject.value.id
+    val travis        = sys.env.contains("TRAVIS")
+    val s3TestEnvVars = Seq(
+      "S3_TEST_REGION",
+      "S3_TEST_ACCESSKEY",
+      "S3_TEST_SECRETACCESSKEY"
+    ).forall(sys.env.contains)
+
+    println(s"S3 configuration for $project: Travis=$travis, S3_TEST_* environment variables=$s3TestEnvVars")
+
+    if (!travis && !s3TestEnvVars) Tests.Argument(TestFrameworks.ScalaTest, "-l", "S3")
+    else                           Tests.Argument(TestFrameworks.ScalaTest)
+  }
 )
 
 lazy val formRunnerJVM = formRunner.jvm
@@ -1574,6 +1573,79 @@ lazy val orbeonRedisJars = (project in file("redis-jars-project"))
     }
   )
 
+lazy val dbToS3AttachmentMigration = (project in file("tools/db-to-s3-attachment-migration"))
+  .dependsOn(formRunnerJVM, formRunnerJVM % "db->db")
+  .configs(DatabaseTest, DebugDatabaseTest)
+  .settings(scala2CommonSettings*)
+  .settings(inConfig(DatabaseTest)(Defaults.testSettings)*)
+  .settings(inConfig(DebugDatabaseTest)(Defaults.testSettings)*)
+  .settings(jUnitTestOptions*)
+  .settings(s3TestSettings)
+  .settings(
+    name                                := "db-to-s3-attachment-migration",
+    libraryDependencies                 += "org.typelevel"            %% "cats-core"           % CatsVersion,
+    libraryDependencies                 += "org.postgresql"           % "postgresql"           % "42.7.10",
+    libraryDependencies                 += "org.xerial"               % "sqlite-jdbc"          % "3.44.1.0",
+    libraryDependencies                 += "mysql"                    % "mysql-connector-java" % "8.0.28"       % DatabaseTest,
+    libraryDependencies                 += "com.oracle.database.jdbc" % "ojdbc11"              % "23.7.0.25.01" % DatabaseTest,
+    libraryDependencies                 += "com.ibm.db2"              % "jcc"                  % "11.5.9.0"     % DatabaseTest,
+    libraryDependencies                 += "com.microsoft.sqlserver"  % "mssql-jdbc"           % "12.8.1.jre11" % DatabaseTest,
+    assembly / mainClass                := Some("org.orbeon.tools.s3migration.Main"),
+    assembly / assemblyJarName          := s"db-to-s3-attachment-migration-${version.value}.jar",
+    assembly / assemblyMergeStrategy    := {
+      case PathList("META-INF", "services", xs*) => MergeStrategy.concat
+      case PathList("META-INF", xs*)             => MergeStrategy.discard
+      case PathList("module-info.class")         => MergeStrategy.discard
+      case x                                     => MergeStrategy.first
+    },
+    TaskKey[File]("proguard") := {
+      val log         = streams.value.log
+      val fatJar      = assembly.value
+      val shrunkJar   = fatJar.getParentFile / fatJar.getName.replace(".jar", "-shrunk.jar")
+      val proguardJar = (ThisBuild / baseDirectory).value / "lib_ant" / "proguard-7.7.0.jar"
+      val javaHome    = System.getProperty("java.home")
+      val configFile  = baseDirectory.value / "proguard.conf"
+
+      log.info(s"Running ProGuard on ${fatJar.getName}...")
+      val exitCode = scala.sys.process.Process(Seq(
+        "java", "-jar", proguardJar.getAbsolutePath, s"@${configFile.getAbsolutePath}",
+        "-injars",      s"${fatJar.getAbsolutePath}(!META-INF/services/java.net.spi.URLStreamHandlerProvider)",
+        "-outjars",     shrunkJar.getAbsolutePath,
+        "-libraryjars", s"$javaHome/jmods/java.base.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.sql.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.xml.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.naming.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.logging.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.desktop.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.management.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.net.http.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.security.sasl.jmod(!**.jar;!module-info.class)",
+        "-libraryjars", s"$javaHome/jmods/java.security.jgss.jmod(!**.jar;!module-info.class)"
+      )).!
+
+      if (exitCode != 0) sys.error(s"ProGuard failed with exit code $exitCode")
+
+      log.info(s"ProGuard output: ${shrunkJar.getName} (${shrunkJar.length() / 1024 / 1024} MB, was ${fatJar.length() / 1024 / 1024} MB)")
+      shrunkJar
+    },
+    DatabaseTest / javaOptions          += {
+      val fatJar  = (assembly / assemblyOutputPath).value
+      val jarPath = (fatJar.getParentFile / fatJar.getName.replace(".jar", "-shrunk.jar")).getAbsolutePath
+      s"-Ddb.to.s3.migration.jar=$jarPath"
+    },
+    DatabaseTest / testOptions          += {
+      val fatJar    = (assembly / assemblyOutputPath).value
+      val shrunkJar = fatJar.getParentFile / fatJar.getName.replace(".jar", "-shrunk.jar")
+      if (shrunkJar.exists()) Tests.Argument(TestFrameworks.ScalaTest)
+      else                    Tests.Argument(TestFrameworks.ScalaTest, "-l", "DBToS3MigrationJar")
+    },
+    DebugDatabaseTest / sourceDirectory := (DatabaseTest / sourceDirectory).value,
+    DebugDatabaseTest / javaOptions     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+  )
+
+// dbToS3AttachmentMigration alias: build JAR and run test
+addCommandAlias("db-to-s3-attachment-migration-test", "; dbToS3AttachmentMigration / proguard; dbToS3AttachmentMigration / Db / test")
+
 lazy val root = (project in file("."))
   .aggregate(
     commonJVM,
@@ -1596,7 +1668,8 @@ lazy val root = (project in file("."))
     demoSqliteDatabase,
     orbeonWarJVM,
     orbeonWarJS,
-    orbeonRedisJars
+    orbeonRedisJars,
+    dbToS3AttachmentMigration
   )
   .settings(
     // TEMP: override so that root project doesn't search under src

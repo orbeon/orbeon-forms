@@ -43,6 +43,7 @@ _exist-data*
 demo-sqlite-database/java.io.tmpdir/
 # SQLite file used for tests
 form-runner/test-db.sqlite
+tools/test-db.sqlite
 lib/xerces-2.12-orbeon-jar/
 resources-local/
 # FormMetadataApiTest

@@ -21,12 +21,12 @@ import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 
 
 case class PathInformation(
-  appForm    : AppForm,
-  formOrData : FormOrData,
-  draft      : Boolean,
-  documentId : Option[String],
-  version    : Option[Int],
-  filenameOpt: Option[String]
+  appForm      : AppForm,
+  formOrData   : FormOrData,
+  draft        : Boolean,
+  documentIdOpt: Option[String],
+  versionOpt   : Option[Int],
+  filenameOpt  : Option[String]
 ) {
   // Fixed path to the attachment file (same for local filesystem and S3)
   lazy val pathSegments: List[String] =
@@ -35,12 +35,12 @@ case class PathInformation(
       appForm.form,
       if (draft) "draft" else formOrData.entryName
     ) :++
-      documentId :++
-      version.map(_.toString) :++
+      documentIdOpt :++
+      versionOpt.map(_.toString) :++
       filenameOpt
 }
 
-private[attachments] object PathInformation {
+object PathInformation {
 
   private val FormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
   private val DataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)(?:/([^/]+))?".r
@@ -51,23 +51,23 @@ private[attachments] object PathInformation {
     httpRequest.getRequestPath match {
       case FormPath(providerName, app, form, filename) =>
         (Provider.withName(providerName), PathInformation(
-          appForm     = AppForm(app, form),
-          formOrData  = FormOrData.Form,
-          draft       = false,
-          documentId  = None,
-          version     = versionFromHeaders,
-          filenameOpt = filename.some
+          appForm       = AppForm(app, form),
+          formOrData    = FormOrData.Form,
+          draft         = false,
+          documentIdOpt = None,
+          versionOpt    = versionFromHeaders,
+          filenameOpt   = filename.some
         ))
 
       // Filename is optional for DELETE requests on data/draft paths
       case DataPath(providerName, app, form, dataOrDraft, documentId, filename) if Option(filename).isDefined || httpRequest.getMethod == DELETE =>
         (Provider.withName(providerName), PathInformation(
-          appForm     = AppForm(app, form),
-          formOrData  = FormOrData.Data,
-          draft       = dataOrDraft == "draft",
-          documentId  = Some(documentId),
-          version     = versionFromHeaders,
-          filenameOpt = Option(filename)
+          appForm       = AppForm(app, form),
+          formOrData    = FormOrData.Data,
+          draft         = dataOrDraft == "draft",
+          documentIdOpt = documentId.some,
+          versionOpt    = versionFromHeaders,
+          filenameOpt   = Option(filename)
         ))
 
       case _ =>

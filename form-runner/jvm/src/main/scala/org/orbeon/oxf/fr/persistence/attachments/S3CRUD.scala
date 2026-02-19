@@ -183,11 +183,14 @@ object S3CRUD extends CRUDConfig {
 
   case class S3Context(s3Client: S3Client, s3Config: S3Config, basePath: String) {
     def key(pathInformation: PathInformation): String =
-      (basePath +: pathInformation.pathSegments)
-        .flatMap(_.trimAllToOpt)
-        .map(_.stripPrefix("/").stripSuffix("/"))
-        .mkString("/")
+      S3CRUD.key(basePath, pathInformation)
   }
+
+  def key(basePath: String, pathInformation: PathInformation): String =
+    (basePath +: pathInformation.pathSegments)
+      .flatMap(_.trimAllToOpt)
+      .map(_.stripPrefix("/").stripSuffix("/"))
+      .mkString("/")
 
   override def config(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Config = {
     val provider                          = this.provider(appForm, formOrData)

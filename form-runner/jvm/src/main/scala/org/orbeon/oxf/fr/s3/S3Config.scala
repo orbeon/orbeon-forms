@@ -32,7 +32,7 @@ case class S3Config(endpoint: String, region: Region, bucket: String, accessKey:
 object S3Config {
   val PropertyPrefix        = "oxf.fr.s3."
   val DefaultEndpoint       = "s3.amazonaws.com"
-  private val DefaultRegion = "aws-global"
+  val DefaultRegion         = "aws-global"
   private val AwsRegionIds  = Region.regions().asScala.map(_.id()).toSet
   private val Logger        = LoggerFactory.createLogger(S3Config.getClass)
 

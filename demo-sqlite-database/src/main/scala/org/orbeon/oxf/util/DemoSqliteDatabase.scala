@@ -55,7 +55,7 @@ object DemoSqliteDatabase {
 
     PipelineSupport.withPipelineContextAndTestExternalContext(XFormsStateManager.sessionCreated, XFormsStateManager.sessionDestroyed) { (_, _) =>
 
-      val datasourceDescriptor = DatasourceDescriptor.sqliteDatasourceDescriptor(sqliteFile)
+      val datasourceDescriptor = DatasourceDescriptor.sqliteDatasourceDescriptor(sqliteFile, Provider.driverClass(Provider.SQLite))
 
       Connect.withNewDatabase(Provider.SQLite, datasourceDescriptor, dropDatabase = false) { connection =>
 

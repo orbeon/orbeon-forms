@@ -40,6 +40,22 @@ object Provider extends Enum[Provider] {
 
   case object SQLite     extends Provider
 
+  def driverClass(provider: Provider): String =
+    provider match {
+      case Oracle     => "oracle.jdbc.OracleDriver"
+      case MySQL      => "com.mysql.cj.jdbc.Driver"
+      case SQLServer  => "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+      case PostgreSQL => "org.postgresql.Driver"
+      case DB2        => "com.ibm.db2.jcc.DB2Driver"
+      case SQLite     => "org.sqlite.JDBC"
+    }
+
+  def fromJdbcUrl(url: String): Provider = {
+    require(url.startsWith("jdbc:"), s"Not a JDBC URL: $url")
+    val providerName = url.stripPrefix("jdbc:").takeWhile(_ != ':')
+    Provider.withName(providerName)
+  }
+
   def xmlColSelect(provider: Provider, tableName: String): String =
     provider match {
       case PostgreSQL | SQLite => s"$tableName.xml as xml"

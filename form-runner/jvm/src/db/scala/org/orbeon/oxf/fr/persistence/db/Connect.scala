@@ -43,22 +43,30 @@ object Connect {
     Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
   }
 
-  def withOrbeonTables[T]
+  def withOrbeonTablesProvideDatasourceDescriptor[T]
     (message: String)
-    (block: (java.sql.Connection, Provider) => T)
+    (block: (java.sql.Connection, Provider, DatasourceDescriptor) => T)
     (implicit logger: IndentedLogger)
   : Unit = {
     Logging.withDebug(message) {
       ProvidersTestedAutomatically.foreach { provider =>
         Logging.withDebug("on database", List("provider" -> provider.entryName)) {
-          Connect.withNewDatabase(provider) { connection =>
+          val ds = DatasourceDescriptor(provider)
+          Connect.withNewDatabase(provider, ds, dropDatabase = true) { connection =>
             createTables(provider, connection)
-            Logging.withDebug("run actual test") { block(connection, provider) }
+            Logging.withDebug("run actual test") { block(connection, provider, ds) }
           }
         }
       }
     }
   }
+
+  def withOrbeonTables[T]
+    (message: String)
+    (block: (java.sql.Connection, Provider) => T)
+    (implicit logger: IndentedLogger)
+  : Unit =
+    withOrbeonTablesProvideDatasourceDescriptor(message) { (connection, provider, _) => block(connection, provider) }
 
   def withNewDatabase[T]
     (provider: Provider)

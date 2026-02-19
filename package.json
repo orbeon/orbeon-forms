@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "jsdom": "22.1.0",
-    "node-fetch": "2.6.7",
+    "node-fetch": "2.6.13",
     "nwsapi": "2.2.4"
   },
   "license": "LGPL-2.1"

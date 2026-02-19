@@ -242,15 +242,15 @@ class PathMapXPathDependencies(
 
     def intersectsStructuralChangeModel(controlIndexes: Array[Int], analysis: XPathAnalysis): Boolean = {
 
-      val controlIsWithinRepeat     = controlIndexes.nonEmpty
-      val touchedModelsEffectiveIds = structuralChangeModelKeys
+      val controlIsWithinRepeat = controlIndexes.nonEmpty
+      val touchedModelsKeys     = structuralChangeModelKeys
 
       // Assumption: a given analysis typically has only one dependent model
       // 2026-02-17: There can be more dependent models when using `xxf:instance()` and #7492,but I don't see that
       // `compareWithPredicate()` depends on that assumption.
       compareWithPredicate(
         analysis.dependentModels,
-        touchedModelsEffectiveIds,
+        touchedModelsKeys,
         modelKey => {
           ! controlIsWithinRepeat ||
           // If there is a match we know that the control depends on the given model, and we
@@ -340,7 +340,7 @@ class PathMapXPathDependencies(
 
       val changeMightImpactDependentModel =
         markedPaths.exists { case (markedPathInstancePrefixedId, markedPathPath) =>
-          dependentPaths.exists { case InstancePath(m, i, p) =>
+          dependentPaths.exists { case InstancePath(_, i, p) =>
             markedPathInstancePrefixedId == i && markedPathPath == p
           }
         }

@@ -93,16 +93,18 @@ object XFormsServerRoute extends XmlNativeRoute {
   def extractWireEvents(actionElement: Element): List[WireAjaxEvent] =
     actionElement.elements(XXFORMS_EVENT_QNAME).toList map extractWireEvent
 
-  def getRequestUUID(request: Document): String = {
-    val uuidElement =
-      request.getRootElement.elementOpt(XFormsNames.XXFORMS_UUID_QNAME) getOrElse
-        (throw new IllegalArgumentException)
-    uuidElement.getTextTrim.trimAllToNull
-  }
+  private def getRequestUuidOrThrow(request: Document): String =
+    request
+      .getRootElement
+      .elementOpt(XFormsNames.XXFORMS_UUID_QNAME)
+      .getOrElse(throw new IllegalArgumentException(s"missing request `${XFormsNames.XXFORMS_UUID_QNAME.qualifiedName}` element"))
+      .getTextTrim
+      .trimAllToOpt
+      .getOrElse(throw new IllegalArgumentException(s"missing request `${XFormsNames.XXFORMS_UUID_QNAME.qualifiedName}` value"))
 
-  def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
+  private def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
 
-    val uuid = getRequestUUID(request) ensuring (_ ne null)
+    val uuid = getRequestUuidOrThrow(request)
 
     val sequenceElement =
       request.getRootElement.elementOpt(XXFORMS_SEQUENCE_QNAME) getOrElse

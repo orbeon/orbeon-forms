@@ -50,7 +50,6 @@ object StringUtils {
 
   // For Java callers
   def trimAllToEmpty(s: String): String                   = s.trimAllToEmpty
-  def trimAllToNull (s: String): String                   = s.trimAllToNull
   def trimAllToOpt  (s: String): Option[String]           = s.trimAllToOpt
   def isAllBlank    (s: String): Boolean                  = s.isAllBlank
   def splitToArray  (s: String): Array[String]            = s.splitTo[Array]()

@@ -77,7 +77,7 @@ object Orbeon {
         context.initParameters.getOrElse(
           PropertiesProperty,
           throw new OXFException("Properties file URL must be specified via `oxf.properties` in `web.xml`.")
-        ).trimAllToNull
+        ).trimAllToNull // TODO: `null`
 
       val runMode = RunMode.getRunMode(context.initParameters)
       logger.info(s"Using run mode: $runMode")

@@ -99,7 +99,7 @@ object XPathUtils {
 
   // 128 usages
   def selectStringValueNormalize(node: odom.Node, expr: String): String =
-    trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
+    selectStringValueOrNull(node, expr, EmptyNamespaces, null, null).trimAllToNull
 
   def selectStringValueNormalizeOpt(node: odom.Node, expr: String): Option[String] =
     trimAllToOpt(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))

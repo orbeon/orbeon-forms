@@ -165,7 +165,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     it.nonEmpty option it
   }
 
-  def resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
+  private def resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
     container              : XBLContainer,
     actionSourceAbsoluteId : String,
     targetControlName      : String,
@@ -302,12 +302,12 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     }
 
   def resolveTargetRelativeToActionSourceOpt(
-    actionSourceAbsoluteId  : String,
-    targetControlName       : String,
-    followIndexes           : Boolean,
-    libraryOrSectionNameOpt : Option[Either[String, String]]
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    followIndexes          : Boolean,
+    libraryOrSectionNameOpt: Option[Either[String, String]]
   )(implicit
-    xfc                     : XFormsFunction.Context
+    xfc                    : XFormsFunction.Context
   ): Option[Iterator[Item]] = {
 
     val container = xfc.container
@@ -590,7 +590,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     inDoc                     : NodeInfo,
     repeatedGridOrSectionName : String,
     atOrNull                  : String,
-    lastIsNone                : Boolean)(implicit // for `fr:repeat-clear` where the last position must not be specified
+    lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
+  )(implicit
     ctx                       : FormRunnerDocContext
   ): Iterator[String] = {
 

@@ -199,18 +199,32 @@
                     name="form-version-property"
                     value="xxf:property(string-join(('oxf.fr.summary.new.form-version', $app, $form), '.'))"/>
                 <xf:var
+                    name="latest-form-version"
+                    model="fr-versioning-model"
+                    as="xs:integer"
+                    value="
+                        max(
+                            instance('fr-versioning-form-metadata')/
+                                form[not(available = 'false')]/
+                                form-version/
+                                xs:integer(.)
+                        )"/>
+                <xf:var
+                    name="form-version-value"
+                    as="xs:integer"
+                    value="
+                        if ($form-version-property castable as xs:integer) then
+                            xs:integer($form-version-property)
+                        else
+                            fr:form-version()
+                    "/>
+                <xf:var
                     name="form-version-param"
                     value="
-                        if ($form-version-property = 'latest') then
+                        if ($form-version-value = $latest-form-version) then
                             ''
                         else
-                            concat(
-                                '?form-version=',
-                                if ($form-version-property castable as xs:integer) then
-                                    $form-version-property
-                                else
-                                    fr:form-version()
-                            )
+                            concat('?form-version=', $form-version-value)
                     "/>
                 <xf:load resource="/fr/{$app}/{$form}/new{$form-version-param}"/>
             </xf:action>

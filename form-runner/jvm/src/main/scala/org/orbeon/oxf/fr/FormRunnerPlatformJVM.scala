@@ -55,7 +55,7 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
           // 2025-10-24: Reproducing the logic we had in `persistence-model.xml`. It's unclear why we set the value
           // of `workflow-stage`, but we delete and create the other attributes. Shouldn't this be done consistently?
           XFormsAPI.setvalue(
-            ref   = documentMetadataElemAsList,
+            ref   = documentMetadataElemAsList /@ Names.WorkflowStage,
             value = privateModeMetadata.workflowStage.getOrElse("")
           )
 

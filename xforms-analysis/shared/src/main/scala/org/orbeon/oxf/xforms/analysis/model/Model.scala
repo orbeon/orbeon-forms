@@ -9,7 +9,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
-import scala.util.chaining.*
 
 
 class Model(
@@ -138,7 +137,7 @@ trait ModelBinds extends BindTree {
 
   def findMipExternalDependencyModels(getModel: String => Model): Set[InstancePath] = {
 
-    val modelsIt =
+    val instancePathsIt =
       for {
         bind            <- iterateAllBinds
         mipName         <- MipName.AllXPathMipsByName.values // `Default` might not be needed
@@ -150,7 +149,7 @@ trait ModelBinds extends BindTree {
       } yield
         instancePath
 
-    modelsIt.toSet
+    instancePathsIt.toSet
   }
 
   private var _dependentModels = Map.empty[Model, Set[InstancePath]]

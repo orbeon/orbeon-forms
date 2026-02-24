@@ -134,12 +134,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 
-  def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
-    container              : XBLContainer,
-    actionSourceAbsoluteId : String, // TODO: review if we need to resolve against this
-    targetControlName      : String,
-    followIndexes          : Boolean,
-    sectionName            : String
+  private def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
+    container        : XBLContainer,
+    targetControlName: String,
+    followIndexes    : Boolean,
+    sectionName      : String
   ): Option[Iterator[NodeInfo]] = {
 
     val resolvedSectionsIt =
@@ -322,13 +321,19 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
             followIndexes,
             libraryName
           )
+        case Some(Right(sectionName)) if sectionName.isAllBlank =>
+          resolveTargetRelativeToActionSourceFromControlsOpt(
+            xfc.containingDocument,
+            XFormsId.effectiveIdToAbsoluteId(Names.FormModel),
+            targetControlName,
+            followIndexes
+          )
         case Some(Right(sectionName)) =>
           resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
             container,
-            actionSourceAbsoluteId,
             targetControlName,
             followIndexes,
-            sectionName
+            sectionName.trimAllToEmpty
           )
         case None =>
           resolveTargetRelativeToActionSourceFromControlsOpt(

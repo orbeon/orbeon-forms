@@ -25,6 +25,7 @@ import org.orbeon.oxf.fr.process.{SimpleProcess, *}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
+import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsInstance}
@@ -357,12 +358,71 @@ private object FormRunnerFunctions {
         actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
         targetControlName       = stringArgument(0),
         followIndexes           = booleanArgumentOpt(1) getOrElse false,
-        libraryOrSectionNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(Right.apply)
+        libraryOrSectionNameOpt = stringArgumentOpt(2).map(_.trimAllToEmpty).map(Right.apply)
       ) map {
         _.map(_.getStringValue).toList // https://github.com/orbeon/orbeon-forms/issues/6016
       }
     }
-  }
+
+    override def addToPathMap(
+      pathMap       : PathMap,
+      pathMapNodeSet: PathMapNodeSet
+    ): PathMapNodeSet = {
+      arguments.head match {
+        case s: StringLiteral =>
+
+          val controlName = s.getStringValue
+
+          implicit val pathMapCtx   : SimplePathMapContext = getPathMapContext(pathMap)
+          implicit val exprContainer: Container            = getContainer
+
+          // for example `my-section-section`
+          val sectionNameOpt =
+            arguments.lift.apply(2)
+              .collect { case s: StringLiteral => s.getStringValue }
+              .map(_.trimAllToEmpty)
+
+          val instancePathOpt =
+            sectionNameOpt match {
+              case Some("") =>
+                // Explicitly search the top-level scope (of the part, but for now we don't specify what should happen
+                // across parts.
+                PathMapSupport.findInstancePathInScope(pathMapCtx.partAnalysisCtx.startScope, controlName)
+              case Some(sectionName) =>
+
+                // The section can be a top-level one or a nested section, but it must be in the top-level scope
+                for {
+                  sectionTemplateComponent <- PathMapSupport.findSectionTemplateComponent(s"$sectionName-content-control")
+                  concreteBinding          <- sectionTemplateComponent.bindingOpt
+                  componentMainModelId     = s"${sectionTemplateComponent.localName}-model"
+                  instancePath             <- PathMapSupport.findInstancePath(concreteBinding.innerScope, componentMainModelId, controlName)
+                } yield
+                  instancePath
+
+              case None =>
+                // No section specified, search in the current context, that is in the same scope as the context
+                // expression. This can either be the top-level scope, or a section template scope.
+                PathMapSupport.findInstancePathInScope(pathMapCtx.element.scope, controlName)
+            }
+
+          instancePathOpt match {
+            case Some((instancePrefixedId, path)) =>
+              PathMapSupport.addAbsoluteInstancePath(
+                pathMap,
+                instancePrefixedId,
+                path
+              )
+            case None =>
+              // If we cannot determine the dependency, we conservatively invalidate
+              pathMap.setInvalidated(true)
+          }
+        case _ =>
+          // Control name is not a literal, so we cannot determine the dependency
+          pathMap.setInvalidated(true)
+      } // match
+      null
+    } // addToPathMap
+  }// class FRControlStringValue
 
   class FRControlTypedValue extends FunctionSupport with RuntimeDependentFunction {
 
@@ -376,7 +436,7 @@ private object FormRunnerFunctions {
           actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
           targetControlName       = stringArgument(0),
           followIndexes           = booleanArgumentOpt(1) getOrElse false,
-          libraryOrSectionNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(Right.apply)
+          libraryOrSectionNameOpt = stringArgumentOpt(2).map(_.trimAllToEmpty).map(Right.apply)
         ) getOrElse
           Iterator.empty
 

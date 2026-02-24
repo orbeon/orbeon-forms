@@ -322,25 +322,26 @@ object PathMapXPathAnalysisBuilder {
               Right(None)
           }
         } else {
-          val instanceNameExpression = instanceExpression.getArguments()(0)
-          instanceNameExpression match {
+          instanceExpression.getArguments()(0) match {
             case stringLiteral: StringLiteral =>
               val originalInstanceId = stringLiteral.getStringValue
               val searchAncestors = expression.isInstanceOf[XXFormsInstanceTrait]
 
               // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an
               // instance() StringLiteral parameter twice
-              val alreadyRewritten = instanceNameExpression.isInstanceOf[PrefixedIdStringLiteral]
+              val alreadyRewritten = stringLiteral.isInstanceOf[PrefixedIdStringLiteral]
+
+              val isAbsoluteId = XFormsId.isAbsoluteId(originalInstanceId)
 
               val prefixedInstanceId =
                 if (alreadyRewritten)
                   // Parameter associates a prefixed id
                   stringLiteral.asInstanceOf[PrefixedIdStringLiteral].prefixedValue
+                else if (isAbsoluteId)
+                  // xxf:instance() with absolute id
+                  XFormsId.getPrefixedId(XFormsId.absoluteIdToEffectiveId(originalInstanceId))
                 else if (searchAncestors)
                   // xxf:instance()
-                  // NOTE: Absolute ids should also be supported. Right now search will fail with an
-                  // absolute id. However, it is unlikely that literal absolute ids will be passed, so
-                  // this is probably not a big deal.
                   partAnalysisCtx.findInstancePrefixedId(scope, originalInstanceId).orNull // can return `None`
                 else if (originalInstanceId.indexOf(ComponentSeparator) != -1) {
                   // HACK: datatable e.g. uses instance(prefixedId)!

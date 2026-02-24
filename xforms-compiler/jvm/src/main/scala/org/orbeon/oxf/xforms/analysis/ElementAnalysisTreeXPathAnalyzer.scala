@@ -61,7 +61,7 @@ object ElementAnalysisTreeXPathAnalyzer {
     }
   }
 
-  class SimplePathMapContext(e: ElementAnalysis) {
+  class SimplePathMapContext(val partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis) {
 
     // Current element
     def element: ElementAnalysis = e
@@ -578,7 +578,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         namespaceMapping          = partAnalysisCtx.getNamespaceMapping(e.prefixedId).orNull,
         baseAnalysis              = contextAnalysis,
         inScopeVariables          = inScopeVariables,
-        pathMapContext            = new SimplePathMapContext(e),
+        pathMapContext            = new SimplePathMapContext(partAnalysisCtx, e),
         scope                     = e.scope,
         defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId),
         locationData              = e.locationData,
@@ -599,7 +599,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         compiledExpression        = expression,
         baseAnalysis              = contextAnalysis,
         inScopeVariables          = inScopeVariables,
-        pathMapContext            = new SimplePathMapContext(e),
+        pathMapContext            = new SimplePathMapContext(partAnalysisCtx, e),
         scope                     = e.scope,
         element                   = e.element,
         defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId)

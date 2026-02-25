@@ -150,13 +150,13 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     val nestedIt =
       resolvedSectionsIt map { section =>
 
-        val root = section.innerRootControl
-
-        resolveTargetRelativeToActionSourceFromControlsOpt(
-          container              = root.container,
-          actionSourceAbsoluteId = root.absoluteId,
-          targetControlName      = targetControlName,
-          followIndexes          = followIndexes
+        section.innerRootControlOpt.flatMap( root =>
+          resolveTargetRelativeToActionSourceFromControlsOpt(
+            container              = root.container,
+            actionSourceAbsoluteId = root.absoluteId,
+            targetControlName      = targetControlName,
+            followIndexes          = followIndexes
+          )
         )
       }
 
@@ -232,13 +232,13 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     val nestedIt =
       resolvedSectionsIt map { section =>
 
-        val root = section.innerRootControl
-
-        resolveTargetRelativeToActionSourceFromControlsOpt(
-          container              = root.container,
-          actionSourceAbsoluteId = root.absoluteId,
-          targetControlName      = targetControlName,
-          followIndexes          = followIndexes
+        section.innerRootControlOpt.flatMap(root =>
+          resolveTargetRelativeToActionSourceFromControlsOpt(
+            container              = root.container,
+            actionSourceAbsoluteId = root.absoluteId,
+            targetControlName      = targetControlName,
+            followIndexes          = followIndexes
+          )
         )
       }
 

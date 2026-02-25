@@ -558,9 +558,11 @@ class XFormsComponentControl(
 
   // Get the control at the root of the inner scope of the component
   def innerRootControl: XXFormsComponentRootControl =
+    innerRootControlOpt.get
+
+  def innerRootControlOpt: Option[XXFormsComponentRootControl] =
     children
       .collectFirst { case root: XXFormsComponentRootControl => root }
-      .get
 
   override def ajaxLhhaSupport: Seq[LHHA] = staticControl.commonBinding.standardLhhaAsSeq
   override def htmlLhhaSupport: Set[LHHA] = staticControl.commonBinding.standardLhhaAsSet

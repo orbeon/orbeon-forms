@@ -155,7 +155,7 @@ abstract class ElementAnalysis(
   final lazy val nonRelevantExtensionAttributes =
     extensionAttributes map { case (k, v) => k -> (if (XMLUtils.maybeAVT(v)) "" else v) } // all blank values for AVTs
 
-  val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
+  val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement)
 
   // XPath analysis
   final var contextAnalysis: Option[XPathAnalysis] = None // only used during construction of `bindingAnalysis` and `valueAnalysis`
@@ -344,14 +344,18 @@ object ElementAnalysis {
   /**
    * Return a list of ancestors in the same scope from leaf to root.
    */
-  def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope, includeSelf: Boolean): List[ElementAnalysis] =
-    ancestorsIterator(start, includeSelf = includeSelf) filter (_.scope == scope) toList
+  def getAllAncestorsInScope(start: ElementAnalysis, includeSelf: Boolean): List[ElementAnalysis] = {
+    val startScope = start.scope
+    ancestorsIterator(start, includeSelf = includeSelf).filter(_.scope == startScope).toList
+  }
 
   /**
    * Get the closest ancestor in the same scope.
    */
-  def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope): Option[ElementAnalysis] =
-    ancestorsIterator(start, includeSelf = false) find (_.scope == scope)
+  def getClosestAncestorInScope(start: ElementAnalysis): Option[ElementAnalysis] = {
+    val startScope = start.scope
+    ancestorsIterator(start, includeSelf = false).find(_.scope == startScope)
+  }
 
   /**
    * Return the first ancestor with a binding analysis that is in the same scope/model.

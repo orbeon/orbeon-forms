@@ -209,11 +209,11 @@ object Controls {
   ): List[XFormsControl] = {
 
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceControlEffectiveId)
-    val scope            = containingDocument.staticOps.scopeForPrefixedId(sourcePrefixedId)
-    val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
+    val sourceScope      = containingDocument.staticOps.scopeForPrefixedId(sourcePrefixedId)
+    val targetPrefixedId = sourceScope.prefixedIdForStaticId(targetStaticId)
 
     for {
-      controls           <- Option(containingDocument.controls).toList
+      controls           <- List(containingDocument.controls)
       effectiveControlId <-
         resolveControlsEffectiveIds(
           containingDocument.staticOps,

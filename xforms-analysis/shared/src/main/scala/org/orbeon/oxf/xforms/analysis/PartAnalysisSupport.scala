@@ -146,7 +146,7 @@ object PartAnalysisSupport {
   def connectDependentModels(models: Iterable[Model], getModel: String => Model): Unit =
     models.foreach { model =>
       model
-        .findMipExternalDependencyModels(getModel)
+        .findMipExternalDependencyModels
         .groupBy(_.modelPrefixedId)
         .foreach { case (dependencyModelPrefixedId, instancePaths) =>
           getModel(dependencyModelPrefixedId)

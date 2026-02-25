@@ -135,14 +135,14 @@ trait ModelBinds extends BindTree {
     iterateBinds(topLevelBinds.iterator)
   }
 
-  def findMipExternalDependencyModels(getModel: String => Model): Set[InstancePath] = {
+  def findMipExternalDependencyModels: Set[InstancePath] = {
 
     val instancePathsIt =
       for {
-        bind            <- iterateAllBinds
-        mipName         <- MipName.AllXPathMipsByName.values // `Default` might not be needed
-        mip             <- bind.getXPathMIPs(mipName)
-        analysis = mip.analysis
+        bind         <- iterateAllBinds
+        mipName      <- MipName.AllXPathMipsByName.values // `Default` might not be needed
+        mip          <- bind.getXPathMIPs(mipName)
+        analysis     = mip.analysis
         if analysis.dependentModels.exists(_ != selfModel.prefixedId) // quick check
         instancePath <- analysis.allInstancePaths
         if instancePath.modelPrefixedId != selfModel.prefixedId

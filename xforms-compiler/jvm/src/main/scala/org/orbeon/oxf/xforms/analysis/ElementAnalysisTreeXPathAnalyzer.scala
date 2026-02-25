@@ -67,12 +67,12 @@ object ElementAnalysisTreeXPathAnalyzer {
     def element: ElementAnalysis = e
 
     // Return the analysis for the context in scope
-    def context: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(e, e.scope)
+    def context: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(e)
 
     // Return a map of static id => analysis for all the ancestor-or-self in scope
     def getInScopeContexts: collection.Map[String, ElementAnalysis] =
       mutable.LinkedHashMap(
-        ElementAnalysis.getAllAncestorsInScope(e, e.scope, includeSelf = true)
+        ElementAnalysis.getAllAncestorsInScope(e, includeSelf = true)
           .map(elementAnalysis => elementAnalysis.staticId -> elementAnalysis)*
       )
 

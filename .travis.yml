@@ -54,9 +54,9 @@ before_install:
 install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
-- npm install
 - nvm install 24
 - nvm use 24
+- npm install
 - |
   export SBT_OPTS="-Dfile.encoding=UTF-8"
 before_script:

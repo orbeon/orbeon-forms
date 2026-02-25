@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import io.circe.parser.parse
 import org.orbeon.oxf.test.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
@@ -287,6 +288,45 @@ class SendTest
           val expectedNormalized = expectedFormatted.replaceAll("\\s", "")
 
           assert(actualString == expectedNormalized)
+        }
+      }
+    }
+
+    it("must support multiple values for `headers`") {
+
+      val firstHeaderName   = "X-Orbeon-Header-1"
+      val secondHeaderName  = "X-Orbeon-Header-2"
+      val firstHeaderValue  = "first-header-value"
+      val secondHeaderValue = "second-header-value"
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "send-action", "new", initialize = true)
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+
+          XFormsAPI.dispatch(
+            name       = "my-run-process",
+            targetId   = Names.FormModel,
+            properties = Map(
+              "process" -> Some(
+                s"""
+                  send(
+                    uri     = "http://localhost:8084/anything",
+                    method  = "get",
+                    replace = "text",
+                    headers = "$firstHeaderName: $firstHeaderValue\\n$secondHeaderName: $secondHeaderValue"
+                  )
+                """
+              )
+            )
+          )
+
+          val actualJson = instance("fr-send-submission-response").get.root.stringValue
+          val cursor     = parse(actualJson).toOption.get.hcursor.downField("headers")
+
+          assert(cursor.get[String](firstHeaderName)  == Right(firstHeaderValue))
+          assert(cursor.get[String](secondHeaderName) == Right(secondHeaderValue))
         }
       }
     }

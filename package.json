@@ -7,9 +7,9 @@
     "url": "https://github.com/orbeon/orbeon-forms/"
   },
   "dependencies": {
-    "jsdom": "22.1.0",
-    "node-fetch": "2.6.7",
-    "nwsapi": "2.2.4"
+    "jsdom": "28.1.0",
+    "node-fetch": "3.3.2",
+    "nwsapi": "2.2.23"
   },
   "devDependencies": {
     "stylelint": "^16.26.1"

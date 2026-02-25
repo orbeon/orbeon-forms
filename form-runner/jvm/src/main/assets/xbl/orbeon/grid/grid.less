@@ -695,6 +695,13 @@
 
                 //  Buttons
                 .fr-grid-td {
+                    .xforms-trigger {
+                        // This prevents the span around the button from taking up the full width of the cell, which
+                        // would otherwise cause a click to the right of the button to hit the span and trigger
+                        // a `DOMActivate`.
+                        display: inline-block;
+                    }
+
                     .xforms-trigger button, .xforms-trigger input {
                         margin-top: 1.72em
                     }

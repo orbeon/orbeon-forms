@@ -42,8 +42,7 @@ object FormRunnerActionApi {
         mapping         = namespaceMapping,
         functionContext = xfc
       )
-
-//    val modelAbsoluteId: String = ???
+    
     val modelAbsoluteId: String = XFormsId.effectiveIdToAbsoluteId(Names.FormModel)
 
     val selectedItems =

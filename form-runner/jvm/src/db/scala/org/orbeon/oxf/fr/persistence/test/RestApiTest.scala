@@ -87,7 +87,8 @@ class RestApiTest
     HttpAssert.put(formURL, Unspecified, form, StatusCode.Created)
   }
 
-  // Read filesystem/S3 base paths from oxf.fr.persistence.[provider].base-path test properties
+  // Read filesystem/S3 base paths from the `oxf.fr.persistence.[provider].base-path` properties,
+  // defined in `src/test/resources/config/properties-local.xml`.
   private implicit lazy val propertySet: PropertySet = CoreCrossPlatformSupport.properties
   private lazy val filesystemBasePath = Paths.get(providerProperty(provider = "filesystem", "base-path", defaultOpt = None))
   private lazy val s3BasePath         =           providerProperty(provider = "s3",         "base-path", defaultOpt = None)
@@ -95,15 +96,21 @@ class RestApiTest
   private var directoryToCleanAfterTest: Option[Path] = None
 
   private def filesystemInit(): Unit = {
-    // Create the attachments base directory if needed, assuming that its parent directory exists
-    directoryToCleanAfterTest = (! Files.exists(filesystemBasePath)).option {
+    // Create the attachments base directory if needed, assuming that its parent directory exists;
+    // if it already exists, clean its contents so stale files from previous test runs don't interfere
+    if (Files.exists(filesystemBasePath)) {
+      Files.walk(filesystemBasePath)
+        .sorted(java.util.Comparator.reverseOrder())
+        .filter(p => p != filesystemBasePath)
+        .forEach(Files.delete(_))
+    } else {
       Files.createDirectory(filesystemBasePath)
-      filesystemBasePath
     }
+    directoryToCleanAfterTest = Some(filesystemBasePath)
   }
 
   private def filesystemCleanup(): Unit = {
-    // Delete the base directory only if it was created by the test
+    // Delete the base directory after the test
     directoryToCleanAfterTest.foreach { directory =>
       // Delete all subdirectories and files in reverse order, so that children are deleted before parents
       Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))

@@ -905,6 +905,8 @@
         </xbl:implementation>
 
         <xbl:template>
+            <!-- The `date` class sets bootstrap-datepicker to "component" mode, causing the picker to open when
+                 users click the add-on instead of the input field. -->
             <xf:group
                 ref="xxf:binding('fr-date')"
                 class="xforms-help-popover-control input-append date fr-field-width-{

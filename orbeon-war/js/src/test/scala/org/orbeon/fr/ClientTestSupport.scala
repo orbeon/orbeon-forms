@@ -257,9 +257,7 @@ trait ClientTestSupport {
       val pretendToBeVisual    = true
 
       val cookieJar            = myCookieJar
-      val virtualConsole       = new VirtualConsole().sendTo(g.console.asInstanceOf[js.Object], new js.Object {
-        val omitJSDOMErrors = false
-      })
+      val virtualConsole       = new VirtualConsole().forwardTo(g.console.asInstanceOf[js.Object])
 
       val resources            = "usable"
       val runScripts           = "dangerously" // "outside-only"

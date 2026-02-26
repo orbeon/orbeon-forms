@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xh:title>Orbeon Demo: Examples of Formulas</xh:title>
         <xh:style>
@@ -104,17 +119,12 @@
                         <grid-5>
                             <control-8/>
                             <control-26/>
-
                             <regex>^[A-Za-z0-9\-_]+$</regex>
                             <control-10>Orbeon</control-10>
                             <control-15/>
-                            <control-27/>
-                            <lei>F50EOCWSQFAUVO9Q8Z97</lei><lei-builtin>F50EOCWSQFAUVO9Q8Z97</lei-builtin>
-
-                            <control-16/>
-                            <control-28/>
-                            <control-17>US0378331005</control-17><isin-builtin>US0378331005</isin-builtin>
-
+                            <lei>F50EOCWSQFAUVO9Q8Z97</lei>
+                            <isin>US0378331005</isin>
+                            <iban>BE68539007547034</iban>
                         </grid-5>
                     </section-5>
 
@@ -128,16 +138,28 @@
 
 
 
-                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" calculate="$number-1 &gt;= $number-2" readonly="false()"/>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"
+                                 calculate="$number-1 &gt;= $number-2"
+                                 readonly="false()"/>
                         <xf:bind id="control-5-bind" ref="control-5" name="control-5"/>
                         <xf:bind id="number-1-bind" ref="number-1" name="number-1" type="xf:decimal"/>
                         <xf:bind id="number-2-bind" ref="number-2" name="number-2" type="xf:decimal"/>
-                        <xf:bind id="control-3-bind" ref="control-3" name="control-3" calculate="$number-1 &gt; $number-2" readonly="false()"/>
+                        <xf:bind id="control-3-bind" ref="control-3" name="control-3"
+                                 calculate="$number-1 &gt; $number-2"
+                                 readonly="false()"/>
                         <xf:bind id="control-22-bind" ref="control-22" name="control-22"/>
-                        <xf:bind id="control-32-bind" ref="control-32" name="control-32" calculate="$number-1 &lt;= $number-2" readonly="false()"/>
-                        <xf:bind id="control-31-bind" ref="control-31" name="control-31" calculate="$number-1 &lt; $number-2" readonly="false()"/>
-                        <xf:bind id="control-33-bind" ref="control-33" name="control-33" calculate="$number-1 = $number-2" readonly="false()"/>
-                        <xf:bind id="control-34-bind" ref="control-34" name="control-34" calculate="$number-1 != $number-2" readonly="false()"/>
+                        <xf:bind id="control-32-bind" ref="control-32" name="control-32"
+                                 calculate="$number-1 &lt;= $number-2"
+                                 readonly="false()"/>
+                        <xf:bind id="control-31-bind" ref="control-31" name="control-31"
+                                 calculate="$number-1 &lt; $number-2"
+                                 readonly="false()"/>
+                        <xf:bind id="control-33-bind" ref="control-33" name="control-33"
+                                 calculate="$number-1 = $number-2"
+                                 readonly="false()"/>
+                        <xf:bind id="control-34-bind" ref="control-34" name="control-34"
+                                 calculate="$number-1 != $number-2"
+                                 readonly="false()"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-2-bind" ref="section-2" name="section-2">
@@ -146,7 +168,9 @@
 
                         <xf:bind id="control-7-bind" ref="control-7" name="control-7"/>
                         <xf:bind id="yes-no-bind" ref="yes-no" name="yes-no" type="xf:boolean"/>
-                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" calculate="$yes-no/string() = 'true'" readonly="false()"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2"
+                                 calculate="$yes-no/string() = 'true'"
+                                 readonly="false()"/>
                         <xf:bind id="control-21-bind" ref="control-21" name="control-21"/>
                     </xf:bind>
                 </xf:bind>
@@ -157,7 +181,9 @@
 
                         <xf:bind id="control-14-bind" ref="control-14" name="control-14"/>
                         <xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/>
-                        <xf:bind id="control-13-bind" ref="control-13" name="control-13" calculate="if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'" readonly="false()"/>
+                        <xf:bind id="control-13-bind" ref="control-13" name="control-13"
+                                 calculate="if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'"
+                                 readonly="false()"/>
                         <xf:bind id="control-29-bind" ref="control-29" name="control-29"/>
                         <xf:bind id="checkboxes-max-bind" ref="checkboxes-max" name="checkboxes-max">
                             <xf:constraint id="validation-1-validation" value="count(xxf:split($checkboxes-max)) &lt;= 2"/>
@@ -176,18 +202,26 @@
 
 
                         <xf:bind id="birthdate-bind" ref="birthdate" name="birthdate" type="xf:date"/>
-                        <xf:bind id="age-bind" ref="age" name="age" calculate="let $date1        := $birthdate,&#xA;    $date2        := current-date(),&#xA;    $months-days1 := substring(xs:string($date1), 6, 11),&#xA;    $months-days2 := substring(xs:string($date2), 6, 11)&#xA;return&#xA;    if ($months-days2 &gt; $months-days1) then&#xA;        year-from-date($date2) - year-from-date($date1)&#xA;    else&#xA;        year-from-date($date2) - year-from-date($date1) - 1" readonly="false()"/>
+                        <xf:bind id="age-bind" ref="age" name="age"
+                                 calculate="let $date1        := $birthdate,&#xA;    $date2        := current-date(),&#xA;    $months-days1 := substring(xs:string($date1), 6, 11),&#xA;    $months-days2 := substring(xs:string($date2), 6, 11)&#xA;return&#xA;    if ($months-days2 &gt; $months-days1) then&#xA;        year-from-date($date2) - year-from-date($date1)&#xA;    else&#xA;        year-from-date($date2) - year-from-date($date1) - 1"
+                                 readonly="false()"/>
                         <xf:bind id="control-23-bind" ref="control-23" name="control-23"/>
-                        <xf:bind id="current-date-bind" ref="current-date" name="current-date" type="xf:date" xxf:default="current-date()"/>
+                        <xf:bind id="current-date-bind" ref="current-date" name="current-date" type="xf:date"
+                                 xxf:default="current-date()"/>
                         <xf:bind id="control-24-bind" ref="control-24" name="control-24"/>
                         <xf:bind id="control-9-bind" ref="control-9" name="control-9"/>
                         <xf:bind id="first-date-bind" ref="first-date" name="first-date" type="xf:date"/>
                         <xf:bind id="second-date-bind" ref="second-date" name="second-date" type="xf:date"/>
-                        <xf:bind id="week-days-bind" ref="week-days" name="week-days" calculate="for&#xA;    $start          in $first-date,&#xA;    $end            in $second-date,&#xA;    $startW         in xs:integer(format-date($start, '[F1]')),&#xA;    $endW           in xs:integer(format-date($end, '[F1]')),&#xA;    $days           in days-from-duration($end - $start),&#xA;    $daysNoWeekends in $days - (floor($days div 7) * 2)&#xA;return&#xA;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&#xA;    else if ($endW &lt; $startW) then $daysNoWeekends - 2&#xA;    else $daysNoWeekends" readonly="false()"/>
+                        <xf:bind id="week-days-bind" ref="week-days" name="week-days"
+                                 calculate="for&#xA;    $start          in $first-date,&#xA;    $end            in $second-date,&#xA;    $startW         in xs:integer(format-date($start, '[F1]')),&#xA;    $endW           in xs:integer(format-date($end, '[F1]')),&#xA;    $days           in days-from-duration($end - $start),&#xA;    $daysNoWeekends in $days - (floor($days div 7) * 2)&#xA;return&#xA;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&#xA;    else if ($endW &lt; $startW) then $daysNoWeekends - 2&#xA;    else $daysNoWeekends"
+                                 readonly="false()"/>
                         <xf:bind id="control-25-bind" ref="control-25" name="control-25"/>
                         <xf:bind id="control-35-bind" ref="control-35" name="control-35"/>
                         <xf:bind id="control-36-bind" ref="control-36" name="control-36"/>
-                        <xf:bind id="date-5-business-days-bind" ref="date-5-business-days" name="date-5-business-days" type="xf:date" constraint="count(     for $i in 1 to days-from-duration($date-5-business-days - current-date()) return     let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),         $is_business :=  xs:integer(format-date($current_date, '[F1]')) &lt;= 5     return if ($is_business) then $i else () ) &gt;= 5"/>
+                        <xf:bind id="date-5-business-days-bind" ref="date-5-business-days"
+                                 name="date-5-business-days"
+                                 type="xf:date"
+                                 constraint="count(     for $i in 1 to days-from-duration($date-5-business-days - current-date()) return     let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),         $is_business :=  xs:integer(format-date($current_date, '[F1]')) &lt;= 5     return if ($is_business) then $i else () ) &gt;= 5"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
@@ -199,10 +233,13 @@
 
 
                         <xf:bind id="control-19-bind" ref="control-19" name="control-19"/>
-                        <xf:bind id="current-time-bind" ref="current-time" name="current-time" type="xf:time" xxf:default="current-time()"/>
+                        <xf:bind id="current-time-bind" ref="current-time" name="current-time" type="xf:time"
+                                 xxf:default="current-time()"/>
                         <xf:bind id="start-time-bind" ref="start-time" name="start-time" type="xf:time"/>
                         <xf:bind id="end-time-bind" ref="end-time" name="end-time" type="xf:time"/>
-                        <xf:bind id="total-hours-bind" ref="total-hours" name="total-hours" calculate="hours-from-duration(xs:time($end-time) - xs:time($start-time))" readonly="false()"/>
+                        <xf:bind id="total-hours-bind" ref="total-hours" name="total-hours"
+                                 calculate="hours-from-duration(xs:time($end-time) - xs:time($start-time))"
+                                 readonly="false()"/>
                         <xf:bind id="control-20-bind" ref="control-20" name="control-20"/>
 
                     </xf:bind>
@@ -214,18 +251,14 @@
                 <xf:bind id="section-5-bind" ref="section-5" name="section-5">
                     <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
                         <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
-
-
-                        <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
-
-                        <xf:bind id="control-16-bind" ref="control-16" name="control-16"/>
-                        <xf:bind id="regex-bind" ref="regex" name="regex" xxf:whitespace="trim"/>
-                        <xf:bind id="control-10-bind" ref="control-10" name="control-10" xxf:whitespace="trim" constraint="matches(., $regex)"/>
                         <xf:bind id="control-26-bind" ref="control-26" name="control-26"/>
-                        <xf:bind id="lei-bind" ref="lei" name="lei" xxf:whitespace="trim" constraint="let $lei := . return   string-length($lei) = 20 and   xs:decimal(     string-join(       for $code in string-to-codepoints($lei)       return         if ($code &gt;= string-to-codepoints('A') and string-to-codepoints('Z') &gt;= $code) then           (: Letters A-Z :)           xs:string($code - string-to-codepoints('A') + 10)         else if ($code &gt;= string-to-codepoints('0') and string-to-codepoints('9') &gt;= $code) then           (: Digits 0-9 :)           xs:string($code - string-to-codepoints('0'))           (: Unrecognized characters :)         else           '',       ''     )   ) mod 97 = 1"/>
-                        <xf:bind id="control-27-bind" ref="control-27" name="control-27"/>
-                        <xf:bind id="control-17-bind" ref="control-17" name="control-17" xxf:whitespace="trim" constraint="let $isin := .&#xA;return&#xA;  (&#xA;    let&#xA;      $without-checksum := substring($isin, 1, 11),&#xA;      $letter-as-numbers-string :=&#xA;        string-join(&#xA;          for $code in string-to-codepoints($without-checksum)&#xA;          return&#xA;            if ($code &gt;= string-to-codepoints('A') and&#xA;                string-to-codepoints('Z') &gt;= $code) then&#xA;              (: Letters A-Z :)&#xA;              string($code - string-to-codepoints('A') + 10)&#xA;            else if ($code &gt;= string-to-codepoints('0') and&#xA;                     string-to-codepoints('9') &gt;= $code) then&#xA;              (: Digits 0-9 :)&#xA;              string($code - string-to-codepoints('0'))&#xA;              (: Unrecognized characters :)&#xA;            else&#xA;              '',&#xA;          ''&#xA;        ),&#xA;      $letter-as-numbers-digits :=&#xA;        for $code in string-to-codepoints($letter-as-numbers-string)&#xA;        return xs:decimal(codepoints-to-string($code)),&#xA;      $reversed-digits :=&#xA;        for $i in 1 to count($letter-as-numbers-digits)&#xA;        return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],&#xA;      $group-1-digits := $reversed-digits[position() mod 2 = 1],&#xA;      $group-2-digits := $reversed-digits[position() mod 2 = 0],&#xA;      $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,&#xA;      $group-1-x2-string := string-join(&#xA;                              for $d in $group-1-x2-decimals&#xA;                              return string($d),&#xA;                              ''&#xA;                            ),&#xA;      $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)&#xA;                            return xs:decimal(codepoints-to-string($code)),&#xA;      $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),&#xA;      $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),&#xA;      $checksum-provided := substring($isin, 12, 1),&#xA;      $proper-checksum := $checksum-computed = $checksum-provided,&#xA;      $proper-length := string-length($isin) = 12&#xA;    return&#xA;      $proper-checksum and $proper-length&#xA;  )"/>
-                        <xf:bind id="control-28-bind" ref="control-28" name="control-28"/><xf:bind id="lei-builtin-bind" ref="lei-builtin" name="lei-builtin" type="fr:lei"/><xf:bind id="isin-builtin-bind" ref="isin-builtin" name="isin-builtin" type="fr:isin"/>
+                        <xf:bind id="regex-bind" ref="regex" name="regex" xxf:whitespace="trim"/>
+                        <xf:bind id="control-10-bind" ref="control-10" name="control-10" xxf:whitespace="trim"
+                                 constraint="matches(., $regex)"/>
+                        <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
+                        <xf:bind id="lei-bind" ref="lei" name="lei" type="fr:lei"/>
+                        <xf:bind id="isin-bind" ref="isin" name="isin" type="fr:isin"/>
+                        <xf:bind id="iban-bind" ref="iban" name="iban" type="fr:iban"/>
                     </xf:bind>
                 </xf:bind>
 
@@ -239,11 +272,10 @@
                     <title xml:lang="en">Orbeon Demo: Examples of Formulas</title>
                     <description xml:lang="en">This form showcases formulas used for calculations and validations in Orbeon Forms.</description>
                     <created-with-version>2023.1.4.202408212351 PE</created-with-version>
-
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
                     <library-versions>
-
-
+                        <_>1</_>
                     </library-versions>
 
 
@@ -263,23 +295,46 @@
 
 
 
-                <singleton>true</singleton><xbl><fr:number field-width="natural"/><fr:date field-width="natural"/><fr:time field-width="natural"/><fr:datetime field-width="natural"/><fr:toc position="left" modes="new edit view pdf tiff test test-pdf" min-sections="1"/></xbl><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-3"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-5"},{"value":"control-22"},{"value":"number-1"},{"value":"number-2"},{"value":"control-3"},{"value":"control-4"},{"value":"control-33"},{"value":"control-34"},{"value":"control-31"},{"value":"control-32"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"control-7"},{"value":"control-21"},{"value":"yes-no"},{"value":"control-2"}],"topLevel":true},{"containerPath":[{"value":"section-6"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"control-12"},{"value":"control-29"},{"value":"checkboxes"},{"value":"control-13"},{"value":"control-14"},{"value":"control-30"},{"value":"checkboxes-max"}],"topLevel":true},{"containerPath":[{"value":"section-4"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-6"},{"value":"control-23"},{"value":"birthdate"},{"value":"age"},{"value":"control-24"},{"value":"control-9"},{"value":"current-date"},{"value":"control-18"},{"value":"control-25"},{"value":"first-date"},{"value":"second-date"},{"value":"week-days"},{"value":"control-35"},{"value":"control-36"},{"value":"date-5-business-days"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-19"},{"value":"start-time"},{"value":"end-time"},{"value":"total-hours"},{"value":"control-11"},{"value":"control-20"},{"value":"current-time"}],"topLevel":true},{"containerPath":[{"value":"section-5"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"control-8"},{"value":"control-26"},{"value":"regex"},{"value":"control-10"},{"value":"control-15"},{"value":"control-27"},{"value":"lei"},{"value":"lei-builtin"},{"value":"control-16"},{"value":"control-28"},{"value":"control-17"},{"value":"isin-builtin"}],"topLevel":true}]}</migration></metadata>
+                    <singleton>true</singleton>
+                    <xbl>
+                        <fr:number field-width="natural"/>
+                        <fr:date field-width="natural"/>
+                        <fr:time field-width="natural"/>
+                        <fr:datetime field-width="natural"/>
+                        <fr:toc position="left" modes="new edit view pdf tiff test test-pdf" min-sections="1"/>
+                    </xbl>
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-3"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-5"},{"value":"control-22"},{"value":"number-1"},{"value":"number-2"},{"value":"control-3"},{"value":"control-4"},{"value":"control-33"},{"value":"control-34"},{"value":"control-31"},{"value":"control-32"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"control-7"},{"value":"control-21"},{"value":"yes-no"},{"value":"control-2"}],"topLevel":true},{"containerPath":[{"value":"section-6"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"control-12"},{"value":"control-29"},{"value":"checkboxes"},{"value":"control-13"},{"value":"control-14"},{"value":"control-30"},{"value":"checkboxes-max"}],"topLevel":true},{"containerPath":[{"value":"section-4"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-6"},{"value":"control-23"},{"value":"birthdate"},{"value":"age"},{"value":"control-24"},{"value":"control-9"},{"value":"current-date"},{"value":"control-18"},{"value":"control-25"},{"value":"first-date"},{"value":"second-date"},{"value":"week-days"},{"value":"control-35"},{"value":"control-36"},{"value":"date-5-business-days"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-19"},{"value":"start-time"},{"value":"end-time"},{"value":"total-hours"},{"value":"control-11"},{"value":"control-20"},{"value":"current-time"}],"topLevel":true},{"containerPath":[{"value":"section-5"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"control-8"},{"value":"control-26"},{"value":"regex"},{"value":"control-10"},{"value":"control-15"},{"value":"lei"},{"value":"isin"},{"value":"iban"}],"topLevel":true}]}</migration>
+                </metadata>
             </xf:instance>
 
-
+            <!-- Attachments -->
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments/>
             </xf:instance>
 
-
+            <!-- All form resources -->
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
                         <control-12>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Testing the value of a checkbox.&lt;/strong&gt; This formula tells whether a specific option of a checkbox is selected.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Testing the value of a checkbox.&lt;/strong&gt; This formula tells whether a specific option of a checkbox is selected.&lt;/div&gt;</text>
                         </control-12>
                         <control-29>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'&lt;/span&gt;&lt;/div&gt;</text>
                         </control-29>
 
                         <checkboxes>
@@ -306,10 +361,12 @@
                             <hint/>
                         </control-13>
                         <control-14>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Counting selected checkboxes.&lt;/strong&gt; This formula validates that at most 2 checkboxes are selected.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Counting selected checkboxes.&lt;/strong&gt; This formula validates that at most 2 checkboxes are selected.&lt;/div&gt;</text>
                         </control-14>
                         <control-30>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(xxf:split($checkboxes-max)) &amp;lt;= 2&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(xxf:split($checkboxes-max)) &amp;lt;= 2&lt;/span&gt;&lt;/div&gt;</text>
                         </control-30>
                         <checkboxes-max>
                             <label>Checkboxes</label>
@@ -333,10 +390,12 @@
                         </checkboxes-max>
 
                         <control-8>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Regular expression validation.&lt;/strong&gt; This formula validates that a text values matches a given regular expression.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Regular expression validation.&lt;/strong&gt; This formula validates that a text values matches a given regular expression.&lt;/div&gt;</text>
                         </control-8>
                         <control-26>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;matches(., $regex)&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;matches(., $regex)&lt;/span&gt;&lt;/div&gt;</text>
                         </control-26>
 
                         <regex>
@@ -348,37 +407,28 @@
                             <hint>Type text here and see if it validates</hint>
                         </control-10>
                         <control-15>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a Legal Entity Identifier (LEI).&lt;/strong&gt; This formula validates an &lt;a href="https://en.wikipedia.org/wiki/Legal_Entity_Identifier"&gt;LEI&lt;/a&gt; (Legal Entity Identifier) field.&lt;br&gt;&lt;br&gt;&lt;em&gt;NOTE: Since Orbeon Forms 2024.1.2, Orbeon Forms includes a built-in LEI component which performs this validation out of the box.&lt;/em&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating ISO Financial Identifiers&lt;/strong&gt;&lt;/div&gt;</text>
                         </control-15>
-                        <control-27>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;let $lei := .&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  string-length($lei) = 20 and&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  xs:decimal(&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    string-join(&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      for $code in string-to-codepoints($lei)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        if ($code &amp;gt;= string-to-codepoints('A') and string-to-codepoints('Z') &amp;gt;= $code) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Letters A-Z :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          xs:string($code - string-to-codepoints('A') + 10)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        else if ($code &amp;gt;= string-to-codepoints('0') and string-to-codepoints('9') &amp;gt;= $code) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Digits 0-9 :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          xs:string($code - string-to-codepoints('0'))&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Unrecognized characters :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          '',&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      ''&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    )&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  ) mod 97 = 1&lt;/span&gt;&lt;/div&gt;</text>
-                        </control-27>
-                        <lei><label>Legal Entity Identifier (LEI)</label><hint/>
-
-
-                        </lei><lei-builtin><label>Builtin LEI form control</label><hint/></lei-builtin>
-
-                        <control-16>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;&lt;strong&gt;Validating an International Securities Identification Number (ISIN).&lt;/strong&gt;&lt;/div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt; &lt;/div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;This formula validates an &lt;a href="https://en.wikipedia.org/wiki/International_Securities_Identification_Number"&gt;ISIN&lt;/a&gt; (International Securities Identification Number). This shows how a formula can become quite sophisticated.&lt;br&gt;&lt;br&gt;&lt;em&gt;NOTE: Since Orbeon Forms 2024.1.2, Orbeon Forms includes a built-in ISIN component which performs this validation out of the box.&lt;/em&gt;&lt;/div&gt;
-&lt;h2 id="validating-an-international-securities-identification-number-isin" class="text-3xl font-semibold heading group relative grid w-full mx-auto decoration-primary/6 max-w-3xl page-api-block:ml-0"&gt;&lt;/h2&gt;
-&lt;/div&gt;</text>
-                        </control-16>
-                        <control-28>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: #236fa1; font-family: andale mono, monospace;"&gt;let $isin := .&lt;br&gt;return&lt;br&gt;  (&lt;br&gt;    let&lt;br&gt;      $without-checksum := substring($isin, 1, 11),&lt;br&gt;      $letter-as-numbers-string :=&lt;br&gt;        string-join(&lt;br&gt;          for $code in string-to-codepoints($without-checksum)&lt;br&gt;          return&lt;br&gt;            if ($code &amp;gt;= string-to-codepoints('A') and&lt;br&gt;                string-to-codepoints('Z') &amp;gt;= $code) then&lt;br&gt;              (: Letters A-Z :)&lt;br&gt;              string($code - string-to-codepoints('A') + 10)&lt;br&gt;            else if ($code &amp;gt;= string-to-codepoints('0') and&lt;br&gt;                     string-to-codepoints('9') &amp;gt;= $code) then&lt;br&gt;              (: Digits 0-9 :)&lt;br&gt;              string($code - string-to-codepoints('0'))&lt;br&gt;              (: Unrecognized characters :)&lt;br&gt;            else&lt;br&gt;              '',&lt;br&gt;          ''&lt;br&gt;        ),&lt;br&gt;      $letter-as-numbers-digits :=&lt;br&gt;        for $code in string-to-codepoints($letter-as-numbers-string)&lt;br&gt;        return xs:decimal(codepoints-to-string($code)),&lt;br&gt;      $reversed-digits :=&lt;br&gt;        for $i in 1 to count($letter-as-numbers-digits)&lt;br&gt;        return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],&lt;br&gt;      $group-1-digits := $reversed-digits[position() mod 2 = 1],&lt;br&gt;      $group-2-digits := $reversed-digits[position() mod 2 = 0],&lt;br&gt;      $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,&lt;br&gt;      $group-1-x2-string := string-join(&lt;br&gt;                              for $d in $group-1-x2-decimals&lt;br&gt;                              return string($d),&lt;br&gt;                              ''&lt;br&gt;                            ),&lt;br&gt;      $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)&lt;br&gt;                            return xs:decimal(codepoints-to-string($code)),&lt;br&gt;      $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),&lt;br&gt;      $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),&lt;br&gt;      $checksum-provided := substring($isin, 12, 1),&lt;br&gt;      $proper-checksum := $checksum-computed = $checksum-provided,&lt;br&gt;      $proper-length := string-length($isin) = 12&lt;br&gt;    return&lt;br&gt;      $proper-checksum and $proper-length&lt;br&gt;  )&lt;/span&gt;&lt;/div&gt;</text>
-                        </control-28>
-                        <control-17><label>ISIN</label><hint/>
-
-
-                        </control-17><isin-builtin><label>Builtin ISIN form control</label><hint/></isin-builtin>
-
+                        <lei>
+                            <label>Builtin LEI form control</label>
+                            <hint/>
+                        </lei>
+                        <isin>
+                            <label>Builtin ISIN form control</label>
+                            <hint/>
+                        </isin>
+                        <iban>
+                            <label>Builtin IBAN form control</label>
+                            <hint/>
+                        </iban>
                         <control-35>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a date is at least 5 business days in the future.&lt;/strong&gt; This formula validates that a date is at least 5 business days (Monday to Friday) in the future.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a date is at least 5 business days in the future.&lt;/strong&gt; This formula validates that a date is at least 5 business days (Monday to Friday) in the future.&lt;/div&gt;</text>
                         </control-35>
                         <control-36>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;for $i in 1 to days-from-duration($date-5-business-days - current-date()) return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$is_business :=  xs:integer(format-date($current_date, '[F1]')) &amp;lt;= 5&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return if ($is_business) then $i else ()&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;) &amp;gt;= 5&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;for $i in 1 to days-from-duration($date-5-business-days - current-date()) return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$is_business :=  xs:integer(format-date($current_date, '[F1]')) &amp;lt;= 5&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return if ($is_business) then $i else ()&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;) &amp;gt;= 5&lt;/span&gt;&lt;/div&gt;</text>
                         </control-36>
                         <date-5-business-days>
                             <label>Date</label>
@@ -387,7 +437,8 @@
                         </date-5-business-days>
 
                         <control-7>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Yes/No selection.&lt;/strong&gt; This formula tells whether the user selected a "Yes" answer using radio buttons.&lt;/div&gt;
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Yes/No selection.&lt;/strong&gt; This formula tells whether the user selected a "Yes" answer using radio buttons.&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
 &lt;div&gt;Here is a technical explanation for the use of the &lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;string()&lt;/span&gt; function:&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
@@ -409,15 +460,18 @@
 &lt;/ul&gt;</text>
                         </control-7>
                         <control-21>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;$yes-no/string() = 'true'&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;$yes-no/string() = 'true'&lt;/span&gt;&lt;/div&gt;</text>
                         </control-21>
                         <control-6>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Age.&lt;/strong&gt; This formula calculates your age based on your birthdate.&lt;/div&gt;
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Age.&lt;/strong&gt; This formula calculates your age based on your birthdate.&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
 &lt;div&gt;This assumes that you turn a certain age on the month and day matching your birthday. For that reason, the formula is trickier than just subtracting years, or subtracting a number of days and then dividing (by 365 or 365.25). These other alternatives will not always produce the correct result!&lt;/div&gt;</text>
                         </control-6>
                         <control-23>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;let $date1        := $birthdate,&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $date2        := current-date(),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $months-days1 := substring(xs:string($date1), 6, 11),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $months-days2 := substring(xs:string($date2), 6, 11)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    if ($months-days2 &amp;gt; $months-days1) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        year-from-date($date2) - year-from-date($date1)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        year-from-date($date2) - year-from-date($date1) - 1&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;let $date1        := $birthdate,&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $date2        := current-date(),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $months-days1 := substring(xs:string($date1), 6, 11),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $months-days2 := substring(xs:string($date2), 6, 11)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    if ($months-days2 &amp;gt; $months-days1) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        year-from-date($date2) - year-from-date($date1)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        year-from-date($date2) - year-from-date($date1) - 1&lt;/span&gt;&lt;/div&gt;</text>
                         </control-23>
 
                         <birthdate>
@@ -429,10 +483,12 @@
                             <hint/>
                         </age>
                         <control-24>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Current date.&lt;/strong&gt; Set the initial value of a date field to the current date.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Current date.&lt;/strong&gt; Set the initial value of a date field to the current date.&lt;/div&gt;</text>
                         </control-24>
                         <control-9>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;current-date()&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;current-date()&lt;/span&gt;&lt;/div&gt;</text>
                         </control-9>
                         <current-date>
                             <label>Current date</label>
@@ -440,10 +496,12 @@
                         </current-date>
 
                         <control-18>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Number of weekdays between two dates.&lt;/strong&gt; This formula counts how many weekdays are between two dates.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Number of weekdays between two dates.&lt;/strong&gt; This formula counts how many weekdays are between two dates.&lt;/div&gt;</text>
                         </control-18>
                         <control-25>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;for&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $start          in $first-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $end            in $second-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $startW         in xs:integer(format-date($start, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $endW           in xs:integer(format-date($end, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $days           in days-from-duration($end - $start),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $daysNoWeekends in $days - (floor($days div 7) * 2)&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    else if ($endW &amp;lt; $startW) then $daysNoWeekends - 2&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    else $daysNoWeekends&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;for&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $start          in $first-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $end            in $second-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $startW         in xs:integer(format-date($start, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $endW           in xs:integer(format-date($end, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $days           in days-from-duration($end - $start),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $daysNoWeekends in $days - (floor($days div 7) * 2)&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    else if ($endW &amp;lt; $startW) then $daysNoWeekends - 2&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    else $daysNoWeekends&lt;/span&gt;&lt;/div&gt;</text>
                         </control-25>
 
                         <first-date>
@@ -460,10 +518,14 @@
                         </week-days>
 
                         <control-5>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;strong&gt;Compare numbers.&lt;/strong&gt; These formulas compare numbers using all the comparison operators.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;strong&gt;Compare numbers.&lt;/strong&gt; These formulas compare numbers using all the comparison operators.&lt;/div&gt;</text>
                         </control-5>
                         <control-22>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 =  $number-2&lt;/span&gt;&lt;/div&gt;
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 =  $number-2&lt;/span&gt;&lt;/div&gt;
 &lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 != $number-2&lt;/span&gt;&lt;/div&gt;
 &lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;gt;  $number-2&lt;br&gt;$number-1 &amp;gt;= $number-2&lt;br&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;lt;  $number-2&lt;/span&gt;&lt;/div&gt;
@@ -537,10 +599,14 @@
                             <help/>
                         </section-4>
                         <control-1>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;strong&gt;Number of hours.&lt;/strong&gt; This formula calculates the number of whole hours between two times.&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;strong&gt;Number of hours.&lt;/strong&gt; This formula calculates the number of whole hours between two times.&lt;/div&gt;</text>
                         </control-1>
                         <control-19>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;hours-from-duration(xs:time($end-time) - xs:time($start-time))&lt;/span&gt;&lt;/div&gt;</text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;hours-from-duration(xs:time($end-time) - xs:time($start-time))&lt;/span&gt;&lt;/div&gt;</text>
                         </control-19>
                         <start-time>
                             <label>Start</label>
@@ -598,24 +664,31 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-3-section" bind="section-3-bind">
                     <xf:label ref="$form-resources/section-3/label"/>
                     <fr:grid id="grid-3-grid" bind="grid-3-bind">
                         <fr:c x="1" y="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-5-control" bind="control-5-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-5-control"
+                                            bind="control-5-bind">
                                 <fr:text ref="$form-resources/control-5/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
 
                         <fr:c x="1" y="2" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-22-control" bind="control-22-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-22-control"
+                                            bind="control-22-bind">
                                 <fr:text ref="$form-resources/control-22/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="3" w="3">
-                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="number-1-control" bind="number-1-bind">
+                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                       xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
+                                       id="number-1-control"
+                                       bind="number-1-bind">
                                 <xf:label ref="$form-resources/number-1/label"/>
                                 <xf:hint ref="$form-resources/number-1/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -624,7 +697,11 @@
                             </fr:number>
                         </fr:c>
                         <fr:c x="4" y="3" w="3">
-                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="number-2-control" bind="number-2-bind">
+                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                       xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
+                                       id="number-2-control"
+                                       bind="number-2-bind">
                                 <xf:label ref="$form-resources/number-2/label"/>
                                 <xf:hint ref="$form-resources/number-2/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -697,19 +774,24 @@
 
                     <fr:grid id="grid-2-grid" bind="grid-2-bind">
                         <fr:c x="1" y="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-7-control" bind="control-7-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-7-control"
+                                            bind="control-7-bind">
                                 <fr:text ref="$form-resources/control-7/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
 
                         <fr:c x="1" y="2" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-21-control" bind="control-21-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-21-control"
+                                            bind="control-21-bind">
                                 <fr:text ref="$form-resources/control-21/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="3" w="3">
-                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="yes-no-control" bind="yes-no-bind">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                            xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                            id="yes-no-control"
+                                            bind="yes-no-bind">
                                 <xf:label ref="$form-resources/yes-no/label"/>
                                 <xf:hint ref="$form-resources/yes-no/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -734,18 +816,22 @@
                     <xf:label ref="$form-resources/section-6/label"/>
                     <fr:grid id="grid-6-grid" bind="grid-6-bind">
                         <fr:c x="1" y="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-12-control" bind="control-12-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-12-control"
+                                            bind="control-12-bind">
                                 <fr:text ref="$form-resources/control-12/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
                         <fr:c x="1" y="2" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-29-control" bind="control-29-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-29-control"
+                                            bind="control-29-bind">
                                 <fr:text ref="$form-resources/control-29/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="3" w="3">
-                            <xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="checkboxes-control" appearance="full" bind="checkboxes-bind">
+                            <xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="checkboxes-control"
+                                       appearance="full"
+                                       bind="checkboxes-bind">
                                 <xf:label ref="$form-resources/checkboxes/label"/>
                                 <xf:hint ref="$form-resources/checkboxes/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -759,7 +845,8 @@
                             </xf:select>
                         </fr:c>
                         <fr:c x="4" y="3" w="3" h="1">
-                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-13-control" bind="control-13-bind">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-13-control"
+                                       bind="control-13-bind">
                                 <xf:label ref="$form-resources/control-13/label"/>
                                 <xf:hint ref="$form-resources/control-13/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -770,17 +857,21 @@
                         <fr:c x="7" y="3" w="3"/>
                         <fr:c x="10" y="3" w="3"/>
                         <fr:c x="1" y="4" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-14-control" bind="control-14-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-14-control"
+                                            bind="control-14-bind">
                                 <fr:text ref="$form-resources/control-14/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="5" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-30-control" bind="control-30-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-30-control"
+                                            bind="control-30-bind">
                                 <fr:text ref="$form-resources/control-30/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="6" w="6">
-                            <xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="checkboxes-max-control" appearance="full" bind="checkboxes-max-bind">
+                            <xf:select xmlns="http://orbeon.org/oxf/xml/form-builder" id="checkboxes-max-control"
+                                       appearance="full"
+                                       bind="checkboxes-max-bind">
                                 <xf:label ref="$form-resources/checkboxes-max/label"/>
                                 <xf:hint ref="$form-resources/checkboxes-max/hint"/>
                                 <xf:alert ref="$form-resources/checkboxes-max/alert" validation="validation-1-validation"/>
@@ -802,18 +893,24 @@
                     <xf:label ref="$form-resources/section-4/label"/>
                     <fr:grid id="grid-4-grid" bind="grid-4-bind">
                         <fr:c x="1" y="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-6-control" bind="control-6-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-6-control"
+                                            bind="control-6-bind">
                                 <fr:text ref="$form-resources/control-6/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
                         <fr:c x="1" y="2" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-23-control" bind="control-23-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-23-control"
+                                            bind="control-23-bind">
                                 <fr:text ref="$form-resources/control-23/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="3" w="3">
-                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="birthdate-control" bind="birthdate-bind">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="birthdate-control"
+                                     bind="birthdate-bind">
                                 <xf:label ref="$form-resources/birthdate/label"/>
                                 <xf:hint ref="$form-resources/birthdate/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -833,19 +930,25 @@
                         <fr:c x="7" y="3" w="3"/>
                         <fr:c x="10" y="3" w="3"/>
                         <fr:c x="1" y="4" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-24-control" bind="control-24-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-24-control"
+                                            bind="control-24-bind">
                                 <fr:text ref="$form-resources/control-24/text" mediatype="text/html"/>
                             </fr:explanation>
 
                         </fr:c>
 
                         <fr:c x="1" y="5" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-9-control" bind="control-9-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-9-control"
+                                            bind="control-9-bind">
                                 <fr:text ref="$form-resources/control-9/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="6" w="3">
-                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="current-date-control" bind="current-date-bind">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="current-date-control"
+                                     bind="current-date-bind">
                                 <xf:label ref="$form-resources/current-date/label"/>
                                 <xf:hint ref="$form-resources/current-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -857,18 +960,24 @@
                         <fr:c x="7" y="6" w="3"/>
                         <fr:c x="10" y="6" w="3"/>
                         <fr:c x="1" y="7" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-18-control" bind="control-18-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-18-control"
+                                            bind="control-18-bind">
                                 <fr:text ref="$form-resources/control-18/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
                         <fr:c x="1" y="8" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-25-control" bind="control-25-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-25-control"
+                                            bind="control-25-bind">
                                 <fr:text ref="$form-resources/control-25/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="9" w="3">
-                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="first-date-control" bind="first-date-bind">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="first-date-control"
+                                     bind="first-date-bind">
                                 <xf:label ref="$form-resources/first-date/label"/>
                                 <xf:hint ref="$form-resources/first-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -877,7 +986,11 @@
                             </fr:date>
                         </fr:c>
                         <fr:c x="4" y="9" w="3" h="1">
-                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="second-date-control" bind="second-date-bind">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="second-date-control"
+                                     bind="second-date-bind">
                                 <xf:label ref="$form-resources/second-date/label"/>
                                 <xf:hint ref="$form-resources/second-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -886,7 +999,8 @@
                             </fr:date>
                         </fr:c>
                         <fr:c x="7" y="9" w="3">
-                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="week-days-control" bind="week-days-bind">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="week-days-control"
+                                       bind="week-days-bind">
                                 <xf:label ref="$form-resources/week-days/label"/>
                                 <xf:hint ref="$form-resources/week-days/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -898,17 +1012,23 @@
 
                         </fr:c>
                         <fr:c x="1" y="10" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-35-control" bind="control-35-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-35-control"
+                                            bind="control-35-bind">
                                 <fr:text ref="$form-resources/control-35/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="11" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-36-control" bind="control-36-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-36-control"
+                                            bind="control-36-bind">
                                 <fr:text ref="$form-resources/control-36/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="12" w="6">
-                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="date-5-business-days-control" bind="date-5-business-days-bind">
+                            <fr:date xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava"
+                                     id="date-5-business-days-control"
+                                     bind="date-5-business-days-bind">
                                 <xf:label ref="$form-resources/date-5-business-days/label"/>
                                 <xf:hint ref="$form-resources/date-5-business-days/hint"/>
                                 <xf:alert ref="$form-resources/date-5-business-days/alert"/>
@@ -922,21 +1042,26 @@
                     <xf:label ref="$form-resources/section-1/label"/>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control" bind="control-1-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control"
+                                            bind="control-1-bind">
                                 <fr:text ref="$form-resources/control-1/text" mediatype="text/html"/>
                             </fr:explanation>
 
 
                             </fr:c>
                         <fr:c x="1" y="2" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-19-control" bind="control-19-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-19-control"
+                                            bind="control-19-bind">
                                 <fr:text ref="$form-resources/control-19/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
 
                         <fr:c x="1" y="3" w="3">
-                            <fr:time xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="start-time-control" bind="start-time-bind">
+                            <fr:time xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava"
+                                     id="start-time-control"
+                                     bind="start-time-bind">
                                 <xf:label ref="$form-resources/start-time/label"/>
                                 <xf:hint ref="$form-resources/start-time/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -945,7 +1070,10 @@
                             </fr:time>
                         </fr:c>
                         <fr:c x="4" y="3" w="3">
-                            <fr:time xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="end-time-control" bind="end-time-bind">
+                            <fr:time xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava"
+                                     id="end-time-control"
+                                     bind="end-time-bind">
                                 <xf:label ref="$form-resources/end-time/label"/>
                                 <xf:hint ref="$form-resources/end-time/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -970,19 +1098,25 @@
 
                         </fr:c>
                         <fr:c x="1" y="4" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-11-control" bind="control-11-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-11-control"
+                                            bind="control-11-bind">
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:text ref="$form-resources/control-11/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="5" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-20-control" bind="control-20-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-20-control"
+                                            bind="control-20-bind">
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:text ref="$form-resources/control-20/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="1" y="6" w="3">
-                            <fr:time xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava" id="current-time-control" bind="current-time-bind">
+                            <fr:time xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava"
+                                     id="current-time-control"
+                                     bind="current-time-bind">
                                 <xf:label ref="$form-resources/current-time/label"/>
                                 <xf:hint ref="$form-resources/current-time/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1002,89 +1136,76 @@
                     <xf:label ref="$form-resources/section-5/label"/>
                     <fr:grid id="grid-5-grid" bind="grid-5-bind">
                         <fr:c x="1" y="1" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-8-control" bind="control-8-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-8-control"
+                                            bind="control-8-bind">
                                 <fr:text ref="$form-resources/control-8/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
 
                         <fr:c x="1" y="2" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-26-control" bind="control-26-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-26-control"
+                                            bind="control-26-bind">
                                 <fr:text ref="$form-resources/control-26/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
-                        <fr:c x="1" y="3" w="3">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="regex-control" bind="regex-bind">
+                        <fr:c x="1" y="3" w="4">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="regex-control"
+                                      bind="regex-bind">
                                 <xf:label ref="$form-resources/regex/label"/>
                                 <xf:hint ref="$form-resources/regex/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
-                        <fr:c x="4" y="3" w="3" h="1">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-10-control" bind="control-10-bind">
+                        <fr:c x="5" y="3" w="4" h="1">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-10-control"
+                                      bind="control-10-bind">
                                 <xf:label ref="$form-resources/control-10/label"/>
                                 <xf:hint ref="$form-resources/control-10/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="3" w="3"/>
-                        <fr:c x="10" y="3" w="3"/>
+                        <fr:c x="9" y="3" w="4"/>
+
                         <fr:c x="1" y="4" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-15-control" bind="control-15-bind">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-15-control"
+                                            bind="control-15-bind">
                                 <fr:text ref="$form-resources/control-15/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
-                        <fr:c x="1" y="5" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-27-control" bind="control-27-bind">
-                                <fr:text ref="$form-resources/control-27/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="1" y="6" w="4">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="lei-control" bind="lei-bind">
+
+                        <fr:c x="1" y="5" w="4">
+                            <fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                    id="lei-control"
+                                    bind="lei-bind">
                                 <xf:label ref="$form-resources/lei/label"/>
-                                <xf:hint ref="$form-resources/lei/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-
-                            </xf:input>
-                        </fr:c><fr:c x="5" y="6" w="2" h="1"/>
-                        <fr:c x="7" y="6" w="4"><fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="lei-builtin-control" bind="lei-builtin-bind">
-                        <xf:label ref="$form-resources/lei-builtin/label"/>
-                        <xf:hint ref="$form-resources/lei-builtin/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:lei></fr:c><fr:c x="11" y="6" w="2" h="1"/>
-                        <fr:c x="1" y="7" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-16-control" bind="control-16-bind">
-                                <fr:text ref="$form-resources/control-16/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="1" y="8" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-28-control" bind="control-28-bind">
-                                <fr:text ref="$form-resources/control-28/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="1" y="9" w="3">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-17-control" bind="control-17-bind">
-                                <xf:label ref="$form-resources/control-17/label"/>
-                                <xf:hint ref="$form-resources/control-17/hint"/>
+                                <xf:hint ref="$form-resources/lei/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:lei>
 
-
-                            </xf:input>
-                        </fr:c><fr:c x="4" y="9" w="3" h="1"/>
-                        <fr:c x="7" y="9" w="3"><fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="isin-builtin-control" bind="isin-builtin-bind">
-                        <xf:label ref="$form-resources/isin-builtin/label"/>
-                        <xf:hint ref="$form-resources/isin-builtin/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:isin></fr:c><fr:c x="10" y="9" w="3" h="1"/>
+                        </fr:c>
+                        <fr:c x="5" y="5" w="4" h="1">
+                            <fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     id="isin-control"
+                                     bind="isin-bind">
+                                <xf:label ref="$form-resources/isin/label"/>
+                                <xf:hint ref="$form-resources/isin/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:isin>
+                        </fr:c>
+                        <fr:c x="9" y="5" w="4">
+                            <fr:iban xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     id="iban-control"
+                                     bind="iban-bind">
+                                <xf:label ref="$form-resources/iban/label"/>
+                                <xf:hint ref="$form-resources/iban/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:iban>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
-
             </fr:body>
         </fr:view>
     </xh:body>

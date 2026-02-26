@@ -119,19 +119,12 @@
                         <grid-5>
                             <control-8/>
                             <control-26/>
-
                             <regex>^[A-Za-z0-9\-_]+$</regex>
                             <control-10>Orbeon</control-10>
                             <control-15/>
-                            <control-27/>
                             <lei>F50EOCWSQFAUVO9Q8Z97</lei>
-                            <lei-builtin>F50EOCWSQFAUVO9Q8Z97</lei-builtin>
-
-                            <control-16/>
-                            <control-28/>
-                            <control-17>US0378331005</control-17>
-                            <isin-builtin>US0378331005</isin-builtin>
-
+                            <isin>US0378331005</isin>
+                            <iban>BE68539007547034</iban>
                         </grid-5>
                     </section-5>
 
@@ -258,23 +251,14 @@
                 <xf:bind id="section-5-bind" ref="section-5" name="section-5">
                     <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
                         <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
-
-
-                        <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
-
-                        <xf:bind id="control-16-bind" ref="control-16" name="control-16"/>
+                        <xf:bind id="control-26-bind" ref="control-26" name="control-26"/>
                         <xf:bind id="regex-bind" ref="regex" name="regex" xxf:whitespace="trim"/>
                         <xf:bind id="control-10-bind" ref="control-10" name="control-10" xxf:whitespace="trim"
                                  constraint="matches(., $regex)"/>
-                        <xf:bind id="control-26-bind" ref="control-26" name="control-26"/>
-                        <xf:bind id="lei-bind" ref="lei" name="lei" xxf:whitespace="trim"
-                                 constraint="let $lei := . return   string-length($lei) = 20 and   xs:decimal(     string-join(       for $code in string-to-codepoints($lei)       return         if ($code &gt;= string-to-codepoints('A') and string-to-codepoints('Z') &gt;= $code) then           (: Letters A-Z :)           xs:string($code - string-to-codepoints('A') + 10)         else if ($code &gt;= string-to-codepoints('0') and string-to-codepoints('9') &gt;= $code) then           (: Digits 0-9 :)           xs:string($code - string-to-codepoints('0'))           (: Unrecognized characters :)         else           '',       ''     )   ) mod 97 = 1"/>
-                        <xf:bind id="control-27-bind" ref="control-27" name="control-27"/>
-                        <xf:bind id="control-17-bind" ref="control-17" name="control-17" xxf:whitespace="trim"
-                                 constraint="let $isin := .&#xA;return&#xA;  (&#xA;    let&#xA;      $without-checksum := substring($isin, 1, 11),&#xA;      $letter-as-numbers-string :=&#xA;        string-join(&#xA;          for $code in string-to-codepoints($without-checksum)&#xA;          return&#xA;            if ($code &gt;= string-to-codepoints('A') and&#xA;                string-to-codepoints('Z') &gt;= $code) then&#xA;              (: Letters A-Z :)&#xA;              string($code - string-to-codepoints('A') + 10)&#xA;            else if ($code &gt;= string-to-codepoints('0') and&#xA;                     string-to-codepoints('9') &gt;= $code) then&#xA;              (: Digits 0-9 :)&#xA;              string($code - string-to-codepoints('0'))&#xA;              (: Unrecognized characters :)&#xA;            else&#xA;              '',&#xA;          ''&#xA;        ),&#xA;      $letter-as-numbers-digits :=&#xA;        for $code in string-to-codepoints($letter-as-numbers-string)&#xA;        return xs:decimal(codepoints-to-string($code)),&#xA;      $reversed-digits :=&#xA;        for $i in 1 to count($letter-as-numbers-digits)&#xA;        return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],&#xA;      $group-1-digits := $reversed-digits[position() mod 2 = 1],&#xA;      $group-2-digits := $reversed-digits[position() mod 2 = 0],&#xA;      $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,&#xA;      $group-1-x2-string := string-join(&#xA;                              for $d in $group-1-x2-decimals&#xA;                              return string($d),&#xA;                              ''&#xA;                            ),&#xA;      $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)&#xA;                            return xs:decimal(codepoints-to-string($code)),&#xA;      $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),&#xA;      $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),&#xA;      $checksum-provided := substring($isin, 12, 1),&#xA;      $proper-checksum := $checksum-computed = $checksum-provided,&#xA;      $proper-length := string-length($isin) = 12&#xA;    return&#xA;      $proper-checksum and $proper-length&#xA;  )"/>
-                        <xf:bind id="control-28-bind" ref="control-28" name="control-28"/>
-                        <xf:bind id="lei-builtin-bind" ref="lei-builtin" name="lei-builtin" type="fr:lei"/>
-                        <xf:bind id="isin-builtin-bind" ref="isin-builtin" name="isin-builtin" type="fr:isin"/>
+                        <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
+                        <xf:bind id="lei-bind" ref="lei" name="lei" type="fr:lei"/>
+                        <xf:bind id="isin-bind" ref="isin" name="isin" type="fr:isin"/>
+                        <xf:bind id="iban-bind" ref="iban" name="iban" type="fr:iban"/>
                     </xf:bind>
                 </xf:bind>
 
@@ -319,6 +303,7 @@
                         <fr:datetime field-width="natural"/>
                         <fr:toc position="left" modes="new edit view pdf tiff test test-pdf" min-sections="1"/>
                     </xbl>
+
                     <email>
                         <templates>
                             <template name="default">
@@ -420,47 +405,20 @@
                         </control-10>
                         <control-15>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a Legal Entity Identifier (LEI).&lt;/strong&gt; This formula validates an &lt;a href="https://en.wikipedia.org/wiki/Legal_Entity_Identifier"&gt;LEI&lt;/a&gt; (Legal Entity Identifier) field.&lt;br&gt;&lt;br&gt;&lt;em&gt;NOTE: Since Orbeon Forms 2024.1.2, Orbeon Forms includes a built-in LEI component which performs this validation out of the box.&lt;/em&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating ISO Financial Identifiers&lt;/strong&gt;&lt;/div&gt;</text>
                         </control-15>
-                        <control-27>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;let $lei := .&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  string-length($lei) = 20 and&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  xs:decimal(&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    string-join(&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      for $code in string-to-codepoints($lei)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        if ($code &amp;gt;= string-to-codepoints('A') and string-to-codepoints('Z') &amp;gt;= $code) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Letters A-Z :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          xs:string($code - string-to-codepoints('A') + 10)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        else if ($code &amp;gt;= string-to-codepoints('0') and string-to-codepoints('9') &amp;gt;= $code) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Digits 0-9 :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          xs:string($code - string-to-codepoints('0'))&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          (: Unrecognized characters :)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;          '',&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;      ''&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    )&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;  ) mod 97 = 1&lt;/span&gt;&lt;/div&gt;</text>
-                        </control-27>
                         <lei>
-                            <label>Legal Entity Identifier (LEI)</label>
-                            <hint/>
-
-
-                        </lei>
-                        <lei-builtin>
                             <label>Builtin LEI form control</label>
                             <hint/>
-                        </lei-builtin>
-
-                        <control-16>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;&lt;strong&gt;Validating an International Securities Identification Number (ISIN).&lt;/strong&gt;&lt;/div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt; &lt;/div&gt;
-&lt;div class="grid-area-1-1 z-[1] mt-[1em]"&gt;This formula validates an &lt;a href="https://en.wikipedia.org/wiki/International_Securities_Identification_Number"&gt;ISIN&lt;/a&gt; (International Securities Identification Number). This shows how a formula can become quite sophisticated.&lt;br&gt;&lt;br&gt;&lt;em&gt;NOTE: Since Orbeon Forms 2024.1.2, Orbeon Forms includes a built-in ISIN component which performs this validation out of the box.&lt;/em&gt;&lt;/div&gt;
-&lt;h2 id="validating-an-international-securities-identification-number-isin" class="text-3xl font-semibold heading group relative grid w-full mx-auto decoration-primary/6 max-w-3xl page-api-block:ml-0"&gt;&lt;/h2&gt;
-&lt;/div&gt;</text>
-                        </control-16>
-                        <control-28>
-                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: #236fa1; font-family: andale mono, monospace;"&gt;let $isin := .&lt;br&gt;return&lt;br&gt;  (&lt;br&gt;    let&lt;br&gt;      $without-checksum := substring($isin, 1, 11),&lt;br&gt;      $letter-as-numbers-string :=&lt;br&gt;        string-join(&lt;br&gt;          for $code in string-to-codepoints($without-checksum)&lt;br&gt;          return&lt;br&gt;            if ($code &amp;gt;= string-to-codepoints('A') and&lt;br&gt;                string-to-codepoints('Z') &amp;gt;= $code) then&lt;br&gt;              (: Letters A-Z :)&lt;br&gt;              string($code - string-to-codepoints('A') + 10)&lt;br&gt;            else if ($code &amp;gt;= string-to-codepoints('0') and&lt;br&gt;                     string-to-codepoints('9') &amp;gt;= $code) then&lt;br&gt;              (: Digits 0-9 :)&lt;br&gt;              string($code - string-to-codepoints('0'))&lt;br&gt;              (: Unrecognized characters :)&lt;br&gt;            else&lt;br&gt;              '',&lt;br&gt;          ''&lt;br&gt;        ),&lt;br&gt;      $letter-as-numbers-digits :=&lt;br&gt;        for $code in string-to-codepoints($letter-as-numbers-string)&lt;br&gt;        return xs:decimal(codepoints-to-string($code)),&lt;br&gt;      $reversed-digits :=&lt;br&gt;        for $i in 1 to count($letter-as-numbers-digits)&lt;br&gt;        return $letter-as-numbers-digits[count($letter-as-numbers-digits) - $i + 1],&lt;br&gt;      $group-1-digits := $reversed-digits[position() mod 2 = 1],&lt;br&gt;      $group-2-digits := $reversed-digits[position() mod 2 = 0],&lt;br&gt;      $group-1-x2-decimals := for $d in $group-1-digits return $d * 2,&lt;br&gt;      $group-1-x2-string := string-join(&lt;br&gt;                              for $d in $group-1-x2-decimals&lt;br&gt;                              return string($d),&lt;br&gt;                              ''&lt;br&gt;                            ),&lt;br&gt;      $group-1-x2-digits := for $code in string-to-codepoints($group-1-x2-string)&lt;br&gt;                            return xs:decimal(codepoints-to-string($code)),&lt;br&gt;      $sum-digits := sum(($group-1-x2-digits, $group-2-digits)),&lt;br&gt;      $checksum-computed := string((10 - ($sum-digits mod 10)) mod 10),&lt;br&gt;      $checksum-provided := substring($isin, 12, 1),&lt;br&gt;      $proper-checksum := $checksum-computed = $checksum-provided,&lt;br&gt;      $proper-length := string-length($isin) = 12&lt;br&gt;    return&lt;br&gt;      $proper-checksum and $proper-length&lt;br&gt;  )&lt;/span&gt;&lt;/div&gt;</text>
-                        </control-28>
-                        <control-17>
-                            <label>ISIN</label>
-                            <hint/>
-
-
-                        </control-17>
-                        <isin-builtin>
+                        </lei>
+                        <isin>
                             <label>Builtin ISIN form control</label>
                             <hint/>
-                        </isin-builtin>
-
+                        </isin>
+                        <iban>
+                            <label>Builtin IBAN form control</label>
+                            <hint/>
+                        </iban>
                         <control-35>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Validating a date is at least 5 business days in the future.&lt;/strong&gt; This formula validates that a date is at least 5 business days (Monday to Friday) in the future.&lt;/div&gt;</text>
@@ -1187,103 +1145,64 @@
                                 <fr:text ref="$form-resources/control-26/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
-                        <fr:c x="1" y="3" w="3">
+                        <fr:c x="1" y="3" w="4">
                             <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="regex-control"
                                       bind="regex-bind">
                                 <xf:label ref="$form-resources/regex/label"/>
                                 <xf:hint ref="$form-resources/regex/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
-                        <fr:c x="4" y="3" w="3" h="1">
+                        <fr:c x="5" y="3" w="4" h="1">
                             <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-10-control"
                                       bind="control-10-bind">
                                 <xf:label ref="$form-resources/control-10/label"/>
                                 <xf:hint ref="$form-resources/control-10/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="3" w="3"/>
-                        <fr:c x="10" y="3" w="3"/>
+                        <fr:c x="9" y="3" w="4"/>
+
                         <fr:c x="1" y="4" w="12">
                             <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-15-control"
                                             bind="control-15-bind">
                                 <fr:text ref="$form-resources/control-15/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
-                        <fr:c x="1" y="5" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-27-control"
-                                            bind="control-27-bind">
-                                <fr:text ref="$form-resources/control-27/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="1" y="6" w="4">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="lei-control" bind="lei-bind">
+
+                        <fr:c x="1" y="5" w="4">
+                            <fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                    id="lei-control"
+                                    bind="lei-bind">
                                 <xf:label ref="$form-resources/lei/label"/>
                                 <xf:hint ref="$form-resources/lei/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-
-                            </xf:input>
-                        </fr:c>
-                        <fr:c x="5" y="6" w="2" h="1"/>
-                        <fr:c x="7" y="6" w="4">
-                            <fr:lei xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                    id="lei-builtin-control"
-                                    bind="lei-builtin-bind">
-                                <xf:label ref="$form-resources/lei-builtin/label"/>
-                                <xf:hint ref="$form-resources/lei-builtin/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </fr:lei>
-                        </fr:c>
-                        <fr:c x="11" y="6" w="2" h="1"/>
-                        <fr:c x="1" y="7" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-16-control"
-                                            bind="control-16-bind">
-                                <fr:text ref="$form-resources/control-16/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="1" y="8" w="12">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-28-control"
-                                            bind="control-28-bind">
-                                <fr:text ref="$form-resources/control-28/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="1" y="9" w="3">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-17-control"
-                                      bind="control-17-bind">
-                                <xf:label ref="$form-resources/control-17/label"/>
-                                <xf:hint ref="$form-resources/control-17/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
-
-                            </xf:input>
                         </fr:c>
-                        <fr:c x="4" y="9" w="3" h="1"/>
-                        <fr:c x="7" y="9" w="3">
+                        <fr:c x="5" y="5" w="4" h="1">
                             <fr:isin xmlns="http://orbeon.org/oxf/xml/form-builder"
                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                     id="isin-builtin-control"
-                                     bind="isin-builtin-bind">
-                                <xf:label ref="$form-resources/isin-builtin/label"/>
-                                <xf:hint ref="$form-resources/isin-builtin/hint"/>
+                                     id="isin-control"
+                                     bind="isin-bind">
+                                <xf:label ref="$form-resources/isin/label"/>
+                                <xf:hint ref="$form-resources/isin/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </fr:isin>
                         </fr:c>
-                        <fr:c x="10" y="9" w="3" h="1"/>
+                        <fr:c x="9" y="5" w="4">
+                            <fr:iban xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     id="iban-control"
+                                     bind="iban-bind">
+                                <xf:label ref="$form-resources/iban/label"/>
+                                <xf:hint ref="$form-resources/iban/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:iban>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
-
             </fr:body>
         </fr:view>
     </xh:body>

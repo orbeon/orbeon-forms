@@ -755,7 +755,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date≡xf-5" class="xforms-help-popover-control input-append fr-field-width-natural fr-native-picker-ios fr-today-highlight-true"/>
+                        <xxf:control id="my-date≡xf-5" class="xforms-help-popover-control input-append date fr-field-width-natural fr-native-picker-ios fr-today-highlight-true"/>
                         <xxf:attribute for="my-date≡input" name="placeholder">MM/DD/YYYY</xxf:attribute>
                         <xxf:attribute for="my-date≡xf-6" name="aria-label"/>
                         <xxf:init id="my-date">

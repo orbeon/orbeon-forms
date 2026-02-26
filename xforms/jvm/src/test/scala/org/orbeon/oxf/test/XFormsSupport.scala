@@ -181,18 +181,19 @@ trait XFormsSupport extends MockitoSugar {
 
   def resolveObjectInsideComponent[T: ClassTag](
     componentStaticOrAbsoluteId: String,
+    componentIndexes           : List[Int] = Nil,
     targetStaticOrAbsoluteId   : String,
-    indexes                    : List[Int] = Nil,
+    targetIndexes              : List[Int] = Nil,
   ): Option[T] = {
 
-    val componentControl = resolveObject[XFormsComponentControl](componentStaticOrAbsoluteId)
+    val componentControl = resolveObject[XFormsComponentControl](componentStaticOrAbsoluteId, indexes = componentIndexes)
     val nestedContainer  = componentControl.get.nestedContainerOpt.get
 
     resolveObject[T](
       sourceEffectiveId  = nestedContainer.findDefaultModel.get.effectiveId,
       container          = nestedContainer,
       staticOrAbsoluteId = targetStaticOrAbsoluteId,
-      indexes            = indexes
+      indexes            = targetIndexes
     )
   }
 

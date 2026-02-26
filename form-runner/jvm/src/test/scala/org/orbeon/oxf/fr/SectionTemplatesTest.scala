@@ -14,7 +14,7 @@ class SectionTemplatesTest
      with FormRunnerSupport
      with XFormsSupport {
 
-  describe("Form with repeated section templates with dependent values") {
+  describe("#7492: form with repeated section templates with dependent values") {
 
     it("must update the top-level and section template controls when the workflow stage changes") {
 
@@ -37,7 +37,7 @@ class SectionTemplatesTest
                 resolveObjectInsideComponent[XFormsValueControl](
                   componentStaticOrAbsoluteId = "my-repeated-workflow-stage-section-content-control",
                   targetStaticOrAbsoluteId    = "current-workflow-stage-control",
-                  indexes                     = List(index)
+                  targetIndexes      = List(index)
                 ).get.getValue(EventCollector.Throw) == workflowStage
               )
           }

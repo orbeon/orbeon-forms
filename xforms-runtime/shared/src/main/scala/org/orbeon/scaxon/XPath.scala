@@ -34,8 +34,9 @@ object XPath {
       namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
       variables       : collection.Map[String, ValueRepresentationType] = null,
       reporter        : Reporter                                        = null,
-      functionContext : FunctionContext                                 = null)(
-      implicit library: FunctionLibrary                                 = null
+      functionContext : FunctionContext                                 = null
+  )(implicit
+    library           : FunctionLibrary                                 = null
   ): om.Item =
     evaluateSingleKeepItems(
       List(item).asJava,
@@ -58,8 +59,9 @@ object XPath {
       namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
       variables       : collection.Map[String, ValueRepresentationType] = null,
       reporter        : Reporter                                        = null,
-      functionContext : FunctionContext                                 = null)(
-      implicit library: FunctionLibrary                                 = null
+      functionContext : FunctionContext                                 = null
+  )(implicit
+    library           : FunctionLibrary                                 = null
   ): collection.Seq[Any] =
     evaluate(item,
       expr,

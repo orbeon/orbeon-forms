@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <issue-7427-s1>
+                        <grid-6>
+                            <s1-in/>
+                            <s1-s1-out/>
+                            <s1-s2-out/>
+                            <s1-s3-out/>
+                            <s1-s4-out/>
+                        </grid-6>
+                    </issue-7427-s1>
+                    <issue-7427-s2>
+                        <grid-6 xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library">
+                            <s2-in/>
+                            <s2-s1-out/>
+                            <s2-s2-out/>
+                            <s2-s3-out/>
+                            <s2-s4-out/>
+                        </grid-6>
+                    </issue-7427-s2>
+                    <issue-7427-s3>
+                        <grid-7 xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library">
+                            <s3-in/>
+                            <s3-s1-out/>
+                            <s3-s2-out/>
+                            <s3-s3-out/>
+                            <s3-s4-out/>
+                        </grid-7>
+                    </issue-7427-s3>
+                    <issue-7427-s4>
+                        <grid-7>
+                            <s4-in/>
+                            <s4-s1-out/>
+                            <s4-s2-out/>
+                            <s4-s3-out/>
+                            <s4-s4-out/>
+                        </grid-7>
+                    </issue-7427-s4>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="issue-7427-s1-bind" ref="issue-7427-s1" name="issue-7427-s1">
+                    <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
+                        <xf:bind id="s1-in-bind" ref="s1-in" name="s1-in" xxf:whitespace="trim"/>
+                        <xf:bind id="s1-s1-out-bind" ref="s1-s1-out" name="s1-s1-out" calculate="fr:control-string-value('s1-in', false(), '')" readonly="false()"/>
+                        <xf:bind id="s1-s2-out-bind" ref="s1-s2-out" name="s1-s2-out" calculate="fr:control-string-value('s2-in', false(), 'issue-7427-s2')" readonly="false()"/>
+                        <xf:bind id="s1-s3-out-bind" ref="s1-s3-out" name="s1-s3-out" calculate="fr:control-string-value('s3-in', false(), 'issue-7427-s3')" readonly="false()"/>
+                        <xf:bind id="s1-s4-out-bind" ref="s1-s4-out" name="s1-s4-out" calculate="fr:control-string-value('s4-in', false(), '')" readonly="false()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="issue-7427-s2-bind" ref="issue-7427-s2" name="issue-7427-s2"/>
+                <xf:bind id="issue-7427-s3-bind" ref="issue-7427-s3" name="issue-7427-s3"/>
+                <xf:bind id="issue-7427-s4-bind" ref="issue-7427-s4" name="issue-7427-s4">
+                    <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
+                        <xf:bind id="s4-in-bind" ref="s4-in" name="s4-in" xxf:whitespace="trim"/>
+                        <xf:bind id="s4-s1-out-bind" ref="s4-s1-out" name="s4-s1-out" calculate="fr:control-string-value('s1-in', false(), '')" readonly="false()"/>
+                        <xf:bind id="s4-s2-out-bind" ref="s4-s2-out" name="s4-s2-out" calculate="fr:control-string-value('s2-in', false(), 'issue-7427-s2')" readonly="false()"/>
+                        <xf:bind id="s4-s3-out-bind" ref="s4-s3-out" name="s4-s3-out" calculate="fr:control-string-value('s3-in', false(), 'issue-7427-s3')" readonly="false()"/>
+                        <xf:bind id="s4-s4-out-bind" ref="s4-s4-out" name="s4-s4-out" calculate="fr:control-string-value('s4-in', false(), '')" readonly="false()"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7427</form-name>
+                    <title xml:lang="en">Section templates: value dependencies #7427</title>
+                    <description xml:lang="en">In this form we have calculated values in different sections, which depend on other sections, either at the top-level or inside section templates. Value
+                        updates must work.
+                    </description>
+
+                    <library-versions>
+                        <orbeon>2</orbeon>
+                        <app>1</app>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">
+                        {"migrations":[{"containerPath":[{"value":"issue-7427-s1"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"s1-in"},{"value":"s1-s1-out"},{"value":"s1-s2-out"},{"value":"s1-s3-out"},{"value":"s1-s4-out"}],"topLevel":true},{"containerPath":[{"value":"issue-7427-s4"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"s4-in"},{"value":"s4-s1-out"},{"value":"s4-s2-out"},{"value":"s4-s3-out"},{"value":"s4-s4-out"}],"topLevel":true},{"containerPath":[{"value":"issue-7427-s2"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"s2-in"},{"value":"s2-s1-out"},{"value":"s2-s2-out"},{"value":"s2-s3-out"},{"value":"s2-s4-out"}],"topLevel":false},{"containerPath":[{"value":"issue-7427-s3"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"s3-in"},{"value":"s3-s1-out"},{"value":"s3-s2-out"},{"value":"s3-s3-out"},{"value":"s3-s4-out"}],"topLevel":false}]}
+                    </migration>
+                </metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <issue-7427-s1><label>#7427: Section 1 (issue-7427-s1)</label></issue-7427-s1>
+                        <issue-7427-s4><label>#7427: Section 4 (issue-7427-s4)</label></issue-7427-s4>
+                        <s4-in><label>s4-in</label>
+                            <hint/>
+                        </s4-in>
+                        <s4-s1-out><label>s4-s1-out</label>
+                            <hint/>
+                        </s4-s1-out>
+                        <s4-s2-out><label>s4-s2-out</label>
+                            <hint/>
+                        </s4-s2-out>
+                        <s4-s3-out><label>s4-s3-out</label>
+                            <hint/>
+                        </s4-s3-out>
+                        <s4-s4-out><label>s4-s4-out</label>
+                            <hint/>
+                        </s4-s4-out>
+                        <issue-7427-s2><label>#7427: Section 2 (issue-7427-s2)</label></issue-7427-s2>
+                        <issue-7427-s3><label>#7427: Section 3 (issue-7427-s3)</label></issue-7427-s3>
+                        <s1-in><label>s1-in</label>
+                            <hint/>
+                        </s1-in>
+                        <s1-s1-out><label>s1-s1-out</label>
+                            <hint/>
+                        </s1-s1-out>
+                        <s1-s2-out><label>s1-s2-out</label>
+                            <hint/>
+                        </s1-s2-out>
+                        <s1-s3-out><label>s1-s3-out</label>
+                            <hint/>
+                        </s1-s3-out>
+                        <s1-s4-out><label>s1-s4-out</label>
+                            <hint/>
+                        </s1-s4-out>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                         xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library" id="issue-issue-7427-s2-component" element="component|issue-7427-s2" data-library-version="1"
+                         class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="issue-7427-s2-model">
+                        <xf:instance id="fr-form-template">
+                            <issue-7427-s2>
+                                <grid-6>
+                                    <s2-in/>
+                                    <s2-s1-out/>
+                                    <s2-s2-out/>
+                                    <s2-s3-out/>
+                                    <s2-s4-out/>
+                                </grid-6>
+                            </issue-7427-s2>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
+                                <xf:bind id="s2-in-bind" ref="s2-in" name="s2-in" xxf:whitespace="trim"/>
+                                <xf:bind id="s2-s1-out-bind" ref="s2-s1-out" name="s2-s1-out" calculate="fr:control-string-value('s1-in', false(), '')" readonly="false()"/>
+                                <xf:bind id="s2-s2-out-bind" ref="s2-s2-out" name="s2-s2-out" calculate="fr:control-string-value('s2-in', false(), 'issue-7427-s2')" readonly="false()"/>
+                                <xf:bind id="s2-s3-out-bind" ref="s2-s3-out" name="s2-s3-out" calculate="fr:control-string-value('s3-in', false(), 'issue-7427-s3')" readonly="false()"/>
+                                <xf:bind id="s2-s4-out-bind" ref="s2-s4-out" name="s2-s4-out" calculate="fr:control-string-value('s4-in', false(), '')" readonly="false()"/>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources" xxf:readonly="true">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <issue-7427-s2><label>#7427: Section 2 (issue-7427-s2)</label></issue-7427-s2>
+                                    <s2-in><label>s2-in</label>
+                                        <hint/>
+                                    </s2-in>
+                                    <s2-s1-out><label>s2-s1-out</label>
+                                        <hint/>
+                                    </s2-s1-out>
+                                    <s2-s2-out><label>s2-s2-out</label>
+                                        <hint/>
+                                    </s2-s2-out>
+                                    <s2-s3-out><label>s2-s3-out</label>
+                                        <hint/>
+                                    </s2-s3-out>
+                                    <s2-s4-out><label>s2-s4-out</label>
+                                        <hint/>
+                                    </s2-s4-out>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                            <metadata>
+                                <email>
+                                    <templates>
+                                        <template name="default">
+                                            <headers/>
+                                            <exclude-from-all-control-values/>
+                                        </template>
+                                    </templates>
+                                    <parameters/>
+                                </email>
+                            </metadata>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:group appearance="xxf:internal" model="issue-7427-s2-model" id="fr-section-template-view">
+                        <fr:grid id="grid-6-grid" bind="grid-6-bind">
+                            <fr:c x="1" y="1" w="5">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="s2-in-control" bind="s2-in-bind">
+                                    <xf:label ref="$form-resources/s2-in/label"/>
+                                    <xf:hint ref="$form-resources/s2-in/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="6" y="1" w="7"/>
+                            <fr:c x="1" y="2" w="3">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s2-s1-out-control" bind="s2-s1-out-bind">
+                                    <xf:label ref="$form-resources/s2-s1-out/label"/>
+                                    <xf:hint ref="$form-resources/s2-s1-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="4" y="2" w="3" h="1">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s2-s2-out-control" bind="s2-s2-out-bind">
+                                    <xf:label ref="$form-resources/s2-s2-out/label"/>
+                                    <xf:hint ref="$form-resources/s2-s2-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="3">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s2-s3-out-control" bind="s2-s3-out-bind">
+                                    <xf:label ref="$form-resources/s2-s3-out/label"/>
+                                    <xf:hint ref="$form-resources/s2-s3-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="10" y="2" w="3" h="1">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s2-s4-out-control" bind="s2-s4-out-bind">
+                                    <xf:label ref="$form-resources/s2-s4-out/label"/>
+                                    <xf:hint ref="$form-resources/s2-s4-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                        </fr:grid>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+            <xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                         xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library" id="issue-issue-7427-s3-component" element="component|issue-7427-s3" data-library-version="1"
+                         class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="issue-7427-s3-model">
+                        <xf:instance id="fr-form-template">
+                            <issue-7427-s3>
+                                <grid-7>
+                                    <s3-in/>
+                                    <s3-s1-out/>
+                                    <s3-s2-out/>
+                                    <s3-s3-out/>
+                                    <s3-s4-out/>
+                                </grid-7>
+                            </issue-7427-s3>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
+                                <xf:bind id="s3-in-bind" ref="s3-in" name="s3-in" xxf:whitespace="trim"/>
+                                <xf:bind id="s3-s1-out-bind" ref="s3-s1-out" name="s3-s1-out" calculate="fr:control-string-value('s1-in', false(), '')" readonly="false()"/>
+                                <xf:bind id="s3-s2-out-bind" ref="s3-s2-out" name="s3-s2-out" calculate="fr:control-string-value('s2-in', false(), 'issue-7427-s2')" readonly="false()"/>
+                                <xf:bind id="s3-s3-out-bind" ref="s3-s3-out" name="s3-s3-out" calculate="fr:control-string-value('s3-in', false(), 'issue-7427-s3')" readonly="false()"/>
+                                <xf:bind id="s3-s4-out-bind" ref="s3-s4-out" name="s3-s4-out" calculate="fr:control-string-value('s4-in', false(), '')" readonly="false()"/>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources" xxf:readonly="true">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <issue-7427-s3><label>#7427: Section 3 (issue-7427-s3)</label></issue-7427-s3>
+                                    <s3-in><label>s3-in</label>
+                                        <hint/>
+                                    </s3-in>
+                                    <s3-s1-out><label>s3-s1-out</label>
+                                        <hint/>
+                                    </s3-s1-out>
+                                    <s3-s2-out><label>s3-s2-out</label>
+                                        <hint/>
+                                    </s3-s2-out>
+                                    <s3-s3-out><label>s3-s3-out</label>
+                                        <hint/>
+                                    </s3-s3-out>
+                                    <s3-s4-out><label>s3-s4-out</label>
+                                        <hint/>
+                                    </s3-s4-out>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                            <metadata>
+                                <email>
+                                    <templates>
+                                        <template name="default">
+                                            <headers/>
+                                            <exclude-from-all-control-values/>
+                                        </template>
+                                    </templates>
+                                    <parameters/>
+                                </email>
+                            </metadata>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:group appearance="xxf:internal" model="issue-7427-s3-model" id="fr-section-template-view">
+                        <fr:grid id="grid-7-grid" bind="grid-7-bind">
+                            <fr:c x="1" y="1" w="5">
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="s3-in-control" bind="s3-in-bind">
+                                    <xf:label ref="$form-resources/s3-in/label"/>
+                                    <xf:hint ref="$form-resources/s3-in/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="6" y="1" w="7"/>
+                            <fr:c x="1" y="2" w="3">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s3-s1-out-control" bind="s3-s1-out-bind">
+                                    <xf:label ref="$form-resources/s3-s1-out/label"/>
+                                    <xf:hint ref="$form-resources/s3-s1-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="4" y="2" w="3" h="1">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s3-s2-out-control" bind="s3-s2-out-bind">
+                                    <xf:label ref="$form-resources/s3-s2-out/label"/>
+                                    <xf:hint ref="$form-resources/s3-s2-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="3">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s3-s3-out-control" bind="s3-s3-out-bind">
+                                    <xf:label ref="$form-resources/s3-s3-out/label"/>
+                                    <xf:hint ref="$form-resources/s3-s3-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="10" y="2" w="3" h="1">
+                                <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s3-s4-out-control" bind="s3-s4-out-bind">
+                                    <xf:label ref="$form-resources/s3-s4-out/label"/>
+                                    <xf:hint ref="$form-resources/s3-s4-out/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:output>
+                            </fr:c>
+                        </fr:grid>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="issue-7427-s1-section" bind="issue-7427-s1-bind">
+                    <xf:label ref="$form-resources/issue-7427-s1/label"/>
+                    <fr:grid id="grid-6-grid" bind="grid-6-bind">
+                        <fr:c x="1" y="1" w="5">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="s1-in-control" bind="s1-in-bind">
+                                <xf:label ref="$form-resources/s1-in/label"/>
+                                <xf:hint ref="$form-resources/s1-in/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="6" y="1" w="7"/>
+                        <fr:c x="1" y="2" w="3">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s1-s1-out-control" bind="s1-s1-out-bind">
+                                <xf:label ref="$form-resources/s1-s1-out/label"/>
+                                <xf:hint ref="$form-resources/s1-s1-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s1-s2-out-control" bind="s1-s2-out-bind">
+                                <xf:label ref="$form-resources/s1-s2-out/label"/>
+                                <xf:hint ref="$form-resources/s1-s2-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s1-s3-out-control" bind="s1-s3-out-bind">
+                                <xf:label ref="$form-resources/s1-s3-out/label"/>
+                                <xf:hint ref="$form-resources/s1-s3-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s1-s4-out-control" bind="s1-s4-out-bind">
+                                <xf:label ref="$form-resources/s1-s4-out/label"/>
+                                <xf:hint ref="$form-resources/s1-s4-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="issue-7427-s2-section" bind="issue-7427-s2-bind">
+                    <xf:label ref="$form-resources/issue-7427-s2/label"/>
+                    <component:issue-7427-s2 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                             xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library"
+                                             id="issue-7427-s2-content-control" bind="issue-7427-s2-content-bind"/>
+                </fr:section>
+                <fr:section id="issue-7427-s3-section" bind="issue-7427-s3-bind">
+                    <xf:label ref="$form-resources/issue-7427-s3/label"/>
+                    <component:issue-7427-s3 xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                             xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library"
+                                             id="issue-7427-s3-content-control"/>
+                </fr:section>
+                <fr:section id="issue-7427-s4-section" bind="issue-7427-s4-bind">
+                    <xf:label ref="$form-resources/issue-7427-s4/label"/>
+                    <fr:grid id="grid-7-grid" bind="grid-7-bind">
+                        <fr:c x="1" y="1" w="5">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="s4-in-control" bind="s4-in-bind">
+                                <xf:label ref="$form-resources/s4-in/label"/>
+                                <xf:hint ref="$form-resources/s4-in/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="6" y="1" w="7"/>
+                        <fr:c x="1" y="2" w="3">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s4-s1-out-control" bind="s4-s1-out-bind">
+                                <xf:label ref="$form-resources/s4-s1-out/label"/>
+                                <xf:hint ref="$form-resources/s4-s1-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s4-s2-out-control" bind="s4-s2-out-bind">
+                                <xf:label ref="$form-resources/s4-s2-out/label"/>
+                                <xf:hint ref="$form-resources/s4-s2-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s4-s3-out-control" bind="s4-s3-out-bind">
+                                <xf:label ref="$form-resources/s4-s3-out/label"/>
+                                <xf:hint ref="$form-resources/s4-s3-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3" h="1">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="s4-s4-out-control" bind="s4-s4-out-bind">
+                                <xf:label ref="$form-resources/s4-s4-out/label"/>
+                                <xf:hint ref="$form-resources/s4-s4-out/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

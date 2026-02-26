@@ -20,11 +20,11 @@ import scala.util.chaining.*
 
 object PathMapSupport {
 
-  // xxx TODO: share with other uses
   def addAbsoluteInstancePath(
     pathMap           : PathMap,
     instancePrefixedId: String,
-    path              : Iterable[QName]
+    path              : Iterable[QName],
+    isAttribute       : Boolean
   )(implicit
     exprContainer     : Container
   ): Unit = {
@@ -43,16 +43,23 @@ object PathMapSupport {
 
     val pool = StaticXPath.GlobalNamePool
 
-    path.foreach { pathElemQName =>
-      target =
+    val pathLength = path.size
+
+    path.zipWithIndex.foreach { case (pathElemQName, index) =>
+
+      val useAttribute = isAttribute && index == pathLength - 1
+
+      val axisExpression =
         new AxisExpression(
-          Axis.CHILD,
+          if (useAttribute) Axis.ATTRIBUTE else Axis.CHILD,
           new NameTest(
-            Type.ELEMENT,
+            if (useAttribute) Type.ATTRIBUTE else Type.ELEMENT,
             pool.allocate(pathElemQName.namespace.prefix, pathElemQName.namespace.uri, pathElemQName.localName),
             pool
           )
-        ).addToPathMap(pathMap, target)
+        )
+
+      target = axisExpression.addToPathMap(pathMap, target)
     }
 
     target.setAtomized()

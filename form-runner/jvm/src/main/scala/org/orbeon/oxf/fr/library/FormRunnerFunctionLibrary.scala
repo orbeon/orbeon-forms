@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
-import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsInstance}
+import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
@@ -410,7 +410,8 @@ private object FormRunnerFunctions {
               PathMapSupport.addAbsoluteInstancePath(
                 pathMap,
                 instancePrefixedId,
-                path
+                path,
+                isAttribute = false
               )
             case None =>
               // If we cannot determine the dependency, we conservatively invalidate
@@ -824,29 +825,14 @@ class FRWorkflowStageValue extends FunctionSupport with RuntimeDependentFunction
     pathMapNodeSet : PathMapNodeSet
   ): PathMapNodeSet = {
 
-    // TODO: reduce duplication with other place
-    def newInstanceExpression: XXFormsInstance = {
-      val instanceExpression = new XXFormsInstance // Use `XXFormsInstance` so that we'll search ancestor models for dependencies
+    implicit val exprContainer: Container            = getContainer
 
-      instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
-      instanceExpression.setArguments(Array(new StringLiteral("fr-document-metadata")))
-
-      instanceExpression.setContainer(getContainer)
-
-      instanceExpression
-    }
-
-    locally {
-      new AxisExpression(
-        Axis.ATTRIBUTE,
-        new NameTest(Type.ATTRIBUTE, "", Names.WorkflowStage, getExecutable.getConfiguration.getNamePool)
-      )
-      .addToPathMap(
-        pathMap,
-        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
-      )
-      .setAtomized()
-    }
+    PathMapSupport.addAbsoluteInstancePath(
+      pathMap            = pathMap,
+      instancePrefixedId = "fr-document-metadata",
+      path               = List(QName("workflow-stage")),
+      isAttribute        = true
+    )
 
     null
   }

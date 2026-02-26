@@ -42,6 +42,10 @@ trait PersistenceApiTrait {
   val PageSizeParam         = "page-size"
   val PageNumberParam       = "page-number"
 
+  def isForceDelete(request: Request, alsoMatchHead: Boolean): Boolean =
+    (request.getMethod == HttpMethod.DELETE || alsoMatchHead && request.getMethod == HttpMethod.HEAD) &&
+      request.getFirstParamAsString(ForceDeleteParam).flatMap(_.trimAllToOpt).contains(true.toString)
+
   val SearchPageSize = 100
 
   case class DataDetails(

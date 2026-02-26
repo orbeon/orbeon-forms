@@ -152,9 +152,7 @@ object CRUDRoute
         val filenameOpt     = if (filename == DataXml) None else Some(filename)
         val lastModifiedOpt = httpRequest.getFirstParamAsString(PersistenceApi.LastModifiedTimeParam).flatMap(_.trimAllToOpt).map(Instant.parse)
 
-        val forceDelete =
-          (httpRequest.getMethod == HttpMethod.DELETE || httpRequest.getMethod == HttpMethod.HEAD) &&
-            httpRequest.getFirstParamAsString(PersistenceApi.ForceDeleteParam).flatMap(_.trimAllToOpt).contains(true.toString)
+        val forceDelete = PersistenceApi.isForceDelete(httpRequest, alsoMatchHead = true)
 
         // Only validate forceDelete for DELETE requests, not HEAD (i.e. calls to connectToObtainHeadersAndCheckPreconditions from proxy)
         if (httpRequest.getMethod == HttpMethod.DELETE && forceDelete && (

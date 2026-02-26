@@ -371,8 +371,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
                 )
 
               val responseHeadersForPermissionsOpt =
-                if (isAttachment) {
-                  // Always use username/groupname from data.xml to determine permissions on attachments
+                if (isAttachment && ! PersistenceApi.isForceDelete(request, alsoMatchHead = false)) {
+                  // Always use username/groupname from data.xml to determine permissions on attachments if not force-deleting
                   val dataXmlPath = path.substring(0, path.lastIndexOf('/') + 1) + DataXml
                   val dataXmlServiceUri = buildServiceUri(dataXmlPath)
                   val dataResult = connectToObtainHeadersAndCheckPreconditions(

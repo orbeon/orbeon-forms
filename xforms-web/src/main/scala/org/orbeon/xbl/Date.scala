@@ -59,8 +59,9 @@ object Date {
     private object EventSupport           extends EventListenerSupport
     private object DatePickerEventSupport extends EventListenerSupport
 
-    private var visibleInputElemOpt: Option[html.Input] = None
-    private var datePickerOpt: Option[DatePicker] = None
+    private var visibleInputElemOpt : Option[html.Input] = None
+    private var datePickerOpt       : Option[DatePicker] = None
+    private var datePickerShown     : Boolean            = false
 
     override def init(): Unit = {
 
@@ -260,12 +261,15 @@ object Date {
         // Register listeners
 
         // DOM listeners
-        DatePickerEventSupport.addListener(containerElem.querySelector(".add-on, .input-group .input-group-addon"), DomEventNames.KeyDown,  onIconKeypress)
+        val addOnElem = containerElem.querySelector(".add-on, .input-group .input-group-addon")
+        DatePickerEventSupport.addListener(addOnElem, DomEventNames.KeyDown, onIconKeypress)
 
         // Date picker listeners
         enableDatePickerChangeListener(datePicker)
-        datePicker.onHide(() => { visibleInputElem.focus() }) // Set focus back on field when done with the picker
-        datePicker.onShow(() => { visibleInputElem.focus() }) // For date picker to be usable with the keyboard
+        datePicker.onShow(() => { datePickerShown = true })
+        datePicker.onHide(() => { datePickerShown = false
+                                  // Set focus back on field when done with the picker
+                                  visibleInputElem.focus() })
 
         // Global language listener
         Language.onLangChange(
@@ -349,12 +353,20 @@ object Date {
 //            datePicker.clearDates()
 //        }
 
-      private def onIconKeypress(event: dom.KeyboardEvent): Unit =
-        if (event.key == " " || event.key == "Enter") {
-          event.preventDefault()
-          event.stopPropagation() // Prevent Enter from also selecting the current date and closing the date picker
-          datePickerOpt.foreach(_.showDatepicker())
+      private def onIconKeypress(event: dom.KeyboardEvent): Unit = {
+        if (! datePickerShown) {
+          // Enter or Space open the date picker.
+          if (event.key == " " || event.key == "Enter") {
+            event.preventDefault()
+            event.stopPropagation() // Prevent Enter from also selecting the current date and closing the date picker
+            datePickerOpt.foreach(_.showDatepicker())
+          }
+        } else {
+          // When the date picker is open, forward keypresses to bootstrap-datepicker,
+          // so users can navigate the date picker with the keyboard.
+          datePickerOpt.foreach(_.data("datepicker").get.asInstanceOf[js.Dynamic].keydown(event))
         }
+      }
     }
   }
 }

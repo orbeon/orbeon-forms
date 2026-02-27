@@ -44,7 +44,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import java.io.ByteArrayInputStream
 import java.nio.file.{Files, Path, Paths}
 import scala.jdk.CollectionConverters.*
-import scala.util.Random
+import scala.util.{Random, Using}
 
 
 /**
@@ -93,30 +93,21 @@ class RestApiTest
   private lazy val filesystemBasePath = Paths.get(providerProperty(provider = "filesystem", "base-path", defaultOpt = None))
   private lazy val s3BasePath         =           providerProperty(provider = "s3",         "base-path", defaultOpt = None)
 
-  private var directoryToCleanAfterTest: Option[Path] = None
-
-  private def filesystemInit(): Unit = {
-    // Create the attachments base directory if needed, assuming that its parent directory exists;
-    // if it already exists, clean its contents so stale files from previous test runs don't interfere
+  private def filesystemInit(): Unit =
     if (Files.exists(filesystemBasePath)) {
-      Files.walk(filesystemBasePath)
-        .sorted(java.util.Comparator.reverseOrder())
-        .filter(p => p != filesystemBasePath)
-        .forEach(Files.delete(_))
+      val isEmpty = Using.resource(Files.list(filesystemBasePath))(_.findFirst().isEmpty)
+      if (! isEmpty) {
+        // Don't delete existing non-empty directory. Instead, rename it adding a `.n` suffix.
+        val backupPath = Iterator.from(1)
+          .map(i => filesystemBasePath.resolveSibling(filesystemBasePath.getFileName.toString + s".$i"))
+          .find(p => ! Files.exists(p))
+          .get
+        Files.move(filesystemBasePath, backupPath)
+        Files.createDirectory(filesystemBasePath)
+      }
     } else {
       Files.createDirectory(filesystemBasePath)
     }
-    directoryToCleanAfterTest = Some(filesystemBasePath)
-  }
-
-  private def filesystemCleanup(): Unit = {
-    // Delete the base directory after the test
-    directoryToCleanAfterTest.foreach { directory =>
-      // Delete all subdirectories and files in reverse order, so that children are deleted before parents
-      Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))
-    }
-    directoryToCleanAfterTest = None
-  }
 
   private def buildFormDefinition(
     provider    : Provider,
@@ -654,11 +645,7 @@ class RestApiTest
         assert(actualSizes == expectedSizes)
       }
 
-      try {
-        basicOperationsWithForm(formName = FilesystemAttachmentsFormName, preTest = filesystemInit, postTest = postTest)
-      } finally {
-        filesystemCleanup()
-      }
+      basicOperationsWithForm(formName = FilesystemAttachmentsFormName, preTest = filesystemInit, postTest = postTest)
     }
 
     it("must pass basic operations (S3 attachments) (#6948)", S3Tag) {
@@ -762,8 +749,7 @@ class RestApiTest
     def draftDeletionWithForm(
       formName: String,
       provider: String,
-      init    : () => Unit = () => (),
-      cleanup : () => Unit = () => ()
+      init    : () => Unit = () => ()
     ): Unit =
       withTestSafeRequestContext { implicit safeRequestCtx =>
         Connect.withOrbeonTables(s"drafts deletion with $provider attachments provider") { (_, provider) =>
@@ -772,52 +758,47 @@ class RestApiTest
 
           init()
 
-          try {
-            createForm(provider, formName)
+          createForm(provider, formName)
 
-            val baseURL = HttpCall.crudURLPrefix(provider, formName)
+          val baseURL = HttpCall.crudURLPrefix(provider, formName)
 
-            val draftData    = HttpCall.XML(<draft_data/>.toDocument)
-            val nonDraftData = HttpCall.XML(<non_draft_data/>.toDocument)
-            val draftAttach  = HttpCall.XML(<draft_attachment/>.toDocument)
+          val draftData    = HttpCall.XML(<draft_data/>.toDocument)
+          val nonDraftData = HttpCall.XML(<non_draft_data/>.toDocument)
+          val draftAttach  = HttpCall.XML(<draft_attachment/>.toDocument)
 
-            val draftURL       = baseURL + "draft/123/data.xml"
-            val dataURL        = baseURL + "data/123/data.xml"
-            val draftAttachURL = baseURL + "draft/123/attach.xml"
+          val draftURL       = baseURL + "draft/123/data.xml"
+          val dataURL        = baseURL + "data/123/data.xml"
+          val draftAttachURL = baseURL + "draft/123/attach.xml"
 
-            // Add draft data and attachment
-            HttpAssert.put(draftURL, version, draftData, StatusCode.Created)
-            HttpAssert.put(draftAttachURL, version, draftAttach, StatusCode.Created)
+          // Add draft data and attachment
+          HttpAssert.put(draftURL, version, draftData, StatusCode.Created)
+          HttpAssert.put(draftAttachURL, version, draftAttach, StatusCode.Created)
 
-            // Draft data and attachment exist
-            HttpAssert.get(draftURL, version, HttpAssert.ExpectedBody(draftData, AnyOperation, Some(version.version)))
-            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedBody(draftAttach, AnyOperation, Some(version.version)))
+          // Draft data and attachment exist
+          HttpAssert.get(draftURL, version, HttpAssert.ExpectedBody(draftData, AnyOperation, Some(version.version)))
+          HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedBody(draftAttach, AnyOperation, Some(version.version)))
 
-            // Delete draft data
-            HttpAssert.del(draftURL, version, StatusCode.NoContent)
+          // Delete draft data
+          HttpAssert.del(draftURL, version, StatusCode.NoContent)
 
-            // Draft data and attachment don't exist anymore (explicit draft data deletion)
-            HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
-            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+          // Draft data and attachment don't exist anymore (explicit draft data deletion)
+          HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+          HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
 
-            // Add back draft data and attachment
-            HttpAssert.put(draftURL, version, nonDraftData, StatusCode.Created)
-            HttpAssert.put(draftAttachURL, version, draftAttach, StatusCode.Created)
+          // Add back draft data and attachment
+          HttpAssert.put(draftURL, version, nonDraftData, StatusCode.Created)
+          HttpAssert.put(draftAttachURL, version, draftAttach, StatusCode.Created)
 
-            // Draft data and attachment exist again
-            HttpAssert.get(draftURL, version, HttpAssert.ExpectedBody(nonDraftData, AnyOperation, Some(version.version)))
-            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedBody(draftAttach, AnyOperation, Some(version.version)))
+          // Draft data and attachment exist again
+          HttpAssert.get(draftURL, version, HttpAssert.ExpectedBody(nonDraftData, AnyOperation, Some(version.version)))
+          HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedBody(draftAttach, AnyOperation, Some(version.version)))
 
-            // Add non-draft data
-            HttpAssert.put(dataURL, version, nonDraftData, StatusCode.Created)
+          // Add non-draft data
+          HttpAssert.put(dataURL, version, nonDraftData, StatusCode.Created)
 
-            // Draft data and attachment don't exist anymore (deletion triggered by non-draft data being added)
-            HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
-            HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
-
-          } finally {
-            cleanup()
-          }
+          // Draft data and attachment don't exist anymore (deletion triggered by non-draft data being added)
+          HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+          HttpAssert.get(draftAttachURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
         }
       }
 
@@ -825,8 +806,7 @@ class RestApiTest
       draftDeletionWithForm(
         formName = FilesystemAttachmentsFormName,
         provider = "filesystem",
-        init     = filesystemInit,
-        cleanup  = filesystemCleanup
+        init     = filesystemInit
       )
     }
 

@@ -556,7 +556,7 @@ object Connection extends ConnectionTrait {
               def replacePassword(s: String) = {
                 val colonIndex = s.indexOf(':')
                 if (colonIndex != -1)
-                  s.substring(0, colonIndex + 1) + PropertySet.PasswordPlaceholder
+                  s.substring(0, colonIndex + 1) + Headers.PasswordPlaceholder
                 else
                   s
               }
@@ -579,7 +579,7 @@ object Connection extends ConnectionTrait {
                   "client"        -> (if (client == InternalHttpClient) "internal" else "Apache"),
                   "effective URL" -> effectiveConnectionUriNoPassword.toString,
                   "method"        -> method.entryName
-                ) ++ cleanCapitalizedHeaders.view.mapValues(_ mkString ",")
+                ) ++ sanitizeHeadersForDebug(cleanCapitalizedHeaders)
               )
             }
 

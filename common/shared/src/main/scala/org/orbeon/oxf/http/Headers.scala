@@ -18,9 +18,12 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.NumericUtils
 
 import java.net.URLEncoder
+import scala.util.matching.Regex
 
 
 object Headers {
+
+  val PasswordPlaceholder: String = "*" * 8
 
   val OrbeonToken                  = "Orbeon-Token"
   val OrbeonUsername               = "Orbeon-Username"
@@ -43,6 +46,7 @@ object Headers {
   val ContentLength                = "Content-Length"
   val LastModified                 = "Last-Modified"
   val Authorization                = "Authorization"
+  val ProxyAuthorization           = "Proxy-Authorization"
   val Location                     = "Location"
   val OrbeonClient                 = "Orbeon-Client"
   val Created                      = "Created"
@@ -88,6 +92,8 @@ object Headers {
     JavaScriptApiEmbeddingClient,
     AppEmbeddingClient
   )
+
+  val AuthRegex: Regex =  """(?i)^(\S+)\s+(.*)$""".r
 
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //
@@ -145,6 +151,24 @@ object Headers {
       if (values ne null) && values.nonEmpty
     } yield
       name -> values
+
+  def sanitizeHeadersForDebug[T[_] <: AnyRef](
+    headers : Iterable[(String, T[String])]
+  )(implicit
+    _conv   : ConvertibleToSeq[T, String]
+  ): Iterable[(String, String)] =
+    headers.map {
+      case (name @ (Authorization | ProxyAuthorization), values) =>
+        name ->
+          values
+            .map {
+              case AuthRegex(scheme, _) => s"$scheme $PasswordPlaceholder"
+              case _                    => PasswordPlaceholder
+            }
+            .mkString(",")
+      case (name, values)=>
+        name -> values.mkString(",")
+    }
 
   // Capitalize any header
   def capitalizeCommonOrSplitHeader(name: String): String =

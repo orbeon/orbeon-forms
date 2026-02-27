@@ -16,6 +16,7 @@ package org.orbeon.oxf.properties
 import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.PropertySet.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
@@ -63,8 +64,6 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String], 
 object PropertySet {
 
   import Private.*
-
-  val PasswordPlaceholder = "xxxxxxxx"
 
   val StarToken = "*"
 
@@ -241,7 +240,7 @@ trait PropertySetFunctions extends PropertySetGetters {
       for {
         (name, prop) <- propertiesByName.toList.sortBy(_._1)
         propType     = prop.typ.toString
-        propValue    = if (name.toLowerCase.contains("password")) PasswordPlaceholder else prop.stringValue
+        propValue    = if (name.toLowerCase.contains("password")) Headers.PasswordPlaceholder else prop.stringValue
       } yield
           s"""|  "$name": {
               |    "type": "${propType.escapeJavaScript}",

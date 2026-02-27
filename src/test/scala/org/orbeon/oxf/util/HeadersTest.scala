@@ -56,4 +56,30 @@ class HeadersTest extends AnyFunSpec {
       assert(lists == proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))
     }
   }
+
+  describe("Sanitize authentication headers for debug") {
+    it("must sanitize sensitive headers and keep others") {
+
+      val originalHeaders = List(
+        "Authorization"       -> List("Bearer abc", "Basic def", "Digest ghi", "Custom jkl", "NoSchemeAuth"),
+        "Cookie"              -> List("session=xyz"),
+        "Set-Cookie"          -> List("id=123; HttpOnly"),
+        "Proxy-Authorization" -> List("Basic def"),
+        "Content-Type"        -> List("application/json"),
+        "User-Agent"          -> List("test-client")
+      )
+
+      val sanitizedHeaders = List(
+        "Authorization"       -> "Bearer ********,Basic ********,Digest ********,Custom ********,********",
+        "Cookie"              -> "session=xyz",
+        "Set-Cookie"          -> "id=123; HttpOnly",
+        "Proxy-Authorization" -> "Basic ********",
+        "Content-Type"        -> "application/json",
+        "User-Agent"          -> "test-client"
+      )
+
+
+      assert(sanitizedHeaders == sanitizeHeadersForDebug(originalHeaders))
+    }
+  }
 }

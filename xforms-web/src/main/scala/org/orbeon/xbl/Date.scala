@@ -271,7 +271,7 @@ object Date {
         Language.onLangChange(
           listenerId = containerElem.id,
           listener   = { _ =>
-            destroy()
+            destroyDatePicker()
             createDatePicker(visibleInputElem, stateOpt)
           }
         )

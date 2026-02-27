@@ -126,8 +126,10 @@ trait ClientTestSupport {
         val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
         assert(sessionCookie.isSuccess)
 
-        val window =
-          FormRunnerWindow(await(loadDocumentViaJSDOM(s"/fr/$app/$form/new", OrbeonServerUrl, sessionCookie.toOption)))
+        val domWindow =
+          await(loadDocumentViaJSDOM(s"/fr/$app/$form/new", OrbeonServerUrl, sessionCookie.toOption))
+
+        val window = FormRunnerWindow(domWindow)
 
         // Wait until there is a form returned by the API
         await {
@@ -136,7 +138,9 @@ trait ClientTestSupport {
           }
         }
 
-        await(body(window))
+        (domWindow, window)
+      }.flatMap { case (domWindow, window) =>
+        body(window).andThen { case _ => domWindow.close() }
       }
     }
 

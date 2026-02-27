@@ -286,6 +286,11 @@
         select="doc('input:form-runner-config')/*/view-appearance"/>
 
     <xsl:variable
+        name="use-wizard-in-new-edit"
+        as="xs:boolean"
+        select="exists(doc('input:form-runner-config')/*/use-wizard-in-new-edit[. = 'true'])"/>
+
+    <xsl:variable
         name="wizard-mode"
         as="xs:string"
         select="

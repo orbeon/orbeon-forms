@@ -36,6 +36,23 @@
 
         <xsl:variable name="bind-id-opt" as="xs:string?" select="@bind"/>
 
+        <xsl:variable name="page-size-opt"                        as="xs:integer?" select="xs:integer(@page-size[. castable as xs:integer])"/>
+
+        <xsl:variable name="use-wizard-repeat-paging-in-new-edit" as="xs:boolean"  select="$use-wizard-in-new-edit and frf:isRepeat(.) and $page-size-opt = 1 and not(@wizard-paging = 'false')"/>
+        <xsl:variable name="use-wizard-repeat-paging"             as="xs:boolean"  select="$view-appearance-opt = 'fr:wizard' and $use-wizard-repeat-paging-in-new-edit"/>
+
+        <xsl:variable
+            name="use-pager"
+            as="xs:boolean"
+            select="
+                frf:isRepeat(.)        and                     (: must be a repeat        :)
+                exists($page-size-opt) and                     (: must have a page size   :)
+                not($is-pdf-mode)      and                     (: never in PDF mode       :)
+                not(@standalone-paging = 'false') and (        (: not explicitly disabled :)
+                    @standalone-paging = 'true' or             (: explicitly enabled      :)
+                    not($use-wizard-repeat-paging-in-new-edit) (: disabled by default in all modes for backward compatibility if we use the wizard paging in new/edit :)
+                )"/>
+
         <xsl:copy>
             <xsl:if test="frf:isRepeat(.) and empty(@iteration-name) and exists($bind-id-opt)">
                 <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">
@@ -80,10 +97,6 @@
             <xsl:if test="$sync-actions/@right = frf:controlNameFromId(@id)">
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
-
-            <xsl:variable name="page-size-opt"            as="xs:integer?" select="xs:integer(@page-size[. castable as xs:integer])"/>
-            <xsl:variable name="use-wizard-repeat-paging" as="xs:boolean"  select="$view-appearance-opt = 'fr:wizard' and $page-size-opt = 1 and not(@wizard-paging = 'false')"/>
-            <xsl:variable name="use-pager"                as="xs:boolean"  select="exists($page-size-opt) and not($is-pdf-mode) and not($use-wizard-repeat-paging)"/>
 
             <xsl:if test="$use-wizard-repeat-paging">
                 <xsl:copy-of select="@page-size"/>

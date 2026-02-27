@@ -210,6 +210,8 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
                 element("mode-namespace-uri-opt", text = v.namespace.uri)
               }
 
+            element("use-wizard-in-new-edit", text = formRunnerConfig.useWizardInNewEdit.toString)
+
             element("is-pdf",              text = formRunnerConfig.isPdf.toString)
             element("is-readonly-mode",    text = formRunnerConfig.isReadonlyMode.toString)
             element("use-pdf-template",    text = formRunnerConfig.usePdfTemplate.toString)
@@ -293,6 +295,7 @@ private object FormRunnerConfigProcessor {
     formVersion                     : Int,
     majorMode                       : String,
     viewAppearanceOpt               : Option[QName],
+    useWizardInNewEdit              : Boolean,
     isPdf                           : Boolean,
     isReadonlyMode                  : Boolean,
     usePdfTemplate                  : Boolean,
@@ -392,7 +395,7 @@ private object FormRunnerConfigProcessor {
       updatedParams.mode == "view" && ! isFormBuilder ||
       isPdf                        && ! usePdfTemplate
 
-    val viewAppearanceOpt = {
+    val (viewAppearanceOpt, useWizardInNewEdit) = {
 
       def isImportPage =
         updatedParams.mode == "import" && ! isService
@@ -400,11 +403,11 @@ private object FormRunnerConfigProcessor {
       val modeQName =
         FormRunner.modeQName(updatedParams.app, updatedParams.form, updatedParams.mode)
 
-      val viewAppearance: QName =
+      val viewAppearanceFromMode =
         modeQName.namespace.uri.nonAllBlank.option(modeQName)               // if the mode is namespaced, use that, as it is an explicit custom mode
-          .orElse(isImportPage.option(WizardQName))                         // else if we are the `import` page, use the wizard
-          .orElse(metadata.useFormulaDebugger.option(FormulaDebuggerQName)) // else if formula debugger is on, use that
-          .orElse(metadata.useWizard.contains(true).option(WizardQName))    // else if wizard is explicitly enabled in metadata, use that (including `import` page)
+
+      val viewAppearanceFromWizardConfig =
+        metadata.useWizard.contains(true).option(WizardQName)               // if wizard is explicitly enabled in metadata, use that (including `import` page)
           .orElse(metadata.useWizard.contains(false).option(FullQName))     // else if wizard is explicitly disabled in metadata, use the full mode
           .orElse {                                                         // else use mode from property
             FormRunner.formRunnerQNameProperty("oxf.fr.detail.view.appearance")(updatedParams)
@@ -414,6 +417,12 @@ private object FormRunnerConfigProcessor {
               }
           }
           .getOrElse(FullQName)
+
+      val viewAppearance: QName =
+        viewAppearanceFromMode                                              // if the mode is namespaced, use that, as it is an explicit custom mode
+          .orElse(isImportPage.option(WizardQName))                         // else if we are the `import` page, use the wizard
+          .orElse(metadata.useFormulaDebugger.option(FormulaDebuggerQName)) // else if formula debugger is on, use that
+          .getOrElse(viewAppearanceFromWizardConfig)                        // wizard config
 
       val useViewAppearance =
         modeQName.namespace.uri.nonAllBlank                             ||  // the mode is namespaced so use that, as it is an explicit custom mode
@@ -425,7 +434,7 @@ private object FormRunnerConfigProcessor {
           // TODO: ^should be just `! isReadonlyMode || isCompile`?
         )
 
-      useViewAppearance.option(viewAppearance)
+      (useViewAppearance.option(viewAppearance), viewAppearanceFromMode.getOrElse(viewAppearanceFromWizardConfig) == WizardQName)
     }
 
     val isReadonlyMode =
@@ -532,6 +541,7 @@ private object FormRunnerConfigProcessor {
       formVersion                      = updatedParams.formVersion,
       majorMode                        = majorMode,
       viewAppearanceOpt                = viewAppearanceOpt,
+      useWizardInNewEdit               = useWizardInNewEdit,
       isPdf                            = isPdf,
       isReadonlyMode                   = isReadonlyMode,
       usePdfTemplate                   = usePdfTemplate,

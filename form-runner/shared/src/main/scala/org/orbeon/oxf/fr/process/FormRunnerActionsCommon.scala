@@ -39,6 +39,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
@@ -53,7 +54,7 @@ import scala.util.{Failure, Success, Try}
 
 trait FormRunnerActionsCommon {
 
-  self: XFormsActions => // for `tryCallback`
+  self: ProcessInterpreter & XFormsActions => // for `tryCallback`
 
   def runningProcessId: Option[String]
   def AllowedFormRunnerActions: Map[String, Action]
@@ -86,6 +87,7 @@ trait FormRunnerActionsCommon {
     "edit-to-new"            -> tryEditToNew,
     "callback"               -> tryCallback,
     "sleep"                  -> trySleep,
+    "control-setvalue"       -> tryControlSetValue,
   )
 
   // Check whether there are pending uploads
@@ -471,6 +473,26 @@ trait FormRunnerActionsCommon {
         (_, computationResult) => computationResult
       )
     }
+
+  // https://github.com/orbeon/orbeon-forms/issues/7509
+  def tryControlSetValue(params: ActionParams): ActionResult =
+    ActionResult.trySync {
+
+      val controlName    = requiredParamByNameUseAvt(params, "control-setvalue", "control-name")
+      val valueExpr      = requiredParamByNameUseAvt(params, "control-setvalue", "value")
+      val sectionNameOpt = paramByNameUseAvt(params, "section-name")
+      val atOpt          = paramByNameUseAvt(params, "at").flatMap(_.trimAllToOpt)
+
+      implicit val xfc: XFormsFunction.Context = FormRunnerActionsCommon.makeTopLevelXFormsFunctionContext(inScopeContainingDocument)
+
+      FormRunnerActionApi.controlSetvalue(
+        controlName      = controlName,
+        valueExpr        = valueExpr,
+        sectionNameOpt   = sectionNameOpt.map(_.trimAllToEmpty),
+        atOpt            = atOpt,
+        namespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+      )
+    }
 }
 
 object FormRunnerActionsCommon {
@@ -483,4 +505,15 @@ object FormRunnerActionsCommon {
 
   def isMessageInHtml(nodeInfo: NodeInfo): Boolean =
     (nodeInfo /@ "html").headOption.exists(_.stringValue == "true")
+
+  def makeTopLevelXFormsFunctionContext(xfcd: XFormsContainingDocument): XFormsFunction.Context = {
+    val model = xfcd.models.find(_.getId == Names.FormModel)
+    XFormsFunction.Context(
+      container         = xfcd,
+      bindingContext    = model.get.getDefaultEvaluationContext,
+      sourceEffectiveId = xfcd.effectiveId,
+      modelOpt          = model,
+      bindNodeOpt       = None
+    )
+  }
 }

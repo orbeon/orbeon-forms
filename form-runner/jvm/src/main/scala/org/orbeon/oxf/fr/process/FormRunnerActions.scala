@@ -60,7 +60,7 @@ trait FormRunnerActions
   extends FormRunnerActionsCommon
      with SimpleProcessCommon {
 
-  self: XFormsActions => // for `tryCallback`
+  self: ProcessInterpreter & XFormsActions => // for `tryCallback`
 
   import FormRunnerRenderedFormat.*
 

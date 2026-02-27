@@ -182,7 +182,7 @@ object FRComponentParamSupport {
           expr               = rewrittenXPathExpr,
           exprVarEffectiveId = Names.FormModel,
           xfcd               = xfcd,
-          exprContextItem    = xfcd.getDefaultModel.getDefaultInstance.rootElement
+          exprContextItem    = xfcd.models.find(_.getId == Names.FormModel).get.getDefaultInstance.rootElement
         )
       }
       .map(_.collect { case v: AtomicValue => v }) // we know this returns only a `StringValue` since it is an AVT

@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <top-level-section>
+                        <grid-1>
+                            <contact-information-first-name/>
+                        </grid-1>
+                        <grid-2>
+                            <grid-2-iteration>
+                                <top-level-repeated-control-1/>
+                                <top-level-repeated-control-2/>
+                            </grid-2-iteration>
+                            <grid-2-iteration>
+                                <top-level-repeated-control-1/>
+                                <top-level-repeated-control-2/>
+                            </grid-2-iteration>
+                            <grid-2-iteration>
+                                <top-level-repeated-control-1/>
+                                <top-level-repeated-control-2/>
+                            </grid-2-iteration>
+                        </grid-2>
+
+                    </top-level-section>
+                    <address-us>
+                        <grid-3 xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library">
+                            <us-address-street-1/>
+                            <us-address-city/>
+
+
+                            <us-address-street-2/>
+                            <us-address-state/>
+                            <us-address-zip/>
+
+
+                            <us-address-urbanization/>
+
+                        </grid-3>
+                    </address-us>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="top-level-section-bind" name="top-level-section" ref="top-level-section">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="contact-information-first-name-bind" ref="contact-information-first-name" name="contact-information-first-name" xxf:whitespace="trim"/>
+                    </xf:bind>
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="grid-2-iteration-bind" ref="grid-2-iteration" name="grid-2-iteration">
+                            <xf:bind id="top-level-repeated-control-1-bind" ref="top-level-repeated-control-1" name="top-level-repeated-control-1" xxf:whitespace="trim"/>
+                            <xf:bind id="top-level-repeated-control-2-bind" ref="top-level-repeated-control-2" name="top-level-repeated-control-2" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="address-us-bind" ref="address-us" name="address-us"/>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7509</form-name>
+                    <title xml:lang="en">Simple processes: add `control-setvalue() action #7509</title>
+                    <description xml:lang="en"/>
+                    <grid-tab-order>default</grid-tab-order>
+                    <library-versions>
+                        <orbeon>2</orbeon>
+                        <app>1</app>
+                    </library-versions>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="4.8.0">[{ "path": "top-level-section/grid-2", "iteration-name": "grid-2-iteration" }]</migration>
+                    <migration version="2019.1.0">
+                        {"migrations":[{"containerPath":[{"value":"top-level-section"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"contact-information-first-name"}],"topLevel":true},{"containerPath":[{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false}]}
+                    </migration>
+                </metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <top-level-repeated-control-1><label>Top-level-repeated-control 1</label>
+                            <hint/>
+                        </top-level-repeated-control-1>
+                        <top-level-repeated-control-2><label>Top-level-repeated-control 2</label>
+                            <hint/>
+                        </top-level-repeated-control-2>
+                        <contact-information-first-name><label>First name</label>
+                            <hint/>
+                        </contact-information-first-name>
+                        <top-level-section>
+                            <label>Top-level section</label>
+                        </top-level-section>
+                        <address-us><label>Address</label>
+                            <help/>
+                        </address-us>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template">
+                <grid-2-iteration>
+                    <top-level-repeated-control-1/>
+                    <top-level-repeated-control-2/>
+                </grid-2-iteration>
+            </xf:instance>
+
+        </xf:model>
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <xbl:binding xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                         xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" id="_-address-us-component" element="component|address-us" data-library-version=""
+                         class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="address-us-model">
+                        <xf:instance id="fr-form-template">
+                            <address-us>
+                                <grid-3>
+                                    <us-address-street-1/>
+                                    <us-address-city/>
+
+
+                                    <us-address-street-2/>
+                                    <us-address-state/>
+                                    <us-address-zip/>
+
+
+                                    <us-address-urbanization/>
+
+                                </grid-3>
+                            </address-us>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                                <xf:bind id="us-address-street-1-bind" ref="us-address-street-1" name="us-address-street-1" xxf:whitespace="trim"/>
+                                <xf:bind id="us-address-street-2-bind" ref="us-address-street-2" name="us-address-street-2" xxf:whitespace="trim"/>
+
+
+                                <xf:bind id="us-address-urbanization-bind" ref="us-address-urbanization" name="us-address-urbanization" xxf:whitespace="trim" relevant="$us-address-state = 'PR'"/>
+                                <xf:bind id="us-address-zip-bind" ref="us-address-zip" name="us-address-zip" xxf:whitespace="trim" required="true()" constraint="matches(., '^[\d]{5}(-[\d]{4})?$')"/>
+                                <xf:bind id="us-address-state-bind" ref="us-address-state" name="us-address-state"/>
+                                <xf:bind id="us-address-city-bind" ref="us-address-city" name="us-address-city" xxf:whitespace="trim" required="true()"/>
+
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources" xxf:readonly="true">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <address-us>
+                                        <label>US address</label>
+
+                                    </address-us>
+                                    <grid-3/>
+                                    <us-address-street-1>
+                                        <label>Street address</label>
+                                        <hint/>
+                                    </us-address-street-1>
+                                    <us-address-street-2>
+                                        <label>Street address line 2</label>
+                                        <hint/>
+                                    </us-address-street-2>
+                                    <us-address-urbanization>
+                                        <label>Urbanization</label>
+                                        <hint/>
+                                    </us-address-urbanization>
+                                    <us-address-zip>
+                                        <label>Zip code</label>
+                                        <hint/>
+                                    </us-address-zip>
+                                    <us-address-state>
+                                        <label>State, territory, or military post</label>
+                                        <hint/>
+                                    </us-address-state>
+                                    <us-address-city>
+                                        <label>City</label>
+                                        <hint/>
+                                    </us-address-city>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                            <metadata>
+                                <email>
+                                    <templates>
+                                        <template name="default">
+                                            <headers/>
+                                            <exclude-from-all-control-values/>
+                                        </template>
+                                    </templates>
+                                    <parameters/>
+                                </email>
+                            </metadata>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:group appearance="xxf:internal" model="address-us-model" id="fr-section-template-view">
+                        <fr:grid id="grid-3-grid" bind="grid-3-bind" tab-order="columns">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input id="us-address-street-1-control" bind="us-address-street-1-bind" autocomplete="address-line1">
+                                    <xf:label ref="$form-resources/us-address-street-1/label"/>
+                                    <xf:hint ref="$form-resources/us-address-street-1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6">
+                                <xf:input id="us-address-city-control" bind="us-address-city-bind" autocomplete="address-line3">
+                                    <xf:label ref="$form-resources/us-address-city/label"/>
+                                    <xf:hint ref="$form-resources/us-address-city/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+
+                            </fr:c>
+
+                            <fr:c x="1" y="2" w="6">
+                                <xf:input id="us-address-street-2-control" bind="us-address-street-2-bind" autocomplete="address-line2">
+                                    <xf:label ref="$form-resources/us-address-street-2/label"/>
+                                    <xf:hint ref="$form-resources/us-address-street-2/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="2" w="4">
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="us-address-state-control" bind="us-address-state-bind">
+                                    <xf:label ref="$form-resources/us-address-state/label"/>
+                                    <xf:hint ref="$form-resources/us-address-state/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </fr:us-state>
+
+
+                            </fr:c>
+                            <fr:c x="11" y="2" w="2" h="1">
+                                <xf:input id="us-address-zip-control" bind="us-address-zip-bind" autocomplete="postal-code">
+                                    <xf:label ref="$form-resources/us-address-zip/label"/>
+                                    <xf:hint ref="$form-resources/us-address-zip/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="1" y="3" w="6">
+
+                            </fr:c>
+                            <fr:c x="7" y="3" w="6">
+                                <xf:input id="us-address-urbanization-control" bind="us-address-urbanization-bind">
+                                    <xf:label ref="$form-resources/us-address-urbanization/label"/>
+                                    <xf:hint ref="$form-resources/us-address-urbanization/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+
+                            </fr:c>
+                        </fr:grid>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="top-level-section-section" bind="top-level-section-bind">
+                    <xf:label ref="$form-resources/top-level-section/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="contact-information-first-name-control" bind="contact-information-first-name-bind">
+                                <xf:label ref="$form-resources/contact-information-first-name/label"/>
+                                <xf:hint ref="$form-resources/contact-information-first-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind" repeat="content" min="1" template="instance('grid-2-template')" apply-defaults="true" fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="top-level-repeated-control-1-control" bind="top-level-repeated-control-1-bind">
+                                <xf:label ref="$form-resources/top-level-repeated-control-1/label"/>
+                                <xf:hint ref="$form-resources/top-level-repeated-control-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="top-level-repeated-control-2-control" bind="top-level-repeated-control-2-bind">
+                                <xf:label ref="$form-resources/top-level-repeated-control-2/label"/>
+                                <xf:hint ref="$form-resources/top-level-repeated-control-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="address-us-section" bind="address-us-bind">
+                    <xf:label ref="$form-resources/address-us/label"/>
+                    <component:address-us xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                          id="address-us-content-control"/>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

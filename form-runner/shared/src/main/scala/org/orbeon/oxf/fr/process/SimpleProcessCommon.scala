@@ -79,17 +79,10 @@ trait SimpleProcessCommon
   // - inside XBL: xxf:run-process('...', 'save then xf:setvalue(ref = "//my-value", value = "bind('bar')")')
   // - inside XBL: xxf:run-process-by-name('...', 'foobar')
   def xpathFunctionContext: FunctionContext =
-    XPath.functionContext.orElse(
-      inScopeContainingDocumentOpt.map { doc =>
-        XFormsFunction.Context(
-          container         = doc,
-          bindingContext    = doc.getDefaultModel.getDefaultEvaluationContext,
-          sourceEffectiveId = doc.effectiveId,
-          modelOpt          = doc.findDefaultModel,
-          bindNodeOpt       = None
-        )
-      }
-    ).orNull // not ideal, but at least one test runs in a scope without an in-scope containing document
+    XPath
+      .functionContext
+      .orElse(inScopeContainingDocumentOpt.map(FormRunnerActionsCommon.makeTopLevelXFormsFunctionContext))
+      .orNull // not ideal, but at least one test runs in a scope without an in-scope containing document
 
   override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))

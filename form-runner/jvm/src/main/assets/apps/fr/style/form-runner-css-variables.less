@@ -82,10 +82,6 @@
   --orbeon-handwritten-signature-read-only-background-color: #eee;
   --orbeon-image-attachment-background-color               : #eee;
 
-  // Scrollbars
-  --orbeon-scrollbar-thumb-color: #c1c1c1;
-  --orbeon-scrollbar-track-color: #fafafa;
-
   // Focus
   --orbeon-focus-border-color   : #3396ff; // Blueish
   --orbeon-focus-highlight-color: rgba(0,123,255,.25);
@@ -144,7 +140,7 @@
   --orbeon-dropdown-menu-selected-background-color: @btnPrimaryBackground;
   --orbeon-dropdown-menu-disabled-color           : #999;
   --orbeon-dropdown-menu-border-color             : rgba(0, 0, 0, 0.15);
-  --orbeon-dropdown-menu-divider                  : #e5e5e5;
+  --orbeon-dropdown-menu-divider-color            : #e5e5e5;
 
   // Sections
   --orbeon-section-title-font-size              : 1.38em;  // 18px
@@ -264,9 +260,15 @@
   --orbeon-required-icon-display-after : inline;
   */
 
-  --orbeon-dialog-title-font-size               : 1.11em; // 2022-12-11: larger font size for dialog title looks better
-  --orbeon-header-footer-font-size              : 1.10em;
-  --orbeon-kbd-hint-font-size                   : 0.82em; // 8pt
+  // Dialogs
+  --orbeon-dialog-background-color      : white;
+  --orbeon-dialog-title-font-size       : 1.11em; // 2022-12-11: larger font size for dialog title looks better
+  --orbeon-dialog-title-color           : black;
+  --orbeon-dialog-title-background-color: #fafafa;
+
+  // Misc
+  --orbeon-header-footer-font-size: 1.10em;
+  --orbeon-kbd-hint-font-size     : 0.82em; // 8pt
 
   // Headings
   --orbeon-h1-font-size: 2.96em; // 38px = 296% * 13px = 275% * 14px
@@ -361,8 +363,6 @@
     --orbeon-handwritten-signature-background-color          : @text-light;
     --orbeon-handwritten-signature-read-only-background-color: @gray-80;
     --orbeon-image-attachment-background-color               : @gray-20;
-    --orbeon-scrollbar-thumb-color                           : @gray-53;
-    --orbeon-scrollbar-track-color                           : @gray-20;
     --orbeon-button-color                                    : @text-light;
     --orbeon-button-background-color                         : @gray-27;
     --orbeon-button-highlight-background-color               : @gray-27;
@@ -409,7 +409,7 @@
     --orbeon-dropdown-menu-selected-background-color         : var(--orbeon-dropdown-menu-hover-background-color);
     --orbeon-dropdown-menu-disabled-color                    : @gray-46;
     --orbeon-dropdown-menu-border-color                      : fade(@gray-27, 75%);
-    --orbeon-dropdown-menu-divider                           : @gray-27;
+    --orbeon-dropdown-menu-divider-color                     : @gray-27;
     --orbeon-section-color                                   : @gray-80;
     --orbeon-section-background-color                        : @gray-20;
     --orbeon-repeater-add-button-color                       : @text-light;
@@ -462,6 +462,9 @@
     --orbeon-landing-card-hover-background-color             : @gray-20;
     --orbeon-landing-card-link-color                         : hsl(@base-blue, 93%, 62%);
     --orbeon-landing-card-link-hover-color                   : var(--orbeon-landing-card-link-color);
+    --orbeon-dialog-background-color                         : @gray-20;
+    --orbeon-dialog-title-color                              : @text-light;
+    --orbeon-dialog-title-background-color                   : @gray-16;
     --orbeon-stripe-color-1                                  : @gray-20;
     --orbeon-stripe-color-2                                  : @base-bg;
   }

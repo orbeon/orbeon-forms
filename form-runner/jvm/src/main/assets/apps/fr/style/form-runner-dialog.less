@@ -1,8 +1,6 @@
 @import (reference) "form-runner-common";
 
 @buttonsAreaHeight: 64px;
-@dialogBackgroundColor: white;
-@dialogTitleBackgroundColor: #fafafa;
 @dialogBorderRadius: 8px;
 
 .yui-panel-container.yui-dialog {
@@ -59,7 +57,7 @@
 
         .xxforms-dialog-head {
             background-image: none; // override YUI default
-            background-color: @dialogTitleBackgroundColor;
+            background-color: var(--orbeon-dialog-title-background-color);
             border-top-left-radius: @dialogBorderRadius;
             border-top-right-radius: @dialogBorderRadius;
             border: none;
@@ -67,7 +65,7 @@
             line-height: 2rem;
             padding: 0 10px;
             font-weight: bold;
-            color: black;
+            color: var(--orbeon-dialog-title-color);
 
             // If the title is too long, don't make a "fat" title but let the text overflow
             white-space: nowrap;
@@ -77,7 +75,7 @@
         }
 
         .xxforms-dialog-body {
-            background-color: @dialogBackgroundColor;
+            background-color: var(--orbeon-dialog-background-color);
             border-bottom-left-radius: @dialogBorderRadius;
             border-bottom-right-radius: @dialogBorderRadius;
             border: none;
@@ -121,7 +119,7 @@
                 border-bottom-left-radius: @dialogBorderRadius;
                 border-bottom-right-radius: @dialogBorderRadius;
                 box-sizing: border-box; // So top margin gets include in height
-                background-color: @dialogBackgroundColor;
+                background-color: var(--orbeon-dialog-background-color);
             }
         }
     }

@@ -62,52 +62,55 @@ trait DynamicDropdownTests {
       ControlSetup(openClosed = Closed, servicePerformsSearch = false, autoSelectUniqueChoice = true,  storeLabel = false, serviceReturnsSingleItem = false, readonly = true,  hasInitialValueInData = true),
     )
 
-    describe("Initial labels") {
-      controlSetups.foreach { controlSetup =>
-        val controlName = controlSetup.controlName
+    it("must find correct initial labels for all control setups") { _ =>
+      withFormReady(app = "tests", form = "databound-select1") { case FormRunnerWindow(_, formRunnerApi) =>
 
-        val mustHaveAfghanistanDataLabel =
-          ! controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && controlSetup.serviceReturnsSingleItem && ! controlSetup.readonly
+        val form = formRunnerApi.getForm(js.undefined)
 
-        val mustHaveSwitzerlandDataLabel =
-          controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && ! controlSetup.serviceReturnsSingleItem && ! controlSetup.storeLabel
+        controlSetups.foreach { controlSetup =>
+          val controlName = controlSetup.controlName
 
-        val labelToFind =
-          if (mustHaveAfghanistanDataLabel)
-            Some("Afghanistan")
-          else if (mustHaveSwitzerlandDataLabel)
-            Some("Switzerland")
-          else
-            None
+          val mustHaveAfghanistanDataLabel =
+            ! controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && controlSetup.serviceReturnsSingleItem && ! controlSetup.readonly
 
-        val labelAttMustHoldValue =
-          labelToFind.isDefined && controlSetup.storeLabel && ! controlSetup.readonly
+          val mustHaveSwitzerlandDataLabel =
+            controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && ! controlSetup.serviceReturnsSingleItem && ! controlSetup.storeLabel
 
-        it(s"for `$controlName`: must find initial label `$labelToFind`") { _ =>
-          withFormReady(app = "tests", form = "databound-select1") { case FormRunnerWindow(_, formRunnerApi) =>
+          val labelToFind =
+            if (mustHaveAfghanistanDataLabel)
+              Some("Afghanistan")
+            else if (mustHaveSwitzerlandDataLabel)
+              Some("Switzerland")
+            else
+              None
 
-            val form = formRunnerApi.getForm(js.undefined)
-            val controls = form.findControlsByName(controlName)
-            assert(controls.nonEmpty)
+          val labelAttMustHoldValue =
+            labelToFind.isDefined && controlSetup.storeLabel && ! controlSetup.readonly
 
-            // Check the initial label value as set into the `data-label` attribute
-            assert {
-              labelToFind match {
-                case Some(label) => controls.head.querySelectorT("[data-label]").dataset("label") == label
-                case None        => controls.head.querySelectorT("[data-label]").dataset("label").isEmpty
-              }
-            }
+          val controls = form.findControlsByName(controlName)
+          assert(controls.nonEmpty, s"Expected controls for `$controlName`")
 
-            // Check the initial label value as set into the `label` attribute on the server, as reflected by the
-            // `*-labelatt` output controls
-            assert {
-              labelToFind match {
-                case Some(label) if labelAttMustHoldValue => form.getControlValue(s"$controlName-labelatt").contains(label)
-                case _                                    => true
-              }
-            }
-          }
+          // Check the initial label value as set into the `data-label` attribute
+          assert(
+            labelToFind match {
+              case Some(label) => controls.head.querySelectorT("[data-label]").dataset("label") == label
+              case None        => controls.head.querySelectorT("[data-label]").dataset("label").isEmpty
+            },
+            s"Unexpected data-label for `$controlName`"
+          )
+
+          // Check the initial label value as set into the `label` attribute on the server, as reflected by the
+          // `*-labelatt` output controls
+          assert(
+            labelToFind match {
+              case Some(label) if labelAttMustHoldValue => form.getControlValue(s"$controlName-labelatt").contains(label)
+              case _                                    => true
+            },
+            s"Unexpected labelatt value for `$controlName`"
+          )
         }
+
+        succeed
       }
     }
   }

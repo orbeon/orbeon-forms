@@ -197,9 +197,11 @@ object DbOperations {
 
       val rs = use(stmt.executeQuery())
       rs.next().flatOption {
+        // Read content length before file content to avoid "The stream is closed" error with SQL Server
+        val contentLength = rs.getLong("content_length")
         Option(rs.getBinaryStream("file_content")).map { stream =>
           use(stream)
-          block(stream, rs.getLong("content_length"))
+          block(stream, contentLength)
         }
       }
     }.get
@@ -213,7 +215,7 @@ object DbOperations {
       case dataRowKey: DataRowKey =>
 
         val sql =
-          s"""SELECT file_content, $lengthExpr
+          s"""SELECT $lengthExpr, file_content
              |  FROM orbeon_form_data_attach
              | WHERE app          = ?
              |   AND form         = ?
@@ -236,7 +238,7 @@ object DbOperations {
       case definitionRowKey: DefinitionRowKey =>
 
         val sql =
-          s"""SELECT file_content, $lengthExpr
+          s"""SELECT $lengthExpr, file_content
              |  FROM orbeon_form_definition_attach
              | WHERE app          = ?
              |   AND form         = ?
